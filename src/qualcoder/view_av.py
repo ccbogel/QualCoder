@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-https://qualcoder-org.github.io/
+https://qualcoder.org/
 """
 
 import sqlite3
@@ -1537,8 +1537,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_expand_collapse = None
+        action_cat_show_coded_files = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
+            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
@@ -1546,7 +1548,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_move_code = modify_menu.addAction(_("Move code to"))
-            action_show_coded_media = menu.addAction(_("Show coded text and media"))
+            action_show_coded_media = menu.addAction(_("Show coded files"))
         action_find_code = menu.addAction(_("Find code"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
@@ -1615,11 +1617,31 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.delete_category_or_code(selected)
         if action == action_assign_segment:
             self.assign_segment_to_code(selected)
+        if action == action_cat_show_coded_files:
+            branch_codes = self.recursive_get_branch_codes(selected, [])
+            self.coded_media_dialog(branch_codes, selected.text(0))
+            return
         if selected is not None and action == action_show_coded_media:
             to_find = int(selected.text(1)[4:])
             found = next((code for code in self.codes if code['cid'] == to_find), None)
             if found:
                 self.coded_media_dialog(found)
+
+    def recursive_get_branch_codes(self, item, branch_codes):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cid":
+                cid = int(item.child(i).text(1)[4:])
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        branch_codes.append(code_)
+                        break
+            if item.child(i).text(1)[0:3] == "cat":
+                self.recursive_get_branch_codes(item.child(i), branch_codes)
+        return branch_codes
 
     def recursive_expand_collapse_branch(self, item, expand_toggle):
         """ Set all children of this item to be expanded or collapsed.
@@ -1630,17 +1652,18 @@ class DialogCodeAV(QtWidgets.QDialog):
             item.setExpanded(expand_toggle)
             self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
-    def coded_media_dialog(self, code_dict):
+    def coded_media_dialog(self, code_dict, category_name:str = ""):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in 000000000000 can be used.
         Called from tree_menu.
         Re-load the codings may have changed.
-        param:
+        Args:
             code_dict : code dictionary
+            category_name : if a category selected, the category name
         """
 
-        DialogCodeInAllFiles(self.app, code_dict)
+        DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.update_dialog_codes_and_categories(["code_name", "code_cat", "code_text", "code_av", "code_image"])
 
     def move_code(self, selected):
@@ -2059,6 +2082,20 @@ class DialogCodeAV(QtWidgets.QDialog):
                 # event position is QPointF, itemAt requires toPoint
                 parent = self.ui.treeWidget.itemAt(event.position().toPoint())
                 self.item_moved_update_data(item, parent)
+                return True
+            # Scroll the tree when dragged item it as top or bottom edges
+            if event.type() == QtCore.QEvent.Type.DragMove:
+                vsb = self.ui.treeWidget.verticalScrollBar()
+                item = self.ui.treeWidget.currentItem()
+                top = self.ui.treeWidget.visualRect(
+                    self.ui.treeWidget.indexAt(self.ui.treeWidget.rect().topLeft())).bottom()
+                bottom = self.ui.treeWidget.viewport().height()
+                y = event.position().toPoint().y()
+                if y < top + 8:  # Margin 0f 8
+                    vsb.setValue(vsb.value() - 1)
+                if y > bottom - 8:  # Margin of 8
+                    vsb.setValue(vsb.value() + 1)
+                return True
         if event.type() != 7 or self.media is None:
             return False
 

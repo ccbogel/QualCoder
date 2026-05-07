@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-https://qualcoder-org.github.io/
+https://qualcoder.org/
 """
 
 import sqlite3
@@ -577,7 +577,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ Menu to select all codes or other selection parameters. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
         action_all = menu.addAction(_("Select all codes"))
         action_unselect = menu.addAction(_("Remove selections"))
         action_like = menu.addAction(_("Select codes like"))
@@ -1496,6 +1496,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.results = tmp
         # Organise results
         self.sort_search_results()
+
+        if self.ui.checkBox_overlaps.isChecked():
+            self.results = self.filter_for_code_overlaps()
+
         self.fill_text_edit_with_search_results()
         # Clean up for next search. Except attributes list, keep attributes selection active.
         self.attribute_file_ids = []
@@ -1762,6 +1766,75 @@ class DialogReportCodes(QtWidgets.QDialog):
                                     'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
                                     'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
             self.results.append(tmp)
+
+    def filter_for_code_overlaps(self):
+        """ Filter out non-overlapping codes. """
+
+        res_av = []
+        res_text = []
+        res_img = []
+        # 1. Split results into text, av, image
+        for r in self.results:
+            if r['result_type'] == 'text':
+                r['overlaps'] = ""
+                res_text.append(r)
+            if r['result_type'] == 'av':
+                r['overlaps'] = ""
+                res_av.append(r)
+            if r['result_type'] == 'image':
+                r['overlaps'] = ""
+                res_img.append(r)
+
+        # 2. Compare each set of coded results
+        for t in res_text:
+            for t2 in res_text:
+                if t == t2:
+                    continue
+                # Inclusion t inside t2
+                if t['fid'] == t2['fid'] and t['coder'] == t2['coder'] and t['pos0'] >= t2['pos0'] and t['pos1'] <= t2['pos1']:
+                    #print(f"\nINCLUSION: {t2['codename']} contains {t['codename']}")
+                    t2['overlaps'] += f"\nINCLUSION: {t2['codename']} [{t2['pos0']}-{t2['pos1']}] contains: {t['codename']} [{t['pos0']}-{t['pos1']}]"
+                    t['overlaps'] += f"\nINCLUSION: {t['codename']} [{t['pos0']}-{t['pos1']}] within: {t2['codename']} [{t2['pos0']}-{t2['pos1']}]"
+                    #print(t)
+                    continue
+                # left side t is below t2. t overlaps on the right side,
+                if t['fid'] == t2['fid'] and t['coder'] == t2['coder'] and t['pos0'] < t2['pos0'] and t['pos1'] >= t2['pos0']:
+                    #print(f"\nOverlap R:{t2['codename']} - {t['codename']}")
+                    t['overlaps'] += f"\nOverlaps: {t['codename']} [{t['pos0']}-{t['pos1']}] : {t2['codename']} [{t2['pos0']}-{t2['pos1']}]"
+                    t2['overlaps'] += f"\nOverlaps: {t2['codename']} [{t2['pos0']}-{t2['pos1']}] : {t['codename']} [{t['pos0']}-{t['pos1']}]"
+                    continue
+        for a in res_av:
+            for a2 in res_av:
+                if a == a2:
+                    continue
+                # Inclusion a inside a2
+                if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] >= a2['pos0'] and a['pos1'] <= a2['pos1']:
+                    # print(f"\nINCLUSION: {a2['codename']} contains {a['codename']}")
+                    a2['overlaps'] += f"\nINCLUSION: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] contains: {a['codename']} [{a['pos0']}-{a['pos1']}]"
+                    a['overlaps'] += f"\nINCLUSION: {a['codename']} [{a['pos0']}-{a['pos1']}] within: {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
+                    # print(a)
+                    continue
+                # left side a is below a2. a overlaps on the right side,
+                if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] < a2['pos0'] and a['pos1'] >= a2['pos0']:
+                    # print(f"\nOverlap R:{t2['codename']} - {t['codename']}")
+                    a['overlaps'] += f"\nOverlaps: {a['codename']} [{a['pos0']}-{a['pos1']}] : {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
+                    a2['overlaps'] += f"\nOverlaps: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] : {a['codename']} [{a['pos0']}-{a['pos1']}]"
+                    continue
+        '''for i in img:
+            pass
+        '''
+        overlaps = []
+        for item in res_text:
+            if item['overlaps'] != "":
+                overlaps.append(item)
+        for item in res_av:
+            if item['overlaps'] != "":
+                overlaps.append(item)
+        for item in res_img:
+            if item['overlaps'] != "":
+                overlaps.append(item)
+
+        return overlaps
 
     def sort_search_results(self):
         """ Sort results by alphabet or by code count, ascending or descending. """
@@ -2128,9 +2201,15 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         for i, row in enumerate(self.results):
             self.heading(row)
+            # Add code memo
             if row['coded_memo'] != "" and memo_choice_index in (4, 5):  # Only memos, Only coded memos
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['coded_memo'] + "\n")
+
+            # Add Overlaps notice, if present
+            if 'overlaps' in row.keys():
+                self.ui.textEdit.insertPlainText(row['overlaps'] + "\n")
+
             if row['result_type'] == 'text' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
@@ -2396,7 +2475,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         pos = cursor_context_pos.position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
 
         # Check that there is a link to view at this location before showing menu option
         action_view = None
@@ -2821,7 +2900,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 sub_code = {'codename': item.text(0), 'cid': int(item.text(1)[4:])}
                 # Maybe None of a top level code - as this will have no parent
                 if item.parent() is not None:
-                    # Top Can be shortenend e.g. longtext .. longtext
+                    # Top Can be shortened e.g. longtext .. longtext
                     sub_code['top'] = item.parent().text(0)
                     sub_codes.append(sub_code)
                     add_cat = True
@@ -3049,7 +3128,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         pos = cursor_context_pos.position()
         selected_text = te.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
 
         # Check that there is a link to view at this location before showing menu option
         action_view = None

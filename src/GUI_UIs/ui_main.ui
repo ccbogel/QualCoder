@@ -234,7 +234,6 @@
     <addaction name="actionManage_journals"/>
     <addaction name="actionManage_attributes"/>
     <addaction name="actionManage_references"/>
-    <addaction name="actionImport_survey_2"/>
     <addaction name="actionManage_bad_links_to_files"/>
     <addaction name="actionImport_twitter_data"/>
    </widget>
@@ -247,27 +246,20 @@
     <addaction name="actionCode_audio_video"/>
     <addaction name="actionCode_pdf"/>
     <addaction name="actionAI_assisted_coding"/>
-    <addaction name="actionColour_scheme"/>
     <addaction name="actionCode_organiser"/>
+    <addaction name="actionColour_scheme"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
      <string>Reports</string>
     </property>
-    <addaction name="actionCoding_reports"/>
     <addaction name="actionCoding_comparison"/>
     <addaction name="actionCoding_comparison_by_file"/>
     <addaction name="actionCode_comparison_table"/>
     <addaction name="actionCode_frequencies"/>
     <addaction name="actionFile_summary"/>
     <addaction name="actionCode_summary"/>
-    <addaction name="actionCode_relations"/>
-    <addaction name="actionCode_co_occurrence"/>
-    <addaction name="actionCode_text_exact_matches"/>
-    <addaction name="actionText_segments_by_codes"/>
     <addaction name="actionCharts"/>
-    <addaction name="actionView_Graph"/>
-    <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
     <addaction name="separator"/>
    </widget>
@@ -294,9 +286,21 @@
     <addaction name="actionAI_Chat_Sidebar"/>
     <addaction name="actionAI_Search_and_Coding"/>
    </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <addaction name="actionCoding_reports"/>
+    <addaction name="actionCode_co_occurrence"/>
+    <addaction name="actionCode_relations"/>
+    <addaction name="actionCode_text_exact_matches"/>
+    <addaction name="actionText_segments_by_codes"/>
+    <addaction name="actionView_Graph"/>
+   </widget>
    <addaction name="menuProject"/>
    <addaction name="menuFiles_and_Cases"/>
    <addaction name="menuCoding"/>
+   <addaction name="menuAnalysis"/>
    <addaction name="menuReports"/>
    <addaction name="menuAI"/>
    <addaction name="menuHelp"/>
@@ -334,12 +338,12 @@
   </action>
   <action name="actionManage_files">
    <property name="text">
-    <string>Manage files</string>
+    <string>Files</string>
    </property>
   </action>
   <action name="actionManage_cases">
    <property name="text">
-    <string>Manage cases</string>
+    <string>Cases</string>
    </property>
   </action>
   <action name="actionFile_categories">
@@ -349,7 +353,7 @@
   </action>
   <action name="actionManage_journals">
    <property name="text">
-    <string>Manage journals</string>
+    <string>Journals</string>
    </property>
   </action>
   <action name="actionCodes">
@@ -384,7 +388,7 @@
   </action>
   <action name="actionCoding_reports">
    <property name="text">
-    <string>Coding reports</string>
+    <string>Code retrieval</string>
    </property>
   </action>
   <action name="actionCoding_summary">
@@ -414,7 +418,7 @@
   </action>
   <action name="actionManage_attributes">
    <property name="text">
-    <string>Manage attributes</string>
+    <string>Attributes</string>
    </property>
   </action>
   <action name="actionFrequency_table">
@@ -515,7 +519,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Manage bad links to files</string>
+    <string>Bad links to files</string>
    </property>
   </action>
   <action name="actionSpecial_functions">
@@ -560,7 +564,7 @@
   </action>
   <action name="actionManage_references">
    <property name="text">
-    <string>Manage references</string>
+    <string>References</string>
    </property>
   </action>
   <action name="actionColour_scheme">
@@ -580,7 +584,7 @@
   </action>
   <action name="actionMenu_Key_Shortcuts">
    <property name="text">
-    <string>Menu Key Shortcuts</string>
+    <string>Key Shortcuts</string>
    </property>
   </action>
   <action name="actionImport_twitter_data">

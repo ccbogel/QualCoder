@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-https://qualcoder-org.github.io/
+https://qualcoder.org/
 """
 
 from PyQt6 import QtWidgets, QtCore
@@ -74,30 +74,30 @@ class DialogInformation(QtWidgets.QDialog):
         super().accept()
 
 
-about = _('<h1 class="western">About QualCoder</h1>\
+about = f'<h1 class="western">{_("About")} QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Optional: Install VLC for audio and video coding.<br /> \
-Optional: Install ffmpeg for waveform images.</p>\
+<p>{_("Optional: Install VLC for audio and video coding.")}<br /> \
+{_("Optional: Install ffmpeg for waveform images.")}</p>\
 <p>Tested on: Windows 11.</p>\
 <p></p>\
-<h2 class="western">Acknowledgements</h2>\
-<p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.<br /> \
-Mike MacCana for the source code for the docx module.<br /> \
-Julius Reich for creating the QualCoder logo.<br /> \
-Kai Dröge for developing and testing the code to incorporate artificial intelligence models for AI, and much more.<br /> \
-Justin Missaghieh-Poncet for French translations, some code development and for setting up the new manual.<br />\
-<a href="https://qualcoder-org.github.io" target="_blank">https://qualcoder-org.github.io</a><br /> \
-Lorenzo Salomón for Spanish translations and for some code development.<br /> \
+<h2 class="western">{_("Acknowledgements")}</h2>\
+<p>Ronggui Huang, Zhang Gehao - {_("Created RQDA - inspiration for QualCoder.")}<br /> \
+Mike MacCana -  {_("Source code for the docx module.")}<br /> \
+Julius Reich - {_("Created the QualCoder logo.")}<br /> \
+Kai Dröge -  {_("Programming, artificial intelligence and much more.")}<br /> \
+Justin Missaghieh-Poncet - {_("French translations, programming, setting up the new website and more.")}<br />\
+<a href="https://qualcoder.org" target="_blank">https://qualcoder.org</a><br /> \
+Lorenzo Salomón - {_("Programming and Spanish translations.")}<br /> \
 Jofen Kihlstrom for past Swedish translations.<br /> \
-To the many members on Github for supporting this project.</p>\
+{_("To the many members on Github for supporting this project.")}</p>\
 <h2>Citation</h2>\
 <p>Curtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) QualCoder Version [Computer software]. \
 Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/QualCoderTag</p>\
 <h2 class="western">Other details</h2> \
 <p>The qda data folder contains folders for imported documents, \
-images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.</p>\
-<p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
+images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.<br /> \
+QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>Created by Colin Curtain BPharm GradDipComp PhD, programmer, Lecturer University of Tasmania.</p>\
 <h2 class="western">Licenses</h2>\
 <h3>LGPL-3.0 License</h3>\
@@ -167,138 +167,146 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT<br />\
 HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,<br />\
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
-OTHER DEALINGS IN THE SOFTWARE.')
+OTHER DEALINGS IN THE SOFTWARE.'
 
-menu_shortcuts = _('<h1>Menu key shortcuts</h1>\n\
-<table><tr><td><b>Menu shortcuts</b></td><td><b>Project menu shortcuts</b></td>\n\
-<td><b>Files and Cases menu shortcuts</b></td></tr>\n\
-<tr><td>Alt 1 Open Project menu</td><td>Ctrl N New project (macOS Cmd N)</td><td>\n\
-Alt F Manage files (macOS Option F)</td></tr>\n\
-<tr><td>Alt 2 Open Files and Cases menu</td><td>Ctrl O Open project</td><td>Alt C Manage cases</td></tr>\n\
-<tr><td>Alt 3 Open Coding menu</td><td>Alt X Close project</td><td>Alt J Manage journals</td></tr>\n\
-<tr><td>Alt 4 Open Reports menu</td><td>Ctrl M Project memo</td><td>Alt A Manage attributes</td></tr>\n\
-<tr><td>Alt 5 Open Help menu</td><td>Alt S Settings</td><td>Alt R Manage references</td></tr>\n\
-<tr><td><br/></td><td>Ctrl Q Exit (macOS Cmd Q)</td><td>Ctrl I Import survey</td></tr>\n\
+menu_shortcuts = f'<h1>{_("Menu key shortcuts")}</h1>\n\
+<table><tr><td><b>{_("Menu shortcuts")}</b></td><td><b>{_("Project menu shortcuts")}</b></td>\n\
+<td><b>{_("Files and Cases menu shortcuts")}</b></td></tr>\n\
+<tr><td>Alt 1 {_("Open Project menu")}</td>\n\
+<td>Ctrl N (macOS Cmd N) {_("New project")}</td><td>\n\
+Alt F (macOS Option F) {_("Manage files")}</td></tr>\n\
+<tr><td>Alt 2 {_("Open Files and Cases menu")}</td><td>Ctrl O {_("Open project")}</td><td>Alt C {_("Manage cases")}</td></tr>\n\
+<tr><td>Alt 3 {_("Open Coding menu")}</td><td>Alt X {_("Close project")}</td><td>Alt J {_("Manage journals")}</td></tr>\n\
+<tr><td>Alt 4 {_("Open Reports menu")}</td><td>Ctrl M {_("Project memo")}</td><td>Alt A {_("Manage attributes")}</td></tr>\n\
+<tr><td>Alt 5 {_("Open Help menu")}</td><td>Alt S {_("Settings")}</td><td>Alt R {_("Manage references")}</td></tr>\n\
+<tr><td><br/></td><td>Ctrl Q (macOS Cmd Q) {_("Exit")}</td><td></td></tr>\n\
 </table><br/><table>\n\
-<tr><td><b>Coding menu shortcuts</b></td><td><b>Reports menu shortcuts</b></td><td><b>Help menu shortcuts</b></td></tr>\n\
-<tr><td>Alt T Code text</td><td>Alt K Coding reports</td><td>Alt H Contents - in web browser</td></tr>\n\
-<tr><td>Alt I Code image</td><td>Alt L Coding comparison</td><td>Alt Y About</td></tr>\n\
-<tr><td>Alt V Code audio/video</td><td>Alt M Coding comparison by file</td><td>Alt Z Special functions</td></tr>\n\
-<tr><td>Alt E Colour scheme</td><td>Alt N Code frequencies</td><td></td></tr>\n\
-<tr><td></td><td>Alt O File summary</td><td></td></tr>\n\
-<tr><td></td><td>Alt P Code summary</td><td></td></tr>\n\
-<tr><td></td><td>Alt Q Code relations</td><td></td></tr>\n\
-<tr><td></td><td>Alt G Open Graph</td><td></td></tr>\n\
-<tr><td></td><td>Alt U Charts</td><td></td></tr>\n\
-<tr><td></td><td>Alt D Database queries</td><td></td></tr></table>')
+<tr><td><b>{_("Coding menu shortcuts")}</b></td><td><b>{_("Reports menu shortcuts")}</b></td><td><b>{_("Help menu shortcuts")}</b></td></tr>\n\
+<tr><td>Alt T {_("Code text")}</td><td>Alt K {_("Code retrieval")}</td><td>Alt H {_("Help contents")}</td></tr>\n\
+<tr><td>Alt I {_("Code image")}</td><td>Alt L {_("Code comparison")}</td><td>Alt Y {_("About")}</td></tr>\n\
+<tr><td>Alt V {_("Code audio/video")}</td><td>Alt M {_("Code comparison by file")}</td><td>Alt Z {_("Special functions")}</td></tr>\n\
+<tr><td>Alt E {_("Colour scheme")}</td><td>Alt N {_("Code frequencies")}</td><td></td></tr>\n\
+<tr><td></td><td>Alt O {_("File summary")}</td><td></td></tr>\n\
+<tr><td></td><td>Alt P {_("Code summary")}</td><td></td></tr>\n\
+<tr><td></td><td>Alt Q {_("Code relations")}</td><td></td></tr>\n\
+<tr><td></td><td>Alt G {_("Open Graph")}</td><td></td></tr>\n\
+<tr><td></td><td>Alt U {_("Charts")}</td><td></td></tr>\n\
+<tr><td></td><td>Alt D {_("Database queries")}</td><td></td></tr></table>'
 
-manage_section_shortcuts = _('<h1>Manage menu section key shortcuts</h1><table>\n\
-<tr><td><b>Key&nbsp;&nbsp;&nbsp;</b></td><td><b>Manage files</b></td><td><b>Cases</b></td>\n\
-<td><b>Journals</b></td><td><b>References</b></td></tr>\n\
-<tr><td>Ctrl 0</td><td>Help</td><td>Help</td><td>Help</td><td></td></tr>\n\
-<tr><td>Ctrl 1</td><td>View file</td><td>Create case</td><td>Create journal</td><td></td></tr>\n\
-<tr><td>Ctrl 2</td><td>Import file</td><td>Import cases</td><td>Export</td><td>Unlink file</td></tr>\n\
-<tr><td>Ctrl 3</td><td>Link to file</td><td>Case file manager</td><td>Export all</td><td>Edit reference</td></tr>\n\
-<tr><td>Ctrl 4</td><td>Create text file</td><td>Add attribute</td><td>Delete journal</td><td>Import references</td></tr>\n\
-<tr><td>Ctrl 5</td><td>Import linked file</td><td>Export attributes</td><td></td><td>Delete reference<</td></tr>\n\
-<tr><td>Ctrl 6</td><td>Export to linked file</td><td>Delete case</td><td></td><td></td></tr>\n\
-<tr><td>Ctrl 7</td><td>Add attribute</td><td></td><td></td><td></td></tr>\n\
-<tr><td>Ctrl 8</td><td>Export attributes</td><td></td><td></td><td></td></tr>\n\
-<tr><td>Ctrl 9</td><td>Export file</td><td></td><td></td><td></td></tr>\n\
-<tr><td></td><td>Ctrl A Show all rows</td><td>Ctrl A Show all rows</td><td></td><td>L Link selected</td></tr>\n\
-<tr><td></td><td></td><td></td><td></td><td>U Unlink file</td></tr>\n\
-</table>')
+manage_section_shortcuts = f'<h1>{_("Manage menu key shortcuts")}</h1><table>\n\
+<tr><td><b>Key&nbsp;&nbsp;&nbsp;</b></td><td><b>{_("Files")}</b></td><td><b>{_("Cases")}</b></td>\n\
+<td><b>{_("Journals")}</b></td><td><b>{_("References")}</b></td></tr>\n\
+<tr><td>Ctrl 0</td><td>{_("Help")}</td><td>{_("Help")}</td><td>{_("Help")}</td><td></td></tr>\n\
+<tr><td>Ctrl 1</td><td>{_("View file")}</td><td>{_("Create case")}</td><td>{_("Create journal")}</td><td></td></tr>\n\
+<tr><td>Ctrl 2</td><td>{_("Import file")}</td><td>{_("Import cases")}</td><td>{_("Export")}</td><td>{_("Unlink file")}</td></tr>\n\
+<tr><td>Ctrl 3</td><td>{_("Link to file")}</td><td>{_("Case file manager")}</td><td>{_("Export all")}</td><td>{_("Edit reference")}</td></tr>\n\
+<tr><td>Ctrl 4</td><td>{_("Create text file")}</td><td>{_("Add attribute")}</td><td>{_("Delete journal")}</td><td>{_("Import references")}</td></tr>\n\
+<tr><td>Ctrl 5</td><td>{_("Import linked file")}</td><td>{_("Export attributes")}</td><td></td><td>{_("Delete reference")}</td></tr>\n\
+<tr><td>Ctrl 6</td><td>{_("Export to linked file")}</td><td>{_("Delete case")}</td><td></td><td></td></tr>\n\
+<tr><td>Ctrl 7</td><td>{_("Add attribute")}</td><td></td><td></td><td></td></tr>\n\
+<tr><td>Ctrl 8</td><td>{_("Export attributes")}</td><td></td><td></td><td></td></tr>\n\
+<tr><td>Ctrl 9</td><td>{_("Export file")}</td><td></td><td></td><td></td></tr>\n\
+<tr><td>Ctrl A</td><td>{_("Show all rows")}</td><td>{_("Show all rows")}</td><td></td><td>L {_("Link selected")}</td></tr>\n\
+<tr><td></td><td></td><td></td><td></td><td>U {_("Unlink file")}</td></tr>\n\
+</table>'
 
-view_av_shortcuts = _('<br /><h2>Manage files - view A/V shortcuts</h2>\n\
-Alt minus Rewind 30 seconds.<br />Ctrl R Rewind 5 seconds (macOS Cmd R)<br />Alt plus Forward 30 seconds<br />\n\
-Ctrl S OR Ctrl P Start/pause. On start rewind slightly (macOS Cmd S Cmd P)<br />\n\
-Ctrl T Insert timestamp in format [hh.mm.ss]<br />\n\
-Ctrl N Enter a new speakers name into shortcuts (macOS use Button)<br />\n\
-Ctrl D Delete speaker names from shortcuts<br />\n\
-Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
-Ctrl Shift &gt; Increase play rate (macOS Cmd Shift &gt;)<br />\n\
-Ctrl Shift &lt; Decrease play rate (macOS Cmd Shift &lt;)<br />\n\
-F2 When tree item selected - Rename code or category<br /><br />')
+view_av_shortcuts = f'<br /><h2>{_("Manage files - view A/V shortcuts")}</h2>\n\
+Alt - {_("Rewind 30 seconds.")}<br />\n\
+Ctrl R (macOS Cmd R) {_("Rewind 5 seconds")}<br />\n\
+Alt + {_("Forward 30 seconds")}<br />\n\
+Ctrl S OR Ctrl P (macOS Cmd S Cmd P) {_("Start / pause.On start rewind slightly")}<br />\n\
+Ctrl T {_("Insert timestamp in format")}[hh.mm.ss]<br />\n\
+Ctrl N (macOS use Button) {_("Enter a new speakers name into shortcuts")}<br />\n\
+Ctrl D {_("Delete speaker names from shortcuts")}<br />\n\
+Ctrl 1 .. 8 {_("Insert speaker in format[speaker name]")}<br />\n\
+Ctrl Shift &gt; (macOS Cmd Shift &gt;) {_("Increase play rate")}<br />\n\
+Ctrl Shift &lt; (macOS Cmd Shift &lt;) {_("Decrease play rate")}<br />\n\
+F2 {_("When tree item selected - Rename code or category")}<br /><br />'
 
 menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
-coding_text_shortcuts = _('<h2>Code text key shortcuts</h2>\
-Ctrl 1 Next file<br />\
-Ctrl 2 File with latest coding<br />\
-Ctrl 3 Go to bookmark<br />\
-Ctrl 4 Open file memo<br />\
-Ctrl 5 Filter files by attributes<br />\
-Ctrl 6 Show selected code previous<br />\
-Ctrl 7 Show selected code next<br />\
-Ctrl 8 Show all codes in text (if selected code previous or next has been used)<br />\
-Ctrl 9 Show codes marked important<br />\
-Ctrl 0 Help - opens in browser<br />\
-Ctrl F Jump to search box<br />\
-Ctrl Z The last code that was unmarked, restore that coding<br />\
-Ctrl E Enter and Exit Edit mode<br />\
-A Annotate - Current text selection<br />\
-Q Quick Mark with code - for current selection<br />\
-B Create bookmark - at clicked position<br />\
-H Hide / Unhide top groupbox<br />\
-I Tag code at clicked position as important<br />\
-L Show codes like (when text coding area is in focus)<br />\
-M Memo code - at clicked position<br />\
-N New code - for selected text<br />\
-O Shortcut to cycle through overlapping codes - at clicked position<br />\
-S Search text - may include current selection<br />\
-R Opens a context menu for recently used codes for marking text<br />\
-U Unmark at clicked position in the text<br />\
-V assign in vivo code to selected text<br />\
-Alt + Left arrow  Shrink coding to the left <br />\
-Alt + Right arrow Shrink coding to the right<br />\
-Shift + Left arrow Extend coding to the left<br />\
-Shift + Right arrow Extend coding to the right<br />\
-! Exclamation mark key - describes clicked text character position<br />\
-$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)<br />\
-F2 When tree item selected - Rename code or category')
+coding_text_shortcuts = f'<h2>{_("Code text key shortcuts")}</h2>\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Go to bookmark")}<br />\
+Ctrl 4 {_("Open file memo")}<br />\
+Ctrl 5 {_("Filter files by attributes")}<br />\
+Ctrl 6 {_("Show selected code previous")}<br />\
+Ctrl 7 {_("Show selected code next")}<br />\
+Ctrl 8 {_("Show all codes in text ( if selected code previous or next has been used)")}<br />\
+Ctrl 9 {_("Show codes marked important")}<br />\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+Ctrl F {_("Jump to search box")}<br />\
+Ctrl Z {_("The last code that was unmarked, restore that coding")}<br />\
+Ctrl E {_("Enter and Exit Edit mode")}<br />\
+A {_("Annotate - Current text selection")}<br />\
+Q {_("Quick Mark with code - for current selection")}<br />\
+B {_("Create bookmark - at clicked position")}<br />\
+H {_("Hide / Unhide top groupbox")}<br />\
+I {_("Tag code at clicked position as important")}<br />\
+L {_("Show codes like (when text coding area is in focus)")}<br />\
+M {_("Memo code - at clicked position")}<br />\
+N {_("New code - for selected text")}<br />\
+O {_("Shortcut to cycle through overlapping codes - at clicked position")}<br />\
+S {_("Search text - may include current selection")}<br />\
+R {_("Opens a context menu for recently used codes for marking text")}<br />\
+Ctrl R {_("Reverse text direction: Left to Right | Right to Left")}<br />\
+U {_("Unmark At clicked position in the text")}<br />\
+V {_("assign in vivo code to selected text")}<br />\
+{_("Alt Left arrow.Shrink coding to the left")}<br />\
+{_("Alt Right arrow.Shrink coding to the right")}<br />\
+{_("Shift Left arrow.Extend coding to the left")}<br />\
+{_("Shift Right arrow.Extend coding to the right")}<br />\
+! {_("Describes clicked text character position")}<br />\
+$ {_("Shift all coding positions after a clicked position by X characters (negative numbers shift left)")}<br />\
+F2 {_("When tree item selected - Rename code or category")}'
 
-coding_image_shortcuts = _('<h2>Code image key shortcuts</h2>\
-Ctrl 1 Next file<br />\
-Ctrl 2 File with latest coding<br />\
-Ctrl 3 Open file memo<br />\
-Ctrl 4 Filter files by attributes<br />\
-Ctrl 5 Show codes marked important<br />\
-Ctrl 0 Help - opens in browser<br />\
-L Show codes like (when coding area is in focus)<br />\
-Ctrl Z The last code is unmarked, undo and restore that coding<br />\
-Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)<br />\
-Minus or Q Zoom out<br />\
-Plus or W Zoom in<br />\
-Right-click on image for menu to rotate image<br />\
-F2 When tree item selected - Rename code or category')
+coding_image_shortcuts = f'<h2>{_("Code image key shortcuts")}</h2>\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Open file memo")}<br />\
+Ctrl 4 {_("Filter files by attributes")}<br />\
+Ctrl 5 {_("Show codes marked important")}<br />\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+L {_("Show codes like (when coding area is in focus)")}<br />\
+Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
+Ctrl G {_("Create a grayed-out image with coloured coded highlights (Wait a few seconds)")}<br />\
+Minus or Q {_("Zoom out")}<br />\
+Plus or W {_("Zoom in")}<br />\
+{_("Right - click on image for menu to rotate image")}<br />\
+F2 {_("When tree item selected - Rename code or category")}'
 
-coding_av_shortcuts = _('<h2>Code audio/video key shortcuts</h2>\
-Ctrl 1 Next file<br />\
-Ctrl 2 File with latest coding<br />\
-Ctrl 3 Open file memo<br />\
-Ctrl 4 Filter files by attributes<br />\
-Ctrl 9 Show codes marked important<br />\
-Ctrl 0 Help - opens in browser<br />\
-A Annotate - for current selection<br />\
-G Assign segment to currently selected code, and open memo for segment.<br />\
-I Tag important<br />\
-L Show codes like (when text coding area is in focus)<br />\
-M Memo code - at clicked position<br />\
-O Cycle through overlapping codes at clicked position<br />\
-Q Quick Mark with code - for current selection<br />\
-S Search text - may include current selection<br />\
-R Opens a context menu for recently used codes for marking text<br />\
-! Shows cursor position in text area<br />\
-5 Go forward 5 seconds.<br />\
-Ctrl Z Restore last unmarked code(s) - text code(s) or segment code<br />\
-Alt minus Rewind 30 seconds<br />\
-Ctrl R Rewind 5 seconds<br />\
-Alt + plus Forward 30 seconds<br />\
-Ctrl P Play/pause. On start rewind 1 second<br />\
-Ctrl D Play/pause. On start rewind 1 second<br />\
-Ctrl S Start and stop av segment creation<br />\
-Ctrl Shift > Increase play rate<br />\
-Ctrl Shift &lt; Decrease play rate<br />\n\
-F2 When tree item selected - Rename code or category')
+coding_av_shortcuts = f'<h2>{_("Code audio/video key shortcuts")}</h2>\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Open file memo")}<br />\
+Ctrl 4 {_("Filter files by attributes")}<br />\
+Ctrl 9 {_("Show codes marked important")}<br />\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+A {_("Annotate - for current selection")}<br />\
+G {_("Assign segment to currently selected code, and open memo for segment.")}<br />\
+I {_("Tag important")}<br />\
+L {_("Show codes like (when text coding area is in focus)")}<br />\
+M {_("Memo code - at clicked position")}<br />\
+O {_("Cycle through overlapping codes at clicked position")}<br />\
+Q {_("Quick Mark with code - for current selection")}<br />\
+S {_("Search text - may include current selection")}<br />\
+R {_("Opens a context menu for recently used codes for marking text")}<br />\
+! {_("Shows cursor position in text area")}<br />\
+5 {_("Go forward 5 seconds.")}<br />\
+Ctrl Z {_("Restore last unmarked code(s) - text code(s) or segment code")}<br />\
+Alt - {_("Rewind 30 seconds")}<br />\
+Ctrl R {_("Rewind 5 seconds")}<br />\
+Alt + {_("Forward 30 seconds")}<br />\
+Ctrl P {_("Play / pause.On start rewind slightly")}<br />\
+Ctrl D {_("Play / pause.On start rewind slightly")}<br />\
+Ctrl S {_("Start and stop av segment creation")}<br />\
+Ctrl Shift &gt; {_("Increase play rate")}<br />\
+Ctrl Shift &lt; {_("Decrease play rate")}<br />\n\
+F2 {_("When tree item selected - Rename code or category")}'
+
+database_queries_shortcuts = f'<h2>{_("Database Queries key shortcuts")}</h2>\
+Ctrl + Enter {_("Run SQL query")}<br />'
 
 coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
+coding_shortcuts_display += database_queries_shortcuts

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-https://qualcoder-org.github.io/
+https://qualcoder.org/
 """
 
 import collections
@@ -484,15 +484,16 @@ class RisImport:
                 # print(line)
                 if line.startswith("PMID"):  # new record
                     ris_data += "TY  - JOUR"
-                if line.startswith("AB  - "):
-                    abstract_tag = True
-                if abstract_tag is True and tag != "":  # No more part of the abstract
-                    abstract_tag = False
                 if line == "":  # End of nbib record
+                    abstract_tag = False
                     ris_data += "\nER  -\n\n"
                 else:
                     tag = nbib_tags.get(line[:6])
                     data = line[6:]
+                    if line.startswith("AB  - "):
+                        abstract_tag = True
+                    elif abstract_tag and tag not in (None, ""):
+                        abstract_tag = False
                     if tag is not None and tag != "":
                         ris_data += "\n" + tag + data
                     elif tag is not None and abstract_tag and tag == "":  # Continued line for abstract

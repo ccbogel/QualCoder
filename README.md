@@ -1,6 +1,8 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
-README QualCoder in other languages : [[Français](https://qualcoder-org.github.io/doc/fr/readme/)]
+Please also read the manual here: [QualCoder Manual](https://qualcoder.org/)
+
+README QualCoder in other languages : [[Français](https://qualcoder.org/doc/fr/readme/)]
 
 # QualCoder
 QualCoder is a qualitative data analysis application written in Python.
@@ -8,7 +10,7 @@ QualCoder is a qualitative data analysis application written in Python.
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, rtf and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies. AI models like GPT-4 from OpenAI can be used to explore your data and analyze the results.  
 
 This software has been used on MacOS and various Linux distros.
-Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Documentation](https://qualcoder-org.github.io/doc/en/).
+Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Documentation](https://qualcoder.org/doc/en/).
 
 It is best to download the Current Release from the Releases page: https://github.com/ccbogel/QualCoder/releases
 
@@ -46,11 +48,13 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.6 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.8.2 folder). e.g. 
 
 ```bash
 cd Downloads\QualCoder-master
 ```
+
+5a. Instead of the next below commands, run the bat file which will run all these commands below, by typing this in and pressing Enter: windows_run_from_source.bat
 
 6. Install the virtual environment and required python modules. 
 

@@ -1,5 +1,8 @@
-include qualcoder/*.xsd
 include *.md
 include LICENSE.txt
+include CITATION.cff
+include qualcoder_onefile.spec
+include requirements.txt
+include windows_run_from_source.bat
 recursive-include qualcoder/GUI *
 recursive-include qualcoder/locale *
