@@ -3428,9 +3428,13 @@ Click "Yes" to start now.')
             self.ui.tabWidget.setCurrentIndex(0)  # Show action log
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
     
-    def ai_prompts(self):
+    def ai_prompts(self, initial_prompt_name: str = "", initial_prompt_scope: str = ""):
         """ Action triggered by AI Prompts menu item."""
-        DialogAiEditPrompts(self.app).exec()
+        DialogAiEditPrompts(
+            self.app,
+            initial_prompt_name=initial_prompt_name,
+            initial_prompt_scope=initial_prompt_scope,
+        ).exec()
 
     def ai_go_chat(self):
         """ Action triggered by AI Chat menu item."""

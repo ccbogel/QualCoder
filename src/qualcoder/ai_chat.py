@@ -78,7 +78,7 @@ MARKDOWN_INTERNAL_LINK_PATTERN = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 MARKDOWN_HR_IMAGE_CACHE: Dict[str, str] = {}
-PROMPT_SLASH_REF_PATTERN = re.compile(r"(?<!\S)/(?!/)[^\s`<>\[\]{}\"']+")
+PROMPT_SLASH_REF_PATTERN = re.compile(r"(?:(?<=^)|(?<=[\s`(\[{]))/(?!/)[^\s`<>\[\]{}\"']+")
 
 
 def markdown_hr_image_data_uri(color: str) -> str:
@@ -256,7 +256,9 @@ class DialogAIChat(QtWidgets.QDialog):
         }
         prefix = prefixes.get(analysis_type, "")
         if prefix != "" and prompt_label.startswith(prefix):
-            return prompt_label[len(prefix):]
+            prompt_label = prompt_label[len(prefix):]
+        if not prompt_label.startswith('/'):
+            prompt_label = '/' + prompt_label
         return prompt_label
 
     def __init__(self, app, parent_text_edit: QTextEdit, main_window: QtWidgets.QMainWindow):
@@ -866,6 +868,7 @@ class DialogAIChat(QtWidgets.QDialog):
             background_color = self.ui.plainTextEdit_question.palette().color(
                 self.ui.plainTextEdit_question.viewport().backgroundRole()
             )
+        self._prompt_reference_background_color = QtGui.QColor(background_color)
         is_dark = background_color.lightness() < 128
         highlight_amount = 0.22 if is_dark else 0.10
         valid_background = self._blend_colors(user_color, background_color, highlight_amount)
@@ -880,6 +883,27 @@ class DialogAIChat(QtWidgets.QDialog):
         }
         if hasattr(self, "_prompt_reference_highlighter"):
             self._prompt_reference_highlighter.rehighlight()
+
+    def _prompt_reference_html_style(self, style_role: str = "user") -> Tuple[str, str]:
+        """Return foreground/background HTML colors for a prompt reference in one UI context."""
+
+        background_color = QtGui.QColor(getattr(self, "_prompt_reference_background_color", QtGui.QColor("#ffffff")))
+        if not background_color.isValid():
+            background_color = QtGui.QColor("#ffffff")
+        role = str(style_role if style_role is not None else "user").strip().lower()
+        if role == "ai":
+            foreground_color = QtGui.QColor(str(getattr(self, "ai_response_color", "#356399")))
+        elif role == "status":
+            foreground_color = QtGui.QColor(str(getattr(self, "ai_status_color", "#808080")))
+        elif role == "info":
+            foreground_color = self.ui.ai_output.palette().color(QPalette.ColorRole.Text)
+        else:
+            foreground_color = QtGui.QColor(str(getattr(self, "ai_user_color", "#287368")))
+        if not foreground_color.isValid():
+            foreground_color = QtGui.QColor(str(getattr(self, "ai_user_color", "#287368")))
+        highlight_amount = 0.22 if background_color.lightness() < 128 else 0.10
+        highlight_color = self._blend_colors(foreground_color, background_color, highlight_amount)
+        return foreground_color.name(), highlight_color.name()
 
     def _prompt_reference_prompt_names(self) -> set[str]:
         """Return known slash-callable prompt names for the current chat."""
@@ -898,6 +922,31 @@ class DialogAIChat(QtWidgets.QDialog):
             for prompt in self._prompt_completion_records
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
+
+    def _resolve_prompt_reference_name(self, prompt_name: str) -> Optional[AgentPromptRecord]:
+        """Resolve a slash prompt reference, with chat-type-local fallback for analysis prompts."""
+
+        normalized = str(prompt_name if prompt_name is not None else '').strip('/').casefold()
+        if normalized == '':
+            return None
+        records_by_name = self._prompt_reference_records_by_name()
+        direct = records_by_name.get(normalized)
+        if direct is not None:
+            return direct
+        if '/' in normalized:
+            return None
+        if not (0 <= self.current_chat_idx < len(self.chat_list)):
+            return None
+        analysis_type = str(self.chat_list[self.current_chat_idx][2] if self.chat_list[self.current_chat_idx][2] is not None else '')
+        prefix_map = {
+            'code_analysis': 'code-analysis/',
+            'topic_exploration': 'topic-exploration/',
+            'text_analysis': 'text-analysis/',
+        }
+        prefix = prefix_map.get(analysis_type, '')
+        if prefix == '':
+            return None
+        return records_by_name.get((prefix + normalized).casefold())
 
     def _prompt_reference_tooltip(self, prompt: AgentPromptRecord) -> str:
         """Build tooltip text for a recognized slash prompt reference."""
@@ -921,56 +970,153 @@ class DialogAIChat(QtWidgets.QDialog):
         cursor = editor.cursorForPosition(pos)
         char_pos = cursor.position()
         text = editor.toPlainText()
-        records_by_name = self._prompt_reference_records_by_name()
-        if char_pos < 0 or char_pos > len(text) or len(records_by_name) == 0:
+        if char_pos < 0 or char_pos > len(text) or len(self._prompt_completion_records) == 0:
             return None
         for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
             if match.start() <= char_pos <= match.end():
                 prompt_name = match.group(0)[1:].rstrip('/.,;:!?').casefold()
-                return records_by_name.get(prompt_name)
+                return self._resolve_prompt_reference_name(prompt_name)
         return None
 
-    def _prompt_reference_html_span(self, token: str, known: bool) -> str:
-        """Render one slash reference token as styled HTML."""
+    def _decode_prompt_reference_href(self, href: str) -> Tuple[str, str]:
+        """Decode a promptref href into prompt name and optional scope."""
 
-        escaped_token = html_lib.escape(str(token if token is not None else ''))
-        if not known:
-            return escaped_token
-        styles = getattr(self, "_prompt_reference_styles", {})
-        valid_style = styles.get("valid", {})
-        background = html_lib.escape(str(valid_style.get("html_background", "")))
-        foreground = html_lib.escape(str(valid_style.get("html_foreground", self.ai_user_color)))
-        prompt_name = str(token if token is not None else '')[1:].rstrip('/.,;:!?')
-        href = 'promptref:' + quote(prompt_name, safe='')
+        payload = str(href if href is not None else '')
+        if payload.startswith('promptref:'):
+            payload = payload[len('promptref:'):]
+        name_part, _, query_part = payload.partition('?')
+        prompt_name = unquote(name_part).strip('/').rstrip('/.,;:!?')
+        prompt_scope = ''
+        if query_part != '':
+            params = parse_qs(query_part)
+            prompt_scope = str(params.get('scope', [''])[0] if params.get('scope') else '').strip()
+        return prompt_name, prompt_scope
+
+    def _prompt_reference_href(self, prompt: AgentPromptRecord) -> str:
+        """Build the internal promptref href for one prompt record."""
+
+        href = 'promptref:' + quote(str(prompt.name if prompt.name is not None else '').strip('/'), safe='')
+        scope = str(prompt.scope if prompt.scope is not None else '').strip()
+        if scope != '':
+            href += '?scope=' + quote(scope, safe='')
+        return href
+
+    def _prompt_reference_records_by_label(self) -> Dict[str, AgentPromptRecord]:
+        """Return known prompts keyed by alternative labels.
+
+        Only explicit slash-notation prompt references are linked to avoid
+        ambiguous matches for generic prompt names in plain prose.
+        """
+
+        return {}
+
+    def _prompt_reference_html_span(self, display_text: str, prompt: Optional[AgentPromptRecord], style_role: str = "user") -> str:
+        """Render one prompt reference token or label as styled HTML."""
+
+        escaped_text = html_lib.escape(str(display_text if display_text is not None else ''))
+        if prompt is None:
+            return escaped_text
+        foreground_color, background_color = self._prompt_reference_html_style(style_role=style_role)
+        background = html_lib.escape(background_color)
+        foreground = html_lib.escape(foreground_color)
+        href = self._prompt_reference_href(prompt)
         return (
             f'<a href="{href}" style="color: {foreground}; text-decoration: none;">'
             '<span style="'
             f'background-color: {background};'
-            f'">{escaped_token}</span>'
+            f'">{escaped_text}</span>'
             '</a>'
         )
 
-    def _render_user_markdown_to_html(self, text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600) -> str:
-        """Render user Markdown and highlight slash prompt references without altering stored text."""
+    def _prompt_reference_placeholders_for_text(
+        self,
+        text: str,
+        include_prompt_labels: bool = False,
+        require_enabled: bool = True,
+        style_role: str = "user",
+    ) -> Tuple[str, Dict[str, str]]:
+        """Replace known prompt references in plain text with placeholders."""
 
-        if not self._prompt_completion_enabled():
-            return render_markdown_to_html(text, hr_color=hr_color, hr_width_px=hr_width_px)
+        if require_enabled and not self._prompt_completion_enabled():
+            return str(text if text is not None else ''), {}
 
-        known_prompt_names = self._prompt_reference_prompt_names()
+        source_text = str(text if text is not None else '')
         replacements: Dict[str, str] = {}
 
         def replace_prompt_ref(match: re.Match) -> str:
             token = match.group(0)
             prompt_name = token[1:].rstrip('/.,;:!?').casefold()
             placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
-            replacements[placeholder] = self._prompt_reference_html_span(token, prompt_name in known_prompt_names)
+            replacements[placeholder] = self._prompt_reference_html_span(
+                token,
+                self._resolve_prompt_reference_name(prompt_name),
+                style_role=style_role,
+            )
             return placeholder
 
-        marked_text = PROMPT_SLASH_REF_PATTERN.sub(replace_prompt_ref, str(text if text is not None else ''))
+        marked_text = PROMPT_SLASH_REF_PATTERN.sub(replace_prompt_ref, source_text)
+        if include_prompt_labels:
+            records_by_label = self._prompt_reference_records_by_label()
+            known_labels = sorted(
+                (label for label in records_by_label.keys() if label != ''),
+                key=len,
+                reverse=True,
+            )
+            if known_labels:
+                label_pattern = re.compile("|".join(re.escape(label) for label in known_labels))
+
+                def replace_prompt_label(match: re.Match) -> str:
+                    label = match.group(0)
+                    placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
+                    replacements[placeholder] = self._prompt_reference_html_span(
+                        label,
+                        records_by_label.get(label.casefold()),
+                        style_role=style_role,
+                    )
+                    return placeholder
+
+                marked_text = label_pattern.sub(replace_prompt_label, marked_text)
+        return marked_text, replacements
+
+    def _render_markdown_with_prompt_refs(self, text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600, style_role: str = "user") -> str:
+        """Render Markdown and highlight known prompt references without altering stored text."""
+
+        marked_text, replacements = self._prompt_reference_placeholders_for_text(
+            text,
+            require_enabled=False,
+            style_role=style_role,
+        )
         rendered_html = render_markdown_to_html(marked_text, hr_color=hr_color, hr_width_px=hr_width_px)
         for placeholder, replacement in replacements.items():
             rendered_html = rendered_html.replace(placeholder, replacement)
         return rendered_html
+
+    def _render_user_markdown_to_html(self, text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600) -> str:
+        """Render user Markdown and highlight slash prompt references without altering stored text."""
+
+        return self._render_markdown_with_prompt_refs(text, hr_color=hr_color, hr_width_px=hr_width_px, style_role="user")
+
+    def _render_plain_text_with_prompt_refs(self, text: str, include_prompt_labels: bool = False, style_role: str = "user") -> str:
+        """Render plain text to safe HTML while linking known prompt references."""
+
+        marked_text, replacements = self._prompt_reference_placeholders_for_text(
+            text,
+            include_prompt_labels=include_prompt_labels,
+            require_enabled=False,
+            style_role=style_role,
+        )
+        rendered_html = html_lib.escape(marked_text).replace('\n', '<br />')
+        for placeholder, replacement in replacements.items():
+            rendered_html = rendered_html.replace(html_lib.escape(placeholder), replacement)
+        return rendered_html
+
+    def _open_prompt_record_in_library(self, prompt: AgentPromptRecord):
+        """Open one prompt record in the prompt library dialog."""
+
+        self.main_window.ai_prompts(
+            initial_prompt_name=prompt.name,
+            initial_prompt_scope=prompt.scope,
+        )
 
     def init_styles(self):
         """Set up the stylesheets for the ui and the chat entries
@@ -4184,7 +4330,12 @@ data collected. This information will accompany every prompt sent to the AI, res
         )
         summary += _('\nPrompt:') + f' {self._analysis_prompt_display_name_and_scope(prompt_record, "text_analysis")}'
         logger.debug('New text analysis chat.')
-        self.new_chat(_('Text analysis') + f' "{doc_name}"', 'text_analysis', summary, prompt_name_and_scope(prompt_record))
+        self.new_chat(
+            _('Text analysis') + f' "{doc_name}"',
+            'text_analysis',
+            summary,
+            self._analysis_prompt_display_name_and_scope(prompt_record, "text_analysis"),
+        )
 
         chat_idx = self.current_chat_idx
         self._persist_agent_prompt_record(chat_idx, prompt_record)
@@ -4406,11 +4557,11 @@ data collected. This information will accompany every prompt sent to the AI, res
 
                 # Show title
                 html_parts.append(f'<h1 style={self.ai_info_style}>{self._display_chat_name(name, analysis_type)}</h1>')
-                summary_br = summary.replace('\n', '<br />')
+                summary_br = self._render_plain_text_with_prompt_refs(summary, style_role="info")
                 display_type = self._display_chat_type_label(analysis_type, preserve_legacy_general=True)
                 if not self._is_agent_chat_type(analysis_type):
                     html_parts.append(
-                        f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {display_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}</p>"
+                        f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {display_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {self._render_plain_text_with_prompt_refs(analysis_prompt, style_role='info')}</p>"
                     )
                 else:
                     html_parts.append(
@@ -4450,7 +4601,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                         if isinstance(status_payload, dict):
                             status_kind = str(status_payload.get("kind", "")).strip().lower()
                             status_text = str(status_payload.get("text", "")).strip()
-                        status_line = html_lib.escape(status_text).replace('\n', '<br />')
+                        status_line = self._render_plain_text_with_prompt_refs(status_text, include_prompt_labels=True, style_role="status")
                         if status_line.strip() == '':
                             continue
                         if status_kind in ('planning', 'reflection'):
@@ -4484,19 +4635,21 @@ data collected. This information will accompany every prompt sent to the AI, res
                         txt = f'{self._message_heading_html(heading)}{txt}'
                         html_parts.append(f'<p style={self.ai_user_style}>{txt}</p>')
                     elif msg_type == 'ai':
-                        txt = render_markdown_to_html(
+                        txt = self._render_markdown_with_prompt_refs(
                             msg[4],
                             hr_color=self.ai_response_color,
                             hr_width_px=markdown_hr_width,
+                            style_role="ai",
                         )
                         author = msg[3]
                         txt = f'{self._ai_agent_heading_html(author, chat_idx=self.current_chat_idx)}{txt}'
                         html_parts.append(f'<p style={self.ai_response_style}>{txt}</p>')
                     elif msg_type == 'info':
                         txt = self._message_heading_html(_("Info:"))
-                        txt += render_markdown_to_html(
+                        txt += self._render_markdown_with_prompt_refs(
                             msg[4],
                             hr_width_px=markdown_hr_width,
+                            style_role="info",
                         )
                         html_parts.append(f'<p style={self.ai_info_style}>{txt}</p>')
                 flush_agent_status_block()
@@ -4507,10 +4660,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                     if len(self.app.ai.ai_streaming_output) != len(txt) and len(txt) == 0:
                         txt = _('Thinking...')
                     txt = self.replace_references(txt, streaming=True)
-                    txt = render_markdown_to_html(
+                    txt = self._render_markdown_with_prompt_refs(
                         txt,
                         hr_color=self.ai_response_color,
                         hr_width_px=markdown_hr_width,
+                        style_role="ai",
                     )
                     txt = f'{self._ai_agent_heading_html(chat_idx=self.current_chat_idx, fallback_to_current=True)}{txt}'
                     html_parts.append(f'<div style={self.ai_response_style}>{txt}</div>')
@@ -7067,6 +7221,24 @@ data collected. This information will accompany every prompt sent to the AI, res
         editor = self.ui.plainTextEdit_question
         editor_viewport = editor.viewport()
 
+        if source in (editor, editor_viewport) and event.type() == QEvent.Type.ContextMenu:
+            context_pos = event.pos()
+            if source is editor:
+                context_pos = editor_viewport.mapFrom(editor, context_pos)
+            prompt = self._prompt_reference_record_at_position(context_pos)
+            cursor = editor.cursorForPosition(context_pos)
+            editor.setTextCursor(cursor)
+            context_menu = editor.createStandardContextMenu()
+            if prompt is not None:
+                context_menu.addSeparator()
+                open_prompt_action = QAction(_('Open prompt in library'), context_menu)
+                open_prompt_action.triggered.connect(
+                    lambda checked=False, p=prompt: self._open_prompt_record_in_library(p)
+                )
+                context_menu.addAction(open_prompt_action)
+            context_menu.exec(event.globalPos())
+            return True
+
         if source in (editor, editor_viewport) and event.type() == QEvent.Type.MouseButtonPress:
             if self._prompt_completion_popup.isVisible() or self._prompt_inline_completion is not None:
                 click_pos = None
@@ -7083,6 +7255,22 @@ data collected. This information will accompany every prompt sent to the AI, res
                     editor.setTextCursor(cursor)
                     editor.setFocus(Qt.FocusReason.MouseFocusReason)
                     return True
+            return super().eventFilter(source, event)
+
+        if source in (editor, editor_viewport) and event.type() == QEvent.Type.MouseButtonRelease:
+            if event.button() == Qt.MouseButton.LeftButton and event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+                click_pos = None
+                try:
+                    click_pos = event.position().toPoint()
+                except Exception:
+                    click_pos = None
+                if click_pos is not None and source is editor:
+                    click_pos = editor_viewport.mapFrom(editor, click_pos)
+                if click_pos is not None:
+                    prompt = self._prompt_reference_record_at_position(click_pos)
+                    if prompt is not None:
+                        self._open_prompt_record_in_library(prompt)
+                        return True
             return super().eventFilter(source, event)
 
         if source is editor_viewport and event.type() == QEvent.Type.ToolTip:
@@ -7135,9 +7323,16 @@ data collected. This information will accompany every prompt sent to the AI, res
         if link:
             # Show tooltip when hovering over a link
             if link.startswith('promptref:'):
-                prompt_name = unquote(link[len('promptref:'):]).strip('/').casefold()
+                prompt_name, prompt_scope = self._decode_prompt_reference_href(link)
                 self._refresh_prompt_completion_records()
-                prompt = self._prompt_reference_records_by_name().get(prompt_name)
+                if prompt_scope != "":
+                    prompt = self.agent_prompts_catalog.find_prompt_variant(
+                        prompt_name,
+                        prompt_scope,
+                        include_internal=True,
+                    )
+                else:
+                    prompt = self._resolve_prompt_reference_name(prompt_name)
                 if prompt is not None:
                     QtWidgets.QToolTip.showText(QCursor.pos(), self._prompt_reference_tooltip(prompt), self.ui.ai_output)
             elif link.startswith('coding:'):
@@ -7261,6 +7456,22 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif link.startswith('action:topic_chat_analyze_more'):
                 self.topic_chat_analyze_more()
             elif link.startswith('promptref:'):
+                prompt_name, prompt_scope = self._decode_prompt_reference_href(link)
+                if prompt_scope != '':
+                    prompt_record = self.agent_prompts_catalog.find_prompt_variant(
+                        prompt_name,
+                        prompt_scope,
+                        include_internal=True,
+                    )
+                else:
+                    prompt_record = self._resolve_prompt_reference_name(prompt_name)
+                    if prompt_record is None:
+                        prompt_record = self.agent_prompts_catalog.get_prompt(prompt_name, include_internal=True)
+                if prompt_record is None:
+                    msg = _('The selected prompt could not be found in the prompt library.')
+                    Message(self.app, _('AI Prompt Library'), msg, icon='warning').exec()
+                    return
+                self._open_prompt_record_in_library(prompt_record)
                 return
 
 # Helper:

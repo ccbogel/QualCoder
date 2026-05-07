@@ -103,10 +103,12 @@ def get_item_level(item) -> int:
 class DialogAiEditPrompts(QtWidgets.QDialog):
     """Dialog to edit prompts from the Markdown-based AI prompt system."""
 
-    def __init__(self, app_, prompt_type=None):
+    def __init__(self, app_, prompt_type=None, initial_prompt_name: str = "", initial_prompt_scope: str = ""):
         self.app = app_
         self.catalog = AiAgentPromptsCatalog(app_)
         self.prompt_type = self.catalog.normalize_prompt_type(prompt_type)
+        self.initial_prompt_name = self.catalog._normalize_prompt_name(initial_prompt_name)
+        self.initial_prompt_scope = str(initial_prompt_scope if initial_prompt_scope is not None else "").strip()
         self.prompts: List[EditorPromptRecord] = []
         self.selected_prompt: Optional[EditorPromptRecord] = None
         self.form_updating = True
@@ -200,6 +202,18 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     is_system=(prompt.scope == "system"),
                 )
             )
+        if self.selected_prompt is None and self.initial_prompt_name != "":
+            initial_type = self.catalog.prompt_type_from_name(self.initial_prompt_name)
+            initial_name = self.catalog.prompt_name_within_type(self.initial_prompt_name)
+            if initial_type is not None and initial_name != "":
+                for prompt in self.prompts:
+                    if (
+                        prompt.prompt_type == initial_type
+                        and prompt.name == initial_name
+                        and (self.initial_prompt_scope == "" or prompt.scope == self.initial_prompt_scope)
+                    ):
+                        self.selected_prompt = prompt
+                        break
         self.prompts.sort(key=lambda item: (prompt_types.index(item.prompt_type), prompt_scopes.index(item.scope), item.name.casefold()))
         self.fill_tree()
 
@@ -227,6 +241,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.form_updating = True
         try:
             selected_path = ""
+            target_item = None
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 selected_path = "|".join(self.tree_get_item_path(self.ui.treeWidget_prompts.selectedItems()[0]))
 
@@ -244,9 +259,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                         prompt_item.setData(0, Qt.ItemDataRole.UserRole + 1, prompt.scope)
                         prompt_item.setData(0, Qt.ItemDataRole.UserRole + 2, prompt.prompt_type)
                         if prompt is self.selected_prompt:
-                            prompt_item.setSelected(True)
+                            target_item = prompt_item
                         elif selected_path != "" and self._prompt_tree_label(prompt) == selected_path:
-                            prompt_item.setSelected(True)
+                            target_item = prompt_item
                     continue
                 type_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
                 type_item.setText(0, prompt_type)
@@ -261,18 +276,24 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     prompt_item.setData(0, Qt.ItemDataRole.UserRole + 1, prompt.scope)
                     prompt_item.setData(0, Qt.ItemDataRole.UserRole + 2, prompt.prompt_type)
                     if prompt is self.selected_prompt:
-                        prompt_item.setSelected(True)
+                        target_item = prompt_item
                     elif selected_path != "" and "|".join([prompt_type, self._prompt_tree_label(prompt)]) == selected_path:
-                        prompt_item.setSelected(True)
+                        target_item = prompt_item
 
-            if len(self.ui.treeWidget_prompts.selectedItems()) == 0 and selected_path != "":
+            if target_item is not None:
+                self._expand_item_ancestors(target_item)
+                self.ui.treeWidget_prompts.setCurrentItem(target_item)
+                target_item.setSelected(True)
+            elif len(self.ui.treeWidget_prompts.selectedItems()) == 0 and selected_path != "":
                 item = self.tree_find_item_by_path(selected_path.split("|"))
                 if item is not None:
+                    self._expand_item_ancestors(item)
+                    self.ui.treeWidget_prompts.setCurrentItem(item)
                     item.setSelected(True)
-                    item.setExpanded(True)
             if len(self.ui.treeWidget_prompts.selectedItems()) == 0:
                 first_prompt_item = self._find_first_prompt_item()
                 if first_prompt_item is not None:
+                    self._expand_item_ancestors(first_prompt_item)
                     self.ui.treeWidget_prompts.setCurrentItem(first_prompt_item)
                     first_prompt_item.setSelected(True)
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
@@ -319,6 +340,14 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             if result is not None:
                 return result
         return None
+
+    def _expand_item_ancestors(self, item) -> None:
+        """Expand a prompt item and all its parent nodes."""
+
+        current = item
+        while current is not None:
+            current.setExpanded(True)
+            current = current.parent()
 
     def _tree_find_item_by_path_recursive(self, item, path_):
         if not path_:
