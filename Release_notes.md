@@ -120,6 +120,28 @@ Options to organise the graph layout - radion, vertical, horizontal.
 
 Improved selection of font sizes and colours in menus.
 
+## Report codes
+
+**Bug fixes**
+-A/V search by cases:
+--fixed an issue where the "important" filter and the ORDER BY clause were being applied to the wrong SQL query, causing incorrect filtering in audio/video results.
+-Excel (XLSX) export:
+--fixed a duplicated column that incorrectly shifted the "a/v" value in case reports.
+-"Only memos" filter in translated languages:
+---the strings "Only memos" and "Only coded memos" were not marked for translation, causing the filter to fail in the Spanish version. It now works correctly in any language.
+-Matrix headers:
+---fixed four issues that prevented code, file, and case memos from displaying correctly in the matrix view (including an "alll" typo, a comparison with an extra colon 'Case:', an incorrect tuple validation, and a misplaced "All memo" literal).
+-"Also all memos" option:
+---now correctly displays the coded segment memo, a behavior that was previously missing despite being implied by the label.
+
+**New functions**
+-Category hierarchy in headers:
+---the full hierarchical path is now displayed before the code name (Root Category > Subcategory > … > Code), making the contextual reading of each segment easier.
+-Co-occurring codes:
+---below each coded segment memo, the set of overlapping codes within the same file is listed in brackets, allowing quick identification of coding overlaps. Works for text, audio/video, and image data.
+-New category sorting option:
+---added a "Category A - z" "Category Z - a"  option to the sorting menu, which organizes results alphabetically according to the category hierarchy (with code name as a secondary criterion).
+
 ## Database queries
 
 Run the sql using key press: Control + Enter Keys
