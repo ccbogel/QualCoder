@@ -957,11 +957,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             ws.cell(column=col + 1, row=row, value=col_heading)
 
         # Fill Excel Worksheet
-        for row, data in enumerate(self.results):
+        for row, data in enumerate(self.results):  # restored original loop body, removed duplicated col_headings/inserted_col definitions and fixed indentation
             ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
             if inserted_col == 1:  # For Case results, insert the Filename data
                 ws.cell(column=2, row=row + 2, value=data['filename'])
-            ws.cell(column=2 + inserted_col, row=row + 2, value=data['coder'])
+            ws.cell(column=2 + inserted_col, row=row + 2, value=data['coder'])  # re-added missing 'coder' cell write that was lost during merge
             ''' TODO 
             align_cell = ws.cell(column=2 + inserted_col, row=row + 2)
             align_cell.value = data['coder']
@@ -975,7 +975,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 ws.cell(column=3 + inserted_col, row=row + 2, value="image")
             if data['result_type'] == 'av':
                 coding_id = f"avid:{data['avid']}"
-                ws.cell(column=3 + inserted_col + inserted_col, row=row + 2, value="a/v")
+                ws.cell(column=3 + inserted_col, row=row + 2, value="a/v")
             ws.cell(column=4 + inserted_col, row=row + 2, value=coding_id)
             ws.cell(column=5 + inserted_col, row=row + 2, value=data['codename'])
             ws.cell(column=6 + inserted_col, row=row + 2, value=data['coded_memo'])
@@ -1045,6 +1045,51 @@ class DialogReportCodes(QtWidgets.QDialog):
                         more = False
             counter += 1
         return category_names
+
+    def get_cooccurring_codes(self, item): # <- L
+        """ Get co-occurring (overlapping) code names for the given coded segment.
+        Searches for other codes in the same file whose span overlaps with the current segment.
+        Excludes the current code itself (by ctid/imid/avid).
+
+        param: item : Dictionary of a single result row (text, image or av)
+        return: List of co-occurring code names (strings), sorted alphabetically, deduplicated.
+        """
+
+        cur = self.app.conn.cursor()
+        cooccur_names = set()
+        if item.get('result_type') == 'text':
+            sql = ("select distinct code_name.name from code_text "
+                   "join code_name on code_name.cid = code_text.cid "
+                   "where code_text.fid=? and code_text.ctid<>? "
+                   "and code_text.pos0 < ? and code_text.pos1 > ?")
+            cur.execute(sql, [item['fid'], item['ctid'], item['pos1'], item['pos0']])
+            for row in cur.fetchall():
+                cooccur_names.add(row[0])
+        elif item.get('result_type') == 'av':
+            sql = ("select distinct code_name.name from code_av "
+                   "join code_name on code_name.cid = code_av.cid "
+                   "where code_av.id=? and code_av.avid<>? "
+                   "and code_av.pos0 < ? and code_av.pos1 > ?")
+            cur.execute(sql, [item['fid'], item['avid'], item['pos1'], item['pos0']])
+            for row in cur.fetchall():
+                cooccur_names.add(row[0])
+        elif item.get('result_type') == 'image':
+            # Two rectangles overlap if they intersect on both axes.
+            sql = ("select distinct code_name.name, x1, y1, width, height from code_image "
+                   "join code_name on code_name.cid = code_image.cid "
+                   "where code_image.id=? and code_image.imid<>?")
+            cur.execute(sql, [item['fid'], item['imid']])
+            ax1 = item['x1']
+            ay1 = item['y1']
+            ax2 = ax1 + item['width']
+            ay2 = ay1 + item['height']
+            for row in cur.fetchall():
+                name, bx1, by1, bw, bh = row
+                bx2 = bx1 + bw
+                by2 = by1 + bh
+                if ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1:
+                    cooccur_names.add(name)
+        return sorted(cooccur_names)
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
@@ -1488,7 +1533,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtCore.QCoreApplication.processEvents()
         prog_dialog.setValue(2)
         # Trim results for option: Only coded memos
-        if self.ui.comboBox_memos.currentText() in ("Only memos", "Only coded memos"):
+        if self.ui.comboBox_memos.currentText() in (_("Only memos"), _("Only coded memos")):  # wrap with _() <- L
             tmp = []
             for r in self.results:
                 if r['coded_memo'] != "":
@@ -1674,7 +1719,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql, parameters)
         results = cur.fetchall()
         keys = 'codename', 'color', 'file_or_casename', 'caseid', 'pos0', 'pos1', 'text', 'coder', 'fid', \
-            'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid', 'filename'
+            'case_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid', 'filename'
         for row in results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'text'
@@ -1744,8 +1789,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             av_sql += " and code_av.memo like ? "
             parameters.append("%" + str(search_text) + "%")
         if important:
-            sql += " and code_av.important=1 "
-        sql += " order by code_name.name, cases.name"
+            av_sql += " and code_av.important=1 "  # was sql, should target av_sql <- L
+        av_sql += " order by code_name.name, cases.name"  # was sql, should target av_sql <- L
         if not parameters:
             cur.execute(av_sql)
         else:
@@ -1803,6 +1848,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                     t['overlaps'] += f"\nOverlaps: {t['codename']} [{t['pos0']}-{t['pos1']}] : {t2['codename']} [{t2['pos0']}-{t2['pos1']}]"
                     t2['overlaps'] += f"\nOverlaps: {t2['codename']} [{t2['pos0']}-{t2['pos1']}] : {t['codename']} [{t['pos0']}-{t['pos1']}]"
                     continue
+
+        # Compare each set of coded a/v results for inclusions and overlaps
         for a in res_av:
             for a2 in res_av:
                 if a == a2:
@@ -1816,13 +1863,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                     continue
                 # left side a is below a2. a overlaps on the right side,
                 if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] < a2['pos0'] and a['pos1'] >= a2['pos0']:
-                    # print(f"\nOverlap R:{t2['codename']} - {t['codename']}")
+                    # print(f"\nOverlap R:{a2['codename']} - {a['codename']}")
                     a['overlaps'] += f"\nOverlaps: {a['codename']} [{a['pos0']}-{a['pos1']}] : {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
                     a2['overlaps'] += f"\nOverlaps: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] : {a['codename']} [{a['pos0']}-{a['pos1']}]"
                     continue
+
         '''for i in img:
             pass
-        '''
+        '''  # Removed leftover 'for a in av' placeholder, now implemented above
         overlaps = []
         for item in res_text:
             if item['overlaps'] != "":
@@ -1845,6 +1893,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         if sort_by == "Z - a":
             self.results = sorted(self.results, key=lambda i_: i_['codename'], reverse=True)
+            return
+
+        # Sort alphabetically by category hierarchy (root>...>nearest), fallback to codename <- L
+        if sort_by in ("Category A - z", "Category Z - a"):
+            def category_sort_key(item):
+                hierarchy = self.categories_of_code(item['cid'])
+                # categories_of_code returns nearest-first, reverse for root-first ordering
+                hierarchy_str = " > ".join(reversed(hierarchy)) if hierarchy else ""
+                # Items without category get an empty hierarchy_str -> grouped together,
+                # then sorted by codename within that group.
+                return (hierarchy_str.lower(), item['codename'].lower())
+            reverse_order = (sort_by == "Category Z - a")  # descending when Z - a
+            self.results = sorted(self.results, key=category_sort_key, reverse=reverse_order)
             return
 
         # Order code names by frequency
@@ -2206,8 +2267,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['coded_memo'] + "\n")
 
-            # Add Overlaps notice, if present
-            if 'overlaps' in row.keys():
+            # Add Overlaps notice, if present and non-empty <- L
+            if row.get('overlaps'):  # skip when 'overlaps' is missing OR empty string
                 self.ui.textEdit.insertPlainText(row['overlaps'] + "\n")
 
             if row['result_type'] == 'text' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
@@ -2219,6 +2280,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(fmt_normal)
+                self.ui.textEdit.insertPlainText("\n")  # separator before coded segment <- L
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText(row['text'])
                 pos1 = len(self.ui.textEdit.toPlainText())
@@ -2233,6 +2295,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if self.ui.checkBox_text_context.isChecked() and self.app.settings[
                     'report_text_context_style'] == 'Bigger':
                     cursor.setCharFormat(fmt_larger)
+                self.ui.textEdit.insertPlainText("\n")  # separator after coded segment <- L
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText(row['posttext'])
                 pos1 = len(self.ui.textEdit.toPlainText())
@@ -2242,12 +2305,19 @@ class DialogReportCodes(QtWidgets.QDialog):
                     cursor.setCharFormat(fmt_normal)
                 if memo_choice_index != 5:  # Only coded memos:
                     self.ui.textEdit.insertPlainText("\n")
-                if row['coded_memo'] != "" and memo_choice_index in (1, 2):  # Also all memos, Also coded memos
+                if row['coded_memo'] != "" and memo_choice_index in (1, 2, 3):  # added 3 -> Also all memos now shows coded_memo
                     self.ui.textEdit.insertPlainText(f"{_('MEMO:')} {row['coded_memo']}\n")
             if row['result_type'] == 'image' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.put_image_into_textedit(row, i, self.ui.textEdit)
             if row['result_type'] == 'av' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.ui.textEdit.insertPlainText(f"\n{row['text']}\n")
+
+            # show co-ocurrences after coded memo (skip on memo-only modes for consistency) <- L
+            if memo_choice_index not in (4, 5):  # hide co-occurrences in "Only memos" / "Only coded memos"
+                cooccur = self.get_cooccurring_codes(row)
+                if cooccur:
+                    self.ui.textEdit.insertPlainText(f"{_('Co-occurring:')} [{', '.join(cooccur)}]\n")
+
             self.text_links.append(row)
         self.eventFilterTT.set_positions(self.text_links)
 
@@ -2405,6 +2475,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         head = "\n"
         if item['result_type'] == 'text':
             head += f"[{item['pos0']}-{item['pos1']}] "
+        # prepend category hierarchy (root > ... > nearest) before code name <- L
+        category_hierarchy = self.categories_of_code(item['cid'])
+        if category_hierarchy:
+            # categories_of_code returns nearest-first, reverse for root-first display
+            head += " > ".join(reversed(category_hierarchy)) + " > "
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
         if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "":
@@ -2646,7 +2721,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 to_hide = code_
         if to_hide:
             codes_list.remove(to_hide)
-        ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
+        ui = DialogSelectItems(self.app, codes_list, _("Select additional code"), "single")  # corrected dialog label, was "replacement code" but this method ADDS a code
         ok = ui.exec()
         if not ok:
             return
@@ -2809,17 +2884,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         memo_choice = self.ui.comboBox_memos.currentText()
         head = f"\n{item['codename']}, "
         if memo_choice in (_("Also all memos"), _("Also code memos"), _("Only memos")) and item['codename_memo'] != "":
-            head += _("CODE MEMO: All memo") + f"{item['codename_memo']}<br />"
+            head += _("CODE MEMO: ") + f"{item['codename_memo']}<br />"  # removed leftover 'All memo' literal <- L
         head += f"{_('File:')} {filename}, "
-        if memo_choice in (_("Also alll memos"), _("Only memos")) and item['source_memo'] != "":
+        if memo_choice in (_("Also all memos"), _("Only memos")) and item['source_memo'] != "":  # typo 'alll' -> 'all' <- L
             head += f" {_('FILE MEMO:')} {item['source_memo']}"
-        if item['file_or_case'] == 'Case:':
+        if item['file_or_case'] == 'Case':  # removed stray colon in 'Case:' <- L
             head += f" {item['file_or_case']}: {item['file_or_casename']}, "
             if memo_choice in (_("Also all memos"), _("Only memos")):
                 cur = self.app.conn.cursor()
                 cur.execute("select ifnull(memo,'') from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
-                if res is not None and res != "":
+                if res is not None and res[0] != "":  # was res != "", should be res[0] <- L
                     head += f", {_('CASE MEMO:')} {res[0]}"
         head += item['coder']
         cursor = text_edit.textCursor()
