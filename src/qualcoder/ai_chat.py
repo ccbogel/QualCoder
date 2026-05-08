@@ -439,7 +439,10 @@ class DialogAIChat(QtWidgets.QDialog):
     def _refresh_prompt_completion_records(self) -> None:
         """Reload user-callable prompt names for the completion popup."""
 
-        self._prompt_completion_records = self.agent_prompts_catalog.list_prompts(include_internal=False)
+        self._prompt_completion_records = [
+            prompt for prompt in self.agent_prompts_catalog.list_prompts(include_internal=False)
+            if self.agent_prompts_catalog.prompt_type_from_name(prompt.name) != "search"
+        ]
         if hasattr(self, "_prompt_reference_highlighter"):
             self._prompt_reference_highlighter.rehighlight()
 
@@ -2004,7 +2007,10 @@ class DialogAIChat(QtWidgets.QDialog):
     def _resolve_turn_agent_prompts(self, user_message: str) -> List[AgentPromptRecord]:
         """Resolve explicit `/name` prompt references from one user message."""
 
-        return self.agent_prompts_catalog.resolve_prompt_references(user_message)
+        return [
+            prompt for prompt in self.agent_prompts_catalog.resolve_prompt_references(user_message)
+            if self.agent_prompts_catalog.prompt_type_from_name(prompt.name) != "search"
+        ]
 
     def _build_turn_prompt_message(self, prompt: AgentPromptRecord) -> str:
         """Format one loaded explicit prompt as persistent supplemental instructions."""

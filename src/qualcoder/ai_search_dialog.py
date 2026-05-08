@@ -61,7 +61,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         """Return the legacy-default prompt for this dialog context when available."""
 
         default_names = {
-            "search": "_search/focused-search",
+            "search": "search/focused-search",
             "code_analysis": "code-analysis/code-summary",
             "topic_exploration": "topic-exploration/topic-summary",
         }

@@ -31,7 +31,7 @@ import yaml
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
 PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", re.DOTALL)
 LEGACY_PROMPT_TYPE_FOLDERS = {
-    "search": "_search",
+    "search": "search",
     "code_analysis": "code-analysis",
     "topic_exploration": "topic-exploration",
     "topic_analysis": "topic-exploration",
@@ -39,7 +39,7 @@ LEGACY_PROMPT_TYPE_FOLDERS = {
 }
 PROMPT_TYPE_FOLDERS = {
     "general": "",
-    "search": "_search",
+    "search": "search",
     "code_analysis": "code-analysis",
     "topic_exploration": "topic-exploration",
     "text_analysis": "text-analysis",
@@ -297,10 +297,18 @@ class AiAgentPromptsCatalog:
 
         return self._slugify_prompt_filename(name, max_length=max_length)
 
-    def build_prompt_markdown_document(self, name: str, description: str, text: str) -> str:
+    def build_prompt_markdown_document(self, name: str, description: str, text: str,
+                                       prompt_path: str = "", prompt_scope: str = "") -> str:
         """Build one Markdown prompt document with frontmatter for editor writes."""
 
-        return self._build_prompt_markdown_document(name, description, text, include_name=True)
+        return self._build_prompt_markdown_document(
+            name,
+            description,
+            text,
+            prompt_path=prompt_path,
+            prompt_scope=prompt_scope,
+            include_name=True,
+        )
 
     def parse_prompt_markdown_document(self, text: str) -> Tuple[Dict[str, Any], str]:
         """Parse one Markdown prompt document into frontmatter metadata and body."""
@@ -335,10 +343,12 @@ class AiAgentPromptsCatalog:
                 continue
 
             os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            prompt_name = self._slug_from_prompt_path(target_path)
             markdown_text = self._build_prompt_markdown_document(
-                self._slug_from_prompt_path(target_path),
+                prompt_name,
                 str(prompt.get("description", "") if isinstance(prompt, dict) else ""),
                 str(prompt.get("text", "") if isinstance(prompt, dict) else ""),
+                prompt_path=prompt_name,
             )
             with open(target_path, "w", encoding="utf-8") as handle:
                 handle.write(markdown_text)
@@ -457,7 +467,7 @@ class AiAgentPromptsCatalog:
         if "/" not in normalized_name:
             return "general"
         top_level = normalized_name.split("/", 1)[0]
-        if top_level == "_search":
+        if top_level == "search":
             return "search"
         if top_level == "code-analysis":
             return "code_analysis"
@@ -465,7 +475,7 @@ class AiAgentPromptsCatalog:
             return "topic_exploration"
         if top_level == "text-analysis":
             return "text_analysis"
-        return None
+        return "general"
 
     def _normalize_prompt_type(self, prompt_type: Optional[str]) -> Optional[str]:
         value = str(prompt_type if prompt_type is not None else "").strip()
@@ -588,6 +598,8 @@ class AiAgentPromptsCatalog:
         return basename
 
     def _build_prompt_markdown_document(self, slug: str, description: str, text: str,
+                                        prompt_path: str = "",
+                                        prompt_scope: str = "",
                                         include_name: bool = True) -> str:
         """Build one Markdown prompt file with YAML frontmatter."""
 
@@ -597,6 +609,12 @@ class AiAgentPromptsCatalog:
         prompt_name = str(slug if slug is not None else "").strip()
         if include_name and prompt_name != "":
             metadata["name"] = prompt_name
+        normalized_path = self._normalize_prompt_name(prompt_path if prompt_path != "" else prompt_name)
+        if normalized_path != "":
+            metadata["path"] = normalized_path
+        normalized_scope = str(prompt_scope if prompt_scope is not None else "").strip().lower()
+        if normalized_scope in self._scope_priority:
+            metadata["Scope"] = normalized_scope
         frontmatter = yaml.safe_dump(
             metadata,
             allow_unicode=True,
