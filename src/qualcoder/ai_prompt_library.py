@@ -105,20 +105,6 @@ class EditorFolderRecord:
             return ""
         return self.relative_dir.rsplit("/", 1)[-1]
 
-
-def get_item_level(item) -> int:
-    """Return the depth of one tree item."""
-
-    level = 0
-    while True:
-        parent = item.parent()
-        if parent is None:
-            break
-        level += 1
-        item = parent
-    return level
-
-
 ITEM_KIND_ROLE = Qt.ItemDataRole.UserRole + 20
 ITEM_PROMPT_NAME_ROLE = Qt.ItemDataRole.UserRole + 21
 ITEM_SCOPE_ROLE = Qt.ItemDataRole.UserRole + 22
@@ -158,6 +144,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.ui.treeWidget_prompts.setStyleSheet(treefont)
 
         self.ui.comboBox_type.addItems(prompt_types)
+        self.ui.radioButton_system.setToolTip(prompt_scope_descriptions["system"])
+        self.ui.radioButton_user.setToolTip(prompt_scope_descriptions["user"])
+        self.ui.radioButton_project.setToolTip(prompt_scope_descriptions["project"])
         self.ui.lineEdit_name.setValidator(
             QtGui.QRegularExpressionValidator(
                 QtCore.QRegularExpression(r"[a-z0-9][a-z0-9_-]{0,63}"),
@@ -234,9 +223,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         button = self.ui.pushButton_new_prompt
         self._new_menu.popup(button.mapToGlobal(QtCore.QPoint(0, button.height())))
 
-    def _reload_prompts(self) -> None:
-        self.prompts = []
-        self.folders = []
+    def _iter_visible_prompt_variants(self):
         selected_prompts: Dict[str, object] = {}
         for prompt in self.catalog.list_prompt_variants(
             prompt_type=self.prompt_type,
@@ -266,6 +253,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             directory = self._relative_dir_of_prompt_path(relative_path)
             if basename.startswith("_") or self._is_hidden_relative_dir(directory):
                 continue
+            yield prompt, prompt_type, relative_path, basename, directory
+
+    def _reload_prompts(self) -> None:
+        self.prompts = []
+        self.folders = []
+        for prompt, prompt_type, _, basename, directory in self._iter_visible_prompt_variants():
             self.prompts.append(
                 EditorPromptRecord(
                     scope=prompt.scope,
@@ -325,9 +318,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
 
     def _folder_sort_key(self, folder: EditorFolderRecord):
         return (prompt_types.index(folder.prompt_type), folder.relative_dir.casefold())
-
-    def _folder_key(self, prompt_type: str, relative_dir: str) -> Tuple[str, str]:
-        return prompt_type, self._normalize_relative_dir(relative_dir)
 
     def _ensure_folder_record(self, prompt_type: str, relative_dir: str, scope: str) -> None:
         normalized_dir = self._normalize_relative_dir(relative_dir)
@@ -486,13 +476,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if folder == "":
             return root
         return os.path.join(root, folder)
-
-    def _folder_record(self, prompt_type: str, relative_dir: str) -> Optional[EditorFolderRecord]:
-        normalized = self._normalize_relative_dir(relative_dir)
-        for folder in self.folders:
-            if folder.prompt_type == prompt_type and folder.relative_dir == normalized:
-                return folder
-        return None
 
     def _folder_direct_children(self, prompt_type: str, parent_dir: str) -> List[EditorFolderRecord]:
         normalized_parent = self._normalize_relative_dir(parent_dir)
@@ -1032,10 +1015,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return None
         return normalized
 
-    def _folder_conflicts_exist(self, scope: str, prompt_type: str, target_dir: str) -> bool:
-        target_abs = self._folder_absolute_path(scope, prompt_type, target_dir)
-        return target_abs != "" and os.path.exists(target_abs)
-
     def new_folder(self) -> None:
         prompt_type, parent_dir = self._selected_folder_context()
         target_scope = "project" if self.app.project_path != "" else "user"
@@ -1375,22 +1354,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
 
     def _scan_current_managed_prompt_files(self, scope: str) -> set[str]:
         result: set[str] = set()
-        for prompt_type in prompt_types:
-            for prompt in self.catalog.list_prompt_variants(
-                prompt_type=prompt_type,
-                include_internal=True,
-                apply_init=False,
-            ):
-                if prompt.scope != scope:
-                    continue
-                current_type = self.catalog.prompt_type_from_name(prompt.name)
-                if current_type != prompt_type:
-                    continue
-                relative_path = self.catalog.prompt_name_within_type(prompt.name)
-                basename = relative_path.rsplit("/", 1)[-1]
-                directory = self._relative_dir_of_prompt_path(relative_path)
-                if basename.startswith("_") or self._is_hidden_relative_dir(directory):
-                    continue
+        for prompt, _, _, _, _ in self._iter_visible_prompt_variants():
+            if prompt.scope == scope:
                 result.add(os.path.normcase(os.path.normpath(prompt.file_path)))
         return result
 
@@ -1481,6 +1446,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 for scope in ("user", "project")
             }
 
+            temp_targets: List[Tuple[str, str]] = []
+
             for scope in ("user", "project"):
                 for desired_dir in sorted(desired_dirs_by_scope[scope], key=len):
                     os.makedirs(desired_dir, exist_ok=True)
@@ -1497,8 +1464,17 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     prompt_path=prompt.path(),
                     prompt_scope=prompt.scope,
                 )
-                with open(target_path, "w", encoding="utf-8") as handle:
+                candidate_tmp = target_path + ".__tmp__"
+                counter = 2
+                while os.path.exists(candidate_tmp):
+                    candidate_tmp = target_path + f".__tmp__{counter}"
+                    counter += 1
+                with open(candidate_tmp, "w", encoding="utf-8") as handle:
                     handle.write(markdown_text)
+                temp_targets.append((candidate_tmp, target_path))
+
+            for temp_path, target_path in temp_targets:
+                os.replace(temp_path, target_path)
 
             for scope in ("user", "project"):
                 current_files = self._scan_current_managed_prompt_files(scope)
@@ -1521,6 +1497,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     except OSError:
                         continue
         except OSError as err:
+            for temp_path, _ in locals().get("temp_targets", []):
+                try:
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
+                except OSError:
+                    pass
             Message(self.app, _('Edit prompts'), _('Could not save the prompt files: ') + str(err), "warning").exec()
             return
 
