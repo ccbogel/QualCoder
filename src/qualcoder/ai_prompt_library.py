@@ -10,11 +10,10 @@ the catalog, but they are no longer shown or edited here.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
 import os
 import re
-import shutil
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple
 
 from PyQt6 import QtCore, QtWidgets, QtGui
@@ -145,6 +144,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.prompts: List[EditorPromptRecord] = []
         self.folders: List[EditorFolderRecord] = []
         self.selected_prompt: Optional[EditorPromptRecord] = None
+        self.dirty = False
         self.form_updating = True
         self.catalog.migrate_legacy_prompts_once()
 
@@ -305,6 +305,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         )
         self.folders.sort(key=lambda item: (prompt_types.index(item.prompt_type), item.relative_dir.casefold()))
         self.fill_tree()
+        self.dirty = False
 
     def _reload_folders(self) -> None:
         folders_by_key: Dict[Tuple[str, str], EditorFolderRecord] = {}
@@ -319,9 +320,63 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     folders_by_key[key].scopes_present.add(scope)
         self.folders = list(folders_by_key.values())
 
-    def _refresh_tree_from_memory(self) -> None:
-        """Rebuild the tree from the current in-memory prompt state without reloading prompts from disk."""
+    def _mark_dirty(self) -> None:
+        self.dirty = True
 
+    def _folder_sort_key(self, folder: EditorFolderRecord):
+        return (prompt_types.index(folder.prompt_type), folder.relative_dir.casefold())
+
+    def _folder_key(self, prompt_type: str, relative_dir: str) -> Tuple[str, str]:
+        return prompt_type, self._normalize_relative_dir(relative_dir)
+
+    def _ensure_folder_record(self, prompt_type: str, relative_dir: str, scope: str) -> None:
+        normalized_dir = self._normalize_relative_dir(relative_dir)
+        if normalized_dir == "" or scope == "":
+            return
+        for folder in self.folders:
+            if folder.prompt_type == prompt_type and folder.relative_dir == normalized_dir:
+                folder.scopes_present.add(scope)
+                return
+        self.folders.append(EditorFolderRecord(prompt_type=prompt_type, relative_dir=normalized_dir, scopes_present={scope}))
+
+    def _remove_folder_scope_recursive(self, prompt_type: str, relative_dir: str, scope: str) -> None:
+        normalized_dir = self._normalize_relative_dir(relative_dir)
+        kept: List[EditorFolderRecord] = []
+        for folder in self.folders:
+            if folder.prompt_type != prompt_type:
+                kept.append(folder)
+                continue
+            if not (folder.relative_dir == normalized_dir or folder.relative_dir.startswith(normalized_dir + "/")):
+                kept.append(folder)
+                continue
+            new_scopes = set(folder.scopes_present)
+            new_scopes.discard(scope)
+            if len(new_scopes) > 0:
+                kept.append(EditorFolderRecord(folder.prompt_type, folder.relative_dir, new_scopes))
+        self.folders = kept
+
+    def _folder_exists_in_scope(self, prompt_type: str, relative_dir: str, scope: str) -> bool:
+        normalized_dir = self._normalize_relative_dir(relative_dir)
+        for folder in self.folders:
+            if folder.prompt_type == prompt_type and folder.relative_dir == normalized_dir and scope in folder.scopes_present:
+                return True
+        return False
+
+    def _ensure_prompt_parent_folders(self) -> None:
+        for prompt in self.prompts:
+            normalized_dir = self._normalize_relative_dir(prompt.directory)
+            if normalized_dir == "":
+                continue
+            parts = normalized_dir.split("/")
+            current = ""
+            for part in parts:
+                current = part if current == "" else current + "/" + part
+                self._ensure_folder_record(prompt.prompt_type, current, prompt.scope)
+
+    def _refresh_tree_from_memory(self) -> None:
+        """Rebuild the tree from the current in-memory model without reading prompts from disk."""
+
+        self._ensure_prompt_parent_folders()
         self.prompts.sort(
             key=lambda item: (
                 prompt_types.index(item.prompt_type),
@@ -330,8 +385,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 item.name.casefold(),
             )
         )
-        self._reload_folders()
-        self.folders.sort(key=lambda item: (prompt_types.index(item.prompt_type), item.relative_dir.casefold()))
+        self.folders.sort(key=self._folder_sort_key)
         self.fill_tree()
 
     def _scan_scope_dirs(self, scope: str, prompt_type: str) -> List[str]:
@@ -833,7 +887,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             )
         )
         self.selected_prompt = new_prompt
-        self.fill_tree()
+        self._mark_dirty()
+        self._refresh_tree_from_memory()
         self.tree_selection_changed()
         self.ui.lineEdit_name.setFocus()
         self.ui.lineEdit_name.selectAll()
@@ -913,7 +968,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return
         self.prompts.remove(self.selected_prompt)
         self.selected_prompt = None
-        self.fill_tree()
+        self._mark_dirty()
+        self._refresh_tree_from_memory()
         self.tree_selection_changed()
 
     def delete_selected(self):
@@ -990,17 +1046,11 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if validated_name is None:
             return
         new_relative_dir = self._join_prompt_path(parent_dir, validated_name)
-        target_abs = self._folder_absolute_path(target_scope, prompt_type, new_relative_dir)
-        if target_abs == "":
-            return
-        if os.path.exists(target_abs):
+        if self._folder_exists_in_scope(prompt_type, new_relative_dir, target_scope):
             Message(self.app, _('Edit prompts'), _('A folder with this name already exists.'), "warning").exec()
             return
-        try:
-            os.makedirs(target_abs, exist_ok=False)
-        except OSError as err:
-            Message(self.app, _('Edit prompts'), _('Could not create folder: ') + str(err), "warning").exec()
-            return
+        self._ensure_folder_record(prompt_type, new_relative_dir, target_scope)
+        self._mark_dirty()
         self._refresh_tree_from_memory()
 
     def rename_folder(self) -> None:
@@ -1011,6 +1061,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return
         scope = self._choose_scope_for_folder_operation(selected_item, "rename")
         if scope is None:
+            return
+        if scope == "system":
+            Message(self.app, _('Edit prompts'), _('System folders are read-only.'), "warning").exec()
             return
         prompt_type = str(selected_item.data(0, ITEM_PROMPT_TYPE_ROLE) or "")
         relative_dir = self._normalize_relative_dir(selected_item.data(0, ITEM_DIRECTORY_ROLE) or "")
@@ -1023,24 +1076,42 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return
         parent_dir = self._relative_dir_of_prompt_path(relative_dir)
         target_dir = self._join_prompt_path(parent_dir, validated_name)
-        source_abs = self._folder_absolute_path(scope, prompt_type, relative_dir)
-        target_abs = self._folder_absolute_path(scope, prompt_type, target_dir)
-        if source_abs == "" or target_abs == "":
+        if target_dir == relative_dir or target_dir.startswith(relative_dir + "/"):
+            Message(self.app, _('Edit prompts'), _('A folder cannot be moved into itself.'), "warning").exec()
             return
-        if os.path.exists(target_abs):
+        if self._folder_exists_in_scope(prompt_type, target_dir, scope):
             Message(self.app, _('Edit prompts'), _('A folder with the target name already exists.'), "warning").exec()
             return
-        try:
-            os.rename(source_abs, target_abs)
-        except OSError as err:
-            Message(self.app, _('Edit prompts'), _('Could not rename folder: ') + str(err), "warning").exec()
-            return
+        updated_folders: List[EditorFolderRecord] = []
+        for folder in self.folders:
+            if folder.prompt_type != prompt_type or scope not in folder.scopes_present:
+                updated_folders.append(folder)
+                continue
+            if folder.relative_dir == relative_dir or folder.relative_dir.startswith(relative_dir + "/"):
+                suffix = folder.relative_dir[len(relative_dir):].lstrip("/")
+                replacement_dir = self._join_prompt_path(target_dir, suffix) if suffix != "" else target_dir
+                new_scopes = set(folder.scopes_present)
+                new_scopes.discard(scope)
+                if len(new_scopes) > 0:
+                    updated_folders.append(EditorFolderRecord(folder.prompt_type, folder.relative_dir, new_scopes))
+                duplicate = False
+                for existing in updated_folders:
+                    if existing.prompt_type == prompt_type and existing.relative_dir == replacement_dir:
+                        existing.scopes_present.add(scope)
+                        duplicate = True
+                        break
+                if not duplicate:
+                    updated_folders.append(EditorFolderRecord(prompt_type, replacement_dir, {scope}))
+                continue
+            updated_folders.append(folder)
+        self.folders = updated_folders
         for prompt in self.prompts:
             if prompt.scope != scope or prompt.prompt_type != prompt_type:
                 continue
             if prompt.directory == relative_dir or prompt.directory.startswith(relative_dir + "/"):
                 suffix = prompt.directory[len(relative_dir):].lstrip("/")
                 prompt.directory = self._join_prompt_path(target_dir, suffix) if suffix != "" else target_dir
+        self._mark_dirty()
         self._refresh_tree_from_memory()
 
     def delete_folder(self) -> None:
@@ -1052,25 +1123,24 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         scope = self._choose_scope_for_folder_operation(selected_item, "delete")
         if scope is None:
             return
+        if scope == "system":
+            Message(self.app, _('Edit prompts'), _('System folders are read-only.'), "warning").exec()
+            return
         prompt_type = str(selected_item.data(0, ITEM_PROMPT_TYPE_ROLE) or "")
         relative_dir = self._normalize_relative_dir(selected_item.data(0, ITEM_DIRECTORY_ROLE) or "")
         msg = _('Do you really want to delete the folder "') + relative_dir + _('" and all prompts it contains?')
         ui = DialogConfirmDelete(self.app, msg, _('Delete Folder'))
         if not ui.exec():
             return
-        target_abs = self._folder_absolute_path(scope, prompt_type, relative_dir)
-        try:
-            shutil.rmtree(target_abs)
-        except OSError as err:
-            Message(self.app, _('Edit prompts'), _('Could not delete folder: ') + str(err), "warning").exec()
-            return
         self.prompts = [
             prompt for prompt in self.prompts
             if not (prompt.scope == scope and prompt.prompt_type == prompt_type and (prompt.directory == relative_dir or prompt.directory.startswith(relative_dir + "/")))
         ]
+        self._remove_folder_scope_recursive(prompt_type, relative_dir, scope)
         if self.selected_prompt is not None and self.selected_prompt.scope == scope and self.selected_prompt.prompt_type == prompt_type:
             if self.selected_prompt.directory == relative_dir or self.selected_prompt.directory.startswith(relative_dir + "/"):
                 self.selected_prompt = None
+        self._mark_dirty()
         self._refresh_tree_from_memory()
 
     def open_tree_context_menu(self, position) -> None:
@@ -1122,8 +1192,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             )
         )
         self.selected_prompt = prompt
-        self.fill_tree()
-        QtCore.QTimer.singleShot(0, self.fill_tree)
+        self._mark_dirty()
+        self._refresh_tree_from_memory()
+        QtCore.QTimer.singleShot(0, self._refresh_tree_from_memory)
         return True
 
     def _drop_target_context(self, item: Optional[QtWidgets.QTreeWidgetItem]) -> Tuple[Optional[str], Optional[str]]:
@@ -1288,7 +1359,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                         item.name.casefold(),
                     )
                 )
-                self.fill_tree()
+                self._mark_dirty()
+                self._refresh_tree_from_memory()
+            else:
+                self._mark_dirty()
         finally:
             self.form_updating = old_form_updating
 
@@ -1299,11 +1373,73 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         rel_parts = [part for part in self._normalize_relative_dir(prompt.directory).split("/") if part != ""]
         return os.path.join(type_root, *rel_parts, prompt.name + ".md")
 
-    def _cleanup_empty_parent_dirs(self, file_path: str, scope: str) -> None:
-        del file_path, scope
-        return
+    def _scan_current_managed_prompt_files(self, scope: str) -> set[str]:
+        result: set[str] = set()
+        for prompt_type in prompt_types:
+            for prompt in self.catalog.list_prompt_variants(
+                prompt_type=prompt_type,
+                include_internal=True,
+                apply_init=False,
+            ):
+                if prompt.scope != scope:
+                    continue
+                current_type = self.catalog.prompt_type_from_name(prompt.name)
+                if current_type != prompt_type:
+                    continue
+                relative_path = self.catalog.prompt_name_within_type(prompt.name)
+                basename = relative_path.rsplit("/", 1)[-1]
+                directory = self._relative_dir_of_prompt_path(relative_path)
+                if basename.startswith("_") or self._is_hidden_relative_dir(directory):
+                    continue
+                result.add(os.path.normcase(os.path.normpath(prompt.file_path)))
+        return result
+
+    def _scan_current_managed_dirs(self, scope: str) -> set[str]:
+        result: set[str] = set()
+        for prompt_type in prompt_types:
+            type_root = self._type_root_dir(scope, prompt_type)
+            if type_root == "" or not os.path.isdir(type_root):
+                continue
+            for relative_dir in self._scan_scope_dirs(scope, prompt_type):
+                if relative_dir == "":
+                    continue
+                result.add(os.path.normcase(os.path.normpath(self._folder_absolute_path(scope, prompt_type, relative_dir))))
+        return result
+
+    def _desired_folder_dirs_for_scope(self, scope: str) -> set[str]:
+        desired: set[str] = set()
+        for folder in self.folders:
+            if scope not in folder.scopes_present:
+                continue
+            abs_dir = self._folder_absolute_path(scope, folder.prompt_type, folder.relative_dir)
+            if abs_dir != "":
+                desired.add(os.path.normcase(os.path.normpath(abs_dir)))
+        for prompt in self.prompts:
+            if prompt.is_system or prompt.scope != scope:
+                continue
+            normalized_dir = self._normalize_relative_dir(prompt.directory)
+            if normalized_dir == "":
+                continue
+            current = ""
+            for part in normalized_dir.split("/"):
+                current = part if current == "" else current + "/" + part
+                abs_dir = self._folder_absolute_path(scope, prompt.prompt_type, current)
+                if abs_dir != "":
+                    desired.add(os.path.normcase(os.path.normpath(abs_dir)))
+        return desired
 
     def ok(self):
+        if self.prompt_type is not None and (
+            self.selected_prompt is None or self.selected_prompt.prompt_type != self.prompt_type
+        ):
+            msg = _(f'You must select a {self.prompt_type} prompt.')
+            Message(self.app, _('Edit prompts'), msg, "warning").exec()
+            return
+
+        if not self.dirty:
+            self.accept()
+            return
+
         for prompt in self.prompts:
             if prompt.is_system:
                 continue
@@ -1318,11 +1454,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 return
             prompt.name = validated_name
 
-        original_paths = {
-            os.path.normcase(os.path.normpath(prompt.original_file_path)): prompt
-            for prompt in self.prompts
-            if not prompt.is_system and str(prompt.original_file_path).strip() != ""
-        }
         final_targets: Dict[str, EditorPromptRecord] = {}
         for prompt in self.prompts:
             if prompt.is_system:
@@ -1339,19 +1470,21 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             final_targets[normalized_target] = prompt
             prompt.current_file_path = target_path
 
-        for normalized_target, prompt in final_targets.items():
-            target_path = prompt.current_file_path
-            if os.path.exists(target_path) and normalized_target not in original_paths:
-                Message(
-                    self.app,
-                    _('Edit prompts'),
-                    _('Saving would overwrite an existing prompt file that is not part of the current editor session: ')
-                    + target_path,
-                    "warning",
-                ).exec()
-                return
-
         try:
+            desired_targets_by_scope: Dict[str, Dict[str, EditorPromptRecord]] = {"user": {}, "project": {}}
+            for normalized_target, prompt in final_targets.items():
+                if prompt.scope in desired_targets_by_scope:
+                    desired_targets_by_scope[prompt.scope][normalized_target] = prompt
+
+            desired_dirs_by_scope = {
+                scope: self._desired_folder_dirs_for_scope(scope)
+                for scope in ("user", "project")
+            }
+
+            for scope in ("user", "project"):
+                for desired_dir in sorted(desired_dirs_by_scope[scope], key=len):
+                    os.makedirs(desired_dir, exist_ok=True)
+
             for prompt in self.prompts:
                 if prompt.is_system:
                     continue
@@ -1367,25 +1500,31 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 with open(target_path, "w", encoding="utf-8") as handle:
                     handle.write(markdown_text)
 
-            final_target_keys = set(final_targets.keys())
-            for normalized_original, original_prompt in original_paths.items():
-                if normalized_original in final_target_keys:
-                    continue
-                try:
-                    os.remove(original_prompt.original_file_path)
-                    self._cleanup_empty_parent_dirs(original_prompt.original_file_path, original_prompt.scope)
-                except OSError:
-                    logger.warning("Could not delete obsolete AI prompt file: %s", original_prompt.original_file_path)
+            for scope in ("user", "project"):
+                current_files = self._scan_current_managed_prompt_files(scope)
+                desired_files = set(desired_targets_by_scope[scope].keys())
+                for current_file in current_files:
+                    if current_file in desired_files:
+                        continue
+                    try:
+                        os.remove(current_file)
+                    except OSError:
+                        logger.warning("Could not delete obsolete AI prompt file: %s", current_file)
+
+                current_dirs = sorted(self._scan_current_managed_dirs(scope), key=lambda item: len(item), reverse=True)
+                desired_dirs = desired_dirs_by_scope[scope]
+                for current_dir in current_dirs:
+                    if current_dir in desired_dirs:
+                        continue
+                    try:
+                        os.rmdir(current_dir)
+                    except OSError:
+                        continue
         except OSError as err:
             Message(self.app, _('Edit prompts'), _('Could not save the prompt files: ') + str(err), "warning").exec()
             return
 
-        if self.prompt_type is not None and (
-            self.selected_prompt is None or self.selected_prompt.prompt_type != self.prompt_type
-        ):
-            msg = _(f'You must select a {self.prompt_type} prompt.')
-            Message(self.app, _('Edit prompts'), msg, "warning").exec()
-            return
+        self.dirty = False
         self.accept()
 
     def cancel(self):
