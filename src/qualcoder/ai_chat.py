@@ -7256,6 +7256,11 @@ data collected. This information will accompany every prompt sent to the AI, res
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
         self._cancel_pending_stream_render()
+        partial_response = str(getattr(self.app.ai, 'ai_streaming_output', '') or self.ai_streaming_output)
+        try:
+            self.app.ai.ai_streaming_output = ''
+        except Exception:
+            pass
         self.ai_streaming_output = ''
 
         def _safe_to_text(obj: object) -> str:
@@ -7268,6 +7273,24 @@ data collected. This information will accompany every prompt sent to the AI, res
                     return '<unprintable>'
 
         try:
+            is_stream_interruption = False
+            try:
+                is_stream_interruption = self.app.ai._is_stream_interruption_exception(value)
+            except Exception:
+                class_name = exception_type.__name__.lower() if exception_type is not None else ''
+                is_stream_interruption = any(
+                    marker in class_name
+                    for marker in ('timeout', 'timedout', 'connection', 'connect', 'network', 'transport')
+                )
+
+            if is_stream_interruption and partial_response != '':
+                self.process_message('ai', partial_response, self.current_streaming_chat_idx)
+                self.process_message(
+                    'info',
+                    _('The AI response was interrupted before it was complete. The partial response was kept.'),
+                    self.current_streaming_chat_idx,
+                )
+
             ai_model_name = self._normalize_ai_profile_author(
                 chat_idx=self.current_streaming_chat_idx,
                 fallback_to_current=True,

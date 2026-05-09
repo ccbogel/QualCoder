@@ -657,6 +657,55 @@ class AiLLM():
         line += f' {err.__class__.__name__}: {error_text}'
         self._write_ai_log(line)
 
+    def _exception_chain(self, err: BaseException):
+        seen = set()
+        current = err
+        while current is not None and id(current) not in seen:
+            seen.add(id(current))
+            yield current
+            current = getattr(current, '__cause__', None) or getattr(current, '__context__', None)
+
+    def _is_timeout_exception(self, err: BaseException) -> bool:
+        for item in self._exception_chain(err):
+            if isinstance(item, (TimeoutError, httpx.TimeoutException)):
+                return True
+            class_name = item.__class__.__name__.lower()
+            if 'timeout' in class_name or 'timedout' in class_name:
+                return True
+        return False
+
+    def _is_stream_interruption_exception(self, err: BaseException) -> bool:
+        for item in self._exception_chain(err):
+            if isinstance(item, (TimeoutError, httpx.TransportError)):
+                return True
+            class_name = item.__class__.__name__.lower()
+            if any(
+                marker in class_name
+                for marker in (
+                    'timeout',
+                    'timedout',
+                    'connection',
+                    'connect',
+                    'network',
+                    'readerror',
+                    'remoteprotocol',
+                    'protocolerror',
+                    'transport',
+                )
+            ):
+                return True
+        return False
+
+    def _allow_partial_stream_result_after_error(self, err: BaseException) -> bool:
+        """Return whether a partial stream can be treated as usable despite an error."""
+
+        # Transport interruptions mean the stream ended before the provider signaled completion.
+        # Returning accumulated text as a normal result would persist a truncated
+        # answer without showing the user that generation failed.
+        if self._is_stream_interruption_exception(err):
+            return False
+        return True
+
     def _next_run_id(self) -> str:
         return "ai-run-" + uuid.uuid4().hex
 
@@ -2540,7 +2589,7 @@ class AiLLM():
             self.log_llm_error(req_id, active_llm, err, context='run_stream')
             # Some providers emit malformed trailing streaming events after content is already complete.
             # Prefer returning the accumulated text instead of failing the whole turn.
-            if self.ai_streaming_output != '':
+            if self.ai_streaming_output != '' and self._allow_partial_stream_result_after_error(err):
                 res = self.ai_streaming_output
                 self.ai_streaming_output = ''
                 if not run_context.cancel_event.is_set():
