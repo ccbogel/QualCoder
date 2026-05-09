@@ -546,6 +546,14 @@ class DialogAiSearch(QtWidgets.QDialog):
             child = item.child(i)
             res.extend(self._get_codes_from_tree(child))
         return res
+
+    def _tree_item_full_name(self, item: QtWidgets.QTreeWidgetItem) -> str:
+        """Return the unabridged code/category name stored in the tree item."""
+
+        full_name = str(item.toolTip(0) if item.toolTip(0) is not None else '').strip()
+        if full_name != '':
+            return full_name
+        return str(item.text(0) if item.text(0) is not None else '').strip()
            
     def ok(self):
         """Collect the infos needed for the ai based search and the filters applied 
@@ -565,7 +573,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             else:
                 item = self.ui.treeWidget.selectedItems()[0]
                 self.selected_code_ids = self._get_codes_from_tree(item)
-                self.selected_code_name = item.text(0)
+                self.selected_code_name = self._tree_item_full_name(item)
                 if self.ui.checkBox_send_memos.isChecked():
                     self.selected_code_memo = item.toolTip(2)
                 else:
@@ -573,7 +581,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                 self.include_coded_segments = self.ui.checkBox_coded_segments.isChecked()
                 item = item.parent()
                 while item is not None and not isinstance(item, QtWidgets.QTreeWidget):
-                    self.selected_code_name = f'{item.text(0)} > {self.selected_code_name}'
+                    self.selected_code_name = f'{self._tree_item_full_name(item)} > {self.selected_code_name}'
                     item = item.parent()               
         else:  # free search selected
             self.selected_code_ids = None
