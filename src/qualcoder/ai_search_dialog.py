@@ -49,6 +49,7 @@ class DialogAiSearch(QtWidgets.QDialog):
     selected_code_name = ''
     selected_code_ids = -1
     selected_code_memo = ''
+    selected_code_scope = []
     include_coded_segments = False
     selected_file_ids = []
     selected_case_ids = []
@@ -126,6 +127,8 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.case_ids = ""
         self.files = []
         self.cases = []
+        self.selected_code_scope = []
+        self.coder_selection_is_custom = False
         self.tree_sort_option = tree_sort_option
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_AiSearch()
@@ -140,7 +143,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.widget_coder.setVisible(False)
         elif context == 'code_analysis':
             self.setWindowTitle('AI Code Analysis')
-            self.ui.label_what.setText(_('1) Which code do you want to analyze?'))
+            self.ui.label_what.setText(_('1) Which codes or categories do you want to analyze?'))
             self.ui.tabWidget.setCurrentIndex(0)
             self.ui.tabWidget.setTabVisible(0, True)  # code search
             self.ui.tabWidget.setTabVisible(1, False)  # free search
@@ -175,7 +178,10 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
+        if context == 'code_analysis':
+            self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
+        else:
+            self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
         if self.ui.tabWidget.isTabVisible(0):  # code
             self.fill_tree(selected_id, selected_is_code) 
         # prompts
@@ -423,6 +429,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.coder_names = []
         for coder_name in selection:
             self.coder_names.append(coder_name['name'])
+        self.coder_selection_is_custom = True
         coder_names_str = ', '.join(self.coder_names)
         self.ui.label_coder.setText(_('Coders: ') + coder_names_str)
         self.fill_code_counts_in_tree()
@@ -554,6 +561,124 @@ class DialogAiSearch(QtWidgets.QDialog):
         if full_name != '':
             return full_name
         return str(item.text(0) if item.text(0) is not None else '').strip()
+
+    def _tree_item_path(self, item: QtWidgets.QTreeWidgetItem) -> str:
+        """Return the full tree path for a code or category item."""
+
+        path = [self._tree_item_full_name(item)]
+        parent = item.parent()
+        while parent is not None and not isinstance(parent, QtWidgets.QTreeWidget):
+            path.insert(0, self._tree_item_full_name(parent))
+            parent = parent.parent()
+        return " > ".join([part for part in path if part != ""])
+
+    def _tree_item_scope_type(self, item: QtWidgets.QTreeWidgetItem) -> str:
+        """Return the tree item scope type: code, category, or unknown."""
+
+        item_id = str(item.text(1) if item.text(1) is not None else '')
+        if item_id.startswith('cid:'):
+            return 'code'
+        if item_id.startswith('catid:'):
+            return 'category'
+        return 'unknown'
+
+    def _tree_item_numeric_id(self, item: QtWidgets.QTreeWidgetItem) -> int:
+        """Return the numeric id stored in the tree item id column."""
+
+        item_id = str(item.text(1) if item.text(1) is not None else '')
+        try:
+            return int(item_id.split(':', 1)[1])
+        except Exception:
+            return -1
+
+    def _iter_code_items_from_tree(self, item: QtWidgets.QTreeWidgetItem) -> list:
+        """Return all code items below item, including item if it is a code."""
+
+        res = []
+        if self._tree_item_scope_type(item) == 'code':
+            res.append(item)
+        for i in range(item.childCount()):
+            res.extend(self._iter_code_items_from_tree(item.child(i)))
+        return res
+
+    def _selected_tree_items_without_selected_ancestors(self) -> list:
+        """Return selected tree items, excluding items already covered by a selected ancestor."""
+
+        selected = list(self.ui.treeWidget.selectedItems())
+        selected_ids = {id(item) for item in selected}
+        result = []
+        for item in selected:
+            parent = item.parent()
+            covered_by_parent = False
+            while parent is not None and not isinstance(parent, QtWidgets.QTreeWidget):
+                if id(parent) in selected_ids:
+                    covered_by_parent = True
+                    break
+                parent = parent.parent()
+            if not covered_by_parent:
+                result.append(item)
+        return result
+
+    def _code_scope_from_tree_item(self, item: QtWidgets.QTreeWidgetItem, include_memos: bool) -> dict:
+        """Build a structured code-analysis scope entry for one selected item."""
+
+        code_items = self._iter_code_items_from_tree(item)
+        included_codes = []
+        code_ids = []
+        for code_item in code_items:
+            code_id = self._tree_item_numeric_id(code_item)
+            if code_id < 0 or code_id in code_ids:
+                continue
+            code_ids.append(code_id)
+            code_scope = {
+                "id": code_id,
+                "path": self._tree_item_path(code_item),
+                "name": self._tree_item_full_name(code_item),
+            }
+            if include_memos:
+                code_scope["memo"] = str(code_item.toolTip(2) if code_item.toolTip(2) is not None else '').strip()
+            included_codes.append(code_scope)
+        scope = {
+            "type": self._tree_item_scope_type(item),
+            "id": self._tree_item_numeric_id(item),
+            "path": self._tree_item_path(item),
+            "name": self._tree_item_full_name(item),
+            "code_ids": code_ids,
+            "included_codes": included_codes,
+        }
+        if include_memos:
+            scope["memo"] = str(item.toolTip(2) if item.toolTip(2) is not None else '').strip()
+        return scope
+
+    def _format_selected_code_name(self, code_scope: list) -> str:
+        """Build a compact display name for the selected code-analysis scope."""
+
+        if len(code_scope) == 0:
+            return ''
+        paths = [str(scope.get("path", "")).strip() for scope in code_scope if str(scope.get("path", "")).strip() != ""]
+        if len(paths) == 1:
+            return paths[0]
+        preview = "; ".join(paths[:3])
+        if len(paths) > 3:
+            preview += "; ..."
+        return preview
+
+    def _format_selected_code_memos(self, code_scope: list) -> str:
+        """Build a compact memo text for the selected top-level code-analysis scope."""
+
+        lines = []
+        for idx, scope in enumerate(code_scope, start=1):
+            memo = str(scope.get("memo", "")).strip()
+            if memo == "":
+                continue
+            scope_type = _("Category") if scope.get("type") == "category" else _("Code")
+            path = str(scope.get("path", "")).strip()
+            if len(code_scope) == 1:
+                lines.append(memo)
+            else:
+                lines.append(f"{idx}. {scope_type}: {path}")
+                lines.append(_("Memo: ") + memo)
+        return "\n".join(lines).strip()
            
     def ok(self):
         """Collect the infos needed for the ai based search and the filters applied 
@@ -571,20 +696,35 @@ class DialogAiSearch(QtWidgets.QDialog):
                 Message(self.app, _('No codes'), msg, "warning").exec()
                 return
             else:
-                item = self.ui.treeWidget.selectedItems()[0]
-                self.selected_code_ids = self._get_codes_from_tree(item)
-                self.selected_code_name = self._tree_item_full_name(item)
-                if self.ui.checkBox_send_memos.isChecked():
-                    self.selected_code_memo = item.toolTip(2)
+                include_memos = self.ui.checkBox_send_memos.isChecked()
+                if self.context == 'code_analysis':
+                    selected_items = self._selected_tree_items_without_selected_ancestors()
+                    self.selected_code_scope = [
+                        self._code_scope_from_tree_item(item, include_memos) for item in selected_items
+                    ]
+                    self.selected_code_ids = []
+                    for scope in self.selected_code_scope:
+                        for code_id in list(scope.get("code_ids", []) or []):
+                            if code_id not in self.selected_code_ids:
+                                self.selected_code_ids.append(code_id)
+                    self.selected_code_name = self._format_selected_code_name(self.selected_code_scope)
+                    if include_memos:
+                        self.selected_code_memo = self._format_selected_code_memos(self.selected_code_scope)
+                    else:
+                        self.selected_code_memo = ''
                 else:
-                    self.selected_code_memo = ''
+                    item = self.ui.treeWidget.selectedItems()[0]
+                    self.selected_code_ids = self._get_codes_from_tree(item)
+                    self.selected_code_scope = []
+                    self.selected_code_name = self._tree_item_path(item)
+                    if include_memos:
+                        self.selected_code_memo = item.toolTip(2)
+                    else:
+                        self.selected_code_memo = ''
                 self.include_coded_segments = self.ui.checkBox_coded_segments.isChecked()
-                item = item.parent()
-                while item is not None and not isinstance(item, QtWidgets.QTreeWidget):
-                    self.selected_code_name = f'{self._tree_item_full_name(item)} > {self.selected_code_name}'
-                    item = item.parent()               
         else:  # free search selected
             self.selected_code_ids = None
+            self.selected_code_scope = []
             self.selected_code_name = self.ui.lineEdit_free_topic.text()
             if self.selected_code_name == '':
                 msg = _('Please enter text in the "topic" field.')
@@ -649,6 +789,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             "has_attribute_filter": (len(self.attribute_file_ids) > 0),
             "selected_case_ids": list(self.selected_case_ids),
             "selected_case_names": list(self.selected_case_names),
+            "custom_coder_filter": bool(self.coder_selection_is_custom),
         }
 
         if len(self.selected_file_ids) == 0:
@@ -672,6 +813,7 @@ class DialogAiSearch(QtWidgets.QDialog):
     def cancel(self):
         self.selected_code_name = ''
         self.selected_code_memo = ''
+        self.selected_code_scope = []
         self.selected_file_ids = []
         self.selected_case_ids = []
         self.selected_case_names = []

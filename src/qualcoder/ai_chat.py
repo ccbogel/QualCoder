@@ -2996,6 +2996,10 @@ class DialogAIChat(QtWidgets.QDialog):
         """Build a compact coder/material summary for the code analysis chat header."""
 
         material_summary = self._topic_exploration_filter_summary(file_ids, filter_info)
+        custom_coder_filter = (
+            isinstance(filter_info, dict)
+            and bool(filter_info.get("custom_coder_filter", False))
+        )
         normalized_coders: List[str] = []
         seen_coders: set[str] = set()
         for raw in list(coder_names or []):
@@ -3007,32 +3011,37 @@ class DialogAIChat(QtWidgets.QDialog):
                 continue
             seen_coders.add(key)
             normalized_coders.append(coder)
-        if len(normalized_coders) == 0:
+        if len(normalized_coders) == 0 or not custom_coder_filter:
             return _('Visible coders; ') + material_summary
         return _('Coders: {}; ').format(", ".join(normalized_coders)) + material_summary
 
     def _code_analysis_scope_env_update(self, code_name: str, code_memo: str, code_ids: List[int],
                                         coder_names: List[str], file_ids: List[int],
-                                        filter_info: Optional[Dict[str, Any]] = None) -> str:
+                                        filter_info: Optional[Dict[str, Any]] = None,
+                                        code_scope: Optional[List[Dict[str, Any]]] = None) -> str:
         """Build one durable scope note for code analysis agent chats."""
 
         focus_name = str(code_name if code_name is not None else '').strip()
         memo_text = str(code_memo if code_memo is not None else '').strip()
         selected_codes = self._selected_code_names(code_ids)
         coder_summary = self._code_analysis_filter_summary(file_ids, coder_names, filter_info)
+        structured_scope = self._format_code_analysis_selection_scope(code_scope)
 
         lines = [
             'System event: This AI agent chat was started in code analysis mode.',
             f'Focus code or category: "{focus_name}".',
         ]
-        if memo_text != '':
+        if structured_scope != '':
+            lines.append('Structured user selection:')
+            lines.append(structured_scope)
+        elif memo_text != '':
             lines.append('Code memo: ' + memo_text)
-        if len(selected_codes) > 1:
+        if structured_scope == '' and len(selected_codes) > 1:
             preview = ", ".join(selected_codes[:8])
             if len(selected_codes) > 8:
                 preview += ', ...'
             lines.append(f'Selected subcodes ({len(selected_codes)}): {preview}')
-        elif len(selected_codes) == 1:
+        elif structured_scope == '' and len(selected_codes) == 1:
             lines.append('Selected code: ' + selected_codes[0])
         lines.append('Selected coding scope: ' + coder_summary)
         lines.append('Base the analysis primarily on the selected coded segments.')
@@ -3041,27 +3050,77 @@ class DialogAIChat(QtWidgets.QDialog):
         lines.append('If a broader scope expansion would be helpful, ask the user for permission first.')
         return "\n".join(lines)
 
+    def _format_code_analysis_selection_scope(self, code_scope: Optional[List[Dict[str, Any]]]) -> str:
+        """Format the user's structured code/category selection for the AI context."""
+
+        if not isinstance(code_scope, list) or len(code_scope) == 0:
+            return ''
+        lines: List[str] = []
+        max_codes_per_scope = 60
+        for idx, raw_scope in enumerate(code_scope, start=1):
+            if not isinstance(raw_scope, dict):
+                continue
+            scope_type = str(raw_scope.get("type", "")).strip()
+            label = "Category branch" if scope_type == "category" else "Code"
+            path = str(raw_scope.get("path", "")).strip()
+            if path == "":
+                path = str(raw_scope.get("name", "")).strip()
+            lines.append(f"{idx}. {label}: {path}")
+            memo = str(raw_scope.get("memo", "")).strip()
+            if memo != "":
+                lines.append(f"   Memo: {memo}")
+            included_codes = list(raw_scope.get("included_codes", []) or [])
+            if scope_type == "category":
+                lines.append(f"   Includes {len(included_codes)} descendant code(s).")
+                for code_scope_item in included_codes[:max_codes_per_scope]:
+                    if not isinstance(code_scope_item, dict):
+                        continue
+                    code_path = str(code_scope_item.get("path", "")).strip()
+                    if code_path == "":
+                        code_path = str(code_scope_item.get("name", "")).strip()
+                    if code_path == "":
+                        continue
+                    lines.append(f"   - {code_path}")
+                    code_memo = str(code_scope_item.get("memo", "")).strip()
+                    if code_memo != "":
+                        lines.append(f"     Memo: {code_memo}")
+                if len(included_codes) > max_codes_per_scope:
+                    omitted = len(included_codes) - max_codes_per_scope
+                    lines.append(f"   - ... {omitted} additional descendant code(s) omitted from this summary.")
+        return "\n".join(lines).strip()
+
     def _code_analysis_bootstrap_contract(self, code_name: str, code_memo: str, prompt: AgentPromptRecord,
-                                          code_ids: List[int]) -> str:
+                                          code_ids: List[int],
+                                          code_scope: Optional[List[Dict[str, Any]]] = None) -> str:
         """Build the task contract for the first code-analysis turn before normal agent finalization."""
 
         focus_name = str(code_name if code_name is not None else '').strip()
         memo_text = str(code_memo if code_memo is not None else '').strip()
         prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
         selected_codes = self._selected_code_names(code_ids)
+        structured_scope = self._format_code_analysis_selection_scope(code_scope)
         if memo_text == '':
             memo_text = _('(no memo provided)')
         code_scope_text = _('one selected code')
         if len(selected_codes) > 1:
             code_scope_text = _('{} selected codes').format(len(selected_codes))
+        scope_instruction = ''
+        if structured_scope != '':
+            scope_instruction = (
+                "The user selection is structured as follows. Preserve these selected groups in your analysis, "
+                "especially when comparing sibling codes or separate category branches:\n"
+                f"{structured_scope}\n"
+            )
         return (
             "Your task: "
             f'Work on a code analysis request centered on "{focus_name}". '
             f'Code memo: {memo_text}\n'
+            f'{scope_instruction}'
             f'The selected analysis prompt "/{prompt_name}" is active for this chat and should guide your analysis.\n'
             f'The coded segments for {code_scope_text} are already available in this conversation as MCP resource results. '
             'Treat these coded segments as the primary focus of the task. '
-            'Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly.'
+            'Do not make empirical claims without support from retrieved evidence. '
+            'If support is uncertain, state the uncertainty clearly.'
         )
 
     def _mcp_code_analysis_worker(self, messages: List[Any], chat_idx: int,
@@ -3089,6 +3148,7 @@ class DialogAIChat(QtWidgets.QDialog):
         code_memo = str(spec.get("code_memo", "")).strip()
         file_ids = list(spec.get("file_ids", []) or [])
         code_ids = list(spec.get("code_ids", []) or [])
+        code_scope = list(spec.get("code_scope", []) or [])
         coder_names = list(spec.get("coder_names", []) or [])
         prompt_name = str(spec.get("prompt_name", "")).strip()
 
@@ -3288,6 +3348,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     code_memo,
                     prompt_record,
                     normalized_code_ids,
+                    code_scope,
                 )
                 + "\n\n"
                 + self._mcp_reflection_system_prompt()
@@ -3575,6 +3636,7 @@ class DialogAIChat(QtWidgets.QDialog):
             code_memo = str(ui.selected_code_memo if ui.selected_code_memo is not None else '').strip()
             file_ids = list(ui.selected_file_ids or [])
             code_ids = list(ui.selected_code_ids or [])
+            code_scope = list(getattr(ui, 'selected_code_scope', []) or [])
             coder_names = list(ui.coder_names or [])
             filter_info = dict(ui.selected_filter_info) if isinstance(ui.selected_filter_info, dict) else {}
             prompt_record = ui.current_prompt
@@ -3590,8 +3652,6 @@ class DialogAIChat(QtWidgets.QDialog):
                 return
 
             summary = _('Analyzing the data coded as "{}" ({} matching segments in scope.)').format(code_name, segment_count)
-            if code_memo != '':
-                summary += _('\nMemo:') + f' {code_memo}'
             prompt_label = self._analysis_prompt_display_name_and_scope(prompt_record, 'code_analysis')
             summary += _('\nPrompt:') + f' {prompt_label}'
             summary += _('\nMaterial:') + ' ' + self._code_analysis_filter_summary(file_ids, coder_names, filter_info)
@@ -3609,13 +3669,16 @@ data collected. This information will accompany every prompt sent to the AI, res
             self._persist_agent_prompt_record(chat_idx, prompt_record)
             self.process_message(
                 'env_update',
-                self._code_analysis_scope_env_update(code_name, code_memo, code_ids, coder_names, file_ids, filter_info),
+                self._code_analysis_scope_env_update(
+                    code_name, code_memo, code_ids, coder_names, file_ids, filter_info, code_scope
+                ),
                 chat_idx,
             )
             bootstrap_spec = {
                 "code_name": code_name,
                 "code_memo": code_memo,
                 "code_ids": code_ids,
+                "code_scope": code_scope,
                 "coder_names": coder_names,
                 "file_ids": file_ids,
                 "filter_info": filter_info,
