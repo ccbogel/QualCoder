@@ -39,6 +39,7 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
+from .code_in_all_files import DialogCodedIds
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
@@ -961,7 +962,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
             if inserted_col == 1:  # For Case results, insert the Filename data
                 ws.cell(column=2, row=row + 2, value=data['filename'])
-            ws.cell(column=2 + inserted_col, row=row + 2, value=data['coder'])  # re-added missing 'coder' cell write that was lost during merge
+            ws.cell(column=2 + inserted_col, row=row + 2, value=data['coder'])  # added missing 'coder' cell write that was lost during merge
             ''' TODO 
             align_cell = ws.cell(column=2 + inserted_col, row=row + 2)
             align_cell.value = data['coder']
@@ -1046,36 +1047,50 @@ class DialogReportCodes(QtWidgets.QDialog):
             counter += 1
         return category_names
 
-    def get_cooccurring_codes(self, item): # <- L
+    def get_cooccurring_codes(self, item):
         """ Get co-occurring (overlapping) code names for the given coded segment.
         Searches for other codes in the same file whose span overlaps with the current segment.
+
         Excludes the current code itself (by ctid/imid/avid).
 
-        param: item : Dictionary of a single result row (text, image or av)
-        return: List of co-occurring code names (strings), sorted alphabetically, deduplicated.
+        Called by: fill_text_edit_with_search_results()
+
+        Args:
+            item : Dictionary of a single result row (text, image or av)
+        return:
+            List of co-occurring code names (strings), sorted alphabetically, no duplicates.
         """
 
         cur = self.app.conn.cursor()
-        cooccur_names = set()
+        cooccuring_code_names = []
         if item.get('result_type') == 'text':
-            sql = ("select distinct code_name.name from code_text "
+            ctids = []
+            sql = ("select code_name.name, ctid  from code_text "
                    "join code_name on code_name.cid = code_text.cid "
                    "where code_text.fid=? and code_text.ctid<>? "
                    "and code_text.pos0 < ? and code_text.pos1 > ?")
             cur.execute(sql, [item['fid'], item['ctid'], item['pos1'], item['pos0']])
             for row in cur.fetchall():
-                cooccur_names.add(row[0])
+                cooccuring_code_names.append(row[0])
+                ctids.append(row[1])
+            if ctids:
+                item['overlaps'] = {'text': ctids}
         elif item.get('result_type') == 'av':
-            sql = ("select distinct code_name.name from code_av "
+            avids = []
+            sql = ("select code_name.name, avid from code_av "
                    "join code_name on code_name.cid = code_av.cid "
                    "where code_av.id=? and code_av.avid<>? "
                    "and code_av.pos0 < ? and code_av.pos1 > ?")
             cur.execute(sql, [item['fid'], item['avid'], item['pos1'], item['pos0']])
             for row in cur.fetchall():
-                cooccur_names.add(row[0])
+                cooccuring_code_names.append(row[0])
+                avids.append(row[1])
+            if avids:
+                item['overlaps'] = {'av': avids}
         elif item.get('result_type') == 'image':
+            imgids = []
             # Two rectangles overlap if they intersect on both axes.
-            sql = ("select distinct code_name.name, x1, y1, width, height from code_image "
+            sql = ("select code_name.name, x1, y1, width, height, imid from code_image "
                    "join code_name on code_name.cid = code_image.cid "
                    "where code_image.id=? and code_image.imid<>?")
             cur.execute(sql, [item['fid'], item['imid']])
@@ -1084,12 +1099,16 @@ class DialogReportCodes(QtWidgets.QDialog):
             ax2 = ax1 + item['width']
             ay2 = ay1 + item['height']
             for row in cur.fetchall():
-                name, bx1, by1, bw, bh = row
+                name, bx1, by1, bw, bh, iid = row
                 bx2 = bx1 + bw
                 by2 = by1 + bh
                 if ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1:
-                    cooccur_names.add(name)
-        return sorted(cooccur_names)
+                    cooccuring_code_names.append(name)
+                    imgids.append(row[5])
+            if imgids:
+                item['overlaps'] = {'image': imgids}
+        cooccuring_code_names = sorted(list(set(cooccuring_code_names)))
+        return cooccuring_code_names
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
@@ -1541,10 +1560,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.results = tmp
         # Organise results
         self.sort_search_results()
-
-        if self.ui.checkBox_overlaps.isChecked():
-            self.results = self.filter_for_code_overlaps()
-
         self.fill_text_edit_with_search_results()
         # Clean up for next search. Except attributes list, keep attributes selection active.
         self.attribute_file_ids = []
@@ -1811,78 +1826,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                                     'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
                                     'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
             self.results.append(tmp)
-
-    def filter_for_code_overlaps(self):
-        """ Filter out non-overlapping codes. """
-
-        res_av = []
-        res_text = []
-        res_img = []
-        # 1. Split results into text, av, image
-        for r in self.results:
-            if r['result_type'] == 'text':
-                r['overlaps'] = ""
-                res_text.append(r)
-            if r['result_type'] == 'av':
-                r['overlaps'] = ""
-                res_av.append(r)
-            if r['result_type'] == 'image':
-                r['overlaps'] = ""
-                res_img.append(r)
-
-        # 2. Compare each set of coded results
-        for t in res_text:
-            for t2 in res_text:
-                if t == t2:
-                    continue
-                # Inclusion t inside t2
-                if t['fid'] == t2['fid'] and t['coder'] == t2['coder'] and t['pos0'] >= t2['pos0'] and t['pos1'] <= t2['pos1']:
-                    #print(f"\nINCLUSION: {t2['codename']} contains {t['codename']}")
-                    t2['overlaps'] += f"\nINCLUSION: {t2['codename']} [{t2['pos0']}-{t2['pos1']}] contains: {t['codename']} [{t['pos0']}-{t['pos1']}]"
-                    t['overlaps'] += f"\nINCLUSION: {t['codename']} [{t['pos0']}-{t['pos1']}] within: {t2['codename']} [{t2['pos0']}-{t2['pos1']}]"
-                    #print(t)
-                    continue
-                # left side t is below t2. t overlaps on the right side,
-                if t['fid'] == t2['fid'] and t['coder'] == t2['coder'] and t['pos0'] < t2['pos0'] and t['pos1'] >= t2['pos0']:
-                    #print(f"\nOverlap R:{t2['codename']} - {t['codename']}")
-                    t['overlaps'] += f"\nOverlaps: {t['codename']} [{t['pos0']}-{t['pos1']}] : {t2['codename']} [{t2['pos0']}-{t2['pos1']}]"
-                    t2['overlaps'] += f"\nOverlaps: {t2['codename']} [{t2['pos0']}-{t2['pos1']}] : {t['codename']} [{t['pos0']}-{t['pos1']}]"
-                    continue
-
-        # Compare each set of coded a/v results for inclusions and overlaps
-        for a in res_av:
-            for a2 in res_av:
-                if a == a2:
-                    continue
-                # Inclusion a inside a2
-                if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] >= a2['pos0'] and a['pos1'] <= a2['pos1']:
-                    # print(f"\nINCLUSION: {a2['codename']} contains {a['codename']}")
-                    a2['overlaps'] += f"\nINCLUSION: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] contains: {a['codename']} [{a['pos0']}-{a['pos1']}]"
-                    a['overlaps'] += f"\nINCLUSION: {a['codename']} [{a['pos0']}-{a['pos1']}] within: {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
-                    # print(a)
-                    continue
-                # left side a is below a2. a overlaps on the right side,
-                if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] < a2['pos0'] and a['pos1'] >= a2['pos0']:
-                    # print(f"\nOverlap R:{a2['codename']} - {a['codename']}")
-                    a['overlaps'] += f"\nOverlaps: {a['codename']} [{a['pos0']}-{a['pos1']}] : {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
-                    a2['overlaps'] += f"\nOverlaps: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] : {a['codename']} [{a['pos0']}-{a['pos1']}]"
-                    continue
-
-        '''for i in img:
-            pass
-        '''  # Removed leftover 'for a in av' placeholder, now implemented above
-        overlaps = []
-        for item in res_text:
-            if item['overlaps'] != "":
-                overlaps.append(item)
-        for item in res_av:
-            if item['overlaps'] != "":
-                overlaps.append(item)
-        for item in res_img:
-            if item['overlaps'] != "":
-                overlaps.append(item)
-
-        return overlaps
 
     def sort_search_results(self):
         """ Sort results by alphabet or by code count, ascending or descending. """
@@ -2267,7 +2210,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['coded_memo'] + "\n")
 
-            # Add Overlaps notice, if present and non-empty <- L
+            # Add Overlaps notice, if present and non-empty
             if row.get('overlaps'):  # skip when 'overlaps' is missing OR empty string
                 self.ui.textEdit.insertPlainText(row['overlaps'] + "\n")
 
@@ -2312,11 +2255,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             if row['result_type'] == 'av' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.ui.textEdit.insertPlainText(f"\n{row['text']}\n")
 
-            # show co-ocurrences after coded memo (skip on memo-only modes for consistency) <- L
+            # Show co-ocurrences after coded memo (skip on memo-only modes for consistency)
             if memo_choice_index not in (4, 5):  # hide co-occurrences in "Only memos" / "Only coded memos"
-                cooccur = self.get_cooccurring_codes(row)
-                if cooccur:
-                    self.ui.textEdit.insertPlainText(f"{_('Co-occurring:')} [{', '.join(cooccur)}]\n")
+                overlaps = self.get_cooccurring_codes(row)  # Adds ctids, imids, avids of the overlaps as Dict{[list]}
+                if overlaps:
+                    self.ui.textEdit.insertPlainText(f"{_('Overlapping codes:')} [{', '.join(overlaps)}]\n")
 
             self.text_links.append(row)
         self.eventFilterTT.set_positions(self.text_links)
@@ -2559,6 +2502,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_edit_memo = None
         action_change_code_to = None
         action_apply_additional_code = None
+        action_show_overlaps = None
         code_here = None
         for row in self.results:
             if row['textedit_start'] <= pos < row['textedit_end']:
@@ -2571,6 +2515,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             action_change_code_to = menu.addAction(_("Change code to"))
             action_edit_memo = menu.addAction(_("Edit memo"))
             action_apply_additional_code = menu.addAction(_("Apply additional code"))
+            if 'overlaps' in code_here:
+                print(code_here)
+                action_show_overlaps = menu.addAction(_("Show overlapping codes"))
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -2612,6 +2559,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.groupBox.setVisible(False)
         if action == action_rotate_180:
             self.rotate_image(cursor_context_pos, img_fmt, html_link, 90)
+        if action == action_show_overlaps:
+            Message(self.app, "TODO", f"TODO WORK IN PROGRESS\nShow overlaps: {code_here['overlaps']}").exec()
+            #DialogCodedIds(self.app, code_here['overlaps']).exec()
 
     def mark_important(self, code):
         """ Add important mark to coding.
