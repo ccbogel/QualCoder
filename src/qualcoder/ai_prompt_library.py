@@ -116,6 +116,7 @@ ITEM_IS_TYPE_ROOT_ROLE = Qt.ItemDataRole.UserRole + 26
 ITEM_KIND_PROMPT = "prompt"
 ITEM_KIND_FOLDER = "folder"
 ITEM_KIND_TYPE = "type"
+ITEM_KIND_ROOT = "root"
 
 
 class DialogAiEditPrompts(QtWidgets.QDialog):
@@ -155,6 +156,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         )
         self.ui.treeWidget_prompts.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget_prompts.customContextMenuRequested.connect(self.open_tree_context_menu)
+        self.ui.treeWidget_prompts.itemCollapsed.connect(self.on_tree_item_collapsed)
         self.ui.treeWidget_prompts.setDragEnabled(True)
         self.ui.treeWidget_prompts.setAcceptDrops(True)
         self.ui.treeWidget_prompts.setDropIndicatorShown(True)
@@ -519,8 +521,27 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         item.setData(0, ITEM_DIRECTORY_ROLE, "")
         item.setData(0, ITEM_IS_TYPE_ROOT_ROLE, True)
 
-    def _make_type_item(self, prompt_type: str) -> QtWidgets.QTreeWidgetItem:
+    def _set_root_item_data(self, item: QtWidgets.QTreeWidgetItem) -> None:
+        item.setData(0, ITEM_KIND_ROLE, ITEM_KIND_ROOT)
+        item.setData(0, ITEM_PROMPT_TYPE_ROLE, "general")
+        item.setData(0, ITEM_DIRECTORY_ROLE, "")
+        item.setData(0, ITEM_IS_TYPE_ROOT_ROLE, True)
+
+    def _make_root_item(self) -> QtWidgets.QTreeWidgetItem:
         item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
+        item.setText(0, "/")
+        item.setToolTip(0, _("Root of the prompt library"))
+        item.setIcon(0, self._folder_icon())
+        font = QFont(item.font(0))
+        font.setBold(True)
+        item.setFont(0, font)
+        item.setFlags((item.flags() | Qt.ItemFlag.ItemIsDropEnabled) & ~Qt.ItemFlag.ItemIsDragEnabled)
+        self._set_root_item_data(item)
+        item.setExpanded(True)
+        return item
+
+    def _make_type_item(self, prompt_type: str) -> QtWidgets.QTreeWidgetItem:
+        item = QtWidgets.QTreeWidgetItem()
         item.setText(0, self._type_display_name(prompt_type))
         item.setToolTip(0, prompt_types_descriptions.get(prompt_type, ""))
         item.setIcon(0, self._type_icon(prompt_type))
@@ -579,16 +600,22 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 selected_path = "|".join(self.tree_get_item_path(self.ui.treeWidget_prompts.selectedItems()[0]))
 
             self.ui.treeWidget_prompts.clear()
+            root_item = self._make_root_item()
+            if selected_path != "" and selected_path == "/" and target_item_holder["item"] is None:
+                target_item_holder["item"] = root_item
             for prompt_type in prompt_types:
                 if self.prompt_type is not None and prompt_type != self.prompt_type:
                     continue
                 if prompt_type == "general":
-                    self._populate_type_branch(prompt_type, self.ui.treeWidget_prompts, "", selected_path, target_item_holder)
+                    self._populate_type_branch(prompt_type, root_item, "", selected_path, target_item_holder)
                     continue
                 type_item = self._make_type_item(prompt_type)
-                if selected_path != "" and selected_path == self._type_display_name(prompt_type) and target_item_holder["item"] is None:
+                root_item.addChild(type_item)
+                if selected_path != "" and selected_path == "/|" + self._type_display_name(prompt_type) and target_item_holder["item"] is None:
                     target_item_holder["item"] = type_item
                 self._populate_type_branch(prompt_type, type_item, "", selected_path, target_item_holder)
+
+            root_item.setExpanded(True)
 
             target_item = target_item_holder["item"]
             if target_item is not None:
@@ -607,6 +634,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     self._expand_item_ancestors(first_prompt_item)
                     self.ui.treeWidget_prompts.setCurrentItem(first_prompt_item)
                     first_prompt_item.setSelected(True)
+                else:
+                    self.ui.treeWidget_prompts.setCurrentItem(root_item)
+                    root_item.setSelected(True)
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 self.ui.treeWidget_prompts.scrollToItem(
                     self.ui.treeWidget_prompts.selectedItems()[0],
@@ -685,6 +715,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             ):
                 return prompt
         return None
+
+    def on_tree_item_collapsed(self, item: QtWidgets.QTreeWidgetItem) -> None:
+        if str(item.data(0, ITEM_KIND_ROLE) or "") == ITEM_KIND_ROOT:
+            item.setExpanded(True)
 
     def tree_selection_changed(self):
         if self.form_updating:
@@ -765,6 +799,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         kind = str(selected_item.data(0, ITEM_KIND_ROLE) or "")
         prompt_type = str(selected_item.data(0, ITEM_PROMPT_TYPE_ROLE) or self.prompt_type or "general")
         relative_dir = self._normalize_relative_dir(selected_item.data(0, ITEM_DIRECTORY_ROLE) or "")
+        if kind == ITEM_KIND_ROOT:
+            return "general", ""
         if kind == ITEM_KIND_PROMPT:
             return prompt_type, relative_dir
         if kind == ITEM_KIND_FOLDER:
@@ -800,6 +836,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 new_scope = "project"
             elif "user" in folder_scopes:
                 new_scope = "user"
+        elif kind == ITEM_KIND_ROOT:
+            new_type = "general"
+            new_dir = ""
         elif kind == ITEM_KIND_TYPE:
             new_type = str(selected_item.data(0, ITEM_PROMPT_TYPE_ROLE) or new_type)
         if new_scope == "system":
@@ -1129,9 +1168,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         menu = QtWidgets.QMenu(self)
         selected_item = self.ui.treeWidget_prompts.currentItem()
         kind = str(selected_item.data(0, ITEM_KIND_ROLE) or "") if selected_item is not None else ""
-        if kind in (ITEM_KIND_TYPE, ITEM_KIND_FOLDER, ITEM_KIND_PROMPT) or selected_item is None:
+        if kind in (ITEM_KIND_ROOT, ITEM_KIND_TYPE, ITEM_KIND_FOLDER, ITEM_KIND_PROMPT) or selected_item is None:
+            new_prompt_action = QAction(_('New prompt'), self)
             new_folder_action = QAction(_('New folder'), self)
+            new_prompt_action.triggered.connect(self.new_prompt)
             new_folder_action.triggered.connect(self.new_folder)
+            menu.addAction(new_prompt_action)
             menu.addAction(new_folder_action)
         if kind == ITEM_KIND_FOLDER:
             rename_folder_action = QAction(_('Rename folder'), self)
@@ -1180,6 +1222,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if item is None:
             return None, None
         kind = str(item.data(0, ITEM_KIND_ROLE) or "")
+        if kind == ITEM_KIND_ROOT:
+            return "general", ""
         if kind == ITEM_KIND_TYPE:
             return str(item.data(0, ITEM_PROMPT_TYPE_ROLE) or ""), ""
         if kind == ITEM_KIND_FOLDER:
