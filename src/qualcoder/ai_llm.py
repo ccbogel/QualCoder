@@ -91,6 +91,7 @@ class AiRunContext:
     http_client: object = None
     llm: object = None
     stream_iter: object = None
+    streaming_output: str = ''
     status: str = 'queued'
     created_at: float = field(default_factory=time.time)
     finished_at: float = 0.0
@@ -472,7 +473,6 @@ class AiLLM():
     _status = ''   
     large_llm_context_window = 128000
     fast_llm_context_window = 16385
-    ai_streaming_output = ''
     sources_collection = 'qualcoder'  # name of the vectorstore collection for source documents
     ai_log_logger = None
     ai_log_handler = None
@@ -491,6 +491,7 @@ class AiLLM():
         self._runs_by_id = {}
         self._latest_run_by_scope = {}
         self._last_status_by_scope = {}
+        self._last_streaming_output_by_run = {}
         self._llm_run_local = threading.local()
         self._large_llm_params = None
         self._fast_llm_params = None
@@ -803,12 +804,40 @@ class AiLLM():
             if scope_type != '':
                 self._last_status_by_scope[self._scope_key(scope_type, run_context.scope_id)] = run_context.status
 
+    def get_streaming_output(self, run_id: str = '') -> str:
+        normalized = str(run_id).strip()
+        if normalized == '':
+            return ''
+        with self._runs_lock:
+            run_context = self._runs_by_id.get(normalized)
+            if run_context is not None:
+                return str(getattr(run_context, 'streaming_output', ''))
+            return str(self._last_streaming_output_by_run.get(normalized, ''))
+
+    def clear_streaming_output(self, run_id: str = ''):
+        normalized = str(run_id).strip()
+        with self._runs_lock:
+            if normalized == '':
+                for run_context in self._runs_by_id.values():
+                    run_context.streaming_output = ''
+                self._last_streaming_output_by_run.clear()
+            else:
+                run_context = self._runs_by_id.get(normalized)
+                if run_context is not None:
+                    run_context.streaming_output = ''
+                self._last_streaming_output_by_run.pop(normalized, None)
+
     def _finalize_run_context(self, run_context: AiRunContext, terminal_status: str = ''):
         if run_context is None:
             return
         with self._runs_lock:
             current = self._runs_by_id.get(run_context.run_id)
             current = run_context if current is None else current
+            streaming_output = str(getattr(current, 'streaming_output', ''))
+            if streaming_output != '':
+                self._last_streaming_output_by_run[current.run_id] = streaming_output
+                while len(self._last_streaming_output_by_run) > 20:
+                    self._last_streaming_output_by_run.pop(next(iter(self._last_streaming_output_by_run)), None)
             if terminal_status != '':
                 current.status = terminal_status
             if current.status not in ('finished', 'errored', 'canceled'):
@@ -2403,7 +2432,6 @@ class AiLLM():
                 self._large_reasoning_effort = str(curr_model.get('reasoning_effort', '')).strip().lower()
                 self._fast_reasoning_effort = ''
                 
-                self.ai_streaming_output = ''
                 self.app.settings['ai_enable'] = 'True'
                 
                 # init vectorstore
@@ -2437,6 +2465,7 @@ class AiLLM():
             self._runs_by_id.clear()
             self._latest_run_by_scope.clear()
             self._last_status_by_scope.clear()
+            self._last_streaming_output_by_run.clear()
         self._status = ''
         
     def cancel(self, ask: bool) -> bool:
@@ -2555,9 +2584,9 @@ class AiLLM():
         return run_context.run_id
 
     def _run_stream_worker(self, signals, run_context: AiRunContext, messages):
-        self.ai_streaming_output = ''
         self._set_current_run_context(run_context)
         self._update_run_status(run_context.run_id, 'running')
+        run_context.streaming_output = ''
         active_llm = run_context.llm
         req_id = self.log_llm_request(active_llm, messages, context='run_stream')
         stream_iter = None
@@ -2570,7 +2599,7 @@ class AiLLM():
                     break  # cancel the streaming
                 else:
                     chunk_text = str(getattr(chunk, 'content', ''))
-                    self.ai_streaming_output += chunk_text
+                    run_context.streaming_output += chunk_text
                     if signals is not None:
                         if signals.streaming is not None:
                             signals.streaming.emit(chunk_text)
@@ -2582,16 +2611,16 @@ class AiLLM():
         except Exception as err:
             if run_context.cancel_event.is_set():
                 self._update_run_status(run_context.run_id, 'canceled')
-                res = self.ai_streaming_output
-                self.ai_streaming_output = ''
+                res = run_context.streaming_output
+                self.clear_streaming_output(run_context.run_id)
                 return res
             self._update_run_status(run_context.run_id, 'errored', self._safe_to_text(err))
             self.log_llm_error(req_id, active_llm, err, context='run_stream')
             # Some providers emit malformed trailing streaming events after content is already complete.
             # Prefer returning the accumulated text instead of failing the whole turn.
-            if self.ai_streaming_output != '' and self._allow_partial_stream_result_after_error(err):
-                res = self.ai_streaming_output
-                self.ai_streaming_output = ''
+            if run_context.streaming_output != '' and self._allow_partial_stream_result_after_error(err):
+                res = run_context.streaming_output
+                self.clear_streaming_output(run_context.run_id)
                 if not run_context.cancel_event.is_set():
                     self.log_llm_response(req_id, active_llm, res, context='run_stream_partial')
                 return res
@@ -2610,8 +2639,8 @@ class AiLLM():
             )
             self._finalize_run_context(run_context, terminal_status)
             self._clear_current_run_context()
-        res = self.ai_streaming_output
-        self.ai_streaming_output = ''
+        res = run_context.streaming_output
+        self.clear_streaming_output(run_context.run_id)
         if not run_context.cancel_event.is_set():
             self.log_llm_response(req_id, active_llm, res, context='run_stream')
         return res

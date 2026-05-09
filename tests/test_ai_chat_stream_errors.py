@@ -12,10 +12,16 @@ except ModuleNotFoundError as err:
 
 class _AiService:
     def __init__(self):
-        self.ai_streaming_output = "partial answer"
+        self.outputs = {"run-1": "partial answer"}
 
     def _is_stream_interruption_exception(self, err):
         return isinstance(err, httpx.TransportError)
+
+    def get_streaming_output(self, run_id):
+        return self.outputs.get(run_id, "")
+
+    def clear_streaming_output(self, run_id):
+        self.outputs.pop(run_id, None)
 
 
 @skipIf(IMPORT_ERROR is not None, f"Optional AI chat dependency is not installed: {IMPORT_ERROR}")
@@ -25,7 +31,7 @@ class TestDialogAIChatStreamErrors(TestCase):
         dialog = DialogAIChat.__new__(DialogAIChat)
         dialog.app = SimpleNamespace(ai=_AiService())
         dialog.current_streaming_chat_idx = 2
-        dialog.ai_streaming_output = ""
+        dialog.current_streaming_run_id = "run-1"
         dialog.messages = []
         dialog._cancel_pending_stream_render = lambda: None
         dialog._clear_chat_ai_profile_snapshot = lambda chat_idx: None
@@ -45,4 +51,4 @@ class TestDialogAIChatStreamErrors(TestCase):
                 for msg_type, msg_content, _chat_idx in dialog.messages
             )
         )
-        self.assertEqual("", dialog.app.ai.ai_streaming_output)
+        self.assertEqual("", dialog.app.ai.get_streaming_output("run-1"))

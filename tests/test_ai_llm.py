@@ -24,6 +24,9 @@ class TestAiLLMStreamErrors(TestCase):
 
     def setUp(self):
         self.ai = AiLLM.__new__(AiLLM)
+        self.ai._runs_lock = threading.RLock()
+        self.ai._runs_by_id = {}
+        self.ai._last_streaming_output_by_run = {}
         self.ai._set_current_run_context = lambda run_context: None
         self.ai._clear_current_run_context = lambda: None
         self.ai.log_llm_request = lambda llm, messages, context='': 1
@@ -47,9 +50,11 @@ class TestAiLLMStreamErrors(TestCase):
             llm=_StreamLLM(err),
             cancel_event=threading.Event(),
             stream_iter=None,
+            streaming_output="",
             error_text="",
             status="queued",
         )
+        self.ai._runs_by_id[self.run_context.run_id] = self.run_context
         return self.run_context
 
     def test_timeout_errors_do_not_allow_partial_stream_result(self):
@@ -114,3 +119,23 @@ class TestAiLLMStreamErrors(TestCase):
 
         self.assertEqual("partial", result)
         self.assertIn(("errored", "malformed trailing event"), self.run_statuses)
+
+    def test_finalized_run_keeps_stream_snapshot_until_cleared(self):
+        run_context = SimpleNamespace(
+            run_id="run-2",
+            cancel_event=threading.Event(),
+            stream_iter=None,
+            http_client=None,
+            streaming_output="partial",
+            status="errored",
+            finished_at=0.0,
+            scope_type="",
+            scope_id=None,
+        )
+        self.ai._runs_by_id[run_context.run_id] = run_context
+
+        AiLLM._finalize_run_context(self.ai, run_context, "errored")
+
+        self.assertEqual("partial", self.ai.get_streaming_output("run-2"))
+        self.ai.clear_streaming_output("run-2")
+        self.assertEqual("", self.ai.get_streaming_output("run-2"))

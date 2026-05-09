@@ -29,7 +29,6 @@ import qtawesome as qta
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.system import SystemMessage
-from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.documents.base import Document
 from markdown_it import MarkdownIt
 
@@ -332,9 +331,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_busy_timer = QtCore.QTimer(self)
         self.ai_busy_timer.timeout.connect(self.update_ai_busy)
         self.ai_busy_timer.start(100)
-        self.ai_streaming_output = ''
-        self.ai_stream_buffer = ""
-        self.ai_stream_in_ref = False
+        self.current_streaming_run_id = ''
         self.ai_stream_render_pending = False
         self.ai_stream_render_timer = QtCore.QTimer(self)
         self.ai_stream_render_timer.setSingleShot(True)
@@ -1719,11 +1716,13 @@ class DialogAIChat(QtWidgets.QDialog):
         """Clear transient streamed-preview text without touching persisted chat history."""
 
         self._cancel_pending_stream_render()
-        self.ai_streaming_output = ''
+        run_id = str(getattr(self, 'current_streaming_run_id', '')).strip()
+        self.current_streaming_run_id = ''
         ai = getattr(self.app, 'ai', None)
         if ai is not None:
             try:
-                ai.ai_streaming_output = ''
+                if run_id != '':
+                    ai.clear_streaming_output(run_id)
             except Exception:
                 pass
 
@@ -2326,6 +2325,7 @@ class DialogAIChat(QtWidgets.QDialog):
         """Start one MCP-backed agent worker with the standard callback wiring."""
 
         self.current_streaming_chat_idx = chat_idx
+        self.current_streaming_run_id = ''
         self._capture_chat_ai_profile_snapshot(chat_idx)
         self.app.ai.start_query(
             worker_func,
@@ -4725,10 +4725,14 @@ data collected. This information will accompany every prompt sent to the AI, res
                         html_parts.append(f'<p style={self.ai_info_style}>{txt}</p>')
                 flush_agent_status_block()
                 # add partially streamed ai response if needed
-                if self.current_chat_idx == self.current_streaming_chat_idx and len(self.app.ai.ai_streaming_output) > 0:
-                    txt = self.app.ai.ai_streaming_output
+                streaming_run_id = str(getattr(self, 'current_streaming_run_id', '')).strip()
+                streaming_output = ''
+                if streaming_run_id != '':
+                    streaming_output = self.app.ai.get_streaming_output(streaming_run_id)
+                if self.current_chat_idx == self.current_streaming_chat_idx and len(streaming_output) > 0:
+                    txt = streaming_output
                     txt = strip_think_blocks(txt)
-                    if len(self.app.ai.ai_streaming_output) != len(txt) and len(txt) == 0:
+                    if len(streaming_output) != len(txt) and len(txt) == 0:
                         txt = _('Thinking...')
                     txt = self.replace_references(txt, streaming=True)
                     txt = self._render_markdown_with_prompt_refs(
@@ -5058,10 +5062,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             cursor = db_conn.cursor()
             cursor.execute('SELECT * FROM chat_messages WHERE chat_id=? ORDER BY id', (curr_chat_id,))
             self.chat_msg_list = cursor.fetchall()
-            self.ai_streaming_output = ''
         else:
             self.chat_msg_list.clear()
-            self.ai_streaming_output = ''
     
     def history_get_ai_messages(self):
         messages = []
@@ -5138,7 +5140,6 @@ data collected. This information will accompany every prompt sent to the AI, res
         return messages
     
     def history_add_message(self, msg_type, msg_author, msg_content, chat_idx=None, db_conn=None, refresh=True, commit=True):
-        self.ai_streaming_output = ''
         if chat_idx is None:
             chat_idx = self.current_chat_idx
         if chat_idx > -1:
@@ -5373,7 +5374,6 @@ data collected. This information will accompany every prompt sent to the AI, res
         if chat_idx is None:
             chat_idx = self.current_chat_idx
         if chat_idx <= -1:
-            self.ai_streaming_output = ''
             self.chat_msg_list.clear()
             msg = _('Please select a chat or create a new one.')
             Message(self.app, _('Chat selection'), msg, "warning").exec()
@@ -5423,14 +5423,16 @@ data collected. This information will accompany every prompt sent to the AI, res
                 messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
                 self._capture_chat_ai_profile_snapshot(chat_idx)
-                self.app.ai.start_stream(messages,
-                                         result_callback=self.ai_message_callback,
-                                         progress_callback=None,
-                                         streaming_callback=self.ai_streaming_callback,
-                                         error_callback=None,
-                                         model_kind='large',
-                                         scope_type='chat',
-                                         scope_id=chat_idx)
+                self.current_streaming_run_id = self.app.ai.start_stream(
+                    messages,
+                    result_callback=self.ai_message_callback,
+                    progress_callback=None,
+                    streaming_callback=self.ai_streaming_callback,
+                    error_callback=self.ai_error_callback,
+                    model_kind='large',
+                    scope_type='chat',
+                    scope_id=chat_idx,
+                )
         elif msg_type == 'user':
             # user question, shown on screen and send to the AI
             if chat_idx == self.current_chat_idx:
@@ -5438,6 +5440,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self._queue_agent_chat_metadata_generation(chat_idx, msg_content)
                 messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
+                self.current_streaming_run_id = ''
                 analysis_type = ''
                 if 0 <= chat_idx < len(self.chat_list):
                     analysis_type = self.chat_list[chat_idx][2]
@@ -5480,14 +5483,16 @@ data collected. This information will accompany every prompt sent to the AI, res
                                             })
                 else:
                     self._capture_chat_ai_profile_snapshot(chat_idx)
-                    self.app.ai.start_stream(messages,
-                                             result_callback=self.ai_message_callback,
-                                             progress_callback=None,
-                                             streaming_callback=self.ai_streaming_callback,
-                                             error_callback=self.ai_error_callback,
-                                             model_kind='large',
-                                             scope_type='chat',
-                                             scope_id=chat_idx)
+                    self.current_streaming_run_id = self.app.ai.start_stream(
+                        messages,
+                        result_callback=self.ai_message_callback,
+                        progress_callback=None,
+                        streaming_callback=self.ai_streaming_callback,
+                        error_callback=self.ai_error_callback,
+                        model_kind='large',
+                        scope_type='chat',
+                        scope_id=chat_idx,
+                    )
                 self.update_chat_window()
         elif msg_type == 'ai':
             # ai responses.
@@ -5497,7 +5502,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                 ai_model_name = self._normalize_ai_profile_author(chat_idx=chat_idx, fallback_to_current=True)
                 msg_content = strip_think_blocks(msg_content)
                 self.history_add_message(msg_type, ai_model_name, msg_content, chat_idx, db_conn)
-                self.ai_streaming_output = ''
                 self.update_chat_window()
             finally:
                 db_conn.close()
@@ -7086,7 +7090,6 @@ data collected. This information will accompany every prompt sent to the AI, res
     def ai_mcp_message_callback(self, mcp_result):
         """Called when the MCP-based AI agent chat worker has finished."""
 
-        self.ai_streaming_output = ''
         if not isinstance(mcp_result, dict):
             self.process_message('info', _('Error: Invalid result from MCP AI agent chat worker.'), self.current_streaming_chat_idx)
             self._clear_chat_ai_profile_snapshot(self.current_streaming_chat_idx)
@@ -7158,14 +7161,16 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         self.current_streaming_chat_idx = chat_idx
         self._capture_chat_ai_profile_snapshot(chat_idx)
-        self.app.ai.start_stream(stream_messages,
-                                 result_callback=self.ai_message_callback,
-                                 progress_callback=None,
-                                 streaming_callback=self.ai_streaming_callback,
-                                 error_callback=self.ai_error_callback,
-                                 model_kind='large',
-                                 scope_type='chat',
-                                 scope_id=chat_idx)
+        self.current_streaming_run_id = self.app.ai.start_stream(
+            stream_messages,
+            result_callback=self.ai_message_callback,
+            progress_callback=None,
+            streaming_callback=self.ai_streaming_callback,
+            error_callback=self.ai_error_callback,
+            model_kind='large',
+            scope_type='chat',
+            scope_id=chat_idx,
+        )
         self.update_chat_window()
         self._update_undo_button_state()
 
@@ -7220,7 +7225,11 @@ data collected. This information will accompany every prompt sent to the AI, res
         self._cancel_pending_stream_render()
         if was_canceled:
             self._log_chat_canceled_env_update(chat_idx, partial_response=(ai_result != ''))
-        self.ai_streaming_output = ''
+        try:
+            self.app.ai.clear_streaming_output(self.current_streaming_run_id)
+        except Exception:
+            pass
+        self.current_streaming_run_id = ''
         if ai_result != '':
             final_text = str(ai_result)
             if self._is_invalid_final_output(final_text):
@@ -7256,12 +7265,13 @@ data collected. This information will accompany every prompt sent to the AI, res
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
         self._cancel_pending_stream_render()
-        partial_response = str(getattr(self.app.ai, 'ai_streaming_output', '') or self.ai_streaming_output)
+        run_id = str(getattr(self, 'current_streaming_run_id', '')).strip()
+        partial_response = str(self.app.ai.get_streaming_output(run_id))
         try:
-            self.app.ai.ai_streaming_output = ''
+            self.app.ai.clear_streaming_output(run_id)
         except Exception:
             pass
-        self.ai_streaming_output = ''
+        self.current_streaming_run_id = ''
 
         def _safe_to_text(obj: object) -> str:
             try:
@@ -7290,7 +7300,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     _('The AI response was interrupted before it was complete. The partial response was kept.'),
                     self.current_streaming_chat_idx,
                 )
-
             ai_model_name = self._normalize_ai_profile_author(
                 chat_idx=self.current_streaming_chat_idx,
                 fallback_to_current=True,
@@ -7303,6 +7312,15 @@ data collected. This information will accompany every prompt sent to the AI, res
             if hasattr(value, 'body'):
                 tb += f'\n{_safe_to_text(getattr(value, "body", ""))}\n'
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
+            if is_stream_interruption:
+                if partial_response == '':
+                    self.process_message(
+                        'info',
+                        _('The AI response was interrupted before it was complete.'),
+                        self.current_streaming_chat_idx,
+                    )
+                self.process_message('info', msg, self.current_streaming_chat_idx)
+                return
             # Error msg in chat and trigger message box show
             self.process_message('info', msg, self.current_streaming_chat_idx)
             qt_exception_hook._exception_caught.emit(msg, tb)
@@ -7569,13 +7587,3 @@ data collected. This information will accompany every prompt sent to the AI, res
                     return
                 self._open_prompt_record_in_library(prompt_record)
                 return
-
-# Helper:
-class LlmCallbackHandler(BaseCallbackHandler):
-    def __init__(self, dialog_ai_chat: DialogAIChat):
-        self.dialog = dialog_ai_chat
-        
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        self.dialog.ai_streaming_output += token
-        if not self.dialog.is_updating_chat_window:
-            self.dialog.update_chat_window()        
