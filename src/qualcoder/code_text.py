@@ -47,6 +47,7 @@ from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean me
 
 from .add_item_name import DialogAddItemName
 from .ai_agent_prompts import AiAgentPromptsCatalog
+from .ai_prompt_library import DialogAiEditPrompts
 from .ai_search_dialog import DialogAiSearch
 from .ai_chat import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
@@ -1679,11 +1680,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                                           action.data())
             return
         if action.property('submenu') == 'ai_text_analysis_prompts':
-            msg = _(
-                'Text analysis prompts are now loaded from Markdown files in the new AI prompt system. '
-                'Editing them from this menu is not available yet.'
-            )
-            Message(self.app, _('AI prompts'), msg, "information").exec()
+            DialogAiEditPrompts(self.app, 'text_analysis').exec()
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
