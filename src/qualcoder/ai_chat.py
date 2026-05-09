@@ -2589,6 +2589,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 return result
             if not needs_mcp:
                 planned_calls = []
+            if len(planned_calls) == 0:
+                stop_reason = "enough_information"
 
             reflection_system_prompt = self._build_mcp_combined_system_prompt(
                 self._mcp_reflection_system_prompt()
@@ -2598,7 +2600,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 "If not, propose only the minimal additional MCP calls needed."
             )
 
-            for reflection_round in range(max_reflection_rounds):
+            for reflection_round in range(max_reflection_rounds) if len(planned_calls) > 0 else []:
                 if self.app.ai.is_current_run_canceled():
                     result["canceled"] = True
                     return result
@@ -6822,8 +6824,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return result
             if not needs_mcp:
                 planned_calls = []
+            if len(planned_calls) == 0:
+                stop_reason = "enough_information"
 
-            for reflection_round in range(max_reflection_rounds):
+            for reflection_round in range(max_reflection_rounds) if len(planned_calls) > 0 else []:
                 if self.app.ai.is_current_run_canceled():
                     result["canceled"] = True
                     return result
