@@ -1074,7 +1074,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cooccuring_code_names.append(row[0])
                 ctids.append(row[1])
             if ctids:
-                item['overlaps'] = {'text': ctids}
+                item['overlaps'] = ctids
         elif item.get('result_type') == 'av':
             avids = []
             sql = ("select code_name.name, avid from code_av "
@@ -1086,7 +1086,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cooccuring_code_names.append(row[0])
                 avids.append(row[1])
             if avids:
-                item['overlaps'] = {'av': avids}
+                item['overlaps'] = avids
         elif item.get('result_type') == 'image':
             imgids = []
             # Two rectangles overlap if they intersect on both axes.
@@ -1106,7 +1106,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     cooccuring_code_names.append(name)
                     imgids.append(row[5])
             if imgids:
-                item['overlaps'] = {'image': imgids}
+                item['overlaps'] = imgids
         cooccuring_code_names = sorted(list(set(cooccuring_code_names)))
         return cooccuring_code_names
 
@@ -2516,7 +2516,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             action_edit_memo = menu.addAction(_("Edit memo"))
             action_apply_additional_code = menu.addAction(_("Apply additional code"))
             if 'overlaps' in code_here:
-                print(code_here)
                 action_show_overlaps = menu.addAction(_("Show overlapping codes"))
         action_copy = None
         if selected_text != "":
@@ -2536,32 +2535,43 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         if action == action_view:
             self.show_context_from_text_edit(code_here)
+            return
         if action == action_unmark:
             self.unmark(code_here)
+            return
         if action == action_important:
             self.mark_important(code_here)
+            return
         if action == action_edit_memo:
             self.edit_memo(code_here)
+            return
         if action == action_change_code_to:
             self.change_code_to_another_code(code_here)
+            return
         if action == action_apply_additional_code:
             self.apply_additional_code(code_here)
+            return
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(selected_text)
+            return
         if action == action_copy_all:
             cb = QtWidgets.QApplication.clipboard()
             te_text = self.ui.textEdit.toPlainText()
             cb.setText(te_text)
+            return
         if action == action_show_top_groupbox:
             self.ui.groupBox.setVisible(True)
+            return
         if action == action_hide_top_groupbox:
             self.ui.groupBox.setVisible(False)
+            return
         if action == action_rotate_180:
             self.rotate_image(cursor_context_pos, img_fmt, html_link, 90)
+            return
         if action == action_show_overlaps:
-            Message(self.app, "TODO", f"TODO WORK IN PROGRESS\nShow overlaps: {code_here['overlaps']}").exec()
-            #DialogCodedIds(self.app, code_here['overlaps']).exec()
+            DialogCodedIds(self.app, code_here).exec()
+            return
 
     def mark_important(self, code):
         """ Add important mark to coding.
