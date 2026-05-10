@@ -139,7 +139,7 @@ Improved selection of font sizes and colours in menus.
 
 -Category hierarchy in headers: Full hierarchical path is now displayed before the code name (Root Category > Subcategory > … > Code), making the contextual reading of each segment easier.
 
--Co-occurring codes: Below each coded segment memo, the set of overlapping codes within the same file is listed in brackets, allowing quick identification of coding overlaps. Works for text, audio/video, and image data.
+-Co-occurring codes: Below each coded segment memo, the set of overlapping codes within the same file is listed in brackets, allowing quick identification of coding overlaps. Works for text, audio/video, and image data. View and export the overlapping codes.
 
 -New category sorting option: Added a "Category A - z" "Category Z - a"  option to the sorting menu, which organizes results alphabetically according to the category hierarchy (with code name as a secondary criterion).
 
