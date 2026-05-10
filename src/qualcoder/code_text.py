@@ -46,7 +46,7 @@ from odf import text as odf_text, office as odf_office, dc as odf_dc, style as o
 from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .add_item_name import DialogAddItemName
-from .ai_agent_prompts import AiAgentPromptsCatalog
+from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
 from .ai_prompt_library import DialogAiEditPrompts
 from .ai_search_dialog import DialogAiSearch
 from .ai_chat import ai_chat_signal_emitter
