@@ -2801,20 +2801,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_prompt = (
-                "Now provide the final answer to the user in normal prose. "
-                "Focus on outcomes of this turn and communicate them clearly. "
-                "Do not mention internal MCP stage constraints. "
-                "When referring to empirical text evidence, cite it as {REF: \"exact quote\"}. "
-                "Remember: REF is invisible markup; if you want a quote to be visible, include the quoted text in normal prose and add REF in addition."
-            )
-            if final_hint != '':
-                final_prompt += '\nHere is a draft idea from your internal reflection:\n' + final_hint
-            if stop_reason not in ("", "enough_information"):
-                final_prompt += (
-                    "\nIf the available project evidence is incomplete, clearly state uncertainty and "
-                    "mention what additional project material would help."
-                )
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -2843,7 +2830,6 @@ class DialogAIChat(QtWidgets.QDialog):
                     }
                 )
 
-            final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
             final_stream_messages = build_phase_messages(final_system_prompt, final_prompt)
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
@@ -3540,20 +3526,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_prompt = (
-                "Now provide the final answer to the user in normal prose. "
-                "Focus on outcomes of this turn and communicate them clearly. "
-                "Do not mention internal MCP stage constraints. "
-                "When referring to empirical text evidence, cite it as {REF: \"exact quote\"}. "
-                "Remember: REF is invisible markup; if you want a quote to be visible, include the quoted text in normal prose and add REF in addition."
-            )
-            if final_hint != '':
-                final_prompt += '\nHere is a draft idea from your internal reflection:\n' + final_hint
-            if stop_reason not in ("", "enough_information"):
-                final_prompt += (
-                    "\nIf the available project evidence is incomplete, clearly state uncertainty and "
-                    "mention what additional project material would help."
-                )
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -3582,7 +3555,6 @@ class DialogAIChat(QtWidgets.QDialog):
                     }
                 )
 
-            final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
             final_stream_messages = build_phase_messages(final_system_prompt, final_prompt)
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
@@ -4303,20 +4275,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_prompt = (
-                "Now provide the final answer to the user in normal prose. "
-                "Focus on outcomes of this turn and communicate them clearly. "
-                "Do not mention internal MCP stage constraints. "
-                "When referring to empirical text evidence, cite it as {REF: \"exact quote\"}. "
-                "Remember: REF is invisible markup; if you want a quote to be visible, include the quoted text in normal prose and add REF in addition."
-            )
-            if final_hint != '':
-                final_prompt += '\nHere is a draft idea from your internal reflection:\n' + final_hint
-            if stop_reason not in ("", "enough_information"):
-                final_prompt += (
-                    "\nIf the available project evidence is incomplete, clearly state uncertainty and "
-                    "mention what additional project material would help."
-                )
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -4345,7 +4304,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     }
                 )
 
-            final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
             final_stream_messages = build_phase_messages(final_system_prompt, final_prompt)
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
@@ -5624,8 +5582,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             "Your task: "
             "Provide a final answer for the user in normal prose based on the conversation and retrieved project context. "
             "Do not output JSON. "
-            "Treat MCP execution as already finished for this turn and report outcomes clearly. "
-            "Default to a conversational reply and keep it short (about 2–5 sentences), unless the user or an upstream instruction explicitly asks for a longer or more structured answer. "
+            "Treat MCP execution as already finished for this turn. "
+            "Focus on the outcomes of this turn and communicate them clearly. "
+            "Do not mention internal MCP stage constraints. "
+            "Default to a conversational reply and keep it short (about 2–8 sentences), unless the user or an upstream instruction explicitly asks for a longer or more structured answer. "
             "Do not be superficial: if you identify several relevant aspects, go deeper on the most interesting one, then ask which of the others the user would like to explore next. "
             "You can use Markdown formatting like bullet points if that helps to keep the answer concise and clear. "
             "If you have made changes to project data through tool calls, give a short and concise summary of what you have done, but avoid repeating information discussed before. "
@@ -5639,6 +5599,22 @@ data collected. This information will accompany every prompt sent to the AI, res
             "Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. "
             "If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately. "
         )
+
+    def _mcp_final_answer_phase_prompts(self, final_hint: str, stop_reason: str) -> Tuple[str, str]:
+        """Build the stable system prompt and dynamic user prompt for the final answer phase."""
+
+        final_hint_text = str(final_hint if final_hint is not None else "").strip()
+        stop_reason_text = str(stop_reason if stop_reason is not None else "").strip()
+        prompt_parts = ["Provide the final answer to the user now."]
+        if final_hint_text != "":
+            prompt_parts.append("Here is a draft idea for the answer:\n" + final_hint_text)
+        if stop_reason_text not in ("", "enough_information"):
+            prompt_parts.append(
+                "The available project evidence may still be incomplete. "
+                "State the uncertainty clearly and mention what additional project material would help."
+            )
+        final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
+        return final_system_prompt, "\n\n".join(prompt_parts)
 
     def _run_mcp_request(self, method: str, params: Dict[str, Any]) -> tuple[Dict[str, Any], Dict[str, Any]]:
         request = {
@@ -7034,20 +7010,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_prompt = (
-                "Now provide the final answer to the user in normal prose. "
-                "Focus on outcomes of this turn and communicate them clearly. "
-                "Do not mention internal MCP stage constraints. "
-                "When referring to empirical text evidence, cite it as {REF: \"exact quote\"}. "
-                "Remember: REF is invisible markup; if you want a quote to be visible, include the quoted text in normal prose and add REF in addition."
-            )
-            if final_hint != '':
-                final_prompt += '\nHere is a draft idea from your internal planning:\n' + final_hint
-            if stop_reason not in ("", "enough_information"):
-                final_prompt += (
-                    "\nIf the available project evidence is incomplete, clearly state uncertainty and "
-                    "mention what additional project material would help."
-                )
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -7076,7 +7039,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     }
                 )
 
-            final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
             final_stream_messages = build_phase_messages(final_system_prompt, final_prompt)
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
