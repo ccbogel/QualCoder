@@ -21,7 +21,7 @@ QualCoder_4_0_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4
 We are not able to compile a binary for Intel based Macs right now due to incompatibilities in the libraries we use.
 The app bundles are compiled on macOS Sequoia. They might also work on Sonoma and Ventura.
 
-If you do not have admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr – d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
+If you do not have admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr - d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
 
 We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
 
