@@ -540,7 +540,8 @@ class DialogCodedIds(QtWidgets.QDialog):
 
         self.app = app
         self.prime_item = prime_item
-        # item may not contain 'important' or 'memo' key
+        # item may not contain 'important'
+        self.prime_item['memo'] = self.prime_item['coded_memo']
         self.prime_item['owner'] = prime_item['coder']  # needed for insert_title.
         QtWidgets.QDialog.__init__(self)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
@@ -559,12 +560,8 @@ class DialogCodedIds(QtWidgets.QDialog):
         self.text_results = []
         self.image_results = []
         self.av_results = []
-        '''self.codes = []
-        self.categories = []
-        self.codes, self.categories = self.app.get_codes_categories()'''
         self.insert_prime_coded_item()
         self.get_and_insert_coded_segments()
-        '''self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)'''
         self.exec()
 
     def insert_prime_coded_item(self):
