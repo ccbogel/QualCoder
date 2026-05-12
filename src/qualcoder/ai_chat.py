@@ -68,14 +68,10 @@ MARKDOWN_RENDERER = MarkdownIt(
     "commonmark",
     options_update={
         "breaks": True,
-        "html": False,
+        "html": True,
         "typographer": True,
     },
 ).enable(["table", "strikethrough"])
-MARKDOWN_INTERNAL_LINK_PATTERN = re.compile(
-    r"<a\s+href=(['\"])(?:coding|chunk|quote|action):.*?</a>",
-    re.IGNORECASE | re.DOTALL,
-)
 MARKDOWN_HR_IMAGE_CACHE: Dict[str, str] = {}
 PROMPT_SLASH_REF_PATTERN = re.compile(r"(?:(?<=^)|(?<=[\s`(\[{]))/(?!/)[^\s`<>\[\]{}\"']+")
 
@@ -103,27 +99,17 @@ def markdown_hr_image_data_uri(color: str) -> str:
 
 
 def render_markdown_to_html(text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600) -> str:
-    """Render AI Markdown for QLabel output while preserving internal QualCoder links."""
+    """Render AI Markdown for QLabel output."""
 
     source_text = str(text if text is not None else "")
-    preserved_links: List[str] = []
     try:
         hr_width_px = max(1, int(hr_width_px))
     except (TypeError, ValueError):
         hr_width_px = 600
 
-    def preserve_quote_link(match: re.Match) -> str:
-        token = f"@@QUALCODER_QUOTE_LINK_{len(preserved_links)}@@"
-        preserved_links.append(match.group(0))
-        return token
-
-    markdown_text = MARKDOWN_INTERNAL_LINK_PATTERN.sub(preserve_quote_link, source_text)
-    rendered_html = MARKDOWN_RENDERER.render(markdown_text).strip()
+    rendered_html = MARKDOWN_RENDERER.render(source_text).strip()
     if rendered_html == "":
         rendered_html = "<p></p>"
-
-    for idx, link_html in enumerate(preserved_links):
-        rendered_html = rendered_html.replace(f"@@QUALCODER_QUOTE_LINK_{idx}@@", link_html)
 
     rendered_html = re.sub(
         r"<code([^>]*)>",
@@ -1097,18 +1083,10 @@ class DialogAIChat(QtWidgets.QDialog):
         return self._render_markdown_with_prompt_refs(text, hr_color=hr_color, hr_width_px=hr_width_px, style_role="user")
 
     def _render_plain_text_with_prompt_refs(self, text: str, include_prompt_labels: bool = False, style_role: str = "user") -> str:
-        """Render plain text to safe HTML while linking known prompt references."""
+        """Render plain text as raw Qt rich text while preserving line breaks."""
 
-        marked_text, replacements = self._prompt_reference_placeholders_for_text(
-            text,
-            include_prompt_labels=include_prompt_labels,
-            require_enabled=False,
-            style_role=style_role,
-        )
-        rendered_html = html_lib.escape(marked_text).replace('\n', '<br />')
-        for placeholder, replacement in replacements.items():
-            rendered_html = rendered_html.replace(html_lib.escape(placeholder), replacement)
-        return rendered_html
+        del include_prompt_labels, style_role
+        return str(text if text is not None else '').replace('\n', '<br />')
 
     def _open_prompt_record_in_library(self, prompt: AgentPromptRecord):
         """Open one prompt record in the prompt library dialog."""
