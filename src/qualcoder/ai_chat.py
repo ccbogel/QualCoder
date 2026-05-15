@@ -197,6 +197,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
         popup_layout.addWidget(self._view)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._hierarchy_indent = 18
 
     def _configure_view(self, view: QtWidgets.QTreeView) -> None:
         """Apply the standard popup tree settings and wire activation handlers."""
@@ -209,9 +210,6 @@ class TreePopupComboBox(QtWidgets.QWidget):
             view.activated.disconnect(self._handle_view_activated)
         except Exception:
             pass
-        view.setRootIsDecorated(True)
-        view.setItemsExpandable(True)
-        view.setExpandsOnDoubleClick(True)
         view.setUniformRowHeights(True)
         view.setHeaderHidden(True)
         view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
@@ -219,6 +217,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
         view.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         view.clicked.connect(self._handle_view_clicked)
         view.activated.connect(self._handle_view_activated)
+        self._update_view_hierarchy_mode()
 
     def setModel(self, model) -> None:
         """Assign the shared item model."""
@@ -239,6 +238,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
                     getattr(self._model, signal_name).connect(self._model_changed)
                 except Exception:
                     pass
+        self._update_view_hierarchy_mode()
         self._sync_current_index_to_model()
         self.update()
 
@@ -285,6 +285,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
         self._popup.layout().addWidget(self._view)
         if self._model is not None:
             self._view.setModel(self._model)
+        self._update_view_hierarchy_mode()
         self._sync_current_index_to_model()
 
     def currentIndex(self) -> int:
@@ -351,17 +352,15 @@ class TreePopupComboBox(QtWidgets.QWidget):
             self._view.clearSelection()
 
     def _model_changed(self, *args) -> None:
+        self._update_view_hierarchy_mode()
         if self._current_index >= self._root_row_count():
             self._current_index = -1
             self._sync_current_index_to_model()
         self.update()
 
     def _popup_width_hint(self) -> int:
-        self._view.resizeColumnToContents(self._model_column)
-        width = max(self.width(), self._view.columnWidth(self._model_column) + 36)
-        scrollbar_width = self._view.style().pixelMetric(QtWidgets.QStyle.PixelMetric.PM_ScrollBarExtent, None, self._view)
         frame_width = self._popup.frameWidth() * 2 + 2
-        return max(width, self.width()) + scrollbar_width + frame_width
+        return max(self.width(), 120) + frame_width
 
     def _popup_height_hint(self) -> int:
         row_count = self._root_row_count()
@@ -385,6 +384,33 @@ class TreePopupComboBox(QtWidgets.QWidget):
         if y_pos < available.top():
             y_pos = available.top()
         self._popup.setGeometry(x_pos, y_pos, width, height)
+
+    def _has_hierarchical_rows(self) -> bool:
+        """Return True when the current model contains expandable top-level items."""
+
+        if self._model is None:
+            return False
+        root = QtCore.QModelIndex()
+        try:
+            row_count = int(self._model.rowCount(root))
+        except Exception:
+            return False
+        for row in range(row_count):
+            index = self._model.index(row, self._model_column, root)
+            if index.isValid() and self._model.hasChildren(index):
+                return True
+        return False
+
+    def _update_view_hierarchy_mode(self) -> None:
+        """Switch between flat list mode and expandable tree mode based on the model."""
+
+        if not hasattr(self, "_view") or self._view is None:
+            return
+        has_hierarchy = self._has_hierarchical_rows()
+        self._view.setRootIsDecorated(has_hierarchy)
+        self._view.setItemsExpandable(has_hierarchy)
+        self._view.setExpandsOnDoubleClick(has_hierarchy)
+        self._view.setIndentation(self._hierarchy_indent if has_hierarchy else 0)
 
     def _activate_index(self, index: QtCore.QModelIndex) -> None:
         if not index.isValid():
@@ -940,6 +966,15 @@ class DialogAIChat(QtWidgets.QDialog):
         except Exception:
             pass
 
+    def _focus_chat_input(self) -> None:
+        """Move focus to the chat input so typing can continue immediately."""
+
+        if not hasattr(self.ui, "plainTextEdit_question"):
+            return
+        if not self.ui.plainTextEdit_question.isEnabled():
+            return
+        self.ui.plainTextEdit_question.setFocus(Qt.FocusReason.OtherFocusReason)
+
     def _discard_inline_prompt_completion(self) -> bool:
         """Remove the transient inline completion suffix if it is still present."""
 
@@ -1485,6 +1520,8 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.scrollArea_ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
         default_panel_color = self.ui.widget_chat.palette().color(self.ui.widget_chat.backgroundRole())
         self.ui.comboBox_ai_chats.setStyleSheet(f"background-color: {default_panel_color.name()};")
+        tree_font = QtGui.QFont(self.app.settings["font"], self.app.settings["treefontsize"], QtGui.QFont.Weight.Normal)
+        self.ui.comboBox_ai_chats.view().setFont(tree_font)
         self.ui.comboBox_ai_permissions.setStyleSheet(f"""
             QComboBox {{
                 background-color: {default_panel_color.name()};
@@ -1896,6 +1933,8 @@ class DialogAIChat(QtWidgets.QDialog):
     def fill_chat_list(self):
         self.chat_list_model.clear()
         self.get_chat_list()
+        if self.current_chat_idx < 0 and len(self.chat_list) > 0:
+            self.current_chat_idx = 0
         for i in range(len(self.chat_list)):
             chat = self.chat_list[i]
             id_, name, analysis_type, summary, date, analysis_prompt = chat
@@ -5131,6 +5170,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
             self.history_update_message_list()
             self.update_chat_window(scroll_to_bottom=False)
+            if self.current_chat_idx > -1:
+                QtCore.QTimer.singleShot(0, self._focus_chat_input)
         else:  # return to previous chat
             self._set_chat_list_current_row(self.current_chat_idx)
         
