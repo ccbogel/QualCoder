@@ -44,7 +44,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-347</y>
         <width>795</width>
         <height>948</height>
        </rect>
@@ -959,9 +959,6 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="toolTip">
                 <string>Advanced option. Only change when you know whatr you are doing.</string>
                </property>
-               <property name="inputMask">
-                <string>D.9</string>
-               </property>
                <property name="text">
                 <string>1.0</string>
                </property>
@@ -1008,9 +1005,6 @@ Not recommended unless you have many large files slowing the backup.</string>
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="inputMask">
-                <string>D.9</string>
                </property>
                <property name="text">
                 <string>1.0</string>

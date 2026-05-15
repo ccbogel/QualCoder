@@ -23,3 +23,5 @@ tmp*.*
 
 .flatpak-*/
 *.flatpak
+AGENTS.md
+windows_run_from_conda_QualCoder_3_8.bat
