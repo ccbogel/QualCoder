@@ -37,6 +37,23 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
+class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
+    """Treat fully-parseable out-of-range numbers as invalid while typing."""
+
+    def validate(self, text: str, pos: int):
+        state, text, pos = super().validate(text, pos)
+        normalized = text.strip().replace(',', '.')
+        if normalized in ('', '.', '-', '-.', '+', '+.'):
+            return QtGui.QValidator.State.Intermediate, text, pos
+        try:
+            value = float(normalized)
+        except ValueError:
+            return state, text, pos
+        if value < self.bottom() or value > self.top():
+            return QtGui.QValidator.State.Invalid, text, pos
+        return state, text, pos
+
+
 class DialogSettings(QtWidgets.QDialog):
     """ Settings for the coder name, coder table and to display ids. """
 
@@ -178,8 +195,10 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_AI_language.setText(self.settings.get('ai_language', ''))
         self.ui.lineEdit_AI_language.setEnabled(not self.ui.checkBox_AI_language_ui.isChecked())
         self.ui.lineEdit_ai_temperature.setText(self.settings.get('ai_temperature', '1.0'))
+        self.ui.lineEdit_ai_temperature.setValidator(self._create_ai_float_validator(0.0, 2.0))
         self.ui.lineEdit_ai_temperature.editingFinished.connect(self.validate_ai_temperature)
         self.ui.lineEdit_top_p.setText(self.settings.get('ai_top_p', '1.0'))
+        self.ui.lineEdit_top_p.setValidator(self._create_ai_float_validator(0.0, 1.0))
         self.ui.lineEdit_top_p.editingFinished.connect(self.validate_ai_top_p)
         self.ui.comboBox_reasoning.currentIndexChanged.connect(self.ai_model_parameters_changed)
         self.ui.lineEdit_ai_api_base.editingFinished.connect(self.ai_api_base_changed)
@@ -409,28 +428,53 @@ class DialogSettings(QtWidgets.QDialog):
         if not self.ui.checkBox_AI_language_ui.isChecked():
             self.ui.lineEdit_AI_language.setFocus()
             self.ui.lineEdit_AI_language.selectAll()
-                
-    def validate_ai_temperature(self):
-        text = self.ui.lineEdit_ai_temperature.text()
-        # Check if the input text is numeric
-        if not text:
-            return
-        value = float(text)
-        if not (0.0 <= value <= 2.0):
-            Message.warning(self, "Invalid input", "AI temperature parameter must be between 0.0 and 2.0.")
-            self.ui.lineEdit_ai_temperature.setFocus()
-            self.ui.lineEdit_ai_temperature.selectAll()
-            
-    def validate_ai_top_p(self):
-        text = self.ui.lineEdit_top_p.text()
-        # Check if the input text is numeric
-        if not text:
-            return
-        value = float(text)
-        if not (0.0 <= value <= 1.0):
-            Message.warning(self, "Invalid input", "AI top_p parameter must be between 0.0 and 1.0.")
-            self.ui.lineEdit_top_p.setFocus()
-            self.ui.lineEdit_top_p.selectAll()
+
+    def _create_ai_float_validator(self, minimum: float, maximum: float) -> QtGui.QDoubleValidator:
+        validator = StrictDoubleRangeValidator(minimum, maximum, 6, self)
+        validator.setNotation(QtGui.QDoubleValidator.Notation.StandardNotation)
+        locale = QtCore.QLocale.c()
+        locale.setNumberOptions(QtCore.QLocale.NumberOption.RejectGroupSeparator)
+        validator.setLocale(locale)
+        return validator
+
+    @staticmethod
+    def parse_bounded_float(text: str, minimum: float, maximum: float) -> str:
+        """Normalize a user-entered float and ensure it stays within range."""
+
+        normalized = text.strip().replace(',', '.')
+        if normalized == '':
+            raise ValueError("empty float value")
+        value = float(normalized)
+        if not (minimum <= value <= maximum):
+            raise ValueError(f"float value {value} outside [{minimum}, {maximum}]")
+        return str(value)
+
+    def validate_ai_float_field(self, line_edit, minimum: float, maximum: float, message: str) -> bool:
+        try:
+            normalized = self.parse_bounded_float(line_edit.text(), minimum, maximum)
+        except ValueError:
+            Message.warning(self, _("Invalid input"), message)
+            line_edit.setFocus()
+            line_edit.selectAll()
+            return False
+        line_edit.setText(normalized)
+        return True
+
+    def validate_ai_temperature(self) -> bool:
+        return self.validate_ai_float_field(
+            self.ui.lineEdit_ai_temperature,
+            0.0,
+            2.0,
+            _("AI temperature parameter must be between 0.0 and 2.0."),
+        )
+
+    def validate_ai_top_p(self) -> bool:
+        return self.validate_ai_float_field(
+            self.ui.lineEdit_top_p,
+            0.0,
+            1.0,
+            _("AI top_p parameter must be between 0.0 and 1.0."),
+        )
             
     def ai_api_base_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
@@ -560,6 +604,10 @@ class DialogSettings(QtWidgets.QDialog):
             self.toggle_ai_advanced_options()
             msg = _('Please select a "large" and a "fast" AI model.')
             Message(self.app, _('AI model'), msg).exec()
+            return
+        if self.settings['ai_enable'] == 'True' and not self.validate_ai_temperature():
+            return
+        if self.settings['ai_enable'] == 'True' and not self.validate_ai_top_p():
             return
         if self.ui.checkBox_ai_project_memo.isChecked():
             self.settings['ai_send_project_memo'] = 'True'
