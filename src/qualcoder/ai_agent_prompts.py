@@ -132,6 +132,40 @@ class AiAgentPromptsCatalog:
             return prompts
         return [item for item in prompts if not item.is_internal]
 
+    def list_visible_prompt_variants(self, prompt_type: Optional[str] = None) -> List[AgentPromptRecord]:
+        """Return effective user-visible prompt variants for one prompt type."""
+
+        normalized_type = self._normalize_prompt_type(prompt_type)
+        selected: Dict[str, AgentPromptRecord] = {}
+        for prompt in self.list_prompt_variants(
+            prompt_type=normalized_type,
+            include_internal=True,
+            apply_init=False,
+        ):
+            conflict_key = self._conflict_key(prompt.name)
+            if conflict_key == "":
+                continue
+            prev = selected.get(conflict_key)
+            if prev is None:
+                selected[conflict_key] = prompt
+                continue
+            prev_rank = self._scope_priority.get(prev.scope, -1)
+            new_rank = self._scope_priority.get(prompt.scope, -1)
+            if new_rank > prev_rank:
+                selected[conflict_key] = prompt
+
+        prompts: List[AgentPromptRecord] = []
+        for prompt in selected.values():
+            relative_path = self.prompt_name_within_type(prompt.name)
+            basename = relative_path.rsplit("/", 1)[-1]
+            directory = self.relative_dir_of_prompt_path(relative_path)
+            if basename.startswith("_") or self.is_hidden_relative_dir(directory):
+                continue
+            prompts.append(prompt)
+
+        prompts.sort(key=lambda item: self.prompt_name_within_type(item.name).casefold())
+        return prompts
+
     def find_prompt_variant(
         self,
         name: str,
@@ -291,6 +325,31 @@ class AiAgentPromptsCatalog:
         if normalized_name.startswith(expected_prefix):
             return normalized_name[len(expected_prefix):]
         return normalized_name
+
+    def normalize_relative_dir(self, value: str) -> str:
+        """Normalize one prompt-internal relative directory path."""
+
+        text = str(value if value is not None else "").strip()
+        if text == "":
+            return ""
+        parts = [part.strip() for part in text.replace("\\", "/").split("/") if part.strip() != ""]
+        return "/".join(parts)
+
+    def relative_dir_of_prompt_path(self, relative_path: str) -> str:
+        """Return the parent directory portion of one prompt path within its type."""
+
+        normalized = self.normalize_relative_dir(relative_path)
+        if "/" not in normalized:
+            return ""
+        return normalized.rsplit("/", 1)[0]
+
+    def is_hidden_relative_dir(self, relative_dir: str) -> bool:
+        """Return whether one prompt-relative directory contains hidden segments."""
+
+        normalized = self.normalize_relative_dir(relative_dir)
+        if normalized == "":
+            return False
+        return any(segment.startswith("_") for segment in normalized.split("/"))
 
     def slugify_prompt_filename(self, name: str, max_length: int = 64) -> str:
         """Return one portable filename slug for the given prompt name."""

@@ -393,14 +393,54 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_spinner_timer = QtCore.QTimer(self)
         self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
 
-    def _text_analysis_prompt_menu_label(self, prompt) -> str:
-        """Return the display label for one text-analysis prompt in the context menu."""
+    @staticmethod
+    def _text_analysis_prompt_menu_leaf(relative_path: str) -> str:
+        """Return the leaf label for one text-analysis prompt menu item."""
 
-        prompt_name = str(getattr(prompt, "name", "") or "").strip()
-        prefix = "text-analysis/"
-        if prompt_name.startswith(prefix):
-            return prompt_name[len(prefix):]
-        return prompt_name
+        normalized = str(relative_path if relative_path is not None else "").replace("\\", "/").strip("/")
+        if normalized == "":
+            return ""
+        return normalized.rsplit("/", 1)[-1]
+
+    def _text_analysis_prompt_folder_icon(self):
+        """Return the same folder icon used by the prompt library."""
+
+        return qta.icon("mdi.folder-outline", color=self.app.highlight_color())
+
+    def _text_analysis_prompt_file_icon(self, menu):
+        """Return the same prompt file icon used by the prompt library."""
+
+        text_color = menu.palette().color(QtGui.QPalette.ColorRole.Text).name()
+        return qta.icon("mdi6.script-text-outline", color=text_color)
+
+    def _populate_text_analysis_prompt_menu(self, menu, prompts_catalog, prompt_records) -> None:
+        """Populate one prompt menu, mirroring the prompt library folder structure."""
+
+        menu_tree = {"prompts": [], "folders": {}}
+        for prompt in prompt_records:
+            relative_path = prompts_catalog.prompt_name_within_type(prompt.name)
+            parts = [part for part in relative_path.split("/") if part != ""]
+            if len(parts) == 0:
+                continue
+            current_branch = menu_tree
+            for part in parts[:-1]:
+                current_branch = current_branch["folders"].setdefault(part, {"prompts": [], "folders": {}})
+            current_branch["prompts"].append((relative_path, prompt))
+
+        def populate_branch(parent_menu, branch) -> None:
+            for relative_path, prompt in branch["prompts"]:
+                action = parent_menu.addAction(self._text_analysis_prompt_menu_leaf(relative_path))
+                action.setToolTip(prompt.description)
+                action.setIcon(self._text_analysis_prompt_file_icon(parent_menu))
+                action.setProperty('submenu', 'ai_text_analysis')
+                action.setData(prompt)
+            for folder_name, child_branch in branch["folders"].items():
+                submenu = parent_menu.addMenu(folder_name)
+                submenu.setToolTipsVisible(True)
+                submenu.setIcon(self._text_analysis_prompt_folder_icon())
+                populate_branch(submenu, child_branch)
+
+        populate_branch(menu, menu_tree)
 
     def _ai_search_scope_id(self):
         return id(self)
@@ -1590,16 +1630,10 @@ class DialogCodeText(QtWidgets.QWidget):
             if self.app.ai is not None and self.app.ai.is_ready():
                 submenu_ai_text_analysis.setEnabled(True)
                 prompts_catalog = AiAgentPromptsCatalog(self.app)
-                prompt_records = prompts_catalog.list_prompt_variants(
-                    prompt_type='text_analysis',
-                    apply_init=False,
-                )
-                for prompt in prompt_records:
-                    ac = submenu_ai_text_analysis.addAction(self._text_analysis_prompt_menu_label(prompt))
-                    ac.setToolTip(prompt.description)
-                    ac.setProperty('submenu', 'ai_text_analysis')
-                    ac.setData(prompt)
-                submenu_ai_text_analysis.addSeparator()
+                prompt_records = prompts_catalog.list_visible_prompt_variants(prompt_type='text_analysis')
+                self._populate_text_analysis_prompt_menu(submenu_ai_text_analysis, prompts_catalog, prompt_records)
+                if len(prompt_records) > 0:
+                    submenu_ai_text_analysis.addSeparator()
                 ac = submenu_ai_text_analysis.addAction(_('Edit text analysis prompts'))
                 ac.setProperty('submenu', 'ai_text_analysis_prompts')
             else:

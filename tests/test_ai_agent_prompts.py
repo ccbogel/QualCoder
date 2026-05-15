@@ -211,6 +211,23 @@ class TestAiAgentPromptsCatalog(TestCase):
         self.assertEqual("Search init\n\nSearch body", with_init.content)
         self.assertEqual("Search body", without_init.content)
 
+    def test_list_visible_prompt_variants_uses_scope_overrides_and_keeps_subfolders(self):
+        self._write_prompt("system", "text-analysis/open-coding", "System root prompt")
+        self._write_prompt("system", "text-analysis/grounded/theory-coding", "System nested prompt")
+        self._write_prompt("user", "text-analysis/grounded/theory-coding", "User nested prompt")
+        self._write_prompt("system", "text-analysis/_drafts/internal-only", "Hidden nested prompt")
+        self._write_prompt("system", "text-analysis/_scratch", "Hidden root prompt")
+
+        prompts = self.catalog.list_visible_prompt_variants(prompt_type="text_analysis")
+
+        self.assertEqual(
+            [
+                ("user", "text-analysis/grounded/theory-coding"),
+                ("system", "text-analysis/open-coding"),
+            ],
+            [(prompt.scope, prompt.name) for prompt in prompts],
+        )
+
     def test_find_prompt_variant_filters_by_type_and_scope(self):
         self._write_prompt("system", "_search/focused-search", "System search")
         self._write_prompt("user", "_search/focused-search", "User search")

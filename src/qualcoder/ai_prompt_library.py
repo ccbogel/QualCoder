@@ -226,35 +226,13 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self._new_menu.popup(button.mapToGlobal(QtCore.QPoint(0, button.height())))
 
     def _iter_visible_prompt_variants(self):
-        selected_prompts: Dict[str, object] = {}
-        for prompt in self.catalog.list_prompt_variants(
-            prompt_type=self.prompt_type,
-            include_internal=True,
-            apply_init=False,
-        ):
-            conflict_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
-            if conflict_key == "":
-                continue
-            prev = selected_prompts.get(conflict_key)
-            if prev is None:
-                selected_prompts[conflict_key] = prompt
-                continue
-            prev_rank = self.catalog._scope_priority.get(str(prev.scope), -1)
-            new_rank = self.catalog._scope_priority.get(str(prompt.scope), -1)
-            if new_rank > prev_rank:
-                selected_prompts[conflict_key] = prompt
-
-        for prompt in selected_prompts.values():
+        for prompt in self.catalog.list_visible_prompt_variants(prompt_type=self.prompt_type):
             prompt_type = self.catalog.prompt_type_from_name(prompt.name)
             if prompt_type is None:
                 continue
-            if self.prompt_type is not None and prompt_type != self.prompt_type:
-                continue
             relative_path = self.catalog.prompt_name_within_type(prompt.name)
             basename = relative_path.rsplit("/", 1)[-1]
-            directory = self._relative_dir_of_prompt_path(relative_path)
-            if basename.startswith("_") or self._is_hidden_relative_dir(directory):
-                continue
+            directory = self.catalog.relative_dir_of_prompt_path(relative_path)
             yield prompt, prompt_type, relative_path, basename, directory
 
     def _reload_prompts(self) -> None:
