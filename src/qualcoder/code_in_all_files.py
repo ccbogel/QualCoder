@@ -49,13 +49,15 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         DialogReportExactTextMatches, DialogCodesBySegments
     """
 
-    def __init__(self, app, codes_list, case_or_file="File", category_name=""):
+    def __init__(self, app, codes_list, case_or_file:str = "File", category_name:str = ""):
         """ Create dialog with textEdit widget to show all codings of this code.
         Called: code_text.coded_media_dialog , code_av.coded_media_dialog , code_image.coded_media_dialog
         param:
             app : class containing app details such as database connection
-            code_dict : dictionary of this code {name, color, cid, catid, date, owner, memo}, OR list of dicionaries
+            codes_list : dictionary of this one code {name, color, cid, catid, date, owner, memo}, OR
+                list of dictionaries of {name,color, cid, catid,date,owner,memo}
             case_or_file: default to "File", but view_graph has a "Case" option
+            category_name: String
         """
 
         self.app = app
@@ -95,7 +97,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.exec()
 
     def get_coded_segments_all_files(self):
-        """ Get coded text by file for this code. """
+        """ Get coded segments by file for this code. """
 
         self.te.blockSignals(True)
         self.te.clear()
@@ -186,7 +188,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             row['textedit_start'] = len(self.te.toPlainText())
             self.insert_title(row)
             row['textedit_end'] = len(self.te.toPlainText())
-            #self.te.append("\n")
             img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
                    'height': row['height'], 'pdf_page': row['pdf_page']}
             self.put_image_into_textedit(img, counter, self.te)
@@ -238,7 +239,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             else:
                 self.te.append("\n")
 
-        self.te.moveCursor(QtGui.QTextCursor.Start)
+        self.te.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
         self.te.blockSignals(False)
 
     def insert_title(self, row):
@@ -519,3 +520,254 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                     self.app.conn.commit()
                 except sqlite3.IntegrityError:
                     pass
+
+
+class DialogCodedIds(QtWidgets.QDialog):
+    """ Display all coded segments using imids, avdids, or ctids, in a modal dialog.
+    Need to store textedit start and end positions so that code in context can be used.
+    Called from:
+        DialogReportCodes
+    """
+
+    def __init__(self, app, prime_item):
+        """ Create dialog with textEdit widget to show all code ids.
+        Used to show codes that overlaps with another base code.
+        Called by: DialogReportCodes
+        Args:
+            app : class containing app details such as database connection
+            prime_item : dictionary of the coded item, containing 'overlaps'
+        """
+
+        self.app = app
+        self.prime_item = prime_item
+        # item may not contain 'important'
+        self.prime_item['memo'] = self.prime_item['coded_memo']
+        self.prime_item['owner'] = prime_item['coder']  # needed for insert_title.
+        QtWidgets.QDialog.__init__(self)
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
+        self.setStyleSheet(font)
+        self.resize(620, 580)
+        # Enable custom window hint to enable customizing window controls
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        title = _("Coded segments")
+        self.setWindowTitle(title)
+        self.gridLayout = QtWidgets.QGridLayout(self)
+        self.te = QtWidgets.QTextEdit()
+        self.gridLayout.addWidget(self.te, 1, 0)
+        self.te.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.te.customContextMenuRequested.connect(self.text_edit_menu)
+        self.text_results = []
+        self.image_results = []
+        self.av_results = []
+        self.insert_prime_coded_item()
+        self.get_and_insert_coded_segments()
+        self.exec()
+
+    def insert_prime_coded_item(self):
+        """  For overlapping codes, show the primary one. """
+
+        hmsg = "<p><i>Right click for export options</i></p><br />"
+        self.te.insertHtml(hmsg)
+        hmsg = "<h3>" + _("Coded item") + "<h3>"
+        self.te.insertHtml(hmsg)
+        self.insert_title(self.prime_item)
+        if self.prime_item['result_type'] == 'text':
+            self.te.append(self.prime_item['text'] + "\n")
+        if self.prime_item['result_type'] == 'av':
+            start = msecs_to_mins_and_secs(self.prime_item['pos0'])
+            end = msecs_to_mins_and_secs(self.prime_item['pos1'])
+            self.te.insertHtml(f'<br />Time: [{start} - {end}] ')
+        if self.prime_item['result_type'] == 'image':
+            img = {'mediapath': self.prime_item['mediapath'], 'x1': self.prime_item['x1'], 'y1': self.prime_item['y1'],
+                   'width': self.prime_item['width'], 'height': self.prime_item['height'], ''
+                    'pdf_page': self.prime_item['pdf_page']}
+            self.put_image_into_textedit(img, 9999, self.te)
+        if 'memo' in self.prime_item and self.prime_item['memo'] != "":
+            self.te.append(_("Memo: ") + self.prime_item['memo'] + "\n")
+        hmsg = "<br /><h3>" + _("Overlaps") + "<h3><br />"
+        self.te.insertHtml(hmsg)
+
+    def get_and_insert_coded_segments(self):
+        """ Get coded text by file for this code. Insert into text edit. """
+
+        self.te.blockSignals(True)
+        cur = self.app.conn.cursor()
+
+        # Get coded text by file for this coded data
+        if self.prime_item['result_type'] == 'text':
+            sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id,ctid," \
+                  "important, code_text_visible.memo, code_text_visible.owner from "
+            sql += "code_text_visible "
+            sql += " join code_name on code_name.cid = code_text_visible.cid join source on fid = source.id "
+            sql += " where ctid=? "
+            sql += " order by pos0"
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid', 'ctid', \
+                'important', 'memo', 'owner'
+            self.text_results = []
+            for id_ in self.prime_item['overlaps']:
+                cur.execute(sql, [id_])
+                results = cur.fetchone()
+                res_dict = dict(zip(keys, results))
+                self.text_results.append(res_dict)
+            # Text insertion into textEdit
+            for row in self.text_results:
+                row['textedit_start'] = len(self.te.toPlainText())
+                self.insert_title(row)
+                row['textedit_end'] = len(self.te.toPlainText())
+                self.te.append(f"{row['text']}\n")
+                if row['memo']:
+                    self.te.append(_("Memo: ") + row['memo'] + "\n")
+        if 'image' in self.prime_item['result_type']:
+            sql = "select code_name.name, color, source.name, x1, y1, width, height,source.mediapath, source.id, "
+            sql += "pdf_page, code_image_visible.memo, imid, important, code_image_visible.owner, pdf_page "
+            sql += "from code_image_visible join code_name "
+            sql += "on code_name.cid = code_image_visible.cid join source on code_image_visible.id = source.id "
+            sql += "where imid =? "
+            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'pdf_page', \
+                'memo', 'imid', 'important', 'owner', 'pdf_page'
+            self.image_results = []
+            for id_ in self.prime_item['overlaps']:
+                cur.execute(sql, [id_])
+                results = cur.fetchall()
+                for row in results:
+                    res_dict = dict(zip(keys, row))
+                    self.image_results.append(res_dict)
+            # Image - textEdit insertion
+            for counter, row in enumerate(self.image_results):
+                row['textedit_start'] = len(self.te.toPlainText())
+                self.insert_title(row)
+                row['textedit_end'] = len(self.te.toPlainText())
+                img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
+                       'height': row['height'], 'pdf_page': row['pdf_page']}
+                self.put_image_into_textedit(img, counter, self.te)
+                if row['memo'] != "":
+                    self.te.append(_("Memo: ") + row['memo'] + "\n")
+                else:
+                    self.te.append("\n")
+
+        if 'av' in self.prime_item['result_type']:
+            sql = "select code_name.name, color, source.name, pos0, pos1, code_av_visible.memo, source.mediapath, "
+            sql += "source.id, avid, important, code_av_visible.owner from code_av_visible join code_name "
+            sql += "on code_name.cid = code_av_visible.cid join source on code_av_visible.id = source.id "
+            sql += "where avid =? "
+            sql += " order by pos0"
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid', 'avid', \
+                'important', 'owner'
+            self.av_results = []
+            for id_ in self.prime_item['overlaps']:
+                cur.execute(sql, [id_])
+                results = cur.fetchall()
+                for row in results:
+                    res_dict = dict(zip(keys, row))
+                    self.av_results.append(res_dict)
+            # A/V - textEdit insertion
+            for row in self.av_results:
+                row['textedit_start'] = len(self.te.toPlainText())
+                self.insert_title(row)
+                start = msecs_to_mins_and_secs(row['pos0'])
+                end = msecs_to_mins_and_secs(row['pos1'])
+                self.te.insertHtml(f'<br />Time: [{start} - {end}] ')
+                row['textedit_end'] = len(self.te.toPlainText())
+                if row['memo'] != "":
+                    self.te.append(_("Memo: ") + row['memo'] + "\n")
+                else:
+                    self.te.append("\n")
+
+        self.te.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
+        self.te.blockSignals(False)
+
+    def insert_title(self, row):
+        """ Convenience method for a/v, image, text title insertion. """
+
+        foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
+        title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
+        title += _(" File: ") + row['file_or_casename']
+        if 'pos0' in row.keys():
+            title += f", [{row['pos0']} - {row['pos1']}]"
+        title += "  " + _("Code:") + f" {row['codename']} ({row['owner']})"
+        if 'important' in row and row['important']:
+            title += " [!]"
+        title += "</span><br />"
+        self.te.insertHtml(title)
+
+    def put_image_into_textedit(self, img, counter, text_edit):
+        """ Scale image, add resource to document, insert image.
+        A counter is important as each image slice needs a unique name, counter adds
+        the uniqueness to the name.
+        Called by: coded_media_dialog
+        param:
+            img: image data dictionary with file location and width, height, position data
+            counter: a changing counter is needed to make discrete different images
+            text_edit:  the widget that shows the data
+        """
+
+        abs_path = ""
+        image = None
+        if "images:" in img['mediapath']:
+            abs_path = img['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + img['mediapath']
+        if not img['mediapath'].lower().endswith(".pdf"):
+            image = QtGui.QImage(abs_path)
+        else:  # A pdf, must create the image
+            if img['mediapath'][:6] == "/docs/":
+                source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
+            if img['mediapath'][:5] == "docs:":
+                source_path = img['mediapath'][5:]
+            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
+            for page in fitz_pdf:
+                if page.number == img['pdf_page']:
+                    # Only need the current page image of interest
+                    pixmap = page.get_pixmap()
+                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
+            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+            image = QtGui.QImage(source_path)
+        image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
+        # scale to max 600 wide or high. Add option to change maximum limit?
+        scaler_w = 1.0
+        scaler_h = 1.0
+        if image.width() > 600:
+            scaler_w = 600 / image.width()
+        if image.height() > 600:
+            scaler_h = 600 / image.height()
+        if scaler_w < scaler_h:
+            scaler = scaler_w
+        else:
+            scaler = scaler_h
+        # Need unique image names or the same image from the same path is reproduced
+        imagename = os.path.join(self.app.project_path, "images", f"{counter}-{img['mediapath']}")
+        url = QtCore.QUrl(imagename)
+        document = text_edit.document()
+        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
+        # See https://doc.qt.io/qt-6/qtextdocument.html#addResource
+        # The image can be inserted into the document using the QTextCursor API:
+        cursor = text_edit.textCursor()
+        image_format = QtGui.QTextImageFormat()
+        image_format.setWidth(image.width() * scaler)
+        image_format.setHeight(image.height() * scaler)
+        image_format.setName(url.toString())
+        cursor.insertImage(image_format)
+        text_edit.insertHtml("<br />")
+
+    def text_edit_menu(self, position):
+        """ Context menu for textEdit. To export text_edit. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"font-size:{self.app.settings['fontsize']}pt")
+        menu.setToolTipsVisible(True)
+        action_export_odt = menu.addAction(_("Export as ODT file"))
+        # TODO action_export_html = menu.addAction(_("Export as HTML files"))
+        action = menu.exec(self.te.mapToGlobal(position))
+        if action == action_export_odt:
+            filename = "Overlaps.odt"
+            exp_dir = ExportDirectoryPathDialog(self.app, filename)
+            filepath = exp_dir.filepath
+            if filepath is None:
+                return
+            tw = QtGui.QTextDocumentWriter()
+            tw.setFileName(filepath)
+            tw.setFormat(b'ODF')  # byte array needed for Windows 10
+            tw.write(self.te.document())
+            msg = _("Overlaps exported: ") + filepath
+            Message(self.app, _('Overlaps exported'), msg, "information").exec()

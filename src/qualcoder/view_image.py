@@ -1004,6 +1004,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_export.setEnabled(True)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
+        pixmap_item.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         pixmap_item.setPos(0, 0)
         self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
         self.scene.addItem(pixmap_item)
