@@ -173,6 +173,304 @@ class PrefixedComboBox(QtWidgets.QComboBox):
         painter.drawControl(QtWidgets.QStyle.ControlElement.CE_ComboBoxLabel, option)
 
 
+class TreePopupComboBox(QtWidgets.QWidget):
+    """Combo-like selector that uses a dedicated popup QTreeView instead of QComboBox internals."""
+
+    currentIndexChanged = pyqtSignal(int)
+    currentModelIndexChanged = pyqtSignal(QtCore.QModelIndex)
+
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = None):
+        super().__init__(parent)
+        self._model = None
+        self._model_column = 0
+        self._current_index = -1
+        self._minimum_contents_length = 0
+        self._size_adjust_policy = None
+        self._popup = QtWidgets.QFrame(None, Qt.WindowType.Popup)
+        self._popup.setFrameShape(QtWidgets.QFrame.Shape.Box)
+        self._popup.setLineWidth(1)
+        popup_layout = QtWidgets.QVBoxLayout(self._popup)
+        popup_layout.setContentsMargins(0, 0, 0, 0)
+        popup_layout.setSpacing(0)
+        self._view = QtWidgets.QTreeView(self._popup)
+        self._configure_view(self._view)
+        popup_layout.addWidget(self._view)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def _configure_view(self, view: QtWidgets.QTreeView) -> None:
+        """Apply the standard popup tree settings and wire activation handlers."""
+
+        try:
+            view.clicked.disconnect(self._handle_view_clicked)
+        except Exception:
+            pass
+        try:
+            view.activated.disconnect(self._handle_view_activated)
+        except Exception:
+            pass
+        view.setRootIsDecorated(True)
+        view.setItemsExpandable(True)
+        view.setExpandsOnDoubleClick(True)
+        view.setUniformRowHeights(True)
+        view.setHeaderHidden(True)
+        view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        view.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        view.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        view.clicked.connect(self._handle_view_clicked)
+        view.activated.connect(self._handle_view_activated)
+
+    def setModel(self, model) -> None:
+        """Assign the shared item model."""
+
+        if self._model is model:
+            return
+        if self._model is not None:
+            for signal_name in ("dataChanged", "layoutChanged", "modelReset", "rowsInserted", "rowsRemoved"):
+                try:
+                    getattr(self._model, signal_name).disconnect(self._model_changed)
+                except Exception:
+                    pass
+        self._model = model
+        self._view.setModel(model)
+        if self._model is not None:
+            for signal_name in ("dataChanged", "layoutChanged", "modelReset", "rowsInserted", "rowsRemoved"):
+                try:
+                    getattr(self._model, signal_name).connect(self._model_changed)
+                except Exception:
+                    pass
+        self._sync_current_index_to_model()
+        self.update()
+
+    def model(self):
+        return self._model
+
+    def setModelColumn(self, column: int) -> None:
+        self._model_column = max(0, int(column))
+        self._sync_current_index_to_model()
+        self.update()
+
+    def modelColumn(self) -> int:
+        return self._model_column
+
+    def setMinimumContentsLength(self, length: int) -> None:
+        self._minimum_contents_length = max(0, int(length))
+        self.updateGeometry()
+
+    def minimumContentsLength(self) -> int:
+        return self._minimum_contents_length
+
+    def setSizeAdjustPolicy(self, policy) -> None:
+        self._size_adjust_policy = policy
+        self.updateGeometry()
+
+    def sizeAdjustPolicy(self):
+        return self._size_adjust_policy
+
+    def view(self) -> QtWidgets.QTreeView:
+        return self._view
+
+    def setView(self, view: QtWidgets.QTreeView) -> None:
+        """Replace the popup tree view while preserving the popup container."""
+
+        if view is self._view:
+            return
+        old_view = self._view
+        if old_view is not None:
+            old_view.hide()
+            old_view.setParent(None)
+        self._view = view
+        self._view.setParent(self._popup)
+        self._configure_view(self._view)
+        self._popup.layout().addWidget(self._view)
+        if self._model is not None:
+            self._view.setModel(self._model)
+        self._sync_current_index_to_model()
+
+    def currentIndex(self) -> int:
+        return self._current_index
+
+    def currentModelIndex(self) -> QtCore.QModelIndex:
+        return self._model_index_from_row(self._current_index)
+
+    def setCurrentIndex(self, index: int) -> None:
+        try:
+            new_index = int(index)
+        except (TypeError, ValueError):
+            new_index = -1
+        row_count = self._root_row_count()
+        if row_count <= 0 or new_index < 0 or new_index >= row_count:
+            new_index = -1
+        previous = self._current_index
+        self._current_index = new_index
+        self._sync_current_index_to_model()
+        self.update()
+        if previous != self._current_index:
+            model_index = self.currentModelIndex()
+            self.currentIndexChanged.emit(self._current_index)
+            self.currentModelIndexChanged.emit(model_index)
+
+    def showPopup(self) -> None:
+        if self._model is None or self._root_row_count() <= 0:
+            return
+        self._prepare_popup_geometry()
+        self._view.show()
+        current_index = self.currentModelIndex()
+        if current_index.isValid():
+            self._view.setCurrentIndex(current_index)
+            self._view.scrollTo(current_index, QtWidgets.QAbstractItemView.ScrollHint.PositionAtCenter)
+        self._popup.show()
+        self._popup.raise_()
+        self._view.setFocus(Qt.FocusReason.PopupFocusReason)
+
+    def hidePopup(self) -> None:
+        self._popup.hide()
+
+    def _root_row_count(self) -> int:
+        if self._model is None:
+            return 0
+        try:
+            return max(0, int(self._model.rowCount(QtCore.QModelIndex())))
+        except Exception:
+            return 0
+
+    def _model_index_from_row(self, row: int) -> QtCore.QModelIndex:
+        if self._model is None or row is None or row < 0:
+            return QtCore.QModelIndex()
+        try:
+            return self._model.index(int(row), self._model_column, QtCore.QModelIndex())
+        except Exception:
+            return QtCore.QModelIndex()
+
+    def _sync_current_index_to_model(self) -> None:
+        current_index = self._model_index_from_row(self._current_index)
+        if current_index.isValid():
+            self._view.setCurrentIndex(current_index)
+        else:
+            self._view.setCurrentIndex(QtCore.QModelIndex())
+            self._view.clearSelection()
+
+    def _model_changed(self, *args) -> None:
+        if self._current_index >= self._root_row_count():
+            self._current_index = -1
+            self._sync_current_index_to_model()
+        self.update()
+
+    def _popup_width_hint(self) -> int:
+        self._view.resizeColumnToContents(self._model_column)
+        width = max(self.width(), self._view.columnWidth(self._model_column) + 36)
+        scrollbar_width = self._view.style().pixelMetric(QtWidgets.QStyle.PixelMetric.PM_ScrollBarExtent, None, self._view)
+        frame_width = self._popup.frameWidth() * 2 + 2
+        return max(width, self.width()) + scrollbar_width + frame_width
+
+    def _popup_height_hint(self) -> int:
+        row_count = self._root_row_count()
+        visible_rows = min(max(1, row_count), 12)
+        row_height = self._view.sizeHintForRow(0)
+        if row_height <= 0:
+            row_height = self.fontMetrics().height() + 8
+        frame_width = self._popup.frameWidth() * 2 + 2
+        return visible_rows * row_height + frame_width
+
+    def _prepare_popup_geometry(self) -> None:
+        anchor = self.mapToGlobal(QtCore.QPoint(0, self.height()))
+        screen = QGuiApplication.screenAt(anchor) or self.screen() or QGuiApplication.primaryScreen()
+        available = screen.availableGeometry() if screen is not None else QtCore.QRect(anchor.x(), anchor.y(), 1000, 800)
+        width = min(self._popup_width_hint(), available.width())
+        height = min(self._popup_height_hint(), max(120, available.height()))
+        x_pos = max(available.left(), min(anchor.x(), available.right() - width + 1))
+        y_pos = anchor.y()
+        if y_pos + height > available.bottom() + 1:
+            y_pos = self.mapToGlobal(QtCore.QPoint(0, 0)).y() - height
+        if y_pos < available.top():
+            y_pos = available.top()
+        self._popup.setGeometry(x_pos, y_pos, width, height)
+
+    def _activate_index(self, index: QtCore.QModelIndex) -> None:
+        if not index.isValid():
+            return
+        if self._model is not None and self._model.hasChildren(index):
+            self._view.setExpanded(index, not self._view.isExpanded(index))
+            return
+        root_index = index.sibling(index.row(), self._model_column)
+        self.hidePopup()
+        self.setCurrentIndex(root_index.row())
+
+    def _handle_view_clicked(self, index: QtCore.QModelIndex) -> None:
+        self._activate_index(index)
+
+    def _handle_view_activated(self, index: QtCore.QModelIndex) -> None:
+        self._activate_index(index)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            if self._popup.isVisible():
+                self.hidePopup()
+            else:
+                self.showPopup()
+            event.accept()
+            return
+        super().mousePressEvent(event)
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space, Qt.Key.Key_Down, Qt.Key.Key_F4):
+            self.showPopup()
+            event.accept()
+            return
+        if event.key() == Qt.Key.Key_Escape and self._popup.isVisible():
+            self.hidePopup()
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
+    def focusOutEvent(self, event: QtGui.QFocusEvent) -> None:
+        super().focusOutEvent(event)
+        self.update()
+
+    def sizeHint(self) -> QtCore.QSize:
+        option = QtWidgets.QStyleOptionComboBox()
+        option.initFrom(self)
+        option.editable = False
+        text_length = max(8, self._minimum_contents_length, len(self._current_text()))
+        text = "M" * text_length
+        contents = QtCore.QSize(self.fontMetrics().horizontalAdvance(text) + 28, self.fontMetrics().height() + 10)
+        return self.style().sizeFromContents(QtWidgets.QStyle.ContentsType.CT_ComboBox, option, contents, self)
+
+    def minimumSizeHint(self) -> QtCore.QSize:
+        return self.sizeHint()
+
+    def _current_text(self) -> str:
+        current_index = self.currentModelIndex()
+        if not current_index.isValid():
+            return ""
+        return str(current_index.data(Qt.ItemDataRole.DisplayRole) or "")
+
+    def _current_icon(self) -> QtGui.QIcon:
+        current_index = self.currentModelIndex()
+        if not current_index.isValid():
+            return QtGui.QIcon()
+        data = current_index.data(Qt.ItemDataRole.DecorationRole)
+        if isinstance(data, QtGui.QIcon):
+            return data
+        return QtGui.QIcon()
+
+    def paintEvent(self, event) -> None:
+        painter = QtWidgets.QStylePainter(self)
+        option = QtWidgets.QStyleOptionComboBox()
+        option.initFrom(self)
+        option.editable = False
+        option.frame = True
+        option.currentText = self._current_text()
+        option.currentIcon = self._current_icon()
+        option.iconSize = QtCore.QSize(16, 16)
+        if self.hasFocus():
+            option.state |= QtWidgets.QStyle.StateFlag.State_HasFocus
+        if self._popup.isVisible():
+            option.state |= QtWidgets.QStyle.StateFlag.State_On
+        painter.drawComplexControl(QtWidgets.QStyle.ComplexControl.CC_ComboBox, option)
+        painter.drawControl(QtWidgets.QStyle.ControlElement.CE_ComboBoxLabel, option)
+
+
 class PromptCompletionListWidget(QtWidgets.QListWidget):
     """Popup list for inline `/prompt` completion in the AI chat input."""
 
@@ -255,6 +553,7 @@ class DialogAIChat(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
+        self.setup_chat_selector_widget()
         self.setup_ai_permissions_combobox()
         self.ui.comboBox_ai_permissions.currentIndexChanged.connect(self.ai_permissions_changed)
         self.load_ai_permissions()
@@ -293,10 +592,8 @@ class DialogAIChat(QtWidgets.QDialog):
         combo_size_policy.setHorizontalPolicy(QtWidgets.QSizePolicy.Policy.Ignored)
         self.ui.comboBox_ai_chats.setSizePolicy(combo_size_policy)
         self.ui.comboBox_ai_chats.setMinimumWidth(0)
-        combo_view = QtWidgets.QTreeView(self.ui.comboBox_ai_chats)
-        combo_view.setRootIsDecorated(False)
-        combo_view.header().setVisible(False)
-        self.ui.comboBox_ai_chats.setView(combo_view)
+        self.ui.comboBox_ai_chats.view().setRootIsDecorated(True)
+        self.ui.comboBox_ai_chats.view().setHeaderHidden(True)
         self.ui.comboBox_ai_chats.currentIndexChanged.connect(self.combo_chat_selection_changed)
         self.ui.toolButton_close_sidebar.pressed.connect(self.close_sidebar_view)
         self.ui.toolButton_edit_title.pressed.connect(self.edit_title)
@@ -640,7 +937,6 @@ class DialogAIChat(QtWidgets.QDialog):
             self._hide_prompt_completion_popup(accept=False)
         try:
             self.ui.comboBox_ai_chats.hidePopup()
-            self.ui.comboBox_ai_chats.view().hide()
         except Exception:
             pass
 
@@ -1188,11 +1484,7 @@ class DialogAIChat(QtWidgets.QDialog):
         """)
         self.ui.scrollArea_ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
         default_panel_color = self.ui.widget_chat.palette().color(self.ui.widget_chat.backgroundRole())
-        self.ui.comboBox_ai_chats.setStyleSheet(f"""
-            QComboBox {{
-                background-color: {default_panel_color.name()};
-            }}
-        """)
+        self.ui.comboBox_ai_chats.setStyleSheet(f"background-color: {default_panel_color.name()};")
         self.ui.comboBox_ai_permissions.setStyleSheet(f"""
             QComboBox {{
                 background-color: {default_panel_color.name()};
@@ -1225,6 +1517,28 @@ class DialogAIChat(QtWidgets.QDialog):
         layout.replaceWidget(old_combo, new_combo)
         old_combo.deleteLater()
         self.ui.comboBox_ai_permissions = new_combo
+
+    def setup_chat_selector_widget(self):
+        """Replace the Designer combobox with a combo-like widget backed by a tree popup."""
+
+        old_combo = self.ui.comboBox_ai_chats
+        new_combo = TreePopupComboBox(old_combo.parentWidget())
+        new_combo.setObjectName(old_combo.objectName())
+        new_combo.setEnabled(old_combo.isEnabled())
+        new_combo.setToolTip(old_combo.toolTip())
+        new_combo.setStatusTip(old_combo.statusTip())
+        new_combo.setWhatsThis(old_combo.whatsThis())
+        new_combo.setAccessibleName(old_combo.accessibleName())
+        new_combo.setAccessibleDescription(old_combo.accessibleDescription())
+        new_combo.setSizePolicy(old_combo.sizePolicy())
+        new_combo.setMinimumSize(old_combo.minimumSize())
+        new_combo.setMaximumSize(old_combo.maximumSize())
+        new_combo.setFont(old_combo.font())
+        new_combo.setStyleSheet(old_combo.styleSheet())
+        layout = old_combo.parentWidget().layout()
+        layout.replaceWidget(old_combo, new_combo)
+        old_combo.deleteLater()
+        self.ui.comboBox_ai_chats = new_combo
 
     def load_ai_permissions(self):
         ai_permissions = self.app.settings.get('ai_permissions', 1)
