@@ -1423,8 +1423,18 @@ class DialogAIChat(QtWidgets.QDialog):
     def _render_plain_text_with_prompt_refs(self, text: str, include_prompt_labels: bool = False, style_role: str = "user") -> str:
         """Render plain text as raw Qt rich text while preserving line breaks."""
 
-        del include_prompt_labels, style_role
-        return str(text if text is not None else '').replace('\n', '<br />')
+        if self._prompt_completion_enabled():
+            self._refresh_prompt_completion_records()
+        marked_text, replacements = self._prompt_reference_placeholders_for_text(
+            text,
+            include_prompt_labels=include_prompt_labels,
+            require_enabled=False,
+            style_role=style_role,
+        )
+        rendered_html = str(marked_text if marked_text is not None else '').replace('\n', '<br />')
+        for placeholder, replacement in replacements.items():
+            rendered_html = rendered_html.replace(placeholder, replacement)
+        return rendered_html
 
     def _open_prompt_record_in_library(self, prompt: AgentPromptRecord):
         """Open one prompt record in the prompt library dialog."""
@@ -4901,6 +4911,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                 id_, name, analysis_type, summary, date, analysis_prompt = chat
                 if hasattr(self, "_prompt_reference_highlighter"):
                     self._prompt_reference_highlighter.rehighlight()
+                if self._is_agent_chat_type(analysis_type):
+                    self._refresh_prompt_completion_records()
                 if analysis_type == 'text chat':
                     # Extract doc info from the summary field:
                     doc_info_pattern = r'<a href="quote:(\d+)_(\d+)_(\d+)">(.+?)</a>'
@@ -4951,8 +4963,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     1,
                     max(self.ui.ai_output.width(), self.ui.scrollArea_ai_output.viewport().width()) - 24
                 )
-                if self._is_agent_chat_type(analysis_type):
-                    self._refresh_prompt_completion_records()
 
                 def flush_agent_status_block():
                     nonlocal agent_status_lines, agent_status_author

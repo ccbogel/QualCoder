@@ -82,3 +82,21 @@ class TestDialogAIChatStreamErrors(TestCase):
         result = dialog.replace_references('{REF: "alpha"}', chat_idx=0)
 
         self.assertEqual("legacy-path", result)
+
+    def test_render_plain_text_with_prompt_refs_keeps_html_and_replaces_prompt_placeholders(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog._prompt_completion_enabled = lambda: True
+        dialog._refresh_prompt_completion_records = lambda: None
+        dialog._prompt_reference_placeholders_for_text = (
+            lambda text, include_prompt_labels=False, require_enabled=False, style_role="user":
+            (
+                'Analyzing text from <a href="quote:1_2_3">Clare</a>\nQUALCODER_PROMPT_REF_0_TOKEN (project)',
+                {"QUALCODER_PROMPT_REF_0_TOKEN": '<a href="promptref:ethnographic-brainstorming">/ethnographic-brainstorming</a>'},
+            )
+        )
+
+        result = dialog._render_plain_text_with_prompt_refs("ignored", style_role="info")
+
+        self.assertIn('<a href="quote:1_2_3">Clare</a>', result)
+        self.assertIn('<a href="promptref:ethnographic-brainstorming">/ethnographic-brainstorming</a>', result)
+        self.assertIn('<br />', result)
