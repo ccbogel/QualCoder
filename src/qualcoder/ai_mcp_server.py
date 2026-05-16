@@ -91,7 +91,8 @@ class AiMcpServer:
             "QualCoder internal MCP server. "
             "Use resources/list, resources/read, tools/list, and tools/call. "
             "Available resources: text documents list (qualcoder://documents), document text by id "
-            "(qualcoder://documents/text/{id}), code tree (qualcoder://codes/tree), and coded text segments by code id "
+            "(qualcoder://documents/text/{id}, with optional start/length or line_start/line_end), "
+            "code tree (qualcoder://codes/tree), and coded text segments by code id "
             "(qualcoder://codes/segments/{cid}), semantic vector search "
             "(qualcoder://vector/search?q=...) with optional filters file_ids and exclude_cids, "
             "BM25 chunk search "
@@ -278,7 +279,13 @@ class AiMcpServer:
                 uri = params.get("uri")
                 if not isinstance(uri, str) or uri.strip() == "":
                     raise ValueError("Missing resource uri.")
-                uri_with_window = self._with_read_window(uri, params.get("start"), params.get("length"))
+                uri_with_window = self._with_read_window(
+                    uri,
+                    params.get("start"),
+                    params.get("length"),
+                    params.get("line_start"),
+                    params.get("line_end"),
+                )
                 req = types.ReadResourceRequest(params=types.ReadResourceRequestParams(uri=uri_with_window))
                 result = self._dispatch_sdk(types.ReadResourceRequest, req)
             elif method == "tools/list":
@@ -447,34 +454,73 @@ class AiMcpServer:
             return None
         return types.PaginatedRequestParams(cursor=str(cursor))
 
-    def _with_read_window(self, uri: str, start: Any, length: Any) -> str:
-        if start is None and length is None:
+    def _with_read_window(self, uri: str, start: Any, length: Any,
+                          line_start: Any = None, line_end: Any = None) -> str:
+        has_char_window = start is not None or length is not None
+        has_line_window = line_start is not None or line_end is not None
+        if has_char_window and has_line_window:
+            raise ValueError("Use either start/length or line_start/line_end, not both.")
+        if not has_char_window and not has_line_window:
             return uri
         parts = urlsplit(uri)
         query = parse_qs(parts.query, keep_blank_values=True)
-        if start is not None:
-            start_i = max(0, self._to_int(start, 0))
-            query["start"] = [str(start_i)]
-        if length is not None:
-            length_i = max(1, min(self._to_int(length, self.default_read_length), self.max_read_length))
-            query["length"] = [str(length_i)]
+        if has_char_window:
+            if start is not None:
+                start_i = max(0, self._to_int(start, 0))
+                query["start"] = [str(start_i)]
+            if length is not None:
+                length_i = max(1, min(self._to_int(length, self.default_read_length), self.max_read_length))
+                query["length"] = [str(length_i)]
+            query.pop("line_start", None)
+            query.pop("line_end", None)
+        else:
+            if line_start is not None:
+                line_start_i = max(1, self._to_int(line_start, 1))
+                query["line_start"] = [str(line_start_i)]
+            if line_end is not None:
+                line_end_i = max(1, self._to_int(line_end, 1))
+                query["line_end"] = [str(line_end_i)]
+            query.pop("start", None)
+            query.pop("length", None)
         return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query, doseq=True), parts.fragment))
 
-    def _parse_read_window(self, uri: str) -> Tuple[str, int, int]:
+    def _parse_read_window(self, uri: str) -> Tuple[str, Dict[str, Any]]:
         parts = urlsplit(uri)
         query = parse_qs(parts.query, keep_blank_values=True)
-        start = max(0, self._to_int(query.get("start", [0])[0], 0))
-        length = max(
-            1,
-            min(
-                self._to_int(query.get("length", [self.default_read_length])[0], self.default_read_length),
-                self.max_read_length,
-            ),
-        )
+        has_char_window = "start" in query or "length" in query
+        has_line_window = "line_start" in query or "line_end" in query
+        if has_char_window and has_line_window:
+            raise ValueError("Use either start/length or line_start/line_end, not both.")
+        if has_line_window:
+            line_start = max(1, self._to_int(query.get("line_start", [1])[0], 1))
+            line_end = self._to_int(query.get("line_end", [line_start])[0], line_start)
+            if line_end < line_start:
+                raise ValueError("line_end must be greater than or equal to line_start.")
+            window = {
+                "mode": "line",
+                "line_start": line_start,
+                "line_end": line_end,
+            }
+        else:
+            start = max(0, self._to_int(query.get("start", [0])[0], 0))
+            length = max(
+                1,
+                min(
+                    self._to_int(query.get("length", [self.default_read_length])[0], self.default_read_length),
+                    self.max_read_length,
+                ),
+            )
+            window = {
+                "mode": "char",
+                "start": start,
+                "length": length,
+            }
         query.pop("start", None)
         query.pop("length", None)
+        query.pop("line_start", None)
+        query.pop("line_end", None)
         base_uri = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query, doseq=True), parts.fragment))
-        return base_uri, start, length
+        return base_uri, window
 
     def _register_sdk_handlers(self) -> None:
         @self._sdk_server.list_resources()
@@ -487,7 +533,10 @@ class AiMcpServer:
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://documents/text/{id}",
                     name="Document by id",
-                    description="Read a text document by source id.",
+                    description=(
+                        "Read a text document by source id. Optional window params: start and length, "
+                        "or line_start and line_end."
+                    ),
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
@@ -535,8 +584,8 @@ class AiMcpServer:
         @self._sdk_server.read_resource()
         async def _read_resource(uri: str) -> List[ReadResourceContents]:
             uri_str = str(uri)
-            base_uri, start, req_length = self._parse_read_window(uri_str)
-            payload = self._read_resource_payload(base_uri, start, req_length)
+            base_uri, window = self._parse_read_window(uri_str)
+            payload = self._read_resource_payload(base_uri, window)
             return [ReadResourceContents(content=json.dumps(payload, ensure_ascii=False), mime_type="application/json")]
 
         @self._sdk_server.list_tools()
@@ -555,7 +604,7 @@ class AiMcpServer:
         async def _get_prompt(_name: str, _arguments: Optional[Dict[str, str]]) -> types.GetPromptResult:
             return types.GetPromptResult.model_validate(self._get_prompt_payload(_name, _arguments))
 
-    def _read_resource_payload(self, uri: str, start: int, req_length: int) -> Dict[str, Any]:
+    def _read_resource_payload(self, uri: str, window: Dict[str, Any]) -> Dict[str, Any]:
         parts = urlsplit(uri)
         uri_no_query = urlunsplit((parts.scheme, parts.netloc, parts.path, "", parts.fragment))
         query = parse_qs(parts.query, keep_blank_values=True)
@@ -583,7 +632,10 @@ class AiMcpServer:
         doc_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_no_query)
         if doc_match is not None:
             doc_id = int(doc_match.group(1))
-            return self._read_document(doc_id, start, req_length)
+            return self._read_document(doc_id, window)
+
+        if str(window.get("mode", "char")) == "line":
+            raise ValueError("line_start/line_end are only supported for text document reads.")
 
         raise ValueError(f"Unknown resource uri: {uri}")
 
@@ -2244,6 +2296,7 @@ class AiMcpServer:
 
                 docstore_ids = [str(row[1]).strip() for row in rows if row[1] is not None and str(row[1]).strip() != ""]
                 docs_map = self._fetch_cached_documents_by_docstore_id(docstore_ids)
+                source_texts = self._fetch_sources_texts([self._to_int(row[2], -1) for row in rows])
 
                 for row in rows:
                     position = self._to_int(row[0], 0)
@@ -2275,16 +2328,24 @@ class AiMcpServer:
                     if source_name == "" and source_id > 0:
                         fetched_name = self._fetch_source_name(source_id)
                         source_name = "" if fetched_name is None else str(fetched_name)
+                    source_fulltext = ""
+                    source_row = source_texts.get(source_id)
+                    if source_row is None and source_id > 0:
+                        source_row = self._fetch_sources_texts([source_id]).get(source_id)
+                    if source_row is not None:
+                        if source_name == "":
+                            source_name = str(source_row[0] if source_row[0] is not None else "")
+                        source_fulltext = str(source_row[1] if source_row[1] is not None else "")
 
-                    hits.append(
-                        {
-                            "source_id": (source_id if source_id > 0 else None),
-                            "source_name": source_name,
-                            "start": (start_index if start_index >= 0 else None),
-                            "length": len(text),
-                            "text": text,
-                        }
-                    )
+                    hit_payload = {
+                        "source_id": (source_id if source_id > 0 else None),
+                        "source_name": source_name,
+                        "start": (start_index if start_index >= 0 else None),
+                        "length": len(text),
+                        "text": text,
+                    }
+                    self._append_line_range_fields(hit_payload, source_fulltext, start_index, len(text))
+                    hits.append(hit_payload)
                     if len(hits) >= page_size:
                         break
 
@@ -2410,17 +2471,23 @@ class AiMcpServer:
         if cursor > total_hits:
             cursor = total_hits
         sliced_hits = ordered_hits[cursor:cursor + page_size]
+        source_texts = self._fetch_sources_texts([self._to_int(hit.get("source_id"), -1) for hit in sliced_hits])
         returned_hits: List[Dict[str, Any]] = []
         for hit in sliced_hits:
-            returned_hits.append(
-                {
-                    "source_id": hit["source_id"],
-                    "source_name": hit["source_name"],
-                    "start": hit["start"],
-                    "length": hit["length"],
-                    "text": hit["text"],
-                }
-            )
+            source_id = self._to_int(hit.get("source_id"), -1)
+            source_fulltext = ""
+            source_row = source_texts.get(source_id)
+            if source_row is not None:
+                source_fulltext = str(source_row[1] if source_row[1] is not None else "")
+            hit_payload = {
+                "source_id": hit["source_id"],
+                "source_name": hit["source_name"],
+                "start": hit["start"],
+                "length": hit["length"],
+                "text": hit["text"],
+            }
+            self._append_line_range_fields(hit_payload, source_fulltext, hit.get("start"), hit.get("length"))
+            returned_hits.append(hit_payload)
 
         next_cursor = min(total_hits, cursor + len(returned_hits))
         truncated = next_cursor < total_hits
@@ -2544,17 +2611,17 @@ class AiMcpServer:
                     if context_text.strip() == "":
                         continue
 
-                    hits.append(
-                        {
-                            "source_id": source_id,
-                            "source_name": source_name,
-                            "start": context_start,
-                            "length": len(context_text),
-                            "match_start": match_start,
-                            "match_length": match_length,
-                            "text": context_text,
-                        }
-                    )
+                    hit_payload = {
+                        "source_id": source_id,
+                        "source_name": source_name,
+                        "start": context_start,
+                        "length": len(context_text),
+                        "match_start": match_start,
+                        "match_length": match_length,
+                        "text": context_text,
+                    }
+                    self._append_line_range_fields(hit_payload, fulltext, context_start, len(context_text))
+                    hits.append(hit_payload)
                     if len(hits) >= page_size:
                         break
 
@@ -3071,6 +3138,83 @@ class AiMcpServer:
             result[source_id] = (source_name, fulltext)
         return result
 
+    def _line_ranges(self, fulltext: str) -> List[Tuple[int, int]]:
+        """Return 0-based [start, end) character ranges for each logical line."""
+
+        text = "" if fulltext is None else str(fulltext)
+        if text == "":
+            return []
+        ranges: List[Tuple[int, int]] = []
+        pos = 0
+        for line_text in text.splitlines(keepends=True):
+            next_pos = pos + len(line_text)
+            ranges.append((pos, next_pos))
+            pos = next_pos
+        if len(ranges) == 0:
+            ranges.append((0, len(text)))
+        return ranges
+
+    def _char_position_to_line_number(self, fulltext: str, char_pos: int) -> int:
+        """Return the 1-based logical line number for one character position."""
+
+        line_ranges = self._line_ranges(fulltext)
+        if len(line_ranges) == 0:
+            return 0
+        text_len = len("" if fulltext is None else str(fulltext))
+        if text_len <= 0:
+            return 0
+        pos = max(0, min(self._to_int(char_pos, 0), text_len - 1))
+        for idx, (_, end_pos) in enumerate(line_ranges, start=1):
+            if pos < end_pos:
+                return idx
+        return len(line_ranges)
+
+    def _char_range_to_line_range(self, fulltext: str, start: int, length: int) -> Tuple[int, int]:
+        """Return 1-based logical line numbers touched by one character range."""
+
+        text = "" if fulltext is None else str(fulltext)
+        if text == "":
+            return 0, 0
+        text_len = len(text)
+        start_i = max(0, min(self._to_int(start, 0), text_len - 1))
+        length_i = max(0, self._to_int(length, 0))
+        end_exclusive = min(text_len, start_i + length_i)
+        start_line = self._char_position_to_line_number(text, start_i)
+        if end_exclusive <= start_i:
+            return start_line, start_line
+        end_line = self._char_position_to_line_number(text, end_exclusive - 1)
+        return start_line, end_line
+
+    def _line_range_to_char_window(self, fulltext: str, line_start: int, line_end: int) -> Tuple[int, int, int, int]:
+        """Convert one 1-based logical line window to a character start/length pair."""
+
+        line_ranges = self._line_ranges(fulltext)
+        if len(line_ranges) == 0:
+            return 0, 0, 0, 0
+        start_line = max(1, self._to_int(line_start, 1))
+        end_line = max(start_line, self._to_int(line_end, start_line))
+        if start_line > len(line_ranges):
+            raise ValueError(f"line_start exceeds the document line count ({len(line_ranges)}).")
+        end_line = min(end_line, len(line_ranges))
+        start_pos = line_ranges[start_line - 1][0]
+        end_pos = line_ranges[end_line - 1][1]
+        return start_pos, max(0, end_pos - start_pos), start_line, end_line
+
+    def _append_line_range_fields(self, payload: Dict[str, Any], fulltext: str,
+                                  start: Any, length: Any) -> Dict[str, Any]:
+        """Attach line_start and line_end to one payload using its character window."""
+
+        start_i = self._to_int(start, -1)
+        length_i = self._to_int(length, -1)
+        if start_i < 0 or length_i < 0:
+            payload["line_start"] = 0
+            payload["line_end"] = 0
+            return payload
+        line_start, line_end = self._char_range_to_line_range(fulltext, start_i, length_i)
+        payload["line_start"] = line_start
+        payload["line_end"] = line_end
+        return payload
+
     def _fetch_excluded_coding_ranges(self, exclude_cids: List[int], file_ids: List[int]) -> Dict[int, List[Tuple[int, int]]]:
         """Fetch coded text ranges grouped by source id for exclusion filtering."""
 
@@ -3224,6 +3368,7 @@ class AiMcpServer:
         segments: List[Dict[str, Any]] = []
         used_chars = 0
         hit_max_char_limit = False
+        source_texts = self._fetch_sources_texts([self._to_int(row[2], -1) for row in segment_rows])
         for row in segment_rows:
             if len(segments) >= max_segments:
                 break
@@ -3237,19 +3382,29 @@ class AiMcpServer:
                 hit_max_char_limit = True
                 break
 
-            segments.append(
-                {
-                    "ctid": row[0],
-                    "cid": row[1],
-                    "fid": row[2],
-                    "quote": quote,
-                    "pos0": row[4],
-                    "pos1": row[5],
-                    "owner": row[6],
-                    "source_name": row[7],
-                    "code_name": row[8],
-                }
+            fid = self._to_int(row[2], -1)
+            source_fulltext = ""
+            source_row = source_texts.get(fid)
+            if source_row is not None:
+                source_fulltext = str(source_row[1] if source_row[1] is not None else "")
+            segment_payload = {
+                "ctid": row[0],
+                "cid": row[1],
+                "fid": row[2],
+                "quote": quote,
+                "pos0": row[4],
+                "pos1": row[5],
+                "owner": row[6],
+                "source_name": row[7],
+                "code_name": row[8],
+            }
+            self._append_line_range_fields(
+                segment_payload,
+                source_fulltext,
+                row[4],
+                self._to_int(row[5], 0) - self._to_int(row[4], 0),
             )
+            segments.append(segment_payload)
             used_chars += quote_length
 
         next_cursor = cursor + len(segments)
@@ -3274,7 +3429,7 @@ class AiMcpServer:
             "segments": segments,
         }
 
-    def _read_document(self, doc_id: int, start: int, length: int) -> Dict[str, Any]:
+    def _read_document(self, doc_id: int, window: Dict[str, Any]) -> Dict[str, Any]:
         row = self._fetchone(
             "SELECT id, name, ifnull(memo,''), owner, ifnull(fulltext,'') "
             "FROM source WHERE id=? AND fulltext is not null",
@@ -3282,9 +3437,26 @@ class AiMcpServer:
         )
         if row is None:
             raise ValueError(f"Document id {doc_id} not found.")
-        fulltext = row[4]
+        fulltext = "" if row[4] is None else str(row[4])
+        window_mode = str(window.get("mode", "char"))
+        if window_mode == "line":
+            start, length, _, _ = self._line_range_to_char_window(
+                fulltext,
+                window.get("line_start", 1),
+                window.get("line_end", window.get("line_start", 1)),
+            )
+        else:
+            start = max(0, self._to_int(window.get("start", 0), 0))
+            length = max(
+                1,
+                min(
+                    self._to_int(window.get("length", self.default_read_length), self.default_read_length),
+                    self.max_read_length,
+                ),
+            )
         end_pos = min(start + length, len(fulltext))
         excerpt = fulltext[start:end_pos]
+        line_start, line_end = self._char_range_to_line_range(fulltext, start, len(excerpt))
         return {
             "id": row[0],
             "name": row[1],
@@ -3293,6 +3465,8 @@ class AiMcpServer:
             "total_length": len(fulltext),
             "start": start,
             "length": len(excerpt),
+            "line_start": line_start,
+            "line_end": line_end,
             "text": excerpt,
         }
 

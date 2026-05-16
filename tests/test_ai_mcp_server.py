@@ -57,12 +57,17 @@ class TestAiMcpServer(TestCase):
         cur.execute(
             "INSERT INTO source (id, name, fulltext, mediapath, memo, owner, date, av_text_id, risid) "
             "VALUES (?,?,?,?,?,?,?,?,?)",
-            (2, "doc two", "klmnopqrst", None, "doc memo 2", "default", "2026-02-13", None, None),
+            (2, "doc two", "first line\nsecond line\nthird line\nfourth", None, "doc memo 2", "default", "2026-02-13", None, None),
         )
         cur.execute(
             "INSERT INTO source (id, name, fulltext, mediapath, memo, owner, date, av_text_id, risid) "
             "VALUES (?,?,?,?,?,?,?,?,?)",
             (3, "doc three", "uvwxyz", None, "doc memo 3", "default", "2026-02-13", None, None),
+        )
+        cur.execute(
+            "INSERT INTO source (id, name, fulltext, mediapath, memo, owner, date, av_text_id, risid) "
+            "VALUES (?,?,?,?,?,?,?,?,?)",
+            (4, "doc four", "line1\nline2\nline3\nline4", None, "doc memo 4", "default", "2026-02-13", None, None),
         )
         cur.execute(
             "INSERT INTO code_cat (catid, name, owner, date, memo, supercatid) VALUES (?,?,?,?,?,?)",
@@ -445,6 +450,20 @@ class TestAiMcpServer(TestCase):
         ctid_order = [seg["ctid"] for seg in payload["segments"]]
         self.assertEqual([4, 2, 3, 1], ctid_order)
 
+    def test_code_segments_include_line_ranges(self):
+        req = {
+            "jsonrpc": "2.0",
+            "id": 39,
+            "method": "resources/read",
+            "params": {"uri": "qualcoder://codes/segments/1?strategy=sequential&max_segments=10&max_chars=1000"},
+        }
+        res = self.server.handle_request(req)
+        self.assertIn("result", res)
+        payload = json.loads(res["result"]["contents"][0]["text"])
+        line_by_ctid = {seg["ctid"]: (seg["line_start"], seg["line_end"]) for seg in payload["segments"]}
+        self.assertEqual((1, 1), line_by_ctid[2])
+        self.assertEqual((2, 2), line_by_ctid[5])
+
     def test_code_segments_sequential_strategy(self):
         req = {
             "jsonrpc": "2.0",
@@ -530,6 +549,36 @@ class TestAiMcpServer(TestCase):
         self.assertEqual(1, payload["id"])
         self.assertEqual("cdef", payload["text"])
         self.assertEqual(2, payload["start"])
+        self.assertEqual(1, payload["line_start"])
+        self.assertEqual(1, payload["line_end"])
+
+    def test_resources_read_document_by_line_range(self):
+        req = {
+            "jsonrpc": "2.0",
+            "id": 36,
+            "method": "resources/read",
+            "params": {"uri": "qualcoder://documents/text/4", "line_start": 2, "line_end": 3},
+        }
+        res = self.server.handle_request(req)
+        self.assertIn("result", res)
+        payload = json.loads(res["result"]["contents"][0]["text"])
+        self.assertEqual(4, payload["id"])
+        self.assertEqual("line2\nline3\n", payload["text"])
+        self.assertEqual(6, payload["start"])
+        self.assertEqual(12, payload["length"])
+        self.assertEqual(2, payload["line_start"])
+        self.assertEqual(3, payload["line_end"])
+
+    def test_resources_read_document_rejects_mixed_char_and_line_windows(self):
+        req = {
+            "jsonrpc": "2.0",
+            "id": 37,
+            "method": "resources/read",
+            "params": {"uri": "qualcoder://documents/text/4", "start": 0, "line_start": 1},
+        }
+        res = self.server.handle_request(req)
+        self.assertIn("error", res)
+        self.assertEqual(-32602, res["error"]["code"])
 
     def test_parse_vector_search_options_accepts_file_ids_and_exclude_cids(self):
         options = self.server._parse_vector_search_options(
@@ -580,6 +629,7 @@ class TestAiMcpServer(TestCase):
         self.assertEqual([1], payload["selection"]["file_ids"])
         self.assertTrue(len(payload["hits"]) > 0)
         self.assertTrue(all(hit["source_id"] == 1 for hit in payload["hits"]))
+        self.assertTrue(all("line_start" in hit and "line_end" in hit for hit in payload["hits"]))
 
     def test_regex_search_exclude_cids_returns_only_new_passages(self):
         req = {
@@ -597,6 +647,22 @@ class TestAiMcpServer(TestCase):
         self.assertEqual(1, len(payload["hits"]))
         self.assertEqual(1, payload["hits"][0]["source_id"])
         self.assertEqual(5, payload["hits"][0]["match_start"])
+        self.assertEqual(1, payload["hits"][0]["line_start"])
+        self.assertEqual(1, payload["hits"][0]["line_end"])
+
+    def test_regex_search_returns_line_ranges_for_multiline_context(self):
+        req = {
+            "jsonrpc": "2.0",
+            "id": 38,
+            "method": "resources/read",
+            "params": {"uri": "qualcoder://search/regex?pattern=line3&file_ids=4&context_chars=0&page_size=10"},
+        }
+        res = self.server.handle_request(req)
+        self.assertIn("result", res)
+        payload = json.loads(res["result"]["contents"][0]["text"])
+        self.assertEqual(1, len(payload["hits"]))
+        self.assertEqual(3, payload["hits"][0]["line_start"])
+        self.assertEqual(3, payload["hits"][0]["line_end"])
 
     def test_unknown_method_returns_jsonrpc_error(self):
         res = self.server.handle_request({"jsonrpc": "2.0", "id": 4, "method": "unknown/method", "params": {}})

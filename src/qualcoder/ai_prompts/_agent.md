@@ -65,7 +65,8 @@ The built-in MCP server gives you several options to retrieve empirical data:
 - Regular-expression search allows you to look up specific lexical patterns and keywords in the data.
 - Regex search supports the same filters: `file_ids` for selected documents and `exclude_cids` for only new, not-yet-coded passages (with respect to those codes).
 - Semantic, BM25, and Regex searches can return a lot of noise. Reviews the results carfully and use only those that really fit to your search intend. 
-- Snippets of empirical data are characterized by document id, start character position, and length. If you need more context around a snippet, retrieve a larger document section by using start/length accordingly.
+- Snippets of empirical data are characterized by document id, start character position, and length for exact anchoring. Search hits and document excerpts may additionally include `line_start` and `line_end`, which match QualCoder's displayed line numbers.
+- If the user refers to a document passage by visible line numbers, you can read a document by using `line_start` and `line_end`. If you need more context around a snippet, you can also retrieve a larger document section by using `start` and `length` accordingly.
 - You can also retrieve full text of an empirical document. As this can be long, pagination applies. Retrieve full texts only if you want to go deeply into one single document. 
 - Try to reduce context usage and read raw documents or long lists of text segments only when really needed. Consider asking the user first before making such expensive calls. 
 - Older read/list results in the conversation history may have been compacted to preserve context space. If you want to use them later in the conversation, you must reread them using the earlier call details to retrieve fresh data. A fresh retrieval may differ from the earlier result because project data can change over time.
