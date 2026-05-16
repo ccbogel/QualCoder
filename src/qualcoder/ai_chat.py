@@ -37,6 +37,7 @@ from datetime import datetime
 import json
 import html as html_lib
 import logging
+import math
 import traceback
 import os
 import sqlite3
@@ -63,6 +64,12 @@ logger = logging.getLogger(__name__)
 topic_analysis_max_chunks = 30
 code_analysis_max_segments_total = 200
 code_analysis_min_segment_coverage = 0.30
+AI_CONTEXT_COMPACTION_TRIGGER_RATIO = 0.80
+AI_CONTEXT_COMPACTION_TARGET_RATIO = 0.50
+AI_CONTEXT_COMPACTION_PROTECTED_TURNS = 6
+AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN = 3.2
+AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS = 10
+AI_CONTEXT_ESTIMATE_SAFETY_RATIO = 1.12
 
 MARKDOWN_RENDERER = MarkdownIt(
     "commonmark",
@@ -1619,7 +1626,8 @@ class DialogAIChat(QtWidgets.QDialog):
                                 analysis_type TEXT,
                                 summary TEXT,
                                 date TEXT,
-                                analysis_prompt TEXT)''')
+                                analysis_prompt TEXT,
+                                compaction_frontier_msg_id INTEGER DEFAULT 0)''')
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS chat_messages (
                                 id INTEGER PRIMARY KEY,
@@ -1636,6 +1644,10 @@ class DialogAIChat(QtWidgets.QDialog):
                                 position INTEGER,
                                 used_flag INTEGER,
                                 FOREIGN KEY (chat_id) REFERENCES chats(id))''')
+        cursor.execute("PRAGMA table_info(chats)")
+        chat_columns = {str(row[1]).strip() for row in cursor.fetchall() if isinstance(row, tuple) and len(row) > 1}
+        if 'compaction_frontier_msg_id' not in chat_columns:
+            cursor.execute("ALTER TABLE chats ADD COLUMN compaction_frontier_msg_id INTEGER DEFAULT 0")
         self.chat_history_conn.commit()
         self.current_chat_idx = -1
         self.fill_chat_list()
@@ -3990,7 +4002,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "prompt_name": prompt_record.name,
                 "prompt_scope": prompt_record.scope,
             }
-            messages = self.history_get_ai_messages()
+            messages = self.history_get_ai_messages_compacted()
             self._start_mcp_agent_worker(messages, chat_idx, self._mcp_code_analysis_worker, bootstrap_spec)
 
     def new_code_chat(self):
@@ -4053,7 +4065,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "prompt_name": prompt_record.name,
                 "prompt_scope": prompt_record.scope,
             }
-            messages = self.history_get_ai_messages()
+            messages = self.history_get_ai_messages_compacted()
             self._start_mcp_agent_worker(messages, chat_idx, self._mcp_topic_exploration_worker, bootstrap_spec)
 
     def new_topic_chat(self):
@@ -4284,7 +4296,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'Work on a text analysis request centered on the selected passage from "{source_name}". '
             f'The selected passage is {int(text_length)} characters long.\n'
             f'The selected analysis prompt "/{prompt_name}" is active for this chat and should guide your analysis.\n'
-            'The selected text passage is already available in this conversation as an MCP resource result. '
+            'The selected text passage should already be available in this conversation as an MCP resource result, unless this MCP result has been compacted. '
             'Treat this selected passage as the primary focus of the task. '
         )
 
@@ -4712,7 +4724,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "prompt_name": prompt_record.name,
             "prompt_scope": prompt_record.scope,
         }
-        messages = self.history_get_ai_messages()
+        messages = self.history_get_ai_messages_compacted()
         self._start_mcp_agent_worker(messages, chat_idx, self._mcp_text_analysis_worker, bootstrap_spec)
         
     def delete_chat(self):
@@ -4889,7 +4901,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 id_, name, analysis_type, summary, date, analysis_prompt = chat
                 if hasattr(self, "_prompt_reference_highlighter"):
                     self._prompt_reference_highlighter.rehighlight()
-                if analysis_type == 'text chat':
+                if analysis_type in ('text chat', 'text_analysis'):
                     # Extract doc info from the summary field:
                     doc_info_pattern = r'<a href="quote:(\d+)_(\d+)_(\d+)">(.+?)</a>'
                     m = re.search(doc_info_pattern, summary)
@@ -4913,7 +4925,12 @@ data collected. This information will accompany every prompt sent to the AI, res
                         self.ai_text_doc_id = None
                         self.ai_text_start_pos = None
                         self.ai_text_doc_name = None   
-                        self.ai_text_text = ''                   
+                        self.ai_text_text = ''
+                else:
+                    self.ai_text_doc_id = None
+                    self.ai_text_start_pos = None
+                    self.ai_text_doc_name = None
+                    self.ai_text_text = ''
 
                 # Show title
                 html_parts.append(f'<h1 style={self.ai_info_style}>{self._display_chat_name(name, analysis_type)}</h1>')
@@ -5355,23 +5372,56 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.chat_msg_list = cursor.fetchall()
         else:
             self.chat_msg_list.clear()
-    
-    def history_get_ai_messages(self):
-        messages = []
+
+    def _chat_analysis_type(self, chat_idx: Optional[int] = None) -> str:
+        """Return the analysis type for one chat index."""
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
+            return ''
+        return str(self.chat_list[chat_idx][2] if self.chat_list[chat_idx][2] is not None else '')
+
+    def _chat_id_for_index(self, chat_idx: Optional[int] = None) -> Optional[int]:
+        """Return the persisted chat id for one chat index."""
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
+            return None
+        try:
+            return int(self.chat_list[chat_idx][0])
+        except Exception:
+            return None
+
+    @staticmethod
+    def _safe_message_id(msg_row: Any) -> int:
+        """Return one persisted chat_messages.id value or -1."""
+
+        if not isinstance(msg_row, tuple) or len(msg_row) == 0:
+            return -1
+        try:
+            return int(msg_row[0])
+        except Exception:
+            return -1
+
+    def _history_base_prompt_keys(self, chat_idx: Optional[int] = None) -> set[str]:
+        """Return prompt keys already covered by the rebuilt base agent prompt."""
+
+        analysis_type = self._chat_analysis_type(chat_idx)
+        if not self._is_agent_chat_type(analysis_type):
+            return set()
+        _, base_prompt_keys = self._collect_agent_base_prompt_context()
+        return base_prompt_keys
+
+    def _history_replay_metadata(self, rows: List[Any], base_prompt_keys: set[str]) -> Tuple[int, Dict[str, int]]:
+        """Collect replay metadata for latest compact state snapshots and prompts."""
+
         latest_agent_state_id = -1
         latest_prompt_ids: Dict[str, int] = {}
-        base_prompt_keys: set[str] = set()
-        analysis_type = ''
-        if 0 <= self.current_chat_idx < len(self.chat_list):
-            analysis_type = str(self.chat_list[self.current_chat_idx][2])
-        if self._is_agent_chat_type(analysis_type):
-            _, base_prompt_keys = self._collect_agent_base_prompt_context()
-        for msg in self.chat_msg_list:
+        for msg in rows:
             if msg[2] == 'agent_state':
-                try:
-                    msg_id = int(msg[0])
-                except Exception:
-                    msg_id = -1
+                msg_id = self._safe_message_id(msg)
                 if msg_id > latest_agent_state_id:
                     latest_agent_state_id = msg_id
             elif msg[2] == 'prompt':
@@ -5380,15 +5430,137 @@ data collected. This information will accompany every prompt sent to the AI, res
                     continue
                 if prompt_name.casefold() in base_prompt_keys:
                     continue
-                try:
-                    msg_id = int(msg[0])
-                except Exception:
-                    msg_id = -1
+                msg_id = self._safe_message_id(msg)
                 prev_id = latest_prompt_ids.get(prompt_name, -1)
                 if msg_id > prev_id:
                     latest_prompt_ids[prompt_name] = msg_id
+        return latest_agent_state_id, latest_prompt_ids
 
-        for msg in self.chat_msg_list:
+    def _parse_mcp_result_payload(self, msg_content: str) -> Optional[Dict[str, Any]]:
+        """Parse one persisted MCP tool_result payload."""
+
+        raw_text = str(msg_content if msg_content is not None else "")
+        if raw_text.startswith("MCP result:\n"):
+            raw_text = raw_text[len("MCP result:\n"):]
+        elif raw_text.startswith("MCP response:\n"):
+            raw_text = raw_text[len("MCP response:\n"):]
+        else:
+            return None
+        try:
+            payload = json.loads(raw_text)
+        except Exception:
+            return None
+        if not isinstance(payload, dict):
+            return None
+        return payload
+
+    def _is_compactable_resource_uri(self, uri: str) -> bool:
+        """Return whether one MCP read URI should be compacted when it gets old."""
+
+        base_uri = str(uri if uri is not None else "").split("?", 1)[0].strip()
+        if base_uri == "":
+            return False
+        if base_uri in (
+            "qualcoder://codes/tree",
+            "qualcoder://documents",
+            "qualcoder://vector/search",
+            "qualcoder://search/bm25",
+            "qualcoder://search/regex",
+        ):
+            return True
+        if re.fullmatch(r"qualcoder://documents/text/\d+", base_uri):
+            return True
+        if re.fullmatch(r"qualcoder://codes/segments/\d+", base_uri):
+            return True
+        return False
+
+    def _summarize_compacted_mcp_result(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Return a short structured summary for one compacted MCP result."""
+
+        summary: Dict[str, Any] = {}
+        method = str(payload.get("method", "")).strip()
+        if method == "resources/read":
+            requested_uri = str(payload.get("requested_uri", "")).strip()
+            if requested_uri != "":
+                summary["target"] = requested_uri
+            contents = payload.get("contents", [])
+            if isinstance(contents, list):
+                summary["content_items"] = len(contents)
+                if len(contents) == 1 and isinstance(contents[0], dict):
+                    resource_payload = contents[0].get("payload", None)
+                    if isinstance(resource_payload, dict):
+                        if "segments" in resource_payload and isinstance(resource_payload.get("segments"), list):
+                            summary["segments"] = len(resource_payload.get("segments", []))
+                        elif "hits" in resource_payload and isinstance(resource_payload.get("hits"), list):
+                            summary["hits"] = len(resource_payload.get("hits", []))
+                        elif "documents" in resource_payload and isinstance(resource_payload.get("documents"), list):
+                            summary["documents"] = len(resource_payload.get("documents", []))
+                        elif "text" in resource_payload:
+                            summary["excerpt_chars"] = len(str(resource_payload.get("text", "")))
+                            total_length = resource_payload.get("total_length", None)
+                            if total_length is not None:
+                                summary["total_length"] = total_length
+                        selection = resource_payload.get("selection", None)
+                        if isinstance(selection, dict):
+                            if "total_hits" in selection:
+                                summary["total_hits"] = selection.get("total_hits")
+                            if "total_segments" in selection:
+                                summary["total_segments"] = selection.get("total_segments")
+                            if "truncated" in selection:
+                                summary["truncated"] = bool(selection.get("truncated", False))
+        elif method == "resources/list":
+            result_payload = payload.get("result", {})
+            if isinstance(result_payload, dict) and isinstance(result_payload.get("resources"), list):
+                summary["resources"] = len(result_payload.get("resources", []))
+        elif method == "resources/templates/list":
+            result_payload = payload.get("result", {})
+            templates = result_payload.get("resourceTemplates", result_payload.get("templates", []))
+            if isinstance(templates, list):
+                summary["resource_templates"] = len(templates)
+        elif method == "tools/list":
+            result_payload = payload.get("result", {})
+            if isinstance(result_payload, dict) and isinstance(result_payload.get("tools"), list):
+                summary["tools"] = len(result_payload.get("tools", []))
+        return summary
+
+    def _compacted_tool_result_placeholder(self, msg_content: str) -> Optional[str]:
+        """Return one short replacement message for older compactable MCP results."""
+
+        payload = self._parse_mcp_result_payload(msg_content)
+        if payload is None:
+            return None
+        if str(payload.get("action", "")).strip() != "mcp_result":
+            return None
+        if "error" in payload:
+            return None
+        method = str(payload.get("method", "")).strip()
+        compacted: Dict[str, Any] = {
+            "action": "mcp_result_compacted",
+            "method": method,
+            "note": _(
+                "Older read/list result omitted from the active context to save space. "
+                "Re-read if needed; current project data may differ."
+            ),
+        }
+        if method == "resources/read":
+            requested_uri = str(payload.get("requested_uri", "")).strip()
+            if not self._is_compactable_resource_uri(requested_uri):
+                return None
+            compacted["summary"] = self._summarize_compacted_mcp_result(payload)
+            return "Compacted MCP result:\n" + json.dumps(compacted, ensure_ascii=False)
+        if method in ("resources/list", "resources/templates/list", "tools/list"):
+            compacted["summary"] = self._summarize_compacted_mcp_result(payload)
+            return "Compacted MCP result:\n" + json.dumps(compacted, ensure_ascii=False)
+        return None
+
+    def _history_rows_to_ai_messages(self, rows: List[Any], chat_idx: Optional[int] = None,
+                                     compact_frontier_msg_id: int = 0) -> List[Any]:
+        """Convert persisted chat rows into replayable LangChain message objects."""
+
+        messages = []
+        base_prompt_keys = self._history_base_prompt_keys(chat_idx)
+        latest_agent_state_id, latest_prompt_ids = self._history_replay_metadata(rows, base_prompt_keys)
+        for msg in rows:
             if msg[2] == 'system':
                 messages.append(SystemMessage(content=msg[4]))
             elif msg[2] == 'instruct' or msg[2] == 'user':
@@ -5399,10 +5571,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     continue
                 if prompt_name.casefold() in base_prompt_keys:
                     continue
-                try:
-                    msg_id = int(msg[0])
-                except Exception:
-                    msg_id = -1
+                msg_id = self._safe_message_id(msg)
                 if msg_id != latest_prompt_ids.get(prompt_name, -1):
                     continue
                 messages.append(HumanMessage(content=msg[4]))
@@ -5413,13 +5582,16 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif msg[2] == 'tool_call':
                 messages.append(AIMessage(content=msg[4]))
             elif msg[2] == 'tool_result':
-                messages.append(HumanMessage(content=msg[4]))
+                msg_content = str(msg[4] if msg[4] is not None else '')
+                msg_id = self._safe_message_id(msg)
+                if compact_frontier_msg_id > 0 and 0 < msg_id <= compact_frontier_msg_id:
+                    compacted = self._compacted_tool_result_placeholder(msg_content)
+                    if compacted is not None and len(compacted) < len(msg_content):
+                        msg_content = compacted
+                messages.append(HumanMessage(content=msg_content))
             elif msg[2] == 'agent_state':
                 # keep only the newest compact agent-state snapshot across turns
-                try:
-                    msg_id = int(msg[0])
-                except Exception:
-                    msg_id = -1
+                msg_id = self._safe_message_id(msg)
                 if msg_id != latest_agent_state_id:
                     continue
                 state_payload = str(msg[4]).strip()
@@ -5429,7 +5601,174 @@ data collected. This information will accompany every prompt sent to the AI, res
                 # one-shot instruction logs must not be replayed in later turns
                 continue
         return messages
-    
+
+    def _message_char_count(self, messages: List[Any]) -> int:
+        """Estimate total payload size in characters for one replayed message list."""
+
+        total_chars = 0
+        for msg in messages:
+            total_chars += len(str(getattr(msg, "content", "")))
+        return total_chars
+
+    def _estimate_token_count_for_messages(self, messages: List[Any]) -> int:
+        """Conservatively estimate token usage for one replayed message list."""
+
+        total_chars = self._message_char_count(messages)
+        base_tokens = (total_chars / AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN)
+        base_tokens += len(messages) * AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS
+        return int(math.ceil(base_tokens * AI_CONTEXT_ESTIMATE_SAFETY_RATIO))
+
+    def _target_char_budget_for_messages(self, message_count: int, target_tokens: int) -> int:
+        """Convert a token target into a conservative character budget."""
+
+        unscaled_token_budget = (float(target_tokens) / AI_CONTEXT_ESTIMATE_SAFETY_RATIO)
+        unscaled_token_budget -= (message_count * AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS)
+        if unscaled_token_budget <= 0:
+            return 0
+        return max(0, int(math.floor(unscaled_token_budget * AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN)))
+
+    def _large_model_context_window(self) -> int:
+        """Return the configured context window of the large model."""
+
+        ai = getattr(self.app, "ai", None)
+        try:
+            context_window = int(getattr(ai, "large_llm_context_window", 128000))
+        except Exception:
+            context_window = 128000
+        if context_window <= 0:
+            return 128000
+        return context_window
+
+    def _protected_turn_start_msg_id(self, rows: List[Any], keep_turns: int = AI_CONTEXT_COMPACTION_PROTECTED_TURNS) -> int:
+        """Return the first message id of the protected recent-turn window."""
+
+        turn_start_ids: List[int] = []
+        for msg in rows:
+            if not isinstance(msg, tuple) or len(msg) < 3:
+                continue
+            if msg[2] not in ('user', 'instruct'):
+                continue
+            msg_id = self._safe_message_id(msg)
+            if msg_id > 0:
+                turn_start_ids.append(msg_id)
+        if len(turn_start_ids) == 0:
+            return 0
+        if len(turn_start_ids) <= keep_turns:
+            return turn_start_ids[0]
+        return turn_start_ids[-keep_turns]
+
+    def _get_chat_compaction_frontier(self, chat_idx: Optional[int] = None, db_conn=None) -> int:
+        """Return the persisted compaction frontier for one chat."""
+
+        chat_id = self._chat_id_for_index(chat_idx)
+        if chat_id is None:
+            return 0
+        if db_conn is None:
+            db_conn = self.chat_history_conn
+        cursor = db_conn.cursor()
+        cursor.execute("SELECT compaction_frontier_msg_id FROM chats WHERE id=?", (chat_id,))
+        row = cursor.fetchone()
+        if not isinstance(row, tuple) or len(row) == 0 or row[0] is None:
+            return 0
+        try:
+            return max(0, int(row[0]))
+        except Exception:
+            return 0
+
+    def _set_chat_compaction_frontier(self, frontier_msg_id: int, chat_idx: Optional[int] = None, db_conn=None) -> None:
+        """Persist a monotonically increasing compaction frontier for one chat."""
+
+        chat_id = self._chat_id_for_index(chat_idx)
+        if chat_id is None:
+            return
+        new_frontier = max(0, int(frontier_msg_id))
+        if db_conn is None:
+            db_conn = self.chat_history_conn
+        current_frontier = self._get_chat_compaction_frontier(chat_idx, db_conn=db_conn)
+        if new_frontier <= current_frontier:
+            return
+        cursor = db_conn.cursor()
+        cursor.execute(
+            "UPDATE chats SET compaction_frontier_msg_id=? WHERE id=?",
+            (new_frontier, chat_id),
+        )
+        db_conn.commit()
+
+    def history_get_ai_messages(self):
+        rows = list(self.chat_msg_list if isinstance(self.chat_msg_list, list) else [])
+        return self._history_rows_to_ai_messages(rows, chat_idx=self.current_chat_idx)
+
+    def history_get_ai_messages_compacted(self):
+        """Return replay messages with older MCP read/list results compacted on demand."""
+
+        rows = list(self.chat_msg_list if isinstance(self.chat_msg_list, list) else [])
+        analysis_type = self._chat_analysis_type(self.current_chat_idx)
+        if not self._is_agent_chat_type(analysis_type):
+            return self._history_rows_to_ai_messages(rows, chat_idx=self.current_chat_idx)
+
+        protected_start_id = self._protected_turn_start_msg_id(rows)
+        protected_limit = (protected_start_id - 1) if protected_start_id > 0 else 0
+        stored_frontier = self._get_chat_compaction_frontier(self.current_chat_idx)
+        effective_frontier = stored_frontier
+        if protected_limit > 0:
+            effective_frontier = min(effective_frontier, protected_limit)
+        elif protected_start_id > 0:
+            effective_frontier = 0
+
+        messages = self._history_rows_to_ai_messages(
+            rows,
+            chat_idx=self.current_chat_idx,
+            compact_frontier_msg_id=effective_frontier,
+        )
+        context_window = self._large_model_context_window()
+        trigger_tokens = int(math.floor(context_window * AI_CONTEXT_COMPACTION_TRIGGER_RATIO))
+        if self._estimate_token_count_for_messages(messages) <= trigger_tokens:
+            return messages
+
+        current_char_total = self._message_char_count(messages)
+        target_tokens = int(math.floor(context_window * AI_CONTEXT_COMPACTION_TARGET_RATIO))
+        target_char_budget = self._target_char_budget_for_messages(len(messages), target_tokens)
+        if current_char_total <= target_char_budget:
+            return messages
+
+        candidate_rows: List[Tuple[int, int]] = []
+        for msg in rows:
+            if not isinstance(msg, tuple) or len(msg) < 5 or msg[2] != 'tool_result':
+                continue
+            msg_id = self._safe_message_id(msg)
+            if msg_id <= effective_frontier:
+                continue
+            if protected_start_id > 0 and msg_id >= protected_start_id:
+                continue
+            compacted = self._compacted_tool_result_placeholder(str(msg[4] if msg[4] is not None else ''))
+            if compacted is None:
+                continue
+            saved_chars = len(str(msg[4] if msg[4] is not None else '')) - len(compacted)
+            if saved_chars <= 0:
+                continue
+            candidate_rows.append((msg_id, saved_chars))
+
+        if len(candidate_rows) == 0:
+            return messages
+
+        saved_chars_total = 0
+        new_frontier = effective_frontier
+        for msg_id, saved_chars in candidate_rows:
+            saved_chars_total += saved_chars
+            new_frontier = msg_id
+            if current_char_total - saved_chars_total <= target_char_budget:
+                break
+
+        if new_frontier <= effective_frontier:
+            return messages
+
+        self._set_chat_compaction_frontier(new_frontier, self.current_chat_idx)
+        return self._history_rows_to_ai_messages(
+            rows,
+            chat_idx=self.current_chat_idx,
+            compact_frontier_msg_id=new_frontier,
+        )
+
     def history_add_message(self, msg_type, msg_author, msg_content, chat_idx=None, db_conn=None, refresh=True, commit=True):
         if chat_idx is None:
             chat_idx = self.current_chat_idx
@@ -5711,7 +6050,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             # Other than system messages, instruct messages are send immediatly and will produce an answer that is shown on screen
             if chat_idx == self.current_chat_idx:
                 self.history_add_message(msg_type, '', msg_content, chat_idx)
-                messages = self.history_get_ai_messages()
+                analysis_type = self._chat_analysis_type(chat_idx)
+                if self._is_agent_chat_type(analysis_type):
+                    messages = self.history_get_ai_messages_compacted()
+                else:
+                    messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
                 self._capture_chat_ai_profile_snapshot(chat_idx)
                 self.current_streaming_run_id = self.app.ai.start_stream(
@@ -5756,7 +6099,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                             json.dumps({"kind": "prompt", "text": status_text}, ensure_ascii=False),
                             chat_idx,
                         )
-                    messages = self.history_get_ai_messages()
+                    messages = self.history_get_ai_messages_compacted()
                     self.app.ai.start_query(self._mcp_general_chat_worker,
                                             self.ai_mcp_message_callback,
                                             messages,
@@ -5814,7 +6157,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "}\n"
             "Rules:\n"
             "- Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.\n"
-            "- The turn already contains initialize, resources/list, and resources/templates/list. Do not repeat them with identical params.\n"
+            "- The turn already contains initialize, resources/list, and resources/templates/list, unless they have been compacted away.\n"
             "- Use as few calls as possible and keep them focused.\n"
             "- If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.\n"
             "- Use tools/call only for tools that have already been discovered through tools/list in the current conversation context.\n"
@@ -5890,8 +6233,9 @@ data collected. This information will accompany every prompt sent to the AI, res
             "}\n"
             "Rules:\n"
             "- Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.\n"
-            "- Initialize, resources/list, and resources/templates/list are already available in context unless explicitly changed.\n"
+            "- Initialize, resources/list, and resources/templates/list are already available in context unless explicitly changed or compacted.\n"
             "- Use as few additional calls as possible and keep them focused.\n"
+            "- If the result from an early MCP-call was compacted away but you want to use this data again, reread it. Do not rely on fragments of content still being present in the conversation context.\n" 
             "- If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.\n"
             "- Use tools/call only for tools that have already been discovered through tools/list in the current conversation context.\n"
             "- If deferred_calls are listed in the reflection prompt, decide explicitly whether they should continue unchanged by setting continue_deferred_calls=true or false.\n"
@@ -6652,6 +6996,12 @@ data collected. This information will accompany every prompt sent to the AI, res
             chat_idx = self.current_chat_idx
         if chat_idx is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
             return []
+        if chat_idx == self.current_chat_idx and isinstance(self.chat_msg_list, list) and len(self.chat_msg_list) > 0:
+            return [
+                str(msg[4])
+                for msg in self.chat_msg_list
+                if isinstance(msg, tuple) and len(msg) > 4 and str(msg[2]).strip() == 'tool_result' and msg[4] is not None
+            ]
         curr_chat_id = self.chat_list[chat_idx][0]
         cursor = self.chat_history_conn.cursor()
         cursor.execute(
