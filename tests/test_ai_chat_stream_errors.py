@@ -52,3 +52,33 @@ class TestDialogAIChatStreamErrors(TestCase):
             )
         )
         self.assertEqual("", dialog.app.ai.get_streaming_output("run-1"))
+
+    def test_replace_references_uses_general_mcp_candidates_for_new_text_analysis_chats(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog.ai_text_doc_id = 7
+        dialog._chat_analysis_type = lambda chat_idx=None: "text_analysis"
+        dialog._collect_ref_candidates = lambda chat_idx=None: [{"source_id": 1, "start": 0, "text": "alpha"}]
+        dialog._replace_text_references = lambda text, streaming=False: "legacy-path"
+        dialog._replace_references_from_candidates = (
+            lambda text, candidates, streaming=False, streaming_placeholder=None:
+            f"general:{len(candidates)}:{text}"
+        )
+
+        result = dialog.replace_references('{REF: "alpha"}', chat_idx=0)
+
+        self.assertEqual('general:1:{REF: "alpha"}', result)
+
+    def test_replace_references_keeps_legacy_text_chat_fallback(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog.ai_text_doc_id = 7
+        dialog._chat_analysis_type = lambda chat_idx=None: "text chat"
+        dialog._collect_ref_candidates = lambda chat_idx=None: [{"source_id": 1, "start": 0, "text": "alpha"}]
+        dialog._replace_text_references = lambda text, streaming=False: "legacy-path"
+        dialog._replace_references_from_candidates = (
+            lambda text, candidates, streaming=False, streaming_placeholder=None:
+            f"general:{len(candidates)}:{text}"
+        )
+
+        result = dialog.replace_references('{REF: "alpha"}', chat_idx=0)
+
+        self.assertEqual("legacy-path", result)

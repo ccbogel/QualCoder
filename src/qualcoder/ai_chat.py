@@ -4901,7 +4901,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 id_, name, analysis_type, summary, date, analysis_prompt = chat
                 if hasattr(self, "_prompt_reference_highlighter"):
                     self._prompt_reference_highlighter.rehighlight()
-                if analysis_type in ('text chat', 'text_analysis'):
+                if analysis_type == 'text chat':
                     # Extract doc info from the summary field:
                     doc_info_pattern = r'<a href="quote:(\d+)_(\d+)_(\d+)">(.+?)</a>'
                     m = re.search(doc_info_pattern, summary)
@@ -5129,7 +5129,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         return re.sub(ref_pattern, replace_ref, res)
 
     def _replace_text_references(self, text, streaming=False):
-        """Replace REF tags for text-analysis chats using the shared resolver."""
+        """Replace REF tags for legacy text-analysis chats using the saved excerpt context."""
 
         candidates = self._text_ref_candidates()
         if not candidates:
@@ -5143,10 +5143,11 @@ data collected. This information will accompany every prompt sent to the AI, res
         )
 
     def replace_references(self, text, streaming=False, chat_idx=None):
-        """Replace text-analysis and MCP/general-chat references with clickable links."""
+        """Replace REF tags with clickable links using the active chat's evidence model."""
 
         res = str(text)
-        if self.ai_text_doc_id is not None:
+        analysis_type = str(self._chat_analysis_type(chat_idx)).strip().lower()
+        if analysis_type == 'text chat' and self.ai_text_doc_id is not None:
             return self._replace_text_references(res, streaming=streaming)
         candidates = self._collect_ref_candidates(chat_idx)
         return self._replace_references_from_candidates(
