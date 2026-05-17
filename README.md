@@ -204,7 +204,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
-3a. Instead of the next below commands, run the shell (.sh) file which will run all these commands below, by making this file executable and typing this in and pressing Enter: 
+3a. Instead of the next below commands, run the shell file which will run all these commands below, by making this file executable and typing this in and pressing Enter: 
 
 `./run_from_source_Ubuntu.sh`
 
