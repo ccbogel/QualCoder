@@ -54,7 +54,9 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 cd Downloads\QualCoder-master
 ```
 
-5a. Instead of the next below commands, run the bat file which will run all these commands below, by typing this in and pressing Enter: windows_run_from_source.bat
+5a. Instead of the next below commands, run the bat file which will run all these commands below, by typing this in and pressing Enter: 
+
+`run_from_source_Windows.bat`
 
 6. Install the virtual environment and required python modules. 
 
@@ -201,6 +203,10 @@ To install from source code below, inside a virtual environment. If you are usin
 `sudo apt install python3-pip python3.12-venv`
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
+
+3a. Instead of the next below commands, run the shell (.sh) file which will run all these commands below, by making this file executable and typing this in and pressing Enter: 
+
+`./run_from_source_Ubuntu.sh`
 
 4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
