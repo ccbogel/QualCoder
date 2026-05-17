@@ -1257,8 +1257,6 @@ class DialogAIChat(QtWidgets.QDialog):
         direct = records_by_name.get(normalized)
         if direct is not None:
             return direct
-        if '/' in normalized:
-            return None
         if not (0 <= self.current_chat_idx < len(self.chat_list)):
             return None
         analysis_type = str(self.chat_list[self.current_chat_idx][2] if self.chat_list[self.current_chat_idx][2] is not None else '')
@@ -1269,6 +1267,8 @@ class DialogAIChat(QtWidgets.QDialog):
         }
         prefix = prefix_map.get(analysis_type, '')
         if prefix == '':
+            return None
+        if normalized.startswith(prefix.casefold()):
             return None
         return records_by_name.get((prefix + normalized).casefold())
 

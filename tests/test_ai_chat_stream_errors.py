@@ -100,3 +100,29 @@ class TestDialogAIChatStreamErrors(TestCase):
         self.assertIn('<a href="quote:1_2_3">Clare</a>', result)
         self.assertIn('<a href="promptref:ethnographic-brainstorming">/ethnographic-brainstorming</a>', result)
         self.assertIn('<br />', result)
+
+    def test_resolve_prompt_reference_name_restores_topic_exploration_prefix_for_nested_header_paths(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        nested_prompt = SimpleNamespace(name="topic-exploration/test/test", scope="project")
+        dialog._prompt_reference_records_by_name = lambda: {
+            "topic-exploration/test/test": nested_prompt,
+        }
+        dialog.current_chat_idx = 0
+        dialog.chat_list = [(1, "Chat", "topic_exploration", "", "", "")]
+
+        result = dialog._resolve_prompt_reference_name("test/test")
+
+        self.assertIs(result, nested_prompt)
+
+    def test_resolve_prompt_reference_name_restores_code_analysis_prefix_for_nested_header_paths(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        nested_prompt = SimpleNamespace(name="code-analysis/test/test", scope="project")
+        dialog._prompt_reference_records_by_name = lambda: {
+            "code-analysis/test/test": nested_prompt,
+        }
+        dialog.current_chat_idx = 0
+        dialog.chat_list = [(1, "Chat", "code_analysis", "", "", "")]
+
+        result = dialog._resolve_prompt_reference_name("test/test")
+
+        self.assertIs(result, nested_prompt)
