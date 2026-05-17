@@ -2868,13 +2868,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 + "\n\n"
                 + self._mcp_topic_exploration_planner_system_prompt()
             )
-            planner_user_prompt = (
-                "Create the initial MCP plan for this topic exploration now. "
-                "Choose the most suitable search strategy and query formulation for the selected topic. "
-                "You may use semantic vector search, BM25 keyword search, regex search, or a focused combination. "
-                "For abstract or theoretical language, consider whether simpler everyday formulations would improve retrieval. "
-                "For this first turn, keep all retrieval strictly within the user-selected material scope already described in the conversation."
-            )
+            planner_user_prompt = "Create the initial MCP plan for this topic exploration now."
             append_single_instruct_log(
                 "planning",
                 "user",
