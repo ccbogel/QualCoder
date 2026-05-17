@@ -1672,6 +1672,7 @@ class AiMcpServer:
         return {
             "catid": category.get("catid", None),
             "name": str(category.get("name", "")),
+            "owner": str(category.get("owner", "")),
         }
 
     def _code_ref(self, code: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -1680,6 +1681,7 @@ class AiMcpServer:
         return {
             "cid": code.get("cid", None),
             "name": str(code.get("name", "")),
+            "owner": str(code.get("owner", "")),
         }
 
     def _table_exists_cur(self, cur: sqlite3.Cursor, table_name: str) -> bool:
