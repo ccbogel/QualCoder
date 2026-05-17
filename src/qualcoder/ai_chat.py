@@ -2271,8 +2271,8 @@ class DialogAIChat(QtWidgets.QDialog):
             )
         self._log_agent_env_update(content, chat_idx)
 
-    def _render_agent_prompt_content(self, content: str) -> str:
-        """Replace supported runtime placeholders in the internal agent prompt."""
+    def _render_agent_prompt_content(self, content: str, extra_context: Optional[Dict[str, Any]] = None) -> str:
+        """Replace supported runtime placeholders in one internal agent prompt."""
 
         if content == "":
             return ""
@@ -2282,12 +2282,30 @@ class DialogAIChat(QtWidgets.QDialog):
             "AI_PERMISSIONS": self._ai_permissions_label(),
             "AI_LANGUAGE": self.app.ai.get_curr_language(),
         }
+        if isinstance(extra_context, dict):
+            for key, value in extra_context.items():
+                normalized_key = str(key if key is not None else "").strip()
+                if normalized_key == "":
+                    continue
+                template_context[normalized_key] = str(value if value is not None else "")
 
         def replace_placeholder(match: re.Match) -> str:
             key = match.group(1)
             return template_context.get(key, match.group(0))
 
         return re.sub(r"\{\{([A-Z0-9_]+)\}\}", replace_placeholder, content)
+
+    def _load_internal_prompt_text(self, name: str, extra_context: Optional[Dict[str, Any]] = None) -> str:
+        """Load one required internal prompt file and render its placeholders."""
+
+        prompt_name = str(name if name is not None else "").strip()
+        prompt = self.agent_prompts_catalog.get_internal_prompt(prompt_name)
+        if prompt is None:
+            raise FileNotFoundError(f'Missing internal AI prompt file: "{prompt_name}.md"')
+        return self._render_agent_prompt_content(
+            str(prompt.content if prompt.content is not None else ""),
+            extra_context=extra_context,
+        )
 
     def _render_base_agent_prompt_record(self, prompt: AgentPromptRecord) -> str:
         """Render prompt content for inclusion in the rebuilt agent base system prompt."""
@@ -2574,14 +2592,13 @@ class DialogAIChat(QtWidgets.QDialog):
         prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
         if description_text == '':
             description_text = _('(no description provided)')
-        return (
-            "Your task: "
-            f'Work on a topic exploration request centered on "{topic_text}". '
-            f'User description: {description_text}\n'
-            f'The selected exploration prompt "/{prompt_name}" is active for this chat and should guide your analysis.\n'
-            'The semantic search results for the selected material are already available in this conversation. '
-            'Treat these retrieved results as the primary focus of the task. '
-            'Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly.'
+        return self._load_internal_prompt_text(
+            "topic-exploration/_bootstrap",
+            {
+                "TOPIC_NAME": topic_text,
+                "DESCRIPTION_TEXT": description_text,
+                "PROMPT_NAME": prompt_name,
+            },
         )
 
     def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: List[int]) -> str:
@@ -3452,16 +3469,15 @@ class DialogAIChat(QtWidgets.QDialog):
                 "especially when comparing sibling codes or separate category branches:\n"
                 f"{structured_scope}\n"
             )
-        return (
-            "Your task: "
-            f'Work on a code analysis request centered on "{focus_name}". '
-            f'Code memo: {memo_text}\n'
-            f'{scope_instruction}'
-            f'The selected analysis prompt "/{prompt_name}" is active for this chat and should guide your analysis.\n'
-            f'The coded segments for {code_scope_text} are already available in this conversation as MCP resource results. '
-            'Treat these coded segments as the primary focus of the task. '
-            'Do not make empirical claims without support from retrieved evidence. '
-            'If support is uncertain, state the uncertainty clearly.'
+        return self._load_internal_prompt_text(
+            "code-analysis/_bootstrap",
+            {
+                "FOCUS_NAME": focus_name,
+                "MEMO_TEXT": memo_text,
+                "SCOPE_INSTRUCTION": scope_instruction,
+                "PROMPT_NAME": prompt_name,
+                "CODE_SCOPE_TEXT": code_scope_text,
+            },
         )
 
     def _mcp_code_analysis_worker(self, messages: List[Any], chat_idx: int,
@@ -4301,13 +4317,13 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
         source_name = str(doc_name if doc_name is not None else '').strip()
-        return (
-            "Your task: "
-            f'Work on a text analysis request centered on the selected passage from "{source_name}". '
-            f'The selected passage is {int(text_length)} characters long.\n'
-            f'The selected analysis prompt "/{prompt_name}" is active for this chat and should guide your analysis.\n'
-            'The selected text passage should already be available in this conversation as an MCP resource result, unless this MCP result has been compacted. '
-            'Treat this selected passage as the primary focus of the task. '
+        return self._load_internal_prompt_text(
+            "text-analysis/_bootstrap",
+            {
+                "SOURCE_NAME": source_name,
+                "TEXT_LENGTH": int(text_length),
+                "PROMPT_NAME": prompt_name,
+            },
         )
 
     def _mcp_text_analysis_worker(self, messages: List[Any], chat_idx: int,
@@ -5845,22 +5861,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         return int(row[0])
 
     def _agent_chat_metadata_system_prompt(self) -> str:
-        language = str(self.app.ai.get_curr_language()).strip()
-        return (
-            "Create concise metadata for a new AI agent chat. "
-            "Return ONLY one JSON object with this shape:\n"
-            "{"
-            "\"name\": \"short chat title\", "
-            "\"summary\": \"one short summary sentence\""
-            "}\n"
-            "Rules:\n"
-            f"- Write both fields in {language}.\n"
-            "- name must be specific, 2 to 8 words, and must not be a generic placeholder.\n"
-            "- name must not contain quotes, line breaks, or ending punctuation.\n"
-            "- summary must be one concise sentence, max 160 characters.\n"
-            "- Base the result only on the first user message.\n"
-            "- Do not output prose outside JSON.\n"
-        )
+        return self._load_internal_prompt_text("_chat-metadata")
 
     def _agent_chat_metadata_json_schema(self) -> Dict[str, Any]:
         return {
@@ -6153,140 +6154,16 @@ data collected. This information will accompany every prompt sent to the AI, res
         return True    
 
     def _mcp_planner_system_prompt(self) -> str:
-        return (
-            "Your task: Plan the next steps needed to fulfill the user's request. "
-            "Return ONLY one JSON object with this shape:\n"
-            "{"
-            "\"needs_mcp\": true|false, "
-            "\"plan_summary\": \"one short user-facing note\", "
-            "\"user_decision_required\": true|false, "
-            "\"decision_question\": \"optional question\", "
-            "\"decision_context\": \"optional short reason\", "
-            "\"proposed_next_calls\": [{\"method\": \"resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call\", \"params\": {}}], "
-            "\"calls\": [{\"method\": \"resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call\", \"params\": {}}], "
-            "\"answer_brief\": \"optional draft answer idea\""
-            "}\n"
-            "Rules:\n"
-            "- Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.\n"
-            "- The turn already contains initialize, resources/list, and resources/templates/list, unless they have been compacted away.\n"
-            "- Use as few calls as possible and keep them focused.\n"
-            "- If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.\n"
-            "- Use tools/call only for tools that have already been discovered through tools/list in the current conversation context.\n"
-            "- Default to user_decision_required=false.\n"
-            "- Set user_decision_required=true only when the global agent rules require a user decision or confirmation.\n"
-            "- If user_decision_required=true, provide one concise natural-language question in decision_question, keep calls empty, and put suggested follow-up MCP actions into proposed_next_calls.\n"
-            "- If the request is clear and executable, prefer concrete calls.\n"
-            "- Reading: Prefer specific reads over broad reads. Reading full empirical documents can be costly. Do this only when it is really needed.\n"
-            "- Follow the current tools/list exactly when planning tools/call actions.\n"
-            "- If a delete action still needs user confirmation after preview, set user_decision_required=true and keep the execute tool call in proposed_next_calls with the preview_token.\n"
-            "- If the conversation contains an Agent state snapshot with pending_user_decision and the latest user message confirms it, execute pending_user_decision.proposed_next_calls now.\n"
-            "- If the user explicitly asks to create or change project data now and the action is executable, prioritize execution: set needs_mcp=true and include concrete tools/call write actions in calls.\n"
-            "- If the task was about collecting information and you have enough evidence in the conversation history already, initiate the final answer by "
-            "setting needs_mcp=false and calls=[].\n"
-            "- plan_summary must be one sentence, user-facing, <=160 characters.\n"
-            "- Do not output prose outside JSON.\n"
-        )
+        return self._load_internal_prompt_text("_planner")
 
     def _mcp_topic_exploration_planner_system_prompt(self) -> str:
-        return (
-            "Your task: Plan the next search steps needed to explore the user's topic in the empirical data. "
-            "Return ONLY one JSON object with this shape:\n"
-            "{"
-            "\"needs_mcp\": true|false, "
-            "\"plan_summary\": \"one short user-facing note\", "
-            "\"user_decision_required\": true|false, "
-            "\"decision_question\": \"optional question\", "
-            "\"decision_context\": \"optional short reason\", "
-            "\"proposed_next_calls\": [{\"method\": \"resources/read\", \"params\": {}}], "
-            "\"calls\": [{\"method\": \"resources/read\", \"params\": {}}], "
-            "\"answer_brief\": \"optional draft answer idea\""
-            "}\n"
-            "Rules:\n"
-            "- In this planner, use only resources/read for search resources.\n"
-            "- Relevant search resources are: qualcoder://vector/search, qualcoder://search/bm25, and qualcoder://search/regex.\n"
-            "- Do not use initialize, resources/list, resources/templates/list, tools/list, or tools/call here unless a later user turn explicitly requires something outside search.\n"
-            "- The current turn already contains initialize, resources/list, and resources/templates/list.\n"
-            "- Use as few search calls as possible, but enough to cover a broad and informative spectrum of potentially relevant material.\n"
-            "- Combine complementary search strategies when useful:\n"
-            "  * vector/search for semantic similarity and conceptually related material\n"
-            "  * search/bm25 for concrete keywords, phrases, and theoretically important terms\n"
-            "  * search/regex for lexical patterns, word stems, spelling variants, or tightly defined textual forms\n"
-            "- When choosing search strings, preserve the original topic idea but broaden it intelligently.\n"
-            "- Consider multiple formulations of the topic, including:\n"
-            "  * simpler everyday language\n"
-            "  * directly related concepts or synonyms\n"
-            "  * narrower facets, contrasting variants, and boundary cases\n"
-            "- If the topic uses scientific or technical language, actively translate it into concrete life-world expressions that may appear in empirical material.\n"
-            "- Prefer a small set of diverse, non-redundant search strings over many similar ones.\n"
-            "- In the first topic-exploration turn, keep all retrieval within the user-selected material scope already described in the conversation.\n"
-            "- Default to user_decision_required=false.\n"
-            "- Set user_decision_required=true only when the global agent rules require a user decision or confirmation.\n"
-            "- If user_decision_required=true, provide one concise natural-language question in decision_question, keep calls empty, and put suggested follow-up MCP actions into proposed_next_calls.\n"
-            "- plan_summary must be one sentence, user-facing, <=160 characters.\n"
-            "- Do not output prose outside JSON.\n"
-        )
+        return self._load_internal_prompt_text("topic-exploration/_planner")
 
     def _mcp_reflection_system_prompt(self) -> str:
-        return (
-            "Your task: Review the collected evidence and action progress, then decide whether more MCP calls are needed. "
-            "Return ONLY one JSON object with this shape:\n"
-            "{"
-            "\"enough_information\": true|false, "
-            "\"reflection_summary\": \"one short user-facing note\", "
-            "\"next_step_note\": \"optional short alias\", "
-            "\"continue_deferred_calls\": true|false, "
-            "\"user_decision_required\": true|false, "
-            "\"decision_question\": \"optional question\", "
-            "\"decision_context\": \"optional short reason\", "
-            "\"proposed_next_calls\": [{\"method\": \"resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call\", \"params\": {}}], "
-            "\"revised_calls\": [{\"method\": \"resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call\", \"params\": {}}], "
-            "\"answer_brief\": \"short answer plan for final response\""
-            "}\n"
-            "Rules:\n"
-            "- Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.\n"
-            "- Initialize, resources/list, and resources/templates/list are already available in context unless explicitly changed or compacted.\n"
-            "- Use as few additional calls as possible and keep them focused.\n"
-            "- If the result from an early MCP-call was compacted away but you want to use this data again, reread it. Do not rely on fragments of content still being present in the conversation context.\n" 
-            "- If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.\n"
-            "- Use tools/call only for tools that have already been discovered through tools/list in the current conversation context.\n"
-            "- If deferred_calls are listed in the reflection prompt, decide explicitly whether they should continue unchanged by setting continue_deferred_calls=true or false.\n"
-            "- If continue_deferred_calls=true, you may keep revised_calls empty to continue the deferred queue unchanged, or provide revised_calls to prepend/adjust the next steps.\n"
-            "- Default to user_decision_required=false.\n"
-            "- Set user_decision_required=true only when the global agent rules require a user decision or confirmation.\n"
-            "- If user_decision_required=true, provide one concise natural-language question in decision_question, keep revised_calls empty, and put suggested follow-up MCP actions into proposed_next_calls.\n"
-            "- If the user explicitly requested write actions, include revised_calls that execute the remaining write actions whenever this is possible.\n"
-            "- If a delete action still needs user confirmation after preview, set user_decision_required=true and place the execute tool with the preview_token into proposed_next_calls.\n"
-            "- Do not stop with explanations only if executable actions are still pending.\n"
-            "- If the task was about collecting information and you now have enough evidence for a final answer, set enough_information=true and revised_calls=[].\n"
-            "- If more information or actions are still needed, set enough_information=false and propose only the necessary revised_calls.\n"
-            "- reflection_summary must be one sentence, user-facing, <=160 characters.\n"
-            "- Avoid boilerplate like 'I will' or 'Next step is' unless strictly needed.\n"
-            "- next_step_note is optional and only used when reflection_summary is empty.\n"
-            "- Do not output prose outside JSON."
-        )
+        return self._load_internal_prompt_text("_reflection")
 
     def _mcp_final_answer_system_prompt(self) -> str:
-        return (
-            "Your task: "
-            "Provide a final answer for the user in normal prose based on the conversation and retrieved project context. "
-            "Do not output JSON. "
-            "Treat MCP execution as already finished for this turn. "
-            "Focus on the outcomes of this turn and communicate them clearly. "
-            "Do not mention internal MCP stage constraints. "
-            "Default to a conversational reply and keep it short (about 2–8 sentences), unless the user or an upstream instruction explicitly asks for a longer or more structured answer. "
-            "Do not be superficial: if you identify several relevant aspects, go deeper on the most interesting one, then ask which of the others the user would like to explore next. "
-            "You can use Markdown formatting like bullet points if that helps to keep the answer concise and clear. "
-            "If you have made changes to project data through tool calls, give a short and concise summary of what you have done, but avoid repeating information discussed before. "
-            "If the user asked for an execution but it could not be completed, state exactly what is missing and ask one concise follow-up question. "
-            "Do not claim that tool use is forbidden unless the user explicitly said so. "
-            "If information is missing, state that briefly and avoid making up details. "
-            "Do not make empirical claims without support from retrieved evidence. If a claim is not supported strongly enough, state the uncertainty instead of inventing support. "            
-            "When you refer to empirical text evidence, add citations in this exact form: "
-            "{REF: \"exact quote from the retrieved evidence\"}. "
-            "The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). "
-            "Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. "
-            "If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately. "
-        )
+        return self._load_internal_prompt_text("_final-answer")
 
     def _mcp_final_answer_phase_prompts(self, final_hint: str, stop_reason: str) -> Tuple[str, str]:
         """Build the stable system prompt and dynamic user prompt for the final answer phase."""
@@ -6831,16 +6708,7 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         latest_user_message = self._get_latest_user_message_text(chat_idx)
         current_language = str(ai_service.get_curr_language()).strip()
-        system_prompt = (
-            "You repair invalid final answers from an AI agent. "
-            "Rewrite the invalid output as one normal user-facing answer in the current conversation language. "
-            "Do not output JSON. "
-            "Do not output code fences. "
-            "Do not mention MCP, internal planning fields, method names, params, or tool calls. "
-            "Do not invent new empirical findings. "
-            "If the invalid output is only an internal control action and does not support a proper final answer, "
-            "say so briefly and naturally, without exposing internal JSON or field names."
-        )
+        system_prompt = self._load_internal_prompt_text("_final-answer-repair")
         repair_prompt = (
             f'Current conversation language: "{current_language}".\n'
             f'Latest user request:\n{latest_user_message}\n\n'
