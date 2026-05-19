@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-11 09:54+0200\n"
-"PO-Revision-Date: 2026-05-11 09:56+0200\n"
+"POT-Creation-Date: 2026-05-19 17:30+0200\n"
+"PO-Revision-Date: 2026-05-19 17:32+0200\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -1700,65 +1700,65 @@ msgstr ""
 "Étape 2 :\n"
 "Examiner les données de plus près..."
 
-#: src/qualcoder/settings.py:109
+#: src/qualcoder/settings.py:126
 msgid "original"
 msgstr "original"
 
-#: src/qualcoder/settings.py:109
+#: src/qualcoder/settings.py:126
 msgid "dark"
 msgstr "sombre"
 
-#: src/qualcoder/settings.py:109 src/qualcoder/view_graph.py:1637
+#: src/qualcoder/settings.py:126 src/qualcoder/view_graph.py:1637
 msgid "blue"
 msgstr "bleu"
 
-#: src/qualcoder/settings.py:109 src/qualcoder/view_graph.py:1639
+#: src/qualcoder/settings.py:126 src/qualcoder/view_graph.py:1639
 msgid "green"
 msgstr "vert"
 
-#: src/qualcoder/settings.py:109 src/qualcoder/view_graph.py:1640
+#: src/qualcoder/settings.py:126 src/qualcoder/view_graph.py:1640
 msgid "orange"
 msgstr "orange"
 
-#: src/qualcoder/settings.py:109
+#: src/qualcoder/settings.py:126
 msgid "purple"
 msgstr "violet"
 
-#: src/qualcoder/settings.py:109 src/qualcoder/view_graph.py:1640
+#: src/qualcoder/settings.py:126 src/qualcoder/view_graph.py:1640
 msgid "yellow"
 msgstr "jaune"
 
-#: src/qualcoder/settings.py:109
+#: src/qualcoder/settings.py:126
 msgid "rainbow"
 msgstr "arc-en-ciel"
 
-#: src/qualcoder/settings.py:109
+#: src/qualcoder/settings.py:126
 msgid "native"
 msgstr "natif"
 
-#: src/qualcoder/settings.py:132
+#: src/qualcoder/settings.py:149
 msgid "Bold"
 msgstr "Gras"
 
-#: src/qualcoder/settings.py:132
+#: src/qualcoder/settings.py:149
 msgid "Italic"
 msgstr "Italique"
 
-#: src/qualcoder/settings.py:132
+#: src/qualcoder/settings.py:149
 msgid "Bigger"
 msgstr "Plus grand"
 
-#: src/qualcoder/settings.py:143
+#: src/qualcoder/settings.py:160
 msgid "Default folder for storing automatic backups and for file outputs."
 msgstr ""
 "Dossier par défaut pour le stockage des sauvegardes automatiques et pour les "
 "sorties de fichiers."
 
-#: src/qualcoder/settings.py:281 src/qualcoder/settings.py:289
+#: src/qualcoder/settings.py:300 src/qualcoder/settings.py:308
 msgid "Edit AI profile name"
 msgstr "Modifier le nom du profil IA"
 
-#: src/qualcoder/settings.py:281
+#: src/qualcoder/settings.py:300
 msgid ""
 "Select a profile first. \n"
 "You can only edit the name of an existing profile. To create a new profile "
@@ -1769,11 +1769,11 @@ msgstr ""
 "nouveau profil à partir de zéro, suivez les instructions du wiki QualCoder "
 "sur GitHub."
 
-#: src/qualcoder/settings.py:290 src/qualcoder/settings.py:480
+#: src/qualcoder/settings.py:309 src/qualcoder/settings.py:524
 msgid "Enter new profile name:"
 msgstr "Saisir le nouveau nom du profil :"
 
-#: src/qualcoder/settings.py:350
+#: src/qualcoder/settings.py:369
 msgid ""
 "The API key contains non-ASCII characters and cannot be used.\n"
 "Please paste the key again exactly as provided by your AI provider. \n"
@@ -1786,64 +1786,77 @@ msgstr ""
 "\n"
 "Caractère(s) invalide(s) : "
 
-#: src/qualcoder/settings.py:353
+#: src/qualcoder/settings.py:372
 msgid "Invalid API key"
 msgstr "Clé API invalide"
 
-#: src/qualcoder/settings.py:455
+#: src/qualcoder/settings.py:456
+msgid "Invalid input"
+msgstr "Entrée invalide"
+
+#: src/qualcoder/settings.py:468
+msgid "AI temperature parameter must be between 0.0 and 2.0."
+msgstr ""
+"Le paramètre de température de l'IA doit être compris entre 0,0 et 2,0."
+
+#: src/qualcoder/settings.py:476
+msgid "AI top_p parameter must be between 0.0 and 1.0."
+msgstr "Le paramètre top_p de l'IA doit être compris entre 0,0 et 1,0."
+
+#: src/qualcoder/settings.py:499
 msgid "Choose a default output folder"
 msgstr "Choisissez un dossier de sortie par défaut"
 
-#: src/qualcoder/settings.py:459 src/qualcoder/settings.py:462
+#: src/qualcoder/settings.py:503 src/qualcoder/settings.py:506
 msgid "Choose another folder"
 msgstr "Choisir un autre dossier"
 
-#: src/qualcoder/settings.py:459
+#: src/qualcoder/settings.py:503
 msgid "Do not use the QualCoder configuration folder."
 msgstr "Ne pas utiliser le dossier de configuration de QualCoder"
 
-#: src/qualcoder/settings.py:462
+#: src/qualcoder/settings.py:506
 msgid "Do not use the QualCoder data folder."
 msgstr "Ne pas utiliser le dossier de données QualCoder"
 
-#: src/qualcoder/settings.py:479 src/qualcoder/settings.py:492
+#: src/qualcoder/settings.py:523 src/qualcoder/settings.py:536
 msgid "New AI profile"
 msgstr "Nouveau profil d'IA"
 
-#: src/qualcoder/settings.py:492
+#: src/qualcoder/settings.py:536
 msgid "An AI profile with this name already exists: "
 msgstr "Un profil IA portant ce nom existe déjà : "
 
-#: src/qualcoder/settings.py:549
+#: src/qualcoder/settings.py:593
 msgid "Please select an AI profile or disable the AI altogether."
 msgstr "Veuillez sélectionner un profil IA ou désactiver complètement l'IA."
 
-#: src/qualcoder/settings.py:550
+#: src/qualcoder/settings.py:594
 msgid "AI profile"
 msgstr "Profil IA"
 
-#: src/qualcoder/settings.py:555
+#: src/qualcoder/settings.py:599
 msgid "Please enter a valid API-key for the AI model."
 msgstr "Veuillez saisir une clé API valide pour le modèle d'IA."
 
-#: src/qualcoder/settings.py:556 src/qualcoder/settings.py:562
+#: src/qualcoder/settings.py:600 src/qualcoder/settings.py:606
 msgid "AI model"
 msgstr "Modèle d'IA"
 
-#: src/qualcoder/settings.py:561
+#: src/qualcoder/settings.py:605
 msgid "Please select a \"large\" and a \"fast\" AI model."
 msgstr ""
 "Veuillez sélectionner un modèle d'IA « grand » et un modèle d'IA « rapide »."
 
-#: src/qualcoder/settings.py:580
+#: src/qualcoder/settings.py:628
 msgid "Restart QualCoder"
 msgstr "Redémarrer QualCoder"
 
-#: src/qualcoder/settings.py:580
+#: src/qualcoder/settings.py:628
 msgid "Restart QualCoder to enact some changes"
 msgstr "Redémarrer QualCoder pour appliquer certains changements"
 
-#: src/qualcoder/settings.py:585
+#: src/qualcoder/settings.py:633
 msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
@@ -1851,7 +1864,7 @@ msgstr ""
 "Les modifications des noms des codeurs⋅euses seront perdues. Êtes-vous sûr "
 "de vouloir annuler ?"
 
-#: src/qualcoder/settings.py:586 src/qualcoder/__main__.py:1769
+#: src/qualcoder/settings.py:634 src/qualcoder/__main__.py:1769
 msgid "Settings"
 msgstr "Paramètres"
 
