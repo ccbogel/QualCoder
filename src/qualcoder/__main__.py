@@ -2617,7 +2617,7 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text)")
+            "bookmarkpos integer, codername text, recently_used_codes text, last_ai_chat_id integer)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -2687,9 +2687,9 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
-                    ('v14', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
-                     0, self.app.settings['codername'], ""))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,?)",
+                    ('v15', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                     0, self.app.settings['codername'], "", None))
         self.app.conn.commit()
         try:
             # Get and display some project details
@@ -3147,6 +3147,14 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v14", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v14")
+        # Database version v15
+        try:
+            cur.execute("select last_ai_chat_id from project")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE project ADD last_ai_chat_id integer')
+            cur.execute('update project set databaseversion="v15", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v15")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"

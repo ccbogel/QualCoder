@@ -19,7 +19,8 @@ class TestAiMcpServer(TestCase):
 
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text, about text, "
-            "bookmarkfile integer, bookmarkpos integer, codername text, recently_used_codes text)"
+            "bookmarkfile integer, bookmarkpos integer, codername text, recently_used_codes text, "
+            "last_ai_chat_id integer)"
         )
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, "
@@ -46,8 +47,8 @@ class TestAiMcpServer(TestCase):
         )
 
         cur.execute(
-            "INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
-            ("v11", "2026-02-13", "memo text", "about", 0, 0, "default", ""),
+            "INSERT INTO project VALUES(?,?,?,?,?,?,?,?,?)",
+            ("v11", "2026-02-13", "memo text", "about", 0, 0, "default", "", None),
         )
         cur.execute(
             "INSERT INTO source (id, name, fulltext, mediapath, memo, owner, date, av_text_id, risid) "

@@ -39,7 +39,7 @@ class TestApp(TestCase):
         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text)")
+            "bookmarkpos integer, codername text, recently_used_codes text, last_ai_chat_id integer)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -105,11 +105,11 @@ class TestApp(TestCase):
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         self.conn.commit()
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,?)",
                     (
                         'v11', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', 'QualCoder 3.7',
                         0,
-                        0, self.settings['codername'], ""))
+                        0, self.settings['codername'], "", None))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
                     ('case one', 'memo 1', 'default', dt))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
@@ -233,7 +233,7 @@ class TestMainWindow(TestCase):
         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text)")
+            "bookmarkpos integer, codername text, recently_used_codes text, last_ai_chat_id integer)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -299,11 +299,11 @@ class TestMainWindow(TestCase):
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         self.conn.commit()
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,?)",
                     (
                         'v11', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', 'QualCoder 3.7',
                         0,
-                        0, self.settings['codername'], ""))
+                        0, self.settings['codername'], "", None))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
                     ('case one', 'memo 1', 'default', dt))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
