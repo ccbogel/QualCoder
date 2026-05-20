@@ -275,6 +275,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+        self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
 
         msg = _("QualCoder roughly displays PDFs.")
         # msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
@@ -762,6 +763,12 @@ class DialogCodePdf(QtWidgets.QWidget):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def tree_item_clicked(self, item, column):
+        """ Use to quicky open memo. """
+
+        if column == 2:
+            self.add_edit_cat_or_code_memo(item)
 
     def codes_tree_header_menu(self, position: int):
         """ treeWidget resize mode - resize to contents or interactive. """

@@ -217,7 +217,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
+        self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)  # open memo, or assign text to code
+
         # Codes-tree header menu
         self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
@@ -533,16 +534,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Set the scene to the top
         self.ui.graphicsView.verticalScrollBar().setValue(0)
 
-    def assign_selected_text_to_code(self):
-        """ Assign selected text on left-click on code in tree. """
-
-        current = self.ui.treeWidget.currentItem()
-        if current.text(1)[0:3] == 'cat':
-            return
-        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-        if len(selected_text) > 0:
-            self.mark()
-
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -745,6 +736,19 @@ class DialogCodeAV(QtWidgets.QDialog):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def tree_item_clicked(self, item, column):
+        """ Use to quicky open memo. Or,
+        Assign selected text on left-click on code in tree. """
+
+        if column == 2:
+            self.add_edit_code_memo(item)
+            return
+        if item.text(1)[0:3] == 'cat':
+            return
+        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
+        if len(selected_text) > 0:
+            self.mark()
 
     def codes_tree_header_menu(self, position):
         """ treeWidget resize mode - resize to contents or interactive. """

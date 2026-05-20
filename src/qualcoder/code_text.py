@@ -125,10 +125,6 @@ class DialogCodeText(QtWidgets.QWidget):
         # Variables associated with right-hand side splitter, for project memo, code rule
         self.project_memo = False
         self.code_rule = False
-        
-        '''# Variables for linked journal
-        self.file_journal_jids = []  # list of (jid, name, jentry) for all journals linked to current file
-        self.file_journal_display_idx = -1  # current index for cycling through journals'''
 
         # Variables for right pane toggle
         self.right_pane_size = 260  # Default size, remembers last size before collapse
@@ -244,11 +240,6 @@ class DialogCodeText(QtWidgets.QWidget):
         # Right hand side splitter buttons
         self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
-        # Unhide and connect journal button
-        '''self.ui.pushButton_journal.setIcon(qta.icon('mdi6.notebook-outline'))
-        self.ui.pushButton_journal.clicked.connect(self.show_file_journal)  # Left click: read-only view
-        self.ui.pushButton_journal.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.pushButton_journal.customContextMenuRequested.connect(self.journal_button_menu)  # right click'''
         self.ui.pushButton_journal.hide()
         self.ui.pushButton_project_memo.setIcon(qta.icon('mdi6.file-document-outline'))
         self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
@@ -360,6 +351,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+        self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
 
         # Variables and widgets for AI search
         self.ai_search_results = []
@@ -966,6 +958,12 @@ class DialogCodeText(QtWidgets.QWidget):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def tree_item_clicked(self, item, column):
+        """ Use to quicky open memo. """
+
+        if column == 2:
+            self.add_edit_cat_or_code_memo(item)
 
     def codes_tree_header_menu(self, position):
         """ treeWidget resize mode - resize to contents or interactive. """

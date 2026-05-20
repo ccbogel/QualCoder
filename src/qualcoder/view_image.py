@@ -141,6 +141,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Codes-tree header menu
         self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
+        self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
         self.tree_column_widths_auto_resize = True
         # Header widgets
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
@@ -668,6 +669,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def tree_item_clicked(self, item, column):
+        """ Use to quicky open memo. """
+
+        if column == 2:
+            self.add_edit_code_memo(item)
 
     def codes_tree_header_menu(self, position):
         """ treeWidget resize mode - resize to contents or interactive. """
