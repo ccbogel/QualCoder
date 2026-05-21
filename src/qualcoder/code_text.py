@@ -68,6 +68,371 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
+class CodingMargin(QtWidgets.QWidget):  # <- L
+    """ Draws side bars adjacent to the text and code names.
+    Uses a track-packing algorithm so that overlapping codes occupy distinct
+    vertical lanes. Embedded in a container widget (widget_code_margin_left /
+    widget_code_margin_right). Scroll synchronization
+    with the editor is handled via signal-slot from the editor's vertical
+    scrollbar.
+
+    The 'side' parameter controls visual layout:
+    - 'left':  lanes stack right-to-left (lane 0 nearest text), names at far left.
+    - 'right': lanes stack left-to-right (lane 0 nearest text), names at far right.
+    """
+
+    def __init__(self, editor, dialog_code_text, side='left'):
+        super().__init__()
+        self.editor = editor
+        self.dialog = dialog_code_text
+        self.side = side  # 'left' or 'right'
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._emit_context_menu_to_dialog)
+        self.setMouseTracking(True)
+        self.setMinimumWidth(120)
+
+    def _emit_context_menu_to_dialog(self, position):
+        if hasattr(self.dialog, 'coding_margin_context_menu'):
+            self.dialog.coding_margin_context_menu(position, self)
+
+    def _compute_lane_layout(self):
+        """ Track-packing algorithm. Returns (ctid_columns, sorted_codes,
+        current_fid), or (None, [], None) if the layout cannot be computed. """
+
+        if not self.dialog.file_ or not self.dialog.code_text:
+            return None, [], None
+
+        current_fid = self.dialog.file_['id']
+        important_only = getattr(self.dialog, 'important', False)
+
+        sorted_codes = sorted(
+            [c for c in self.dialog.code_text
+             if c.get('fid') == current_fid
+             and (not important_only or c.get('important') == 1)],
+            key=lambda x: x.get('pos0', 0)
+        )
+
+        ctid_columns = {}
+        tracks = []
+        for code in sorted_codes:
+            ctid = code.get('ctid')
+            if ctid is None:
+                continue
+            placed = False
+            for i, track_end in enumerate(tracks):
+                if track_end <= code['pos0']:
+                    tracks[i] = code['pos1']
+                    ctid_columns[ctid] = i
+                    placed = True
+                    break
+            if not placed:
+                tracks.append(code['pos1'])
+                ctid_columns[ctid] = len(tracks) - 1
+
+        return ctid_columns, sorted_codes, current_fid
+
+    def paintEvent(self, event):
+        if not self.dialog.file_ or not self.dialog.code_text:
+            return
+        try:
+            painter = QtGui.QPainter(self)
+            font = QtGui.QFont(self.dialog.app.settings['font'], 9)
+            painter.setFont(font)
+            offset = self.editor.contentOffset()
+            block = self.editor.firstVisibleBlock()
+
+            ctid_columns, _sorted_codes, current_fid = self._compute_lane_layout()
+            if current_fid is None:
+                return
+
+            drawn_ctids = set()
+
+            while block.isValid():
+                rect = self.editor.blockBoundingGeometry(block).translated(offset)
+                if rect.top() > self.height():
+                    break
+                if rect.bottom() >= 0:
+                    self.draw_code_bars(painter, block, rect, drawn_ctids, current_fid, ctid_columns)
+                block = block.next()
+        except Exception as e:
+            logger.debug(f"CodingMargin paintEvent error: {e}")
+
+    def draw_code_bars(self, painter, block, rect, drawn_ctids, current_fid, ctid_columns):
+        """ Draw a coloured vertical bar per overlapping code on this block,
+        plus the code name at the appropriate edge (only once per segment) """
+
+        file_start = self.dialog.file_.get('start', 0)
+        block_start = block.position() + file_start
+        block_end = block_start + block.length()
+
+        names_drawn_by_line = {}
+        margin_width = self.width()
+
+        important_only = getattr(self.dialog, 'important', False)
+        layout = block.layout()
+
+        bar_w = 3
+        lane_step = 10
+
+        for code in self.dialog.code_text:
+            if code.get('fid') != current_fid:
+                continue
+            if important_only and code.get('important') != 1:
+                continue
+            ctid = code.get('ctid')
+            if ctid is None:
+                continue
+
+            if code['pos0'] < block_end and code['pos1'] > block_start:
+                col_index = ctid_columns.get(ctid, 0)
+
+                if self.side == 'right':
+                    offset_x = 12 + (col_index * lane_step)
+                else:  # 'left'
+                    offset_x = margin_width - 15 - (col_index * lane_step)
+
+                color_hex = code.get('color', '#cccccc')
+                color = QtGui.QColor(color_hex)
+                painter.setPen(QtCore.Qt.PenStyle.NoPen)
+                painter.setBrush(color)
+
+                start_rel = max(code['pos0'], block_start) - block_start
+                end_rel = min(code['pos1'], block_end) - block_start
+                start_rel = max(0, min(start_rel, max(0, block.length() - 1)))
+                end_rel = max(start_rel + 1, min(end_rel, block.length()))
+                start_line = layout.lineForTextPosition(start_rel)
+                end_line = layout.lineForTextPosition(max(start_rel, end_rel - 1))
+
+                if start_line.isValid() and end_line.isValid():
+                    first_line = start_line.lineNumber()
+                    last_line = end_line.lineNumber()
+                    for line_number in range(first_line, last_line + 1):
+                        line = layout.lineAt(line_number)
+                        if not line.isValid():
+                            continue
+                        painter.drawRect(
+                            offset_x,
+                            int(rect.top() + line.y()),
+                            bar_w,
+                            max(1, int(line.height()))
+                        )
+                else:
+                    painter.drawRect(offset_x, int(rect.top()), bar_w, int(rect.height()))
+
+                if ctid not in drawn_ctids and code['pos0'] >= block_start:
+                    painter.setPen(color.darker(150))
+                    raw_name = code.get('name', '')
+                    _fm = painter.fontMetrics()
+                    if self.side == 'right':
+                        _lanes_end_x = 12 + (col_index + 1) * lane_step
+                        _available_w = max(0, margin_width - _lanes_end_x - 5)
+                    else:  # 'left'
+                        _lanes_start_x = margin_width - 15 - (col_index + 1) * lane_step
+                        _available_w = max(0, _lanes_start_x - 5 - 5)
+                    name = _fm.elidedText(
+                        raw_name, QtCore.Qt.TextElideMode.ElideRight, _available_w)
+
+                    if start_line.isValid():
+                        line_number = start_line.lineNumber()
+                        names_on_line = names_drawn_by_line.get(line_number, 0)
+                        y_pos = int(rect.top() + start_line.y()
+                                    + painter.fontMetrics().ascent()
+                                    + (names_on_line * 12))
+                        names_drawn_by_line[line_number] = names_on_line + 1
+                    else:
+                        names_on_line = names_drawn_by_line.get(-1, 0)
+                        y_pos = int(rect.top() + painter.fontMetrics().ascent()
+                                    + (names_on_line * 12))
+                        names_drawn_by_line[-1] = names_on_line + 1
+
+                    if self.side == 'right':
+                        name_w = painter.fontMetrics().horizontalAdvance(name)
+                        x_pos = max(margin_width - name_w - 5, 18)
+                    else:  # 'left'
+                        x_pos = 5
+
+                    painter.drawText(x_pos, y_pos, name)
+                    drawn_ctids.add(ctid)
+
+    def _code_at_position(self, pos):
+        """ Return the code_text item under the given QPoint, or None.
+        Matches both the coloured stripe and the code name label"""
+
+        if not self.dialog.file_ or not self.dialog.code_text:
+            return None
+
+        ctid_columns, _sorted, current_fid = self._compute_lane_layout()
+        if current_fid is None:
+            return None
+
+        margin_width = self.width()
+        bar_w = 3
+        lane_step = 10
+
+        offset = self.editor.contentOffset()
+        block = self.editor.firstVisibleBlock()
+        file_start = self.dialog.file_.get('start', 0)
+        important_only = getattr(self.dialog, 'important', False)
+
+        stripe_hit = None
+        label_hit = None
+
+        font = QtGui.QFont(self.dialog.app.settings['font'], 9)
+        fm = QtGui.QFontMetrics(font)
+
+        while block.isValid():
+            rect = self.editor.blockBoundingGeometry(block).translated(offset)
+            if rect.top() > self.height():
+                break
+            if rect.bottom() < 0:
+                block = block.next()
+                continue
+
+            block_start = block.position() + file_start
+            block_end = block_start + block.length()
+            layout = block.layout()
+
+            seen_ctids_in_block = set()
+            names_drawn_by_line = {}
+
+            for code in self.dialog.code_text:
+                if code.get('fid') != current_fid:
+                    continue
+                if important_only and code.get('important') != 1:
+                    continue
+                ctid = code.get('ctid')
+                if ctid is None:
+                    continue
+                if not (code['pos0'] < block_end and code['pos1'] > block_start):
+                    continue
+
+                col_index = ctid_columns.get(ctid, 0)
+                if self.side == 'right':
+                    offset_x = 12 + (col_index * lane_step)
+                else:
+                    offset_x = margin_width - 15 - (col_index * lane_step)
+
+                start_rel = max(code['pos0'], block_start) - block_start
+                end_rel = min(code['pos1'], block_end) - block_start
+                start_rel = max(0, min(start_rel, max(0, block.length() - 1)))
+                end_rel = max(start_rel + 1, min(end_rel, block.length()))
+                start_line = layout.lineForTextPosition(start_rel)
+                end_line = layout.lineForTextPosition(max(start_rel, end_rel - 1))
+
+                if start_line.isValid() and end_line.isValid():
+                    first_line = start_line.lineNumber()
+                    last_line = end_line.lineNumber()
+                    for line_number in range(first_line, last_line + 1):
+                        line = layout.lineAt(line_number)
+                        if not line.isValid():
+                            continue
+                        stripe_rect = QtCore.QRect(
+                            offset_x,
+                            int(rect.top() + line.y()),
+                            bar_w,
+                            max(1, int(line.height())))
+                        if stripe_rect.contains(pos):
+                            stripe_hit = code
+
+                if ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
+                    raw_name = code.get('name', '')
+                    if self.side == 'right':
+                        _lanes_end_x = 12 + (col_index + 1) * lane_step
+                        _available_w = max(0, margin_width - _lanes_end_x - 5)
+                    else:  # 'left'
+                        _lanes_start_x = margin_width - 15 - (col_index + 1) * lane_step
+                        _available_w = max(0, _lanes_start_x - 5 - 5)
+                    name = fm.elidedText(
+                        raw_name, QtCore.Qt.TextElideMode.ElideRight, _available_w)
+                    if start_line.isValid():
+                        line_number = start_line.lineNumber()
+                        names_on_line = names_drawn_by_line.get(line_number, 0)
+                        y_pos = int(rect.top() + start_line.y()
+                                    + fm.ascent()
+                                    + (names_on_line * 12))
+                        names_drawn_by_line[line_number] = names_on_line + 1
+                    else:
+                        names_on_line = names_drawn_by_line.get(-1, 0)
+                        y_pos = int(rect.top() + fm.ascent() + (names_on_line * 12))
+                        names_drawn_by_line[-1] = names_on_line + 1
+
+                    name_w = fm.horizontalAdvance(name)
+                    if self.side == 'right':
+                        x_pos = max(margin_width - name_w - 5, 18)
+                    else:
+                        x_pos = 5
+
+                    label_rect = QtCore.QRect(
+                        x_pos,
+                        y_pos - fm.ascent(),
+                        name_w,
+                        fm.height())
+                    if label_rect.contains(pos):
+                        label_hit = code
+                    seen_ctids_in_block.add(ctid)
+
+            block = block.next()
+
+        return stripe_hit if stripe_hit is not None else label_hit
+
+    def mouseMoveEvent(self, event):
+        """ hover over a code -> show tooltip """
+
+        try:
+            code = self._code_at_position(event.pos())
+        except Exception as e:
+            logger.debug(f"CodingMargin hit-test error: {e}")
+            code = None
+
+        if code is None:
+            QtWidgets.QToolTip.hideText()
+            self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
+            super().mouseMoveEvent(event)
+            return
+
+        try:
+            tooltip_html = self.dialog._build_code_tooltip_html(code)
+        except Exception as e:
+            logger.debug(f"CodingMargin tooltip build error: {e}")
+            tooltip_html = code.get('name', '')
+
+        QtWidgets.QToolTip.showText(event.globalPosition().toPoint(),
+                                    tooltip_html,
+                                    self)
+        self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        super().mouseMoveEvent(event)
+
+    def mousePressEvent(self, event):
+        """ left-click on stripe/label -> select that exact coded segment in editor. """
+
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            try:
+                code = self._code_at_position(event.pos())
+            except Exception as e:
+                logger.debug(f"CodingMargin click hit-test error: {e}")
+                code = None
+            if code is not None and self.dialog.file_ is not None:
+                file_start = self.dialog.file_.get('start', 0)
+                pos0 = code['pos0'] - file_start
+                pos1 = code['pos1'] - file_start
+                text_len = len(self.dialog.ui.plainTextEdit.toPlainText())
+                pos0 = max(0, min(pos0, text_len))
+                pos1 = max(0, min(pos1, text_len))
+                cursor = self.dialog.ui.plainTextEdit.textCursor()
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                self.dialog.ui.plainTextEdit.setTextCursor(cursor)
+                self.dialog.ui.plainTextEdit.ensureCursorVisible()
+                event.accept()
+                return
+        super().mousePressEvent(event)
+
+    def leaveEvent(self, event):
+        QtWidgets.QToolTip.hideText()
+        self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
+        super().leaveEvent(event)
+
+
 class DialogCodeText(QtWidgets.QWidget):
     """ Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
@@ -128,6 +493,29 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Variables for right pane toggle
         self.right_pane_size = 260  # Default size, remembers last size before collapse
+
+        # Visual options for code stripes margin and highlight style.
+        # show_margin_stripes and highlight_style are INDEPENDENT preferences,
+        # persisted under separate keys and changed via the margin context menu <- L
+        try:
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'False')
+            if isinstance(saved_pref, bool):
+                self.show_margin_stripes = saved_pref
+            else:
+                self.show_margin_stripes = str(saved_pref).lower() == 'true'
+        except (KeyError, AttributeError):
+            self.show_margin_stripes = False  # (default: margin hidden)
+
+        try:
+            saved_style = self.app.settings.get('codetext_highlight_style', None)
+        except (KeyError, AttributeError):
+            saved_style = None
+
+        if saved_style in ('marker', 'underline'):
+            self.highlight_style = saved_style
+        else:
+            # Backwards-compatible default derived from margin visibility.
+            self.highlight_style = 'underline' if self.show_margin_stripes else 'marker'
 
         # Variables for Edit mode
         self.text = ""
@@ -346,6 +734,71 @@ class DialogCodeText(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
         layout.addWidget(self.number_bar)
         self.ui.lineNumbers.setLayout(layout)
+
+        # expose the margin context menu over the line numbers widget too <- L
+        self.ui.lineNumbers.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.lineNumbers.customContextMenuRequested.connect(
+            lambda pos: self.coding_margin_context_menu(pos, self.ui.lineNumbers))
+
+        # Initialize coding margin INSIDE the .ui container widget
+        # (widget_code_margin_left or widget_code_margin_right). Qt's layout
+        # manages its size. Default side is 'left'; user can switch via menu <- L
+        try:
+            saved_side = self.app.settings.get('codetext_margin_side', 'left')
+            if saved_side not in ('left', 'right'):
+                saved_side = 'left'
+            self.margin_side = saved_side
+        except (KeyError, AttributeError):
+            self.margin_side = 'left'
+
+        self.coding_margin = CodingMargin(self.ui.plainTextEdit, self, side=self.margin_side) # <- L
+
+        # inject the margin widget into the chosen container (mirroring the
+        # NumberBar pattern used for self.ui.lineNumbers) <- L
+        self._coding_margin_layout_left = QtWidgets.QVBoxLayout(self.ui.widget_code_margin_left)
+        self._coding_margin_layout_left.setContentsMargins(0, 0, 0, 0)
+        self._coding_margin_layout_right = QtWidgets.QVBoxLayout(self.ui.widget_code_margin_right)
+        self._coding_margin_layout_right.setContentsMargins(0, 0, 0, 0)
+
+        # make widget_code_margin_left, plainTextEdit and widget_code_margin_right
+        # user-resizable by wrapping them inside a horizontal QSplitter <- L
+        self._text_margins_splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
+        self._text_margins_splitter.setHandleWidth(4)
+        self._text_margins_splitter.setChildrenCollapsible(False)
+
+        # switch margin containers' size policy from Fixed to Preferred so
+        # the splitter can resize them. plainTextEdit keeps Expanding <- L
+        for _margin_w in (self.ui.widget_code_margin_left,
+                          self.ui.widget_code_margin_right):
+            _sp = _margin_w.sizePolicy()
+            _sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Policy.Preferred)
+            _margin_w.setSizePolicy(_sp)
+
+        # detach the three widgets from horizontalLayout and reinsert them
+        # into the splitter, preserving order <- L
+        _hlayout = self.ui.widget_textEdit.layout()
+        _insert_index = _hlayout.indexOf(self.ui.widget_code_margin_left)
+        for _w in (self.ui.widget_code_margin_left,
+                   self.ui.plainTextEdit,
+                   self.ui.widget_code_margin_right):
+            _hlayout.removeWidget(_w)
+            self._text_margins_splitter.addWidget(_w)
+        _hlayout.insertWidget(_insert_index, self._text_margins_splitter)
+
+        # give plainTextEdit a non-zero stretch factor so the editor keeps
+        # most of the horizontal space by default <- L
+        self._text_margins_splitter.setStretchFactor(
+            self._text_margins_splitter.indexOf(self.ui.plainTextEdit), 1)
+
+        self._install_coding_margin_in_side(self.margin_side)
+
+        # apply initial visibility based on persisted preference <- L
+        self.coding_margin.setVisible(self.show_margin_stripes)
+        self._set_margin_container_visibility(self.show_margin_stripes)
+
+        # sync margin redraw with editor scroll <- L
+        self.ui.plainTextEdit.verticalScrollBar().valueChanged.connect(self.coding_margin.update)
+
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
@@ -386,6 +839,405 @@ class DialogCodeText(QtWidgets.QWidget):
     def help(self):
         """ Open help for transcribe section in browser. """
         self.app.help_wiki("4.1.-Coding-Text")
+
+    def _build_code_tooltip_html(self, code):  # <- L
+        """ Build the tooltip HTML for a single coded segment """
+
+        seltext = code.get('seltext', '') or ''
+        seltext = seltext.replace("\n", "").replace("\r", "")
+        # Readable cut-off, not halfway through a word (mirrors ToolTipEventFilter)
+        if len(seltext) > 90:
+            pre = seltext[0:40].split(' ')
+            post = seltext[len(seltext) - 40:].split(' ')
+            try:
+                pre = pre[:-1]
+            except IndexError:
+                pass
+            try:
+                post = post[1:]
+            except IndexError:
+                pass
+            seltext = " ".join(pre) + " ... " + " ".join(post)
+
+        color = TextColor(code.get('color', '#cccccc')).recommendation
+        text_ = '<p style="background-color:' + code.get('color', '#cccccc') + "; color:" + color + '"><em>'
+        text_ += code.get('name', '') + "</em>"
+        if self.app.settings['showids']:
+            text_ += " [ctid:" + str(code.get('ctid', '')) + "]"
+        text_ += " (" + str(code.get('owner', '')) + ")"
+        text_ += "<br />" + seltext
+        if code.get('memo', '') != "":
+            memo_text = code['memo']
+            if len(memo_text) > 150:
+                memo_text = memo_text[:150] + "..."
+            text_ += "<br /><em>" + _("MEMO: ") + memo_text + "</em>"
+        if code.get('important') == 1:
+            text_ += "<br /><em>" + _("IMPORTANT") + "</em>"
+        text_ += "</p>"
+        return text_
+
+    # Helpers to relocate the coding margin between left/right <- L
+    def _install_coding_margin_in_side(self, side):
+        """ Move the CodingMargin widget into the left or right container. """
+
+        if side not in ('left', 'right'):
+            side = 'left'
+
+        for lay in (self._coding_margin_layout_left, self._coding_margin_layout_right):
+            if lay is None:
+                continue
+            idx = lay.indexOf(self.coding_margin)
+            if idx >= 0:
+                lay.takeAt(idx)
+
+        if side == 'right':
+            self._coding_margin_layout_right.addWidget(self.coding_margin)
+        else:
+            self._coding_margin_layout_left.addWidget(self.coding_margin)
+
+        self.margin_side = side
+        self.coding_margin.side = side
+
+    def _set_margin_container_visibility(self, visible):  # <- L
+        """ Show or hide the active container so the layout reclaims its space
+        when the margin is turned off. """
+
+        if self.margin_side == 'right':
+            self.ui.widget_code_margin_right.setVisible(visible)
+            self.ui.widget_code_margin_left.setVisible(False)
+        else:
+            self.ui.widget_code_margin_left.setVisible(visible)
+            self.ui.widget_code_margin_right.setVisible(False)
+
+    def coding_margin_context_menu(self, position, source_widget):  # <- L
+        """ Right-click context menu over the CodingMargin widget.
+        - If the click hits a code stripe/label: show code actions.
+        - Otherwise: show the margin-configuration menu. """
+
+        clicked_code = None
+        if isinstance(source_widget, CodingMargin):
+            try:
+                clicked_code = source_widget._code_at_position(position)
+            except Exception as e:
+                logger.debug(f"CodingMargin context-menu hit-test error: {e}")
+                clicked_code = None
+
+        if clicked_code is not None and self.file_ is not None:
+            self._coding_margin_code_actions_menu(clicked_code, source_widget, position)
+            return
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+
+        if self.show_margin_stripes:
+            action_visibility = menu.addAction(_("Hide code stripes margin"))
+        else:
+            action_visibility = menu.addAction(_("Show code stripes margin"))
+
+        menu.addSeparator()
+
+        action_move_left = None
+        action_move_right = None
+        if self.margin_side == 'right':
+            action_move_left = menu.addAction(_("Move margin to the left"))
+        else:
+            action_move_right = menu.addAction(_("Move margin to the right"))
+
+        menu.addSeparator()
+
+        style_menu = menu.addMenu(_("Highlight style"))
+        action_style_marker = None
+        action_style_underline = None
+        if self.highlight_style != 'marker':
+            action_style_marker = style_menu.addAction(_("Marker"))
+        if self.highlight_style != 'underline':
+            action_style_underline = style_menu.addAction(_("Underline"))
+
+        global_pos = source_widget.mapToGlobal(position)
+        action = menu.exec(global_pos)
+        if action is None:
+            return
+
+        if action == action_visibility:
+            self._toggle_margin_visibility_only()
+            return
+        if action == action_move_left:
+            self._set_margin_side('left')
+            return
+        if action == action_move_right:
+            self._set_margin_side('right')
+            return
+        if action == action_style_marker:
+            self._set_highlight_style('marker')
+            return
+        if action == action_style_underline:
+            self._set_highlight_style('underline')
+            return
+
+    def _coding_margin_code_actions_menu(self, code, source_widget, position):  # <- L
+        """ Context menu with actions specific to the code clicked in the margin """
+
+        if code is None or self.file_ is None:
+            return
+
+        file_start = self.file_.get('start', 0)
+        text_len = len(self.ui.plainTextEdit.toPlainText())
+        editor_pos = code['pos0'] - file_start
+        editor_pos = max(0, min(editor_pos, max(0, text_len - 1)))
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+
+        action_unmark = menu.addAction(_("Unmark (U)"))
+        action_code_memo = menu.addAction(_("Memo coded text (M)"))
+        action_resize = menu.addAction(_("Resize"))
+        action_annotate = menu.addAction(_("Annotate (A)"))
+        action_change_code = menu.addAction(_("Change code"))
+
+        global_pos = source_widget.mapToGlobal(position)
+        action = menu.exec(global_pos)
+        if action is None:
+            return
+
+        # RRoute to per-ctid variants so every action affects ONLY the
+        # exact segment clicked in the margin (no DialogSelectItems re-prompt on
+        # overlapping codes). The cursor is still moved for visual feedback <- L
+        cursor = self.ui.plainTextEdit.textCursor()
+        cursor.setPosition(editor_pos)
+        self.ui.plainTextEdit.setTextCursor(cursor)
+
+        if action == action_unmark:
+            self._margin_unmark_ctid(code)  # was self.unmark(editor_pos) <- L
+            return
+        if action == action_code_memo:
+            self._margin_coded_text_memo_ctid(code)  # was self.coded_text_memo(editor_pos) <- L
+            return
+        if action == action_resize:
+            self._margin_resize_ctid(code)  # was self.display_handles_for_code(editor_pos) <- L
+            return
+        if action == action_annotate:
+            self._margin_annotate_ctid(code)  # was self.annotate() <- L
+            return
+        if action == action_change_code:
+            self._margin_change_code_ctid(code)  # was self.change_code_to_another_code(editor_pos) <- L
+            return
+
+    # Per-ctid action variants used ONLY by the margin code-actions menu.
+    # They operate on the exact coded segment clicked in the margin (identified
+    # by ctid), without re-prompting via DialogSelectItems when codes overlap <- L
+    def _margin_unmark_ctid(self, code):
+        """ Unmark the exact coded segment (by ctid) clicked in the margin. """
+
+        if self.file_ is None or code is None or code.get('ctid') is None:
+            return
+        self.clear_edit_variables()
+        # Locate the live item in self.code_text by ctid (deepcopy for undo)
+        target = next((c for c in self.code_text if c.get('ctid') == code['ctid']), code)
+        self.undo_deleted_codes = deepcopy([target])
+        cur = self.app.conn.cursor()
+        cur.execute("delete from code_text where ctid=?", [code['ctid']])
+        self.app.conn.commit()
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+        self.update_file_tooltip()
+        self.app.delete_backup = False
+
+    def _margin_coded_text_memo_ctid(self, code):  # <- L
+        """ Add/edit memo for the exact coded segment (by ctid) clicked. """
+
+        if self.file_ is None or code is None or code.get('ctid') is None:
+            return
+        text_item = next((c for c in self.code_text if c.get('ctid') == code['ctid']), None)
+        if text_item is None:
+            return
+        msg = f"{text_item.get('name', '')} [{text_item['pos0']} - {text_item['pos1']}]"
+        ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg, text_item['memo'], "show", text_item['seltext'])
+        ui.exec()
+        memo = ui.memo
+        if memo == text_item['memo']:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update code_text set memo=? where ctid=?", (memo, text_item['ctid']))
+        self.app.conn.commit()
+        text_item['memo'] = memo
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def _margin_change_code_ctid(self, code):  # <- L
+        """ Change the exact coded segment (by ctid) clicked to another code. """
+
+        if self.file_ is None or code is None or code.get('ctid') is None:
+            return
+        codes_list = deepcopy(self.codes)
+        to_remove = next((c for c in codes_list if c['cid'] == code['cid']), None)
+        if to_remove:
+            codes_list.remove(to_remove)
+        ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        replacement_code = ui.get_selected()
+        if not replacement_code:
+            return
+        cur = self.app.conn.cursor()
+        try:
+            cur.execute("update code_text set cid=? where ctid=?", [replacement_code['cid'], code['ctid']])
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            pass
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def _margin_annotate_ctid(self, code):  # <- L
+        """ Add/edit/remove an annotation over the EXACT range (pos0-pos1) of
+        the coded segment clicked in the margin. Mirrors annotate() but is
+        bound to the segment's range instead of the editor selection. """
+
+        if self.file_ is None or code is None:
+            return
+        self.clear_edit_variables()
+        pos0 = code['pos0']  # absolute (already includes file offset)
+        pos1 = code['pos1']
+        # Find an existing annotation overlapping this exact range for this file
+        item = None
+        details = ""
+        for note in self.annotations:
+            if note['fid'] == self.file_['id'] and \
+                    ((note['pos0'] <= pos0 <= note['pos1']) or (note['pos0'] <= pos1 <= note['pos1'])):
+                item = note
+                details = f"{item['owner']} {item['date']}"
+                break
+
+        # New annotation over the segment range
+        if item is None:
+            item = {'fid': int(self.file_['id']), 'pos0': pos0, 'pos1': pos1,
+                    'memo': "", 'owner': self.app.settings['codername'],
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+            ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
+            ui.exec()
+            item['memo'] = ui.memo
+            if item['memo'] != "":
+                cur = self.app.conn.cursor()
+                cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
+                    values(?,?,?,?,?,?)", (item['fid'], item['pos0'], item['pos1'],
+                                           item['memo'], item['owner'], item['date']))
+                self.app.conn.commit()
+                self.app.delete_backup = False
+                cur.execute("select last_insert_rowid()")
+                item['anid'] = cur.fetchone()[0]
+                self.annotations.append(item)
+                self.parent_textEdit.append(_("Annotation added at position: ")
+                                            + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ")
+                                            + self.file_['name'])
+                self.get_coded_text_update_eventfilter_tooltips()
+            return
+
+        # Edit existing annotation
+        ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
+        ui.exec()
+        item['memo'] = ui.memo
+        if item['memo'] != "":
+            item['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur = self.app.conn.cursor()
+            cur.execute("update annotation set memo=?, date=? where anid=?",
+                        (item['memo'], item['date'], item['anid']))
+            self.app.conn.commit()
+            self.app.delete_backup = False
+            self.annotations = self.app.get_annotations()
+            self.get_coded_text_update_eventfilter_tooltips()
+            return
+
+        # Blank memo -> delete the annotation
+        cur = self.app.conn.cursor()
+        cur.execute("delete from annotation where anid=?", (item['anid'],))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.annotations = self.app.get_annotations()
+        self.parent_textEdit.append(_("Annotation removed from position ")
+                                    + str(item['pos0']) + _(" for: ") + self.file_['name'])
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def _margin_resize_ctid(self, code):  # <- L
+        """ Show resize handles bound to the EXACT coded segment (by ctid)
+        clicked in the margin, without the DialogSelectItems prompt. """
+
+        if self.file_ is None or code is None or code.get('ctid') is None:
+            return
+        code_to_handle = next((c for c in self.code_text if c.get('ctid') == code['ctid']), None)
+        if code_to_handle is None:
+            return
+        self.hide_resize_handles()
+
+        # Create start handle
+        cursor_start = self.ui.plainTextEdit.textCursor()
+        cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
+        rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
+        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
+        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        self.active_handles.append(h_start)
+
+        # Create end handle
+        cursor_end = self.ui.plainTextEdit.textCursor()
+        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()),
+                                   code_to_handle['pos1'] - self.file_['start']))
+        rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
+        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
+        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        self.active_handles.append(h_end)
+
+    def _toggle_margin_visibility_only(self):  # <- L
+        """ Independent visibility toggle (does NOT alter highlight_style). """
+
+        self.show_margin_stripes = not self.show_margin_stripes
+        try:
+            self.app.settings['codetext_show_margin_stripes'] = (
+                'True' if self.show_margin_stripes else 'False')
+        except (TypeError, AttributeError):
+            pass
+
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.setVisible(self.show_margin_stripes)
+        self._set_margin_container_visibility(self.show_margin_stripes)
+
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.update()
+
+    def _set_margin_side(self, side):  # <- L
+        """ Move the coding margin to the requested side and persist. """
+
+        if side not in ('left', 'right'):
+            return
+        if side == self.margin_side:
+            return
+
+        self._install_coding_margin_in_side(side)
+        try:
+            self.app.settings['codetext_margin_side'] = side
+        except (TypeError, AttributeError):
+            pass
+
+        self._set_margin_container_visibility(self.show_margin_stripes)
+
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.update()
+
+    def _set_highlight_style(self, style):  # <- L
+        """ Switch in-text highlight style between 'marker' and 'underline'. """
+
+        if style not in ('marker', 'underline'):
+            return
+        if style == self.highlight_style:
+            return
+
+        self.highlight_style = style
+        try:
+            self.app.settings['codetext_highlight_style'] = style
+        except (TypeError, AttributeError):
+            pass
+
+        if self.file_ is not None and self.ui.plainTextEdit.toPlainText() != "":
+            self.unlight()
+            self.highlight()
 
     def show_right_side_pane(self):
         """ Toggle visibility of the right side pane (groupBox_info).
@@ -3373,6 +4225,11 @@ class DialogCodeText(QtWidgets.QWidget):
         Ctrl E Enter and exit Edit Mode
         """
 
+        # request a margin redraw on editor resize so stripes follow text reflow <- L
+        if object_ is self.ui.plainTextEdit and event.type() == QtCore.QEvent.Type.Resize:
+            if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+                self.coding_margin.update()
+
         if object_ is self.ui.treeWidget.viewport():
             # If a show selected code was active, then clicking on a code in code tree, shows all codes and all tooltips
             if event.type() == QtCore.QEvent.Type.MouseButtonPress:
@@ -4622,6 +5479,12 @@ class DialogCodeText(QtWidgets.QWidget):
             self.text = self.text[:-1]
         self.detect_text_direction()
         self.ui.plainTextEdit.setPlainText(self.text)
+
+        # margin visibility handled via layout container; sync with preference <- L
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.setVisible(self.show_margin_stripes)
+        self._set_margin_container_visibility(self.show_margin_stripes)
+
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active
@@ -4629,6 +5492,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
+
+        # ensure the margin is repainted with the new file's codes <- L
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.update()
 
     def detect_text_direction(self):
         for char in self.text:
@@ -4672,7 +5539,15 @@ class DialogCodeText(QtWidgets.QWidget):
         code_results = cur.fetchall()
         keys = 'ctid', 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'important', 'name'
         for row in code_results:
-            self.code_text.append(dict(zip(keys, row)))
+            item = dict(zip(keys, row))  # ajustado
+            # inject 'color' so CodingMargin can use it directly <- L
+            for c in self.codes:
+                if c['cid'] == item['cid']:
+                    item['color'] = c['color']
+                    break
+            if 'color' not in item:
+                item['color'] = '#cccccc'
+            self.code_text.append(item)
         # Update filter for tooltip and redo formatting
         if self.important:
             imp_coded = []
@@ -4697,6 +5572,123 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor) # (removido el - 1)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
+    def _apply_format_to_code_item(self, item, codes_lookup):  # <- L
+        """ Apply highlight formatting to a single coded text item.
+        Extracted from highlight() so it can be reused by the incremental
+        refresh path in mark(). Honors self.highlight_style and important state.
+        Wraps mergeCharFormat with setUpdatesEnabled(False/True) to coalesce
+        paints (critical in 'marker' mode on large files). """
+
+        if self.file_ is None:
+            return
+        fmt = QtGui.QTextCharFormat()
+        cursor = self.ui.plainTextEdit.textCursor()
+        cursor.setPosition(int(item['pos0'] - self.file_['start']),
+                           QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(int(item['pos1'] - self.file_['start']),
+                           QtGui.QTextCursor.MoveMode.KeepAnchor)
+        color = codes_lookup.get(item['cid'], {}).get('color', "#777777")
+
+        if self.highlight_style == 'underline':
+            fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
+            fmt.setUnderlineColor(QColor(color))
+        else:
+            brush = QBrush(QColor(color))
+            fmt.setBackground(brush)
+            text_brush = QBrush(QColor(TextColor(color).recommendation))
+            fmt.setForeground(text_brush)
+
+        if item.get('memo', '') != "":
+            fmt.setFontItalic(True)
+        else:
+            fmt.setFontItalic(False)
+        if item.get('important'):
+            fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+
+        self.ui.plainTextEdit.setUpdatesEnabled(False)
+        try:
+            cursor.mergeCharFormat(fmt)
+        finally:
+            self.ui.plainTextEdit.setUpdatesEnabled(True)
+
+    def _mark_incremental_refresh(self, new_coded):  # <- L
+        """ Lightweight refresh after a single mark() insertion.
+        Replaces the full cascade (get_coded_text_update_eventfilter_tooltips ->
+        unlight -> highlight) with the minimum steps needed after marking ONE
+        new code:
+          1) format the new code's range only
+          2) refresh the tooltip event filter with the updated self.code_text
+          3) apply overlap underlines that involve the new code only
+             (skipped in 'underline' mode or when 'important' filter is on)
+          4) repaint the side margin """
+
+        if self.file_ is None:
+            return
+        codes_lookup = {x['cid']: x for x in self.codes}
+        # 1) Format the newly added code only (skip if 'important' filter is on
+        #    and this new code is not important, to stay consistent with the
+        #    filtered view and the margin). <- L
+        if not (self.important and new_coded.get('important') != 1):
+            self._apply_format_to_code_item(new_coded, codes_lookup)
+        # 2) Refresh tooltip event filter (uses self.code_text, already extended)
+        if self.important:
+            imp_coded = [c for c in self.code_text if c.get('important') == 1]
+            self.eventFilterTT.set_codes_and_annotations(
+                self.app, imp_coded, self.codes, self.annotations, self.file_)
+        else:
+            self.eventFilterTT.set_codes_and_annotations(
+                self.app, self.code_text, self.codes, self.annotations, self.file_)
+        # 3) Underline overlaps that involve the new code (O(n) instead of O(n^2))
+        if not self.important and getattr(self, 'highlight_style', 'marker') != 'underline':
+            self._apply_overlap_underlines_for_code(new_coded)
+        # 4) Repaint the side margin
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.update()
+
+    def _apply_overlap_underlines_for_code(self, new_coded):  # <- L
+        """ Underline the overlap regions between 'new_coded' and the rest of
+        self.code_text. Same visual style as apply_underline_to_overlaps but
+        O(n) instead of O(n^2): only the new code is compared against existing
+        ones. Batches mergeCharFormat inside one setUpdatesEnabled window. """
+
+        if self.file_ is None:
+            return
+        new_p0 = new_coded['pos0']
+        new_p1 = new_coded['pos1']
+        if new_p0 == new_p1:
+            return
+
+        cursor = self.ui.plainTextEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.SingleUnderline)
+        if self.app.settings['stylesheet'] == 'dark':
+            fmt.setUnderlineColor(QColor("#000000"))
+        else:
+            fmt.setUnderlineColor(QColor("#FFFFFF"))
+
+        self.ui.plainTextEdit.setUpdatesEnabled(False)
+        try:
+            for other in self.code_text:
+                if other is new_coded:
+                    continue
+                if (other.get('ctid') is not None
+                        and new_coded.get('ctid') is not None
+                        and other['ctid'] == new_coded['ctid']):
+                    continue
+                o_p0 = other['pos0']
+                o_p1 = other['pos1']
+                ov_start = max(new_p0, o_p0)
+                ov_end = min(new_p1, o_p1)
+                if ov_start >= ov_end:
+                    continue
+                cursor.setPosition(ov_start - self.file_['start'],
+                                   QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(ov_end - self.file_['start'],
+                                   QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.mergeCharFormat(fmt)
+        finally:
+            self.ui.plainTextEdit.setUpdatesEnabled(True)
+
     def highlight(self):
         """ Apply text highlighting to current file.
         If no colour has been assigned to a code, those coded text fragments are coloured gray.
@@ -4706,6 +5698,9 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         if self.file_ is None or self.ui.plainTextEdit.toPlainText() == "":
+            # still refresh the side margin so it clears properly <- L
+            if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+                self.coding_margin.update()
             return
         # Add coding highlights
         codes = {x['cid']: x for x in self.codes}
@@ -4715,11 +5710,18 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
             cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
-            brush = QBrush(QColor(color))
-            fmt.setBackground(brush)
-            # Foreground depends on the defined need_white_text color in color_selector
-            text_brush = QBrush(QColor(TextColor(color).recommendation))
-            fmt.setForeground(text_brush)
+
+            # choose between underline-only and full background fill <- L
+            if self.highlight_style == 'underline':
+                fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
+                fmt.setUnderlineColor(QColor(color))
+            else:
+                brush = QBrush(QColor(color))
+                fmt.setBackground(brush)
+                # Foreground depends on the defined need_white_text color in color_selector
+                text_brush = QBrush(QColor(TextColor(color).recommendation))
+                fmt.setForeground(text_brush)
+
             # Highlight codes with memos - these are italicised
             # Italics also used for overlapping codes
             if item['memo'] != "":
@@ -4731,10 +5733,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 fmt.setFontWeight(QtGui.QFont.Weight.Bold)
             # Use important flag for ONLY showing important codes (button selected)
             if self.important and item['important'] == 1:
-                cursor.setCharFormat(fmt)
+                cursor.mergeCharFormat(fmt)  # merge so underline composes correctly <- L
             # Show all codes, as important button not selected
             if not self.important:
-                cursor.setCharFormat(fmt)
+                cursor.mergeCharFormat(fmt)  # merge so underline composes correctly <- L
 
         # Add annotation marks - these are in bold, important codings are also bold
         for note in self.annotations:
@@ -4753,6 +5755,10 @@ class DialogCodeText(QtWidgets.QWidget):
                     cursor.mergeCharFormat(format_bold)
         self.apply_underline_to_overlaps()
 
+        # refresh the side margin widget after highlights change <- L
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.update()
+
     def apply_underline_to_overlaps(self):
         """ Apply underline format to coded text sections which are overlapping.
         Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
@@ -4760,6 +5766,10 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         if self.important:
+            return
+        # skip in 'underline' mode to preserve per-code dashed coloured <- L
+        # underlines (a flat mono-coloured underline would hide the code colour).
+        if getattr(self, 'highlight_style', 'marker') == 'underline':
             return
         overlaps = []
         for i in self.code_text:
@@ -4815,6 +5825,15 @@ class DialogCodeText(QtWidgets.QWidget):
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
                  'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                  'important': None}
+        # inject name and color from self.codes so CodingMargin and the
+        # incremental refresh can use them directly without re-querying the DB. <- L
+        for _c in self.codes:
+            if _c['cid'] == cid:
+                coded['name'] = _c['name']
+                coded['color'] = _c['color']
+                break
+        if 'color' not in coded:
+            coded['color'] = '#cccccc'
 
         # Check for an existing duplicated marking first
         cur = self.app.conn.cursor()
@@ -4824,12 +5843,16 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(result) > 0:
             # The event can trigger multiple times, so do not present a warning to the user
             return
-        self.code_text.append(coded)
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                                                                coded['seltext'], coded['pos0'], coded['pos1'],
                                                                coded['owner'],
                                                                coded['memo'], coded['date'], coded['important']))
+        # capture the new ctid so the incremental refresh can identify
+        # this exact segment (used to skip self-overlap) <- L
+        cur.execute("select last_insert_rowid()")
+        coded['ctid'] = cur.fetchone()[0]
+        self.code_text.append(coded)  # moved AFTER ctid is known <- L
         self.app.conn.commit()
         self.app.delete_backup = False
 
@@ -4860,8 +5883,12 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.app.conn.commit()
                     self.code_text[len(self.code_text) - 1]['memo'] = memo
 
-        # Update filter for tooltip and update code colours
-        self.get_coded_text_update_eventfilter_tooltips()
+        # Replace the full cascade <- L
+        # (get_coded_text_update_eventfilter_tooltips -> unlight -> highlight)
+        # by an incremental refresh that only formats the new code's range and
+        # the overlaps it introduces. On large files with many codes this turns
+        # a slow op into a near-instant one with no visible difference.
+        self._mark_incremental_refresh(coded)  # was get_coded_text_update_eventfilter_tooltips() <- L
         self.fill_code_counts_in_tree()
         # Update recent_codes
         tmp_code = None
@@ -5611,6 +6638,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if res_case:
             self.edit_original_case_assignment = res_case
 
+        # Hide the coding margin (and its container) during edit mode <- L
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.hide()
+        self._set_margin_container_visibility(False)
+
         temp_edit_pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
         if temp_edit_pos > 0:
             self.edit_pos = temp_edit_pos
@@ -5691,6 +6723,11 @@ class DialogCodeText(QtWidgets.QWidget):
             self.edit_pos = len(self.ui.plainTextEdit.toPlainText()) - 1
         text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
+
+        # repaint the margin after exiting edit mode. load_file (called
+        # above) already restores visibility based on settings <- L
+        if hasattr(self, 'coding_margin') and self.coding_margin is not None:
+            self.coding_margin.update()
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
