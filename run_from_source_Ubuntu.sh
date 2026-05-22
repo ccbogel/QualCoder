@@ -4,7 +4,7 @@
 
 echo "Starting"
 # Create venv
-if [ -d ".env"]; then
+if [ -d ".env" ]; then
     echo "Virtual environment exists."
 else
     echo "Creating virtual environment."
