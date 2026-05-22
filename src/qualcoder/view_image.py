@@ -1201,6 +1201,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         handle_item.setBrush(QBrush(QtGui.QColor("#ff0000")))  # Red color for visibility <- L
                         handle_item.setData(0, "resize_handle")  # Main tag to detect clicks <- L
                         handle_item.setData(1, h_type)          # Identifies the specific corner <- L
+                        handle_item.setZValue(1000)  # keep handles above all coded rectangles so they are always clickable <- L
                         self.scene.addItem(handle_item)
                 if self.show_code_captions == 1:
                     self.caption(x, y, code_name)
@@ -1898,9 +1899,52 @@ class DialogCodeImage(QtWidgets.QDialog):
             if action == action_rotate_counter:
                 self.rotate_counter()
             return
-        item = items[0]
-        if len(items) > 1:
-            # Make item unambigious for selection by adding owner
+        # build and show the context menu FIRST, before resolving which
+        # segment to act on. The segment is only disambiguated after an action that
+        # needs a specific segment is chosen (see below). <- L
+        item = items[0]  # used only for important-mark menu options when a single segment <- L
+
+        # Determine importance state for menu construction when there is only one segment.
+        # With multiple segments we show both important options, since the target is not yet known. <- L
+        single_segment = len(items) == 1
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_memo = menu.addAction(_('Memo'))
+        action_unmark = menu.addAction(_('Unmark'))
+        action_move_resize = menu.addAction(_("Move or resize"))
+        # Add the option Interactive resize <- L
+        action_interactive_resize = menu.addAction(_("Interactive resize"))
+        action_important = None
+        action_not_important = None
+        if single_segment:  # only filter important options when the target segment is unambiguous <- L
+            if item['important'] is None or item['important'] != 1:
+                action_important = menu.addAction(_("Add important mark"))
+            if item['important'] == 1:
+                action_not_important = menu.addAction(_("Remove important mark"))
+        else:  # multiple segments: offer both, decide after segment is selected <- L
+            action_important = menu.addAction(_("Add important mark"))
+            action_not_important = menu.addAction(_("Remove important mark"))
+        action_highlight_gray = menu.addAction(_("Highlight this area - gray"))
+        action_highlight_solarize = menu.addAction(_("Highlight this area - solarize"))
+        action_highlight_blur = menu.addAction(_("Highlight this area - blur"))
+        action_highlight_code_gray = menu.addAction(_("Highlight this code - gray"))
+        action_highlight_code_solarize = menu.addAction(_("Highlight this code - solarize"))
+        action_highlight_code_blur = menu.addAction(_("Highlight this code - blur"))
+
+        action = menu.exec(global_pos)
+        if action is None:
+            return
+
+        # after an action is chosen, if it acts on a specific segment and there is
+        # more than one segment under the cursor, ask which segment now. <- L
+        # include "Highlight this code" actions so the user picks which code's
+        # cid is used when several segments overlap <- L
+        segment_actions = (action_memo, action_unmark, action_move_resize, action_interactive_resize,
+                           action_important, action_not_important, action_highlight_gray,
+                           action_highlight_solarize, action_highlight_blur,
+                           action_highlight_code_gray, action_highlight_code_solarize,
+                           action_highlight_code_blur)
+        if len(items) > 1 and action in segment_actions:
             items_for_select = []
             for it in items:
                 it_view = it.copy()
@@ -1917,30 +1961,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             for it in items:
                 if it['imid'] == selected['imid']:
                     item = it
-                    break        
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_memo = menu.addAction(_('Memo'))
-        action_unmark = menu.addAction(_('Unmark'))
-        action_move_resize = menu.addAction(_("Move or resize"))
-        # Add the option Interactive resize <- L
-        action_interactive_resize = menu.addAction(_("Interactive resize"))
-        action_important = None
-        if item['important'] is None or item['important'] != 1:
-            action_important = menu.addAction(_("Add important mark"))
-        action_not_important = None
-        if item['important'] == 1:
-            action_not_important = menu.addAction(_("Remove important mark"))
-        action_highlight_gray = menu.addAction(_("Highlight this area - gray"))
-        action_highlight_solarize = menu.addAction(_("Highlight this area - solarize"))
-        action_highlight_blur = menu.addAction(_("Highlight this area - blur"))
-        action_highlight_code_gray = menu.addAction(_("Highlight this code - gray"))
-        action_highlight_code_solarize = menu.addAction(_("Highlight this code - solarize"))
-        action_highlight_code_blur = menu.addAction(_("Highlight this code - blur"))
-
-        action = menu.exec(global_pos)
-        if action is None:
-            return
+                    break
         if action == action_highlight_gray:
             self.image_highlight("gray", item)
         if action == action_highlight_code_gray:
@@ -2191,12 +2212,25 @@ class DialogCodeImage(QtWidgets.QDialog):
         if height < 0:
             y = y + height
             height = abs(height)
-        # Outside image area, do not code
+        # instead of cancelling when the selection goes outside the image,
+        # clamp it to the image bounds so it cannot exceed the limits but still codes <- L
         for item in self.scene.items():
             if type(item) == QtWidgets.QGraphicsPixmapItem:
-                if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
-                    self.selection = None
-                    return
+                max_w = item.boundingRect().width()
+                max_h = item.boundingRect().height()
+                # Clamp top-left corner inside the image <- L
+                if x < 0:
+                    width += x  # reduce width by the part that fell off the left edge <- L
+                    x = 0
+                if y < 0:
+                    height += y  # reduce height by the part that fell off the top edge <- L
+                    y = 0
+                # Clamp bottom-right corner to the image edges <- L
+                if x + width > max_w:
+                    width = max_w - x
+                if y + height > max_h:
+                    height = max_h - y
+                break
         x_unscaled = round(x / self.scale)
         y_unscaled = round(y / self.scale)
         width_unscaled = round(width / self.scale)
@@ -2244,7 +2278,24 @@ class DialogCodeImage(QtWidgets.QDialog):
         
         mouse_x, mouse_y = pos.x(), pos.y()
         min_size = 10 * self.scale  # Prevents the box from shrinking to near invisibility
-        
+
+        # clamp the mouse position to the visible image bounds before using it,
+        # so dragging outside the image cannot push the rectangle past the edges
+        # and removes the "jump" / over-reach when leaving the image area <- L
+        scaled_w = self.pixmap.width() * self.scale
+        scaled_h = self.pixmap.height() * self.scale
+        # When rotated 90/270 the visible image swaps width/height on screen <- L
+        if self.degrees in (90, 270):
+            scaled_w, scaled_h = scaled_h, scaled_w
+        if mouse_x < 0:
+            mouse_x = 0
+        if mouse_x > scaled_w:
+            mouse_x = scaled_w
+        if mouse_y < 0:
+            mouse_y = 0
+        if mouse_y > scaled_h:
+            mouse_y = scaled_h
+
         # Logic to push the rectangle walls depending on the dragged corner
         if self.active_handle == "TL":  # Top-Left: Modifies left X and top Y
             new_x = min(mouse_x, orig_right - min_size)
@@ -2258,7 +2309,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         elif self.active_handle == "BR":  # Bottom-Right: Modifies right X and bottom Y
             new_right = max(mouse_x, orig_x + min_size)
             new_bottom = max(mouse_y, orig_y + min_size)
-            
+
         # Apply the new calculated size to the red dashed rectangle (Live feedback)
         self.interactive_rect_item.setRect(new_x, new_y, new_right - new_x, new_bottom - new_y)
 
