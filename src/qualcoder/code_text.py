@@ -795,6 +795,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # apply initial visibility based on persisted preference <- L
         self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        self.ui.lineNumbers.setToolTip(_("Right click for highlighting options"))
 
         # sync margin redraw with editor scroll <- L
         self.ui.plainTextEdit.verticalScrollBar().valueChanged.connect(self.coding_margin.update)
