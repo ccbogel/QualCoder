@@ -1064,7 +1064,7 @@ Formatted like below for name detection.
              <widget class="QPushButton" name="pushButton_show_all_codings">
               <property name="geometry">
                <rect>
-                <x>120</x>
+                <x>100</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1080,7 +1080,7 @@ Formatted like below for name detection.
              <widget class="QPushButton" name="pushButton_show_codings_prev">
               <property name="geometry">
                <rect>
-                <x>43</x>
+                <x>40</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1096,7 +1096,7 @@ Formatted like below for name detection.
              <widget class="QPushButton" name="pushButton_show_codings_next">
               <property name="geometry">
                <rect>
-                <x>80</x>
+                <x>70</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1112,7 +1112,7 @@ Formatted like below for name detection.
              <widget class="QPushButton" name="pushButton_important">
               <property name="geometry">
                <rect>
-                <x>160</x>
+                <x>130</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1128,7 +1128,7 @@ Formatted like below for name detection.
              <widget class="QLabel" name="label_code">
               <property name="geometry">
                <rect>
-                <x>200</x>
+                <x>161</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1163,7 +1163,7 @@ Formatted like below for name detection.
              <widget class="QPushButton" name="pushButton_clear_filter_code">
               <property name="geometry">
                <rect>
-                <x>240</x>
+                <x>191</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1174,6 +1174,19 @@ Formatted like below for name detection.
               </property>
               <property name="text">
                <string/>
+              </property>
+             </widget>
+             <widget class="QLineEdit" name="lineEdit_code_filter">
+              <property name="geometry">
+               <rect>
+                <x>226</x>
+                <y>1</y>
+                <width>113</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </widget>

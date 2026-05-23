@@ -232,7 +232,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}])) # for clear filter code <- L
         self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
         self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
-        self.ui.pushButton_clear_filter_code.setVisible(False)   
+        self.ui.pushButton_clear_filter_code.setVisible(False)
+        self.ui.lineEdit_code_filter.textChanged.connect(lambda textchanged: self.show_codes_like(self.ui.lineEdit_code_filter.text()))
+
         # Codes tree
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -1597,39 +1599,46 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    def show_codes_like(self):
+    def show_codes_like(self, preset):
         """ Show all codes if text is empty.
-         Show selected codes that contain entered text.
-         The input dialog is too narrow, so it is re-created. """
+        Show selected codes that contain entered text.
+        The input dialog is too narrow, so it is re-created.
+        Args:
+             preset: None of called from tree_menu, or a string value if called from filer_code_text line edit
+        """
+        case_sensitive = True
+        if preset is None:
+            dialog = QtWidgets.QDialog(None)
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+            dialog.setWindowTitle(_("Show some codes"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
+            if self.show_codes_like_filter:
+                dlg_text += _("Filter: ") + self.show_codes_like_filter
+            lbl = QtWidgets.QLabel(dlg_text)
+            line = QtWidgets.QLineEdit()
+            chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
+            btnBox = QtWidgets.QDialogButtonBox()
+            btnBox.setStandardButtons(
+                QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(lbl)
+            layout.addWidget(chkbox)
+            layout.addWidget(line)
+            layout.addWidget(btnBox)
+            dialog.setLayout(layout)
+            btnBox.rejected.connect(dialog.reject)
+            btnBox.accepted.connect(dialog.accept)
+            dialog.resize(200, 60)
+            ok = dialog.exec()
+            if not ok:
+                return
+            self.show_codes_colour_filter = ""
+            case_sensitive = chkbox.isChecked()
+            self.show_codes_like_filter = line.text()
+        else:
+            self.show_codes_like_filter = preset
 
-        dialog = QtWidgets.QDialog(None)
-        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-        dialog.setWindowTitle(_("Show some codes"))
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
-        if self.show_codes_like_filter:
-            dlg_text += _("Filter: ") + self.show_codes_like_filter
-        lbl = QtWidgets.QLabel(dlg_text)
-        line = QtWidgets.QLineEdit()
-        chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
-        btnBox = QtWidgets.QDialogButtonBox()
-        btnBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(lbl)
-        layout.addWidget(chkbox)
-        layout.addWidget(line)
-        layout.addWidget(btnBox)
-        dialog.setLayout(layout)
-        btnBox.rejected.connect(dialog.reject)
-        btnBox.accepted.connect(dialog.accept)
-        dialog.resize(200, 60)
-        ok = dialog.exec()
-        if not ok:
-            return
-        self.show_codes_colour_filter = ""
-        case_sensitive = chkbox.isChecked()
-        self.show_codes_like_filter = line.text()
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()

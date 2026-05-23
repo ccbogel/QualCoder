@@ -509,7 +509,7 @@
           <widget class="QPushButton" name="pushButton_latest">
            <property name="geometry">
             <rect>
-             <x>40</x>
+             <x>30</x>
              <y>0</y>
              <width>28</width>
              <height>28</height>
@@ -541,7 +541,7 @@
           <widget class="QPushButton" name="pushButton_document_memo">
            <property name="geometry">
             <rect>
-             <x>80</x>
+             <x>60</x>
              <y>0</y>
              <width>28</width>
              <height>28</height>
@@ -557,7 +557,7 @@
           <widget class="QPushButton" name="pushButton_file_attributes">
            <property name="geometry">
             <rect>
-             <x>120</x>
+             <x>90</x>
              <y>0</y>
              <width>28</width>
              <height>28</height>
@@ -573,7 +573,7 @@
           <widget class="QPushButton" name="pushButton_clear_filter_file">
            <property name="geometry">
             <rect>
-             <x>160</x>
+             <x>120</x>
              <y>0</y>
              <width>28</width>
              <height>28</height>
@@ -626,6 +626,19 @@
             <string/>
            </property>
           </widget>
+          <widget class="QLineEdit" name="lineEdit_code_filter">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>1</y>
+             <width>113</width>
+             <height>26</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
          </widget>
         </widget>
         <widget class="QScrollArea" name="scrollArea">
@@ -638,7 +651,7 @@
             <x>0</x>
             <y>0</y>
             <width>467</width>
-            <height>502</height>
+            <height>494</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
