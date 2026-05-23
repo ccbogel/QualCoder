@@ -431,7 +431,7 @@
        <widget class="QPushButton" name="pushButton_latest">
         <property name="geometry">
          <rect>
-          <x>40</x>
+          <x>30</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -463,7 +463,7 @@
        <widget class="QPushButton" name="pushButton_document_memo">
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>60</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -479,7 +479,7 @@
        <widget class="QPushButton" name="pushButton_file_attributes">
         <property name="geometry">
          <rect>
-          <x>120</x>
+          <x>90</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -495,7 +495,7 @@
        <widget class="QPushButton" name="pushButton_clear_filter_file">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>120</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -546,6 +546,19 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_code_filter">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>1</y>
+          <width>113</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Code name filter</string>
         </property>
        </widget>
       </widget>

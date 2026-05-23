@@ -21,7 +21,7 @@ QualCoder_4_0_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4
 We are not able to compile a binary for Intel based Macs right now due to incompatibilities in the libraries we use.
 The app bundles are compiled on macOS Sequoia. They might also work on Sonoma and Ventura.
 
-If you do not have admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr – d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
+If you do not have admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr - d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
 
 We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
 
@@ -119,6 +119,29 @@ Another way via a dialog window to add coded segments.
 Options to organise the graph layout - radion, vertical, horizontal.
 
 Improved selection of font sizes and colours in menus.
+
+## Report codes
+
+**Bug fixes**
+
+-A/V search by cases:
+--fixed an issue where the "important" filter and the ORDER BY clause were being applied to the wrong SQL query, causing incorrect filtering in audio/video results.
+
+-Excel (XLSX) export: Fixed a duplicated column that incorrectly shifted the "a/v" value in case reports.
+
+-"Only memos" filter in translated languages: The strings "Only memos" and "Only coded memos" were not marked for translation, causing the filter to fail in the Spanish version. It now works correctly in any language.
+
+-Matrix headers: Fixed four issues that prevented code, file, and case memos from displaying correctly in the matrix view (including an "alll" typo, a comparison with an extra colon 'Case:', an incorrect tuple validation, and a misplaced "All memo" literal).
+
+-"Also all memos" option: Now correctly displays the coded segment memo, a behavior that was previously missing despite being implied by the label.
+
+**New functions**
+
+-Category hierarchy in headers: Full hierarchical path is now displayed before the code name (Root Category > Subcategory > … > Code), making the contextual reading of each segment easier.
+
+-Co-occurring codes: Below each coded segment memo, the set of overlapping codes within the same file is listed in brackets, allowing quick identification of coding overlaps. Works for text, audio/video, and image data. View and export the overlapping codes.
+
+-New category sorting option: Added a "Category A - z" "Category Z - a"  option to the sorting menu, which organizes results alphabetically according to the category hierarchy (with code name as a secondary criterion).
 
 ## Database queries
 

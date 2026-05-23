@@ -612,7 +612,7 @@
        <widget class="QPushButton" name="pushButton_latest">
         <property name="geometry">
          <rect>
-          <x>40</x>
+          <x>30</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -628,7 +628,7 @@
        <widget class="QPushButton" name="pushButton_view_original">
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>60</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -660,7 +660,7 @@
        <widget class="QPushButton" name="pushButton_document_memo">
         <property name="geometry">
          <rect>
-          <x>120</x>
+          <x>90</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -676,7 +676,7 @@
        <widget class="QPushButton" name="pushButton_file_attributes">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>120</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -692,7 +692,7 @@
        <widget class="QPushButton" name="pushButton_clear_filter_file">
         <property name="geometry">
          <rect>
-          <x>200</x>
+          <x>150</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -732,7 +732,7 @@
        <widget class="QPushButton" name="pushButton_important">
         <property name="geometry">
          <rect>
-          <x>130</x>
+          <x>40</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -748,7 +748,7 @@
        <widget class="QLabel" name="label_code">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>70</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -783,7 +783,7 @@
        <widget class="QPushButton" name="pushButton_clear_filter_code">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>100</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -794,6 +794,19 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_code_filter">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>1</y>
+          <width>113</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Code name filter</string>
         </property>
        </widget>
       </widget>
@@ -808,7 +821,7 @@
          <x>0</x>
          <y>0</y>
          <width>264</width>
-         <height>593</height>
+         <height>588</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">

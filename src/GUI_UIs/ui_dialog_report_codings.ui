@@ -218,7 +218,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>0</y>
+        <y>30</y>
         <width>131</width>
         <height>26</height>
        </rect>
@@ -263,7 +263,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>30</y>
+        <y>60</y>
         <width>131</width>
         <height>26</height>
        </rect>
@@ -291,7 +291,7 @@
      <widget class="QCheckBox" name="checkBox_text_context">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>390</x>
         <y>-1</y>
         <width>131</width>
         <height>26</height>
@@ -448,22 +448,6 @@ Change Settings for number of characters and display style.</string>
       </property>
       <property name="text">
        <string>References</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_overlaps">
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>60</y>
-        <width>131</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Only show codes where there are overlapping or conjoining codes that are in the selected codes</string>
-      </property>
-      <property name="text">
-       <string>Overlaps</string>
       </property>
      </widget>
     </widget>

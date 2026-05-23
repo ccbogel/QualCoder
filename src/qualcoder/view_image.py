@@ -141,6 +141,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Codes-tree header menu
         self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
+        self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
         self.tree_column_widths_auto_resize = True
         # Header widgets
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
@@ -160,10 +161,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
-        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter code  <- L
-        self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
-        self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
-        self.ui.pushButton_clear_filter_code.setVisible(False)  # hidden until a filter is active <- L
+
         # Widgets under File list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
@@ -177,6 +175,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)  # hidden until a filter is active        
+        # Widgets under codes tree
+        self.ui.lineEdit_code_filter.textChanged.connect(lambda textchanged: self.show_codes_like(self.ui.lineEdit_code_filter.text()))
+        self.ui.pushButton_clear_filter_code.setIcon(
+            qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter code
+        self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
+        self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
+        self.ui.pushButton_clear_filter_code.setVisible(False)  # hidden until a filter is active
+
         # Header - Pdf widgets
         self.pdf_controls_toggle()
         self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
@@ -669,6 +675,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                         break
             iterator += 1  # Move to the next item
 
+    def tree_item_clicked(self, item, column):
+        """ Use to quicky open memo. """
+
+        if column == 2:
+            self.add_edit_code_memo(item)
+
     def codes_tree_header_menu(self, position):
         """ treeWidget resize mode - resize to contents or interactive. """
 
@@ -1004,6 +1016,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_export.setEnabled(True)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
+        pixmap_item.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         pixmap_item.setPos(0, 0)
         self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
         self.scene.addItem(pixmap_item)
@@ -1193,6 +1206,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         handle_item.setBrush(QBrush(QtGui.QColor("#ff0000")))  # Red color for visibility <- L
                         handle_item.setData(0, "resize_handle")  # Main tag to detect clicks <- L
                         handle_item.setData(1, h_type)          # Identifies the specific corner <- L
+                        handle_item.setZValue(1000)  # keep handles above all coded rectangles so they are always clickable <- L
                         self.scene.addItem(handle_item)
                 if self.show_code_captions == 1:
                     self.caption(x, y, code_name)
@@ -1460,43 +1474,50 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
         self.update_dialog_codes_and_categories(["code_name"])
 
-    def show_codes_like(self):
+    def show_codes_like(self, preset=None):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
-         The input dialog is too narrow, so it is re-created. """
+         The input dialog is too narrow, so it is re-created.
+         Args:
+             preset: None of called from tree_menu, or a string value if called from filer_code_text line edit
+        """
 
-        dialog = QtWidgets.QDialog(None)
-        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-        dialog.setWindowTitle(_("Show some codes"))
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
-        if self.show_codes_like_filter:
-            dlg_text += _("Filter: ") + self.show_codes_like_filter
-        lbl = QtWidgets.QLabel(dlg_text)
-        line = QtWidgets.QLineEdit()
-        chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
-        btn_box = QtWidgets.QDialogButtonBox()
-        btn_box.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(lbl)
-        layout.addWidget(chkbox)
-        layout.addWidget(line)
-        layout.addWidget(btn_box)
-        dialog.setLayout(layout)
-        btn_box.rejected.connect(dialog.reject)
-        btn_box.accepted.connect(dialog.accept)
-        dialog.resize(200, 60)
-        ok = dialog.exec()
-        if not ok:
-            return
-        self.show_codes_colour_filter = ""
-        case_sensitive = chkbox.isChecked()
-        self.show_codes_like_filter = line.text()
+        case_sensitive = True
+        if preset is None:
+            dialog = QtWidgets.QDialog(None)
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+            dialog.setWindowTitle(_("Show some codes"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
+            if self.show_codes_like_filter:
+                dlg_text += _("Filter: ") + self.show_codes_like_filter
+            lbl = QtWidgets.QLabel(dlg_text)
+            line = QtWidgets.QLineEdit()
+            chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
+            btn_box = QtWidgets.QDialogButtonBox()
+            btn_box.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(lbl)
+            layout.addWidget(chkbox)
+            layout.addWidget(line)
+            layout.addWidget(btn_box)
+            dialog.setLayout(layout)
+            btn_box.rejected.connect(dialog.reject)
+            btn_box.accepted.connect(dialog.accept)
+            dialog.resize(200, 60)
+            ok = dialog.exec()
+            if not ok:
+                return
+            self.show_codes_colour_filter = ""
+            case_sensitive = chkbox.isChecked()
+            self.show_codes_like_filter = line.text()
+        else:
+            self.show_codes_like_filter = preset
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, self.show_codes_like_filter, case_sensitive)
-        if self.show_codes_like_filter == "":  # for clear filter code<- L
+        if self.show_codes_like_filter == "":  # for clear filter code
             self.ui.pushButton_clear_filter_code.setVisible(False)
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
@@ -1890,9 +1911,52 @@ class DialogCodeImage(QtWidgets.QDialog):
             if action == action_rotate_counter:
                 self.rotate_counter()
             return
-        item = items[0]
-        if len(items) > 1:
-            # Make item unambigious for selection by adding owner
+        # build and show the context menu FIRST, before resolving which
+        # segment to act on. The segment is only disambiguated after an action that
+        # needs a specific segment is chosen (see below). <- L
+        item = items[0]  # used only for important-mark menu options when a single segment <- L
+
+        # Determine importance state for menu construction when there is only one segment.
+        # With multiple segments we show both important options, since the target is not yet known. <- L
+        single_segment = len(items) == 1
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_memo = menu.addAction(_('Memo'))
+        action_unmark = menu.addAction(_('Unmark'))
+        action_move_resize = menu.addAction(_("Move or resize"))
+        # Add the option Interactive resize <- L
+        action_interactive_resize = menu.addAction(_("Interactive resize"))
+        action_important = None
+        action_not_important = None
+        if single_segment:  # only filter important options when the target segment is unambiguous <- L
+            if item['important'] is None or item['important'] != 1:
+                action_important = menu.addAction(_("Add important mark"))
+            if item['important'] == 1:
+                action_not_important = menu.addAction(_("Remove important mark"))
+        else:  # multiple segments: offer both, decide after segment is selected <- L
+            action_important = menu.addAction(_("Add important mark"))
+            action_not_important = menu.addAction(_("Remove important mark"))
+        action_highlight_gray = menu.addAction(_("Highlight this area - gray"))
+        action_highlight_solarize = menu.addAction(_("Highlight this area - solarize"))
+        action_highlight_blur = menu.addAction(_("Highlight this area - blur"))
+        action_highlight_code_gray = menu.addAction(_("Highlight this code - gray"))
+        action_highlight_code_solarize = menu.addAction(_("Highlight this code - solarize"))
+        action_highlight_code_blur = menu.addAction(_("Highlight this code - blur"))
+
+        action = menu.exec(global_pos)
+        if action is None:
+            return
+
+        # after an action is chosen, if it acts on a specific segment and there is
+        # more than one segment under the cursor, ask which segment now. <- L
+        # include "Highlight this code" actions so the user picks which code's
+        # cid is used when several segments overlap <- L
+        segment_actions = (action_memo, action_unmark, action_move_resize, action_interactive_resize,
+                           action_important, action_not_important, action_highlight_gray,
+                           action_highlight_solarize, action_highlight_blur,
+                           action_highlight_code_gray, action_highlight_code_solarize,
+                           action_highlight_code_blur)
+        if len(items) > 1 and action in segment_actions:
             items_for_select = []
             for it in items:
                 it_view = it.copy()
@@ -1909,30 +1973,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             for it in items:
                 if it['imid'] == selected['imid']:
                     item = it
-                    break        
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_memo = menu.addAction(_('Memo'))
-        action_unmark = menu.addAction(_('Unmark'))
-        action_move_resize = menu.addAction(_("Move or resize"))
-        # Add the option Interactive resize <- L
-        action_interactive_resize = menu.addAction(_("Interactive resize"))
-        action_important = None
-        if item['important'] is None or item['important'] != 1:
-            action_important = menu.addAction(_("Add important mark"))
-        action_not_important = None
-        if item['important'] == 1:
-            action_not_important = menu.addAction(_("Remove important mark"))
-        action_highlight_gray = menu.addAction(_("Highlight this area - gray"))
-        action_highlight_solarize = menu.addAction(_("Highlight this area - solarize"))
-        action_highlight_blur = menu.addAction(_("Highlight this area - blur"))
-        action_highlight_code_gray = menu.addAction(_("Highlight this code - gray"))
-        action_highlight_code_solarize = menu.addAction(_("Highlight this code - solarize"))
-        action_highlight_code_blur = menu.addAction(_("Highlight this code - blur"))
-
-        action = menu.exec(global_pos)
-        if action is None:
-            return
+                    break
         if action == action_highlight_gray:
             self.image_highlight("gray", item)
         if action == action_highlight_code_gray:
@@ -2183,12 +2224,25 @@ class DialogCodeImage(QtWidgets.QDialog):
         if height < 0:
             y = y + height
             height = abs(height)
-        # Outside image area, do not code
+        # instead of cancelling when the selection goes outside the image,
+        # clamp it to the image bounds so it cannot exceed the limits but still codes <- L
         for item in self.scene.items():
             if type(item) == QtWidgets.QGraphicsPixmapItem:
-                if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
-                    self.selection = None
-                    return
+                max_w = item.boundingRect().width()
+                max_h = item.boundingRect().height()
+                # Clamp top-left corner inside the image <- L
+                if x < 0:
+                    width += x  # reduce width by the part that fell off the left edge <- L
+                    x = 0
+                if y < 0:
+                    height += y  # reduce height by the part that fell off the top edge <- L
+                    y = 0
+                # Clamp bottom-right corner to the image edges <- L
+                if x + width > max_w:
+                    width = max_w - x
+                if y + height > max_h:
+                    height = max_h - y
+                break
         x_unscaled = round(x / self.scale)
         y_unscaled = round(y / self.scale)
         width_unscaled = round(width / self.scale)
@@ -2236,7 +2290,24 @@ class DialogCodeImage(QtWidgets.QDialog):
         
         mouse_x, mouse_y = pos.x(), pos.y()
         min_size = 10 * self.scale  # Prevents the box from shrinking to near invisibility
-        
+
+        # clamp the mouse position to the visible image bounds before using it,
+        # so dragging outside the image cannot push the rectangle past the edges
+        # and removes the "jump" / over-reach when leaving the image area <- L
+        scaled_w = self.pixmap.width() * self.scale
+        scaled_h = self.pixmap.height() * self.scale
+        # When rotated 90/270 the visible image swaps width/height on screen <- L
+        if self.degrees in (90, 270):
+            scaled_w, scaled_h = scaled_h, scaled_w
+        if mouse_x < 0:
+            mouse_x = 0
+        if mouse_x > scaled_w:
+            mouse_x = scaled_w
+        if mouse_y < 0:
+            mouse_y = 0
+        if mouse_y > scaled_h:
+            mouse_y = scaled_h
+
         # Logic to push the rectangle walls depending on the dragged corner
         if self.active_handle == "TL":  # Top-Left: Modifies left X and top Y
             new_x = min(mouse_x, orig_right - min_size)
@@ -2250,7 +2321,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         elif self.active_handle == "BR":  # Bottom-Right: Modifies right X and bottom Y
             new_right = max(mouse_x, orig_x + min_size)
             new_bottom = max(mouse_y, orig_y + min_size)
-            
+
         # Apply the new calculated size to the red dashed rectangle (Live feedback)
         self.interactive_rect_item.setRect(new_x, new_y, new_right - new_x, new_bottom - new_y)
 
