@@ -7778,7 +7778,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         self._schedule_stream_render()
 
     def ai_stream_process_reference(self, reference):
-        '''Replace a reference to the empirical data woth a clicable link'''
+        '''Replace a reference to the empirical data with a clickable link'''
         return " {REFERENCE} "
 
     
