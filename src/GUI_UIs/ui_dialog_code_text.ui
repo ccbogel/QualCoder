@@ -365,8 +365,8 @@ Right click for options: all (default), first, code within code.</string>
      <widget class="QPushButton" name="pushButton_edit">
       <property name="geometry">
        <rect>
-        <x>770</x>
-        <y>0</y>
+        <x>650</x>
+        <y>40</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -453,8 +453,8 @@ As all assigned positions may be incorrect. </string>
       </property>
       <property name="geometry">
        <rect>
-        <x>800</x>
-        <y>0</y>
+        <x>680</x>
+        <y>40</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -827,7 +827,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_latest">
                   <property name="geometry">
                    <rect>
-                    <x>40</x>
+                    <x>30</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -843,7 +843,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_bookmark_go">
                   <property name="geometry">
                    <rect>
-                    <x>80</x>
+                    <x>60</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -875,7 +875,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_document_memo">
                   <property name="geometry">
                    <rect>
-                    <x>120</x>
+                    <x>90</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -891,7 +891,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_file_attributes">
                   <property name="geometry">
                    <rect>
-                    <x>160</x>
+                    <x>120</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -907,7 +907,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_clear_filter_file">
                   <property name="geometry">
                    <rect>
-                    <x>200</x>
+                    <x>150</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
