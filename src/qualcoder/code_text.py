@@ -55,7 +55,6 @@ from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, ToolTipEventFilter
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
-# from .edit_journal import DialogEditJournal  # journal editor dialog <- L
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems  # For isinstance()
@@ -68,7 +67,7 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-class CodingMargin(QtWidgets.QWidget):  # <- L
+class CodingMargin(QtWidgets.QWidget):
     """ Draws side bars adjacent to the text and code names.
     Uses a track-packing algorithm so that overlapping codes occupy distinct
     vertical lanes. Embedded in a container widget (widget_code_margin_left /
@@ -608,7 +607,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)  # hidden until a filter is active
-        # Buttons under codes-tree
+        # Widgets under codes tree
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
@@ -625,6 +624,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
         self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
         self.ui.pushButton_clear_filter_code.setVisible(False)  # hidden until a filter is active        
+        self.ui.lineEdit_code_filter.textChanged.connect(lambda textchanged: self.show_codes_like(self.ui.lineEdit_code_filter.text()))
+
         # Right hand side splitter buttons
         self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
@@ -3134,38 +3135,46 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def show_codes_like(self):
+    def show_codes_like(self, preset=None):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
-         The input dialog is too narrow, so it is re-created. """
+         The input dialog is too narrow, so it is re-created.
+         Args:
+             preset: None of called from tree_menu, or a string value if called from filer_code_text line edit
+        """
 
-        dialog = QtWidgets.QDialog(None)
-        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-        dialog.setWindowTitle(_("Show some codes"))
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
-        if self.show_codes_like_filter:
-            dlg_text += _("Filter: ") + self.show_codes_like_filter
-        lbl = QtWidgets.QLabel(dlg_text)
-        line = QtWidgets.QLineEdit()
-        chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
-        btnBox = QtWidgets.QDialogButtonBox()
-        btnBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(lbl)
-        layout.addWidget(chkbox)
-        layout.addWidget(line)
-        layout.addWidget(btnBox)
-        dialog.setLayout(layout)
-        btnBox.rejected.connect(dialog.reject)
-        btnBox.accepted.connect(dialog.accept)
-        dialog.resize(200, 60)
-        ok = dialog.exec()
-        if not ok:
-            return
-        self.show_codes_colour_filter = ""
-        case_sensitive = chkbox.isChecked()
-        self.show_codes_like_filter = line.text()
+        case_sensitive = True
+        if preset is None:
+            dialog = QtWidgets.QDialog(None)
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+            dialog.setWindowTitle(_("Show some codes"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
+            if self.show_codes_like_filter:
+                dlg_text += _("Filter: ") + self.show_codes_like_filter
+            lbl = QtWidgets.QLabel(dlg_text)
+            line = QtWidgets.QLineEdit()
+            chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
+            btnBox = QtWidgets.QDialogButtonBox()
+            btnBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(lbl)
+            layout.addWidget(chkbox)
+            layout.addWidget(line)
+            layout.addWidget(btnBox)
+            dialog.setLayout(layout)
+            btnBox.rejected.connect(dialog.reject)
+            btnBox.accepted.connect(dialog.accept)
+            dialog.resize(200, 60)
+            ok = dialog.exec()
+            if not ok:
+                return
+            self.show_codes_colour_filter = ""
+            case_sensitive = chkbox.isChecked()
+            self.show_codes_like_filter = line.text()
+        else:
+            self.show_codes_like_filter = preset
+
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()
@@ -3173,7 +3182,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.show_codes_like_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
-            self.ui.pushButton_clear_filter_code.setVisible(False) # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
