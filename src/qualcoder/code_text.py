@@ -528,6 +528,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.no_codes_annotes_cases = None
         self.edit_mode_has_changed = False
         self.ui.groupBox_edit_mode.hide()
+        lbl_font = f'font: {self.app.settings["fontsize"] - 2}pt "{self.app.settings["font"]}";'
+        self.ui.label_editing.setStyleSheet(lbl_font)
         ee = f'{_("EDITING TEXT MODE (Ctrl+E)")} '
         ee += _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / "
@@ -536,6 +538,10 @@ class DialogCodeText(QtWidgets.QWidget):
             "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is "
             "typed over or deleted.")
         self.ui.label_editing.setText(ee)
+        self.ui.pushButton_edit_next.setIcon(qta.icon('mdi6.arrow-right'))
+        self.ui.pushButton_edit_next.clicked.connect(lambda pressed: self.edit_mode_find("next"))
+        self.ui.pushButton_edit_prev.setIcon(qta.icon('mdi6.arrow-left'))
+        self.ui.pushButton_edit_prev.clicked.connect(lambda pressed: self.edit_mode_find("previous"))
         self.edit_pos = 0
         self.edit_mode = False
         # Revert to original if edit text caused problems
@@ -6779,6 +6785,57 @@ class DialogCodeText(QtWidgets.QWidget):
         # above) already restores visibility based on settings <- L
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
+
+    def edit_mode_find(self, direction="next"):
+        """  Move forward or backward through the edit document.
+        Uses REGEX. """
+
+        cursor = self.ui.plainTextEdit.textCursor()
+        cur_pos = cursor.position()
+        search_term = self.ui.lineEdit_edit_search.text()
+        if search_term == "":
+            return
+        pattern = None
+        try:
+            pattern = re.compile(search_term)
+        except re.error as err:
+            logger.warning(f're module error Bad escape {err}')
+        if pattern is None:
+            return
+        result = None
+        try:
+            if direction == "next":
+                for match in pattern.finditer(self.text):
+                    if match.start() > cursor.position():
+                        result = match.start()
+                        break
+            else:  # previous
+                matches = []
+                for match in pattern.finditer(self.text):
+                    matches.insert(0, match.start())
+                for match in matches:
+                    if match + len(search_term) < cursor.position():
+                        result = match
+                        break
+        except re.error:
+            logger.exception('Failed searching text for %s', search_term)
+        print("Match position:", result)
+        if result is None:
+            return
+        cursor.setPosition(result)
+        self.ui.plainTextEdit.setTextCursor(cursor)
+        cursor.setPosition(cursor.position() + len(search_term), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
+
+        '''
+        cursor.setPosition(cursor.position() + next_result[2])
+        self.ui.plainTextEdit.setTextCursor(cursor)
+        # Highlight selected text
+        cursor.setPosition(next_result[1])
+        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
+        self.scroll_text_into_view()'''
+
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
