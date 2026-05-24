@@ -72,6 +72,10 @@ When in the file name column pressing delete will delete the file(s).
 
 Added sub-menus for Modify (Code or ecategoert selected), Filter, Sort.
 
+Added a code namestext filter under neathte codes tree.
+
+Add a move category underneath category function.
+
 ## Code text
 
 Can set font and size for the document.
