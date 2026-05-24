@@ -82,13 +82,15 @@ Can set font and size for the document.
 
 Can resize codes with movable handles.
 
+Can change text highlighting from marker style to underline style and or vertical code stripes. 
+
 Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report.
 
 Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
 
 Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
 
-Added a Filter icon when the Codes tree is fileter to specific codes (via Show codes like, or Show codes by colour).
+Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour).
 
 ## Code PDF
 
