@@ -34,7 +34,7 @@ import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
 import sqlite3
-import  unicodedata
+import unicodedata
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -42,7 +42,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 # Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
 from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean method
-from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Required for _export_odt_clean
+from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Need for _export_odt_clean
 from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .add_item_name import DialogAddItemName
@@ -52,7 +52,8 @@ from .ai_chat import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect, colour_ranges, colors, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, ToolTipEventFilter
+from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
+    ToolTipEventFilter
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -609,7 +610,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter <- L
+        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)  # hidden until a filter is active
@@ -626,7 +627,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter <- L
+        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
         self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
         self.ui.pushButton_clear_filter_code.setVisible(False)  # hidden until a filter is active        
@@ -757,24 +758,23 @@ class DialogCodeText(QtWidgets.QWidget):
             self.margin_side = saved_side
         except (KeyError, AttributeError):
             self.margin_side = 'left'
+        self.coding_margin = CodingMargin(self.ui.plainTextEdit, self, side=self.margin_side)
 
-        self.coding_margin = CodingMargin(self.ui.plainTextEdit, self, side=self.margin_side) # <- L
-
-        # inject the margin widget into the chosen container (mirroring the
-        # NumberBar pattern used for self.ui.lineNumbers) <- L
+        # Inject the margin widget into the chosen container (mirroring the
+        # NumberBar pattern used for self.ui.lineNumbers)
         self._coding_margin_layout_left = QtWidgets.QVBoxLayout(self.ui.widget_code_margin_left)
         self._coding_margin_layout_left.setContentsMargins(0, 0, 0, 0)
         self._coding_margin_layout_right = QtWidgets.QVBoxLayout(self.ui.widget_code_margin_right)
         self._coding_margin_layout_right.setContentsMargins(0, 0, 0, 0)
 
         # make widget_code_margin_left, plainTextEdit and widget_code_margin_right
-        # user-resizable by wrapping them inside a horizontal QSplitter <- L
+        # user-resizable by wrapping them inside a horizontal QSplitter
         self._text_margins_splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
         self._text_margins_splitter.setHandleWidth(4)
         self._text_margins_splitter.setChildrenCollapsible(False)
 
-        # switch margin containers' size policy from Fixed to Preferred so
-        # the splitter can resize them. plainTextEdit keeps Expanding <- L
+        # Switch margin containers' size policy from Fixed to Preferred so
+        # the splitter can resize them. plainTextEdit keeps Expanding
         for _margin_w in (self.ui.widget_code_margin_left,
                           self.ui.widget_code_margin_right):
             _sp = _margin_w.sizePolicy()
@@ -1541,7 +1541,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
-        self.ui.pushButton_clear_filter_file.setVisible(True) # <- L
+        self.ui.pushButton_clear_filter_file.setVisible(True)
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
 
     def update_sizes(self):
@@ -2318,7 +2318,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def text_edit_recent_codes_menu(self, position):
         """ Alternative context menu.
         Shows a list of recent codes to select from.
-        Called by R key press in the text edit pane, only if there is some selected text. """
+        Called by R key press in the text edit pane, only if there is some selected text.
+        Add """
 
         if self.ui.plainTextEdit.toPlainText() == "":
             return
@@ -2328,13 +2329,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(self.recent_codes) == 0:
             return
         menu = QtWidgets.QMenu()
-        for item in self.recent_codes:
-            menu.addAction(item['name'])
+        for i, item in enumerate(self.recent_codes):
+            menu.addAction(item['name'] + f' &{i + 1}')
         action = menu.exec(self.ui.plainTextEdit.mapToGlobal(position))
         if action is None:
             return
         # Remaining actions will be the submenu codes
-        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text()[:-3])
         self.mark()
 
     def text_edit_menu(self, position):
@@ -2357,7 +2358,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_unmark = None
         action_new_code = None
         action_new_invivo_code = None
-        submenu_ai_text_analysis = None
+        submenu_ai_text_analysis = None  # ? Not used
         action_show_handles = None
 
         # Can have multiple coded text at this position
@@ -2871,7 +2872,7 @@ class DialogCodeText(QtWidgets.QWidget):
             action_move_code = modify_menu.addAction(_("Move code to"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
-        action_show_codes_of_colour = filter_menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
+        action_show_codes_colour = filter_menu.addAction(_("Show codes of colour") + f": {self.show_codes_colour_filter}")
         sort_menu = menu.addMenu(_("Sort"))
         action_all_asc = sort_menu.addAction(_("Sort ascending"))
         action_all_desc = sort_menu.addAction(_("Sort descending"))
@@ -2894,7 +2895,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if action == action_show_codes_like:
                 self.show_codes_like()
                 return
-            if action == action_show_codes_of_colour:
+            if action == action_show_codes_colour:
                 self.show_codes_of_color()
                 return
             if selected is not None and action == action_color:
@@ -3202,16 +3203,16 @@ class DialogCodeText(QtWidgets.QWidget):
             lbl = QtWidgets.QLabel(dlg_text)
             line = QtWidgets.QLineEdit()
             chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
-            btnBox = QtWidgets.QDialogButtonBox()
-            btnBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            btnbox = QtWidgets.QDialogButtonBox()
+            btnbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
             layout = QtWidgets.QVBoxLayout()
             layout.addWidget(lbl)
             layout.addWidget(chkbox)
             layout.addWidget(line)
-            layout.addWidget(btnBox)
+            layout.addWidget(btnbox)
             dialog.setLayout(layout)
-            btnBox.rejected.connect(dialog.reject)
-            btnBox.accepted.connect(dialog.accept)
+            btnbox.rejected.connect(dialog.reject)
+            btnbox.accepted.connect(dialog.accept)
             dialog.resize(200, 60)
             ok = dialog.exec()
             if not ok:
@@ -3278,7 +3279,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def clear_file_filter(self):
         """ Clear any active file filter (show files like, case files, attributes)
-        and reload all files. """ # <- L
+        and reload all files. """
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
@@ -5447,7 +5448,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(
                         only_visible=True):
                     msg = _(
-                        'The coder "{}" is currently hidden. Do you want to make it visible, so you can see the speaker codings?').format(
+                        'Coder "{}" is currently hidden. Do you want to make it visible, to see the speaker codings?').format(
                         speaker_coder_name)
                     msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
                     msg_box.setStandardButtons(
@@ -5626,7 +5627,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor) # (removido el - 1)
+        cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
     def _apply_format_to_code_item(self, item, codes_lookup):  # <- L
@@ -5960,8 +5961,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.recent_codes.remove(item)
                 break
         self.recent_codes.insert(0, tmp_code)
-        if len(self.recent_codes) > 10:
-            self.recent_codes = self.recent_codes[:10]
+        if len(self.recent_codes) > 9:
+            self.recent_codes = self.recent_codes[:9]
         recent_codes_string = ""
         for r in self.recent_codes:
             recent_codes_string += f" {r['cid']}"
@@ -6791,7 +6792,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Uses REGEX. """
 
         cursor = self.ui.plainTextEdit.textCursor()
-        cur_pos = cursor.position()
         search_term = self.ui.lineEdit_edit_search.text()
         if search_term == "":
             return
@@ -6827,16 +6827,6 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(cursor.position() + len(search_term), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
 
-        '''
-        cursor.setPosition(cursor.position() + next_result[2])
-        self.ui.plainTextEdit.setTextCursor(cursor)
-        # Highlight selected text
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
-        self.ui.plainTextEdit.setTextCursor(cursor)
-        self.scroll_text_into_view()'''
-
-
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
         via adding or deleting. uses diff-match-patch module much faster than difflib, with large text files
@@ -6851,7 +6841,6 @@ class DialogCodeText(QtWidgets.QWidget):
             [(0, "...appy to pay €200."), (1, 'X')]
         Removing 'really'
             [(0, 'I '), (-1, 'really'), (0, " like ...")]
-
         """
 
         self.edit_mode_has_changed = True
@@ -7857,6 +7846,7 @@ class DialogFontAndSize(QtWidgets.QDialog):
 
     def get_size_and_font(self):
         return self.font_size_combo.currentText(), self.font_combo.currentText()
+
 
 # see https://www.freeformatter.com/html-entities.html
 entities = {"&": "&amp;", '"': '&quot;', "'": "&#39;", "<": "&lt;", ">": "&gt;", "–": "&ndash;", "—": "&mdash;",
