@@ -1802,23 +1802,24 @@ class DialogCodeAV(QtWidgets.QDialog):
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
         if self.show_codes_colour_filter == "":  # <- L
-            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.pushButton_clear_filter_code.setVisible(True)
             self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
             
     def clear_code_filter(self):
-        """ Clear any active code filter and restore all codes in the tree. """ # for clear filter code <- L
+        """ Clear any active code filter and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
         self.ui.pushButton_clear_filter_code.setVisible(False)
         self.ui.pushButton_clear_filter_code.setStyleSheet("")
 
     def clear_file_filter(self):
-        """ Clear any active file filter and reload all files. """ # for clear filter file
+        """ Clear any active file filter and reload all files. """
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))

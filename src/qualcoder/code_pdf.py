@@ -1743,6 +1743,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Clear any active code filter and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
         self.ui.label_code.setPixmap(QtGui.QPixmap())

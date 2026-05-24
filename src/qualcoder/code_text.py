@@ -3268,14 +3268,16 @@ class DialogCodeText(QtWidgets.QWidget):
     def clear_code_filter(self):
         """ Clear any active code filter (show codes like or show codes of colour)
         and restore all codes in the tree. """
+
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, "")  # unhide all codes
+        self.recursive_traverse(root, "")  # Show all codes
         self.ui.label_code.setPixmap(QtGui.QPixmap())
         self.ui.label_code.setToolTip("")
         self.ui.pushButton_clear_filter_code.setVisible(False)
-        self.ui.pushButton_clear_filter_code.setStyleSheet("")  # reset blue style
+        self.ui.pushButton_clear_filter_code.setStyleSheet("")  # Reset style
 
     def clear_file_filter(self):
         """ Clear any active file filter (show files like, case files, attributes)
