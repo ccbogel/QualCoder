@@ -1366,11 +1366,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
-        action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-            action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_expand_collapse = None
@@ -1381,6 +1379,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_merge_category = None
+        action_move_category = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_merge_category = modify_menu.addAction(_("Merge category into category"))
+            action_move_category = modify_menu.addAction(_("Move category under category"))
         action_delete = modify_menu.addAction(_("Delete"))
         action_color = None
         action_show_coded_media = None
@@ -1419,29 +1422,44 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
             if action == action_show_codes_like:
                 self.show_codes_like()
+                return
             if selected is not None and action == action_color:
                 self.change_code_color(selected)
+                return
             if action == action_add_category:
                 self.add_category()
+                return
             if action == action_add_code:
                 self.add_code()
+                return
             if action == action_merge_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.merge_category(catid)
+                return
+            if action == action_move_category:
+                catid = int(selected.text(1).split(":")[1])
+                self.move_category(catid)
+                return
             if action == action_add_code_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_code(catid)
+                return
             if action == action_add_category_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_category(catid)
+                return
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
+                return
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
+                return
             if selected is not None and action == action_edit_memo:
                 self.add_edit_cat_or_code_memo(selected)
+                return
             if selected is not None and action == action_delete:
                 self.delete_category_or_code(selected)
+                return
             if action == action_cat_show_coded_files:
                 branch_codes = self.recursive_get_branch_codes(selected, [])
                 self.coded_media_dialog(branch_codes, selected.text(0))
@@ -1491,6 +1509,40 @@ class DialogCodePdf(QtWidgets.QWidget):
                 no_merge_list.append(item.child(i).text(1)[6:])
             self.recursive_non_merge_item(item.child(i), no_merge_list)
         return no_merge_list
+
+    def move_category(self, catid: int):
+        """ Select another category to move this category underneath.
+        Args:
+            catid : Integer category identifier
+        """
+
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_string = f"({','.join(do_not_merge_list)})"
+        sql = "select name, catid, supercatid from code_cat where catid not in "
+        sql += do_not_merge_ids_string + " order by name"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        current_cat_name = self.ui.treeWidget.currentItem().text(0)
+        if category['name'] == '':
+            cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
+        else:
+            cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
+        self.update_dialog_codes_and_categories()
 
     def merge_category(self, catid):
         """ Select another category to merge this category into.
