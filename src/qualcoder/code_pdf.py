@@ -220,7 +220,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter file <- L
+        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)   
@@ -229,7 +229,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
-        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}])) # for clear filter code <- L
+        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
         self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
         self.ui.pushButton_clear_filter_code.setVisible(False)
@@ -766,7 +766,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                         break
             iterator += 1  # Move to the next item
 
-    def tree_item_clicked(self, item, column):
+    def tree_item_clicked(self, item, column:int):
         """ Use to quicky open memo. """
 
         if column == 2:
@@ -1006,13 +1006,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(self.recent_codes) == 0:
             return
         menu = QtWidgets.QMenu()
-        for item in self.recent_codes:
-            menu.addAction(item['name'])
+        for i, item in enumerate(self.recent_codes):
+            menu.addAction(item['name'] + f' &{i + 1}')
         action = menu.exec(self.ui.plainTextEdit.mapToGlobal(position))
         if action is None:
             return
         # Remaining actions will be the submenu codes
-        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text()[:-3])
         self.mark()
 
     def text_edit_menu(self, position: int):
@@ -1205,7 +1205,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    def recursive_set_current_item(self, item, text_):
+    def recursive_set_current_item(self, item, text_:str):
         """ Set matching item to be the current selected item.
         Recurse through any child categories.
         Tried to use QTreeWidget.finditems - but this did not find matching item text
@@ -1488,7 +1488,11 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def recursive_expand_collapse_branch(self, item, expand_toggle):
         """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories. """
+        Recurse through all child categories.
+        Arge:
+            item : QTreeWidgetItem
+            expand_toggle : Bool
+        """
 
         child_count = item.childCount()
         for i in range(child_count):
@@ -1501,6 +1505,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         Tried to use QTreeWidget.finditems - but this did not find matching item text
         Called by: textEdit recent codes menu option
         Required for: merge_category()
+        Args:
+                item : QTreeWidgetItem
+                no_merge_list : list of treeitems
         """
 
         child_count = item.childCount()
@@ -1544,9 +1551,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
         self.update_dialog_codes_and_categories()
 
-    def merge_category(self, catid):
+    def merge_category(self, catid: int):
         """ Select another category to merge this category into.
-        param:
+        Args:
             catid : Integer category identifier
         """
 
@@ -1616,7 +1623,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
-        param:
+        Args:
             selected : QTreeWidgetItem
          """
 
@@ -1656,7 +1663,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Show selected codes that contain entered text.
         The input dialog is too narrow, so it is re-created.
         Args:
-             preset: None of called from tree_menu, or a string value if called from filer_code_text line edit
+             preset: None if called from tree_menu, or a string value if called from filer_code_text line edit
         """
         case_sensitive = True
         if preset is None:
@@ -1670,17 +1677,17 @@ class DialogCodePdf(QtWidgets.QWidget):
             lbl = QtWidgets.QLabel(dlg_text)
             line = QtWidgets.QLineEdit()
             chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
-            btnBox = QtWidgets.QDialogButtonBox()
-            btnBox.setStandardButtons(
+            btnbox = QtWidgets.QDialogButtonBox()
+            btnbox.setStandardButtons(
                 QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
             layout = QtWidgets.QVBoxLayout()
             layout.addWidget(lbl)
             layout.addWidget(chkbox)
             layout.addWidget(line)
-            layout.addWidget(btnBox)
+            layout.addWidget(btnbox)
             dialog.setLayout(layout)
-            btnBox.rejected.connect(dialog.reject)
-            btnBox.accepted.connect(dialog.accept)
+            btnbox.rejected.connect(dialog.reject)
+            btnbox.accepted.connect(dialog.accept)
             dialog.resize(200, 60)
             ok = dialog.exec()
             if not ok:
@@ -1698,7 +1705,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.show_codes_like_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
-            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
@@ -1724,7 +1731,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.show_codes_colour_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
-            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
@@ -1733,7 +1740,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def clear_code_filter(self):
-        """ Clear any active code filter and restore all codes in the tree. """ # for clear filter code <- L
+        """ Clear any active code filter and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
         root = self.ui.treeWidget.invisibleRootItem()
@@ -1744,7 +1751,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_code.setStyleSheet("")
         
     def clear_file_filter(self):
-        """ Clear any active file filter and reload all files. """ # for clear filter file <- L
+        """ Clear any active file filter and reload all files. """
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
@@ -1946,6 +1953,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Show codes like
         if key == QtCore.Qt.Key.Key_L:
             self.show_codes_like()
+            return
         # Quick mark selected
         if key == QtCore.Qt.Key.Key_Q:
             self.selected_graphic_textboxes = self.scene.selectedItems()
@@ -1956,18 +1964,21 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Recent codes selection
         if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
             self.selected_graphic_textboxes = self.scene.selectedItems()
-            if len(self.selected_graphic_textboxes) == 0:
+            # Selected text boxes
+            if len(self.selected_graphic_textboxes) > 0:
+                # Can only be single selection, as text boxes re-drawn selection is lost.
+                ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                selection = ui.get_selected()
+                self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
+                self.mark(by_text_boxes=True)
                 return
-            # Can only be single selection, as text boxes re-drawn selection is lost.
-            ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
-            ok = ui.exec()
-            if not ok:
+            else:  # Selected text in textedit
+                if self.ui.plainTextEdit.textCursor().selectedText() != "":
+                    self.text_edit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
                 return
-            selection = ui.get_selected()
-            self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
-            self.mark(by_text_boxes=True)
-            return
-
         if not self.ui.plainTextEdit.hasFocus():
             return
         cursor_pos = self.ui.plainTextEdit.textCursor().position()
@@ -2022,10 +2033,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_V and selected_text != "":
             self.mark_with_new_code(in_vivo=True)
             return
-        # Recent codes context menu
+        '''# Recent codes context menu
         if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.plainTextEdit.textCursor().selectedText() != "":
             self.text_edit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
-            return
+            return'''
         # Search, with or without selected
         if key == QtCore.Qt.Key.Key_S and self.file_ is not None:
             if selected_text == "":
@@ -2189,8 +2200,9 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def extend_left(self, code_):
         """ Shift left arrow.
-        param:
-            code_ """
+        Args:
+            code_ : Dictonary
+        """
 
         if code_['pos0'] < 1:
             return
@@ -2275,7 +2287,11 @@ class DialogCodePdf(QtWidgets.QWidget):
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
-        Also merge codes if one code is dropped on another code. """
+        Also merge codes if one code is dropped on another code.
+        Args:
+            item : QTreeWidgetItem
+            parent : QTreeWidgetItem
+        """
 
         # find the category in the list
         if item.text(1)[0:3] == 'cat':
@@ -2333,7 +2349,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code.
                 param:
-            item : Dictionary code item
+            item : QTreeWidgetItem
             parent : QTreeWidgetItem
         """
 
@@ -2414,7 +2430,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
-        param:
+        Args:
             catid : None to add to without category, catid to add to category.
             code_name : String : Used for 'in vivo' coding where name is preset by in vivo text selection.
         return:
@@ -2495,7 +2511,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def add_category(self, supercatid=None):
         """ When button pressed, add a new category.
         Note: the addItem dialog does the checking for duplicate category names
-        param:
+        Args:
             supercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
@@ -2515,7 +2531,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
     def delete_category_or_code(self, selected):
-        """ Determine if selected item is a code or category before deletion. """
+        """ Determine if selected item is a code or category before deletion.
+        Args:
+            selected : QTreeWidgetItem
+        """
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
@@ -2527,6 +2546,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def delete_code(self, selected):
         """ Find code, remove from database, refresh and code data and fill treeWidget.
+        Args:
+            selected : QTreeWidgetItem
         """
 
         # Find the code in the list, check to delete
@@ -2559,7 +2580,10 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. """
+        and fill treeWidget.
+        Args:
+            selected : QTreeWidgetItem
+        """
 
         found = -1
         for i in range(0, len(self.categories)):
@@ -2587,7 +2611,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
     def add_edit_cat_or_code_memo(self, selected):
-        """ View and edit a memo for a category or code. """
+        """ View and edit a memo for a category or code.
+        Args:
+            selected : QTreeWidgetItem
+        """
 
         changed_tables = None
         if selected.text(1)[0:3] == 'cid':
@@ -2643,7 +2670,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
         Check that the code or category name is not currently in use.
-        param:
+        Args:
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
@@ -2718,7 +2745,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def change_code_color(self, selected):
         """ Change the colour of the currently selected code.
-        param:
+        Args:
             selected : QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
@@ -2753,7 +2780,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         {'id', 'name', 'memo', 'characters'= number of characters in the file,
         'start' = showing characters from this position, 'end' = showing characters to this position}
 
-        args:
+        Args:
             position :
         """
 
@@ -2985,7 +3012,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         Called from:
             view_file_dialog, context_menu
-        param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
+        Args:
+            file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
 
         if file_ is None:
@@ -3239,7 +3267,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Apply code backgrounds to text.
          Loop through coded text and match any at this position.
          if self.important checked and this is not important. Do not colour.
-         param:
+         Args:
             item: QGraphicsTextItem
             text_item: dictionary of pdf text item data """
 
@@ -3322,7 +3350,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         # Menu for graphics view area
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
         ''' Cannot mark selected textboxes. as soon as context menu appears, textbox selections are removed.
         action_mark = None
         '''
@@ -3456,8 +3484,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Get code text for this file and for all visible coders
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
-        sql = "select code_text_visible.ctid, code_text_visible.cid, fid, seltext, pos0, pos1, code_text_visible.owner, code_text_visible.date, " \
-              "code_text_visible.memo, important, name"
+        sql = "select code_text_visible.ctid, code_text_visible.cid, fid, seltext, pos0, pos1, " \
+              "code_text_visible.owner, code_text_visible.date, code_text_visible.memo, important, name"
         sql += " from code_text_visible join code_name on code_text_visible.cid = code_name.cid"
         sql += " where fid=?"
         # sql += " and pos0 >=? and pos1 <=? "  # problem area, removed
@@ -3508,9 +3536,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         for item in self.code_text:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.plainTextEdit.textCursor()
-            '''print(f"len text {len(self.ui.plainTextEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
-                  f" pos1 {item['pos1'] - self.file_['start']}"
-                  f" page plain text end {self.pages[self.page_num]['plain_text_end']}")  # tmp'''
             if item['pos0'] > self.pages[self.page_num]['plain_text_end'] or item['pos1'] < self.pages[self.page_num][
                 'plain_text_start']:
                 continue
@@ -3769,8 +3794,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
-
         Called via context menu, button
+        Args:
+            cursor_pos : QTextDocument cursor
         """
 
         if self.file_ is None:
@@ -3859,7 +3885,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def get_pdf_metadata(self, filepath: str):
-        """ Get metadata from PDF """
+        """ Get metadata from PDF.
+         Args:
+             filepath: String full file path
+        """
 
         fp = open(filepath, 'rb')
         parser = PDFParser(fp)
@@ -3868,7 +3897,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.metadata = ""
         if info:
             for k, v in info[0].items():
-                # print(k,v)
                 self.metadata += k + " = "
                 try:
                     self.metadata += v.decode('UTF-8', errors="ignore")
@@ -3973,7 +4001,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             h.deleteLater()
         self.active_handles = []
 
-    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
+    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0:int, orig_pos1:int):
         """ Receive final drop coordinates from a handle and update the database. """
         if is_start:
             if new_pos >= code_item['pos1']:
