@@ -4345,10 +4345,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 ui = DialogSelectItems(self.app, codes_here, _("Select a code"), "single")
                 ok = ui.exec()
                 if not ok:
-                    return
+                    return True
                 code_ = ui.get_selected()
                 if not code_:
-                    return
+                    return True
             if len(codes_here) == 1:
                 code_ = codes_here[0]
             # Key event can be too sensitive, adjusted  for 150 millisecond gap
