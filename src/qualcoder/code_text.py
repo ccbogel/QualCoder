@@ -1193,7 +1193,7 @@ class DialogCodeText(QtWidgets.QWidget):
         h_end.move(rect_end.x() - 6, rect_end.y() + 2)
         self.active_handles.append(h_end)
 
-    def _toggle_margin_visibility_only(self):  # <- L
+    def _toggle_margin_visibility_only(self):
         """ Independent visibility toggle (does NOT alter highlight_style). """
 
         self.show_margin_stripes = not self.show_margin_stripes
@@ -2695,7 +2695,7 @@ class DialogCodeText(QtWidgets.QWidget):
             items[0].setToolTip(new_tt)
         self.app.delete_backup = False
 
-    def coded_text_memo(self, position=None):
+    def coded_text_memo(self, position:None|int=None):
         """ Add or edit a memo for this coded text.
         Args:
             position : Current text cursor position
@@ -2866,10 +2866,12 @@ class DialogCodeText(QtWidgets.QWidget):
         action_color = None
         action_show_coded_media = None
         action_move_code = None
+        action_move_codes = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = modify_menu.addAction(_("Move code to"))
+            action_move_codes = modify_menu.addAction(_("Move multiple codes"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
         action_show_codes_colour = filter_menu.addAction(_("Show codes of colour") + f": {self.show_codes_colour_filter}")
@@ -2924,6 +2926,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 return
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
+                return
+            if action == action_move_codes:
+                self.move_multiple_codes()
                 return
             if action == action_expand_collapse:
                 expand_toggle = not selected.isExpanded()
@@ -3101,6 +3106,11 @@ class DialogCodeText(QtWidgets.QWidget):
             raise
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
 
+    def move_multiple_codes(self):
+        """ Move multiple codes """
+
+        print("TODO Move multiple codes")
+
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
@@ -3183,7 +3193,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def show_codes_like(self, preset=None):
+    def show_codes_like(self, preset:str|None=None):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
          The input dialog is too narrow, so it is re-created.
@@ -3318,27 +3328,29 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def keyPressEvent(self, event):
         """
-        Ctrl Z Undo last unmarking
-        Ctrl F jump to search box
         A annotate - for current selection
-        Q Quick Mark with code - for current selection
         B Create bookmark - at clicked position
+        Shift B - go to bookmark
+        C New category
+        Ctrl F jump to search box
         H Hide / Unhide top groupbox
         I Tag important
         L Show codes like
         M memo code - at clicked position
         N new code
         O Shortcut to cycle through overlapping codes - at clicked position
-        S search text - may include current selection
+        Q Quick Mark with code - for current selection
         R opens a context menu for recently used codes for marking text
         Ctrl R - Reverse from left to right to right to left
+        S search text - may include current selection
         U Unmark at selected location
         V assign 'in vivo' code to selected text
+        Ctrl Z Undo last unmarking
+
         Ctrl 0 to Ctrl 9 - button presses
         ! Display Clicked character position
         ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
-
         F2 Rename code or category
         """
 
@@ -3349,7 +3361,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
             return
-        # Ctrl Z undo last unmarked coding
+        # Ctrl Z undo last unmarked coding # TODO expand function
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.undo_last_unmarked_code()
             return
@@ -3432,12 +3444,21 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
             self.annotate()
             return
+        # Go to bookmark
+        if key == QtCore.Qt.Key.Key_B and mods == QtCore.Qt.KeyboardModifier.ShiftModifier and self.file_ is not None:
+            self.go_to_bookmark()
+            return
         # Bookmark
         if key == QtCore.Qt.Key.Key_B and self.file_ is not None:
             text_pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_pos])
             self.app.conn.commit()
+            return
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # TODO if already category selected, add category to that
+            self.add_category()
             return
         # Hide unHide top groupbox
         if key == QtCore.Qt.Key.Key_H:
@@ -3581,7 +3602,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.export_codebook()
         self.ui.comboBox_export.setCurrentIndex(0)
 
-    def export_odt_file(self, mode="highlight"):
+    def export_odt_file(self, mode:str="highlight"):
         """ Export text to open file format with .odt ending.
         Args:
             mode: String - 'highlight', 'comment', or 'report'
@@ -4755,7 +4776,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def add_code(self, catid=None, code_name=""):
+    def add_code(self, catid:int|None=None, code_name:str=""):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code, or a color has been pre-set by the user.
         New code is added to data and database.
@@ -4839,8 +4860,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_tree()
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def add_category(self, supercatid=None):
-        """ When button pressed, add a new category.
+    def add_category(self, supercatid:int|None=None):
+        """ Add a new category.
         Note: the addItem dialog does the checking for duplicate category names
         Args:
             supercatid : None to add without category, supercatid to add to category. """
@@ -7720,7 +7741,6 @@ class DialogCodeText(QtWidgets.QWidget):
 
         return best_doc
 
-# --- handles experimental
     def display_handles_for_code(self, position):
         """ Display interactive drag handles to resize a code's boundaries. """
 
