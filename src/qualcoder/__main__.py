@@ -244,9 +244,9 @@ class App(object):
                     f.write(os.linesep)
         return result
 
-    def append_recent_project(self, new_path):
+    def append_recent_project(self, new_path:str):
         """ Add project path as first entry to .qualcoder/recent_projects.txt
-        param:
+        Args:
             new_path String filepath to project
         """
 
@@ -280,8 +280,11 @@ class App(object):
         if result:
             return result[0]
 
-    def create_connection(self, project_path):
-        """ Create connection to recent project. """
+    def create_connection(self, project_path:str):
+        """ Create connection to recent project.
+        Args:
+            project_path: str
+        """
 
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
@@ -309,7 +312,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_code_names(self, cids=None):
+    def get_code_names(self, cids:list[int]|None = None):
         """
         Args:
             cids : List of cids as Integers, or None for all
@@ -332,7 +335,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_filenames(self, ids=None):
+    def get_filenames(self, ids:list[int]|None = None):
         """ Get all filenames.
         Args:
             ids: List of ids or none
@@ -372,7 +375,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_text_filenames(self, ids=None):
+    def get_text_filenames(self, ids:list[int]|None = None):
         """ Get filenames, id, memo and mediapath of text files.
 
         Args:
@@ -423,7 +426,7 @@ class App(object):
                 length = len(res[0])
             return res[0][start_pos:start_pos + length]
 
-    def get_line_numbers(self, full_text, quote_start, quote_end):
+    def get_line_numbers(self, full_text:str, quote_start:int, quote_end:int):
         """Determines line numbers of a quote
 
         Args:
@@ -452,7 +455,7 @@ class App(object):
                 
         return start_line_number, end_line_number
 
-    def get_pdf_filenames(self, ids=None):
+    def get_pdf_filenames(self, ids:list[int]|None = None):
         """ Get id, filenames, memo and mediapath of pdf text files.
         Args:
             ids: list of Integer ids for a restricted list of files, or None.
@@ -478,7 +481,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_image_filenames(self, ids=None):
+    def get_image_filenames(self, ids:list[int]|None = None):
         """ Get filenames of image files only.
         Args:
             ids: list of Integer ids for a restricted list of files, or None.
@@ -503,7 +506,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_image_and_pdf_filenames(self, ids=None):
+    def get_image_and_pdf_filenames(self, ids:list[int]|None = None):
         """ Get filenames of image and pdf files.
         Args:
             ids: list of Integer ids for a restricted list of files, or None.
@@ -531,7 +534,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_av_filenames(self, ids=None):
+    def get_av_filenames(self, ids:list[int]|None = None):
         """ Get filenames of audio video files only.
         Args:
             ids: list of Integer ids for a restricted list of files.
@@ -596,7 +599,7 @@ class App(object):
             codes.append(dict(zip(keys, row)))
         return codes, categories
     
-    def check_bad_file_links(self, id_=None):
+    def check_bad_file_links(self, id_:int|None=None):
         """ Check all linked files are present.
         Will not state a bad link to an internally created text file.
         Called from MainWindow.open_project, Manage_files, view_av.
@@ -1088,7 +1091,7 @@ class App(object):
             'ai_model_index': -1
         }
 
-    def get_file_texts(self, file_ids=None):
+    def get_file_texts(self, file_ids:list[int]|None = None):
         """ Get the texts of all text files as a list of dictionaries.
         Called by DialogCodeText.search_for_text
         Args:
@@ -1140,7 +1143,7 @@ class App(object):
             result.append(dict(zip(keys, row)))
         return result
 
-    def get_journal_texts(self, journal_ids=None):
+    def get_journal_texts(self, journal_ids:list[int]|None = None):
         """ Get the texts of all journals as a list of dictionaries.
         Called by DialogJournals.search_for_text
         Args:
@@ -1329,7 +1332,7 @@ class App(object):
             pass        
         return coder_names
          
-    def save_backup(self, suffix=""):
+    def save_backup(self, suffix:str=""):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
         A backup can be generated in the subsequent hour.
@@ -1368,7 +1371,7 @@ class App(object):
         self.delete_backup_path_name = backup
         return msg, backup
         
-    def help_wiki(self, page_path):
+    def help_wiki(self, page_path:str):
         """ Open website doc help page in https://qualcoder.org.
         Assumes English pages are present as a default.
         Args:
@@ -1805,14 +1808,6 @@ Click "Yes" to start now.')
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
-    """def text_mining(self):
-        ''' text analysis of files / cases / codings.
-        NOT CURRENTLY IMPLEMENTED, FOR FUTURE EXPANSION.
-        '''
-
-        ui = DialogTextMining(self.app, self.ui.textEdit)
-        ui.show()"""
-
     def report_coding_comparison(self):
         """ Compare two or more coders across all text files using Cohens Kappa. """
 
@@ -1961,16 +1956,6 @@ Click "Yes" to start now.')
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
-    '''def import_twitter(self):
-        """ Import twitter flat sheet: csv file.
-        Create cases by User name.
-        Create qualitative text files for each tweet.
-        Assign attributes to cases and files. """
-
-        self.ui.label_manage.hide()
-        ui = DialogImportTwitterData(self.app, self.ui.textEdit)
-        self.tab_layout_helper(self.ui.tab_manage, ui)'''
-
     def manage_cases(self):
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
@@ -2012,12 +1997,12 @@ Click "Yes" to start now.')
     def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. 
-        
-        task: "documents": The default, shows the tab with the text documents
-              "ai_search": Shows the tab "AI Search"
-        doc_id: If not None and task = "documents", this doument will be loaded in the coding window
-        doc_sel_start: The character-position of the beginning of the selection in the coding window
-        doc_sel_end: The end of the selection 
+        Args:
+            task: "documents": The default, shows the tab with the text documents
+                  "ai_search": Shows the tab "AI Search"
+            doc_id: If not None and task = "documents", this doument will be loaded in the coding window
+            doc_sel_start: The character-position of the beginning of the selection in the coding window
+            doc_sel_end: The end of the selection
         """
 
         files = self.app.get_text_filenames()
@@ -2510,7 +2495,7 @@ Click "Yes" to start now.')
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    def open_project(self, path_="", newproject="no"):
+    def open_project(self, path_:str|bool="", newproject:str="no"):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not back up on a newly created project, as it will not contain data.
@@ -2520,7 +2505,7 @@ Click "Yes" to start now.')
         Backups are not replaced within the same hour.
         Update older databases to current version mainly by adding columns and tables.
         Table constraints are not updated (code_text duplicated codings).
-        param:
+        Args:
             path: if path is "" then get the path from a dialog, otherwise use the supplied path
             newproject: yes or no  if yes then do not make an initial backup
         """
@@ -3184,6 +3169,7 @@ Click "Yes" to start now.')
         citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.app.version} [Computer software].\n"
         citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{tag}\n"
         self.ui.textEdit.append(citation)
+
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
