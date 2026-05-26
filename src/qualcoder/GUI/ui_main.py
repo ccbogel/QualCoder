@@ -254,7 +254,6 @@ class Ui_MainWindow(object):
         self.menuFiles_and_Cases.addAction(self.actionManage_attributes)
         self.menuFiles_and_Cases.addAction(self.actionManage_references)
         self.menuFiles_and_Cases.addAction(self.actionManage_bad_links_to_files)
-        self.menuFiles_and_Cases.addAction(self.actionImport_twitter_data)
         self.menuCoding.addAction(self.actionCodes)
         self.menuCoding.addAction(self.actionCode_image)
         self.menuCoding.addAction(self.actionCode_audio_video)
