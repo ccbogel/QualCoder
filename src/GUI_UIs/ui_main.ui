@@ -169,7 +169,6 @@
     <addaction name="actionManage_attributes"/>
     <addaction name="actionManage_references"/>
     <addaction name="actionManage_bad_links_to_files"/>
-    <addaction name="actionImport_twitter_data"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
     <property name="title">
@@ -540,7 +539,7 @@
     <string>Setup Wizard</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Rebuild_internal_memory">
@@ -571,7 +570,7 @@
     <string>AI related Settings</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Prompts">
