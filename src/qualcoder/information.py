@@ -240,14 +240,16 @@ Ctrl F {_("Jump to search box")}<br />\
 Ctrl Z {_("The last code that was unmarked, restore that coding")}<br />\
 Ctrl E {_("Enter and Exit Edit mode")}<br />\
 A {_("Annotate - Current text selection")}<br />\
-Q {_("Quick Mark with code - for current selection")}<br />\
 B {_("Create bookmark - at clicked position")}<br />\
+Shift B {_("Go to bookmark")}<br />\
+C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 H {_("Hide / Unhide top groupbox")}<br />\
-I {_("Tag code at clicked position as important")}<br />\
+I {_("Tag coded text at clicked position as important")}<br />\
 L {_("Show codes like (when text coding area is in focus)")}<br />\
 M {_("Memo code - at clicked position")}<br />\
 N {_("New code - for selected text")}<br />\
 O {_("Shortcut to cycle through overlapping codes - at clicked position")}<br />\
+Q {_("Quick Mark with code - for current selection")}<br />\
 S {_("Search text - may include current selection")}<br />\
 R {_("Opens a context menu for recently used codes for marking text")}<br />\
 Ctrl R {_("Reverse text direction: Left to Right | Right to Left")}<br />\
@@ -261,6 +263,31 @@ V {_("assign in vivo code to selected text")}<br />\
 $ {_("Shift all coding positions after a clicked position by X characters (negative numbers shift left)")}<br />\
 F2 {_("When tree item selected - Rename code or category")}'
 
+coding_pdf_shortcuts = f'<h2>{_("Code PDF key shortcuts")}</h2>\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Open file memo")}<br />\
+Ctrl 4 {_("Filter files by attributes")}<br />\
+Ctrl 5 {_("Show codes marked important")}<br />\
+Ctrl 9 {_("Show codes marked important")}<br />\
+A {_("Annotate - Current text selection")}<br />\
+B {_("Create bookmark - at clicked position")}<br />\
+C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
+H {_("Hide / Unhide top groupbox")}<br />\
+I {_("Tag coded text at clicked position as important")}<br />\
+L {_("Show codes like (when coding area is in focus)")}<br />\
+M {_("Memo code - at clicked position")}<br />\
+Q {_("Quick Mark with code - for current selection")}<br />\
+R {_("Opens a context menu for recently used codes for marking text")}<br />\
+U {_("Unmark At clicked position in the text")}<br />\
+V {_("assign in vivo code to selected text")}<br />\
+Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
+Minus {_("Zoom out")}<br />\
+Plus {_("Zoom in")}<br />\
+! {_("Describes clicked text character position")}<br />\
+F2 {_("When tree item selected - Rename code or category")}'
+
 coding_image_shortcuts = f'<h2>{_("Code image key shortcuts")}</h2>\
 Ctrl 1 {_("Next file")}<br />\
 Ctrl 2 {_("File with latest coding")}<br />\
@@ -268,6 +295,7 @@ Ctrl 3 {_("Open file memo")}<br />\
 Ctrl 4 {_("Filter files by attributes")}<br />\
 Ctrl 5 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
+C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 L {_("Show codes like (when coding area is in focus)")}<br />\
 Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
 Ctrl G {_("Create a grayed-out image with coloured coded highlights (Wait a few seconds)")}<br />\
@@ -284,6 +312,7 @@ Ctrl 4 {_("Filter files by attributes")}<br />\
 Ctrl 9 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
 A {_("Annotate - for current selection")}<br />\
+C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 G {_("Assign segment to currently selected code, and open memo for segment.")}<br />\
 I {_("Tag important")}<br />\
 L {_("Show codes like (when text coding area is in focus)")}<br />\
@@ -308,5 +337,5 @@ F2 {_("When tree item selected - Rename code or category")}'
 database_queries_shortcuts = f'<h2>{_("Database Queries key shortcuts")}</h2>\
 Ctrl + Enter {_("Run SQL query")}<br />'
 
-coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
+coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
