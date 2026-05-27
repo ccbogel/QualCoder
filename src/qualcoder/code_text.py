@@ -3419,12 +3419,12 @@ class DialogCodeText(QtWidgets.QWidget):
             selected = self.ui.treeWidget.currentItem()
             self.rename_category_or_code(selected)
             return
-
         if not self.ui.plainTextEdit.hasFocus():
             return
         # Ignore all other key events if edit mode is active
         if self.edit_mode:
             return
+
         key = event.key()
         # mod = QtGui.QGuiApplication.keyboardModifiers()
         cursor_pos = self.ui.plainTextEdit.textCursor().position()
@@ -3433,10 +3433,11 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.code_text:
             if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
                 codes_here.append(item)
-        # Hash display character position
+        # ! display character position
         if key == QtCore.Qt.Key.Key_Exclam:
             Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
             return
+        # $ shift code positions
         if key == QtCore.Qt.Key.Key_Dollar:
             self.shift_code_positions(self.ui.plainTextEdit.textCursor().position() + self.file_['start'])
             return
@@ -3445,7 +3446,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.annotate()
             return
         # Go to bookmark
-        if key == QtCore.Qt.Key.Key_B and mods == QtCore.Qt.KeyboardModifier.ShiftModifier and self.file_ is not None:
+        if key == QtCore.Qt.Key.Key_B and mods == QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.go_to_bookmark()
             return
         # Bookmark
@@ -3457,8 +3458,12 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # New category
         if key == QtCore.Qt.Key.Key_C:
-            # TODO if already category selected, add category to that
-            self.add_category()
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
             return
         # Hide unHide top groupbox
         if key == QtCore.Qt.Key.Key_H:

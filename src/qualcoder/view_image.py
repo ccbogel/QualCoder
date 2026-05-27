@@ -1638,7 +1638,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def keyPressEvent(self, event):
         """
-        Ctrl Z Undo last unmarking
+        C New Category
         H hide / show top group box
         Ctrl 0 to Ctrl 9 - button presses
         + or W  Zoom out
@@ -1646,13 +1646,22 @@ class DialogCodeImage(QtWidgets.QDialog):
         Ctrl 0 to Ctrl 5 Buttons and Help
         Ctrl G - Gray image with highlighted codings
         L Show codes like
-
+        Ctrl Z Undo last unmarking
         F2 Rename code or category
         """
 
         key = event.key()
         mods = event.modifiers()
 
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
+            return
         if key == QtCore.Qt.Key.Key_H:
             self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
             return

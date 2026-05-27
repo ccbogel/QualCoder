@@ -1885,6 +1885,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Ctrl Z Undo last unmarking
         Ctrl F jump to search box
         A annotate - for current selection - text edit only
+        C New category
         Q Quick Mark with code - for current selection
         H Hide / Unhide top groupbox
         I Tag important
@@ -1924,6 +1925,15 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
             selected = self.ui.treeWidget.currentItem()
             self.rename_category_or_code(selected)
+            return
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
             return
 
         # Ctrl 0 to 9

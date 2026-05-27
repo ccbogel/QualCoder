@@ -1909,8 +1909,7 @@ class DialogCodeAV(QtWidgets.QDialog):
          These key presses are not used in edi mode.
 
         A annotate - for current selection
-        ON HOLD C - Save screenshot as png
-        ON HOLD D - Save screenshot in project for image coding
+        C New category
         G Glue selected segment to selected code, and open segment memo
         Q Quick Mark with code - for current selection
         I Tag important
@@ -1933,7 +1932,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Ctrl + Shift + > to increase play rate
         Ctrl + Shift + < to decrease play rate
 
-        F2 Rename code or cateegory
+        F2 Rename code or category
         """
 
         key = event.key()
@@ -1948,10 +1947,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_D and not self.ddialog.isHidden():
             self.import_screenshot_into_project()
             return
-        # Save screenshot png - C
-        if key == QtCore.Qt.Key.Key_C and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
+        if key == QtCore.Qt.Key.Key_ABC and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
             self.save_screenshot()
             return'''
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
+            return
         # Glue segment to currently selected code and open segment memo
         if key == QtCore.Qt.Key.Key_G and self.segment['start_msecs'] is not None and \
             self.segment['end_msecs'] is not None and self.ui.treeWidget.currentItem() is not None \
