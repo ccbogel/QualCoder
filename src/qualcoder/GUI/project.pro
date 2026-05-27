@@ -42,7 +42,6 @@ ui_dialog_select_items.py \
 ui_dialog_settings.py \
 ui_dialog_speakers.py \
 ui_dialog_start_and_end_marks.py \
-ui_dialog_text_mining.py \
 ui_dialog_view_av.py \
 ui_dialog_view_image.py \
 ui_dialog_view_text.py \
