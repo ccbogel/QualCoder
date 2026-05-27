@@ -3107,10 +3107,38 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
 
     def move_multiple_codes(self):
-        """ Move multiple codes """
+        """ Move multiple codes to another category. """
 
-        print("TODO Move multiple codes")
-        Message(self.app, "TODO", "Work in progress").exec()
+        cur = self.app.conn.cursor()
+        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
+                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
+        res = cur.fetchall()
+        code_list = []
+        for r in res:
+            name = r[0]
+            if r[1] is not None:
+                name = r[1] + " ← " + r[0]
+            code_list.append({'name': name, 'cid': r[2]})
+        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codes = ui.get_selected()
+        cur.execute("select name, catid from code_cat order by upper(name)")
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        for s in selected_codes:
+            cur.execute("update code_name set catid=? where cid=?", [category['catid'], s['cid']])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
+        self.update_dialog_codes_and_categories(["code_name"])
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
