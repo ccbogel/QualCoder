@@ -2866,12 +2866,12 @@ class DialogCodeText(QtWidgets.QWidget):
         action_color = None
         action_show_coded_media = None
         action_move_code = None
-        action_move_codes = None
+        action_move_multi_codes = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = modify_menu.addAction(_("Move code to"))
-            action_move_codes = modify_menu.addAction(_("Move multiple codes"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
         action_show_codes_colour = filter_menu.addAction(_("Show codes of colour") + f": {self.show_codes_colour_filter}")
@@ -2927,7 +2927,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
                 return
-            if action == action_move_codes:
+            if action == action_move_multi_codes:
                 self.move_multiple_codes()
                 return
             if action == action_expand_collapse:
@@ -3110,6 +3110,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Move multiple codes """
 
         print("TODO Move multiple codes")
+        Message(self.app, "TODO", "Work in progress").exec()
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
