@@ -92,6 +92,10 @@ Can move a dragged item to the top and bottom of the visible tree, and the tree 
 
 Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour).
 
+Key presse for Shift B to go to bookmark, andC to add a new category.
+
+Edit text mode - now has a search bar.
+
 ## Code PDF
 
 Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
@@ -140,6 +144,8 @@ Improved selection of font sizes and colours in menus.
 -Matrix headers: Fixed four issues that prevented code, file, and case memos from displaying correctly in the matrix view (including an "alll" typo, a comparison with an extra colon 'Case:', an incorrect tuple validation, and a misplaced "All memo" literal).
 
 -"Also all memos" option: Now correctly displays the coded segment memo, a behavior that was previously missing despite being implied by the label.
+
+-Fix merge projects error. Occured sometimes when projects with audio, video or image files are merged.
 
 **New functions**
 
