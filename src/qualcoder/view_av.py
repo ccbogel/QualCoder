@@ -1938,6 +1938,12 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         key = event.key()
         mods = QtGui.QGuiApplication.keyboardModifiers()
+
+        # Esc hides any active resize handles <- L
+        if key == QtCore.Qt.Key.Key_Escape:
+            if hasattr(self, 'active_handles') and self.active_handles:
+                self.hide_resize_handles()
+                return
         '''# Get screenshot and load in project for coding - D
         if key == QtCore.Qt.Key.Key_D and not self.ddialog.isHidden():
             self.import_screenshot_into_project()
@@ -3792,7 +3798,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor_start.setPosition(max(0, code_to_handle['pos0']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
-        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        # start teardrop tip is at its top-right corner -> shift left by full width <- L
+        h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
 
         # Create end handle
@@ -3800,7 +3807,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
-        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        # end teardrop tip is at its top-left corner -> align directly to the cursor x <- L
+        h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
 
     def hide_resize_handles(self):
@@ -3809,6 +3817,28 @@ class DialogCodeAV(QtWidgets.QDialog):
             h.hide()
             h.deleteLater()
         self.active_handles = []
+
+    # Reposition active handles to their code's current pos0/pos1 without recreating them.
+    # Keeps the handles on screen so start and end can be adjusted repeatedly <- L
+    def reposition_resize_handles(self):
+        """ Re-anchor active handles after a resize so they stay usable. """
+        if not getattr(self, 'active_handles', []):
+            return
+        for h in self.active_handles:
+            fresh = next((c for c in self.code_text if c.get('ctid') == h.code_item.get('ctid')), None)
+            if fresh is not None:
+                h.code_item = fresh
+                h.orig_pos0 = fresh['pos0']
+                h.orig_pos1 = fresh['pos1']
+            anchor = h.code_item['pos0'] if h.is_start else h.code_item['pos1']
+            cursor = self.ui.plainTextEdit.textCursor()
+            cursor.setPosition(max(0, min(len(self.ui.plainTextEdit.toPlainText()), anchor)))
+            rect = self.ui.plainTextEdit.cursorRect(cursor)
+            if h.is_start:
+                h.move(rect.x() - h.width(), rect.y())  # start tip at top-right
+            else:
+                h.move(rect.x(), rect.y())  # end tip at top-left
+            h.raise_()
 
     def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
         """ Receive final drop coordinates from a handle and update the database. """
@@ -3856,8 +3886,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             code_item['pos1'] = orig_pos1
             Message(self.app, _("Duplicate Error"),
                     _("This code already exists at this exact location."), "warning").exec()
-        self.hide_resize_handles()
+        # Keep handles active after a successful resize so the user can
+        # adjust the other end without re-triggering the action <- L
         self.get_coded_text_update_eventfilter_tooltips()
+        self.reposition_resize_handles()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):

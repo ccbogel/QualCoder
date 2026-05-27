@@ -1906,6 +1906,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         key = event.key()
         mods = event.modifiers()
 
+        # Esc hides any active resize handles <- L
+        if key == QtCore.Qt.Key.Key_Escape:
+            if hasattr(self, 'active_handles') and self.active_handles:
+                self.hide_resize_handles()
+                return
+
         # Ctrl + F jump to search box
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
@@ -2093,9 +2099,15 @@ class DialogCodePdf(QtWidgets.QWidget):
         Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
 
-        # Hide handles if the user clicks elsewhere in the editor
+        # Only hide handles if the cursor leaves the coded segment that owns them,
+        # so they stay visible while the user clicks inside the same segment <- L
         if hasattr(self, 'active_handles') and self.active_handles:
-            self.hide_resize_handles()
+            pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
+            owner = self.active_handles[0].code_item
+            cursor_has_selection = self.ui.plainTextEdit.textCursor().hasSelection()
+            # Hide if a selection is made, or the cursor is outside the owning segment <- L
+            if cursor_has_selection or not (owner['pos0'] <= pos <= owner['pos1']):
+                self.hide_resize_handles()
 
         self.overlaps_at_pos = []
         self.overlaps_at_pos_idx = 0
@@ -3983,7 +3995,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
-        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        # start teardrop tip is at its top-right corner -> shift left by full width <- L
+        h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
 
         # Create end handle
@@ -3992,7 +4005,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1'] - self.file_['start']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
-        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        # end teardrop tip is at its top-left corner -> align directly to the cursor x <- L
+        h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
 
     def hide_resize_handles(self):
@@ -4001,6 +4015,29 @@ class DialogCodePdf(QtWidgets.QWidget):
             h.hide()
             h.deleteLater()
         self.active_handles = []
+
+    # Reposition active handles to their code's current pos0/pos1 without recreating them.
+    # Keeps the handles on screen so start and end can be adjusted repeatedly <- L
+    def reposition_resize_handles(self):
+        """ Re-anchor active handles after a resize so they stay usable. """
+        if not getattr(self, 'active_handles', []) or self.file_ is None:
+            return
+        for h in self.active_handles:
+            fresh = next((c for c in self.code_text if c.get('ctid') == h.code_item.get('ctid')), None)
+            if fresh is not None:
+                h.code_item = fresh
+                h.orig_pos0 = fresh['pos0']
+                h.orig_pos1 = fresh['pos1']
+            anchor = h.code_item['pos0'] if h.is_start else h.code_item['pos1']
+            cursor = self.ui.plainTextEdit.textCursor()
+            cursor.setPosition(max(0, min(len(self.ui.plainTextEdit.toPlainText()),
+                                          anchor - self.file_['start'])))
+            rect = self.ui.plainTextEdit.cursorRect(cursor)
+            if h.is_start:
+                h.move(rect.x() - h.width(), rect.y())  # start tip at top-right
+            else:
+                h.move(rect.x(), rect.y())  # end tip at top-left
+            h.raise_()
 
     def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0:int, orig_pos1:int):
         """ Receive final drop coordinates from a handle and update the database. """
@@ -4048,8 +4085,10 @@ class DialogCodePdf(QtWidgets.QWidget):
             code_item['pos1'] = orig_pos1
             Message(self.app, _("Duplicate Error"),
                     _("This code already exists at this exact location."), "warning").exec()
-        self.hide_resize_handles()
+        # keep handles active after a successful resize so the user can
+        # adjust the other end without re-triggering the action <- L
         self.get_coded_text_update_eventfilter_tooltips()
+        self.reposition_resize_handles()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
