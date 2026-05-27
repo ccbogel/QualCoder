@@ -318,10 +318,11 @@ class MergeProjects:
                 src['newid'] = res[0]
                 # Warn user if the source and destination fulltexts are different lengths
                 # Occurs if one of the texts was edited or replaced
-                if len(src['fulltext']) != res[1]:
+                # Check fulltext for not None, as might be image, audio, video
+                if src['fulltext'] is not None and len(src['fulltext']) != res[1]:
                     msg = _("Warning! Inaccurate coding positions. Text lengths different for same text file: ")
                     msg += src['name'] + "\n"
-                    msg += _("Import project file text length: ") + str(len(src['fulltext'])) + "  "
+                    msg += _("Import project file text length: ") + f"{len(src['fulltext'])}  "
                     msg += _("Destination project file text length: ") + str(res[1]) + "\n"
                     self.summary_msg += msg
             else:
