@@ -1388,10 +1388,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         action_color = None
         action_show_coded_media = None
         action_move_code = None
+        action_move_multi_codes = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = modify_menu.addAction(_("Move code to"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
         action_show_codes_of_colour = filter_menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
@@ -1450,6 +1452,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
+                return
+            if action == action_move_multi_codes:
+                self.move_multiple_codes()
                 return
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
@@ -1619,6 +1624,41 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.update_dialog_codes_and_categories()
             raise
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
+
+    def move_multiple_codes(self):
+        """ Move multiple codes to another category. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
+                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
+        res = cur.fetchall()
+        code_list = []
+        for r in res:
+            name = r[0]
+            if r[1] is not None:
+                name = r[1] + " ← " + r[0]
+            code_list.append({'name': name, 'cid': r[2]})
+        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codes = ui.get_selected()
+        cur.execute("select name, catid from code_cat order by upper(name)")
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        for s in selected_codes:
+            cur.execute("update code_name set catid=? where cid=?", [category['catid'], s['cid']])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
+        self.update_dialog_codes_and_categories(["code_name"])
+
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
@@ -1897,7 +1937,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         U Unmark at selected location
         V assign 'in vivo' code to selected text - text edit only
         Ctrl 0 to Ctrl 9 - button presses
-        # Display Clicked character position
+        ! Display Clicked character position
         Shift + Zoom in
         Ctrl - Zoom out
 
@@ -2004,7 +2044,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         for item in self.code_text:
             if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
                 codes_here.append(item)
-        # Hash display character position
+        # ! display character position
         if key == QtCore.Qt.Key.Key_Exclam:
             Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
             return
@@ -2050,10 +2090,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_V and selected_text != "":
             self.mark_with_new_code(in_vivo=True)
             return
-        '''# Recent codes context menu
-        if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.plainTextEdit.textCursor().selectedText() != "":
-            self.text_edit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
-            return'''
         # Search, with or without selected
         if key == QtCore.Qt.Key.Key_S and self.file_ is not None:
             if selected_text == "":
