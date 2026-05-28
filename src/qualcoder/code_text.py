@@ -1015,19 +1015,19 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
 
         if action == action_unmark:
-            self._margin_unmark_ctid(code)  # was self.unmark(editor_pos) <- L
+            self._margin_unmark_ctid(code)
             return
         if action == action_code_memo:
-            self._margin_coded_text_memo_ctid(code)  # was self.coded_text_memo(editor_pos) <- L
+            self._margin_coded_text_memo_ctid(code)
             return
         if action == action_resize:
-            self._margin_resize_ctid(code)  # was self.display_handles_for_code(editor_pos) <- L
+            self._margin_resize_ctid(code)
             return
         if action == action_annotate:
-            self._margin_annotate_ctid(code)  # was self.annotate() <- L
+            self._margin_annotate_ctid(code)
             return
         if action == action_change_code:
-            self._margin_change_code_ctid(code)  # was self.change_code_to_another_code(editor_pos) <- L
+            self._margin_change_code_ctid(code)
             return
 
     # Per-ctid action variants used ONLY by the margin code-actions menu.
@@ -1165,7 +1165,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                     + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def _margin_resize_ctid(self, code):  # <- L
+    def _margin_resize_ctid(self, code):
         """ Show resize handles bound to the EXACT coded segment (by ctid)
         clicked in the margin, without the DialogSelectItems prompt. """
 
@@ -1181,7 +1181,8 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
-        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        # start teardrop tip is at its top-right corner -> shift left by full width
+        h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
 
         # Create end handle
@@ -1190,7 +1191,8 @@ class DialogCodeText(QtWidgets.QWidget):
                                    code_to_handle['pos1'] - self.file_['start']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
-        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        # end teardrop tip is at its top-left corner -> align directly to the cursor x
+        h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
 
     def _toggle_margin_visibility_only(self):
@@ -1851,9 +1853,6 @@ class DialogCodeText(QtWidgets.QWidget):
         selected = self.ui.treeWidget.currentItem()
         if selected is None:
             return
-        '''# Clear journal state <- L
-        self.file_journal_jids = []
-        self.file_journal_display_idx = -1'''
         self.project_memo = False
         self.code_rule = True
         self.ui.textEdit_info.setReadOnly(True)
@@ -1888,10 +1887,6 @@ class DialogCodeText(QtWidgets.QWidget):
     def show_project_memo(self):
         """ Show project memo in right-hand side splitter pane """
 
-        '''# Clear journal state
-        self.file_journal_jids = []
-        self.file_journal_display_idx = -1'''
-
         cur = self.app.conn.cursor()
         cur.execute("select memo from project")
         res = cur.fetchone()
@@ -1902,166 +1897,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(res[0])
         self.ui.textEdit_info.blockSignals(False)
-    
-    '''def show_file_journal(self):  # <- L
-        """ Left-click: cycle through journals linked to current file in read-only mode.
-        Each click shows the next journal. If no journals exist, shows empty pane.
-        Journal names match the file name (with optional _N suffix for multiples). """
-
-        if self.file_ is None:
-            return  # silent return <- L
-        self.project_memo = False
-        self.code_rule = False
-        cur = self.app.conn.cursor()
-        base_name = self.file_['name']
-        # Find all journals whose name matches the file name or file name with suffix <- L
-        cur.execute("select jid, name, jentry from journal where name=? or name like ? order by name",  # <- L
-                    [base_name, base_name + "\\_%"])  # <- L
-        results = cur.fetchall()
-        self.file_journal_jids = results  # store full tuples (jid, name, jentry) <- L 
-        if not results:
-            self.file_journal_display_idx = -1
-            self.ui.label_info.setText(_("Journal: ") + base_name + " " + _("(none)"))
-            self.ui.textEdit_info.blockSignals(True)
-            self.ui.textEdit_info.setReadOnly(True)
-            self.ui.textEdit_info.setText("")
-            self.ui.textEdit_info.blockSignals(False)
-            return
-        # Cycle to next journal
-        self.file_journal_display_idx += 1
-        if self.file_journal_display_idx >= len(results):  # wrap around <- L
-            self.file_journal_display_idx = 0
-        idx = self.file_journal_display_idx
-        j_name = results[idx][1]
-        j_text = results[idx][2] if results[idx][2] else ""
-        # Label shows current/total
-        label = f"{_('Journal')}: {j_name}"
-        if len(results) > 1:
-            label += f"  ({idx + 1}/{len(results)}) — {_('click to cycle')}"
-        self.ui.label_info.setText(label)
-        self.ui.textEdit_info.blockSignals(True)
-        self.ui.textEdit_info.setReadOnly(True)  # read-only view
-        self.ui.textEdit_info.setText(j_text)
-        self.ui.textEdit_info.blockSignals(False)'''
-        
-    '''def journal_button_menu(self, position):  # right-click context menu for journal button <- L
-        """ Right-click context menu for journal button.
-        Options: Create new journal, Edit journal (opens dialog). """
-
-        if self.file_ is None:
-            Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
-            return
-        cur = self.app.conn.cursor()
-        base_name = self.file_['name']
-        cur.execute("select jid, name from journal where name=? or name like ?",
-                    [base_name, base_name + "\\_%"])
-        existing = cur.fetchall()
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
-        action_create = None
-        action_edit = None
-        if existing:  # journal(s) already linked — only allow editing <- L
-            action_edit = menu.addAction(_("Edit journal"))
-        else:  # nno journals yet — only allow creation <- L
-            action_create = menu.addAction(_("Create new journal"))
-
-        action = menu.exec(self.ui.pushButton_journal.mapToGlobal(position))
-        if action is None:  # <- L
-            return  # <- L
-        if action == action_create:  # <- L
-            self._create_file_journal()  # <- L
-        elif action == action_edit:  # <- L
-            self._edit_file_journal()  # <- L'''
-
-    '''def _create_file_journal(self):  # <- L
-        """ Create a new journal with the same name as the file.
-        If a journal with that name exists, append _1, _2, etc.
-        Uses the custom journal editor dialog with context menu. """
-
-        if self.file_ is None:
-            return
-        cur = self.app.conn.cursor()
-        base_name = self.file_['name']
-        journal_name = base_name
-        # Check if name exists and find next available suffix
-        cur.execute("select name from journal where name=?", [journal_name])
-        if cur.fetchone() is not None:
-            suffix = 1
-            while True:
-                candidate = f"{base_name}_{suffix}"
-                cur.execute("select name from journal where name=?", [candidate])
-                if cur.fetchone() is None:
-                    journal_name = candidate
-                    break
-                suffix += 1
-        # Open journal editor dialog
-        dlg = DialogEditJournal(self.app, journal_name, "", self.file_)
-        ok = dlg.exec()
-        if not ok:
-            return
-        journal_text = dlg.get_text()
-        if not journal_text.strip():
-            return  # <- L do not create empty journals
-        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        cur.execute("insert into journal(name, jentry, owner, date) values(?,?,?,?)",
-                    (journal_name, journal_text, self.app.settings['codername'], now_date))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        self.parent_textEdit.append(_("Journal created: ") + journal_name)
-        self.file_journal_display_idx = -1  # reset cycle index
-        self.show_file_journal()  # refresh the read-only view'''
-
-    '''def _edit_file_journal(self):  # <- L
-        """ Edit an existing journal linked to the current file.
-        If multiple journals exist, let the user select which one to edit.
-        Opens a custom journal editor dialog with context menu options. """
-
-        if self.file_ is None:
-            return
-        cur = self.app.conn.cursor()
-        base_name = self.file_['name']
-        cur.execute("select jid, name, jentry from journal where name=? or name like ? order by name",
-                    [base_name, base_name + "\\_%"])
-        results = cur.fetchall()
-        if not results:
-            Message(self.app, _("Warning"), _("No journals found for this file."), "warning").exec()
-            return
-        # If only one journal, open it directly
-        if len(results) == 1:
-            jid = results[0][0]
-            j_name = results[0][1]
-            j_text = results[0][2] if results[0][2] else ""
-        else:
-            # Multiple journals: let user select which to edit
-            journal_list = [{'name': r[1], 'jid': r[0]} for r in results]
-            ui = DialogSelectItems(self.app, journal_list, _("Select journal to edit"), "single")
-            ok = ui.exec()
-            if not ok:
-                return
-            selected = ui.get_selected()
-            if not selected:
-                return
-            jid = selected['jid']
-            j_name = selected['name']
-            cur.execute("select jentry from journal where jid=?", [jid])
-            res = cur.fetchone()
-            j_text = res[0] if res and res[0] else ""
-        # Open journal editor dialog
-        dlg = DialogEditJournal(self.app, j_name, j_text, self.file_)
-        ok = dlg.exec()
-        if not ok:
-            return
-        new_text = dlg.get_text()
-        if new_text == j_text:  # no changes
-            return
-        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        cur.execute("update journal set jentry=?, date=? where jid=?",
-                    (new_text, now_date, jid))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        self.file_journal_display_idx = -1  # reset cycle index after edit
-        self.show_file_journal()  # refresh the read-only view'''
             
     # Header section widgets
     def delete_all_codes_from_file(self):
@@ -2503,7 +2338,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.mark()
 
     def mark_with_new_code(self, in_vivo: bool = False):
-        """ Create new code and mark selected text.
+        """ Create new code. If text selected, mark selected text.
         Called through text_edit_menu or N key press - with selected text.
         Args:
             in_vivo : Boolean if True use in vivo text selection as code name """
@@ -3509,7 +3344,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_M:
             self.coded_text_memo(cursor_pos)
             return
-        if key == QtCore.Qt.Key.Key_N and self.ui.plainTextEdit.textCursor().selectedText() != '':
+        if key == QtCore.Qt.Key.Key_N:  # and self.ui.plainTextEdit.textCursor().selectedText() != '':
             self.mark_with_new_code(False)
             return
         # Overlapping codes cycle
