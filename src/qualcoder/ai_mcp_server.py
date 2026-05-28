@@ -95,12 +95,13 @@ class AiMcpServer:
             "cases list (qualcoder://cases), case details by id (qualcoder://cases/{id}), "
             "and case text segments by case id (qualcoder://cases/text/{id}), "
             "code tree (qualcoder://codes/tree), and coded text segments by code id "
-            "(qualcoder://codes/segments/{cid}), semantic vector search "
-            "(qualcoder://vector/search?q=...) with optional filters file_ids and exclude_cids, "
+            "(qualcoder://codes/segments/{cid}) with optional filters file_ids, case_ids, and owner, "
+            "semantic vector search "
+            "(qualcoder://vector/search?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
             "BM25 chunk search "
-            "(qualcoder://search/bm25?q=...) with optional filters file_ids and exclude_cids, "
+            "(qualcoder://search/bm25?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
             "and regular-expression search "
-            "(qualcoder://search/regex?pattern=...) with optional filters file_ids and exclude_cids. "
+            "(qualcoder://search/regex?pattern=...) with optional filters file_ids, case_ids, and exclude_cids. "
             "Available tools include preview and write operations for categories, codes, and text codings. "
             "Delete actions on categories or codes should be previewed before execution."
         )
@@ -579,37 +580,38 @@ class AiMcpServer:
                     name="Coded text segments by code id",
                     description=(
                         "Read coded text segments for a code id. Optional query params: strategy "
-                        "(diverse_by_document|recent_first|sequential), max_segments, max_chars, cursor, file_ids, owner. "
+                        "(diverse_by_document|recent_first|sequential), max_segments, max_chars, cursor, "
+                        "file_ids, case_ids, owner. "
                         "If owner is set, the server reads from code_text instead of code_text_visible."
                     ),
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
-                    uriTemplate="qualcoder://vector/search{?q,cursor,file_ids,exclude_cids,score_threshold}",
+                    uriTemplate="qualcoder://vector/search{?q,cursor,file_ids,case_ids,exclude_cids,score_threshold}",
                     name="Semantic vector search",
                     description=(
                         "Search semantically similar text chunks. Pass one or more q parameters "
                         "(for example ?q=work&q=employment). Optional params: cursor, "
-                        "file_ids, exclude_cids, score_threshold."
+                        "file_ids, case_ids, exclude_cids, score_threshold."
                     ),
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
-                    uriTemplate="qualcoder://search/bm25{?q,cursor,page_size,file_ids,exclude_cids}",
+                    uriTemplate="qualcoder://search/bm25{?q,cursor,page_size,file_ids,case_ids,exclude_cids}",
                     name="BM25 search",
                     description=(
                         "Search chunked text lexically using SQLite FTS5 BM25 ranking. "
                         "Pass one or more q parameters. Optional params: cursor, page_size, "
-                        "file_ids and exclude_cids."
+                        "file_ids, case_ids, and exclude_cids."
                     ),
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
-                    uriTemplate="qualcoder://search/regex{?pattern,flags,cursor,page_size,file_ids,exclude_cids,context_chars}",
+                    uriTemplate="qualcoder://search/regex{?pattern,flags,cursor,page_size,file_ids,case_ids,exclude_cids,context_chars}",
                     name="Regular-expression search",
                     description=(
                         "Search text documents using a regular expression pattern. "
-                        "Optional params: flags (imsx), cursor, page_size, file_ids, "
+                        "Optional params: flags (imsx), cursor, page_size, file_ids, case_ids, "
                         "exclude_cids, context_chars."
                     ),
                     mimeType="application/json",
@@ -720,21 +722,21 @@ class AiMcpServer:
                 uri="qualcoder://vector/search",
                 name="Semantic vector search",
                 description="Semantic retrieval over embedded text chunks. Requires query param q. "
-                            "Optional filters: file_ids and exclude_cids.",
+                            "Optional filters: file_ids, case_ids, and exclude_cids.",
                 mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://search/bm25",
                 name="BM25 search",
                 description="FTS5/BM25 lexical retrieval over text chunks. Requires query param q. "
-                            "Optional filters: file_ids and exclude_cids.",
+                            "Optional filters: file_ids, case_ids, and exclude_cids.",
                 mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://search/regex",
                 name="Regular-expression search",
                 description="Regex keyword search over text documents. Requires query param pattern. "
-                            "Optional filters: file_ids and exclude_cids.",
+                            "Optional filters: file_ids, case_ids, and exclude_cids.",
                 mimeType="application/json",
             ),
         ]
@@ -2180,14 +2182,8 @@ class AiMcpServer:
         cursor = self._to_int(query.get("cursor", [0])[0], 0)
         cursor = max(0, cursor)
 
-        file_ids: List[int] = []
-        for raw in query.get("file_ids", []):
-            parts = [p.strip() for p in str(raw).split(",")]
-            for part in parts:
-                if part == "":
-                    continue
-                file_ids.append(max(0, self._to_int(part, -1)))
-        file_ids = [fid for fid in file_ids if fid > 0]
+        file_ids = self._parse_positive_int_list_options(query, ("file_ids",))
+        case_ids = self._parse_positive_int_list_options(query, ("case_ids",))
         owners = self._parse_string_list_options(query, ("owner", "owners"))
 
         return {
@@ -2196,6 +2192,7 @@ class AiMcpServer:
             "max_chars": max_chars,
             "cursor": cursor,
             "file_ids": file_ids,
+            "case_ids": case_ids,
             "owners": owners,
         }
 
@@ -2298,12 +2295,14 @@ class AiMcpServer:
         score_threshold = max(0.0, min(score_threshold, 1.0))
 
         file_ids = self._parse_positive_int_list_options(query, ("file_ids",))
+        case_ids = self._parse_positive_int_list_options(query, ("case_ids",))
         exclude_cids = self._parse_positive_int_list_options(query, ("exclude_cids", "exclude_code_ids", "cids"))
 
         return {
             "queries": deduped_queries,
             "cursor": cursor,
             "file_ids": file_ids,
+            "case_ids": case_ids,
             "exclude_cids": exclude_cids,
             "score_threshold": score_threshold,
         }
@@ -2340,6 +2339,7 @@ class AiMcpServer:
         page_size = max(1, min(page_size, self.max_bm25_page_size))
 
         file_ids = self._parse_positive_int_list_options(query, ("file_ids",))
+        case_ids = self._parse_positive_int_list_options(query, ("case_ids",))
         exclude_cids = self._parse_positive_int_list_options(query, ("exclude_cids", "exclude_code_ids", "cids"))
 
         return {
@@ -2347,6 +2347,7 @@ class AiMcpServer:
             "cursor": cursor,
             "page_size": page_size,
             "file_ids": file_ids,
+            "case_ids": case_ids,
             "exclude_cids": exclude_cids,
         }
 
@@ -2378,6 +2379,7 @@ class AiMcpServer:
         context_chars = max(0, min(context_chars, self.max_regex_context_chars))
 
         file_ids = self._parse_positive_int_list_options(query, ("file_ids",))
+        case_ids = self._parse_positive_int_list_options(query, ("case_ids",))
         exclude_cids = self._parse_positive_int_list_options(query, ("exclude_cids", "exclude_code_ids", "cids"))
 
         return {
@@ -2387,6 +2389,7 @@ class AiMcpServer:
             "page_size": page_size,
             "context_chars": context_chars,
             "file_ids": file_ids,
+            "case_ids": case_ids,
             "exclude_cids": exclude_cids,
         }
 
@@ -2409,6 +2412,9 @@ class AiMcpServer:
         file_ids = options.get("file_ids", [])
         if not isinstance(file_ids, list):
             file_ids = []
+        case_ids = options.get("case_ids", [])
+        if not isinstance(case_ids, list):
+            case_ids = []
         exclude_cids = options.get("exclude_cids", [])
         if not isinstance(exclude_cids, list):
             exclude_cids = []
@@ -2416,7 +2422,34 @@ class AiMcpServer:
                                                       self.default_vector_score_threshold), 1.0))
         k_per_query = self.default_vector_k_per_query
 
-        cache_key = self._vector_search_cache_key(queries, file_ids, exclude_cids, score_threshold, k_per_query)
+        case_ranges = self._fetch_case_ranges(case_ids, file_ids if len(file_ids) > 0 else None) if len(case_ids) > 0 else {}
+        effective_file_ids = file_ids
+        if len(case_ids) > 0:
+            effective_file_ids = sorted(case_ranges.keys())
+            if len(effective_file_ids) == 0:
+                return {
+                    "selection": {
+                        "queries": queries,
+                        "cursor": 0,
+                        "file_ids": file_ids,
+                        "case_ids": case_ids,
+                        "exclude_cids": exclude_cids,
+                        "score_threshold": score_threshold,
+                        "total_hits": 0,
+                        "next_cursor": 0,
+                        "truncated": False,
+                    },
+                    "hits": [],
+                }
+
+        cache_key = self._vector_search_cache_key(
+            queries,
+            effective_file_ids,
+            case_ids,
+            exclude_cids,
+            score_threshold,
+            k_per_query,
+        )
 
         conn = self._connect_chat_history()
         try:
@@ -2429,7 +2462,8 @@ class AiMcpServer:
                     cache_key,
                     vectorstore_sig,
                     queries,
-                    file_ids,
+                    effective_file_ids,
+                    case_ids,
                     exclude_cids,
                     score_threshold,
                     k_per_query,
@@ -2522,6 +2556,7 @@ class AiMcpServer:
                     "queries": queries,
                     "cursor": cursor,
                     "file_ids": file_ids,
+                    "case_ids": case_ids,
                     "exclude_cids": exclude_cids,
                     "score_threshold": score_threshold,
                     "total_hits": total_hits,
@@ -2554,6 +2589,9 @@ class AiMcpServer:
         file_ids = options.get("file_ids", [])
         if not isinstance(file_ids, list):
             file_ids = []
+        case_ids = options.get("case_ids", [])
+        if not isinstance(case_ids, list):
+            case_ids = []
         exclude_cids = options.get("exclude_cids", [])
         if not isinstance(exclude_cids, list):
             exclude_cids = []
@@ -2562,7 +2600,25 @@ class AiMcpServer:
         if search_db_path is None or str(search_db_path).strip() == "" or not os.path.exists(search_db_path):
             raise RuntimeError("Search index is not initialized.")
 
-        excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, file_ids) if len(exclude_cids) > 0 else {}
+        case_ranges = self._fetch_case_ranges(case_ids, file_ids if len(file_ids) > 0 else None) if len(case_ids) > 0 else {}
+        effective_file_ids = file_ids
+        if len(case_ids) > 0:
+            effective_file_ids = sorted(case_ranges.keys())
+            if len(effective_file_ids) == 0:
+                return {
+                    "selection": {
+                        "queries": queries,
+                        "cursor": 0,
+                        "file_ids": file_ids,
+                        "case_ids": case_ids,
+                        "exclude_cids": exclude_cids,
+                        "total_hits": 0,
+                        "next_cursor": 0,
+                        "truncated": False,
+                    },
+                    "hits": [],
+                }
+        excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, effective_file_ids) if len(exclude_cids) > 0 else {}
         fused_hits: Dict[int, Dict[str, Any]] = {}
 
         search_conn = sqlite3.connect(search_db_path, timeout=30)
@@ -2571,7 +2627,7 @@ class AiMcpServer:
                 params: List[Any] = [str(query_text)]
                 where_sql = " WHERE search_chunk_fts MATCH ?"
                 normalized_file_ids = []
-                for fid in file_ids:
+                for fid in effective_file_ids:
                     fid_i = self._to_int(fid, -1)
                     if fid_i > 0:
                         normalized_file_ids.append(fid_i)
@@ -2598,6 +2654,12 @@ class AiMcpServer:
                     start_index = self._to_int(row[3], -1)
                     length = self._to_int(row[4], 0)
                     if chunk_id <= 0 or source_id <= 0 or start_index < 0 or length <= 0:
+                        continue
+                    if len(case_ids) > 0 and not self._range_within_any(
+                        start_index,
+                        start_index + length,
+                        case_ranges.get(source_id, []),
+                    ):
                         continue
                     if len(excluded_ranges) > 0:
                         if self._range_overlaps_any(start_index, start_index + length, excluded_ranges.get(source_id, [])):
@@ -2660,6 +2722,7 @@ class AiMcpServer:
                     "queries": queries,
                     "cursor": cursor,
                     "file_ids": file_ids,
+                    "case_ids": case_ids,
                     "exclude_cids": exclude_cids,
                     "total_hits": total_hits,
                     "next_cursor": next_cursor,
@@ -2683,6 +2746,9 @@ class AiMcpServer:
         file_ids = options.get("file_ids", [])
         if not isinstance(file_ids, list):
             file_ids = []
+        case_ids = options.get("case_ids", [])
+        if not isinstance(case_ids, list):
+            case_ids = []
         exclude_cids = options.get("exclude_cids", [])
         if not isinstance(exclude_cids, list):
             exclude_cids = []
@@ -2693,7 +2759,36 @@ class AiMcpServer:
         except re.error as err:
             raise ValueError(f"Invalid regex pattern: {err}")
 
-        cache_key = self._regex_search_cache_key(pattern_text, flags_text, file_ids, exclude_cids, context_chars)
+        case_ranges = self._fetch_case_ranges(case_ids, file_ids if len(file_ids) > 0 else None) if len(case_ids) > 0 else {}
+        effective_file_ids = file_ids
+        if len(case_ids) > 0:
+            effective_file_ids = sorted(case_ranges.keys())
+            if len(effective_file_ids) == 0:
+                return {
+                    "selection": {
+                        "pattern": pattern_text,
+                        "flags": flags_text,
+                        "cursor": 0,
+                        "page_size": page_size,
+                        "context_chars": context_chars,
+                        "file_ids": file_ids,
+                        "case_ids": case_ids,
+                        "exclude_cids": exclude_cids,
+                        "total_hits": 0,
+                        "next_cursor": 0,
+                        "truncated": False,
+                    },
+                    "hits": [],
+                }
+
+        cache_key = self._regex_search_cache_key(
+            pattern_text,
+            flags_text,
+            effective_file_ids,
+            case_ids,
+            exclude_cids,
+            context_chars,
+        )
 
         conn = self._connect_chat_history()
         try:
@@ -2705,7 +2800,8 @@ class AiMcpServer:
                     cache_key,
                     pattern_text,
                     flags_text,
-                    file_ids,
+                    effective_file_ids,
+                    case_ids,
                     exclude_cids,
                     context_chars,
                 )
@@ -2801,6 +2897,7 @@ class AiMcpServer:
                     "page_size": page_size,
                     "context_chars": context_chars,
                     "file_ids": file_ids,
+                    "case_ids": case_ids,
                     "exclude_cids": exclude_cids,
                     "total_hits": total_hits,
                     "next_cursor": next_cursor,
@@ -2921,7 +3018,7 @@ class AiMcpServer:
 
     def _build_vector_search_cache(self, conn: sqlite3.Connection, cache_key: str,
                                    vectorstore_sig: str, queries: List[str], file_ids: List[int],
-                                   exclude_cids: List[int], score_threshold: float,
+                                   case_ids: List[int], exclude_cids: List[int], score_threshold: float,
                                    k_per_query: int) -> Tuple[int, int]:
         ai = getattr(self.app, "ai", None)
         if ai is None:
@@ -2936,8 +3033,9 @@ class AiMcpServer:
         if not isinstance(chunks, list):
             chunks = []
 
-        if len(exclude_cids) > 0 and len(chunks) > 0:
-            excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, file_ids)
+        case_ranges = self._fetch_case_ranges(case_ids, file_ids if len(file_ids) > 0 else None) if len(case_ids) > 0 and len(chunks) > 0 else {}
+        excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, file_ids) if len(exclude_cids) > 0 and len(chunks) > 0 else {}
+        if (len(case_ranges) > 0 or len(excluded_ranges) > 0) and len(chunks) > 0:
             filtered_chunks = []
             for chunk_doc in chunks:
                 metadata = getattr(chunk_doc, "metadata", {})
@@ -2948,7 +3046,13 @@ class AiMcpServer:
                 page_content = str(getattr(chunk_doc, "page_content", ""))
                 text_length = len(page_content)
                 if source_id <= 0 or start_index < 0 or text_length <= 0:
-                    # Strict mode for exclude_cids: only keep verifiable "new" passages.
+                    # Strict mode for range-based filters: only keep verifiable passages.
+                    continue
+                if len(case_ids) > 0 and not self._range_within_any(
+                    start_index,
+                    start_index + text_length,
+                    case_ranges.get(source_id, []),
+                ):
                     continue
                 if self._range_overlaps_any(
                     start_index,
@@ -3054,7 +3158,7 @@ class AiMcpServer:
         return cache_id, total_hits
 
     def _build_regex_search_cache(self, conn: sqlite3.Connection, cache_key: str, pattern_text: str,
-                                  flags_text: str, file_ids: List[int], exclude_cids: List[int],
+                                  flags_text: str, file_ids: List[int], case_ids: List[int], exclude_cids: List[int],
                                   context_chars: int) -> Tuple[int, int]:
         re_flags = self._regex_flags_to_re_flags(flags_text)
         try:
@@ -3111,6 +3215,7 @@ class AiMcpServer:
                 raise
             return existing
 
+        case_ranges = self._fetch_case_ranges(case_ids, norm_file_ids if len(norm_file_ids) > 0 else None) if len(case_ids) > 0 else {}
         excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, norm_file_ids) if len(exclude_cids) > 0 else {}
         match_rows: List[Tuple[Any, ...]] = []
         for row in rows:
@@ -3123,6 +3228,10 @@ class AiMcpServer:
                 match_end = int(match.end())
                 if match_end <= match_start:
                     continue
+                if len(case_ids) > 0:
+                    case_range_matches = case_ranges.get(source_id, [])
+                    if not self._range_within_any(match_start, match_end, case_range_matches):
+                        continue
                 if len(excluded_ranges) > 0:
                     if self._range_overlaps_any(match_start, match_end, excluded_ranges.get(source_id, [])):
                         continue
@@ -3168,7 +3277,7 @@ class AiMcpServer:
         return cache_id, len(insert_rows)
 
     def _vector_search_cache_key(self, queries: List[str], file_ids: List[int],
-                                 exclude_cids: List[int], score_threshold: float,
+                                 case_ids: List[int], exclude_cids: List[int], score_threshold: float,
                                  k_per_query: int) -> str:
         norm_file_ids: List[int] = []
         for fid in file_ids:
@@ -3178,6 +3287,14 @@ class AiMcpServer:
                 continue
             if fid_i > 0:
                 norm_file_ids.append(fid_i)
+        norm_case_ids: List[int] = []
+        for case_id in case_ids:
+            try:
+                case_id_i = int(case_id)
+            except (TypeError, ValueError):
+                continue
+            if case_id_i > 0:
+                norm_case_ids.append(case_id_i)
         norm_exclude_cids: List[int] = []
         for cid in exclude_cids:
             try:
@@ -3189,6 +3306,7 @@ class AiMcpServer:
         payload = {
             "queries": queries,
             "file_ids": sorted(set(norm_file_ids)),
+            "case_ids": sorted(set(norm_case_ids)),
             "exclude_cids": sorted(set(norm_exclude_cids)),
             "score_threshold": round(float(score_threshold), 4),
             "k_per_query": int(k_per_query),
@@ -3197,7 +3315,7 @@ class AiMcpServer:
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     def _regex_search_cache_key(self, pattern_text: str, flags_text: str, file_ids: List[int],
-                                exclude_cids: List[int], context_chars: int) -> str:
+                                case_ids: List[int], exclude_cids: List[int], context_chars: int) -> str:
         norm_file_ids: List[int] = []
         for fid in file_ids:
             try:
@@ -3206,6 +3324,14 @@ class AiMcpServer:
                 continue
             if fid_i > 0:
                 norm_file_ids.append(fid_i)
+        norm_case_ids: List[int] = []
+        for case_id in case_ids:
+            try:
+                case_id_i = int(case_id)
+            except (TypeError, ValueError):
+                continue
+            if case_id_i > 0:
+                norm_case_ids.append(case_id_i)
         norm_exclude_cids: List[int] = []
         for cid in exclude_cids:
             try:
@@ -3219,6 +3345,7 @@ class AiMcpServer:
             "pattern": pattern_text,
             "flags": flags_text,
             "file_ids": sorted(set(norm_file_ids)),
+            "case_ids": sorted(set(norm_case_ids)),
             "exclude_cids": sorted(set(norm_exclude_cids)),
             "context_chars": int(context_chars),
         }
@@ -3301,6 +3428,65 @@ class AiMcpServer:
             fulltext = "" if row[2] is None else str(row[2])
             result[source_id] = (source_name, fulltext)
         return result
+
+    def _fetch_case_ranges(self, case_ids: List[int], file_ids: Optional[List[int]] = None) -> Dict[int, List[Tuple[int, int]]]:
+        """Fetch text-backed case ranges grouped by source id."""
+
+        normalized_case_ids: List[int] = []
+        for case_id in list(case_ids or []):
+            case_id_i = self._to_int(case_id, -1)
+            if case_id_i > 0:
+                normalized_case_ids.append(case_id_i)
+        normalized_case_ids = sorted(set(normalized_case_ids))
+        if len(normalized_case_ids) == 0:
+            return {}
+
+        where_parts: List[str] = ["ct.caseid IN (" + ",".join(["?"] * len(normalized_case_ids)) + ")", "source.fulltext is not null", "ct.pos1 > ct.pos0"]
+        params: List[Any] = list(normalized_case_ids)
+
+        normalized_file_ids: List[int] = []
+        for fid in list(file_ids or []):
+            fid_i = self._to_int(fid, -1)
+            if fid_i > 0:
+                normalized_file_ids.append(fid_i)
+        normalized_file_ids = sorted(set(normalized_file_ids))
+        if len(normalized_file_ids) > 0:
+            where_parts.append("ct.fid IN (" + ",".join(["?"] * len(normalized_file_ids)) + ")")
+            params.extend(normalized_file_ids)
+
+        rows = self._fetchall(
+            "SELECT ct.fid, ct.pos0, ct.pos1 "
+            "FROM case_text AS ct "
+            "JOIN source ON source.id = ct.fid "
+            "WHERE " + " AND ".join(where_parts) + " "
+            "ORDER BY ct.fid, ct.pos0, ct.pos1",
+            tuple(params),
+        )
+        result: Dict[int, List[Tuple[int, int]]] = {}
+        for row in rows:
+            fid = self._to_int(row[0], -1)
+            pos0 = self._to_int(row[1], -1)
+            pos1 = self._to_int(row[2], -1)
+            if fid <= 0 or pos0 < 0 or pos1 <= pos0:
+                continue
+            if fid not in result:
+                result[fid] = []
+            result[fid].append((pos0, pos1))
+        return result
+
+    def _range_within_any(self, start: int, end: int, ranges: List[Tuple[int, int]]) -> bool:
+        """Return True if [start, end) is fully contained in any range in ranges."""
+
+        if end <= start:
+            return False
+        if not isinstance(ranges, list) or len(ranges) == 0:
+            return False
+        for r_start, r_end in ranges:
+            if start >= r_start and end <= r_end:
+                return True
+            if r_start > start:
+                break
+        return False
 
     def _line_ranges(self, fulltext: str) -> List[Tuple[int, int]]:
         """Return 0-based [start, end) character ranges for each logical line."""
@@ -3456,6 +3642,9 @@ class AiMcpServer:
         file_ids = options.get("file_ids", [])
         if not isinstance(file_ids, list):
             file_ids = []
+        case_ids = options.get("case_ids", [])
+        if not isinstance(case_ids, list):
+            case_ids = []
         owners = options.get("owners", [])
         if not isinstance(owners, list):
             owners = []
@@ -3473,6 +3662,15 @@ class AiMcpServer:
             placeholders = ",".join(["?"] * len(file_ids))
             where_parts.append(f"ct.fid IN ({placeholders})")
             where_params.extend(file_ids)
+        if len(case_ids) > 0:
+            placeholders = ",".join(["?"] * len(case_ids))
+            where_parts.append(
+                "EXISTS (SELECT 1 FROM case_text AS ctf "
+                "WHERE ctf.fid = ct.fid "
+                f"AND ctf.caseid IN ({placeholders}) "
+                "AND ct.pos0 >= ctf.pos0 AND ct.pos1 <= ctf.pos1)"
+            )
+            where_params.extend(case_ids)
         if len(owners) > 0:
             placeholders = ",".join(["?"] * len(owners))
             where_parts.append(f"ct.owner IN ({placeholders})")
@@ -3585,6 +3783,7 @@ class AiMcpServer:
                 "max_chars": max_chars,
                 "cursor": cursor,
                 "file_ids": file_ids,
+                "case_ids": case_ids,
                 "total_segments": total_segments,
                 "next_cursor": next_cursor,
                 "truncated": truncated,

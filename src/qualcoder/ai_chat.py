@@ -2648,7 +2648,8 @@ class DialogAIChat(QtWidgets.QDialog):
             },
         )
 
-    def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: List[int]) -> str:
+    def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: List[int],
+                                             case_ids: Optional[List[int]] = None) -> str:
         """Build the MCP vector-search URI used to bootstrap one topic exploration chat."""
 
         query_variants = self.app.ai.generate_code_descriptions(topic_name, topic_description)
@@ -2678,6 +2679,13 @@ class DialogAIChat(QtWidgets.QDialog):
                 continue
             if file_id > 0:
                 params.append(("file_ids", str(file_id)))
+        for raw_case_id in list(case_ids or []):
+            try:
+                case_id = int(raw_case_id)
+            except Exception:
+                continue
+            if case_id > 0:
+                params.append(("case_ids", str(case_id)))
         query_string = urlencode(params, doseq=True)
         if query_string == '':
             return "qualcoder://vector/search"
@@ -3363,7 +3371,8 @@ class DialogAIChat(QtWidgets.QDialog):
         return [max(1, value) for value in budgets]
 
     def _code_analysis_segments_uri(self, cid: int, file_ids: List[int], coder_names: List[str],
-                                    max_segments: int, max_chars: int) -> str:
+                                    max_segments: int, max_chars: int,
+                                    case_ids: Optional[List[int]] = None) -> str:
         """Build the MCP coded-segments URI used to bootstrap one code analysis chat."""
 
         params: List[Tuple[str, str]] = [
@@ -3378,6 +3387,13 @@ class DialogAIChat(QtWidgets.QDialog):
                 continue
             if file_id > 0:
                 params.append(("file_ids", str(file_id)))
+        for raw_case_id in list(case_ids or []):
+            try:
+                case_id = int(raw_case_id)
+            except Exception:
+                continue
+            if case_id > 0:
+                params.append(("case_ids", str(case_id)))
         seen_coders: set[str] = set()
         for raw in list(coder_names or []):
             coder = str(raw if raw is not None else '').strip()
@@ -3548,6 +3564,8 @@ class DialogAIChat(QtWidgets.QDialog):
         code_ids = list(spec.get("code_ids", []) or [])
         code_scope = list(spec.get("code_scope", []) or [])
         coder_names = list(spec.get("coder_names", []) or [])
+        filter_info = dict(spec.get("filter_info", {}) or {})
+        selected_case_ids = list(filter_info.get("selected_case_ids", []) or [])
         prompt_name = str(spec.get("prompt_name", "")).strip()
 
         prompt_record = self.agent_prompts_catalog.find_prompt_variant(
@@ -3599,6 +3617,7 @@ class DialogAIChat(QtWidgets.QDialog):
                             coder_names,
                             segment_budgets[idx],
                             char_budgets[idx],
+                            selected_case_ids,
                         )
                     },
                 )
