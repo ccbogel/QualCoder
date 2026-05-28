@@ -2495,6 +2495,7 @@ class AiMcpServer:
                 docstore_ids = [str(row[1]).strip() for row in rows if row[1] is not None and str(row[1]).strip() != ""]
                 docs_map = self._fetch_cached_documents_by_docstore_id(docstore_ids)
                 source_texts = self._fetch_sources_texts([self._to_int(row[2], -1) for row in rows])
+                case_memberships = self._fetch_case_memberships([self._to_int(row[2], -1) for row in rows])
 
                 for row in rows:
                     position = self._to_int(row[0], 0)
@@ -2541,6 +2542,11 @@ class AiMcpServer:
                         "start": (start_index if start_index >= 0 else None),
                         "length": len(text),
                         "text": text,
+                        "matching_cases": self._matching_cases_for_range(
+                            start_index,
+                            start_index + len(text),
+                            case_memberships.get(source_id, []),
+                        ),
                     }
                     self._append_line_range_fields(hit_payload, source_fulltext, start_index, len(text))
                     hits.append(hit_payload)
@@ -2698,6 +2704,7 @@ class AiMcpServer:
             cursor = total_hits
         sliced_hits = ordered_hits[cursor:cursor + page_size]
         source_texts = self._fetch_sources_texts([self._to_int(hit.get("source_id"), -1) for hit in sliced_hits])
+        case_memberships = self._fetch_case_memberships([self._to_int(hit.get("source_id"), -1) for hit in sliced_hits])
         returned_hits: List[Dict[str, Any]] = []
         for hit in sliced_hits:
             source_id = self._to_int(hit.get("source_id"), -1)
@@ -2711,6 +2718,11 @@ class AiMcpServer:
                 "start": hit["start"],
                 "length": hit["length"],
                 "text": hit["text"],
+                "matching_cases": self._matching_cases_for_range(
+                    self._to_int(hit.get("start"), -1),
+                    self._to_int(hit.get("start"), -1) + self._to_int(hit.get("length"), 0),
+                    case_memberships.get(source_id, []),
+                ),
             }
             self._append_line_range_fields(hit_payload, source_fulltext, hit.get("start"), hit.get("length"))
             returned_hits.append(hit_payload)
@@ -2831,6 +2843,7 @@ class AiMcpServer:
 
                 source_ids = [self._to_int(row[1], -1) for row in rows]
                 source_texts = self._fetch_sources_texts(source_ids)
+                case_memberships = self._fetch_case_memberships(source_ids)
 
                 for row in rows:
                     position = self._to_int(row[0], 0)
@@ -2879,6 +2892,11 @@ class AiMcpServer:
                         "match_start": match_start,
                         "match_length": match_length,
                         "text": context_text,
+                        "matching_cases": self._matching_cases_for_range(
+                            match_start,
+                            match_start + match_length,
+                            case_memberships.get(source_id, []),
+                        ),
                     }
                     self._append_line_range_fields(hit_payload, fulltext, context_start, len(context_text))
                     hits.append(hit_payload)
@@ -3474,6 +3492,61 @@ class AiMcpServer:
             result[fid].append((pos0, pos1))
         return result
 
+    def _fetch_case_memberships(self, file_ids: List[int]) -> Dict[int, List[Tuple[int, int, int, str]]]:
+        """Fetch text-backed case memberships grouped by source id."""
+
+        normalized_file_ids: List[int] = []
+        for fid in list(file_ids or []):
+            fid_i = self._to_int(fid, -1)
+            if fid_i > 0:
+                normalized_file_ids.append(fid_i)
+        normalized_file_ids = sorted(set(normalized_file_ids))
+        if len(normalized_file_ids) == 0:
+            return {}
+
+        placeholders = ",".join(["?"] * len(normalized_file_ids))
+        rows = self._fetchall(
+            "SELECT ct.fid, ct.pos0, ct.pos1, c.caseid, ifnull(c.name,'') "
+            "FROM case_text AS ct "
+            "JOIN cases AS c ON c.caseid = ct.caseid "
+            "JOIN source ON source.id = ct.fid "
+            f"WHERE ct.fid IN ({placeholders}) "
+            "AND source.fulltext is not null AND ct.pos1 > ct.pos0 "
+            "ORDER BY ct.fid, ct.pos0, ct.pos1, c.caseid",
+            tuple(normalized_file_ids),
+        )
+        result: Dict[int, List[Tuple[int, int, int, str]]] = {}
+        for row in rows:
+            fid = self._to_int(row[0], -1)
+            pos0 = self._to_int(row[1], -1)
+            pos1 = self._to_int(row[2], -1)
+            case_id = self._to_int(row[3], -1)
+            case_name = "" if row[4] is None else str(row[4])
+            if fid <= 0 or pos0 < 0 or pos1 <= pos0 or case_id <= 0:
+                continue
+            if fid not in result:
+                result[fid] = []
+            result[fid].append((pos0, pos1, case_id, case_name))
+        return result
+
+    def _matching_cases_for_range(self, start: int, end: int,
+                                  memberships: List[Tuple[int, int, int, str]]) -> List[Dict[str, Any]]:
+        """Return case identifiers for memberships that fully contain [start, end)."""
+
+        if start < 0 or end <= start:
+            return []
+        if not isinstance(memberships, list) or len(memberships) == 0:
+            return []
+        matches: List[Dict[str, Any]] = []
+        seen_case_ids: Set[int] = set()
+        for r_start, r_end, case_id, case_name in memberships:
+            if r_start > start:
+                break
+            if start >= r_start and end <= r_end and case_id not in seen_case_ids:
+                seen_case_ids.add(case_id)
+                matches.append({"caseid": case_id, "name": case_name})
+        return matches
+
     def _range_within_any(self, start: int, end: int, ranges: List[Tuple[int, int]]) -> bool:
         """Return True if [start, end) is fully contained in any range in ranges."""
 
@@ -3731,6 +3804,7 @@ class AiMcpServer:
         used_chars = 0
         hit_max_char_limit = False
         source_texts = self._fetch_sources_texts([self._to_int(row[2], -1) for row in segment_rows])
+        case_memberships = self._fetch_case_memberships([self._to_int(row[2], -1) for row in segment_rows])
         for row in segment_rows:
             if len(segments) >= max_segments:
                 break
@@ -3759,6 +3833,11 @@ class AiMcpServer:
                 "owner": row[6],
                 "source_name": row[7],
                 "code_name": row[8],
+                "matching_cases": self._matching_cases_for_range(
+                    self._to_int(row[4], -1),
+                    self._to_int(row[5], -1),
+                    case_memberships.get(fid, []),
+                ),
             }
             self._append_line_range_fields(
                 segment_payload,
