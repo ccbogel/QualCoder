@@ -92,6 +92,8 @@ class AiMcpServer:
             "Use resources/list, resources/read, tools/list, and tools/call. "
             "Available resources: text documents list (qualcoder://documents), document text by id "
             "(qualcoder://documents/text/{id}, with optional start/length or line_start/line_end), "
+            "cases list (qualcoder://cases), case details by id (qualcoder://cases/{id}), "
+            "and case text segments by case id (qualcoder://cases/text/{id}), "
             "code tree (qualcoder://codes/tree), and coded text segments by code id "
             "(qualcoder://codes/segments/{cid}), semantic vector search "
             "(qualcoder://vector/search?q=...) with optional filters file_ids and exclude_cids, "
@@ -401,6 +403,8 @@ class AiMcpServer:
 
         if uri_base == "qualcoder://documents":
             return _('Reviewing the list of text documents...')
+        if uri_base == "qualcoder://cases":
+            return _('Reviewing the list of cases...')
         if uri_base == "qualcoder://codes/tree":
             return _('Reviewing the current code structure...')
         if uri_base == "qualcoder://vector/search":
@@ -409,6 +413,20 @@ class AiMcpServer:
             return _('Running keyword search in empirical data (BM25)...')
         if uri_base == "qualcoder://search/regex":
             return _('Running keyword search in empirical data (Regex)...')
+        case_text_match = re.fullmatch(r"qualcoder://cases/text/(\d+)", uri_base)
+        if case_text_match is not None:
+            case_id = int(case_text_match.group(1))
+            case_name = self._fetch_case_name(case_id)
+            if case_name is None or case_name == "":
+                case_name = f"Case {case_id}"
+            return _('Reviewing text segments for case "{name}"...').format(name=case_name)
+        case_match = re.fullmatch(r"qualcoder://cases/(\d+)", uri_base)
+        if case_match is not None:
+            case_id = int(case_match.group(1))
+            case_name = self._fetch_case_name(case_id)
+            if case_name is None or case_name == "":
+                case_name = f"Case {case_id}"
+            return _('Reviewing case details for "{name}"...').format(name=case_name)
         code_segments_match = re.fullmatch(r"qualcoder://codes/segments/(\d+)", uri_base)
         if code_segments_match is not None:
             cid = int(code_segments_match.group(1))
@@ -540,6 +558,23 @@ class AiMcpServer:
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
+                    uriTemplate="qualcoder://cases/{id}",
+                    name="Case by id",
+                    description=(
+                        "Read one case by case id, including memo, attributes, and linked files."
+                    ),
+                    mimeType="application/json",
+                ),
+                types.ResourceTemplate(
+                    uriTemplate="qualcoder://cases/text/{id}{?cursor,max_segments,max_chars,file_ids}",
+                    name="Case text segments by case id",
+                    description=(
+                        "Read text-backed case segments for a case id. Optional query params: "
+                        "cursor, max_segments, max_chars, file_ids."
+                    ),
+                    mimeType="application/json",
+                ),
+                types.ResourceTemplate(
                     uriTemplate="qualcoder://codes/segments/{cid}",
                     name="Coded text segments by code id",
                     description=(
@@ -613,6 +648,8 @@ class AiMcpServer:
             return self._codes_tree()
         if uri_no_query == "qualcoder://documents":
             return {"documents": self._fetch_text_documents()}
+        if uri_no_query == "qualcoder://cases":
+            return {"cases": self._fetch_cases()}
         if uri_no_query == "qualcoder://vector/search":
             options = self._parse_vector_search_options(query)
             return self._read_vector_search(options)
@@ -622,6 +659,17 @@ class AiMcpServer:
         if uri_no_query == "qualcoder://search/regex":
             options = self._parse_regex_search_options(query)
             return self._read_regex_search(options)
+
+        case_text_match = re.fullmatch(r"qualcoder://cases/text/(\d+)", uri_no_query)
+        if case_text_match is not None:
+            case_id = int(case_text_match.group(1))
+            options = self._parse_case_text_options(query)
+            return self._read_case_text(case_id, options)
+
+        case_match = re.fullmatch(r"qualcoder://cases/(\d+)", uri_no_query)
+        if case_match is not None:
+            case_id = int(case_match.group(1))
+            return self._read_case(case_id)
 
         code_segments_match = re.fullmatch(r"qualcoder://codes/segments/(\d+)", uri_no_query)
         if code_segments_match is not None:
@@ -660,6 +708,12 @@ class AiMcpServer:
                 uri="qualcoder://documents",
                 name="Text documents",
                 description="List text documents in the project.",
+                mimeType="application/json",
+            ),
+            types.Resource(
+                uri="qualcoder://cases",
+                name="Cases",
+                description="List cases in the project with memo, attributes, and linked-file counts.",
                 mimeType="application/json",
             ),
             types.Resource(
@@ -1994,6 +2048,90 @@ class AiMcpServer:
             )
         return docs
 
+    def _fetch_case_name(self, case_id: int) -> Optional[str]:
+        row = self._fetchone("SELECT name FROM cases WHERE caseid=?", (case_id,))
+        if row is None:
+            return None
+        return row[0]
+
+    def _fetch_case_attributes(self, case_ids: List[int]) -> Dict[int, Dict[str, str]]:
+        normalized_ids: List[int] = []
+        for case_id in case_ids:
+            case_id_i = self._to_int(case_id, -1)
+            if case_id_i > 0:
+                normalized_ids.append(case_id_i)
+        normalized_ids = sorted(set(normalized_ids))
+        if len(normalized_ids) == 0:
+            return {}
+        placeholders = ",".join(["?"] * len(normalized_ids))
+        rows = self._fetchall(
+            "SELECT id, name, ifnull(value,'') FROM attribute "
+            f"WHERE attr_type='case' AND id IN ({placeholders}) "
+            "ORDER BY id, lower(name)",
+            tuple(normalized_ids),
+        )
+        result: Dict[int, Dict[str, str]] = {}
+        for row in rows:
+            case_id = self._to_int(row[0], -1)
+            if case_id <= 0:
+                continue
+            if case_id not in result:
+                result[case_id] = {}
+            attr_name = "" if row[1] is None else str(row[1])
+            result[case_id][attr_name] = "" if row[2] is None else str(row[2])
+        return result
+
+    def _fetch_case_link_counts(self, case_ids: List[int]) -> Dict[int, Dict[str, int]]:
+        normalized_ids: List[int] = []
+        for case_id in case_ids:
+            case_id_i = self._to_int(case_id, -1)
+            if case_id_i > 0:
+                normalized_ids.append(case_id_i)
+        normalized_ids = sorted(set(normalized_ids))
+        if len(normalized_ids) == 0:
+            return {}
+        placeholders = ",".join(["?"] * len(normalized_ids))
+        rows = self._fetchall(
+            "SELECT caseid, count(*), count(distinct fid) "
+            f"FROM case_text WHERE caseid IN ({placeholders}) GROUP BY caseid",
+            tuple(normalized_ids),
+        )
+        result: Dict[int, Dict[str, int]] = {}
+        for row in rows:
+            case_id = self._to_int(row[0], -1)
+            if case_id <= 0:
+                continue
+            result[case_id] = {
+                "text_segment_count": self._to_int(row[1], 0),
+                "file_count": self._to_int(row[2], 0),
+            }
+        return result
+
+    def _fetch_cases(self) -> List[Dict[str, Any]]:
+        rows = self._fetchall(
+            "SELECT caseid, name, ifnull(memo,''), owner, date FROM cases ORDER BY lower(name)"
+        )
+        case_ids = [self._to_int(row[0], -1) for row in rows]
+        attributes_by_case = self._fetch_case_attributes(case_ids)
+        counts_by_case = self._fetch_case_link_counts(case_ids)
+        result: List[Dict[str, Any]] = []
+        for row in rows:
+            case_id = self._to_int(row[0], -1)
+            counts = counts_by_case.get(case_id, {})
+            result.append(
+                {
+                    "id": case_id,
+                    "name": row[1],
+                    "memo": row[2],
+                    "owner": row[3],
+                    "date": row[4],
+                    "file_count": self._to_int(counts.get("file_count", 0), 0),
+                    "text_segment_count": self._to_int(counts.get("text_segment_count", 0), 0),
+                    "attributes": attributes_by_case.get(case_id, {}),
+                }
+            )
+        return result
+
     def _fetch_source_name(self, doc_id: int) -> Optional[str]:
         row = self._fetchone("SELECT name FROM source WHERE id=?", (doc_id,))
         if row is None:
@@ -2059,6 +2197,30 @@ class AiMcpServer:
             "cursor": cursor,
             "file_ids": file_ids,
             "owners": owners,
+        }
+
+    def _parse_case_text_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+        max_segments = self._to_int(
+            query.get("max_segments", [self.default_segments_max_segments])[0],
+            self.default_segments_max_segments,
+        )
+        max_segments = max(1, min(max_segments, self.max_segments_limit))
+
+        max_chars = self._to_int(
+            query.get("max_chars", [self.default_segments_max_chars])[0],
+            self.default_segments_max_chars,
+        )
+        max_chars = max(1, min(max_chars, self.max_segments_chars_limit))
+
+        cursor = self._to_int(query.get("cursor", [0])[0], 0)
+        cursor = max(0, cursor)
+
+        file_ids = self._parse_positive_int_list_options(query, ("file_ids",))
+        return {
+            "max_segments": max_segments,
+            "max_chars": max_chars,
+            "cursor": cursor,
+            "file_ids": file_ids,
         }
 
     def _parse_string_list_options(self, query: Dict[str, List[str]], keys: Tuple[str, ...]) -> List[str]:
@@ -3427,6 +3589,163 @@ class AiMcpServer:
                 "next_cursor": next_cursor,
                 "truncated": truncated,
                 "hit_max_char_limit": hit_max_char_limit,
+            },
+            "segments": segments,
+        }
+
+    def _read_case(self, case_id: int) -> Dict[str, Any]:
+        row = self._fetchone(
+            "SELECT caseid, name, ifnull(memo,''), owner, date FROM cases WHERE caseid=?",
+            (case_id,),
+        )
+        if row is None:
+            raise ValueError(f"Case id {case_id} not found.")
+        attributes = self._fetch_case_attributes([case_id]).get(case_id, {})
+        counts = self._fetch_case_link_counts([case_id]).get(case_id, {})
+        file_rows = self._fetchall(
+            "SELECT ct.fid, ifnull(source.name,''), ifnull(source.mediapath,''), "
+            "count(*), max(case when source.fulltext is not null then 1 else 0 end), "
+            "max(case when source.fulltext is not null and ct.pos0=0 and ct.pos1=length(source.fulltext) "
+            "then 1 else 0 end) "
+            "FROM case_text AS ct "
+            "JOIN source ON source.id = ct.fid "
+            "WHERE ct.caseid=? "
+            "GROUP BY ct.fid, source.name, source.mediapath "
+            "ORDER BY lower(source.name), ct.fid",
+            (case_id,),
+        )
+        files: List[Dict[str, Any]] = []
+        for file_row in file_rows:
+            files.append(
+                {
+                    "fid": self._to_int(file_row[0], -1),
+                    "name": "" if file_row[1] is None else str(file_row[1]),
+                    "mediapath": "" if file_row[2] is None else str(file_row[2]),
+                    "segment_count": self._to_int(file_row[3], 0),
+                    "has_text": bool(self._to_int(file_row[4], 0)),
+                    "fully_linked_text": bool(self._to_int(file_row[5], 0)),
+                }
+            )
+        return {
+            "case": {
+                "id": self._to_int(row[0], -1),
+                "name": row[1],
+                "memo": row[2],
+                "owner": row[3],
+                "date": row[4],
+                "file_count": self._to_int(counts.get("file_count", 0), 0),
+                "text_segment_count": self._to_int(counts.get("text_segment_count", 0), 0),
+                "attributes": attributes,
+                "files": files,
+            }
+        }
+
+    def _read_case_text(self, case_id: int, options: Dict[str, Any]) -> Dict[str, Any]:
+        case_name = self._fetch_case_name(case_id)
+        if case_name is None:
+            raise ValueError(f"Case id {case_id} not found.")
+
+        max_segments = int(options.get("max_segments", self.default_segments_max_segments))
+        max_chars = int(options.get("max_chars", self.default_segments_max_chars))
+        cursor = max(0, self._to_int(options.get("cursor", 0), 0))
+        file_ids = options.get("file_ids", [])
+        if not isinstance(file_ids, list):
+            file_ids = []
+
+        where_parts = ["ct.caseid=?", "source.fulltext is not null"]
+        where_params: List[Any] = [case_id]
+        if len(file_ids) > 0:
+            placeholders = ",".join(["?"] * len(file_ids))
+            where_parts.append(f"ct.fid IN ({placeholders})")
+            where_params.extend(file_ids)
+        where_sql = " WHERE " + " AND ".join(where_parts)
+
+        count_row = self._fetchone(
+            "SELECT count(*) FROM case_text AS ct "
+            "JOIN source ON source.id = ct.fid "
+            + where_sql,
+            tuple(where_params),
+        )
+        total_segments = 0 if count_row is None else self._to_int(count_row[0], 0)
+
+        all_link_count_row = self._fetchone(
+            "SELECT count(*) FROM case_text AS ct WHERE ct.caseid=?"
+            + (
+                ""
+                if len(file_ids) == 0
+                else " AND ct.fid IN (" + ",".join(["?"] * len(file_ids)) + ")"
+            ),
+            tuple([case_id] + list(file_ids)),
+        )
+        total_links = 0 if all_link_count_row is None else self._to_int(all_link_count_row[0], 0)
+        skipped_nontext_segments = max(0, total_links - total_segments)
+
+        if cursor > total_segments:
+            cursor = total_segments
+
+        rows = self._fetchall(
+            "SELECT ct.id, ct.caseid, ct.fid, ct.pos0, ct.pos1, ct.owner, ct.date, ifnull(ct.memo,''), "
+            "ifnull(source.name,''), ifnull(source.fulltext,'') "
+            "FROM case_text AS ct "
+            "JOIN source ON source.id = ct.fid "
+            + where_sql
+            + " ORDER BY ct.fid, ct.pos0, ct.id LIMIT ? OFFSET ?",
+            tuple(where_params + [max_segments, cursor]),
+        )
+
+        segments: List[Dict[str, Any]] = []
+        used_chars = 0
+        hit_max_char_limit = False
+        for row in rows:
+            if len(segments) >= max_segments:
+                break
+            fulltext = "" if row[9] is None else str(row[9])
+            pos0 = max(0, self._to_int(row[3], 0))
+            pos1 = max(pos0, self._to_int(row[4], pos0))
+            excerpt = fulltext[pos0:min(pos1, len(fulltext))]
+            excerpt_length = len(excerpt)
+            if used_chars >= max_chars:
+                hit_max_char_limit = True
+                break
+            if used_chars + excerpt_length > max_chars:
+                hit_max_char_limit = True
+                break
+            segment_payload = {
+                "id": self._to_int(row[0], -1),
+                "caseid": self._to_int(row[1], -1),
+                "case_name": case_name,
+                "fid": self._to_int(row[2], -1),
+                "source_name": "" if row[8] is None else str(row[8]),
+                "pos0": pos0,
+                "pos1": pos1,
+                "length": excerpt_length,
+                "text": excerpt,
+                "owner": "" if row[5] is None else str(row[5]),
+                "date": row[6],
+                "memo": "" if row[7] is None else str(row[7]),
+            }
+            self._append_line_range_fields(segment_payload, fulltext, pos0, excerpt_length)
+            segments.append(segment_payload)
+            used_chars += excerpt_length
+
+        next_cursor = cursor + len(segments)
+        if next_cursor > total_segments:
+            next_cursor = total_segments
+        truncated = next_cursor < total_segments
+
+        return {
+            "caseid": case_id,
+            "case_name": case_name,
+            "selection": {
+                "cursor": cursor,
+                "max_segments": max_segments,
+                "max_chars": max_chars,
+                "file_ids": file_ids,
+                "total_segments": total_segments,
+                "next_cursor": next_cursor,
+                "truncated": truncated,
+                "hit_max_char_limit": hit_max_char_limit,
+                "skipped_nontext_segments": skipped_nontext_segments,
             },
             "segments": segments,
         }
