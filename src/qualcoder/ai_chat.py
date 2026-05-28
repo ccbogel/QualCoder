@@ -2794,6 +2794,8 @@ class DialogAIChat(QtWidgets.QDialog):
         topic_name = str(spec.get("topic_name", "")).strip()
         topic_description = str(spec.get("topic_description", "")).strip()
         file_ids = list(spec.get("file_ids", []) or [])
+        filter_info = dict(spec.get("filter_info", {}) or {})
+        selected_case_ids = list(filter_info.get("selected_case_ids", []) or [])
         prompt_name = str(spec.get("prompt_name", "")).strip()
 
         prompt_record = self.agent_prompts_catalog.find_prompt_variant(
@@ -2816,6 +2818,17 @@ class DialogAIChat(QtWidgets.QDialog):
             ("initialize", {}),
             ("resources/list", {}),
             ("resources/templates/list", {}),
+            (
+                "resources/read",
+                {
+                    "uri": self._topic_exploration_vector_search_uri(
+                        topic_name,
+                        topic_description,
+                        file_ids,
+                        selected_case_ids,
+                    )
+                },
+            ),
         ]
         planner_json_schema = self._mcp_planner_json_schema()
         reflection_json_schema = self._mcp_reflection_json_schema()
