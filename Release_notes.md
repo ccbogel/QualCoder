@@ -52,7 +52,7 @@ For install from source code, download the zip file below and use the instructio
 
 ## Menus and tabs
 
-A new menu otpion Analysis has been added. Menu items have been re-organised between Analysis and Reports. 
+A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. 
 
 ## Journals
 
