@@ -2230,9 +2230,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         # into \n on setPlainText(), and a leftover BOM adds a char; either makes
         # stored positions drift past the editor length (setPosition out of range,
         # frozen highlight on resize). <- L
-        text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
-        if text_ and text_[0] == "\ufeff":
-            text_ = text_[1:]
+        if os.path.splitext(import_file)[1].lower() != '.pdf': # skip PDF 
+            text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
+            if text_ and text_[0] == "\ufeff":
+                text_ = text_[1:]
         # Final checks: check for duplicated filename and update model, widget and database
         name_split = import_file.split("/")
         filename = name_split[-1]
