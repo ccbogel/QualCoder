@@ -287,7 +287,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         """ Get data about file and fill text edit. """
 
         file_ = {}
-        file_name = self.ui.listWidget.currentItem().text()
+        current_item = self.ui.listWidget.currentItem() # <- L
+        if current_item is None:
+            return
+        file_name = current_item.text()
         for f in self.files:
             if f['name'] == file_name:
                 file_ = f
