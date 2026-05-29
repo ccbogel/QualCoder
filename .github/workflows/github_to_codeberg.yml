@@ -1,0 +1,29 @@
+# Sync repo to the Forgejo mirror https://codeberg.org/Recommendations/Mirror_to_Codeberg
+name: Repo sync (GitHub -> Forgejo)
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch: # Manual dispatch
+  schedule:
+    - cron: "0 */12 * * *"
+
+jobs:
+  sync-repo-to-forgejo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "Gather facts"
+        run: |
+          echo "Repo variables:"
+          echo "  FORGEJO_PUSH_URL: ${{ vars.FORGEJO_BASE_URL }}${{ vars.FORGEJO_REPO }}.git"
+          echo "  FORGEJO_USERNAME: ${{ vars.FORGEJO_USERNAME }}"
+      - name: "Sync repo"
+        uses: spyoungtech/mirror-action@master
+        with:
+          REMOTE: "${{ vars.FORGEJO_BASE_URL }}${{ vars.FORGEJO_REPO }}.git"
+          GIT_USERNAME: ${{ vars.FORGEJO_USERNAME }}
+          GIT_PASSWORD: ${{ secrets._FORGEJO_TOKEN }}
