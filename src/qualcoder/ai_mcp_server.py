@@ -54,6 +54,8 @@ class AiMcpServer:
         "codes/create_category",
         "codes/create_code",
         "codes/create_text_coding",
+        "cases/create_case",
+        "cases/link_text_to_case",
     )
     FULL_ACCESS_WRITE_TOOL_NAMES = (
         "codes/rename_category",
@@ -64,6 +66,8 @@ class AiMcpServer:
         "codes/delete_code",
         "codes/move_text_coding",
         "codes/delete_text_coding",
+        "cases/update_case",
+        "cases/unlink_text_from_case",
     )
     PREVIEW_TOOL_NAMES = (
         "codes/preview_delete_category",
@@ -102,7 +106,7 @@ class AiMcpServer:
             "(qualcoder://search/bm25?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
             "and regular-expression search "
             "(qualcoder://search/regex?pattern=...) with optional filters file_ids, case_ids, and exclude_cids. "
-            "Available tools include preview and write operations for categories, codes, and text codings. "
+            "Available tools include preview and write operations for categories, codes, text codings, and cases. "
             "Delete actions on categories or codes should be previewed before execution."
         )
 
@@ -395,6 +399,33 @@ class AiMcpServer:
             if tool_name == "codes/delete_text_coding":
                 ctid = self._to_int(tool_args.get("ctid"), -1)
                 return _('Deleting text coding #{ctid}...').format(ctid=ctid if ctid > 0 else "?")
+            if tool_name == "cases/create_case":
+                case_name = " ".join(str(tool_args.get("name", "")).split()).strip()
+                if case_name == "":
+                    case_name = _("(unnamed case)")
+                return _('Creating case "{name}"...').format(name=case_name)
+            if tool_name == "cases/update_case":
+                caseid = self._to_int(tool_args.get("caseid"), -1)
+                case_name = self._fetch_case_name(caseid) if caseid > 0 else None
+                if case_name is None or str(case_name).strip() == "":
+                    case_name = _("Case") + (f" #{caseid}" if caseid > 0 else "")
+                return _('Updating case "{name}"...').format(name=str(case_name))
+            if tool_name == "cases/link_text_to_case":
+                caseid = self._to_int(tool_args.get("caseid"), -1)
+                fid = self._to_int(tool_args.get("fid"), -1)
+                case_name = self._fetch_case_name(caseid) if caseid > 0 else None
+                if case_name is None or str(case_name).strip() == "":
+                    case_name = _("Case") + (f" #{caseid}" if caseid > 0 else "")
+                doc_name = self._fetch_source_name(fid) if fid > 0 else None
+                if doc_name is None or str(doc_name).strip() == "":
+                    doc_name = _("Document") + (f" #{fid}" if fid > 0 else "")
+                return _('Linking text from "{document}" to case "{case}"...').format(
+                    document=str(doc_name),
+                    case=str(case_name),
+                )
+            if tool_name == "cases/unlink_text_from_case":
+                link_id = self._to_int(tool_args.get("id"), -1)
+                return _('Removing case-text link #{id}...').format(id=link_id if link_id > 0 else "?")
             return _('Executing tool "{name}"...').format(name=tool_name)
         if method != "resources/read":
             return ""
@@ -939,6 +970,68 @@ class AiMcpServer:
                         "additionalProperties": False,
                     },
                 },
+                {
+                    "name": "cases/create_case",
+                    "description": (
+                        "Create a new case. Use this only when explicitly needed by the user request."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "memo": {"type": "string"},
+                        },
+                        "required": ["name"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "cases/link_text_to_case",
+                    "description": (
+                        "Link one text passage or a whole text document to a case. "
+                        "Supports either quote matching, explicit pos0/pos1, or full_document=true."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "caseid": {"type": "integer"},
+                            "fid": {"type": "integer"},
+                            "quote": {"type": "string"},
+                            "pos0": {"type": "integer"},
+                            "pos1": {"type": "integer"},
+                            "full_document": {"type": "boolean"},
+                            "memo": {"type": "string"},
+                        },
+                        "required": ["caseid", "fid"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "cases/update_case",
+                    "description": "Rename a case and/or update its memo. Requires Full access.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "caseid": {"type": "integer"},
+                            "name": {"type": "string"},
+                            "memo": {"type": "string"},
+                        },
+                        "required": ["caseid"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "cases/unlink_text_from_case",
+                    "description": "Remove one text link from a case by link id. Requires Full access.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "integer"},
+                        },
+                        "required": ["id"],
+                        "additionalProperties": False,
+                    },
+                },
             ]
         }
 
@@ -980,6 +1073,14 @@ class AiMcpServer:
             payload = self._tool_move_text_coding(arguments, change_set_id)
         elif tool_name == "codes/delete_text_coding":
             payload = self._tool_delete_text_coding(arguments, change_set_id)
+        elif tool_name == "cases/create_case":
+            payload = self._tool_create_case(arguments, change_set_id)
+        elif tool_name == "cases/link_text_to_case":
+            payload = self._tool_link_text_to_case(arguments, change_set_id)
+        elif tool_name == "cases/update_case":
+            payload = self._tool_update_case(arguments, change_set_id)
+        elif tool_name == "cases/unlink_text_from_case":
+            payload = self._tool_unlink_text_from_case(arguments, change_set_id)
         else:
             raise ValueError(f"Unknown tool name: {tool_name}")
 
@@ -1722,6 +1823,309 @@ class AiMcpServer:
         finally:
             conn.close()
 
+    def _tool_create_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        name = " ".join(str(arguments.get("name", "")).split()).strip()
+        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        if name == "":
+            raise ValueError("name must not be empty.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            existing = cur.execute(
+                "SELECT caseid, owner, ifnull(memo,'') FROM cases WHERE lower(name)=lower(?)",
+                (name,),
+            ).fetchone()
+            if existing is not None:
+                return {
+                    "tool": "cases/create_case",
+                    "created": False,
+                    "reason": "already_exists",
+                    "case": {
+                        "caseid": int(existing[0]),
+                        "name": name,
+                        "memo": "" if existing[2] is None else str(existing[2]),
+                        "owner": "" if existing[1] is None else str(existing[1]),
+                    },
+                }
+
+            cur.execute(
+                "INSERT INTO cases (name, memo, owner, date) VALUES (?, ?, ?, ?)",
+                (name, memo, self.AI_AGENT_OWNER, now),
+            )
+            caseid = int(cur.lastrowid)
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "create_case",
+                    "caseid": caseid,
+                    "name": name,
+                    "memo": memo,
+                    "owner": self.AI_AGENT_OWNER,
+                    "created_at": now,
+                },
+            )
+            self._emit_project_table_changes(["cases"])
+            return {
+                "tool": "cases/create_case",
+                "created": True,
+                "case": {
+                    "caseid": caseid,
+                    "name": name,
+                    "memo": memo,
+                    "owner": self.AI_AGENT_OWNER,
+                    "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_link_text_to_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        caseid = self._to_int(arguments.get("caseid"), -1)
+        fid = self._to_int(arguments.get("fid"), -1)
+        quote = str(arguments.get("quote", "") if arguments.get("quote", "") is not None else "").strip()
+        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        pos0 = self._to_int(arguments.get("pos0"), -1)
+        pos1 = self._to_int(arguments.get("pos1"), -1)
+        full_document = bool(arguments.get("full_document", False))
+
+        if caseid <= 0:
+            raise ValueError("caseid must be a positive integer.")
+        if fid <= 0:
+            raise ValueError("fid must be a positive integer.")
+        if not full_document and quote == "" and not (pos0 >= 0 and pos1 > pos0):
+            raise ValueError("Provide quote, explicit pos0/pos1, or full_document=true.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            case_row = self._fetch_case_row_cur(cur, caseid)
+            if case_row is None:
+                raise ValueError(f"Case id {caseid} not found.")
+            source_row = cur.execute(
+                "SELECT id, name, ifnull(fulltext,'') FROM source WHERE id=? AND fulltext IS NOT NULL",
+                (fid,),
+            ).fetchone()
+            if source_row is None:
+                raise ValueError(f"Text document id {fid} not found.")
+            fulltext = str(source_row[2])
+
+            if full_document:
+                pos0 = 0
+                pos1 = len(fulltext)
+            elif quote != "":
+                pos0, pos1 = self._quote_search(quote, fulltext)
+
+            if pos0 < 0 or pos1 <= pos0:
+                raise ValueError("The requested case link span is invalid or could not be matched in the document text.")
+            if pos1 > len(fulltext):
+                raise ValueError("pos1 exceeds the document length.")
+            excerpt = fulltext[pos0:pos1]
+            if excerpt == "":
+                raise ValueError("The requested case link span is empty.")
+
+            existing = cur.execute(
+                "SELECT id, owner, ifnull(memo,'') FROM case_text WHERE caseid=? AND fid=? AND pos0=? AND pos1=?",
+                (caseid, fid, pos0, pos1),
+            ).fetchone()
+            if existing is not None:
+                return {
+                    "tool": "cases/link_text_to_case",
+                    "created": False,
+                    "reason": "already_exists",
+                    "link": {
+                        "id": int(existing[0]),
+                        "caseid": caseid,
+                        "fid": fid,
+                        "pos0": pos0,
+                        "pos1": pos1,
+                        "owner": "" if existing[1] is None else str(existing[1]),
+                        "memo": "" if existing[2] is None else str(existing[2]),
+                    },
+                }
+
+            cur.execute(
+                "INSERT INTO case_text (caseid, fid, pos0, pos1, owner, date, memo) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (caseid, fid, pos0, pos1, self.AI_AGENT_OWNER, now, memo),
+            )
+            link_id = int(cur.lastrowid)
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "create_case_text",
+                    "id": link_id,
+                    "caseid": caseid,
+                    "case_name": str(case_row.get("name", "")),
+                    "fid": fid,
+                    "source_name": str(source_row[1] if source_row[1] is not None else ""),
+                    "pos0": pos0,
+                    "pos1": pos1,
+                    "owner": self.AI_AGENT_OWNER,
+                    "memo": memo,
+                    "created_at": now,
+                },
+            )
+            self._emit_project_table_changes(["case_text"])
+            return {
+                "tool": "cases/link_text_to_case",
+                "created": True,
+                "link": {
+                    "id": link_id,
+                    "caseid": caseid,
+                    "case_name": str(case_row.get("name", "")),
+                    "fid": fid,
+                    "source_name": str(source_row[1] if source_row[1] is not None else ""),
+                    "pos0": pos0,
+                    "pos1": pos1,
+                    "text": excerpt,
+                    "owner": self.AI_AGENT_OWNER,
+                    "date": now,
+                    "memo": memo,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_update_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        caseid = self._to_int(arguments.get("caseid"), -1)
+        if caseid <= 0:
+            raise ValueError("caseid must be a positive integer.")
+        has_name = "name" in arguments
+        has_memo = "memo" in arguments
+        if not has_name and not has_memo:
+            raise ValueError("Provide at least one field to update: name or memo.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            case_row = self._fetch_case_row_cur(cur, caseid)
+            if case_row is None:
+                raise ValueError(f"Case id {caseid} not found.")
+
+            old_name = str(case_row.get("name", ""))
+            old_memo = str(case_row.get("memo", ""))
+            new_name = old_name if not has_name else " ".join(str(arguments.get("name", "")).split()).strip()
+            new_memo = old_memo if not has_memo else str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+            if new_name == "":
+                raise ValueError("name must not be empty.")
+            if new_name.casefold() != old_name.casefold():
+                conflicting = cur.execute(
+                    "SELECT caseid FROM cases WHERE lower(name)=lower(?) AND caseid<>?",
+                    (new_name, caseid),
+                ).fetchone()
+                if conflicting is not None:
+                    raise ValueError(f'Case name "{new_name}" already exists.')
+            if new_name == old_name and new_memo == old_memo:
+                return {
+                    "tool": "cases/update_case",
+                    "updated": False,
+                    "reason": "no_changes",
+                    "case": {
+                        "caseid": caseid,
+                        "name": old_name,
+                        "memo": old_memo,
+                        "owner": str(case_row.get("owner", "")),
+                    },
+                }
+
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute(
+                "UPDATE cases SET name=?, memo=?, date=? WHERE caseid=?",
+                (new_name, new_memo, now, caseid),
+            )
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "update_case",
+                    "caseid": caseid,
+                    "before": {
+                        "name": old_name,
+                        "memo": old_memo,
+                        "owner": str(case_row.get("owner", "")),
+                    },
+                    "after": {
+                        "name": new_name,
+                        "memo": new_memo,
+                        "owner": str(case_row.get("owner", "")),
+                    },
+                    "updated_at": now,
+                },
+            )
+            self._emit_project_table_changes(["cases"])
+            return {
+                "tool": "cases/update_case",
+                "updated": True,
+                "case": {
+                    "caseid": caseid,
+                    "name": new_name,
+                    "memo": new_memo,
+                    "owner": str(case_row.get("owner", "")),
+                    "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_unlink_text_from_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        link_id = self._to_int(arguments.get("id"), -1)
+        if link_id <= 0:
+            raise ValueError("id must be a positive integer.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            link_row = self._fetch_case_text_row_cur(cur, link_id)
+            if link_row is None:
+                raise ValueError(f"Case-text link id {link_id} not found.")
+            snapshot = {"tables": {"case_text": [dict(link_row)]}}
+            cur.execute("DELETE FROM case_text WHERE id=?", (link_id,))
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "delete_case_text",
+                    "id": link_id,
+                    "snapshot": snapshot,
+                },
+            )
+            self._emit_project_table_changes(["case_text"])
+            return {
+                "tool": "cases/unlink_text_from_case",
+                "deleted": True,
+                "link": {
+                    "id": link_id,
+                    "caseid": int(link_row.get("caseid", -1)),
+                    "fid": int(link_row.get("fid", -1)),
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
     def _category_ref(self, category: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         if not isinstance(category, dict):
             return None
@@ -1738,6 +2142,15 @@ class AiMcpServer:
             "cid": code.get("cid", None),
             "name": str(code.get("name", "")),
             "owner": str(code.get("owner", "")),
+        }
+
+    def _case_ref(self, case: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if not isinstance(case, dict):
+            return None
+        return {
+            "caseid": case.get("caseid", None),
+            "name": str(case.get("name", "")),
+            "owner": str(case.get("owner", "")),
         }
 
     def _table_exists_cur(self, cur: sqlite3.Cursor, table_name: str) -> bool:
@@ -1792,6 +2205,26 @@ class AiMcpServer:
             "SELECT ctid, cid, fid, seltext, pos0, pos1, owner, date, memo, avid, important "
             "FROM code_text WHERE ctid=?",
             (ctid_i,),
+        )
+
+    def _fetch_case_row_cur(self, cur: sqlite3.Cursor, caseid: Any) -> Optional[Dict[str, Any]]:
+        caseid_i = self._to_int(caseid, -1)
+        if caseid_i <= 0:
+            return None
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT caseid, name, ifnull(memo,'') as memo, owner, date FROM cases WHERE caseid=?",
+            (caseid_i,),
+        )
+
+    def _fetch_case_text_row_cur(self, cur: sqlite3.Cursor, link_id: Any) -> Optional[Dict[str, Any]]:
+        link_id_i = self._to_int(link_id, -1)
+        if link_id_i <= 0:
+            return None
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT id, caseid, fid, pos0, pos1, owner, date, ifnull(memo,'') as memo FROM case_text WHERE id=?",
+            (link_id_i,),
         )
 
     def _collect_category_subtree(self, cur: sqlite3.Cursor, root_catid: int) -> Dict[str, Any]:

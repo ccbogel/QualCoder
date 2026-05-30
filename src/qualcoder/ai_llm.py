@@ -1261,6 +1261,36 @@ class AiLLM():
                 label = _("Text coding")
             return _("Created text coding: ") + label
 
+        if op_type == "create_case":
+            name = self._short_change_label(op.get("name", ""))
+            return (_("Created case: ") + name) if name != "" else ""
+
+        if op_type == "create_case_text":
+            case_name = self._short_change_label(op.get("case_name", ""))
+            source_name = self._short_change_label(op.get("source_name", ""))
+            if allow_db_lookup:
+                if case_name == "":
+                    caseid = int(op.get("caseid", -1))
+                    if caseid > 0:
+                        cur = self.app.conn.cursor()
+                        cur.execute("SELECT name FROM cases WHERE caseid=?", (caseid,))
+                        row = cur.fetchone()
+                        if row is not None:
+                            case_name = self._short_change_label(row[0])
+                if source_name == "":
+                    source_name = self._short_change_label(self._lookup_source_name(int(op.get("fid", -1))))
+            label = " @ ".join([item for item in (case_name, source_name) if item != ""])
+            return (_("Linked text to case: ") + label) if label != "" else _("Linked text to case")
+
+        if op_type == "update_case":
+            before_name = self._short_change_label(op.get("before", {}).get("name", ""))
+            after_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if before_name != "" and after_name != "" and before_name != after_name:
+                return _("Updated case: ") + before_name + " -> " + after_name
+            if after_name != "":
+                return _("Updated case: ") + after_name
+            return _("Updated case")
+
         if op_type == "rename_category":
             old_name = self._short_change_label(op.get("old_name", ""))
             new_name = self._short_change_label(op.get("new_name", ""))
@@ -1360,6 +1390,27 @@ class AiLLM():
                     return _("Deleted text coding: ") + label
             return _("Deleted text coding")
 
+        if op_type == "delete_case_text":
+            snapshot = self._snapshot_tables(op)
+            link_rows = snapshot.get("case_text", [])
+            if isinstance(link_rows, list) and len(link_rows) > 0 and isinstance(link_rows[0], dict):
+                caseid = int(link_rows[0].get("caseid", -1))
+                fid = int(link_rows[0].get("fid", -1))
+                case_name = ""
+                source_name = ""
+                if allow_db_lookup:
+                    if caseid > 0:
+                        cur = self.app.conn.cursor()
+                        cur.execute("SELECT name FROM cases WHERE caseid=?", (caseid,))
+                        row = cur.fetchone()
+                        if row is not None:
+                            case_name = self._short_change_label(row[0])
+                    source_name = self._short_change_label(self._lookup_source_name(fid))
+                label = " @ ".join([item for item in (case_name, source_name) if item != ""])
+                if label != "":
+                    return _("Removed case link: ") + label
+            return _("Removed case link")
+
         return ""
 
     def _format_ai_change_age(self, created_at: str) -> str:
@@ -1444,7 +1495,9 @@ class AiLLM():
 
         category_count = 0
         code_count = 0
+        case_count = 0
         coding_count = 0
+        case_link_count = 0
         operation_summaries = []
         seen_operation_summaries = set()
 
@@ -1458,6 +1511,10 @@ class AiLLM():
                 code_count += 1
             elif op_type in ("create_coding_text", "move_coding_text", "delete_coding_text"):
                 coding_count += 1
+            elif op_type in ("create_case", "update_case"):
+                case_count += 1
+            elif op_type in ("create_case_text", "delete_case_text"):
+                case_link_count += 1
             summary = self._ai_change_operation_summary(op, allow_db_lookup=allow_db_lookup)
             if summary != "" and summary not in seen_operation_summaries:
                 seen_operation_summaries.add(summary)
@@ -1468,8 +1525,12 @@ class AiLLM():
             parts.append(str(category_count) + " " + _("category(ies)"))
         if code_count > 0:
             parts.append(str(code_count) + " " + _("code(s)"))
+        if case_count > 0:
+            parts.append(str(case_count) + " " + _("case(s)"))
         if coding_count > 0:
             parts.append(str(coding_count) + " " + _("text coding(s)"))
+        if case_link_count > 0:
+            parts.append(str(case_link_count) + " " + _("case link(s)"))
         if len(parts) == 0:
             return
 
@@ -1598,6 +1659,68 @@ class AiLLM():
             return False, "changed", row
         return True, "ok", row
 
+    def _can_undo_create_case(self, cur, op):
+        caseid = int(op.get("caseid", -1))
+        if caseid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT caseid, name, owner FROM cases WHERE caseid=?", (caseid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        expected_name = str(op.get("name", "")).strip()
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != "AI Agent":
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_create_case_text(self, cur, op):
+        link_id = int(op.get("id", -1))
+        if link_id <= 0:
+            return False, "invalid", None
+        cur.execute(
+            "SELECT id, caseid, fid, pos0, pos1, owner FROM case_text WHERE id=?",
+            (link_id,),
+        )
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        expected = {
+            "caseid": int(op.get("caseid", -1)),
+            "fid": int(op.get("fid", -1)),
+            "pos0": int(op.get("pos0", -1)),
+            "pos1": int(op.get("pos1", -1)),
+            "owner": str(op.get("owner", "AI Agent")),
+        }
+        if expected["caseid"] > 0 and row[1] != expected["caseid"]:
+            return False, "changed", row
+        if expected["fid"] > 0 and row[2] != expected["fid"]:
+            return False, "changed", row
+        if expected["pos0"] >= 0 and row[3] != expected["pos0"]:
+            return False, "changed", row
+        if expected["pos1"] >= 0 and row[4] != expected["pos1"]:
+            return False, "changed", row
+        if expected["owner"] != "" and row[5] != expected["owner"]:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_case(self, cur, op):
+        caseid = int(op.get("caseid", -1))
+        if caseid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT caseid, name, ifnull(memo,''), owner FROM cases WHERE caseid=?", (caseid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
     def _can_undo_rename_category(self, cur, op):
         catid = int(op.get("catid", -1))
         if catid <= 0:
@@ -1682,6 +1805,7 @@ class AiLLM():
             "code_text": "ctid",
             "code_av": "avid",
             "code_image": "imid",
+            "case_text": "id",
         }
         for table_name, pk_name in primary_keys.items():
             rows = tables.get(table_name, [])
@@ -1704,7 +1828,7 @@ class AiLLM():
 
     def _restore_snapshot(self, cur, op):
         tables = self._snapshot_tables(op)
-        restore_order = ("code_cat", "code_name", "code_text", "code_av", "code_image")
+        restore_order = ("code_cat", "code_name", "cases", "code_text", "case_text", "code_av", "code_image")
         for table_name in restore_order:
             rows = tables.get(table_name, [])
             if not isinstance(rows, list) or len(rows) == 0:
@@ -1781,17 +1905,21 @@ class AiLLM():
 
         code_ids = set()
         category_ids = set()
+        case_ids = set()
         coding_ctids = set()
+        case_link_ids = set()
         skipped_changed = 0
         skipped_missing = 0
         restore_categories = 0
         restore_codes = 0
         restore_codings = 0
+        restore_case_links = 0
         revert_renamed_categories = 0
         revert_renamed_codes = 0
         revert_moved_categories = 0
         revert_moved_codes = 0
         revert_moved_codings = 0
+        revert_updated_cases = 0
 
         for op in operations:
             if not isinstance(op, dict):
@@ -1820,6 +1948,32 @@ class AiLLM():
                     cid = int(op.get("cid", -1))
                     if ctid > 0 and cid not in code_ids:
                         coding_ctids.add(ctid)
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "create_case":
+                ok, reason, row_data = self._can_undo_create_case(cur, op)
+                if ok:
+                    case_ids.add(int(op.get("caseid", -1)))
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "create_case_text":
+                ok, reason, row_data = self._can_undo_create_case_text(cur, op)
+                if ok:
+                    link_id = int(op.get("id", -1))
+                    if link_id > 0:
+                        case_link_ids.add(link_id)
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "update_case":
+                ok, reason, row_data = self._can_undo_update_case(cur, op)
+                if ok:
+                    revert_updated_cases += 1
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -1879,6 +2033,14 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "delete_case_text":
+                ok, reason = self._can_restore_snapshot(cur, op)
+                if ok:
+                    restore_case_links += len(self._snapshot_tables(op).get("case_text", []))
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
 
         code_codings_total = 0
         code_codings_non_ai = 0
@@ -1932,6 +2094,10 @@ class AiLLM():
                     _("Warning: ") + str(standalone_codings_non_ai) +
                     _(" standalone coding(s) are not owned by 'AI Agent'.")
                 )
+        if len(case_ids) > 0:
+            lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
+        if len(case_link_ids) > 0:
+            lines.append(_("Undo will remove ") + str(len(case_link_ids)) + _(" case link(s)."))
         if restore_categories > 0 or restore_codes > 0 or restore_codings > 0:
             parts = []
             if restore_categories > 0:
@@ -1941,10 +2107,14 @@ class AiLLM():
             if restore_codings > 0:
                 parts.append(str(restore_codings) + _(" coding(s)"))
             lines.append(_("Undo will restore ") + ", ".join(parts) + ".")
+        if restore_case_links > 0:
+            lines.append(_("Undo will restore ") + str(restore_case_links) + _(" case link(s)."))
         if revert_renamed_categories > 0:
             lines.append(str(revert_renamed_categories) + _(" renamed category(ies) would be restored to their old names."))
         if revert_renamed_codes > 0:
             lines.append(str(revert_renamed_codes) + _(" renamed code(s) would be restored to their old names."))
+        if revert_updated_cases > 0:
+            lines.append(str(revert_updated_cases) + _(" updated case(s) would be restored to their previous values."))
         if revert_moved_categories > 0:
             lines.append(str(revert_moved_categories) + _(" moved category tree(s) would be moved back to their previous parent."))
         if revert_moved_codes > 0:
@@ -1998,6 +2168,22 @@ class AiLLM():
                         self._add_project_table_changes(project_table_changes, "code_text")
                     continue
 
+                if op_type == "create_case_text":
+                    ok, reason, row = self._can_undo_create_case_text(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        continue
+                    cur.execute("DELETE FROM case_text WHERE id=?", (int(row[0]),))
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "case_text")
+                    continue
+
                 if op_type == "create_code":
                     ok, reason, row = self._can_undo_create_code(cur, op)
                     if not ok:
@@ -2029,6 +2215,23 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "code_name", *changed_tables)
+                    continue
+
+                if op_type == "create_case":
+                    ok, reason, row = self._can_undo_create_case(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        continue
+                    caseid = int(row[0])
+                    cur.execute("DELETE FROM cases WHERE caseid=?", (caseid,))
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "cases")
                     continue
 
                 if op_type == "create_category":
@@ -2091,6 +2294,31 @@ class AiLLM():
                         self._add_project_table_changes(project_table_changes, "code_name")
                     continue
 
+                if op_type == "update_case":
+                    ok, reason, row = self._can_undo_update_case(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE cases SET name=?, memo=?, owner=? WHERE caseid=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "cases")
+                    continue
+
                 if op_type == "move_category_tree":
                     ok, reason, row = self._can_undo_move_category_tree(cur, op)
                     if not ok:
@@ -2148,7 +2376,7 @@ class AiLLM():
                         self._add_project_table_changes(project_table_changes, "code_text")
                     continue
 
-                if op_type in ("delete_category_tree", "delete_code", "delete_coding_text"):
+                if op_type in ("delete_category_tree", "delete_code", "delete_coding_text", "delete_case_text"):
                     ok, reason = self._can_restore_snapshot(cur, op)
                     if not ok:
                         if reason == "changed":
