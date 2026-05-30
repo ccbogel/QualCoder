@@ -2691,57 +2691,82 @@ class DialogAIChat(QtWidgets.QDialog):
             return "qualcoder://vector/search"
         return "qualcoder://vector/search?" + query_string
 
-    def _constrain_search_uri_to_file_scope(self, uri: str, allowed_file_ids: List[int]) -> str:
-        """Restrict one MCP search URI to the allowed file scope for the initial turn."""
+    def _constrain_search_uri_to_material_scope(self, uri: str, allowed_file_ids: List[int],
+                                                allowed_case_ids: Optional[List[int]] = None) -> str:
+        """Restrict one MCP read URI to the allowed file/case scope for the initial turn."""
 
-        normalized_allowed: List[int] = []
-        seen_allowed: set[int] = set()
+        normalized_allowed_files: List[int] = []
+        seen_allowed_files: set[int] = set()
         for raw in list(allowed_file_ids or []):
             try:
                 file_id = int(raw)
             except Exception:
                 continue
-            if file_id <= 0 or file_id in seen_allowed:
+            if file_id <= 0 or file_id in seen_allowed_files:
                 continue
-            seen_allowed.add(file_id)
-            normalized_allowed.append(file_id)
-        if len(normalized_allowed) == 0:
-            return str(uri if uri is not None else "").strip()
+            seen_allowed_files.add(file_id)
+            normalized_allowed_files.append(file_id)
+
+        normalized_allowed_cases: List[int] = []
+        seen_allowed_cases: set[int] = set()
+        for raw in list(allowed_case_ids or []):
+            try:
+                case_id = int(raw)
+            except Exception:
+                continue
+            if case_id <= 0 or case_id in seen_allowed_cases:
+                continue
+            seen_allowed_cases.add(case_id)
+            normalized_allowed_cases.append(case_id)
 
         raw_uri = str(uri if uri is not None else "").strip()
         if raw_uri == "":
             return raw_uri
+        if len(normalized_allowed_files) == 0 and len(normalized_allowed_cases) == 0:
+            return raw_uri
+
         parsed = urlparse(raw_uri)
         base_uri = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
-        if base_uri not in (
-            "qualcoder://vector/search",
-            "qualcoder://search/bm25",
-            "qualcoder://search/regex",
-        ):
+        supports_scope_constraints = (
+            base_uri in (
+                "qualcoder://vector/search",
+                "qualcoder://search/bm25",
+                "qualcoder://search/regex",
+            )
+            or re.fullmatch(r"qualcoder://codes/segments/\d+", base_uri) is not None
+        )
+        if not supports_scope_constraints:
             return raw_uri
 
         query = parse_qs(parsed.query, keep_blank_values=True)
-        existing_file_ids: List[int] = []
-        seen_existing: set[int] = set()
-        for raw in list(query.get("file_ids", []) or []):
-            try:
-                file_id = int(raw)
-            except Exception:
-                continue
-            if file_id <= 0 or file_id in seen_existing:
-                continue
-            seen_existing.add(file_id)
-            existing_file_ids.append(file_id)
 
-        if len(existing_file_ids) > 0:
-            allowed_set = set(normalized_allowed)
-            constrained_file_ids = [fid for fid in existing_file_ids if fid in allowed_set]
-            if len(constrained_file_ids) == 0:
-                constrained_file_ids = list(normalized_allowed)
-        else:
-            constrained_file_ids = list(normalized_allowed)
+        def _constrain_positive_int_query_values(key: str, allowed_values: List[int]) -> None:
+            if len(allowed_values) == 0:
+                return
+            existing_values: List[int] = []
+            seen_existing: set[int] = set()
+            for raw in list(query.get(key, []) or []):
+                try:
+                    value = int(raw)
+                except Exception:
+                    continue
+                if value <= 0 or value in seen_existing:
+                    continue
+                seen_existing.add(value)
+                existing_values.append(value)
 
-        query["file_ids"] = [str(fid) for fid in constrained_file_ids]
+            if len(existing_values) > 0:
+                allowed_set = set(allowed_values)
+                constrained_values = [value for value in existing_values if value in allowed_set]
+                if len(constrained_values) == 0:
+                    constrained_values = list(allowed_values)
+            else:
+                constrained_values = list(allowed_values)
+
+            query[key] = [str(value) for value in constrained_values]
+
+        _constrain_positive_int_query_values("file_ids", normalized_allowed_files)
+        _constrain_positive_int_query_values("case_ids", normalized_allowed_cases)
         new_query = urlencode(query, doseq=True)
         return urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment))
 
@@ -2794,6 +2819,8 @@ class DialogAIChat(QtWidgets.QDialog):
         topic_name = str(spec.get("topic_name", "")).strip()
         topic_description = str(spec.get("topic_description", "")).strip()
         file_ids = list(spec.get("file_ids", []) or [])
+        filter_info = dict(spec.get("filter_info", {}) or {})
+        selected_case_ids = list(filter_info.get("selected_case_ids", []) or [])
         prompt_name = str(spec.get("prompt_name", "")).strip()
 
         prompt_record = self.agent_prompts_catalog.find_prompt_variant(
@@ -2836,7 +2863,11 @@ class DialogAIChat(QtWidgets.QDialog):
             if method_name == "resources/read":
                 raw_uri = str(request_params.get("uri", "")).strip()
                 if raw_uri != "":
-                    constrained_uri = self._constrain_search_uri_to_file_scope(raw_uri, file_ids)
+                    constrained_uri = self._constrain_search_uri_to_material_scope(
+                        raw_uri,
+                        file_ids,
+                        selected_case_ids,
+                    )
                     request_params["uri"] = constrained_uri
                     display_params["uri"] = constrained_uri
             if method_name == "tools/call" and ai_change_set_id != "":
@@ -3637,6 +3668,16 @@ class DialogAIChat(QtWidgets.QDialog):
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
             display_params = dict(request_params)
+            if method_name == "resources/read":
+                raw_uri = str(request_params.get("uri", "")).strip()
+                if raw_uri != "":
+                    constrained_uri = self._constrain_search_uri_to_material_scope(
+                        raw_uri,
+                        file_ids,
+                        selected_case_ids,
+                    )
+                    request_params["uri"] = constrained_uri
+                    display_params["uri"] = constrained_uri
             if method_name == "tools/call" and ai_change_set_id != "":
                 request_params["_ai_change_set_id"] = ai_change_set_id
             return request_params, display_params
