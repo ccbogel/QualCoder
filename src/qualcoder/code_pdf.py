@@ -220,7 +220,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter file <- L
+        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)   
@@ -229,7 +229,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
-        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}])) # for clear filter code <- L
+        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
         self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
         self.ui.pushButton_clear_filter_code.setVisible(False)
@@ -766,7 +766,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                         break
             iterator += 1  # Move to the next item
 
-    def tree_item_clicked(self, item, column):
+    def tree_item_clicked(self, item, column:int):
         """ Use to quicky open memo. """
 
         if column == 2:
@@ -1006,13 +1006,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(self.recent_codes) == 0:
             return
         menu = QtWidgets.QMenu()
-        for item in self.recent_codes:
-            menu.addAction(item['name'])
+        for i, item in enumerate(self.recent_codes):
+            menu.addAction(item['name'] + f' &{i + 1}')
         action = menu.exec(self.ui.plainTextEdit.mapToGlobal(position))
         if action is None:
             return
         # Remaining actions will be the submenu codes
-        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text()[:-3])
         self.mark()
 
     def text_edit_menu(self, position: int):
@@ -1205,7 +1205,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    def recursive_set_current_item(self, item, text_):
+    def recursive_set_current_item(self, item, text_:str):
         """ Set matching item to be the current selected item.
         Recurse through any child categories.
         Tried to use QTreeWidget.finditems - but this did not find matching item text
@@ -1366,11 +1366,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
-        action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-            action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_expand_collapse = None
@@ -1381,14 +1379,21 @@ class DialogCodePdf(QtWidgets.QWidget):
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_merge_category = None
+        action_move_category = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_merge_category = modify_menu.addAction(_("Merge category into category"))
+            action_move_category = modify_menu.addAction(_("Move category under category"))
         action_delete = modify_menu.addAction(_("Delete"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
+        action_move_multi_codes = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = modify_menu.addAction(_("Move code to"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
         action_show_codes_of_colour = filter_menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
@@ -1419,29 +1424,47 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
             if action == action_show_codes_like:
                 self.show_codes_like()
+                return
             if selected is not None and action == action_color:
                 self.change_code_color(selected)
+                return
             if action == action_add_category:
                 self.add_category()
+                return
             if action == action_add_code:
                 self.add_code()
+                return
             if action == action_merge_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.merge_category(catid)
+                return
+            if action == action_move_category:
+                catid = int(selected.text(1).split(":")[1])
+                self.move_category(catid)
+                return
             if action == action_add_code_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_code(catid)
+                return
             if action == action_add_category_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_category(catid)
+                return
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
+                return
+            if action == action_move_multi_codes:
+                self.move_multiple_codes()
+                return
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
+                return
             if selected is not None and action == action_edit_memo:
                 self.add_edit_cat_or_code_memo(selected)
+                return
             if selected is not None and action == action_delete:
                 self.delete_category_or_code(selected)
+                return
             if action == action_cat_show_coded_files:
                 branch_codes = self.recursive_get_branch_codes(selected, [])
                 self.coded_media_dialog(branch_codes, selected.text(0))
@@ -1470,7 +1493,11 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def recursive_expand_collapse_branch(self, item, expand_toggle):
         """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories. """
+        Recurse through all child categories.
+        Arge:
+            item : QTreeWidgetItem
+            expand_toggle : Bool
+        """
 
         child_count = item.childCount()
         for i in range(child_count):
@@ -1483,6 +1510,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         Tried to use QTreeWidget.finditems - but this did not find matching item text
         Called by: textEdit recent codes menu option
         Required for: merge_category()
+        Args:
+                item : QTreeWidgetItem
+                no_merge_list : list of treeitems
         """
 
         child_count = item.childCount()
@@ -1492,9 +1522,43 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.recursive_non_merge_item(item.child(i), no_merge_list)
         return no_merge_list
 
-    def merge_category(self, catid):
+    def move_category(self, catid: int):
+        """ Select another category to move this category underneath.
+        Args:
+            catid : Integer category identifier
+        """
+
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_string = f"({','.join(do_not_merge_list)})"
+        sql = "select name, catid, supercatid from code_cat where catid not in "
+        sql += do_not_merge_ids_string + " order by name"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        current_cat_name = self.ui.treeWidget.currentItem().text(0)
+        if category['name'] == '':
+            cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
+        else:
+            cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
+        self.update_dialog_codes_and_categories()
+
+    def merge_category(self, catid: int):
         """ Select another category to merge this category into.
-        param:
+        Args:
             catid : Integer category identifier
         """
 
@@ -1561,10 +1625,45 @@ class DialogCodePdf(QtWidgets.QWidget):
             raise
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
 
+    def move_multiple_codes(self):
+        """ Move multiple codes to another category. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
+                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
+        res = cur.fetchall()
+        code_list = []
+        for r in res:
+            name = r[0]
+            if r[1] is not None:
+                name = r[1] + " ← " + r[0]
+            code_list.append({'name': name, 'cid': r[2]})
+        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codes = ui.get_selected()
+        cur.execute("select name, catid from code_cat order by upper(name)")
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        for s in selected_codes:
+            cur.execute("update code_name set catid=? where cid=?", [category['catid'], s['cid']])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
+        self.update_dialog_codes_and_categories(["code_name"])
+
+
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
-        param:
+        Args:
             selected : QTreeWidgetItem
          """
 
@@ -1604,7 +1703,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Show selected codes that contain entered text.
         The input dialog is too narrow, so it is re-created.
         Args:
-             preset: None of called from tree_menu, or a string value if called from filer_code_text line edit
+             preset: None if called from tree_menu, or a string value if called from filer_code_text line edit
         """
         case_sensitive = True
         if preset is None:
@@ -1618,17 +1717,17 @@ class DialogCodePdf(QtWidgets.QWidget):
             lbl = QtWidgets.QLabel(dlg_text)
             line = QtWidgets.QLineEdit()
             chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
-            btnBox = QtWidgets.QDialogButtonBox()
-            btnBox.setStandardButtons(
+            btnbox = QtWidgets.QDialogButtonBox()
+            btnbox.setStandardButtons(
                 QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
             layout = QtWidgets.QVBoxLayout()
             layout.addWidget(lbl)
             layout.addWidget(chkbox)
             layout.addWidget(line)
-            layout.addWidget(btnBox)
+            layout.addWidget(btnbox)
             dialog.setLayout(layout)
-            btnBox.rejected.connect(dialog.reject)
-            btnBox.accepted.connect(dialog.accept)
+            btnbox.rejected.connect(dialog.reject)
+            btnbox.accepted.connect(dialog.accept)
             dialog.resize(200, 60)
             ok = dialog.exec()
             if not ok:
@@ -1646,7 +1745,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.show_codes_like_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
-            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
@@ -1672,7 +1771,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.show_codes_colour_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
-            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
@@ -1681,9 +1780,10 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def clear_code_filter(self):
-        """ Clear any active code filter and restore all codes in the tree. """ # for clear filter code <- L
+        """ Clear any active code filter and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
         self.ui.label_code.setPixmap(QtGui.QPixmap())
@@ -1692,7 +1792,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_code.setStyleSheet("")
         
     def clear_file_filter(self):
-        """ Clear any active file filter and reload all files. """ # for clear filter file <- L
+        """ Clear any active file filter and reload all files. """
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
@@ -1825,6 +1925,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Ctrl Z Undo last unmarking
         Ctrl F jump to search box
         A annotate - for current selection - text edit only
+        C New category
         Q Quick Mark with code - for current selection
         H Hide / Unhide top groupbox
         I Tag important
@@ -1836,7 +1937,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         U Unmark at selected location
         V assign 'in vivo' code to selected text - text edit only
         Ctrl 0 to Ctrl 9 - button presses
-        # Display Clicked character position
+        ! Display Clicked character position
         Shift + Zoom in
         Ctrl - Zoom out
 
@@ -1845,6 +1946,12 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         key = event.key()
         mods = event.modifiers()
+
+        # Esc hides any active resize handles <- L
+        if key == QtCore.Qt.Key.Key_Escape:
+            if hasattr(self, 'active_handles') and self.active_handles:
+                self.hide_resize_handles()
+                return
 
         # Ctrl + F jump to search box
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -1858,6 +1965,15 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
             selected = self.ui.treeWidget.currentItem()
             self.rename_category_or_code(selected)
+            return
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
             return
 
         # Ctrl 0 to 9
@@ -1894,6 +2010,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Show codes like
         if key == QtCore.Qt.Key.Key_L:
             self.show_codes_like()
+            return
         # Quick mark selected
         if key == QtCore.Qt.Key.Key_Q:
             self.selected_graphic_textboxes = self.scene.selectedItems()
@@ -1904,18 +2021,21 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Recent codes selection
         if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
             self.selected_graphic_textboxes = self.scene.selectedItems()
-            if len(self.selected_graphic_textboxes) == 0:
+            # Selected text boxes
+            if len(self.selected_graphic_textboxes) > 0:
+                # Can only be single selection, as text boxes re-drawn selection is lost.
+                ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                selection = ui.get_selected()
+                self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
+                self.mark(by_text_boxes=True)
                 return
-            # Can only be single selection, as text boxes re-drawn selection is lost.
-            ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
-            ok = ui.exec()
-            if not ok:
+            else:  # Selected text in textedit
+                if self.ui.plainTextEdit.textCursor().selectedText() != "":
+                    self.text_edit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
                 return
-            selection = ui.get_selected()
-            self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
-            self.mark(by_text_boxes=True)
-            return
-
         if not self.ui.plainTextEdit.hasFocus():
             return
         cursor_pos = self.ui.plainTextEdit.textCursor().position()
@@ -1924,7 +2044,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         for item in self.code_text:
             if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
                 codes_here.append(item)
-        # Hash display character position
+        # ! display character position
         if key == QtCore.Qt.Key.Key_Exclam:
             Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
             return
@@ -1969,10 +2089,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Create or assign in vivo code to selected text
         if key == QtCore.Qt.Key.Key_V and selected_text != "":
             self.mark_with_new_code(in_vivo=True)
-            return
-        # Recent codes context menu
-        if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.plainTextEdit.textCursor().selectedText() != "":
-            self.text_edit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
             return
         # Search, with or without selected
         if key == QtCore.Qt.Key.Key_S and self.file_ is not None:
@@ -2029,9 +2145,15 @@ class DialogCodePdf(QtWidgets.QWidget):
         Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
 
-        # Hide handles if the user clicks elsewhere in the editor
+        # Only hide handles if the cursor leaves the coded segment that owns them,
+        # so they stay visible while the user clicks inside the same segment <- L
         if hasattr(self, 'active_handles') and self.active_handles:
-            self.hide_resize_handles()
+            pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
+            owner = self.active_handles[0].code_item
+            cursor_has_selection = self.ui.plainTextEdit.textCursor().hasSelection()
+            # Hide if a selection is made, or the cursor is outside the owning segment <- L
+            if cursor_has_selection or not (owner['pos0'] <= pos <= owner['pos1']):
+                self.hide_resize_handles()
 
         self.overlaps_at_pos = []
         self.overlaps_at_pos_idx = 0
@@ -2137,8 +2259,9 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def extend_left(self, code_):
         """ Shift left arrow.
-        param:
-            code_ """
+        Args:
+            code_ : Dictonary
+        """
 
         if code_['pos0'] < 1:
             return
@@ -2223,7 +2346,11 @@ class DialogCodePdf(QtWidgets.QWidget):
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
-        Also merge codes if one code is dropped on another code. """
+        Also merge codes if one code is dropped on another code.
+        Args:
+            item : QTreeWidgetItem
+            parent : QTreeWidgetItem
+        """
 
         # find the category in the list
         if item.text(1)[0:3] == 'cat':
@@ -2281,7 +2408,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code.
                 param:
-            item : Dictionary code item
+            item : QTreeWidgetItem
             parent : QTreeWidgetItem
         """
 
@@ -2362,7 +2489,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
-        param:
+        Args:
             catid : None to add to without category, catid to add to category.
             code_name : String : Used for 'in vivo' coding where name is preset by in vivo text selection.
         return:
@@ -2443,7 +2570,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def add_category(self, supercatid=None):
         """ When button pressed, add a new category.
         Note: the addItem dialog does the checking for duplicate category names
-        param:
+        Args:
             supercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
@@ -2463,7 +2590,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
     def delete_category_or_code(self, selected):
-        """ Determine if selected item is a code or category before deletion. """
+        """ Determine if selected item is a code or category before deletion.
+        Args:
+            selected : QTreeWidgetItem
+        """
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
@@ -2475,6 +2605,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def delete_code(self, selected):
         """ Find code, remove from database, refresh and code data and fill treeWidget.
+        Args:
+            selected : QTreeWidgetItem
         """
 
         # Find the code in the list, check to delete
@@ -2507,7 +2639,10 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. """
+        and fill treeWidget.
+        Args:
+            selected : QTreeWidgetItem
+        """
 
         found = -1
         for i in range(0, len(self.categories)):
@@ -2535,7 +2670,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
     def add_edit_cat_or_code_memo(self, selected):
-        """ View and edit a memo for a category or code. """
+        """ View and edit a memo for a category or code.
+        Args:
+            selected : QTreeWidgetItem
+        """
 
         changed_tables = None
         if selected.text(1)[0:3] == 'cid':
@@ -2591,7 +2729,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
         Check that the code or category name is not currently in use.
-        param:
+        Args:
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
@@ -2666,7 +2804,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def change_code_color(self, selected):
         """ Change the colour of the currently selected code.
-        param:
+        Args:
             selected : QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
@@ -2701,7 +2839,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         {'id', 'name', 'memo', 'characters'= number of characters in the file,
         'start' = showing characters from this position, 'end' = showing characters to this position}
 
-        args:
+        Args:
             position :
         """
 
@@ -2933,7 +3071,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         Called from:
             view_file_dialog, context_menu
-        param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
+        Args:
+            file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
 
         if file_ is None:
@@ -3187,7 +3326,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Apply code backgrounds to text.
          Loop through coded text and match any at this position.
          if self.important checked and this is not important. Do not colour.
-         param:
+         Args:
             item: QGraphicsTextItem
             text_item: dictionary of pdf text item data """
 
@@ -3270,7 +3409,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         # Menu for graphics view area
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
         ''' Cannot mark selected textboxes. as soon as context menu appears, textbox selections are removed.
         action_mark = None
         '''
@@ -3404,8 +3543,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Get code text for this file and for all visible coders
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
-        sql = "select code_text_visible.ctid, code_text_visible.cid, fid, seltext, pos0, pos1, code_text_visible.owner, code_text_visible.date, " \
-              "code_text_visible.memo, important, name"
+        sql = "select code_text_visible.ctid, code_text_visible.cid, fid, seltext, pos0, pos1, " \
+              "code_text_visible.owner, code_text_visible.date, code_text_visible.memo, important, name"
         sql += " from code_text_visible join code_name on code_text_visible.cid = code_name.cid"
         sql += " where fid=?"
         # sql += " and pos0 >=? and pos1 <=? "  # problem area, removed
@@ -3456,9 +3595,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         for item in self.code_text:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.plainTextEdit.textCursor()
-            '''print(f"len text {len(self.ui.plainTextEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
-                  f" pos1 {item['pos1'] - self.file_['start']}"
-                  f" page plain text end {self.pages[self.page_num]['plain_text_end']}")  # tmp'''
             if item['pos0'] > self.pages[self.page_num]['plain_text_end'] or item['pos1'] < self.pages[self.page_num][
                 'plain_text_start']:
                 continue
@@ -3717,8 +3853,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
-
         Called via context menu, button
+        Args:
+            cursor_pos : QTextDocument cursor
         """
 
         if self.file_ is None:
@@ -3807,7 +3944,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def get_pdf_metadata(self, filepath: str):
-        """ Get metadata from PDF """
+        """ Get metadata from PDF.
+         Args:
+             filepath: String full file path
+        """
 
         fp = open(filepath, 'rb')
         parser = PDFParser(fp)
@@ -3816,7 +3956,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.metadata = ""
         if info:
             for k, v in info[0].items():
-                # print(k,v)
                 self.metadata += k + " = "
                 try:
                     self.metadata += v.decode('UTF-8', errors="ignore")
@@ -3902,7 +4041,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
-        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        # start teardrop tip is at its top-right corner -> shift left by full width <- L
+        h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
 
         # Create end handle
@@ -3911,7 +4051,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1'] - self.file_['start']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
-        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        # end teardrop tip is at its top-left corner -> align directly to the cursor x <- L
+        h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
 
     def hide_resize_handles(self):
@@ -3921,7 +4062,30 @@ class DialogCodePdf(QtWidgets.QWidget):
             h.deleteLater()
         self.active_handles = []
 
-    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
+    # Reposition active handles to their code's current pos0/pos1 without recreating them.
+    # Keeps the handles on screen so start and end can be adjusted repeatedly <- L
+    def reposition_resize_handles(self):
+        """ Re-anchor active handles after a resize so they stay usable. """
+        if not getattr(self, 'active_handles', []) or self.file_ is None:
+            return
+        for h in self.active_handles:
+            fresh = next((c for c in self.code_text if c.get('ctid') == h.code_item.get('ctid')), None)
+            if fresh is not None:
+                h.code_item = fresh
+                h.orig_pos0 = fresh['pos0']
+                h.orig_pos1 = fresh['pos1']
+            anchor = h.code_item['pos0'] if h.is_start else h.code_item['pos1']
+            cursor = self.ui.plainTextEdit.textCursor()
+            cursor.setPosition(max(0, min(len(self.ui.plainTextEdit.toPlainText()),
+                                          anchor - self.file_['start'])))
+            rect = self.ui.plainTextEdit.cursorRect(cursor)
+            if h.is_start:
+                h.move(rect.x() - h.width(), rect.y())  # start tip at top-right
+            else:
+                h.move(rect.x(), rect.y())  # end tip at top-left
+            h.raise_()
+
+    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0:int, orig_pos1:int):
         """ Receive final drop coordinates from a handle and update the database. """
         if is_start:
             if new_pos >= code_item['pos1']:
@@ -3967,8 +4131,10 @@ class DialogCodePdf(QtWidgets.QWidget):
             code_item['pos1'] = orig_pos1
             Message(self.app, _("Duplicate Error"),
                     _("This code already exists at this exact location."), "warning").exec()
-        self.hide_resize_handles()
+        # keep handles active after a successful resize so the user can
+        # adjust the other end without re-triggering the action <- L
         self.get_coded_text_update_eventfilter_tooltips()
+        self.reposition_resize_handles()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):

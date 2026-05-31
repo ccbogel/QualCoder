@@ -1536,11 +1536,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             action_assign_segment = menu.addAction("Assign segment to code")
         action_add_code_to_category = None
         action_add_category_to_category = None
-        action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-            action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_expand_collapse = None
@@ -1551,10 +1549,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_merge_category = None
+        action_move_category = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_merge_category = modify_menu.addAction(_("Merge category into category"))
+            action_move_category = modify_menu.addAction(_("Move category under category"))
         action_delete = modify_menu.addAction(_("Delete"))
+        action_move_multi_codes = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_move_code = modify_menu.addAction(_("Move code to"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
         action_find_code = menu.addAction(_("Find code"))
         filter_menu = menu.addMenu(_("Filter"))
@@ -1594,6 +1599,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if selected is not None and action == action_move_code:
             self.move_code(selected)
             return
+        if action == action_move_multi_codes:
+            self.move_multiple_codes()
+            return
         if action == action_add_category_to_category:
             catid = int(selected.text(1).split(":")[1])
             self.add_category(catid)
@@ -1603,6 +1611,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         if action == action_add_code:
             self.add_code()
+            return
+        if action == action_move_category:
+            catid = int(selected.text(1).split(":")[1])
+            self.move_category(catid)
             return
         if action == action_merge_category:
             catid = int(selected.text(1).split(":")[1])
@@ -1673,6 +1685,41 @@ class DialogCodeAV(QtWidgets.QDialog):
         DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.update_dialog_codes_and_categories(["code_name", "code_cat", "code_text", "code_av", "code_image"])
 
+    def move_multiple_codes(self):
+        """ Move multiple codes to another category. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
+                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
+        res = cur.fetchall()
+        code_list = []
+        for r in res:
+            name = r[0]
+            if r[1] is not None:
+                name = r[1] + " ← " + r[0]
+            code_list.append({'name': name, 'cid': r[2]})
+        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codes = ui.get_selected()
+        cur.execute("select name, catid from code_cat order by upper(name)")
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        for s in selected_codes:
+            cur.execute("update code_name set catid=? where cid=?", [category['catid'], s['cid']])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
+        self.update_dialog_codes_and_categories(["code_name"])
+
+
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
@@ -1694,6 +1741,40 @@ class DialogCodeAV(QtWidgets.QDialog):
         category = ui.get_selected()
         cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
         self.update_dialog_codes_and_categories(["code_name"])
+
+    def move_category(self, catid: int):
+        """ Select another category to move this category underneath.
+        Args:
+            catid : Integer category identifier
+        """
+
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_string = f"({','.join(do_not_merge_list)})"
+        sql = "select name, catid, supercatid from code_cat where catid not in "
+        sql += do_not_merge_ids_string + " order by name"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        current_cat_name = self.ui.treeWidget.currentItem().text(0)
+        if category['name'] == '':
+            cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
+        else:
+            cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
+        self.update_dialog_codes_and_categories()
 
     def show_codes_like(self, preset=None):
         """ Show all codes if text is empty.
@@ -1761,23 +1842,24 @@ class DialogCodeAV(QtWidgets.QDialog):
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
         if self.show_codes_colour_filter == "":  # <- L
-            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setVisible(False)
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.pushButton_clear_filter_code.setVisible(True)
             self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
             
     def clear_code_filter(self):
-        """ Clear any active code filter and restore all codes in the tree. """ # for clear filter code <- L
+        """ Clear any active code filter and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
         self.ui.pushButton_clear_filter_code.setVisible(False)
         self.ui.pushButton_clear_filter_code.setStyleSheet("")
 
     def clear_file_filter(self):
-        """ Clear any active file filter and reload all files. """ # for clear filter file
+        """ Clear any active file filter and reload all files. """
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
@@ -1867,8 +1949,7 @@ class DialogCodeAV(QtWidgets.QDialog):
          These key presses are not used in edi mode.
 
         A annotate - for current selection
-        ON HOLD C - Save screenshot as png
-        ON HOLD D - Save screenshot in project for image coding
+        C New category
         G Glue selected segment to selected code, and open segment memo
         Q Quick Mark with code - for current selection
         I Tag important
@@ -1891,19 +1972,33 @@ class DialogCodeAV(QtWidgets.QDialog):
         Ctrl + Shift + > to increase play rate
         Ctrl + Shift + < to decrease play rate
 
-        F2 Rename code or cateegory
+        F2 Rename code or category
         """
 
         key = event.key()
         mods = QtGui.QGuiApplication.keyboardModifiers()
+
+        # Esc hides any active resize handles <- L
+        if key == QtCore.Qt.Key.Key_Escape:
+            if hasattr(self, 'active_handles') and self.active_handles:
+                self.hide_resize_handles()
+                return
         '''# Get screenshot and load in project for coding - D
         if key == QtCore.Qt.Key.Key_D and not self.ddialog.isHidden():
             self.import_screenshot_into_project()
             return
-        # Save screenshot png - C
-        if key == QtCore.Qt.Key.Key_C and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
+        if key == QtCore.Qt.Key.Key_ABC and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
             self.save_screenshot()
             return'''
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
+            return
         # Glue segment to currently selected code and open segment memo
         if key == QtCore.Qt.Key.Key_G and self.segment['start_msecs'] is not None and \
             self.segment['end_msecs'] is not None and self.ui.treeWidget.currentItem() is not None \
@@ -3750,7 +3845,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor_start.setPosition(max(0, code_to_handle['pos0']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
-        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        # start teardrop tip is at its top-right corner -> shift left by full width <- L
+        h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
 
         # Create end handle
@@ -3758,7 +3854,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
-        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        # end teardrop tip is at its top-left corner -> align directly to the cursor x <- L
+        h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
 
     def hide_resize_handles(self):
@@ -3767,6 +3864,28 @@ class DialogCodeAV(QtWidgets.QDialog):
             h.hide()
             h.deleteLater()
         self.active_handles = []
+
+    # Reposition active handles to their code's current pos0/pos1 without recreating them.
+    # Keeps the handles on screen so start and end can be adjusted repeatedly <- L
+    def reposition_resize_handles(self):
+        """ Re-anchor active handles after a resize so they stay usable. """
+        if not getattr(self, 'active_handles', []):
+            return
+        for h in self.active_handles:
+            fresh = next((c for c in self.code_text if c.get('ctid') == h.code_item.get('ctid')), None)
+            if fresh is not None:
+                h.code_item = fresh
+                h.orig_pos0 = fresh['pos0']
+                h.orig_pos1 = fresh['pos1']
+            anchor = h.code_item['pos0'] if h.is_start else h.code_item['pos1']
+            cursor = self.ui.plainTextEdit.textCursor()
+            cursor.setPosition(max(0, min(len(self.ui.plainTextEdit.toPlainText()), anchor)))
+            rect = self.ui.plainTextEdit.cursorRect(cursor)
+            if h.is_start:
+                h.move(rect.x() - h.width(), rect.y())  # start tip at top-right
+            else:
+                h.move(rect.x(), rect.y())  # end tip at top-left
+            h.raise_()
 
     def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
         """ Receive final drop coordinates from a handle and update the database. """
@@ -3814,8 +3933,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             code_item['pos1'] = orig_pos1
             Message(self.app, _("Duplicate Error"),
                     _("This code already exists at this exact location."), "warning").exec()
-        self.hide_resize_handles()
+        # Keep handles active after a successful resize so the user can
+        # adjust the other end without re-triggering the action <- L
         self.get_coded_text_update_eventfilter_tooltips()
+        self.reposition_resize_handles()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):

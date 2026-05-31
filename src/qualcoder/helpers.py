@@ -1088,15 +1088,38 @@ class CodeResizeHandle(QtWidgets.QWidget):
         self.orig_pos0 = code_item['pos0']
         self.orig_pos1 = code_item['pos1']
         self.setCursor(QtCore.Qt.CursorShape.SizeHorCursor)
-        self.setFixedSize(14, 18)
-        # Force PyQt to render the QWidget background
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setFixedSize(20, 26)  # larger to fit the Android-style teardrop <- L
+        # transparent background so only the painted teardrop shape is visible <- L
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
-        color = self.code_item.get('color', '#0078d7')  # Blue
-        self.setStyleSheet(f"background-color: {color}; border: 2px solid #333; border-radius: 4px;")
+        self._color = self.code_item.get('color', '#0078d7')  # store color for paintEvent <- L
         self.dragging = False
         self.show()
         self.raise_()  # Ensure it stays on top of the text
+
+    # Draw an Android-style text-selection teardrop handle.
+    # Start handle points to the bottom-right, end handle points to the bottom-left <- L
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
+        w = self.width()
+        h = self.height()
+        radius = w / 2.0
+        path = QtGui.QPainterPath()
+        if self.is_start:
+            # Pointed corner at top-right, round body below (points up-right toward text start)
+            path.moveTo(w, 0)
+            path.lineTo(w, radius)
+            path.arcTo(0, 0, w, w, 0, -270)
+        else:
+            # Pointed corner at top-left, round body below (points up-left toward text end)
+            path.moveTo(0, 0)
+            path.lineTo(0, radius)
+            path.arcTo(0, 0, w, w, 180, 270)
+        path.closeSubpath()
+        painter.setPen(QtGui.QPen(QtGui.QColor("#333333"), 1))
+        painter.setBrush(QtGui.QBrush(QtGui.QColor(self._color)))
+        painter.drawPath(path)
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
@@ -1110,7 +1133,11 @@ class CodeResizeHandle(QtWidgets.QWidget):
             # Move the handle visually
             cursor = self.editor.cursorForPosition(viewport_pos)
             cursor_rect = self.editor.cursorRect(cursor)
-            self.move(cursor_rect.x() - 7, cursor_rect.y() + 2)
+            # keep teardrop tip aligned during drag (start->top-right, end->top-left) <- L
+            if self.is_start:
+                self.move(cursor_rect.x() - self.width(), cursor_rect.y())
+            else:
+                self.move(cursor_rect.x(), cursor_rect.y())
             self.raise_()
 
             # Clamp new position to text boundaries

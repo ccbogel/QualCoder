@@ -1313,11 +1313,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
-        action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-            action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_expand_collapse = None
@@ -1328,13 +1326,20 @@ class DialogCodeImage(QtWidgets.QDialog):
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_merge_category = None
+        action_move_category = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_merge_category = modify_menu.addAction(_("Merge category into category"))
+            action_move_category = modify_menu.addAction(_("Move category under category"))
         action_delete = modify_menu.addAction(_("Delete"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
+        action_move_multi_codes = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_move_code = modify_menu.addAction(_("Move code to"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
         action_find_code = menu.addAction(_("Find code"))
         filter_menu = menu.addMenu(_("Filter"))
@@ -1371,12 +1376,19 @@ class DialogCodeImage(QtWidgets.QDialog):
         if selected is not None and action == action_move_code:
             self.move_code(selected)
             return
+        if action == action_move_multi_codes:
+            self.move_multiple_codes()
+            return
         if action == action_add_category:
             self.add_category()
             return
         if action == action_add_category_to_category:
             catid = int(selected.text(1).split(":")[1])
             self.add_category(catid)
+            return
+        if action == action_move_category:
+            catid = int(selected.text(1).split(":")[1])
+            self.move_category(catid)
             return
         if action == action_add_code:
             self.add_code()
@@ -1451,6 +1463,74 @@ class DialogCodeImage(QtWidgets.QDialog):
         DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.get_coded_areas()
         self.redraw_scene()
+
+    def move_category(self, catid: int):
+        """ Select another category to move this category underneath.
+        Args:
+            catid : Integer category identifier
+        """
+
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_string = f"({','.join(do_not_merge_list)})"
+        sql = "select name, catid, supercatid from code_cat where catid not in "
+        sql += do_not_merge_ids_string + " order by name"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        current_cat_name = self.ui.treeWidget.currentItem().text(0)
+        if category['name'] == '':
+            cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
+        else:
+            cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
+        self.update_dialog_codes_and_categories()
+
+    def move_multiple_codes(self):
+        """ Move multiple codes to another category. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
+                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
+        res = cur.fetchall()
+        code_list = []
+        for r in res:
+            name = r[0]
+            if r[1] is not None:
+                name = r[1] + " ← " + r[0]
+            code_list.append({'name': name, 'cid': r[2]})
+        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codes = ui.get_selected()
+        cur.execute("select name, catid from code_cat order by upper(name)")
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None}]
+        for r in res:
+            category_list.append({'name': r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        for s in selected_codes:
+            cur.execute("update code_name set catid=? where cid=?", [category['catid'], s['cid']])
+            self.app.conn.commit()
+            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
+        self.update_dialog_codes_and_categories(["code_name"])
 
     def move_code(self, selected):
         """ Move code to another category or to no category in the tree.
@@ -1548,13 +1628,14 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def clear_code_filter(self):
         """ Clear any active code filter (show codes like or show codes of colour)
-        and restore all codes in the tree. """ # <- L
+        and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, "")  # unhide all codes
+        self.recursive_traverse(root, "")  # Show all codes
         self.ui.pushButton_clear_filter_code.setVisible(False)
-        self.ui.pushButton_clear_filter_code.setStyleSheet("")  # reset blue style
+        self.ui.pushButton_clear_filter_code.setStyleSheet("")  # reset style
 
     def clear_file_filter(self):
         """ Clear any active file filter (show files like, case files, attributes)
@@ -1596,7 +1677,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def keyPressEvent(self, event):
         """
-        Ctrl Z Undo last unmarking
+        C New Category
         H hide / show top group box
         Ctrl 0 to Ctrl 9 - button presses
         + or W  Zoom out
@@ -1604,13 +1685,22 @@ class DialogCodeImage(QtWidgets.QDialog):
         Ctrl 0 to Ctrl 5 Buttons and Help
         Ctrl G - Gray image with highlighted codings
         L Show codes like
-
+        Ctrl Z Undo last unmarking
         F2 Rename code or category
         """
 
         key = event.key()
         mods = event.modifiers()
 
+        # New category
+        if key == QtCore.Qt.Key.Key_C:
+            # if category already selected, add new category to that
+            supercatid = None
+            selected = self.ui.treeWidget.currentItem()
+            if selected is not None and selected.text(1)[0:3] == 'cat':
+                supercatid = int(selected.text(1)[6:])
+            self.add_category(supercatid)
+            return
         if key == QtCore.Qt.Key.Key_H:
             self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
             return

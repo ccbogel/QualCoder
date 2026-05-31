@@ -365,8 +365,8 @@ Right click for options: all (default), first, code within code.</string>
      <widget class="QPushButton" name="pushButton_edit">
       <property name="geometry">
        <rect>
-        <x>770</x>
-        <y>0</y>
+        <x>650</x>
+        <y>40</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -453,8 +453,8 @@ As all assigned positions may be incorrect. </string>
       </property>
       <property name="geometry">
        <rect>
-        <x>800</x>
-        <y>0</y>
+        <x>680</x>
+        <y>40</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -665,58 +665,164 @@ Formatted like below for name detection.
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>100</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>80</height>
+       <height>100</height>
       </size>
      </property>
      <property name="title">
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0" rowspan="2">
-       <widget class="QLabel" name="label_editing">
-        <property name="enabled">
-         <bool>true</bool>
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="groupBox_edit">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>76</height>
+          <height>100</height>
          </size>
         </property>
-        <property name="text">
+        <property name="title">
          <string/>
         </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="pushButton_exit_edit">
-        <property name="minimumSize">
-         <size>
-          <width>28</width>
-          <height>28</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>28</width>
-          <height>28</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Exit Edit text </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
+        <widget class="QLabel" name="label_editing">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>800</width>
+           <height>50</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>800</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>800</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_exit_edit">
+         <property name="geometry">
+          <rect>
+           <x>820</x>
+           <y>20</y>
+           <width>28</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Exit Edit text </string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_edit_search">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>60</y>
+           <width>113</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Search for text</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_edit_next">
+         <property name="geometry">
+          <rect>
+           <x>160</x>
+           <y>60</y>
+           <width>28</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Next</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_edit_prev">
+         <property name="geometry">
+          <rect>
+           <x>130</x>
+           <y>60</y>
+           <width>28</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Previous</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -827,7 +933,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_latest">
                   <property name="geometry">
                    <rect>
-                    <x>40</x>
+                    <x>30</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -843,7 +949,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_bookmark_go">
                   <property name="geometry">
                    <rect>
-                    <x>80</x>
+                    <x>60</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -875,7 +981,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_document_memo">
                   <property name="geometry">
                    <rect>
-                    <x>120</x>
+                    <x>90</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -891,7 +997,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_file_attributes">
                   <property name="geometry">
                    <rect>
-                    <x>160</x>
+                    <x>120</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -907,7 +1013,7 @@ Formatted like below for name detection.
                  <widget class="QPushButton" name="pushButton_clear_filter_file">
                   <property name="geometry">
                    <rect>
-                    <x>200</x>
+                    <x>150</x>
                     <y>0</y>
                     <width>28</width>
                     <height>28</height>
@@ -1386,7 +1492,6 @@ Formatted like below for name detection.
   <tabstop>pushButton_next</tabstop>
   <tabstop>pushButton_edit</tabstop>
   <tabstop>comboBox_export</tabstop>
-  <tabstop>pushButton_exit_edit</tabstop>
   <tabstop>pushButton_delete_all_codes</tabstop>
  </tabstops>
  <resources/>

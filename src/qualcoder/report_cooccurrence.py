@@ -1065,6 +1065,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
         self.ui.tableWidget.setRowCount(len(header_labels))
         self.ui.tableWidget.setVerticalHeaderLabels(header_labels)
+        # tooltip with the full code name on each header using header items <- L
+        for i, code_ in enumerate(self.selected_codes):
+            h_item = self.ui.tableWidget.horizontalHeaderItem(i)
+            if h_item is not None:
+                h_item.setToolTip(code_['name'])
+            v_item = self.ui.tableWidget.verticalHeaderItem(i)
+            if v_item is not None:
+                v_item.setToolTip(code_['name'])
         for row, row_data in enumerate(self.data_counts):
             for col, cell_data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem()

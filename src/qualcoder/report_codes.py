@@ -2570,7 +2570,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.rotate_image(cursor_context_pos, img_fmt, html_link, 90)
             return
         if action == action_show_overlaps:
-            DialogCodedIds(self.app, code_here).exec()
+            DialogCodedIds(self.app, code_here)  # removed redundant .exec(); DialogCodedIds.__init__ already calls self.exec()
             return
 
     def mark_important(self, code):
