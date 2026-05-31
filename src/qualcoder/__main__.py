@@ -1394,20 +1394,44 @@ class App(object):
         if result and suffix == "":
             return f"Backup exists already with this name: {backup}", backup
         msg = ""
+        backup_ignore_patterns = (
+            'search.sqlite',
+            'search.sqlite-*',
+            '*.sqlite-shm',
+            '*.sqlite-wal',
+            '*.sqlite-journal',
+        )
         if self.settings['backup_av_files'] == 'True':
             try:
-                shutil.copytree(self.project_path, backup)
+                shutil.copytree(self.project_path, backup, ignore=shutil.ignore_patterns(*backup_ignore_patterns))
             except FileExistsError as err:
                 msg = _("There is already a backup with this name")
                 print(f"{err}\nmsg")
                 logger.warning(_(msg) + f"\n{err}")
+            except shutil.Error as err:
+                msg = _("Project backup could not be fully created.") + " " + str(err)
+                logger.warning(msg)
         else:
-            shutil.copytree(self.project_path, backup,
-                            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg',
-                                                          '*.wmv', '*.MP3',
-                                                          '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
-            # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
-            msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
+            try:
+                shutil.copytree(
+                    self.project_path,
+                    backup,
+                    ignore=shutil.ignore_patterns(
+                        *backup_ignore_patterns,
+                        '*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv',
+                        '*.MP3', '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'
+                    )
+                )
+                # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
+                msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
+            except FileExistsError as err:
+                msg = _("There is already a backup with this name")
+                logger.warning(_(msg) + f"\n{err}")
+            except shutil.Error as err:
+                msg = _("Project backup could not be fully created.") + " " + str(err)
+                logger.warning(msg)
+        if not os.path.exists(backup):
+            return msg, backup
         # self.ui.textEdit.append(_("Project backup created: ") + backup)
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
@@ -3178,11 +3202,7 @@ Click "Yes" to start now.')
         self.app.update_coder_names()
         cur.execute('update project set codername=?', [self.app.settings['codername']])
         self.app.conn.commit()
-        
-        # AI: init llm and update vectorstore
-        self.app.ai.init_llm(self)
-        self.ai_chat_window.init_ai_chat(self.app)
-        
+
         # Fix missing folders within QualCoder project. Otherwise, will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
@@ -3210,6 +3230,10 @@ Click "Yes" to start now.')
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             msg, backup_name = self.app.save_backup()
             self.ui.textEdit.append(msg)
+
+        # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
+        self.app.ai.init_llm(self)
+        self.ai_chat_window.init_ai_chat(self.app)
         msg = f"\n{_('Project Opened: ')}{self.app.project_name}"
         self.ui.textEdit.append(msg)
         self.project_summary_report()
