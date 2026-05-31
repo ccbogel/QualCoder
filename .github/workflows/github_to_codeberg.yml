@@ -24,6 +24,6 @@ jobs:
       - name: "Sync repo"
         uses: spyoungtech/mirror-action@master
         with:
-          REMOTE: "${{ vars.FORGEJO_BASE_URL }}${{ vars.FORGEJO_REPO }}.git"
+          REMOTE: "https://codeberg.org/qualcoder/QualCoder.git"
           GIT_USERNAME: ${{ vars.FORGEJO_USERNAME }}
           GIT_PASSWORD: ${{ secrets._FORGEJO_TOKEN }}
