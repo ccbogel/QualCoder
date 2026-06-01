@@ -2574,7 +2574,7 @@ msgstr "Code in Code"
 
 #: src\qualcoder\code_text.py:1525
 msgid "Mark with new code (N)"
-msgstr "Mmit neuem Code markieren (N)"
+msgstr "Mit neuem Code markieren (N)"
 
 #: src\qualcoder\code_text.py:1543
 msgid "Copy with metadata"
@@ -2650,11 +2650,11 @@ msgstr "Bericht exportiert: "
 #: src\qualcoder\code_text.py:2733
 #, fuzzy
 msgid "Include journal"
-msgstr "Neue Zeitschrift"
+msgstr "Neues Notizbuch"
 
 #: src\qualcoder\code_text.py:2734
 msgid "Journals are linked to this file. Include them in the report?"
-msgstr ""
+msgstr "Mit dieser Datei sind Notizbücher verknüpft. Sollen diese in den Bericht aufgenommen werden?"
 
 #: src\qualcoder\code_text.py:2749 src\qualcoder\code_text.py:3239
 #: src\qualcoder\code_text.py:3311
@@ -2758,7 +2758,7 @@ msgstr "Datei Memo"
 #: src\qualcoder\code_text.py:3134
 #, fuzzy
 msgid "File Journal"
-msgstr "Neue Zeitschrift"
+msgstr "Neues Notizbuch"
 
 #: src\qualcoder\code_text.py:3252 src\qualcoder\code_text.py:3320
 msgid "Coded text file exported to: "
@@ -3632,7 +3632,7 @@ msgstr "Schließe Projekt: "
 #: src\qualcoder\information.py:179
 #, fuzzy
 msgid "Manage journals"
-msgstr "Neue Zeitschrift"
+msgstr "Notizbücher bearbeiten"
 
 #: src\qualcoder\information.py:180
 msgid "Open Reports menu"
@@ -3776,7 +3776,7 @@ msgstr "Fälle"
 #: src\qualcoder\information.py:198
 #, fuzzy
 msgid "Journals"
-msgstr "Zeitschriften: "
+msgstr "Notizbücher: "
 
 #: src\qualcoder\information.py:198
 #, fuzzy
@@ -3785,7 +3785,7 @@ msgstr "Referenz"
 
 #: src\qualcoder\information.py:199
 msgid "Help"
-msgstr ""
+msgstr "Hilfe"
 
 #: src\qualcoder\information.py:200 src\qualcoder\manage_references.py:236
 msgid "View file"
@@ -3799,7 +3799,7 @@ msgstr "Fall auswählen"
 #: src\qualcoder\information.py:200
 #, fuzzy
 msgid "Create journal"
-msgstr "Neue Zeitschrift"
+msgstr "Neues Notizbuch"
 
 #: src\qualcoder\information.py:201
 #, fuzzy
@@ -3852,7 +3852,7 @@ msgstr "Attribut hinzufügen ("
 #: src\qualcoder\information.py:203
 #, fuzzy
 msgid "Delete journal"
-msgstr "Neue Zeitschrift"
+msgstr "Notizbuch löschen"
 
 #: src\qualcoder\information.py:203
 #, fuzzy
@@ -3904,19 +3904,19 @@ msgstr ""
 
 #: src\qualcoder\information.py:214
 msgid "Rewind 30 seconds."
-msgstr ""
+msgstr "30 Sekunden zurückspulen."
 
 #: src\qualcoder\information.py:215 src\qualcoder\information.py:299
 msgid "Rewind 5 seconds"
-msgstr ""
+msgstr "5 Sekunden zurückspulen."
 
 #: src\qualcoder\information.py:216 src\qualcoder\information.py:300
 msgid "Forward 30 seconds"
-msgstr ""
+msgstr "30 Sekunden vorspulen."
 
 #: src\qualcoder\information.py:217
 msgid "Start / pause.On start rewind slightly"
-msgstr ""
+msgstr "Start / Pause. Beim Start leicht zurückspulen"
 
 #: src\qualcoder\information.py:218
 #, fuzzy
@@ -3989,7 +3989,7 @@ msgstr "Als wichtig markierte Codierungen anzeigen"
 #: src\qualcoder\information.py:238 src\qualcoder\information.py:270
 #: src\qualcoder\information.py:285
 msgid "Help - opens in browser"
-msgstr ""
+msgstr "Hilfe – wird im Browser geöffnet"
 
 #: src\qualcoder\information.py:239
 msgid "Jump to search box"
@@ -4195,7 +4195,7 @@ msgstr "Notizbuch: "
 
 #: src\qualcoder\journals.py:252
 msgid "Attribute added to journals:"
-msgstr "Attribut zu Zeitschriften hinzugefügt:"
+msgstr "Attribut zu Notizbüchern hinzugefügt:"
 
 #: src\qualcoder\journals.py:252 src\qualcoder\manage_files.py:1414
 msgid "type"
@@ -4203,7 +4203,7 @@ msgstr "Typ"
 
 #: src\qualcoder\journals.py:356 src\qualcoder\__main__.py:2981
 msgid "Journals: "
-msgstr "Zeitschriften: "
+msgstr "Notizbücher: "
 
 #: src\qualcoder\journals.py:368 src\qualcoder\journals.py:373
 #: src\qualcoder\journals.py:378 src\qualcoder\journals.py:420
@@ -4270,11 +4270,11 @@ msgstr "Notizbücher exportiert"
 
 #: src\qualcoder\journals.py:621
 msgid "New Journal"
-msgstr "Neue Zeitschrift"
+msgstr "Neues Notizbuch"
 
 #: src\qualcoder\journals.py:621
 msgid "Journal name"
-msgstr "Name der Zeitschrift"
+msgstr "Name des Notizbuchs"
 
 #: src\qualcoder\journals.py:642
 msgid "Journal created: "
@@ -9418,7 +9418,7 @@ msgstr "Unbehandelter Fehler"
 #~ msgstr "Dicker"
 
 #~ msgid "Thinner"
-#~ msgstr "Verdünner"
+#~ msgstr "Dünner"
 
 #~ msgid "Automatic coding in files: "
 #~ msgstr "Automatische Codierung in Dateien: "
@@ -9434,24 +9434,24 @@ msgstr "Unbehandelter Fehler"
 
 #, fuzzy
 #~ msgid "Rename coder"
-#~ msgstr "Code umbenennen"
+#~ msgstr "Codierenden umbenennen"
 
 #, fuzzy
 #~ msgid "No change"
-#~ msgstr " zu ändern."
+#~ msgstr "Keine Änderung"
 
 #, fuzzy
 #~ msgid "Are you sure?"
 #~ msgstr "Programm beenden?"
 
 #~ msgid "Csv file Export"
-#~ msgstr "Csv-Datei Exportieren"
+#~ msgstr "Csv-Datei exportieren"
 
 #~ msgid "Code relations stats csv file exported to: "
 #~ msgstr "Code-Relations-Statistiken als csv-Datei exportiert: "
 
 #~ msgid "Csv summary file Export"
-#~ msgstr "Csv-Zusammenfassungsdatei Export"
+#~ msgstr "Csv-Zusammenfassungsdatei exportieren"
 
 #~ msgid "Select Twitter csv file"
 #~ msgstr "Twitter csv-Datei auswählen"
@@ -9552,18 +9552,18 @@ msgstr "Unbehandelter Fehler"
 
 #, fuzzy
 #~ msgid "Save wordcloud"
-#~ msgstr "Wort-Wolke"
+#~ msgstr "Wort-Wolke speichern"
 
 #~ msgid ""
 #~ "Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
 #~ "Ctrl+1-8 Ctrl+D"
 #~ msgstr ""
 #~ "Transkriptionsbereich: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
-#~ "Ctrl+1-8"
+#~ "Ctrl+1-8 Ctrl+D"
 
 #~ msgid "Please select an AI provider or disable the AI altogether."
 #~ msgstr ""
-#~ "Bitte wählen Sie einen KI-Anbieter oder deaktivieren Sie das KI ganz."
+#~ "Bitte wählen Sie einen KI-Anbieter oder deaktivieren Sie das KI vollständig."
 
 #~ msgid "AI provider"
 #~ msgstr "KI-Anbieter"
