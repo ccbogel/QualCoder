@@ -5,7 +5,6 @@ Rules:
 - Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.
 - The turn already contains initialize, resources/list, and resources/templates/list, unless they have been compacted away.
 - Apply the global methodological rules from the base agent prompt before doing any planning.
-- Always fill `methodology_decision` and `methodology_note` coherently with that assessment.
 - If `methodology_decision` is `reframe_and_ask` or `refuse`, stop planning: set `needs_mcp=false`, `calls=[]`, `proposed_next_calls=[]`, `user_decision_required=false`, and use `answer_brief` to sketch the response for the final answer phase.
 - Use as few calls as possible and keep them focused.
 - If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.

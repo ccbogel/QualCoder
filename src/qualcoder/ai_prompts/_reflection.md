@@ -5,7 +5,6 @@ Rules:
 - Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.
 - Initialize, resources/list, and resources/templates/list are already available in context unless explicitly changed or compacted.
 - Reassess the task using the global methodological rules from the base agent prompt.
-- Always fill `methodology_decision` and `methodology_note` coherently with that reassessment.
 - If `methodology_decision` is `reframe_and_ask` or `refuse`, stop further evidence collection: set `enough_information=true`, `revised_calls=[]`, `proposed_next_calls=[]`, `user_decision_required=false`, and use `answer_brief` to sketch the response for the final answer phase.
 - Use as few additional calls as possible and keep them focused.
 - If the result from an early MCP-call was compacted away but you want to use this data again, reread it. Do not rely on fragments of content still being present in the conversation context.

@@ -3022,6 +3022,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                     "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                     "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                     "stop_reason": stop_reason,
                     "pending_calls": planned_calls if isinstance(planned_calls, list) else [],
                     "pending_user_decision": pending_user_decision,
@@ -3246,6 +3247,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                     "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                     "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                     "stop_reason": stop_reason,
                     "pending_calls": [],
                     "pending_user_decision": pending_user_decision,
@@ -3283,6 +3285,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                 "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                 "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                 "stop_reason": stop_reason,
                 "pending_calls": [],
                 "pending_user_decision": None,
@@ -4001,6 +4004,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                     "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                     "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                     "stop_reason": stop_reason,
                     "pending_calls": [],
                     "pending_user_decision": pending_user_decision,
@@ -4038,6 +4042,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                 "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                 "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                 "stop_reason": stop_reason,
                 "pending_calls": [],
                 "pending_user_decision": None,
@@ -4760,6 +4765,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                     "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                     "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                     "stop_reason": stop_reason,
                     "pending_calls": [],
                     "pending_user_decision": pending_user_decision,
@@ -4797,6 +4803,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                 "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                 "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                 "stop_reason": stop_reason,
                 "pending_calls": [],
                 "pending_user_decision": None,
@@ -6391,6 +6398,15 @@ data collected. This information will accompany every prompt sent to the AI, res
             lines.append("Methodology note: " + note)
         return "\n".join(lines)
 
+    def _snapshot_methodology_gate(self, methodology_gate: Any) -> Dict[str, str]:
+        """Return the compact methodological gate state for agent-state snapshots."""
+
+        gate = self._extract_methodology_gate(methodology_gate)
+        return {
+            "decision": str(gate.get("decision", "allow")).strip() or "allow",
+            "note": str(gate.get("note", "")).strip(),
+        }
+
     def _mcp_final_answer_phase_prompts(self, final_hint: str, stop_reason: str,
                                         methodology_gate: Optional[Dict[str, Any]] = None) -> Tuple[str, str]:
         """Build the stable system prompt and dynamic user prompt for the final answer phase."""
@@ -7595,6 +7611,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                     "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                     "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                     "stop_reason": stop_reason,
                     "pending_calls": planned_calls if isinstance(planned_calls, list) else [],
                     "pending_user_decision": pending_user_decision,
@@ -7813,6 +7830,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                     "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                     "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                     "stop_reason": stop_reason,
                     "pending_calls": planned_calls if isinstance(planned_calls, list) else [],
                     "pending_user_decision": pending_user_decision,
@@ -7850,6 +7868,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
                 "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
                 "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                "methodology_gate": self._snapshot_methodology_gate(methodology_gate),
                 "stop_reason": stop_reason,
                 "pending_calls": planned_calls if isinstance(planned_calls, list) else [],
                 "pending_user_decision": None,
