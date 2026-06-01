@@ -2854,6 +2854,7 @@ class DialogAIChat(QtWidgets.QDialog):
         stop_reason = ""
         latest_plan_summary = _("Prepared the initial topic exploration evidence.")
         latest_reflection_summary = ""
+        methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
 
@@ -2993,20 +2994,28 @@ class DialogAIChat(QtWidgets.QDialog):
             initial_brief = str(plan_data.get("answer_brief", "")).strip()
             if initial_brief != "":
                 final_hint = initial_brief
-            planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
-            planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
-            planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
-            if planner_user_decision_required and planner_decision_question == "":
-                planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
-            if planner_user_decision_required and planner_decision_question != "":
-                pending_user_decision = {
-                    "phase": "planning",
-                    "question": planner_decision_question,
-                    "context": planner_decision_context,
-                    "proposed_next_calls": proposed_plan_calls,
-                }
-                result["direct_ai_message"] = planner_decision_question
-                stop_reason = "awaiting_user_decision"
+            planner_methodology_gate = self._extract_methodology_gate(plan_data)
+            methodology_gate = self._merge_methodology_gate(methodology_gate, planner_methodology_gate)
+            if self._is_methodology_gate_blocking(planner_methodology_gate):
+                planned_calls = []
+                proposed_plan_calls = []
+                needs_mcp = False
+                stop_reason = "methodology_" + planner_methodology_gate["decision"]
+            else:
+                planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
+                planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
+                planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
+                if planner_user_decision_required and planner_decision_question == "":
+                    planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
+                if planner_user_decision_required and planner_decision_question != "":
+                    pending_user_decision = {
+                        "phase": "planning",
+                        "question": planner_decision_question,
+                        "context": planner_decision_context,
+                        "proposed_next_calls": proposed_plan_calls,
+                    }
+                    result["direct_ai_message"] = planner_decision_question
+                    stop_reason = "awaiting_user_decision"
             if pending_user_decision is not None:
                 agent_state_snapshot = {
                     "type": "mcp_agent_state",
@@ -3039,7 +3048,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 return result
             if not needs_mcp:
                 planned_calls = []
-            if len(planned_calls) == 0:
+            if len(planned_calls) == 0 and stop_reason == "":
                 stop_reason = "enough_information"
 
             reflection_system_prompt = self._build_mcp_combined_system_prompt(
@@ -3127,6 +3136,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
                 if reflection_brief != "":
                     final_hint = reflection_brief
+                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
                 enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
                 reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
                 continue_deferred_calls = self._json_bool(
@@ -3145,6 +3156,10 @@ class DialogAIChat(QtWidgets.QDialog):
                 )
                 if short_reflection_note != "":
                     self._emit_mcp_status_text(signals, chat_idx, short_reflection_note, status_kind="reflection")
+                if self._is_methodology_gate_blocking(reflection_methodology_gate):
+                    planned_calls = []
+                    stop_reason = "methodology_" + reflection_methodology_gate["decision"]
+                    break
                 user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
                 decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
                 decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
@@ -3208,6 +3223,12 @@ class DialogAIChat(QtWidgets.QDialog):
                         if replan_summary != "":
                             latest_plan_summary = replan_summary
                             self._emit_mcp_status_text(signals, chat_idx, replan_summary, status_kind="planning")
+                        replan_methodology_gate = self._extract_methodology_gate(replan_data)
+                        methodology_gate = self._merge_methodology_gate(methodology_gate, replan_methodology_gate)
+                        if self._is_methodology_gate_blocking(replan_methodology_gate):
+                            planned_calls = []
+                            stop_reason = "methodology_" + replan_methodology_gate["decision"]
+                            break
                         revised_calls = self._normalize_mcp_calls(
                             replan_data.get("calls", []), allowed_methods, max_queued_calls
                         )
@@ -3251,7 +3272,11 @@ class DialogAIChat(QtWidgets.QDialog):
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(
+                final_hint,
+                stop_reason,
+                methodology_gate,
+            )
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -3662,6 +3687,7 @@ class DialogAIChat(QtWidgets.QDialog):
         stop_reason = ""
         latest_plan_summary = _("Prepared the selected coded segments for analysis.")
         latest_reflection_summary = ""
+        methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
 
@@ -3880,6 +3906,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
                 if reflection_brief != "":
                     final_hint = reflection_brief
+                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
                 enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
                 reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
                 continue_deferred_calls = self._json_bool(
@@ -3898,6 +3926,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 )
                 if short_reflection_note != "":
                     self._emit_mcp_status_text(signals, chat_idx, short_reflection_note, status_kind="reflection")
+                if self._is_methodology_gate_blocking(reflection_methodology_gate):
+                    stop_reason = "methodology_" + reflection_methodology_gate["decision"]
+                    break
                 user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
                 decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
                 decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
@@ -3996,7 +4027,11 @@ class DialogAIChat(QtWidgets.QDialog):
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(
+                final_hint,
+                stop_reason,
+                methodology_gate,
+            )
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -4488,6 +4523,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         stop_reason = ""
         latest_plan_summary = _("Prepared the selected text passage for analysis.")
         latest_reflection_summary = ""
+        methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
 
@@ -4629,6 +4665,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                 reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
                 if reflection_brief != "":
                     final_hint = reflection_brief
+                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
                 enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
                 reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
                 continue_deferred_calls = self._json_bool(
@@ -4647,6 +4685,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                 )
                 if short_reflection_note != "":
                     self._emit_mcp_status_text(signals, chat_idx, short_reflection_note, status_kind="reflection")
+                if self._is_methodology_gate_blocking(reflection_methodology_gate):
+                    stop_reason = "methodology_" + reflection_methodology_gate["decision"]
+                    break
                 user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
                 decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
                 decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
@@ -4745,7 +4786,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(
+                final_hint,
+                stop_reason,
+                methodology_gate,
+            )
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",
@@ -6267,7 +6312,87 @@ data collected. This information will accompany every prompt sent to the AI, res
     def _mcp_final_answer_system_prompt(self) -> str:
         return self._load_internal_prompt_text("_final-answer")
 
-    def _mcp_final_answer_phase_prompts(self, final_hint: str, stop_reason: str) -> Tuple[str, str]:
+    def _empty_methodology_gate(self) -> Dict[str, Any]:
+        """Return the default methodological gate state."""
+
+        return {
+            "decision": "allow",
+            "note": "",
+        }
+
+    def _normalize_methodology_decision(self, value: Any) -> str:
+        """Normalize one methodological gate decision string."""
+
+        normalized = str(value if value is not None else "").strip().casefold().replace("-", "_")
+        if normalized in ("allow", "allow_with_caveat", "reframe_and_ask", "refuse"):
+            return normalized
+        return "allow"
+
+    def _extract_methodology_gate(self, payload: Any) -> Dict[str, Any]:
+        """Extract a normalized methodological gate payload from planner/reflection JSON."""
+
+        if not isinstance(payload, dict):
+            return self._empty_methodology_gate()
+        return {
+            "decision": self._normalize_methodology_decision(payload.get("methodology_decision", "allow")),
+            "note": self._normalize_progress_note(payload.get("methodology_note", ""), max_length=1000),
+        }
+
+    def _merge_methodology_gate(self, current: Any, new_gate: Any) -> Dict[str, Any]:
+        """Keep the stronger methodological gate while preserving useful detail."""
+
+        severity = {
+            "allow": 0,
+            "allow_with_caveat": 1,
+            "reframe_and_ask": 2,
+            "refuse": 3,
+        }
+        current_gate = self._extract_methodology_gate(current)
+        incoming_gate = self._extract_methodology_gate(new_gate)
+        current_rank = severity.get(current_gate["decision"], 0)
+        incoming_rank = severity.get(incoming_gate["decision"], 0)
+        selected = incoming_gate if incoming_rank >= current_rank else current_gate
+        fallback = current_gate if selected is incoming_gate else incoming_gate
+        merged = dict(selected)
+        if merged.get("note", "") == "":
+            merged["note"] = str(fallback.get("note", "")).strip()
+        return merged
+
+    def _is_methodology_gate_blocking(self, methodology_gate: Any) -> bool:
+        """Return whether the methodological gate should stop direct task execution."""
+
+        decision = self._extract_methodology_gate(methodology_gate).get("decision", "allow")
+        return decision in ("reframe_and_ask", "refuse")
+
+    def _methodology_gate_prompt_block(self, methodology_gate: Any) -> str:
+        """Format one methodological gate note for the final-answer phase."""
+
+        gate = self._extract_methodology_gate(methodology_gate)
+        decision = gate.get("decision", "allow")
+        if decision == "allow":
+            return ""
+
+        lines: List[str] = [f"Methodology gate result: {decision}."]
+        if decision == "allow_with_caveat":
+            lines.append(
+                "Proceed only if you foreground the methodological caveat before the substantive answer."
+            )
+        elif decision == "reframe_and_ask":
+            lines.append(
+                "Do not fulfill the original request directly. Explain the concern briefly, then reframe it into a sound next step."
+            )
+        elif decision == "refuse":
+            lines.append(
+                "Do not carry out the requested analysis as asked. Explain briefly why it would be methodologically unsound and offer a safer alternative."
+            )
+
+        note = str(gate.get("note", "")).strip()
+        if note != "":
+            lines.append("Methodology note: " + note)
+        return "\n".join(lines)
+
+    def _mcp_final_answer_phase_prompts(self, final_hint: str, stop_reason: str,
+                                        methodology_gate: Optional[Dict[str, Any]] = None) -> Tuple[str, str]:
         """Build the stable system prompt and dynamic user prompt for the final answer phase."""
 
         final_hint_text = str(final_hint if final_hint is not None else "").strip()
@@ -6275,7 +6400,10 @@ data collected. This information will accompany every prompt sent to the AI, res
         prompt_parts = ["Provide the final answer to the user now."]
         if final_hint_text != "":
             prompt_parts.append("Here is a draft idea for the answer:\n" + final_hint_text)
-        if stop_reason_text not in ("", "enough_information"):
+        methodology_note = self._methodology_gate_prompt_block(methodology_gate)
+        if methodology_note != "":
+            prompt_parts.append(methodology_note)
+        if stop_reason_text not in ("", "enough_information") and not stop_reason_text.startswith("methodology_"):
             prompt_parts.append(
                 "The available project evidence may still be incomplete. "
                 "State the uncertainty clearly and mention what additional project material would help."
@@ -6487,6 +6615,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             "properties": {
                 "needs_mcp": {"type": "boolean"},
                 "plan_summary": {"type": "string"},
+                "methodology_decision": {
+                    "type": "string",
+                    "enum": ["allow", "allow_with_caveat", "reframe_and_ask", "refuse"],
+                },
+                "methodology_note": {"type": "string"},
                 "user_decision_required": {"type": "boolean"},
                 "decision_question": {"type": "string"},
                 "decision_context": {"type": "string"},
@@ -6497,6 +6630,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             "required": [
                 "needs_mcp",
                 "plan_summary",
+                "methodology_decision",
+                "methodology_note",
                 "user_decision_required",
                 "decision_question",
                 "decision_context",
@@ -6517,6 +6652,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "enough_information": {"type": "boolean"},
                 "reflection_summary": {"type": "string"},
                 "next_step_note": {"type": "string"},
+                "methodology_decision": {
+                    "type": "string",
+                    "enum": ["allow", "allow_with_caveat", "reframe_and_ask", "refuse"],
+                },
+                "methodology_note": {"type": "string"},
                 "continue_deferred_calls": {"type": "boolean"},
                 "user_decision_required": {"type": "boolean"},
                 "decision_question": {"type": "string"},
@@ -6529,6 +6669,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "enough_information",
                 "reflection_summary",
                 "next_step_note",
+                "methodology_decision",
+                "methodology_note",
                 "continue_deferred_calls",
                 "user_decision_required",
                 "decision_question",
@@ -6742,6 +6884,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             "decision_question",
             "decision_context",
             "answer_brief",
+            "methodology_decision",
+            "methodology_note",
             "plan_summary",
             "reflection_summary",
             "continue_deferred_calls",
@@ -7301,6 +7445,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             max_queued_calls = 100
             total_tool_calls = 0
             stop_reason = ""
+            methodology_gate = self._empty_methodology_gate()
             def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
                 display_params = dict(request_params)
@@ -7422,20 +7567,28 @@ data collected. This information will accompany every prompt sent to the AI, res
             initial_brief = str(plan_data.get("answer_brief", "")).strip()
             if initial_brief != "":
                 final_hint = initial_brief
-            planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
-            planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
-            planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
-            if planner_user_decision_required and planner_decision_question == "":
-                planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
-            if planner_user_decision_required and planner_decision_question != "":
-                pending_user_decision = {
-                    "phase": "planning",
-                    "question": planner_decision_question,
-                    "context": planner_decision_context,
-                    "proposed_next_calls": proposed_plan_calls,
-                }
-                result["direct_ai_message"] = planner_decision_question
-                stop_reason = "awaiting_user_decision"
+            planner_methodology_gate = self._extract_methodology_gate(plan_data)
+            methodology_gate = self._merge_methodology_gate(methodology_gate, planner_methodology_gate)
+            if self._is_methodology_gate_blocking(planner_methodology_gate):
+                planned_calls = []
+                proposed_plan_calls = []
+                needs_mcp = False
+                stop_reason = "methodology_" + planner_methodology_gate["decision"]
+            else:
+                planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
+                planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
+                planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
+                if planner_user_decision_required and planner_decision_question == "":
+                    planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
+                if planner_user_decision_required and planner_decision_question != "":
+                    pending_user_decision = {
+                        "phase": "planning",
+                        "question": planner_decision_question,
+                        "context": planner_decision_context,
+                        "proposed_next_calls": proposed_plan_calls,
+                    }
+                    result["direct_ai_message"] = planner_decision_question
+                    stop_reason = "awaiting_user_decision"
             if pending_user_decision is not None:
                 agent_state_snapshot = {
                     "type": "mcp_agent_state",
@@ -7468,7 +7621,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return result
             if not needs_mcp:
                 planned_calls = []
-            if len(planned_calls) == 0:
+            if len(planned_calls) == 0 and stop_reason == "":
                 stop_reason = "enough_information"
 
             for reflection_round in range(max_reflection_rounds) if len(planned_calls) > 0 else []:
@@ -7548,6 +7701,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                 reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
                 if reflection_brief != "":
                     final_hint = reflection_brief
+                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
                 enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
                 reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
                 continue_deferred_calls = self._json_bool(
@@ -7568,6 +7723,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                 )
                 if short_reflection_note != "":
                     self._emit_mcp_status_text(signals, chat_idx, short_reflection_note, status_kind="reflection")
+                if self._is_methodology_gate_blocking(reflection_methodology_gate):
+                    planned_calls = []
+                    stop_reason = "methodology_" + reflection_methodology_gate["decision"]
+                    break
                 user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
                 decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
                 decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
@@ -7631,6 +7790,12 @@ data collected. This information will accompany every prompt sent to the AI, res
                             latest_plan_summary = replan_summary
                         if replan_summary != "":
                             self._emit_mcp_status_text(signals, chat_idx, replan_summary, status_kind="planning")
+                        replan_methodology_gate = self._extract_methodology_gate(replan_data)
+                        methodology_gate = self._merge_methodology_gate(methodology_gate, replan_methodology_gate)
+                        if self._is_methodology_gate_blocking(replan_methodology_gate):
+                            planned_calls = []
+                            stop_reason = "methodology_" + replan_methodology_gate["decision"]
+                            break
                         revised_calls = self._normalize_mcp_calls(
                             replan_data.get("calls", []), allowed_methods, max_queued_calls
                         )
@@ -7674,7 +7839,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(final_hint, stop_reason)
+            final_system_prompt, final_prompt = self._mcp_final_answer_phase_prompts(
+                final_hint,
+                stop_reason,
+                methodology_gate,
+            )
 
             agent_state_snapshot = {
                 "type": "mcp_agent_state",

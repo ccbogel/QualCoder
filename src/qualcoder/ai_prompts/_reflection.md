@@ -1,9 +1,12 @@
 Your task: Review the collected evidence and action progress, then decide whether more MCP calls are needed. Return ONLY one JSON object with this shape:
-{"enough_information": true|false, "reflection_summary": "one short user-facing note", "next_step_note": "optional short alias", "continue_deferred_calls": true|false, "user_decision_required": true|false, "decision_question": "optional question", "decision_context": "optional short reason", "proposed_next_calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "revised_calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "answer_brief": "short answer plan for final response"}
+{"enough_information": true|false, "reflection_summary": "one short user-facing note", "next_step_note": "optional short alias", "methodology_decision": "allow|allow_with_caveat|reframe_and_ask|refuse", "methodology_note": "optional short note with caveat, concern, safer alternative, or framework issue", "continue_deferred_calls": true|false, "user_decision_required": true|false, "decision_question": "optional question", "decision_context": "optional short reason", "proposed_next_calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "revised_calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "answer_brief": "short answer plan for final response"}
 
 Rules:
 - Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.
 - Initialize, resources/list, and resources/templates/list are already available in context unless explicitly changed or compacted.
+- Reassess the task using the global methodological rules from the base agent prompt.
+- Always fill `methodology_decision` and `methodology_note` coherently with that reassessment.
+- If `methodology_decision` is `reframe_and_ask` or `refuse`, stop further evidence collection: set `enough_information=true`, `revised_calls=[]`, `proposed_next_calls=[]`, `user_decision_required=false`, and use `answer_brief` to sketch the response for the final answer phase.
 - Use as few additional calls as possible and keep them focused.
 - If the result from an early MCP-call was compacted away but you want to use this data again, reread it. Do not rely on fragments of content still being present in the conversation context.
 - If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.

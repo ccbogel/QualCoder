@@ -1,9 +1,12 @@
 Your task: Plan the next steps needed to fulfill the user's request. Return ONLY one JSON object with this shape:
-{"needs_mcp": true|false, "plan_summary": "one short user-facing note", "user_decision_required": true|false, "decision_question": "optional question", "decision_context": "optional short reason", "proposed_next_calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "answer_brief": "optional draft answer idea"}
+{"needs_mcp": true|false, "plan_summary": "one short user-facing note", "methodology_decision": "allow|allow_with_caveat|reframe_and_ask|refuse", "methodology_note": "optional short note with caveat, concern, safer alternative, or framework issue", "user_decision_required": true|false, "decision_question": "optional question", "decision_context": "optional short reason", "proposed_next_calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "calls": [{"method": "resources/list|resources/read|resources/templates/list|initialize|tools/list|tools/call", "params": {}}], "answer_brief": "optional draft answer idea"}
 
 Rules:
 - Allowed methods: initialize, resources/list, resources/templates/list, resources/read, tools/list, tools/call.
 - The turn already contains initialize, resources/list, and resources/templates/list, unless they have been compacted away.
+- Apply the global methodological rules from the base agent prompt before doing any planning.
+- Always fill `methodology_decision` and `methodology_note` coherently with that assessment.
+- If `methodology_decision` is `reframe_and_ask` or `refuse`, stop planning: set `needs_mcp=false`, `calls=[]`, `proposed_next_calls=[]`, `user_decision_required=false`, and use `answer_brief` to sketch the response for the final answer phase.
 - Use as few calls as possible and keep them focused.
 - If you need any tool and the available tools are not already known from the current conversation context, call tools/list before planning or using tools/call.
 - Use tools/call only for tools that have already been discovered through tools/list in the current conversation context.
