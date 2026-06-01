@@ -2494,8 +2494,8 @@ class DialogAIChat(QtWidgets.QDialog):
             return
         self.history_add_message('prompt', prompt_name, prompt_message, chat_idx)
 
-    def _selected_source_names(self, file_ids: List[int]) -> List[str]:
-        """Return ordered source names for the selected file ids."""
+    def _selected_sources(self, file_ids: List[int]) -> List[Tuple[int, str]]:
+        """Return ordered `(source_id, source_name)` tuples for the selected file ids."""
 
         normalized_ids: List[int] = []
         for raw in list(file_ids or []):
@@ -2514,7 +2514,7 @@ class DialogAIChat(QtWidgets.QDialog):
         try:
             cursor = conn.cursor()
             cursor.execute(
-                f"SELECT name FROM source WHERE id IN ({placeholders}) ORDER BY CASE id "
+                f"SELECT id, name FROM source WHERE id IN ({placeholders}) ORDER BY CASE id "
                 + " ".join(f"WHEN ? THEN {idx}" for idx in range(len(normalized_ids)))
                 + " ELSE 999999 END",
                 tuple(normalized_ids + normalized_ids),
@@ -2524,7 +2524,68 @@ class DialogAIChat(QtWidgets.QDialog):
             return []
         finally:
             conn.close()
-        return [str(row[0]).strip() for row in rows if row is not None and row[0] is not None]
+        selected_sources: List[Tuple[int, str]] = []
+        for row in rows:
+            if row is None or len(row) < 2:
+                continue
+            try:
+                source_id = int(row[0])
+            except Exception:
+                continue
+            source_name = str(row[1] if row[1] is not None else '').strip()
+            if source_id <= 0 or source_name == '':
+                continue
+            selected_sources.append((source_id, source_name))
+        return selected_sources
+
+    def _selected_source_names(self, file_ids: List[int]) -> List[str]:
+        """Return ordered source names for the selected file ids."""
+
+        return [source_name for _source_id, source_name in self._selected_sources(file_ids)]
+
+    def _selected_cases(self, case_ids: List[int]) -> List[Tuple[int, str]]:
+        """Return ordered `(case_id, case_name)` tuples for the selected case ids."""
+
+        normalized_ids: List[int] = []
+        for raw in list(case_ids or []):
+            try:
+                case_id = int(raw)
+            except Exception:
+                continue
+            if case_id > 0:
+                normalized_ids.append(case_id)
+        normalized_ids = list(dict.fromkeys(normalized_ids))
+        if len(normalized_ids) == 0:
+            return []
+        placeholders = ",".join(["?"] * len(normalized_ids))
+        db_path = os.path.join(self.app.project_path, 'data.qda')
+        conn = sqlite3.connect(db_path)
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"SELECT caseid, name FROM cases WHERE caseid IN ({placeholders}) ORDER BY CASE caseid "
+                + " ".join(f"WHEN ? THEN {idx}" for idx in range(len(normalized_ids)))
+                + " ELSE 999999 END",
+                tuple(normalized_ids + normalized_ids),
+            )
+            rows = cursor.fetchall()
+        except Exception:
+            return []
+        finally:
+            conn.close()
+        selected_cases: List[Tuple[int, str]] = []
+        for row in rows:
+            if row is None or len(row) < 2:
+                continue
+            try:
+                case_id = int(row[0])
+            except Exception:
+                continue
+            case_name = str(row[1] if row[1] is not None else '').strip()
+            if case_id <= 0 or case_name == '':
+                continue
+            selected_cases.append((case_id, case_name))
+        return selected_cases
 
     def _topic_exploration_scope_env_update(self, topic_name: str, topic_description: str,
                                             file_ids: List[int], filter_info: Optional[Dict[str, Any]] = None) -> str:
@@ -2540,12 +2601,14 @@ class DialogAIChat(QtWidgets.QDialog):
                 continue
             if file_id > 0 and file_id not in normalized_file_ids:
                 normalized_file_ids.append(file_id)
-        source_names = self._selected_source_names(normalized_file_ids)
+        selected_sources = self._selected_sources(normalized_file_ids)
+        source_names = [source_name for _source_id, source_name in selected_sources]
         source_count = len(normalized_file_ids)
         filter_info = dict(filter_info) if isinstance(filter_info, dict) else {}
         no_file_filter = bool(filter_info.get("no_file_filter", False))
         no_case_filter = bool(filter_info.get("no_case_filter", False))
         has_attribute_filter = bool(filter_info.get("has_attribute_filter", False))
+        selected_cases = self._selected_cases(list(filter_info.get("selected_case_ids", []) or []))
         case_names = [str(name).strip() for name in list(filter_info.get("selected_case_names", []) or []) if str(name).strip() != ""]
         no_filters = no_file_filter and no_case_filter and not has_attribute_filter
 
@@ -2577,6 +2640,22 @@ class DialogAIChat(QtWidgets.QDialog):
                     preview += ', ...'
                 material_parts.append(f'Resulting documents ({source_count}): {preview}.')
             lines.append('Selected material: ' + " ".join(material_parts))
+            if len(selected_sources) > 0:
+                doc_scope_preview = "; ".join(
+                    f'{source_name} [id={source_id}]'
+                    for source_id, source_name in selected_sources[:40]
+                )
+                if len(selected_sources) > 40:
+                    doc_scope_preview += f'; ... ({len(selected_sources) - 40} more)'
+                lines.append('Document id map for the current material scope: ' + doc_scope_preview + '.')
+            if len(selected_cases) > 0:
+                case_scope_preview = "; ".join(
+                    f'{case_name} [id={case_id}]'
+                    for case_id, case_name in selected_cases[:40]
+                )
+                if len(selected_cases) > 40:
+                    case_scope_preview += f'; ... ({len(selected_cases) - 40} more)'
+                lines.append('Case id map for the current material scope: ' + case_scope_preview + '.')
         lines.append('For the initial exploration turn, keep retrieval within the user-selected material described above.')
         lines.append('After that first turn, the scope may be expanded if this seems helpful and the user agrees.')
         return "\n".join(lines)
@@ -3500,6 +3579,8 @@ class DialogAIChat(QtWidgets.QDialog):
         selected_codes = self._selected_code_names(code_ids)
         coder_summary = self._code_analysis_filter_summary(file_ids, coder_names, filter_info)
         structured_scope = self._format_code_analysis_selection_scope(code_scope)
+        selected_sources = self._selected_sources(file_ids)
+        selected_cases = self._selected_cases(list((filter_info or {}).get("selected_case_ids", []) or []))
 
         lines = [
             'System event: This AI agent chat was started in code analysis mode.',
@@ -3518,6 +3599,22 @@ class DialogAIChat(QtWidgets.QDialog):
         elif structured_scope == '' and len(selected_codes) == 1:
             lines.append('Selected code: ' + selected_codes[0])
         lines.append('Selected coding scope: ' + coder_summary)
+        if len(selected_sources) > 0:
+            doc_scope_preview = "; ".join(
+                f'{source_name} [id={source_id}]'
+                for source_id, source_name in selected_sources[:40]
+            )
+            if len(selected_sources) > 40:
+                doc_scope_preview += f'; ... ({len(selected_sources) - 40} more)'
+            lines.append('Document id map for the current material scope: ' + doc_scope_preview + '.')
+        if len(selected_cases) > 0:
+            case_scope_preview = "; ".join(
+                f'{case_name} [id={case_id}]'
+                for case_id, case_name in selected_cases[:40]
+            )
+            if len(selected_cases) > 40:
+                case_scope_preview += f'; ... ({len(selected_cases) - 40} more)'
+            lines.append('Case id map for the current material scope: ' + case_scope_preview + '.')
         lines.append('Base the analysis primarily on the selected coded segments.')
         lines.append('If narrowly targeted additional project material would directly help to fulfill the active analysis prompt, you may retrieve and use it.')
         lines.append('Keep any such expansion tightly focused, such as immediate same-document context, a small number of comparison passages, or directly relevant additional evidence for the selected codes.')
