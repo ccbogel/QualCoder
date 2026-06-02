@@ -31,7 +31,7 @@ from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .color_selector import TextColor
 from .report_attributes import DialogSelectAttributeParameters
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
-from .helpers import Message
+from .helpers import Message, init_persistent_tree_header, restore_persistent_tree_widths
 from .select_items import DialogSelectItems
 
 
@@ -122,6 +122,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'ai_search_tree_widths')
         if self.ui.tabWidget.isTabVisible(0):  # code
             self.fill_tree(selected_id, selected_is_code) 
         # prompts
@@ -189,8 +190,6 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -298,7 +297,11 @@ class DialogAiSearch(QtWidgets.QDialog):
         if self.tree_sort_option == "all desc":
             self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
         self.fill_code_counts_in_tree()
-        self.ui.treeWidget.expandAll()    
+        self.ui.treeWidget.expandAll()
+        restore_persistent_tree_widths(
+            self.ui.treeWidget,
+            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
+        )
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code from all visible or selected coders and all files. """

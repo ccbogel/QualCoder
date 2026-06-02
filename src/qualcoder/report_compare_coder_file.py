@@ -32,7 +32,8 @@ from PyQt6.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
-from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog
+from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog, init_persistent_tree_header, \
+    restore_persistent_tree_widths
 from .information import DialogInformation
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -94,6 +95,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.listWidget_files.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreportcomparecoderfile_tree_widths')
         self.ui.listWidget_files.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.file_menu)
         self.ui.comboBox_coders.insertItems(0, self.coders)
@@ -904,8 +906,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids']:
             self.ui.treeWidget.showColumn(1)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -977,6 +977,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         # self.ui.treeWidget.expandAll()
+        restore_persistent_tree_widths(self.ui.treeWidget)
 
 
 class DialogDualCodedImage(QtWidgets.QDialog):

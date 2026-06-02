@@ -36,7 +36,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from .helpers import Message, ExportDirectoryPathDialog
+from .helpers import Message, ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
 from .information import DialogInformation
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -58,7 +58,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.coded = []  # Used to refactor name
         self.truncated_code_names = True
         self.contains_long_names = False
-        self.tree_column_widths_auto_resize = True
         self.file_ids = []
         self.get_data()
         self.calculate_code_frequencies()
@@ -78,6 +77,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreportcodefrequencies_tree_widths')
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -438,8 +438,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -533,6 +531,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        restore_persistent_tree_widths(self.ui.treeWidget)
 
     def tree_menu(self, position):
         menu = QtWidgets.QMenu()
@@ -552,8 +551,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_cat_show_coded_files = menu.addAction(_("Show coded files"))
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
-        action_resize = menu.addAction(_("Toggle automatic column resize"))
-
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -583,12 +580,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             expand_toggle = not selected.isExpanded()
             self.recursive_expand_collapse_branch(selected, expand_toggle)
             return
-        if action == action_resize:
-            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
-        if self.tree_column_widths_auto_resize:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        else:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def recursive_get_branch_codes(self, item, branch_codes):
         """ Set all children of this item to be expanded or collapsed.
@@ -632,7 +623,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.categories = []
         self.truncated_code_names = True
         self.contains_long_names = False
-        self.tree_column_widths_auto_resize = True
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportComparisons()
@@ -655,6 +645,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreportcodercomparisons_tree_widths')
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         if len(self.coders) == 3:  # includes empty slot
@@ -973,8 +964,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids']:
             self.ui.treeWidget.showColumn(1)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -1055,6 +1044,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        restore_persistent_tree_widths(self.ui.treeWidget)
 
     def tree_menu(self, position):
         menu = QtWidgets.QMenu()
@@ -1074,8 +1064,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_cat_show_coded_files = menu.addAction(_("Show coded files"))
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
-        action_resize = menu.addAction(_("Toggle automatic column resize"))
-
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -1101,12 +1089,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         if action == action_expand_collapse:
             expand_toggle = not selected.isExpanded()
             self.recursive_expand_collapse_branch(selected, expand_toggle)
-        if action == action_resize:
-            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
-        if self.tree_column_widths_auto_resize:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        else:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def recursive_get_branch_codes(self, item, branch_codes):
         """ Set all children of this item to be expanded or collapsed.
