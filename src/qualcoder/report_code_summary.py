@@ -34,6 +34,7 @@ from PyQt6.QtCore import Qt
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
+from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
 from .stopwords import *
 
 # If VLC not installed, it will not crash
@@ -76,10 +77,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreport_code_summary_tree_widths')
         # Tree variables
         self.contains_long_names = False
         self.truncated_code_names = True
-        self.tree_column_widths_auto_resize = True
 
         languages = ["  ", "Deutsch de", "English en", "Español es", "Français fr", "Italiano it", "Português pt"]
         for lang in languages:
@@ -149,8 +150,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -264,6 +263,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
+        restore_persistent_tree_widths(
+            self.ui.treeWidget,
+            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
+        )
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code.
@@ -316,7 +319,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         action_truncate_names = None
         if self.contains_long_names and self.truncated_code_names is False:
             action_truncate_names = menu.addAction(_("Truncate names"))
-        action_resize = menu.addAction(_("Toggle automatic column resize"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -340,12 +342,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         if action == action_truncate_names:
             self.truncated_code_names = True
             self.fill_tree()
-        if action == action_resize:
-            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
-        if self.tree_column_widths_auto_resize:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        else:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def recursive_get_branch_codes(self, item, branch_codes):
         """ Set all children of this item to be expanded or collapsed.

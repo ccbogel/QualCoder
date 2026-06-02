@@ -33,7 +33,7 @@ from PyQt6.QtGui import QBrush
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_report_codes_by_segments import Ui_DialogSegmentCodings
-from .helpers import Message
+from .helpers import Message, init_persistent_tree_header, restore_persistent_tree_widths
 from .report_attributes import DialogSelectAttributeParameters
 
 
@@ -90,10 +90,10 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreportcodesbysegments_tree_widths')
         # Tree variables
         self.contains_long_names = False
         self.truncated_code_names = True
-        self.tree_column_widths_auto_resize = True
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -382,8 +382,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -496,6 +494,10 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
+        restore_persistent_tree_widths(
+            self.ui.treeWidget,
+            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
+        )
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code from all coders and all files. """
@@ -544,7 +546,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         action_truncate_names = None
         if self.contains_long_names and not self.truncated_code_names:
             action_truncate_names = menu.addAction(_("Truncate names"))
-        action_resize = menu.addAction(_("Toggle automatic column resize"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -596,12 +597,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         if action == action_truncate_names:
             self.truncated_code_names = True
             self.fill_tree()
-        if action == action_resize:
-            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
-        if self.tree_column_widths_auto_resize:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        else:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def recursive_get_branch_codes(self, item, branch_codes):
         """ Set all children of this item to be expanded or collapsed.
