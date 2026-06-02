@@ -46,7 +46,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
-from .helpers import ExportDirectoryPathDialog, Message
+from .helpers import ExportDirectoryPathDialog, Message, init_persistent_tree_header, restore_persistent_tree_widths
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
@@ -138,11 +138,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        # Codes-tree header menu
-        self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
         self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
-        self.tree_column_widths_auto_resize = True
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodeimage_tree_widths')
         # Header widgets
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
@@ -489,11 +486,6 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        if self.tree_column_widths_auto_resize:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        else:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -606,6 +598,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         if self.tree_sort_option == "all desc":
             self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
         self.fill_code_counts_in_tree()
+        restore_persistent_tree_widths(
+            self.ui.treeWidget,
+            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
+        )
 
     def fill_code_counts_in_tree(self):
         """ Calculate the frequency of each code and category for all visible coders and the selected file.
@@ -680,19 +676,6 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if column == 2:
             self.add_edit_code_memo(item)
-
-    def codes_tree_header_menu(self, position):
-        """ treeWidget resize mode - resize to contents or interactive. """
-
-        menu = QtWidgets.QMenu(self)
-        action_resize = menu.addAction(_("Toggle automatic resize"))
-        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
-        if action == action_resize:
-            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
-        if self.tree_column_widths_auto_resize:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        else:
-            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.

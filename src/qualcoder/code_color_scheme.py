@@ -32,6 +32,7 @@ from PyQt6.QtGui import QBrush
 
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
+from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -74,6 +75,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodecolorscheme_tree_widths')
         self.ui.pushButton_clear_selection_codes.pressed.connect(self.ui.treeWidget.clearSelection)
         self.ui.pushButton_clear_selection.pressed.connect(self.ui.tableWidget.clearSelection)
         self.ui.tableWidget.setTabKeyNavigation(False)
@@ -151,8 +153,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -252,6 +252,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         self.ui.treeWidget.expandAll()
+        restore_persistent_tree_widths(self.ui.treeWidget)
 
     def update_selected_colors(self):
         """ Update colour list. Prior to applying colors. """

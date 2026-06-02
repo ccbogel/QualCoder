@@ -33,7 +33,7 @@ from PyQt6.QtGui import QBrush
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
-from .helpers import DialogCodeInText, Message
+from .helpers import DialogCodeInText, Message, init_persistent_tree_header, restore_persistent_tree_widths
 from .report_attributes import DialogSelectAttributeParameters
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -94,6 +94,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreportexactmatches_tree_widths')
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -644,8 +645,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         header = [_("Code Tree"), _("Id")]
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -719,6 +718,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         # self.ui.treeWidget.expandAll()
+        restore_persistent_tree_widths(self.ui.treeWidget)
 
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.

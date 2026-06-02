@@ -125,6 +125,209 @@ def file_typer(mediapath):
     return "text"
 
 
+def init_persistent_tree_header(tree_widget, app, settings_key):
+    """Configure a tree header for interactive widths that persist in config.ini."""
+
+    header = tree_widget.header()
+    header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+    header.setStretchLastSection(False)
+    tree_widget._qc_tree_widths_settings_key = settings_key
+    if getattr(tree_widget, "_qc_tree_widths_initialized", False):
+        return
+
+    tree_widget._qc_tree_widths_app = app
+    tree_widget._qc_restoring_tree_widths = False
+    tree_widget._qc_tree_widths_ready = False
+    tree_widget._qc_tree_widths_pending_restore = False
+    save_timer = QtCore.QTimer(tree_widget)
+    save_timer.setSingleShot(True)
+    save_timer.setInterval(300)
+    def _flush_config(*_args):
+        app.write_config_ini(app.settings, app.ai_models)
+
+    save_timer.timeout.connect(_flush_config)
+    tree_widget._qc_tree_widths_save_timer = save_timer
+
+    def _save_widths(_logical_index, _old_size, _new_size):
+        if getattr(tree_widget, "_qc_restoring_tree_widths", False):
+            return
+        if not getattr(tree_widget, "_qc_tree_widths_ready", False):
+            return
+        save_persistent_tree_widths(tree_widget)
+        tree_widget._qc_tree_widths_save_timer.start()
+
+    header.sectionResized.connect(_save_widths)
+    tree_widget.destroyed.connect(_flush_config)
+    event_filter = PersistentTreeWidthEventFilter(tree_widget)
+    tree_widget.installEventFilter(event_filter)
+    tree_widget._qc_tree_widths_event_filter = event_filter
+    tree_widget._qc_tree_widths_initialized = True
+
+
+def save_persistent_tree_widths(tree_widget):
+    """Save the current widths of all tree columns to app settings."""
+
+    app = getattr(tree_widget, "_qc_tree_widths_app", None)
+    settings_key = getattr(tree_widget, "_qc_tree_widths_settings_key", "")
+    if app is None or settings_key == "":
+        return
+    widths = []
+    header = tree_widget.header()
+    for index in range(tree_widget.columnCount()):
+        widths.append(str(header.sectionSize(index)))
+    app.settings[settings_key] = ",".join(widths)
+
+
+def _normalized_tree_minimum_widths(minimum_widths):
+    """Return minimum widths as a dict keyed by column index."""
+
+    if minimum_widths is None:
+        return {}
+    if isinstance(minimum_widths, dict):
+        return minimum_widths
+    return dict(enumerate(minimum_widths))
+
+
+def _tree_widths_look_uninitialized(tree_widget, widths, default_width_factors):
+    """Detect fallback Qt header widths saved before the widget had a real size."""
+
+    if default_width_factors is None or len(widths) != tree_widget.columnCount():
+        return False
+    normalized = []
+    for index, width in enumerate(widths):
+        if tree_widget.isColumnHidden(index):
+            normalized.append(0)
+        else:
+            normalized.append(width)
+    visible_default_count = sum(1 for width in normalized if width == 100)
+    return visible_default_count >= 2 and all(width in (0, 100) for width in normalized)
+
+
+class PersistentTreeWidthEventFilter(QtCore.QObject):
+    """Apply deferred tree widths once the widget has a real size."""
+
+    def eventFilter(self, watched, event):
+        if watched is None:
+            return False
+        if not getattr(watched, "_qc_tree_widths_pending_restore", False):
+            return False
+        if event.type() in (
+                QtCore.QEvent.Type.Show,
+                QtCore.QEvent.Type.Resize,
+                QtCore.QEvent.Type.LayoutRequest):
+            QtCore.QTimer.singleShot(0, lambda: _apply_pending_tree_widths(watched))
+        return False
+
+
+def _apply_pending_tree_widths(tree_widget):
+    """Apply deferred default widths if the tree is ready for sizing."""
+
+    if not getattr(tree_widget, "_qc_tree_widths_pending_restore", False):
+        return
+    _apply_default_tree_widths(
+        tree_widget,
+        minimum_widths=getattr(tree_widget, "_qc_pending_tree_minimum_widths", {}),
+        default_width_factors=getattr(tree_widget, "_qc_pending_tree_default_width_factors", None)
+    )
+
+
+def _apply_default_tree_widths(tree_widget, minimum_widths=None, default_width_factors=None):
+    """Apply initial column widths after the widget has a usable viewport size."""
+
+    if tree_widget.columnCount() == 0:
+        return
+
+    header = tree_widget.header()
+    available_width = tree_widget.viewport().width()
+    if not tree_widget.isVisible() or available_width < 250:
+        return
+
+    minimum_widths = _normalized_tree_minimum_widths(minimum_widths)
+    tree_widget._qc_restoring_tree_widths = True
+    try:
+        for index in range(tree_widget.columnCount()):
+            tree_widget.resizeColumnToContents(index)
+        if default_width_factors is not None:
+            visible_factors = {}
+            reserved_width = 0
+            for index in range(tree_widget.columnCount()):
+                if tree_widget.isColumnHidden(index):
+                    continue
+                if index not in default_width_factors:
+                    reserved_width += header.sectionSize(index)
+                    continue
+                factor = default_width_factors[index]
+                if factor is None:
+                    continue
+                visible_factors[index] = factor
+            total_factor = sum(visible_factors.values())
+            if total_factor > 0:
+                flexible_width = max(available_width - reserved_width, 100)
+                allocated_width = 0
+                factor_columns = list(visible_factors.items())
+                for position, (index, factor) in enumerate(factor_columns):
+                    if position == len(factor_columns) - 1:
+                        target_width = max(flexible_width - allocated_width, 1)
+                    else:
+                        target_width = max(1, int(round(flexible_width * (factor / total_factor))))
+                        allocated_width += target_width
+                    minimum_width = minimum_widths.get(index)
+                    if minimum_width is not None:
+                        target_width = max(target_width, minimum_width)
+                    header.resizeSection(index, target_width)
+        for index, width in minimum_widths.items():
+            if width is not None and index < tree_widget.columnCount() and not tree_widget.isColumnHidden(index):
+                header.resizeSection(index, max(header.sectionSize(index), width))
+        tree_widget._qc_tree_widths_ready = True
+        tree_widget._qc_tree_widths_pending_restore = False
+        save_persistent_tree_widths(tree_widget)
+    finally:
+        tree_widget._qc_restoring_tree_widths = False
+
+
+def restore_persistent_tree_widths(tree_widget, minimum_widths=None, default_width_factors=None):
+    """Restore saved tree column widths or size to contents on first use."""
+
+    app = getattr(tree_widget, "_qc_tree_widths_app", None)
+    settings_key = getattr(tree_widget, "_qc_tree_widths_settings_key", "")
+    if app is None or settings_key == "":
+        return
+
+    header = tree_widget.header()
+    header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+    header.setStretchLastSection(False)
+
+    minimum_widths = _normalized_tree_minimum_widths(minimum_widths)
+    tree_widget._qc_restoring_tree_widths = True
+    try:
+        saved_widths = app.settings.get(settings_key, "")
+        widths = []
+        if saved_widths:
+            try:
+                widths = [int(value) for value in saved_widths.split(",") if value != ""]
+            except ValueError:
+                widths = []
+        if len(widths) == tree_widget.columnCount() and not _tree_widths_look_uninitialized(
+            tree_widget, widths, default_width_factors
+        ):
+            for index, width in enumerate(widths):
+                if width > 0:
+                    minimum_width = minimum_widths.get(index)
+                    if minimum_width is not None:
+                        width = max(width, minimum_width)
+                    header.resizeSection(index, width)
+            tree_widget._qc_tree_widths_ready = True
+            tree_widget._qc_tree_widths_pending_restore = False
+            return
+        tree_widget._qc_tree_widths_ready = False
+        tree_widget._qc_tree_widths_pending_restore = True
+        tree_widget._qc_pending_tree_minimum_widths = minimum_widths
+        tree_widget._qc_pending_tree_default_width_factors = default_width_factors
+        QtCore.QTimer.singleShot(0, lambda: _apply_pending_tree_widths(tree_widget))
+    finally:
+        tree_widget._qc_restoring_tree_widths = False
+
+
 class Message(QtWidgets.QMessageBox):
     """ This is called a lot , but is styled to font size """
 
