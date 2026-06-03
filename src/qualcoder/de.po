@@ -83,7 +83,6 @@ msgid "AI Text Analysis"
 msgstr "KI Textanalyse"
 
 #: src\qualcoder\ai_chat.py:386
-#, fuzzy
 msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
@@ -422,7 +421,6 @@ msgid "AI: Starting up..."
 msgstr "KI: Start..."
 
 #: src\qualcoder\ai_llm.py:483
-#, fuzzy
 msgid "AI: In the follwoing window, please set up the AI model."
 msgstr "KI: Im folgenden Fenster stellen Sie bitte das KI-Modell ein."
 
@@ -3933,7 +3931,6 @@ msgid "Show selected code next"
 msgstr "Nächsten ausgewählten Code anzeigen"
 
 #: src\qualcoder\information.py:236
-#, fuzzy
 msgid ""
 "Show all codes in text ( if selected code previous or next has been used)"
 msgstr ""
@@ -8540,7 +8537,6 @@ msgid "There are no new coded segments for this code."
 msgstr "Es gibt keine neuen kodierten Segmente für diesen Code."
 
 #: src\qualcoder\view_graph.py:4303
-#, fuzzy
 msgid "No co-ocurrences"
 msgstr "Keine Kookkurrenzen"
 
