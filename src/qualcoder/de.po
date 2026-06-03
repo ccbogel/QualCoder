@@ -88,7 +88,7 @@ msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
 msgstr ""
-"Keine Kodierungen für diese Kombination aus Koder:in, Dokumentfilter und "
+"Keine Codierungen für diese Kombination aus Coder:in, Dokumentfilter und "
 "Code gefunden."
 
 #: src\qualcoder\ai_chat.py:387
