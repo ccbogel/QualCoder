@@ -350,12 +350,12 @@ class AiMcpServer:
                 code_name = self._fetch_code_name(cid) if cid > 0 else None
                 if code_name is None or str(code_name).strip() == "":
                     code_name = _("Code") + (f" #{cid}" if cid > 0 else "")
-                doc_name = self._fetch_source_name(fid) if fid > 0 else None
-                if doc_name is None or str(doc_name).strip() == "":
-                    doc_name = _("Document") + (f" #{fid}" if fid > 0 else "")
+                file_name = self._fetch_source_name(fid) if fid > 0 else None
+                if file_name is None or str(file_name).strip() == "":
+                    file_name = _("Document") + (f" #{fid}" if fid > 0 else "")
                 return _('Creating text coding for code "{code}" in document "{document}"...').format(
                     code=str(code_name),
-                    document=str(doc_name),
+                    document=str(file_name),
                 )
             if tool_name in ("codes/delete_category", "codes/move_category", "codes/preview_delete_category"):
                 catid = self._to_int(tool_args.get("catid"), -1)
@@ -416,11 +416,11 @@ class AiMcpServer:
                 case_name = self._fetch_case_name(caseid) if caseid > 0 else None
                 if case_name is None or str(case_name).strip() == "":
                     case_name = _("Case") + (f" #{caseid}" if caseid > 0 else "")
-                doc_name = self._fetch_source_name(fid) if fid > 0 else None
-                if doc_name is None or str(doc_name).strip() == "":
-                    doc_name = _("Document") + (f" #{fid}" if fid > 0 else "")
+                file_name = self._fetch_source_name(fid) if fid > 0 else None
+                if file_name is None or str(file_name).strip() == "":
+                    file_name = _("Document") + (f" #{fid}" if fid > 0 else "")
                 return _('Linking text from "{document}" to case "{case}"...').format(
-                    document=str(doc_name),
+                    document=str(file_name),
                     case=str(case_name),
                 )
             if tool_name == "cases/unlink_text_from_case":
@@ -466,13 +466,13 @@ class AiMcpServer:
             if code_name is None or code_name == "":
                 code_name = f"Code {cid}"
             return _('Reviewing coded text segments for "{name}"...').format(name=code_name)
-        doc_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_base)
-        if doc_match is not None:
-            doc_id = int(doc_match.group(1))
-            doc_name = self._fetch_source_name(doc_id)
-            if doc_name is None or doc_name == "":
-                doc_name = f"Document {doc_id}"
-            return _('Reviewing passages from "{name}"...').format(name=doc_name)
+        file_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_base)
+        if file_match is not None:
+            file_id = int(file_match.group(1))
+            file_name = self._fetch_source_name(file_id)
+            if file_name is None or file_name == "":
+                file_name = f"Document {file_id}"
+            return _('Reviewing passages from "{name}"...').format(name=file_name)
 
         return _('Reviewing project material...')
 
@@ -584,8 +584,9 @@ class AiMcpServer:
                     uriTemplate="qualcoder://documents/text/{id}",
                     name="Document by id",
                     description=(
-                        "Read a text document by source id. Optional window params: start and length, "
-                        "or line_start and line_end."
+                        "Read one text document by source id, including memo, document attributes, "
+                        "and a text excerpt. Optional window params: start and length, or line_start "
+                        "and line_end."
                     ),
                     mimeType="application/json",
                 ),
@@ -710,10 +711,10 @@ class AiMcpServer:
             options = self._parse_code_segments_options(query)
             return self._read_code_segments(cid, options)
 
-        doc_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_no_query)
-        if doc_match is not None:
-            doc_id = int(doc_match.group(1))
-            return self._read_document(doc_id, window)
+        file_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_no_query)
+        if file_match is not None:
+            file_id = int(file_match.group(1))
+            return self._read_document(file_id, window)
 
         if str(window.get("mode", "char")) == "line":
             raise ValueError("line_start/line_end are only supported for text document reads.")
@@ -740,7 +741,7 @@ class AiMcpServer:
             types.Resource(
                 uri="qualcoder://documents",
                 name="Text documents",
-                description="List text documents in the project.",
+                description="List text documents in the project with memo, document attributes, and text length.",
                 mimeType="application/json",
             ),
             types.Resource(
@@ -2466,19 +2467,24 @@ class AiMcpServer:
         }
 
     def _fetch_text_documents(self) -> List[Dict[str, Any]]:
-        docs = []
-        for row in self._fetchall(
+        rows = self._fetchall(
             "SELECT id, name, ifnull(memo,''), owner, date, ifnull(length(fulltext),0) "
             "FROM source WHERE fulltext is not null ORDER BY lower(name)"
-        ):
+        )
+        file_ids = [self._to_int(row[0], -1) for row in rows]
+        attributes_by_file = self._fetch_file_attributes(file_ids)
+        docs = []
+        for row in rows:
+            file_id = self._to_int(row[0], -1)
             docs.append(
                 {
-                    "id": row[0],
+                    "id": file_id,
                     "name": row[1],
                     "memo": row[2],
                     "owner": row[3],
                     "date": row[4],
                     "length": row[5],
+                    "attributes": attributes_by_file.get(file_id, {}),
                 }
             )
         return docs
@@ -2514,6 +2520,33 @@ class AiMcpServer:
                 result[case_id] = {}
             attr_name = "" if row[1] is None else str(row[1])
             result[case_id][attr_name] = "" if row[2] is None else str(row[2])
+        return result
+
+    def _fetch_file_attributes(self, file_ids: List[int]) -> Dict[int, Dict[str, str]]:
+        normalized_ids: List[int] = []
+        for file_id in file_ids:
+            file_id_i = self._to_int(file_id, -1)
+            if file_id_i > 0:
+                normalized_ids.append(file_id_i)
+        normalized_ids = sorted(set(normalized_ids))
+        if len(normalized_ids) == 0:
+            return {}
+        placeholders = ",".join(["?"] * len(normalized_ids))
+        rows = self._fetchall(
+            "SELECT id, name, ifnull(value,'') FROM attribute "
+            f"WHERE attr_type='file' AND id IN ({placeholders}) "
+            "ORDER BY id, lower(name)",
+            tuple(normalized_ids),
+        )
+        result: Dict[int, Dict[str, str]] = {}
+        for row in rows:
+            file_id = self._to_int(row[0], -1)
+            if file_id <= 0:
+                continue
+            if file_id not in result:
+                result[file_id] = {}
+            attr_name = "" if row[1] is None else str(row[1])
+            result[file_id][attr_name] = "" if row[2] is None else str(row[2])
         return result
 
     def _fetch_case_link_counts(self, case_ids: List[int]) -> Dict[int, Dict[str, int]]:
@@ -2567,8 +2600,8 @@ class AiMcpServer:
             )
         return result
 
-    def _fetch_source_name(self, doc_id: int) -> Optional[str]:
-        row = self._fetchone("SELECT name FROM source WHERE id=?", (doc_id,))
+    def _fetch_source_name(self, file_id: int) -> Optional[str]:
+        row = self._fetchone("SELECT name FROM source WHERE id=?", (file_id,))
         if row is None:
             return None
         return row[0]
@@ -4325,16 +4358,20 @@ class AiMcpServer:
             "ORDER BY lower(source.name), ct.fid",
             (case_id,),
         )
+        file_ids = [self._to_int(file_row[0], -1) for file_row in file_rows]
+        attributes_by_file = self._fetch_file_attributes(file_ids)
         files: List[Dict[str, Any]] = []
         for file_row in file_rows:
+            file_id = self._to_int(file_row[0], -1)
             files.append(
                 {
-                    "fid": self._to_int(file_row[0], -1),
+                    "fid": file_id,
                     "name": "" if file_row[1] is None else str(file_row[1]),
                     "mediapath": "" if file_row[2] is None else str(file_row[2]),
                     "segment_count": self._to_int(file_row[3], 0),
                     "has_text": bool(self._to_int(file_row[4], 0)),
                     "fully_linked_text": bool(self._to_int(file_row[5], 0)),
+                    "attributes": attributes_by_file.get(file_id, {}),
                 }
             )
         return {
@@ -4461,14 +4498,15 @@ class AiMcpServer:
             "segments": segments,
         }
 
-    def _read_document(self, doc_id: int, window: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_document(self, file_id: int, window: Dict[str, Any]) -> Dict[str, Any]:
         row = self._fetchone(
             "SELECT id, name, ifnull(memo,''), owner, ifnull(fulltext,'') "
             "FROM source WHERE id=? AND fulltext is not null",
-            (doc_id,),
+            (file_id,),
         )
         if row is None:
-            raise ValueError(f"Document id {doc_id} not found.")
+            raise ValueError(f"Document id {file_id} not found.")
+        attributes = self._fetch_file_attributes([file_id]).get(file_id, {})
         fulltext = "" if row[4] is None else str(row[4])
         window_mode = str(window.get("mode", "char"))
         if window_mode == "line":
@@ -4494,6 +4532,7 @@ class AiMcpServer:
             "name": row[1],
             "memo": row[2],
             "owner": row[3],
+            "attributes": attributes,
             "total_length": len(fulltext),
             "start": start,
             "length": len(excerpt),
