@@ -236,6 +236,9 @@ Right-click for options</string>
       <property name="text">
        <string>Changing to another report will lose unsaved graph.</string>
       </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_codes_of_text">
       <property name="geometry">
