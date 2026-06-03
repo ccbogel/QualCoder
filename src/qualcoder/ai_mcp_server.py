@@ -50,6 +50,13 @@ class AiMcpServer:
     AI_PERMISSION_READ_ONLY = 0
     AI_PERMISSION_SANDBOXED = 1
     AI_PERMISSION_FULL_ACCESS = 2
+    RESERVED_ATTRIBUTE_NAMES = (
+        "Ref_Type",
+        "Ref_Author",
+        "Ref_Title",
+        "Ref_Year",
+        "Ref_Journal",
+    )
     SANDBOX_WRITE_TOOL_NAMES = (
         "codes/create_category",
         "codes/create_code",
@@ -67,7 +74,11 @@ class AiMcpServer:
         "codes/move_text_coding",
         "codes/delete_text_coding",
         "cases/update_case",
+        "cases/create_attribute",
+        "cases/update_attributes",
         "cases/unlink_text_from_case",
+        "documents/create_attribute",
+        "documents/update_attributes",
     )
     PREVIEW_TOOL_NAMES = (
         "codes/preview_delete_category",
@@ -106,7 +117,8 @@ class AiMcpServer:
             "(qualcoder://search/bm25?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
             "and regular-expression search "
             "(qualcoder://search/regex?pattern=...) with optional filters file_ids, case_ids, and exclude_cids. "
-            "Available tools include preview and write operations for categories, codes, text codings, and cases. "
+            "Available tools include preview and write operations for categories, codes, text codings, "
+            "case attributes, document attributes, and cases. "
             "Delete actions on categories or codes should be previewed before execution."
         )
 
@@ -167,6 +179,8 @@ class AiMcpServer:
             return f"{tool_name} {'moved' if bool(payload.get('moved', False)) else 'did not move'} a result."
         if "renamed" in payload:
             return f"{tool_name} {'renamed' if bool(payload.get('renamed', False)) else 'did not rename'} a result."
+        if "updated" in payload:
+            return f"{tool_name} {'updated' if bool(payload.get('updated', False)) else 'did not update'} a result."
         if "preview_token" in payload:
             return f"{tool_name} prepared a preview."
         return f"{tool_name} completed."
@@ -1022,6 +1036,49 @@ class AiMcpServer:
                     },
                 },
                 {
+                    "name": "cases/create_attribute",
+                    "description": (
+                        "Create a new case attribute definition and placeholder values for all cases. "
+                        "Requires Full access."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "value_type": {"type": "string", "enum": ["character", "numeric"]},
+                        },
+                        "required": ["name"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "cases/update_attributes",
+                    "description": (
+                        "Update values for one or more existing attributes on a case. "
+                        "Requires Full access."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "caseid": {"type": "integer"},
+                            "attributes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "value": {"type": ["string", "number", "null"]},
+                                    },
+                                    "required": ["name"],
+                                    "additionalProperties": False,
+                                },
+                            },
+                        },
+                        "required": ["caseid", "attributes"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
                     "name": "cases/unlink_text_from_case",
                     "description": "Remove one text link from a case by link id. Requires Full access.",
                     "inputSchema": {
@@ -1030,6 +1087,49 @@ class AiMcpServer:
                             "id": {"type": "integer"},
                         },
                         "required": ["id"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "documents/create_attribute",
+                    "description": (
+                        "Create a new document attribute definition and placeholder values for all project documents. "
+                        "Requires Full access."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "value_type": {"type": "string", "enum": ["character", "numeric"]},
+                        },
+                        "required": ["name"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "documents/update_attributes",
+                    "description": (
+                        "Update values for one or more existing attributes on a text document. "
+                        "Does not modify document text. Requires Full access."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "fid": {"type": "integer"},
+                            "attributes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "value": {"type": ["string", "number", "null"]},
+                                    },
+                                    "required": ["name"],
+                                    "additionalProperties": False,
+                                },
+                            },
+                        },
+                        "required": ["fid", "attributes"],
                         "additionalProperties": False,
                     },
                 },
@@ -1080,8 +1180,16 @@ class AiMcpServer:
             payload = self._tool_link_text_to_case(arguments, change_set_id)
         elif tool_name == "cases/update_case":
             payload = self._tool_update_case(arguments, change_set_id)
+        elif tool_name == "cases/create_attribute":
+            payload = self._tool_create_attribute("case", arguments, change_set_id)
+        elif tool_name == "cases/update_attributes":
+            payload = self._tool_update_attributes("case", arguments, change_set_id)
         elif tool_name == "cases/unlink_text_from_case":
             payload = self._tool_unlink_text_from_case(arguments, change_set_id)
+        elif tool_name == "documents/create_attribute":
+            payload = self._tool_create_attribute("file", arguments, change_set_id)
+        elif tool_name == "documents/update_attributes":
+            payload = self._tool_update_attributes("file", arguments, change_set_id)
         else:
             raise ValueError(f"Unknown tool name: {tool_name}")
 
@@ -2127,6 +2235,247 @@ class AiMcpServer:
         finally:
             conn.close()
 
+    def _tool_create_attribute(self, target_type: str, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        normalized_target_type = self._normalize_attribute_target_type(target_type)
+        tool_name = "cases/create_attribute" if normalized_target_type == "case" else "documents/create_attribute"
+        attribute_name = self._normalize_attribute_name(arguments.get("name", ""))
+        if attribute_name == "":
+            raise ValueError("Attribute name must not be empty.")
+        if attribute_name in self.RESERVED_ATTRIBUTE_NAMES:
+            raise ValueError(f'Attribute name "{attribute_name}" is reserved.')
+        value_type = self._normalize_attribute_value_type(arguments.get("value_type", "character"))
+        now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            existing = self._fetch_attribute_type_row_cur(cur, attribute_name)
+            if existing is not None:
+                return {
+                    "tool": tool_name,
+                    "created": False,
+                    "reason": "already_exists",
+                    "attribute_type": {
+                        "name": str(existing.get("name", "")),
+                        "target_type": str(existing.get("caseOrFile", "")),
+                        "value_type": str(existing.get("valuetype", "")),
+                        "owner": str(existing.get("owner", "")),
+                        "memo": str(existing.get("memo", "")),
+                    },
+                }
+
+            cur.execute(
+                "INSERT INTO attribute_type (name, date, owner, memo, caseOrFile, valuetype) VALUES (?, ?, ?, ?, ?, ?)",
+                (attribute_name, now, self.AI_AGENT_OWNER, "", normalized_target_type, value_type),
+            )
+            target_ids = self._fetch_attribute_target_ids_cur(cur, normalized_target_type)
+            placeholder_rows = [
+                (attribute_name, "", target_id, normalized_target_type, now, self.AI_AGENT_OWNER)
+                for target_id in target_ids
+            ]
+            if len(placeholder_rows) > 0:
+                cur.executemany(
+                    "INSERT INTO attribute (name, value, id, attr_type, date, owner) VALUES (?, ?, ?, ?, ?, ?)",
+                    placeholder_rows,
+                )
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "create_case_attribute" if normalized_target_type == "case" else "create_document_attribute",
+                    "name": attribute_name,
+                    "target_type": normalized_target_type,
+                    "value_type": value_type,
+                    "owner": self.AI_AGENT_OWNER,
+                    "placeholder_count": len(target_ids),
+                    "created_at": now,
+                },
+            )
+            self._emit_project_table_changes(["attribute_type", "attribute"])
+            return {
+                "tool": tool_name,
+                "created": True,
+                "attribute_type": {
+                    "name": attribute_name,
+                    "target_type": normalized_target_type,
+                    "value_type": value_type,
+                    "owner": self.AI_AGENT_OWNER,
+                    "memo": "",
+                    "date": now,
+                },
+                "placeholder_count": len(target_ids),
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_update_attributes(self, target_type: str, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        normalized_target_type = self._normalize_attribute_target_type(target_type)
+        if normalized_target_type == "file":
+            self._validate_document_attribute_arguments(arguments)
+            tool_name = "documents/update_attributes"
+            target_field_name = "fid"
+        else:
+            tool_name = "cases/update_attributes"
+            target_field_name = "caseid"
+
+        target_id = self._to_int(arguments.get(target_field_name), -1)
+        if target_id <= 0:
+            raise ValueError(f"{target_field_name} must be a positive integer.")
+        raw_attributes = arguments.get("attributes", [])
+        if not isinstance(raw_attributes, list) or len(raw_attributes) == 0:
+            raise ValueError("attributes must be a non-empty list.")
+
+        requested_attributes: List[Dict[str, Any]] = []
+        seen_names = set()
+        for idx, raw_item in enumerate(raw_attributes, start=1):
+            if not isinstance(raw_item, dict):
+                raise ValueError(f"attributes[{idx}] must be an object.")
+            attribute_name = self._normalize_attribute_name(raw_item.get("name", ""))
+            if attribute_name == "":
+                raise ValueError(f"attributes[{idx}].name must not be empty.")
+            if attribute_name in seen_names:
+                raise ValueError(f'Attribute "{attribute_name}" is listed more than once.')
+            seen_names.add(attribute_name)
+            requested_attributes.append(
+                {
+                    "name": attribute_name,
+                    "value": self._normalize_attribute_value(raw_item.get("value", "")),
+                }
+            )
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            target_row = self._fetch_attribute_target_row_cur(cur, normalized_target_type, target_id)
+            if target_row is None:
+                label = "Case" if normalized_target_type == "case" else "Text document"
+                raise ValueError(f"{label} id {target_id} not found.")
+
+            attribute_type_rows = self._fetch_attribute_type_rows_cur(
+                cur,
+                [item["name"] for item in requested_attributes],
+            )
+            changes: List[Dict[str, Any]] = []
+            result_changes: List[Dict[str, Any]] = []
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+
+            for item in requested_attributes:
+                attribute_name = str(item.get("name", ""))
+                attribute_type_row = attribute_type_rows.get(attribute_name)
+                if attribute_type_row is None:
+                    raise ValueError(f'Attribute "{attribute_name}" does not exist.')
+                if str(attribute_type_row.get("caseOrFile", "")) != normalized_target_type:
+                    expected_label = "case" if normalized_target_type == "case" else "document"
+                    raise ValueError(f'Attribute "{attribute_name}" is not defined for {expected_label}s.')
+                value_type = str(attribute_type_row.get("valuetype", "character"))
+                new_value = self._validate_attribute_value_for_type(item.get("value", ""), value_type, attribute_name)
+                existing_row = self._fetch_attribute_row_by_key_cur(cur, attribute_name, normalized_target_type, target_id)
+
+                if existing_row is None:
+                    if new_value == "":
+                        continue
+                    cur.execute(
+                        "INSERT INTO attribute (name, value, id, attr_type, date, owner) VALUES (?, ?, ?, ?, ?, ?)",
+                        (attribute_name, new_value, target_id, normalized_target_type, now, self.AI_AGENT_OWNER),
+                    )
+                    attrid = int(cur.lastrowid)
+                    before_state = {
+                        "exists": False,
+                    }
+                    after_state = {
+                        "exists": True,
+                        "attrid": attrid,
+                        "value": new_value,
+                        "owner": self.AI_AGENT_OWNER,
+                        "date": now,
+                    }
+                else:
+                    old_value = "" if existing_row.get("value", None) is None else str(existing_row.get("value", ""))
+                    if new_value == old_value:
+                        continue
+                    attrid = self._to_int(existing_row.get("attrid"), -1)
+                    before_state = {
+                        "exists": True,
+                        "attrid": attrid,
+                        "value": old_value,
+                        "owner": "" if existing_row.get("owner", None) is None else str(existing_row.get("owner", "")),
+                        "date": "" if existing_row.get("date", None) is None else str(existing_row.get("date", "")),
+                    }
+                    cur.execute(
+                        "UPDATE attribute SET value=?, date=?, owner=? WHERE attrid=?",
+                        (new_value, now, self.AI_AGENT_OWNER, attrid),
+                    )
+                    after_state = {
+                        "exists": True,
+                        "attrid": attrid,
+                        "value": new_value,
+                        "owner": self.AI_AGENT_OWNER,
+                        "date": now,
+                    }
+
+                changes.append(
+                    {
+                        "name": attribute_name,
+                        "value_type": value_type,
+                        "before": before_state,
+                        "after": after_state,
+                    }
+                )
+                result_changes.append(
+                    {
+                        "name": attribute_name,
+                        "value_type": value_type,
+                        "before": "" if not before_state.get("exists", False) else str(before_state.get("value", "")),
+                        "after": new_value,
+                    }
+                )
+
+            if len(changes) == 0:
+                return {
+                    "tool": tool_name,
+                    "updated": False,
+                    "reason": "no_changes",
+                    "target": {
+                        target_field_name: target_id,
+                        "name": str(target_row.get("name", "")),
+                    },
+                }
+
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "update_case_attributes" if normalized_target_type == "case" else "update_document_attributes",
+                    "target_type": normalized_target_type,
+                    target_field_name: target_id,
+                    "target_name": str(target_row.get("name", "")),
+                    "changes": changes,
+                    "updated_at": now,
+                },
+            )
+            self._emit_project_table_changes(["attribute"])
+            return {
+                "tool": tool_name,
+                "updated": True,
+                "target": {
+                    target_field_name: target_id,
+                    "name": str(target_row.get("name", "")),
+                },
+                "changes": result_changes,
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
     def _category_ref(self, category: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         if not isinstance(category, dict):
             return None
@@ -2227,6 +2576,125 @@ class AiMcpServer:
             "SELECT id, caseid, fid, pos0, pos1, owner, date, ifnull(memo,'') as memo FROM case_text WHERE id=?",
             (link_id_i,),
         )
+
+    def _fetch_source_row_cur(self, cur: sqlite3.Cursor, fid: Any) -> Optional[Dict[str, Any]]:
+        fid_i = self._to_int(fid, -1)
+        if fid_i <= 0:
+            return None
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT id, name, ifnull(memo,'') as memo, owner, date FROM source "
+            "WHERE id=? AND fulltext IS NOT NULL",
+            (fid_i,),
+        )
+
+    def _fetch_attribute_type_row_cur(self, cur: sqlite3.Cursor, attribute_name: Any) -> Optional[Dict[str, Any]]:
+        name = str(attribute_name if attribute_name is not None else "")
+        if name == "":
+            return None
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT name, date, owner, ifnull(memo,'') as memo, caseOrFile, valuetype "
+            "FROM attribute_type WHERE name=?",
+            (name,),
+        )
+
+    def _fetch_attribute_type_rows_cur(self, cur: sqlite3.Cursor, attribute_names: List[str]) -> Dict[str, Dict[str, Any]]:
+        normalized_names = [str(name) for name in attribute_names if str(name).strip() != ""]
+        normalized_names = list(dict.fromkeys(normalized_names))
+        if len(normalized_names) == 0:
+            return {}
+        placeholders = ",".join(["?"] * len(normalized_names))
+        rows = self._fetchall_dict_cur(
+            cur,
+            "SELECT name, date, owner, ifnull(memo,'') as memo, caseOrFile, valuetype "
+            f"FROM attribute_type WHERE name IN ({placeholders})",
+            tuple(normalized_names),
+        )
+        return {str(row.get("name", "")): row for row in rows}
+
+    def _fetch_attribute_row_cur(self, cur: sqlite3.Cursor, attrid: Any) -> Optional[Dict[str, Any]]:
+        attrid_i = self._to_int(attrid, -1)
+        if attrid_i <= 0:
+            return None
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT attrid, name, attr_type, ifnull(value,'') as value, id, ifnull(date,'') as date, "
+            "ifnull(owner,'') as owner FROM attribute WHERE attrid=?",
+            (attrid_i,),
+        )
+
+    def _fetch_attribute_row_by_key_cur(
+            self,
+            cur: sqlite3.Cursor,
+            attribute_name: str,
+            target_type: str,
+            target_id: int) -> Optional[Dict[str, Any]]:
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT attrid, name, attr_type, ifnull(value,'') as value, id, ifnull(date,'') as date, "
+            "ifnull(owner,'') as owner FROM attribute WHERE name=? AND attr_type=? AND id=?",
+            (attribute_name, target_type, target_id),
+        )
+
+    def _fetch_attribute_target_ids_cur(self, cur: sqlite3.Cursor, target_type: str) -> List[int]:
+        normalized_target_type = self._normalize_attribute_target_type(target_type)
+        if normalized_target_type == "case":
+            rows = cur.execute("SELECT caseid FROM cases ORDER BY caseid").fetchall()
+            return [self._to_int(row[0], -1) for row in rows if self._to_int(row[0], -1) > 0]
+        rows = cur.execute("SELECT id FROM source ORDER BY id").fetchall()
+        return [self._to_int(row[0], -1) for row in rows if self._to_int(row[0], -1) > 0]
+
+    def _fetch_attribute_target_row_cur(
+            self,
+            cur: sqlite3.Cursor,
+            target_type: str,
+            target_id: int) -> Optional[Dict[str, Any]]:
+        normalized_target_type = self._normalize_attribute_target_type(target_type)
+        if normalized_target_type == "case":
+            return self._fetch_case_row_cur(cur, target_id)
+        return self._fetch_source_row_cur(cur, target_id)
+
+    def _normalize_attribute_target_type(self, target_type: Any) -> str:
+        text = str(target_type if target_type is not None else "").strip().lower()
+        if text in ("case", "file"):
+            return text
+        raise ValueError("target_type must be 'case' or 'file'.")
+
+    def _normalize_attribute_name(self, value: Any) -> str:
+        return " ".join(str(value if value is not None else "").split()).strip()
+
+    def _normalize_attribute_value_type(self, value: Any) -> str:
+        text = str(value if value is not None else "character").strip().lower()
+        if text not in ("character", "numeric"):
+            raise ValueError("value_type must be 'character' or 'numeric'.")
+        return text
+
+    def _normalize_attribute_value(self, value: Any) -> str:
+        if value is None:
+            return ""
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        return str(value).strip()
+
+    def _validate_attribute_value_for_type(self, value: str, value_type: str, attribute_name: str) -> str:
+        normalized_value = self._normalize_attribute_value(value)
+        if value_type == "numeric" and normalized_value != "":
+            try:
+                float(normalized_value)
+            except (TypeError, ValueError):
+                raise ValueError(f'Attribute "{attribute_name}" is numeric and requires a numeric value.')
+        return normalized_value
+
+    def _validate_document_attribute_arguments(self, arguments: Dict[str, Any]) -> None:
+        forbidden_fields = []
+        for field_name in ("text", "fulltext", "content", "memo"):
+            if field_name in arguments:
+                forbidden_fields.append(field_name)
+        if len(forbidden_fields) > 0:
+            raise ValueError(
+                "documents/update_attributes only supports document attributes and cannot modify memo or text."
+            )
 
     def _collect_category_subtree(self, cur: sqlite3.Cursor, root_catid: int) -> Dict[str, Any]:
         categories = self._fetchall_dict_cur(

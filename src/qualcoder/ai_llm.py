@@ -1207,6 +1207,19 @@ class AiLLM():
         except Exception:
             return ""
 
+    def _lookup_case_name(self, caseid: int) -> str:
+        if caseid <= 0:
+            return ""
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("SELECT name FROM cases WHERE caseid=?", (caseid,))
+            row = cur.fetchone()
+            if row is None:
+                return ""
+            return str(row[0] if row[0] is not None else "").strip()
+        except Exception:
+            return ""
+
     def _format_name_line(self, prefix: str, names: list, max_items: int = 5) -> str:
         if not isinstance(names, list) or len(names) == 0:
             return ""
@@ -1265,6 +1278,14 @@ class AiLLM():
             name = self._short_change_label(op.get("name", ""))
             return (_("Created case: ") + name) if name != "" else ""
 
+        if op_type == "create_case_attribute":
+            name = self._short_change_label(op.get("name", ""))
+            return (_("Created case attribute: ") + name) if name != "" else ""
+
+        if op_type == "create_document_attribute":
+            name = self._short_change_label(op.get("name", ""))
+            return (_("Created document attribute: ") + name) if name != "" else ""
+
         if op_type == "create_case_text":
             case_name = self._short_change_label(op.get("case_name", ""))
             source_name = self._short_change_label(op.get("source_name", ""))
@@ -1290,6 +1311,28 @@ class AiLLM():
             if after_name != "":
                 return _("Updated case: ") + after_name
             return _("Updated case")
+
+        if op_type == "update_case_attributes":
+            target_name = self._short_change_label(op.get("target_name", ""))
+            if allow_db_lookup and target_name == "":
+                target_name = self._short_change_label(self._lookup_case_name(int(op.get("caseid", -1))))
+            change_count = len(op.get("changes", [])) if isinstance(op.get("changes", []), list) else 0
+            if target_name != "" and change_count > 0:
+                return _("Updated case attributes: ") + target_name + f" ({change_count})"
+            if target_name != "":
+                return _("Updated case attributes: ") + target_name
+            return _("Updated case attributes")
+
+        if op_type == "update_document_attributes":
+            target_name = self._short_change_label(op.get("target_name", ""))
+            if allow_db_lookup and target_name == "":
+                target_name = self._short_change_label(self._lookup_source_name(int(op.get("fid", -1))))
+            change_count = len(op.get("changes", [])) if isinstance(op.get("changes", []), list) else 0
+            if target_name != "" and change_count > 0:
+                return _("Updated document attributes: ") + target_name + f" ({change_count})"
+            if target_name != "":
+                return _("Updated document attributes: ") + target_name
+            return _("Updated document attributes")
 
         if op_type == "rename_category":
             old_name = self._short_change_label(op.get("old_name", ""))
@@ -1498,6 +1541,7 @@ class AiLLM():
         case_count = 0
         coding_count = 0
         case_link_count = 0
+        attribute_count = 0
         operation_summaries = []
         seen_operation_summaries = set()
 
@@ -1515,6 +1559,12 @@ class AiLLM():
                 case_count += 1
             elif op_type in ("create_case_text", "delete_case_text"):
                 case_link_count += 1
+            elif op_type in (
+                    "create_case_attribute",
+                    "create_document_attribute",
+                    "update_case_attributes",
+                    "update_document_attributes"):
+                attribute_count += 1
             summary = self._ai_change_operation_summary(op, allow_db_lookup=allow_db_lookup)
             if summary != "" and summary not in seen_operation_summaries:
                 seen_operation_summaries.add(summary)
@@ -1531,6 +1581,8 @@ class AiLLM():
             parts.append(str(coding_count) + " " + _("text coding(s)"))
         if case_link_count > 0:
             parts.append(str(case_link_count) + " " + _("case link(s)"))
+        if attribute_count > 0:
+            parts.append(str(attribute_count) + " " + _("attribute action(s)"))
         if len(parts) == 0:
             return
 
@@ -1720,6 +1772,84 @@ class AiLLM():
         if str(row[2]) != expected_memo:
             return False, "changed", row
         return True, "ok", row
+
+    def _fetch_attribute_row_by_key(self, cur, name: str, attr_type: str, target_id: int):
+        cur.execute(
+            "SELECT attrid, name, attr_type, ifnull(value,''), id, ifnull(owner,''), ifnull(date,'') "
+            "FROM attribute WHERE name=? AND attr_type=? AND id=?",
+            (name, attr_type, target_id),
+        )
+        return cur.fetchone()
+
+    def _attribute_row_matches_state(self, row, state: dict) -> bool:
+        if row is None or not isinstance(state, dict):
+            return False
+        expected_attrid = int(state.get("attrid", -1))
+        if expected_attrid > 0 and int(row[0]) != expected_attrid:
+            return False
+        expected_value = str(state.get("value", ""))
+        expected_owner = str(state.get("owner", ""))
+        if str(row[3]) != expected_value:
+            return False
+        if expected_owner != "" and str(row[5]) != expected_owner:
+            return False
+        return True
+
+    def _can_undo_create_attribute(self, cur, op):
+        attr_name = str(op.get("name", "")).strip()
+        target_type = str(op.get("target_type", "")).strip()
+        if attr_name == "" or target_type not in ("case", "file"):
+            return False, "invalid", None
+        cur.execute(
+            "SELECT name, ifnull(owner,''), ifnull(caseOrFile,''), ifnull(valuetype,'') "
+            "FROM attribute_type WHERE name=?",
+            (attr_name,),
+        )
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        if str(row[1]) != "AI Agent":
+            return False, "changed", row
+        if str(row[2]) != target_type:
+            return False, "changed", row
+        expected_value_type = str(op.get("value_type", "character")).strip() or "character"
+        if str(row[3]) != expected_value_type:
+            return False, "changed", row
+        cur.execute(
+            "SELECT count(*), "
+            "sum(case when length(ifnull(value,'')) > 0 then 1 else 0 end), "
+            "sum(case when ifnull(owner,'') != 'AI Agent' then 1 else 0 end) "
+            "FROM attribute WHERE name=? AND attr_type=?",
+            (attr_name, target_type),
+        )
+        attr_row = cur.fetchone() or (0, 0, 0)
+        if int(attr_row[1] or 0) > 0 or int(attr_row[2] or 0) > 0:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_attributes(self, cur, op):
+        if not isinstance(op, dict):
+            return False, "invalid", None
+        target_type = str(op.get("target_type", "")).strip()
+        target_id = int(op.get("caseid", op.get("fid", -1)))
+        changes = op.get("changes", [])
+        if target_type not in ("case", "file") or target_id <= 0 or not isinstance(changes, list) or len(changes) == 0:
+            return False, "invalid", None
+        current_rows = []
+        for change in changes:
+            if not isinstance(change, dict):
+                return False, "invalid", None
+            attr_name = str(change.get("name", "")).strip()
+            after = change.get("after", {}) if isinstance(change.get("after", {}), dict) else {}
+            if attr_name == "" or not bool(after.get("exists", False)):
+                return False, "invalid", None
+            row = self._fetch_attribute_row_by_key(cur, attr_name, target_type, target_id)
+            if row is None:
+                return False, "missing", None
+            if not self._attribute_row_matches_state(row, after):
+                return False, "changed", row
+            current_rows.append(row)
+        return True, "ok", current_rows
 
     def _can_undo_rename_category(self, cur, op):
         catid = int(op.get("catid", -1))
@@ -1920,6 +2050,8 @@ class AiLLM():
         revert_moved_codes = 0
         revert_moved_codings = 0
         revert_updated_cases = 0
+        remove_attributes = 0
+        revert_updated_attributes = 0
 
         for op in operations:
             if not isinstance(op, dict):
@@ -1960,6 +2092,14 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type in ("create_case_attribute", "create_document_attribute"):
+                ok, reason, row_data = self._can_undo_create_attribute(cur, op)
+                if ok:
+                    remove_attributes += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
             elif op_type == "create_case_text":
                 ok, reason, row_data = self._can_undo_create_case_text(cur, op)
                 if ok:
@@ -1974,6 +2114,14 @@ class AiLLM():
                 ok, reason, row_data = self._can_undo_update_case(cur, op)
                 if ok:
                     revert_updated_cases += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type in ("update_case_attributes", "update_document_attributes"):
+                ok, reason, row_data = self._can_undo_update_attributes(cur, op)
+                if ok:
+                    revert_updated_attributes += 1
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -2098,6 +2246,8 @@ class AiLLM():
             lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
         if len(case_link_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_link_ids)) + _(" case link(s)."))
+        if remove_attributes > 0:
+            lines.append(_("Undo will remove ") + str(remove_attributes) + _(" attribute definition(s)."))
         if restore_categories > 0 or restore_codes > 0 or restore_codings > 0:
             parts = []
             if restore_categories > 0:
@@ -2115,6 +2265,8 @@ class AiLLM():
             lines.append(str(revert_renamed_codes) + _(" renamed code(s) would be restored to their old names."))
         if revert_updated_cases > 0:
             lines.append(str(revert_updated_cases) + _(" updated case(s) would be restored to their previous values."))
+        if revert_updated_attributes > 0:
+            lines.append(str(revert_updated_attributes) + _(" attribute update(s) would be restored to their previous values."))
         if revert_moved_categories > 0:
             lines.append(str(revert_moved_categories) + _(" moved category tree(s) would be moved back to their previous parent."))
         if revert_moved_codes > 0:
@@ -2234,6 +2386,25 @@ class AiLLM():
                         self._add_project_table_changes(project_table_changes, "cases")
                     continue
 
+                if op_type in ("create_case_attribute", "create_document_attribute"):
+                    ok, reason, row = self._can_undo_create_attribute(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        continue
+                    attr_name = str(op.get("name", "")).strip()
+                    attr_type = str(op.get("target_type", "")).strip()
+                    cur.execute("DELETE FROM attribute WHERE name=? AND attr_type=?", (attr_name, attr_type))
+                    cur.execute("DELETE FROM attribute_type WHERE name=?", (attr_name,))
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "attribute", "attribute_type")
+                    continue
+
                 if op_type == "create_category":
                     ok, reason, row = self._can_undo_create_category(cur, op)
                     if not ok:
@@ -2317,6 +2488,43 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "cases")
+                    continue
+
+                if op_type in ("update_case_attributes", "update_document_attributes"):
+                    ok, reason, rows = self._can_undo_update_attributes(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        continue
+                    row_changed = False
+                    changes = op.get("changes", [])
+                    for change in reversed(changes):
+                        if not isinstance(change, dict):
+                            continue
+                        before = change.get("before", {}) if isinstance(change.get("before", {}), dict) else {}
+                        after = change.get("after", {}) if isinstance(change.get("after", {}), dict) else {}
+                        attrid = int(after.get("attrid", before.get("attrid", -1)))
+                        if bool(before.get("exists", False)):
+                            cur.execute(
+                                "UPDATE attribute SET value=?, owner=?, date=? WHERE attrid=?",
+                                (
+                                    str(before.get("value", "")),
+                                    str(before.get("owner", "")),
+                                    str(before.get("date", "")),
+                                    attrid,
+                                ),
+                            )
+                        else:
+                            cur.execute("DELETE FROM attribute WHERE attrid=?", (attrid,))
+                        if cur.rowcount > 0:
+                            row_changed = True
+                    if row_changed:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "attribute")
                     continue
 
                 if op_type == "move_category_tree":
