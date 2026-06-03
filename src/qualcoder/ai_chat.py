@@ -666,6 +666,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self._chat_ai_profile_snapshots: Dict[int, str] = {}
         self._pending_restore_chat_id: Optional[int] = None
         self.ai_output_autoscroll = True
+        self._chat_window_refresh_pending = False
+        self._chat_window_refresh_timer = QtCore.QTimer(self)
+        self._chat_window_refresh_timer.setSingleShot(True)
+        self._chat_window_refresh_timer.timeout.connect(self._flush_chat_window_refresh)
         self.setMinimumWidth(0)
         self.ui.widget_chat.setMinimumWidth(0)
         self.ui.scrollArea_ai_output.setMinimumWidth(0)
@@ -2149,6 +2153,25 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_stream_render_timer.start(300)
             return
         self.ai_stream_render_pending = False
+        self.update_chat_window()
+
+    def _schedule_chat_window_refresh(self):
+        """Coalesce chat-window refreshes for MCP progress updates."""
+
+        self._chat_window_refresh_pending = True
+        if not self._chat_window_refresh_timer.isActive():
+            self._chat_window_refresh_timer.start(150)
+
+    def _flush_chat_window_refresh(self):
+        """Apply one deferred chat-window refresh."""
+
+        if not self._chat_window_refresh_pending:
+            return
+        if self.is_updating_chat_window:
+            self._chat_window_refresh_timer.start(150)
+            return
+        self._chat_window_refresh_pending = False
+        self.history_update_message_list()
         self.update_chat_window()
 
     def _chat_scope_active(self, chat_idx=None) -> bool:
@@ -6094,7 +6117,6 @@ data collected. This information will accompany every prompt sent to the AI, res
         cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)'
                        ' VALUES (?, ?, ?, ?)', (curr_chat_id, 'agent_status', msg_author, status_line))
         self.chat_history_conn.commit()
-        self.history_update_message_list()
 
     def _chat_user_message_count(self, chat_id: int, db_conn=None) -> int:
         """Count persisted user messages for one chat."""
@@ -6279,7 +6301,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         elif msg_type == 'agent_status':
             self.history_add_or_append_agent_status(msg_content, chat_idx)
             if chat_idx == self.current_chat_idx:
-                self.update_chat_window()
+                self._schedule_chat_window_refresh()
         elif msg_type == 'system':
             # System messages are hidden from the chat window.
             # Agent chats rebuild their system prompt fresh on every turn, so persisting it is unnecessary.
@@ -8103,7 +8125,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                         msg_content,
                         chat_idx,
                         refresh_history=False,
-                            commit_history=True,
+                        commit_history=True,
                     )
             status = str(payload.get("status", "")).strip()
             status_kind = str(payload.get("status_kind", "")).strip().lower()
