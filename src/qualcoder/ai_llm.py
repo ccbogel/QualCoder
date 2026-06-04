@@ -2027,6 +2027,43 @@ class AiLLM():
             non_ai += int(row[1] or 0)
         return total, non_ai
 
+    def _should_keep_skipped_undo_operation(self, reason: str) -> bool:
+        """Return whether one skipped undo operation should remain retryable."""
+
+        return str(reason).strip() == "changed"
+
+    def _format_undo_skip_detail(self, op: dict, reason: str, keep_for_retry: bool) -> str:
+        """Build one user-facing explanation for a skipped undo operation."""
+
+        label = self._ai_change_operation_summary(op, allow_db_lookup=True)
+        if label == "":
+            label = _("Stored AI change")
+
+        if reason == "changed":
+            detail = _(
+                "Could not be undone because the affected item no longer matches the recorded state. "
+                "It may have been edited afterwards or still be blocked by dependent data."
+            )
+        elif reason == "missing":
+            detail = _(
+                "Could not be undone because the affected item is already missing."
+            )
+        else:
+            detail = _(
+                "Could not be undone because the stored undo information is incomplete or inconsistent."
+            )
+
+        if keep_for_retry:
+            detail += " " + _(
+                "This undo step remains in the list so you can remove the blocking condition and try again later."
+            )
+        else:
+            detail += " " + _(
+                "This undo step was removed from the list."
+            )
+
+        return label + "\n" + _("Reason: ") + detail
+
     def _build_ai_change_impact_text(self, change_set):
         operations = change_set.get("operations", [])
         if not isinstance(operations, list) or len(operations) == 0:
@@ -2286,21 +2323,38 @@ class AiLLM():
     def _undo_ai_change_set(self, change_set):
         operations = change_set.get("operations", [])
         if not isinstance(operations, list):
-            return {"undone": 0, "skipped": 0}
+            return {
+                "undone": 0,
+                "skipped_changed": 0,
+                "skipped_missing": 0,
+                "skipped_invalid": 0,
+                "blocked_retry": 0,
+                "removed_skipped": 0,
+                "deleted_code_codings": 0,
+                "deleted_code_codings_non_ai": 0,
+                "skip_details": [],
+                "remaining_operations": [],
+            }
         stats = {
             "undone": 0,
             "skipped_changed": 0,
             "skipped_missing": 0,
             "skipped_invalid": 0,
+            "blocked_retry": 0,
+            "removed_skipped": 0,
             "deleted_code_codings": 0,
             "deleted_code_codings_non_ai": 0,
+            "skip_details": [],
+            "remaining_operations": [],
         }
+        remaining_operations = []
         project_table_changes = set()
         cur = self.app.conn.cursor()
         try:
             for op in reversed(operations):
                 if not isinstance(op, dict):
                     stats["skipped_invalid"] += 1
+                    stats["removed_skipped"] += 1
                     continue
                 op_type = str(op.get("type", "")).strip()
 
@@ -2313,6 +2367,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute("DELETE FROM code_text WHERE ctid=?", (int(row[0]),))
                     if cur.rowcount > 0:
@@ -2329,6 +2390,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute("DELETE FROM case_text WHERE id=?", (int(row[0]),))
                     if cur.rowcount > 0:
@@ -2345,6 +2413,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cid = int(row[0])
                     coding_total, coding_non_ai = self._count_code_codings(cur, cid)
@@ -2378,6 +2453,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     caseid = int(row[0])
                     cur.execute("DELETE FROM cases WHERE caseid=?", (caseid,))
@@ -2395,6 +2477,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     attr_name = str(op.get("name", "")).strip()
                     attr_type = str(op.get("target_type", "")).strip()
@@ -2414,6 +2503,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     catid = int(row[0])
                     cur.execute("UPDATE code_name SET catid=NULL WHERE catid=?", (catid,))
@@ -2436,6 +2532,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute(
                         "UPDATE code_cat SET name=? WHERE catid=?",
@@ -2455,6 +2558,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute(
                         "UPDATE code_name SET name=? WHERE cid=?",
@@ -2474,6 +2584,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
                     cur.execute(
@@ -2499,6 +2616,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     row_changed = False
                     changes = op.get("changes", [])
@@ -2536,6 +2660,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute(
                         "UPDATE code_cat SET supercatid=? WHERE catid=?",
@@ -2555,6 +2686,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute(
                         "UPDATE code_name SET catid=? WHERE cid=?",
@@ -2574,6 +2712,13 @@ class AiLLM():
                             stats["skipped_missing"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     cur.execute(
                         "UPDATE code_text SET cid=? WHERE ctid=?",
@@ -2591,6 +2736,13 @@ class AiLLM():
                             stats["skipped_changed"] += 1
                         else:
                             stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
                         continue
                     self._restore_snapshot(cur, op)
                     stats["undone"] += 1
@@ -2598,6 +2750,8 @@ class AiLLM():
                     continue
 
                 stats["skipped_invalid"] += 1
+                stats["skip_details"].append(self._format_undo_skip_detail(op, "invalid", False))
+                stats["removed_skipped"] += 1
 
             self.app.conn.commit()
             self.app.delete_backup = False
@@ -2606,6 +2760,8 @@ class AiLLM():
         except Exception:
             self.app.conn.rollback()
             raise
+        remaining_operations.reverse()
+        stats["remaining_operations"] = remaining_operations
         return stats
 
     def undo_ai_agent_changes(self):
@@ -2664,16 +2820,27 @@ class AiLLM():
             "skipped_changed": 0,
             "skipped_missing": 0,
             "skipped_invalid": 0,
+            "blocked_retry": 0,
+            "removed_skipped": 0,
             "deleted_code_codings": 0,
             "deleted_code_codings_non_ai": 0,
         }
+        skip_details = []
         undone_count = 0
         for item in selected_sets:
             item_stats = self._undo_ai_change_set(item)
             for key in stats.keys():
                 stats[key] += int(item_stats.get(key, 0))
+            item_skip_details = item_stats.get("skip_details", [])
+            if isinstance(item_skip_details, list):
+                skip_details.extend([detail for detail in item_skip_details if str(detail).strip() != ""])
+            remaining_operations = item_stats.get("remaining_operations", [])
             if item in history:
-                history.remove(item)
+                if isinstance(remaining_operations, list) and len(remaining_operations) > 0:
+                    item["operations"] = remaining_operations
+                    self._refresh_ai_change_set_name(item, allow_db_lookup=True, use_relative_time=True)
+                else:
+                    history.remove(item)
             undone_count += 1
 
         msg = _("Undo AI changes") + "\n"
@@ -2682,9 +2849,17 @@ class AiLLM():
         skipped = int(stats.get("skipped_changed", 0)) + int(stats.get("skipped_missing", 0)) + int(stats.get("skipped_invalid", 0))
         if skipped > 0:
             msg += _("Skipped operations: ") + str(skipped) + "\n"
+        blocked_retry = int(stats.get("blocked_retry", 0))
+        if blocked_retry > 0:
+            msg += _("Blocked operations kept for retry: ") + str(blocked_retry) + "\n"
+        removed_skipped = int(stats.get("removed_skipped", 0))
+        if removed_skipped > 0:
+            msg += _("Skipped operations removed from the list: ") + str(removed_skipped) + "\n"
         non_ai_loss = int(stats.get("deleted_code_codings_non_ai", 0))
         if non_ai_loss > 0:
             msg += _("Warning: removed codings not owned by 'AI Agent': ") + str(non_ai_loss) + "\n"
+        if len(skip_details) > 0:
+            msg += "\n" + _("Undo details:") + "\n\n" + "\n\n".join(skip_details)
         if self.parent_text_edit is not None:
             try:
                 self.parent_text_edit.append(msg)
