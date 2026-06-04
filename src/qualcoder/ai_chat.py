@@ -70,6 +70,10 @@ AI_CONTEXT_COMPACTION_PROTECTED_TURNS = 6
 AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN = 3.2
 AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS = 10
 AI_CONTEXT_ESTIMATE_SAFETY_RATIO = 1.12
+AI_AGENT_MAX_CALLS_PER_ROUND = 12
+AI_AGENT_MAX_REFLECTION_ROUNDS = 8
+AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE = 40
+AI_AGENT_MAX_QUEUED_CALLS = 100
 
 MARKDOWN_RENDERER = MarkdownIt(
     "commonmark",
@@ -2948,10 +2952,10 @@ class DialogAIChat(QtWidgets.QDialog):
         ]
         planner_json_schema = self._mcp_planner_json_schema()
         reflection_json_schema = self._mcp_reflection_json_schema()
-        max_calls_per_round = 8
-        max_reflection_rounds = 4
-        max_total_tool_calls = 20 + len(bootstrap_calls)
-        max_queued_calls = 100
+        max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
+        max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
+        max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
+        max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
         total_tool_calls = 0
         stop_reason = ""
         latest_plan_summary = _("Prepared the initial topic exploration evidence.")
@@ -3802,10 +3806,10 @@ class DialogAIChat(QtWidgets.QDialog):
                 )
             )
         reflection_json_schema = self._mcp_reflection_json_schema()
-        max_calls_per_round = 8
-        max_reflection_rounds = 4
-        max_total_tool_calls = 20 + len(bootstrap_calls)
-        max_queued_calls = 100
+        max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
+        max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
+        max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
+        max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
         total_tool_calls = 0
         stop_reason = ""
         latest_plan_summary = _("Prepared the selected coded segments for analysis.")
@@ -4640,10 +4644,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             ("resources/read", {"uri": self._text_analysis_document_uri(doc_id, start_pos, text_length)}),
         ]
         reflection_json_schema = self._mcp_reflection_json_schema()
-        max_calls_per_round = 8
-        max_reflection_rounds = 4
-        max_total_tool_calls = 20 + len(bootstrap_calls)
-        max_queued_calls = 100
+        max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
+        max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
+        max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
+        max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
         total_tool_calls = 0
         stop_reason = ""
         latest_plan_summary = _("Prepared the selected text passage for analysis.")
@@ -7574,10 +7578,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                     bootstrap_calls.append((str(item[0]).strip(), dict(item[1]) if isinstance(item[1], dict) else {}))
             planner_json_schema = self._mcp_planner_json_schema()
             reflection_json_schema = self._mcp_reflection_json_schema()
-            max_calls_per_round = 8
-            max_reflection_rounds = 4
-            max_total_tool_calls = 20 + len(bootstrap_calls)
-            max_queued_calls = 100
+            max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
+            max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
+            max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
+            max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
             total_tool_calls = 0
             stop_reason = ""
             methodology_gate = self._empty_methodology_gate()
