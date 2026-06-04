@@ -40,6 +40,8 @@ import polib
 from lxml import etree
 from typing import Dict, Any, List, Tuple
 
+SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
+
 def extract_pot_file(directory, pot_filename):
     """ Called by: update_translation_placeholders """
     # List all .py files within the specified directory
@@ -99,13 +101,14 @@ def update_qt_ts_files(lang_=None):
     CAlled by: update_translation_placeholders
     """
 
-    translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
-                         "app_pt.ts", "app_sv.ts", "app_zh.ts"]
+    translation_files = [f"app_{lang}.ts" for lang in SUPPORTED_LANGUAGES]
+    
     if lang_ is not None:
         translation_files = [f for f in translation_files if f.startswith(f"app_{lang_}")]
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
+    i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
     
     # Build a .pro file, which can then be used by pylupdate5 to create ts files
     def rel_for_pro(path):
@@ -118,7 +121,7 @@ def update_qt_ts_files(lang_=None):
             ui_files.append(rel_for_pro(os.path.join(gui_directory, file)))
     ui_files.sort()
 
-    ts_files = [rel_for_pro(os.path.join(gui_directory, t)) for t in translation_files]
+    ts_files = [rel_for_pro(os.path.join(i18n_directory, t)) for t in translation_files]
 
     text = "SOURCES = \\\n"
     text += " \\\n".join(ui_files)
@@ -146,9 +149,10 @@ def update_translation_placeholders(language=None):
     """ Update po files, update GUI ts files """
 
     directory = os.path.join('src', 'qualcoder')
+    directory_po = os.path.join(directory, 'i18n')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
-    update_po_files(directory, pot_filename, language)
+    update_po_files(directory_po, pot_filename, language)
     update_qt_ts_files(language)
 
 def recompile_translation(language=None):
@@ -158,13 +162,13 @@ def recompile_translation(language=None):
 
     project_root = os.path.dirname(os.path.abspath(__file__))
 
-    language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
+    language_list = SUPPORTED_LANGUAGES
     if language in language_list:
         language_list = [language]
 
     # GETTEXT TRANSLATION
     # .po-files
-    po_dir = os.path.join(project_root, "src", "qualcoder")
+    po_dir = os.path.join(project_root, "src", "qualcoder", "i18n")
     po_files = [os.path.join(po_dir, f'{lang_}.po') for lang_ in language_list]
 
     # .mo-files
@@ -270,7 +274,7 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
 def analyze_translation_status(language: str = None) -> str:
     """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report."""
     project_root = os.path.dirname(os.path.abspath(__file__))
-    languages = ["de", "en", "es", "fr", "it", "ja", "pt", "sv", "zh"]
+    languages = SUPPORTED_LANGUAGES
     if language and language in languages:
         languages = [language]
 
@@ -280,7 +284,7 @@ def analyze_translation_status(language: str = None) -> str:
     for lang in languages:
         report_data[lang] = {
             "gettext": analyze_translation_file(
-                os.path.join(project_root, "src", "qualcoder", f"{lang}.po"),
+                os.path.join(project_root, "src", "qualcoder", "i18n", f"{lang}.po"),
                 "po",
             ),
             "qt": analyze_translation_file(
@@ -291,16 +295,14 @@ def analyze_translation_status(language: str = None) -> str:
 
     # Generate markdown lines
     markdown_lines: List[str] = [
-        "# Translation Status Report 🌍\n",
-        "This report provides a **combined overview** of the translation progress for Gettext (.po) and Qt (.ts) files.\n",
+        "# Translation Status Report\n",
         "",
-        "## Legend",
+        "Legend",
         "- 🟩: Fully translated",
         "- 🟨: Partially translated (fuzzy/obsolete)",
         "- 🟥: Untranslated",
         "- ❌: File missing or error",
         "",
-        "## Translation Status",
         "| Language | Progress | Gettext | Qt | **Total** | **Translated** | **% Complete** |",
         "|----------|----------|---------|----|-----------|----------------|----------------|",
     ]
