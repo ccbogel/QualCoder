@@ -42,6 +42,7 @@ from typing import Dict, Any, List, Tuple
 
 SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
 
+
 def extract_pot_file(directory, pot_filename):
     """ Called by: update_translation_placeholders """
     # List all .py files within the specified directory
@@ -83,6 +84,12 @@ def update_po_files(directory, pot_filename, lang_=None):
                         print(f"Updated PO file: {po_file}")
                     except subprocess.CalledProcessError as exc:
                         print(f"Error updating PO file {po_file}: {exc}")
+                if file.endswith('.po~'):
+                    try:
+                        os.remove(os.path.join(root, file))
+                    except FileNotFoundError:
+                        pass
+
 
 def delete_obsolete_ts(file_ts):
     parser = etree.XMLParser(remove_blank_text=True)
@@ -92,13 +99,14 @@ def delete_obsolete_ts(file_ts):
     for message in obsolete_messages:
         message.getparent().remove(message)
     tree.write(file_ts, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    
+
+
 def update_qt_ts_files(lang_=None):
     """ Requires pyludate5
     pip install pyqt5-tools
     Run from QualCoder-master folder
     Warning: pylupdate6 overrides ,but does not update, existing ts files.
-    CAlled by: update_translation_placeholders
+    Called by: update_translation_placeholders
     """
 
     translation_files = [f"app_{lang}.ts" for lang in SUPPORTED_LANGUAGES]
@@ -122,7 +130,6 @@ def update_qt_ts_files(lang_=None):
     ui_files.sort()
 
     ts_files = [rel_for_pro(os.path.join(i18n_directory, t)) for t in translation_files]
-
     text = "SOURCES = \\\n"
     text += " \\\n".join(ui_files)
     text += "\n\nTRANSLATIONS = \\\n"
@@ -145,6 +152,7 @@ def update_qt_ts_files(lang_=None):
             delete_obsolete_ts(ts_path)
             print(f"Cleaned obsolete entries in {ts_file}")
 
+
 def update_translation_placeholders(language=None):
     """ Update po files, update GUI ts files """
 
@@ -155,9 +163,10 @@ def update_translation_placeholders(language=None):
     update_po_files(directory_po, pot_filename, language)
     update_qt_ts_files(language)
 
+
 def recompile_translation(language=None):
     """ Make sure lrelease.exe is in path.
-     Colin - I put mine in C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
+     e.g. C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
      This is a user path environment variable """
 
     project_root = os.path.dirname(os.path.abspath(__file__))
@@ -217,6 +226,7 @@ def recompile_translation(language=None):
         print('Updated base_64_lang_helper.py')
     print("Finished")
 
+
 def generate_progress_bar(translated_percent: float, partial_percent: float) -> str:
     """Generate a 10-square progress bar using 🟩 (translated), 🟨 (partial), 🟥 (untranslated)."""
     total_squares = 10
@@ -224,6 +234,7 @@ def generate_progress_bar(translated_percent: float, partial_percent: float) -> 
     partial = min(total_squares - translated, int(round(partial_percent / 10)))
     untranslated = total_squares - translated - partial
     return "🟩" * translated + "🟨" * partial + "🟥" * untranslated
+
 
 def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
     """Analyze a single translation file (.po or .ts) and return its statistics."""
@@ -235,7 +246,6 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
 
     try:
         if file_type == "po":
-            import polib
             po = polib.pofile(file_path)
             total = len(po)
             translated = sum(1 for entry in po if entry.translated())
@@ -270,6 +280,7 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
         stats["error"] = str(e)
 
     return stats
+
 
 def analyze_translation_status(language: str = None) -> str:
     """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report."""
@@ -365,10 +376,10 @@ def analyze_translation_status(language: str = None) -> str:
     output_path = os.path.join(project_root, "LANGUAGES.md")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(markdown_lines))
-
     print(f"Translation status report generated: {output_path}")
     return output_path
-    
+
+
 def main():
     print("Run from the QualCoder-master folder")
     print("Choose option: --update --compile")
