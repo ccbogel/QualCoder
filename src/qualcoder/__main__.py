@@ -1404,12 +1404,12 @@ class App(object):
 
         lang = self.settings['language']
         try:
-            urllib.request.urlopen(f"https://qualcoder.org/doc/{lang}/{page_path}")
+            urllib.request.urlopen(f"https://qualcoder.org/{lang}/{page_path}")
         except urllib_err.HTTPError as err:
-            logger.warning(f"App.help_wiki:\nhttps://qualcoder.org/doc/{lang}/{page_path}\n{err}")
+            logger.warning(f"App.help_wiki:\nhttps://qualcoder.org/{lang}/{page_path}\n{err}")
             if err.code == 404:
                 lang = "en"
-        webbrowser.open(f"https://qualcoder.org/doc/{lang}/{page_path}")
+        webbrowser.open(f"https://qualcoder.org/{lang}/{page_path}")
        
 
 class MainWindow(QtWidgets.QMainWindow):
