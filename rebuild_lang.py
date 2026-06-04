@@ -38,7 +38,7 @@ import subprocess
 import sys
 import polib
 from lxml import etree
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
 
 SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
 
@@ -258,7 +258,6 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
             })
 
         elif file_type == "ts":
-            from lxml import etree
             parser = etree.XMLParser(remove_blank_text=True)
             tree = etree.parse(file_path, parser)
             root = tree.getroot()
