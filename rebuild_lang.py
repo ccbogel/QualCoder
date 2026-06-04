@@ -386,6 +386,7 @@ def main():
     print("--compile compiles language files ts to qm files and po to mo files")
     print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile only that language.")
     print("e.g. --update --lang fr")
+    print("--status Creates LANGUAGES.md file which shows translation status of files.")
 
 
 if __name__ == "__main__":
