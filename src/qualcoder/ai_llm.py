@@ -1611,6 +1611,14 @@ class AiLLM():
             lines.append(_("Additional actions: ") + str(remaining))
         change_set["name"] = "\n".join(lines)
 
+        tooltip_lines = [first_line]
+        tooltip_summaries = operation_summaries[:20]
+        tooltip_lines.extend(tooltip_summaries)
+        tooltip_remaining = len(operation_summaries) - len(tooltip_summaries)
+        if tooltip_remaining > 0:
+            tooltip_lines.append(_("Additional actions: ") + str(tooltip_remaining))
+        change_set["tooltip"] = "\n".join(tooltip_lines)
+
     def discard_empty_ai_change_set(self, set_id: str) -> None:
         """Remove a pre-created AI change set if no write operation was recorded."""
 

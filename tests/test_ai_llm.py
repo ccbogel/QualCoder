@@ -279,3 +279,24 @@ class TestAiLLMUndoHistory(TestCase):
 
         self.assertEqual(0, len(self.ai.ai_change_history))
         self.assertEqual(0, self.conn.execute("SELECT COUNT(*) FROM attribute_type").fetchone()[0])
+
+    def test_change_set_tooltip_lists_more_actions_than_preview(self):
+        change_set = {
+            "id": "set-2",
+            "created_at": "2026-06-04 12:00:00",
+            "operations": [
+                {"type": "create_code", "name": f"Code {i}"}
+                for i in range(1, 26)
+            ],
+        }
+
+        self.ai._refresh_ai_change_set_name(change_set)
+
+        self.assertIn("Created code: Code 1", change_set["name"])
+        self.assertIn("Created code: Code 4", change_set["name"])
+        self.assertIn("Additional actions: 21", change_set["name"])
+        self.assertNotIn("Created code: Code 5", change_set["name"])
+
+        self.assertIn("Created code: Code 20", change_set["tooltip"])
+        self.assertNotIn("Created code: Code 21", change_set["tooltip"])
+        self.assertIn("Additional actions: 5", change_set["tooltip"])

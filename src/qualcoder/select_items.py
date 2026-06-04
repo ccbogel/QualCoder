@@ -155,7 +155,7 @@ class ListModel(QtCore.QAbstractListModel):
             return QtCore.QVariant(row_item['name'])
         elif role == QtCore.Qt.ItemDataRole.ToolTipRole:  # show full text on hover
             row_item = self.list[index.row()]
-            return row_item['name']
+            return row_item.get('tooltip', row_item['name'])
         elif role == QtCore.Qt.ItemDataRole.UserRole:  # return the whole python object
             row_item = self.list[index.row()]
             return row_item
