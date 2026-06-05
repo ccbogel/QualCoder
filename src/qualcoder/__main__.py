@@ -755,6 +755,14 @@ class App(object):
                 'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
                 'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
                 'dialogmanagelinks_w', 'dialogmanagelinks_h',
+                'ai_search_tree_widths',
+                'dialogcodetext_tree_widths', 'dialogcodepdf_tree_widths',
+                'dialogcodeimage_tree_widths', 'dialogcodeav_tree_widths',
+                'dialogreport_code_summary_tree_widths', 'dialogreportcodes_tree_widths',
+                'dialogreportcodesbysegments_tree_widths', 'dialogreportcomparecoderfile_tree_widths',
+                'dialogreportexactmatches_tree_widths', 'dialogreportrelations_tree_widths',
+                'dialogreportcodefrequencies_tree_widths', 'dialogreportcodercomparisons_tree_widths',
+                'dialogcodecolorscheme_tree_widths',
                 'docfontsize', 'showids',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
@@ -779,6 +787,8 @@ class App(object):
                     settings_data[key] = 50000
                 if key == 'showids':
                     settings_data[key] = False
+                if key.endswith('_tree_widths'):
+                    settings_data[key] = ""
                 if key == 'report_text_context_style':
                     settings_data[key] = "Bold"
                 if key == 'report_text_context_characters':
@@ -1121,6 +1131,20 @@ class App(object):
             'dialogreport_file_summary_splitter1': 100,
             'dialogreport_code_summary_splitter0': 100,
             'dialogreport_code_summary_splitter1': 100,
+            'ai_search_tree_widths': '',
+            'dialogcodetext_tree_widths': '',
+            'dialogcodepdf_tree_widths': '',
+            'dialogcodeimage_tree_widths': '',
+            'dialogcodeav_tree_widths': '',
+            'dialogreport_code_summary_tree_widths': '',
+            'dialogreportcodes_tree_widths': '',
+            'dialogreportcodesbysegments_tree_widths': '',
+            'dialogreportcomparecoderfile_tree_widths': '',
+            'dialogreportexactmatches_tree_widths': '',
+            'dialogreportrelations_tree_widths': '',
+            'dialogreportcodefrequencies_tree_widths': '',
+            'dialogreportcodercomparisons_tree_widths': '',
+            'dialogcodecolorscheme_tree_widths': '',
             'stylesheet': 'native',
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',

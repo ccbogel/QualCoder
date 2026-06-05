@@ -44,7 +44,7 @@ from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
-    ExportDirectoryPathDialog
+    ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
@@ -120,6 +120,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.installEventFilter(self)  # For H key
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
+        init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogreportcodes_tree_widths')
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         # These signals after the tree is filled the first time
@@ -440,8 +441,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -547,6 +546,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
+        restore_persistent_tree_widths(
+            self.ui.treeWidget,
+            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
+        )
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code from all coders and all files. """

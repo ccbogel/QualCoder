@@ -5,6 +5,8 @@ Using --compile option
 This script compiles .po to .mo files, and .ts to .qm files.
 Using --lang option
 Change only a specific language
+Using --status option
+Check status of translation
 
 Requires polib and PyQt5
 
@@ -36,6 +38,10 @@ import subprocess
 import sys
 import polib
 from lxml import etree
+from typing import Dict, Any, List
+
+SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
+
 
 def extract_pot_file(directory, pot_filename):
     """ Called by: update_translation_placeholders """
@@ -78,6 +84,12 @@ def update_po_files(directory, pot_filename, lang_=None):
                         print(f"Updated PO file: {po_file}")
                     except subprocess.CalledProcessError as exc:
                         print(f"Error updating PO file {po_file}: {exc}")
+                if file.endswith('.po~'):
+                    try:
+                        os.remove(os.path.join(root, file))
+                    except FileNotFoundError:
+                        pass
+
 
 def delete_obsolete_ts(file_ts):
     parser = etree.XMLParser(remove_blank_text=True)
@@ -87,22 +99,24 @@ def delete_obsolete_ts(file_ts):
     for message in obsolete_messages:
         message.getparent().remove(message)
     tree.write(file_ts, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    
+
+
 def update_qt_ts_files(lang_=None):
     """ Requires pyludate5
     pip install pyqt5-tools
     Run from QualCoder-master folder
     Warning: pylupdate6 overrides ,but does not update, existing ts files.
-    CAlled by: update_translation_placeholders
+    Called by: update_translation_placeholders
     """
 
-    translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
-                         "app_pt.ts", "app_sv.ts", "app_zh.ts"]
+    translation_files = [f"app_{lang}.ts" for lang in SUPPORTED_LANGUAGES]
+    
     if lang_ is not None:
         translation_files = [f for f in translation_files if f.startswith(f"app_{lang_}")]
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
+    i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
     
     # Build a .pro file, which can then be used by pylupdate5 to create ts files
     def rel_for_pro(path):
@@ -115,8 +129,7 @@ def update_qt_ts_files(lang_=None):
             ui_files.append(rel_for_pro(os.path.join(gui_directory, file)))
     ui_files.sort()
 
-    ts_files = [rel_for_pro(os.path.join(gui_directory, t)) for t in translation_files]
-
+    ts_files = [rel_for_pro(os.path.join(i18n_directory, t)) for t in translation_files]
     text = "SOURCES = \\\n"
     text += " \\\n".join(ui_files)
     text += "\n\nTRANSLATIONS = \\\n"
@@ -139,29 +152,32 @@ def update_qt_ts_files(lang_=None):
             delete_obsolete_ts(ts_path)
             print(f"Cleaned obsolete entries in {ts_file}")
 
+
 def update_translation_placeholders(language=None):
     """ Update po files, update GUI ts files """
 
     directory = os.path.join('src', 'qualcoder')
+    directory_po = os.path.join(directory, 'i18n')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
-    update_po_files(directory, pot_filename, language)
+    update_po_files(directory_po, pot_filename, language)
     update_qt_ts_files(language)
+
 
 def recompile_translation(language=None):
     """ Make sure lrelease.exe is in path.
-     Colin - I put mine in C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
+     e.g. C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
      This is a user path environment variable """
 
     project_root = os.path.dirname(os.path.abspath(__file__))
 
-    language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
+    language_list = SUPPORTED_LANGUAGES
     if language in language_list:
         language_list = [language]
 
     # GETTEXT TRANSLATION
     # .po-files
-    po_dir = os.path.join(project_root, "src", "qualcoder")
+    po_dir = os.path.join(project_root, "src", "qualcoder", "i18n")
     po_files = [os.path.join(po_dir, f'{lang_}.po') for lang_ in language_list]
 
     # .mo-files
@@ -211,6 +227,158 @@ def recompile_translation(language=None):
     print("Finished")
 
 
+def generate_progress_bar(translated_percent: float, partial_percent: float) -> str:
+    """Generate a 10-square progress bar using 🟩 (translated), 🟨 (partial), 🟥 (untranslated)."""
+    total_squares = 10
+    translated = min(total_squares, int(round(translated_percent / 10)))
+    partial = min(total_squares - translated, int(round(partial_percent / 10)))
+    untranslated = total_squares - translated - partial
+    return "🟩" * translated + "🟨" * partial + "🟥" * untranslated
+
+
+def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
+    """Analyze a single translation file (.po or .ts) and return its statistics."""
+    stats: Dict[str, Any] = {"error": None, "missing": False}
+
+    if not os.path.exists(file_path):
+        stats["missing"] = True
+        return stats
+
+    try:
+        if file_type == "po":
+            po = polib.pofile(file_path)
+            total = len(po)
+            translated = sum(1 for entry in po if entry.translated())
+            fuzzy = sum(1 for entry in po if "fuzzy" in entry.flags)
+            stats.update({
+                "total": total,
+                "translated": translated,
+                "partial": fuzzy,
+                "untranslated": total - translated - fuzzy,
+            })
+
+        elif file_type == "ts":
+            parser = etree.XMLParser(remove_blank_text=True)
+            tree = etree.parse(file_path, parser)
+            root = tree.getroot()
+            messages = root.xpath("//message")
+            total = len(messages)
+            translated = len(root.xpath(
+                '//message[translation and not(translation[@type="unfinished"]) and not(translation[@type="obsolete"])]'
+            ))
+            obsolete = len(root.xpath('//message[translation[@type="obsolete"]]'))
+            untranslated = len(root.xpath('//message[not(translation) or translation[@type="unfinished"]]'))
+            stats.update({
+                "total": total,
+                "translated": translated,
+                "partial": obsolete,
+                "untranslated": untranslated,
+            })
+
+    except Exception as e:
+        stats["error"] = str(e)
+
+    return stats
+
+
+def analyze_translation_status(language: str = None) -> str:
+    """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report."""
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    languages = SUPPORTED_LANGUAGES
+    if language and language in languages:
+        languages = [language]
+
+    # Collect data for all languages
+    report_data: Dict[str, Dict[str, Dict[str, Any]]] = {}
+
+    for lang in languages:
+        report_data[lang] = {
+            "gettext": analyze_translation_file(
+                os.path.join(project_root, "src", "qualcoder", "i18n", f"{lang}.po"),
+                "po",
+            ),
+            "qt": analyze_translation_file(
+                os.path.join(project_root, "src", "qualcoder", "GUI", f"app_{lang}.ts"),
+                "ts",
+            ),
+        }
+
+    # Generate markdown lines
+    markdown_lines: List[str] = [
+        "# Translation Status Report\n",
+        "",
+        "Legend",
+        "- 🟩: Fully translated",
+        "- 🟨: Partially translated (fuzzy/obsolete)",
+        "- 🟥: Untranslated",
+        "- ❌: File missing or error",
+        "",
+        "| Language | Progress | Gettext | Qt | **Total** | **Translated** | **% Complete** |",
+        "|----------|----------|---------|----|-----------|----------------|----------------|",
+    ]
+
+    for lang in languages:
+        gettext_stats = report_data[lang]["gettext"]
+        qt_stats = report_data[lang]["qt"]
+
+        # Handle Gettext data
+        if gettext_stats.get("missing"):
+            gettext_total = 0
+            gettext_translated = 0
+            gettext_partial = 0
+            gettext_str = "❌ Missing"
+        elif gettext_stats.get("error"):
+            gettext_total = 0
+            gettext_translated = 0
+            gettext_partial = 0
+            gettext_str = f"❌ Error: {gettext_stats['error']}"
+        else:
+            gettext_total = gettext_stats["total"]
+            gettext_translated = gettext_stats["translated"]
+            gettext_partial = gettext_stats["partial"]
+            gettext_str = f"{gettext_translated}/{gettext_total} ({gettext_partial} fuzzy)"
+
+        # Handle Qt data
+        if qt_stats.get("missing"):
+            qt_total = 0
+            qt_translated = 0
+            qt_partial = 0
+            qt_str = "❌ Missing"
+        elif qt_stats.get("error"):
+            qt_total = 0
+            qt_translated = 0
+            qt_partial = 0
+            qt_str = f"❌ Error: {qt_stats['error']}"
+        else:
+            qt_total = qt_stats["total"]
+            qt_translated = qt_stats["translated"]
+            qt_partial = qt_stats["partial"]
+            qt_str = f"{qt_translated}/{qt_total} ({qt_partial} obsolete)"
+
+        # Combined totals
+        total_entries = gettext_total + qt_total
+        total_translated = gettext_translated + qt_translated
+        total_partial = gettext_partial + qt_partial
+        percent_complete = (total_translated / total_entries * 100) if total_entries > 0 else 0
+        percent_partial = (total_partial / total_entries * 100) if total_entries > 0 else 0
+
+        # Generate combined progress bar
+        progress_bar = generate_progress_bar(percent_complete, percent_partial)
+
+        markdown_lines.append(
+            f"| {lang} | {progress_bar} | {gettext_str} | {qt_str} | **{total_entries}** | **{total_translated}** | **{percent_complete:.1f}%** |"
+        )
+
+    markdown_lines.extend(["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."])
+
+    # Write to LANGUAGES.md
+    output_path = os.path.join(project_root, "LANGUAGES.md")
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(markdown_lines))
+    print(f"Translation status report generated: {output_path}")
+    return output_path
+
+
 def main():
     print("Run from the QualCoder-master folder")
     print("Choose option: --update --compile")
@@ -218,6 +386,7 @@ def main():
     print("--compile compiles language files ts to qm files and po to mo files")
     print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile only that language.")
     print("e.g. --update --lang fr")
+    print("--status Creates LANGUAGES.md file which shows translation status of files.")
 
 
 if __name__ == "__main__":
@@ -232,6 +401,8 @@ if __name__ == "__main__":
             update_translation_placeholders(lang)
         elif mode == "--compile":
             recompile_translation(lang)
+        elif mode == "--status":
+            analyze_translation_status(lang)
         else:
             main()
     else:
