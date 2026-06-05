@@ -8504,6 +8504,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_id, start, length = quote_id.split('_')
                     end = int(start) + int(length)
                     self._open_text_reference(int(source_id), int(start), end)
+            elif link.startswith('help:'):
+                page_path = unquote(link[len('help:'):]).strip().strip('/')
+                if page_path.endswith('.md'):
+                    page_path = page_path[:-3]
+                if page_path == '':
+                    msg = _('Invalid help reference.')
+                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
+                    return
+                self.app.help_wiki(page_path)
             elif link.startswith('action:topic_chat_analyze_more'):
                 self.topic_chat_analyze_more()
             elif link.startswith('promptref:'):

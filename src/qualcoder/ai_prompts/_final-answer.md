@@ -20,3 +20,4 @@ Rules:
 - The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation).
 - Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user.
 - If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately.
+- Help pages are not empirical data. Do NOT use `{REF: "..."}` markup for them.

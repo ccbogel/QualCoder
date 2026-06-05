@@ -23,6 +23,8 @@ from mcp import types
 from mcp.server.lowlevel import Server
 from mcp.server.lowlevel.server import ReadResourceContents
 
+from .ai_help_index import AiHelpIndex
+
 
 class AiMcpServer:
     """Internal MCP server for QualCoder project data."""
@@ -46,6 +48,8 @@ class AiMcpServer:
     default_regex_context_chars = 120
     max_regex_context_chars = 1000
     max_regex_hits = 20000
+    default_help_page_size = 5
+    max_help_page_size = 20
     AI_AGENT_OWNER = "AI Agent"
     AI_PERMISSION_READ_ONLY = 0
     AI_PERMISSION_SANDBOXED = 1
@@ -99,6 +103,7 @@ class AiMcpServer:
             version=self.server_version,
             instructions=self._server_instructions(),
         )
+        self.help_index = AiHelpIndex()
         self._register_sdk_handlers()
 
     def _server_instructions(self) -> str:
@@ -117,6 +122,9 @@ class AiMcpServer:
             "(qualcoder://search/bm25?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
             "and regular-expression search "
             "(qualcoder://search/regex?pattern=...) with optional filters file_ids, case_ids, and exclude_cids. "
+            "It also provides cached access to the English QualCoder help wiki: page list "
+            "(qualcoder://help/pages), help search (qualcoder://help/search?q=...), and help page reads "
+            "(qualcoder://help/page/{slug}). "
             "Available tools include preview and write operations for categories, codes, text codings, "
             "case attributes, document attributes, and cases. "
             "Delete actions on categories or codes should be previewed before execution."
@@ -459,6 +467,13 @@ class AiMcpServer:
             return _('Running keyword search in empirical data (BM25)...')
         if uri_base == "qualcoder://search/regex":
             return _('Running keyword search in empirical data (Regex)...')
+        if uri_base == "qualcoder://help/pages":
+            return _('Reviewing available QualCoder help pages...')
+        if uri_base == "qualcoder://help/search":
+            return _('Searching the QualCoder help...')
+        help_page_match = re.fullmatch(r"qualcoder://help/page/([^/?#]+)", uri_base)
+        if help_page_match is not None:
+            return _('Reviewing a QualCoder help page...')
         case_text_match = re.fullmatch(r"qualcoder://cases/text/(\d+)", uri_base)
         if case_text_match is not None:
             case_id = int(case_text_match.group(1))
@@ -662,6 +677,24 @@ class AiMcpServer:
                     ),
                     mimeType="application/json",
                 ),
+                types.ResourceTemplate(
+                    uriTemplate="qualcoder://help/search{?q,cursor,page_size}",
+                    name="QualCoder help search",
+                    description=(
+                        "Search the cached English QualCoder help pages. Pass one or more English q "
+                        "parameters. Optional params: cursor and page_size."
+                    ),
+                    mimeType="application/json",
+                ),
+                types.ResourceTemplate(
+                    uriTemplate="qualcoder://help/page/{slug}",
+                    name="QualCoder help page by slug",
+                    description=(
+                        "Read one cached English QualCoder help page by page slug. Optional window "
+                        "params: start and length."
+                    ),
+                    mimeType="application/json",
+                ),
             ]
 
         @self._sdk_server.read_resource()
@@ -698,6 +731,8 @@ class AiMcpServer:
             return {"documents": self._fetch_text_documents()}
         if uri_no_query == "qualcoder://cases":
             return {"cases": self._fetch_cases()}
+        if uri_no_query == "qualcoder://help/pages":
+            return self.help_index.list_pages()
         if uri_no_query == "qualcoder://vector/search":
             options = self._parse_vector_search_options(query)
             return self._read_vector_search(options)
@@ -707,6 +742,13 @@ class AiMcpServer:
         if uri_no_query == "qualcoder://search/regex":
             options = self._parse_regex_search_options(query)
             return self._read_regex_search(options)
+        if uri_no_query == "qualcoder://help/search":
+            options = self._parse_help_search_options(query)
+            return self.help_index.search(
+                queries=options["queries"],
+                page_size=options["page_size"],
+                cursor=options["cursor"],
+            )
 
         case_text_match = re.fullmatch(r"qualcoder://cases/text/(\d+)", uri_no_query)
         if case_text_match is not None:
@@ -729,6 +771,16 @@ class AiMcpServer:
         if file_match is not None:
             file_id = int(file_match.group(1))
             return self._read_document(file_id, window)
+        help_page_match = re.fullmatch(r"qualcoder://help/page/([^/?#]+)", uri_no_query)
+        if help_page_match is not None:
+            if str(window.get("mode", "char")) == "line":
+                raise ValueError("line_start/line_end are not supported for help page reads.")
+            slug = help_page_match.group(1)
+            return self.help_index.read_page(
+                slug=slug,
+                start=window.get("start", 0),
+                length=window.get("length", self.default_read_length),
+            )
 
         if str(window.get("mode", "char")) == "line":
             raise ValueError("line_start/line_end are only supported for text document reads.")
@@ -783,6 +835,18 @@ class AiMcpServer:
                 name="Regular-expression search",
                 description="Regex keyword search over text documents. Requires query param pattern. "
                             "Optional filters: file_ids, case_ids, and exclude_cids.",
+                mimeType="application/json",
+            ),
+            types.Resource(
+                uri="qualcoder://help/pages",
+                name="QualCoder help pages",
+                description="List cached English QualCoder help pages available for AI assistance.",
+                mimeType="application/json",
+            ),
+            types.Resource(
+                uri="qualcoder://help/search",
+                name="QualCoder help search",
+                description="Search cached English QualCoder help pages. Requires query param q.",
                 mimeType="application/json",
             ),
         ]
@@ -3192,6 +3256,41 @@ class AiMcpServer:
             seen.add(val)
             unique_values.append(val)
         return unique_values
+
+    def _parse_help_search_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+        query_strings: List[str] = []
+        for key in ("q", "query", "queries"):
+            values = query.get(key, [])
+            for raw in values:
+                raw_text = str(raw).strip()
+                if raw_text == "":
+                    continue
+                for line in raw_text.splitlines():
+                    line_clean = " ".join(line.split()).strip()
+                    if line_clean != "":
+                        query_strings.append(line_clean)
+
+        deduped_queries: List[str] = []
+        seen_queries: set[str] = set()
+        for q in query_strings:
+            q_key = q.lower()
+            if q_key in seen_queries:
+                continue
+            seen_queries.add(q_key)
+            deduped_queries.append(q)
+
+        if len(deduped_queries) == 0:
+            raise ValueError("Missing help search query. Use at least one ?q=... parameter.")
+
+        cursor_raw = str(query.get("cursor", [""])[0]).strip()
+        page_size = self._to_int(query.get("page_size", [self.default_help_page_size])[0], self.default_help_page_size)
+        page_size = max(1, min(page_size, self.max_help_page_size))
+
+        return {
+            "queries": deduped_queries,
+            "cursor": cursor_raw if cursor_raw != "" else None,
+            "page_size": page_size,
+        }
 
     def _parse_vector_search_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
         query_strings: List[str] = []
