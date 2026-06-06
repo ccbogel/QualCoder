@@ -116,7 +116,10 @@ def update_qt_ts_files(lang_=None):
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
-    i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
+    if lang_ is None:
+        i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
+    else:
+        i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n", lang_)
     
     # Build a .pro file, which can then be used by pylupdate5 to create ts files
     def rel_for_pro(path):
@@ -178,10 +181,10 @@ def recompile_translation(language=None):
     # GETTEXT TRANSLATION
     # .po-files
     po_dir = os.path.join(project_root, "src", "qualcoder", "i18n")
-    po_files = [os.path.join(po_dir, f'{lang_}.po') for lang_ in language_list]
+    po_files = [os.path.join(po_dir, lang_, f'{lang_}.po') for lang_ in language_list]
 
     # .mo-files
-    mo_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
+    mo_basedir = os.path.join(project_root, "src", "qualcoder", "i18n")
     mo_files = [os.path.join(mo_basedir, lang_, 'LC_MESSAGES', f'{lang_}.mo') for lang_ in language_list]
 
     for po_file, mo_file in zip(po_files, mo_files):
@@ -199,11 +202,11 @@ def recompile_translation(language=None):
     # Qt TRANSLATIONS
 
     # .ts-files
-    ts_dir = os.path.join(project_root, "src", "qualcoder", 'GUI')
+    ts_dir = os.path.join(project_root, "src", "qualcoder", 'i18n')
     ts_files = [os.path.join(ts_dir, f'app_{lang_}.ts') for lang_ in language_list]
 
     # .qm-files
-    qm_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
+    qm_basedir = os.path.join(project_root, "src", "qualcoder", "i18n")
     qm_files = [os.path.join(qm_basedir, lang_, f'app_{lang_}.qm') for lang_ in language_list]
 
     for ts_file, qm_file in zip(ts_files, qm_files):
@@ -220,8 +223,8 @@ def recompile_translation(language=None):
     # Update base_64_lang_helper.py
     answer = input(f'Do you want to update "base_64_lang_helper.py"? (y/n)')
     if answer == 'y':
-        os.chdir(os.path.join(project_root, "src", 'qualcoder', 'locale'))
-        cmd = os.path.join(project_root, "src", 'qualcoder', 'locale', 'create_lang_script_base64.py')
+        os.chdir(os.path.join(project_root, "src", 'qualcoder', 'i18n'))
+        cmd = os.path.join(project_root, "src", 'qualcoder', 'i18n', 'create_lang_script_base64.py')
         subprocess.call(cmd, shell=True)
         print('Updated base_64_lang_helper.py')
     print("Finished")
