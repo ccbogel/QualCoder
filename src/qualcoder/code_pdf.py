@@ -174,6 +174,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        self.ui.lineEdit_search.returnPressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)

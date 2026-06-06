@@ -543,6 +543,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_edit_next.clicked.connect(lambda pressed: self.edit_mode_find("next"))
         self.ui.pushButton_edit_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_edit_prev.clicked.connect(lambda pressed: self.edit_mode_find("previous"))
+        self.ui.lineEdit_edit_search.returnPressed.connect(self.edit_mode_find)
         self.edit_pos = 0
         self.edit_mode = False
         # Revert to original if edit text caused problems
@@ -592,7 +593,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_type = "3"  # 3 character threshold for text search
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
-        self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+        self.ui.lineEdit_search.returnPressed.connect(self.move_to_next_search_text)
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
 
@@ -1918,7 +1919,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
-        if self.search_type == 3 and len(self.search_term) < 3:
+        if int(self.search_type) == 3 and len(self.search_term) < 3:
             self.ui.label_search_totals.setText("")
             return
         if self.search_type == 5 and len(self.search_term) < 5:
@@ -1966,6 +1967,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None or self.search_indices == []:
             return
+        self.search_term = self.ui.lineEdit_search.text()
+        if int(self.search_type) == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
+        if int(self.search_type) == 5 and len(self.search_term) < 5:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
         self.search_index += 1
         if self.search_index >= len(self.search_indices):
             self.search_index = 0
@@ -1994,6 +2006,17 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Push button pressed to move to previous search text position. """
 
         if self.file_ is None or self.search_indices == []:
+            return
+        self.search_term = self.ui.lineEdit_search.text()
+        if int(self.search_type) == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
+        if int(self.search_type) == 5 and len(self.search_term) < 5:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
             return
         self.search_index -= 1
         if self.search_index < 0:
@@ -6660,10 +6683,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
 
-    def edit_mode_find(self, direction="next"):
+    def edit_mode_find(self, direction:str="next"):
         """  Move forward or backward through the edit document.
-        Uses REGEX. """
+        Uses REGEX.
+        Args:
+            direction: string '', next, previous """
 
+        if direction == "":
+            direction = "next"
         cursor = self.ui.plainTextEdit.textCursor()
         search_term = self.ui.lineEdit_edit_search.text()
         if search_term == "":
@@ -6692,7 +6719,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
         except re.error:
             logger.exception('Failed searching text for %s', search_term)
-        print("Match position:", result)
         if result is None:
             return
         cursor.setPosition(result)
