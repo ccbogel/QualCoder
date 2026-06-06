@@ -3215,12 +3215,12 @@ def gui():
     # Use two character language setting
     lang = settings.get('language', 'en')
     # Test for pyinstall data files
-    locale_dir = os.path.join(path, 'locale')
+    locale_dir = os.path.join(path, 'i18n')
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         ext_data_dir = sys._MEIPASS
         locale_dir = os.path.join(ext_data_dir, 'qualcoder')
-        locale_dir = os.path.join(locale_dir, 'locale')
+        locale_dir = os.path.join(locale_dir, 'i18n')
         # locale_dir = os.path.join(locale_dir, lang)
         # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
     # print("LISTDIR: ", os.listdir(locale_dir))
