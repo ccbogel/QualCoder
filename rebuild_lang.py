@@ -116,10 +116,10 @@ def update_qt_ts_files(lang_=None):
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
-    if lang_ is None:
-        i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
-    else:
+    if lang_ is not None:
         i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n", lang_)
+    else:
+        i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
     
     # Build a .pro file, which can then be used by pylupdate5 to create ts files
     def rel_for_pro(path):
@@ -132,7 +132,15 @@ def update_qt_ts_files(lang_=None):
             ui_files.append(rel_for_pro(os.path.join(gui_directory, file)))
     ui_files.sort()
 
-    ts_files = [rel_for_pro(os.path.join(i18n_directory, t)) for t in translation_files]
+    ts_files = []
+    for t in translation_files:
+        if lang_ is not None:
+            ts_path = os.path.join(i18n_directory, t)
+        else:
+            lang_from_file = t.replace("app_", "").replace(".ts", "")
+            ts_path = os.path.join(script_path, "src", "qualcoder", "i18n", lang_from_file, t)
+        ts_files.append(rel_for_pro(ts_path))
+
     text = "SOURCES = \\\n"
     text += " \\\n".join(ui_files)
     text += "\n\nTRANSLATIONS = \\\n"

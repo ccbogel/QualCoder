@@ -59,6 +59,14 @@ ui_save_query.py \
 ui_special_functions.py
 
 TRANSLATIONS = \
-../i18n/fr/app_fr.ts
+../i18n/de/app_de.ts \
+../i18n/en/app_en.ts \
+../i18n/es/app_es.ts \
+../i18n/fr/app_fr.ts \
+../i18n/it/app_it.ts \
+../i18n/ja/app_ja.ts \
+../i18n/pt/app_pt.ts \
+../i18n/sv/app_sv.ts \
+../i18n/zh/app_zh.ts
 
 CODECFORTR = ISO-8859-5
