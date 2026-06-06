@@ -56,7 +56,7 @@ from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
-from qualcoder.locale.base64_lang_helper import *
+from qualcoder.i18n.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
@@ -3215,12 +3215,12 @@ def gui():
     # Use two character language setting
     lang = settings.get('language', 'en')
     # Test for pyinstall data files
-    locale_dir = os.path.join(path, 'locale')
+    locale_dir = os.path.join(path, 'i18n')
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         ext_data_dir = sys._MEIPASS
         locale_dir = os.path.join(ext_data_dir, 'qualcoder')
-        locale_dir = os.path.join(locale_dir, 'locale')
+        locale_dir = os.path.join(locale_dir, 'i18n')
         # locale_dir = os.path.join(locale_dir, lang)
         # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
     # print("LISTDIR: ", os.listdir(locale_dir))
