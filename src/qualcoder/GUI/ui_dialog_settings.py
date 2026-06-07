@@ -545,7 +545,12 @@ class Ui_Dialog_settings(object):
         self.label_current_coder.setText(_translate("Dialog_settings", "Current coder: "))
         self.label_directory.setText(_translate("Dialog_settings", "/"))
         self.label_4.setText(_translate("Dialog_settings", "Language"))
-        self.comboBox_language.setToolTip(_translate("Dialog_settings", "Close and open the software for the change in language to occur."))
+        self.comboBox_language.setToolTip(_translate("Dialog_settings", "Close and open the software for the change in language to occur.\n"
+"Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.\n"
+"Additional languages can be added if they are listed in the src/qualcoder/i18n folder. To do this update the config.ini  file to another language that is available. Find the line begining language = \n"
+"Then update it.\n"
+"For example: \n"
+"langauge = it"))
         self.label.setText(_translate("Dialog_settings", "General font and size"))
         self.label_3.setText(_translate("Dialog_settings", "Font size for codes tree"))
         self.label_7.setText(_translate("Dialog_settings", "Font size for documents"))
