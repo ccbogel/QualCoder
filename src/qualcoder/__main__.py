@@ -30,7 +30,6 @@ import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from pathlib import Path
 import platform
 import shutil
 import sys
@@ -3215,35 +3214,24 @@ def gui():
         app.setWindowIcon(QtGui.QIcon(pm))
 
     lang = settings.get('language', 'en')
-    # Test for pyinstall data files
-    ''' DELETE THIS COMMENTED SECTION SOON ?
-    locale_dir = os.path.join(path, 'i18n')
-    # Need to get the external data directory for PyInstaller
+    i18n_dir = os.path.join(path, 'i18n')
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        ext_data_dir = sys._MEIPASS
-        locale_dir = os.path.join(ext_data_dir, 'qualcoder')
-        locale_dir = os.path.join(locale_dir, 'i18n')
-        # locale_dir = os.path.join(locale_dir, lang)
-        # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-    # print("LISTDIR: ", os.listdir(locale_dir))'''
+        i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')
+
+    translator = gettext.NullTranslations()
     if lang != 'en':
-        install_language(lang)
-        # Qt translation for GUIs
         qt_translator = QtCore.QTranslator()
-        if qt_translator.isEmpty():
-            # print("trying to load translation qm file from .qualcoder folder")
-            qm = os.path.join(home, '.qualcoder', f'{lang}.qm')
-            qt_translator.load(qm)
+        qt_translator.load(os.path.join(i18n_dir, f'{lang}.qm'))
         app.installTranslator(qt_translator)
-        
-        # gettext translations for code strings
-        config_dir = os.path.join(home, '.qualcoder')
+
         try:
-            translator = gettext.translation(lang, localedir=config_dir, languages=[lang])
-            translator.install()
+            with open(os.path.join(i18n_dir, f'{lang}.mo'), 'rb') as file_:
+                translator = gettext.GNUTranslations(file_)
         except Exception as err:
             print(err)
             logger.error(err)
+
+    translator.install()
 
     ex = MainWindow(qual_app)
     try:
@@ -3265,33 +3253,6 @@ def gui():
         qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
     sys.exit(app.exec())
-
-
-def install_language(lang):
-    """ Install Qt qm and .mo files into config folder .qualcoder.
-    Strict directory structure for gettext base dir/lang/LC_MESSAGES/lang.mo
-    args:
-        lang: String 2 letter code
-    """
-
-    config_path = os.path.join(home, '.qualcoder')
-    i18n_dir = os.path.join(Path(__file__).parent, 'i18n')
-    try:
-        shutil.copy(os.path.join(i18n_dir, f'{lang}.qm'), os.path.join(config_path, f'{lang}.qm'))
-    except Exception as err:
-        print(err)
-    if not os.path.exists(os.path.join(config_path, lang)):
-        os.mkdir(os.path.join(config_path, lang))
-    if not os.path.exists(os.path.join(config_path,lang, 'LC_MESSAGES')):
-        os.mkdir(os.path.join(config_path,lang, 'LC_MESSAGES'))
-    source = os.path.join(i18n_dir, f'{lang}.mo')
-    # Check source and if not present, check .qualcoder folder for an alternative source
-    if not os.path.exists(source):
-        source = os.path.join(config_path, f'{lang}.mo')
-    try:
-        shutil.copy(source, os.path.join(config_path,lang, 'LC_MESSAGES', f'{lang}.mo'))
-    except Exception as err:
-        print(err)
 
 def install_droid_sans_mono():
     """ Install DroidSansMono ttf font for wordclouds into .qualcoder folder """
