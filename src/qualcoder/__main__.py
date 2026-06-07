@@ -30,6 +30,7 @@ import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from pathlib import Path
 import platform
 import shutil
 import sys
@@ -56,7 +57,6 @@ from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
-from qualcoder.i18n.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
@@ -3201,9 +3201,11 @@ def gui():
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
     project_path = qual_app.get_most_recent_projectpath()
-    # Check Noto Sans installed  - for general application
+    # Noto Sans - for general application
     install_noto_sans()
     QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
+    # DroidSandMono - for wordcloud
+    install_droid_sans_mono()
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     if sys.platform != 'darwin':
@@ -3212,9 +3214,9 @@ def gui():
         pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32_icon), "png")
         app.setWindowIcon(QtGui.QIcon(pm))
 
-    # Use two character language setting
     lang = settings.get('language', 'en')
     # Test for pyinstall data files
+    ''' DELETE THIS COMMENTED SECTION SOON ?
     locale_dir = os.path.join(path, 'i18n')
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
@@ -3223,51 +3225,26 @@ def gui():
         locale_dir = os.path.join(locale_dir, 'i18n')
         # locale_dir = os.path.join(locale_dir, lang)
         # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-    # print("LISTDIR: ", os.listdir(locale_dir))
-    install_language(lang)  # Install language files on every start, so updates are reflected
-    # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
-    translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-    if lang in ["de", "es", "fr", "it", "ja", "pt", "sv", "zh"]:
-        # qt translator applies to ui designed GUI widgets only
-        # qt_locale_dir = os.path.join(locale_dir, lang)
-        # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
-        # print("qt qm translation file: ", qt_locale_file)
+    # print("LISTDIR: ", os.listdir(locale_dir))'''
+    if lang != 'en':
+        install_language(lang)
+        # Qt translation for GUIs
         qt_translator = QtCore.QTranslator()
-        # qt_translator.load(qt_locale_file)
-        ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
-        A solution to this error [Errno 13] Permission denied:
-        Replace 'lang' with the short language name, e.g. app_de.qm '''
         if qt_translator.isEmpty():
-            print("trying to load translation qm file from .qualcoder folder")
-            qm = os.path.join(home, '.qualcoder')
-            qm = os.path.join(qm, f"app_{lang}.qm")
-            print("qm file located at: ", qm)
+            # print("trying to load translation qm file from .qualcoder folder")
+            qm = os.path.join(home, '.qualcoder', f'{lang}.qm')
             qt_translator.load(qm)
-            '''if qt_translator.isEmpty():
-                print(f"Installing app_{lang}.qm to .qualcoder folder")
-                install_language(lang)
-                qt_translator.load(qm)'''
         app.installTranslator(qt_translator)
-        '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
-        A solution to this [Errno 13] Permission denied:
-        Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
-        Replace 'lang' with the language short name e.g. de, el, es ...
-        '''
+        
+        # gettext translations for code strings
+        config_dir = os.path.join(home, '.qualcoder')
         try:
-            translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
-            print("locale directory for python translations: ", locale_dir)
+            translator = gettext.translation(lang, localedir=config_dir, languages=[lang])
+            translator.install()
         except Exception as err:
-            print("Error accessing python translations mo file\n", err)
-            print("Locale directory for python translations: ", locale_dir)
-            try:
-                print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
-                mo_dir = os.path.join(home, '.qualcoder')
-                translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-            except Exception as err2:
-                print(f"No {lang}.mo translation file loaded", err2)
-    translator.install()
-    # Check DroidSandMono installed  - for wordcloud
-    install_droid_sans_mono()
+            print(err)
+            logger.error(err)
+
     ex = MainWindow(qual_app)
     try:
         if project_path:
@@ -3291,57 +3268,30 @@ def gui():
 
 
 def install_language(lang):
-    """ Mainly for pyinstaller on Windows, as cannot access language data files.
-    So, recreate them from base64 data into home/.qualcoder folder.
-    Install Qt translation file into folder .qualcoder/app_lang.qm
-    Install poedit.mo file into folder .qualcoder/lang/LC_MESSAGES/lang.mo
+    """ Install Qt qm and .mo files into config folder .qualcoder.
+    Strict directory structure for gettext base dir/lang/LC_MESSAGES/lang.mo
+    args:
+        lang: String 2 letter code
     """
 
-    qm = os.path.join(home, '.qualcoder')
-    qm = os.path.join(qm, f'app_{lang}.qm')
-    qm_data = None
-    mo_data = None
-    if lang == "de":
-        qm_data = de_qm
-        mo_data = de_mo
-    if lang == "es":
-        qm_data = es_qm
-        mo_data = es_mo
-    if lang == "fr":
-        qm_data = fr_qm
-        mo_data = fr_mo
-    if lang == "it":
-        qm_data = it_qm
-        mo_data = it_mo
-    if lang == "ja":
-        qm_data = ja_qm
-        mo_data = ja_mo
-    if lang == "pt":
-        qm_data = pt_qm
-        mo_data = pt_mo
-    if lang == "sv":
-        qm_data = sv_qm
-        mo_data = sv_mo
-    if lang == "zh":
-        qm_data = zh_qm
-        mo_data = zh_mo
-    if qm_data is None or mo_data is None:
-        return
-    with open(qm, 'wb') as file_:
-        decoded_data = base64.decodebytes(qm_data)
-        file_.write(decoded_data)
-    mo_path = os.path.join(home, '.qualcoder')
-    mo_path = os.path.join(mo_path, lang)
-    if not os.path.exists(mo_path):
-        os.mkdir(mo_path)
-    mo_path = os.path.join(mo_path, "LC_MESSAGES")
-    if not os.path.exists(mo_path):
-        os.mkdir(mo_path)
-    mo = os.path.join(mo_path, lang + ".mo")
-    with open(mo, 'wb') as file_:
-        decoded_data = base64.decodebytes(mo_data)
-        file_.write(decoded_data)
-
+    config_path = os.path.join(home, '.qualcoder')
+    i18n_dir = os.path.join(Path(__file__).parent, 'i18n')
+    try:
+        shutil.copy(os.path.join(i18n_dir, f'{lang}.qm'), os.path.join(config_path, f'{lang}.qm'))
+    except Exception as err:
+        print(err)
+    if not os.path.exists(os.path.join(config_path, lang)):
+        os.mkdir(os.path.join(config_path, lang))
+    if not os.path.exists(os.path.join(config_path,lang, 'LC_MESSAGES')):
+        os.mkdir(os.path.join(config_path,lang, 'LC_MESSAGES'))
+    source = os.path.join(i18n_dir, f'{lang}.mo')
+    # Check source and if not present, check .qualcoder folder for an alternative source
+    if not os.path.exists(source):
+        source = os.path.join(config_path, f'{lang}.mo')
+    try:
+        shutil.copy(source, os.path.join(config_path,lang, 'LC_MESSAGES', f'{lang}.mo'))
+    except Exception as err:
+        print(err)
 
 def install_droid_sans_mono():
     """ Install DroidSansMono ttf font for wordclouds into .qualcoder folder """
