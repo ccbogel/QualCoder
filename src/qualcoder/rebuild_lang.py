@@ -33,22 +33,15 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from lxml import etree
 import os
-from pathlib import Path
-import polib
 import subprocess
 import sys
+import polib
+from lxml import etree
 from typing import Dict, Any, List
 
-project_root = os.path.dirname(os.path.abspath(__file__))
-i18n_directory = os.path.join(project_root, "src", "qualcoder", "i18n")
-# SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ro', 'sv', 'zh']
-supported_languages = []
-for root, dirs, files in os.walk(i18n_directory):
-    for file in files:
-        if len(Path(file).stem) == 2 and Path(file).stem not in supported_languages:
-            supported_languages.append(Path(file).stem)
+SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ro', 'sv', 'zh']
+
 
 def extract_pot_file(directory, pot_filename):
     """ Called by: update_translation_placeholders """
@@ -118,7 +111,7 @@ def update_qt_ts_files(lang_=None):
         lang : String es, fr, etc
     """
 
-    translation_files = [f"{lang}.ts" for lang in supported_languages]
+    translation_files = [f"{lang}.ts" for lang in SUPPORTED_LANGUAGES]
 
     if lang_ is not None:
         translation_files = [f for f in translation_files if f.startswith(f"{lang_}")]
@@ -143,7 +136,14 @@ def update_qt_ts_files(lang_=None):
 
     ts_files = []
     for t in translation_files:
-        ts_files.append(rel_for_pro(i18n_directory) + "/" + t)
+        print(t)
+        '''if lang_ is not None:
+            ts_path = os.path.join(i18n_directory, t)
+        else:
+            lang_from_file = t.replace("app_", "").replace(".ts", "")
+            ts_path = os.path.join(script_path, "src", "qualcoder", "i18n", lang_from_file, t)'''
+        #ts_files.append(rel_for_pro(ts_path))
+        ts_files.append(rel_for_pro(i18n_directory))
 
     text = "SOURCES = \\\n"
     text += " \\\n".join(ui_files)
@@ -157,9 +157,7 @@ def update_qt_ts_files(lang_=None):
     print("Created project.pro file")
     
     # Compile ts files
-    print("pro_file_path", pro_file_path)
     subprocess.call(f'pylupdate5 "{pro_file_path}"', shell=True)
-    # Error here: pylupdate5 error: Cannot save '../i18n'
     print("Updated ts translation files")
     
     # Delete old .ts files
@@ -187,15 +185,19 @@ def recompile_translation(language=None):
      This is a user path environment variable """
 
     project_root = os.path.dirname(os.path.abspath(__file__))
-    language_list = supported_languages
+    language_list = SUPPORTED_LANGUAGES
     if language in language_list:
         language_list = [language]
 
     # GETTEXT TRANSLATION
     # .po-files
-    po_files = [os.path.join(i18n_directory, f'{lang_}.po') for lang_ in language_list]
+    po_dir = os.path.join(project_root, "src", "qualcoder", "i18n")
+    po_files = [os.path.join(po_dir, f'{lang_}.po') for lang_ in language_list]
+
     # .mo-files
-    mo_files = [os.path.join(i18n_directory, f'{lang_}.mo') for lang_ in language_list]
+    mo_basedir = os.path.join(project_root, "src", "qualcoder", "i18n")
+    #mo_files = [os.path.join(mo_basedir, lang_, 'LC_MESSAGES', f'{lang_}.mo') for lang_ in language_list]
+    mo_files = [os.path.join(mo_basedir, f'{lang_}.mo') for lang_ in language_list]
 
     for po_file, mo_file in zip(po_files, mo_files):
         if os.path.exists(po_file):
@@ -210,12 +212,15 @@ def recompile_translation(language=None):
                     print(f'Skipping "{mo_file}".')
 
     # Qt TRANSLATIONS
+
     # .ts-files
     ts_dir = os.path.join(project_root, "src", "qualcoder", 'i18n')
     ts_files = [os.path.join(ts_dir, f'{lang_}.ts') for lang_ in language_list]
 
     # .qm-files
-    qm_files = [os.path.join(i18n_directory, f'{lang_}.qm') for lang_ in language_list]
+    qm_basedir = os.path.join(project_root, "src", "qualcoder", "i18n")
+    #qm_files = [os.path.join(qm_basedir, lang_, f'{lang_}.qm') for lang_ in language_list]
+    qm_files = [os.path.join(qm_basedir, f'{lang_}.qm') for lang_ in language_list]
 
     for ts_file, qm_file in zip(ts_files, qm_files):
         if os.path.exists(ts_file):
@@ -227,6 +232,14 @@ def recompile_translation(language=None):
                     print(f"{qm_file} has been updated.")
                 else:
                     print(f'Skipping "{qm_file}".')
+
+    '''# Update base_64_lang_helper.py
+    answer = input(f'Do you want to update "base_64_lang_helper.py"? (y/n)')
+    if answer == 'y':
+        os.chdir(os.path.join(project_root, "src", 'qualcoder', 'i18n'))
+        cmd = os.path.join(project_root, "src", 'qualcoder', 'i18n', 'create_lang_script_base64.py')
+        subprocess.call(cmd, shell=True)
+        print('Updated base_64_lang_helper.py')'''
     print("Finished")
 
 
@@ -285,7 +298,7 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
 def analyze_translation_status(language: str = None) -> str:
     """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report."""
     project_root = os.path.dirname(os.path.abspath(__file__))
-    languages = supported_languages   # fix this bit later
+    languages = SUPPORTED_LANGUAGES
     if language and language in languages:
         languages = [language]
 
@@ -298,6 +311,7 @@ def analyze_translation_status(language: str = None) -> str:
                 "po",
             ),
             "qt": analyze_translation_file(
+                #os.path.join(project_root, "src", "qualcoder", "GUI", f"app_{lang}.ts"),
                 os.path.join(project_root, "src", "qualcoder", "i18n", f"{lang}.ts"),
                 "ts",
             ),
