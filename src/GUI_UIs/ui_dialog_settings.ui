@@ -375,9 +375,10 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="toolTip">
                 <string>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
-Additional languages can be added if they are listed in the src/qualcoder/i18n folder. To do this update the config.ini  file to another language that is available. Find the line begining language = 
-Then update it.
-For example: 
+Additional languages can be added if they are listed in the src/qualcoder/i18n folder. 
+To do this update the config.ini  file to another language that is available. 
+Find the line begining language = 
+Then update it. For example: 
 langauge = it</string>
                </property>
               </widget>
