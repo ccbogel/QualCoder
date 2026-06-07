@@ -3216,7 +3216,7 @@ def gui():
     lang = settings.get('language', 'en')
     i18n_dir = os.path.join(path, 'i18n')
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')
+        i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')  # For pyinstaller: abs path to bundled files
 
     translator = gettext.NullTranslations()
     if lang != 'en':
@@ -3238,7 +3238,7 @@ def gui():
         if project_path:
             split_ = project_path.split("|")
             proj_path = ""
-            # Only the path - older and rarer format - legacy
+            # Only the path - legacy format
             if len(split_) == 1:
                 proj_path = split_[0]
             # Newer datetime | path
@@ -3253,6 +3253,7 @@ def gui():
         qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
     sys.exit(app.exec())
+
 
 def install_droid_sans_mono():
     """ Install DroidSansMono ttf font for wordclouds into .qualcoder folder """
