@@ -24,6 +24,7 @@ datas += copy_metadata('huggingface-hub')
 datas += copy_metadata('pyyaml')
 datas += copy_metadata('torch')
 datas += copy_metadata('tokenizers')
+datas += [('src/qualcoder/i18n', 'qualcoder/i18n')]
 datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('transformers')
