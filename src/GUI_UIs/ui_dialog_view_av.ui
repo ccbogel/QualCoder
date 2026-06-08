@@ -375,7 +375,7 @@ red underline = Assigned to code or annotation</string>
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>96</x>
         <y>3</y>
         <width>161</width>
         <height>30</height>
@@ -509,11 +509,14 @@ red underline = Assigned to code or annotation</string>
      <widget class="QCheckBox" name="checkBox_case_sensitive">
       <property name="geometry">
        <rect>
-        <x>208</x>
+        <x>38</x>
         <y>7</y>
         <width>21</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Case sensitive</string>
       </property>
       <property name="text">
        <string/>
@@ -522,7 +525,7 @@ red underline = Assigned to code or annotation</string>
      <widget class="QLabel" name="label_case_sensitive">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>60</x>
         <y>4</y>
         <width>28</width>
         <height>28</height>
@@ -539,6 +542,9 @@ red underline = Assigned to code or annotation</string>
         <width>28</width>
         <height>28</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>Case sensitive</string>
       </property>
       <property name="text">
        <string/>
