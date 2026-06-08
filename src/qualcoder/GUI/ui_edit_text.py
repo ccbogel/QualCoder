@@ -72,7 +72,7 @@ class Ui_Dialog_edit_text(object):
         self.label_case_sensitive.setToolTip(_translate("Dialog_edit_text", "Case sensitive"))
         self.pushButton_previous.setToolTip(_translate("Dialog_edit_text", "Previous"))
         self.checkBox_case_sensitive.setToolTip(_translate("Dialog_edit_text", "Case sensitive"))
-        self.lineEdit_search.setToolTip(_translate("Dialog_edit_text", "<html><head/><body><p>Search for text.</p></body></html>"))
+        self.lineEdit_search.setToolTip(_translate("Dialog_edit_text", "Search for text."))
         self.pushButton_next.setToolTip(_translate("Dialog_edit_text", "Next"))
         self.label.setText(_translate("Dialog_edit_text", "When editing text: Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.\n"
 "Positions may not correctly adjust. Make  a backup copy of the project before editing text.\n"
