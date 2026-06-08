@@ -543,6 +543,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_edit_next.clicked.connect(lambda pressed: self.edit_mode_find("next"))
         self.ui.pushButton_edit_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_edit_prev.clicked.connect(lambda pressed: self.edit_mode_find("previous"))
+        self.ui.label_edit_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
+        self.ui.checkBox_edit_case_sensitive.stateChanged.connect(self.edit_mode_find)
         self.ui.lineEdit_edit_search.returnPressed.connect(self.edit_mode_find)
         self.edit_pos = 0
         self.edit_mode = False
@@ -6696,8 +6698,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if search_term == "":
             return
         pattern = None
+        flags = 0
+        if not self.ui.checkBox_edit_case_sensitive.isChecked():
+            flags |= re.IGNORECASE
         try:
-            pattern = re.compile(search_term)
+            pattern = re.compile(search_term, flags)
         except re.error as err:
             logger.warning(f're module error Bad escape {err}')
         if pattern is None:
