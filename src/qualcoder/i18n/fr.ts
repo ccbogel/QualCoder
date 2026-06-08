@@ -2461,39 +2461,41 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
       <location filename="../GUI/ui_edit_text.py" line="70"/>
       <source>Memo</source>
-      <translation type="unfinished">Mémo</translation>
+      <translation>Mémo</translation>
     </message>
     <message>
       <location filename="../GUI/ui_edit_text.py" line="71"/>
       <source>Clear</source>
-      <translation type="unfinished"/>
+      <translation>Effacer</translation>
     </message>
     <message>
       <location filename="../GUI/ui_edit_text.py" line="74"/>
       <source>Case sensitive</source>
-      <translation type="unfinished">Sensible à la casse</translation>
+      <translation>Sensible à la casse</translation>
     </message>
     <message>
       <location filename="../GUI/ui_edit_text.py" line="73"/>
       <source>Previous</source>
-      <translation type="unfinished">Précédent</translation>
+      <translation>Précédent</translation>
     </message>
     <message>
       <location filename="../GUI/ui_edit_text.py" line="76"/>
       <source>Next</source>
-      <translation type="unfinished">Suivant</translation>
+      <translation>Suivant</translation>
     </message>
     <message>
       <location filename="../GUI/ui_edit_text.py" line="77"/>
       <source>When editing text: Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.
 Positions may not correctly adjust. Make  a backup copy of the project before editing text.
 </source>
-      <translation type="unfinished"/>
+      <translation>Lors de la modification du texte : évitez de sélectionner des combinaisons de texte comprenant à la fois des sections non marquées et des sections codées, annotées ou associées à un dossier.
+Le positionnement risque de ne pas s'ajuster correctement. Effectuez une copie de sauvegarde du projet avant de modifier le texte.
+</translation>
     </message>
     <message>
       <location filename="../GUI/ui_edit_text.py" line="75"/>
       <source>Search for text.</source>
-      <translation type="unfinished">Recherchez le texte.</translation>
+      <translation>Recherchez le texte.</translation>
     </message>
   </context>
   <context>

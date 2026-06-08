@@ -45,6 +45,7 @@ ui_dialog_start_and_end_marks.py \
 ui_dialog_view_av.py \
 ui_dialog_view_image.py \
 ui_dialog_view_text.py \
+ui_edit_text.py \
 ui_error_dlg.py \
 ui_import_twitter.py \
 ui_main.py \
@@ -59,6 +60,14 @@ ui_save_query.py \
 ui_special_functions.py
 
 TRANSLATIONS = \
-../i18n/fr.ts
+../i18n/pt.ts \
+../i18n/sv.ts \
+../i18n/zh.ts \
+../i18n/ja.ts \
+../i18n/ro.ts \
+../i18n/es.ts \
+../i18n/de.ts \
+../i18n/fr.ts \
+../i18n/it.ts
 
 CODECFORTR = ISO-8859-5

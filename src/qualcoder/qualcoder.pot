@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 08:57+0200\n"
+"POT-Creation-Date: 2026-06-08 10:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:584
+#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
 #: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
 #: src/qualcoder/report_sql.py:436
 msgid "Copy"
@@ -3871,37 +3871,7 @@ msgstr ""
 msgid "Proportion: "
 msgstr ""
 
-#: src/qualcoder/edit_textfile.py:78
-msgid ""
-"Avoid selecting text combinations of unmarked text sections and coded/"
-"annotated/case-assigned sections."
-msgstr ""
-
-#: src/qualcoder/edit_textfile.py:79
-msgid "Positions may not correctly adjust."
-msgstr ""
-
-#: src/qualcoder/edit_textfile.py:80
-msgid ""
-"Do not code this text until you reload Coding - Code Text from the menu bar."
-msgstr ""
-
-#: src/qualcoder/edit_textfile.py:85 src/qualcoder/view_av.py:4450
-#: src/qualcoder/code_text.py:535
-msgid ""
-"Avoid selecting sections of text with a combination of not underlined (not "
-"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
-"assigned)."
-msgstr ""
-
-#: src/qualcoder/edit_textfile.py:87 src/qualcoder/view_av.py:4452
-#: src/qualcoder/code_text.py:538
-msgid ""
-"Positions of the underlying codes / annotations / case-assigned may not "
-"correctly adjust if text is typed over or deleted."
-msgstr ""
-
-#: src/qualcoder/edit_textfile.py:583 src/qualcoder/case_file_manager.py:448
+#: src/qualcoder/edit_textfile.py:654 src/qualcoder/case_file_manager.py:448
 #: src/qualcoder/report_exact_matches.py:732 src/qualcoder/cases.py:1101
 #: src/qualcoder/speakers.py:289 src/qualcoder/report_relations.py:561
 #: src/qualcoder/report_sql.py:435
@@ -5757,6 +5727,19 @@ msgstr ""
 msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
+msgstr ""
+
+#: src/qualcoder/view_av.py:4450 src/qualcoder/code_text.py:535
+msgid ""
+"Avoid selecting sections of text with a combination of not underlined (not "
+"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
+"assigned)."
+msgstr ""
+
+#: src/qualcoder/view_av.py:4452 src/qualcoder/code_text.py:538
+msgid ""
+"Positions of the underlying codes / annotations / case-assigned may not "
+"correctly adjust if text is typed over or deleted."
 msgstr ""
 
 #: src/qualcoder/view_av.py:4928

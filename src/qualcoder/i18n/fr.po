@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 08:15+0200\n"
+"POT-Creation-Date: 2026-06-08 10:15+0200\n"
 "PO-Revision-Date: 2026-06-08 09:03+0200\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Gtranslator 50.0\n"
 
-#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:584
+#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
 #: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
 #: src/qualcoder/report_sql.py:436
 msgid "Copy"
@@ -4028,46 +4028,7 @@ msgstr "Intersection : "
 msgid "Proportion: "
 msgstr "Proportion : "
 
-#: src/qualcoder/edit_textfile.py:78
-msgid ""
-"Avoid selecting text combinations of unmarked text sections and coded/"
-"annotated/case-assigned sections."
-msgstr ""
-"Évitez de combiner des sections de texte non marquées avec des sections "
-"codées/annotées/cassées."
-
-#: src/qualcoder/edit_textfile.py:79
-msgid "Positions may not correctly adjust."
-msgstr "Les positions peuvent ne pas s'ajuster correctement."
-
-#: src/qualcoder/edit_textfile.py:80
-msgid ""
-"Do not code this text until you reload Coding - Code Text from the menu bar."
-msgstr ""
-"Ne codez pas ce texte avant d'avoir rechargé Codage - Code de texte dans la "
-"barre de menu."
-
-#: src/qualcoder/edit_textfile.py:85 src/qualcoder/view_av.py:4450
-#: src/qualcoder/code_text.py:535
-msgid ""
-"Avoid selecting sections of text with a combination of not underlined (not "
-"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
-"assigned)."
-msgstr ""
-"Évitez de sélectionner des sections de texte avec une combinaison de non "
-"souligné (non codé / annoté / attribué à un cas) et souligné (codé, annoté, "
-"attribué à un cas)."
-
-#: src/qualcoder/edit_textfile.py:87 src/qualcoder/view_av.py:4452
-#: src/qualcoder/code_text.py:538
-msgid ""
-"Positions of the underlying codes / annotations / case-assigned may not "
-"correctly adjust if text is typed over or deleted."
-msgstr ""
-"Les codes/annotations/cas attribués peuvent être mal alignés si le texte est "
-"modifié."
-
-#: src/qualcoder/edit_textfile.py:583 src/qualcoder/case_file_manager.py:448
+#: src/qualcoder/edit_textfile.py:654 src/qualcoder/case_file_manager.py:448
 #: src/qualcoder/report_exact_matches.py:732 src/qualcoder/cases.py:1101
 #: src/qualcoder/speakers.py:289 src/qualcoder/report_relations.py:561
 #: src/qualcoder/report_sql.py:435
@@ -6003,6 +5964,24 @@ msgstr ""
 "Zone de transcription : Ctrl+T (insérer un horodatage) Ctrl+N (nouvel "
 "intervenant) Ctrl+1-8 (sélectionner un intervenant) Ctrl+D (supprimer un "
 "intervenant)"
+
+#: src/qualcoder/view_av.py:4450 src/qualcoder/code_text.py:535
+msgid ""
+"Avoid selecting sections of text with a combination of not underlined (not "
+"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
+"assigned)."
+msgstr ""
+"Évitez de sélectionner des sections de texte avec une combinaison de non "
+"souligné (non codé / annoté / attribué à un cas) et souligné (codé, annoté, "
+"attribué à un cas)."
+
+#: src/qualcoder/view_av.py:4452 src/qualcoder/code_text.py:538
+msgid ""
+"Positions of the underlying codes / annotations / case-assigned may not "
+"correctly adjust if text is typed over or deleted."
+msgstr ""
+"Les codes/annotations/cas attribués peuvent être mal alignés si le texte est "
+"modifié."
 
 #: src/qualcoder/view_av.py:4928
 msgid "Select name to delete"
@@ -8226,6 +8205,23 @@ msgstr " commence avec : "
 #: src/qualcoder/GUI/special_functions.py:54
 msgid "Uncaught Exception"
 msgstr "Uncaught Exception"
+
+#~ msgid ""
+#~ "Avoid selecting text combinations of unmarked text sections and coded/"
+#~ "annotated/case-assigned sections."
+#~ msgstr ""
+#~ "Évitez de combiner des sections de texte non marquées avec des sections "
+#~ "codées/annotées/cassées."
+
+#~ msgid "Positions may not correctly adjust."
+#~ msgstr "Les positions peuvent ne pas s'ajuster correctement."
+
+#~ msgid ""
+#~ "Do not code this text until you reload Coding - Code Text from the menu "
+#~ "bar."
+#~ msgstr ""
+#~ "Ne codez pas ce texte avant d'avoir rechargé Codage - Code de texte dans "
+#~ "la barre de menu."
 
 #, fuzzy
 #~ msgid "Codes by XXX"
