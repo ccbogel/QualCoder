@@ -29,7 +29,7 @@ import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import unicodedata
 
-from GUI.ui_edit_text import Ui_Dialog_edit_text
+from .GUI.ui_edit_text import Ui_Dialog_edit_text
 from .helpers import MarkdownHighlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
