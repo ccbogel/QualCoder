@@ -320,8 +320,8 @@ def analyze_translation_status(language: str | None = None) -> str:
         "- 🟥: Untranslated",
         "- ❌: File missing or error",
         "",
-        "| Language | Progress | Gettext | Qt | **Total** | **Translated** | **% Complete** |",
-        "|----------|----------|---------|----|-----------|----------------|----------------|",
+        "| Language | Progress | Status  |",
+        "|----------|----------|---------|",
     ]
 
     for lang in languages:
@@ -372,7 +372,7 @@ def analyze_translation_status(language: str | None = None) -> str:
         # Generate combined progress bar
         progress_bar = generate_progress_bar(percent_complete, percent_partial)
         markdown_lines.append(
-            f"| {lang} | {progress_bar} | {gettext_str} | {qt_str} | **{total_entries}** | **{total_translated}** | **{percent_complete:.1f}%** |"
+            f"| {lang} | {progress_bar} {percent_complete:.1f}% ({total_translated} / {total_entries}) | |"
         )
     markdown_lines.extend(
         ["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."])
