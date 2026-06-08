@@ -4517,6 +4517,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
         # Search text in transcription
         self.ui.label_search_regex.setPixmap(qta.icon('mdi6.text-search').pixmap(22, 22))
+        self.ui.label_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
@@ -4526,6 +4527,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        self.ui.checkBox_case_sensitive.stateChanged.connect(self.search_for_text)
         # Transcription buttons
         self.ui.pushButton_new_speaker.setIcon(qta.icon('mdi6.account-plus-outline'))
         self.ui.pushButton_new_speaker.setToolTip("Ctrl+N")
@@ -5265,7 +5267,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is three or more characters long.
         Resets current search_index.
-        NOT IMPLEMENTED If case sensitive is checked then text searched is matched for case sensitivity.
+        If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
         if not self.search_indices:
@@ -5279,8 +5281,8 @@ class DialogViewAV(QtWidgets.QDialog):
             return
         pattern = None
         flags = 0
-        '''if not self.ui.checkBox_search_case.isChecked():
-            flags |= re.IGNORECASE'''
+        if not self.ui.checkBox_case_sensitive.isChecked():
+            flags |= re.IGNORECASE
         try:
             pattern = re.compile(search_term, flags)
         except Exception as e_:
