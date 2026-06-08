@@ -112,7 +112,7 @@ class Ui_Dialog_view_av(object):
         self.groupBox_search_text.setTitle("")
         self.groupBox_search_text.setObjectName("groupBox_search_text")
         self.lineEdit_search = QtWidgets.QLineEdit(parent=self.groupBox_search_text)
-        self.lineEdit_search.setGeometry(QtCore.QRect(40, 3, 161, 30))
+        self.lineEdit_search.setGeometry(QtCore.QRect(96, 3, 161, 30))
         self.lineEdit_search.setObjectName("lineEdit_search")
         self.pushButton_next = QtWidgets.QPushButton(parent=self.groupBox_search_text)
         self.pushButton_next.setGeometry(QtCore.QRect(290, 3, 28, 28))
@@ -146,11 +146,11 @@ class Ui_Dialog_view_av(object):
         self.pushButton_remove_speaker.setGeometry(QtCore.QRect(650, 3, 161, 30))
         self.pushButton_remove_speaker.setObjectName("pushButton_remove_speaker")
         self.checkBox_case_sensitive = QtWidgets.QCheckBox(parent=self.groupBox_search_text)
-        self.checkBox_case_sensitive.setGeometry(QtCore.QRect(208, 7, 21, 24))
+        self.checkBox_case_sensitive.setGeometry(QtCore.QRect(38, 7, 21, 24))
         self.checkBox_case_sensitive.setText("")
         self.checkBox_case_sensitive.setObjectName("checkBox_case_sensitive")
         self.label_case_sensitive = QtWidgets.QLabel(parent=self.groupBox_search_text)
-        self.label_case_sensitive.setGeometry(QtCore.QRect(230, 4, 28, 28))
+        self.label_case_sensitive.setGeometry(QtCore.QRect(60, 4, 28, 28))
         self.label_case_sensitive.setMinimumSize(QtCore.QSize(28, 28))
         self.label_case_sensitive.setMaximumSize(QtCore.QSize(28, 28))
         self.label_case_sensitive.setText("")
@@ -216,6 +216,8 @@ class Ui_Dialog_view_av(object):
         self.pushButton_new_speaker.setText(_translate("Dialog_view_av", "New speaker"))
         self.pushButton_insert_timestamp.setToolTip(_translate("Dialog_view_av", "Insert timestamp"))
         self.pushButton_remove_speaker.setText(_translate("Dialog_view_av", "Remove Speaker"))
+        self.checkBox_case_sensitive.setToolTip(_translate("Dialog_view_av", "Case sensitive"))
+        self.label_case_sensitive.setToolTip(_translate("Dialog_view_av", "Case sensitive"))
 
 
 if __name__ == "__main__":
