@@ -126,10 +126,7 @@ def update_qt_ts_files(lang_: str | None = None):
         translation_files = [f for f in translation_files if f.startswith(f"{lang_}")]
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
-    if lang_ is not None:
-        i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n", lang_)
-    else:
-        i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
+    i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
 
     # Build a .pro file, which can then be used by pylupdate5 to create ts files
     def rel_for_pro(path):
@@ -161,7 +158,7 @@ def update_qt_ts_files(lang_: str | None = None):
 
     # Delete old .ts files
     for ts_file in translation_files:
-        ts_path = os.path.join(gui_directory, ts_file)
+        ts_path = os.path.join(i18n_directory, ts_file)
         if os.path.exists(ts_path):
             delete_obsolete_ts(ts_path)
             print(f"Cleaned obsolete entries in {ts_file}")
