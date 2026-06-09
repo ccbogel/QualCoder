@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 18:05+1000\n"
+"POT-Creation-Date: 2026-06-08 10:17+0200\n"
 "PO-Revision-Date: 2026-06-02 22:44+0200\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
@@ -21,94 +21,161 @@ msgstr ""
 "X-Language: ro\n"
 "X-Source-Language: en\n"
 
-#: src\qualcoder\add_attribute.py:76
-msgid "This attribute name already exists in cases, files or journals."
-msgstr "Numele acestui atribut există deja în cazuri, fișiere sau jurnale."
+#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
+#: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
+#: src/qualcoder/report_sql.py:436
+msgid "Copy"
+msgstr "Copiați"
 
-#: src\qualcoder\add_attribute.py:77
-msgid "Or is reserved for bibliography attributes:"
-msgstr "Sau este rezervat pentru atributele bibliografice:"
+#: src/qualcoder/error_dlg.py:45
+msgid "Copy error message and traceback to the clipboard."
+msgstr "Copiați mesajul de eroare și traceback-ul în clipboard."
 
-#: src\qualcoder\add_attribute.py:79
-msgid "Duplicate"
-msgstr "Duplicat"
+#: src/qualcoder/error_dlg.py:65
+msgid "Exception handler"
+msgstr "Gestionare excepții"
 
-#: src\qualcoder\add_item_name.py:77
-msgid "Duplicated"
-msgstr "Duplicat"
+#: src/qualcoder/error_dlg.py:95 src/qualcoder/ai_llm.py:704
+#: src/qualcoder/ai_vectorstore.py:64 src/qualcoder/ai_chat.py:1311
+#: src/qualcoder/GUI/special_functions.py:53
+msgid "Uncaught exception: "
+msgstr "Excepție neprinsă: "
 
-#: src\qualcoder\add_item_name.py:77
-msgid "This already exists"
-msgstr "Acesta există deja"
+#: src/qualcoder/report_file_summary.py:116
+#: src/qualcoder/report_file_summary.py:175 src/qualcoder/code_pdf.py:2852
+#: src/qualcoder/code_pdf.py:2943 src/qualcoder/view_image.py:772
+#: src/qualcoder/view_image.py:846
+#: src/qualcoder/report_compare_coder_file.py:169
+#: src/qualcoder/report_compare_coder_file.py:228 src/qualcoder/view_av.py:777
+#: src/qualcoder/view_av.py:874 src/qualcoder/code_text.py:5032
+#: src/qualcoder/code_text.py:5137
+msgid "Show files like"
+msgstr "Afișați fișiere precum"
 
-#: src\qualcoder\ai_chat.py:93
-msgid "<your question>"
-msgstr "<întrebarea ta>"
+#: src/qualcoder/report_file_summary.py:117 src/qualcoder/code_pdf.py:2853
+#: src/qualcoder/view_image.py:774
+#: src/qualcoder/report_compare_coder_file.py:170 src/qualcoder/view_av.py:779
+#: src/qualcoder/code_text.py:5033
+msgid "Show files by attributes"
+msgstr "Afișați fișierele după atribute"
 
-#: src\qualcoder\ai_chat.py:288 src\qualcoder\ai_chat.py:303
-#: src\qualcoder\ai_chat.py:329 src\qualcoder\ai_chat.py:452
-#: src\qualcoder\ai_chat.py:679
-msgid "No project open."
-msgstr "Niciun proiect deschis."
+#: src/qualcoder/report_file_summary.py:118 src/qualcoder/code_pdf.py:2854
+#: src/qualcoder/view_image.py:773
+#: src/qualcoder/report_compare_coder_file.py:171 src/qualcoder/view_av.py:778
+#: src/qualcoder/code_text.py:5034
+msgid "Show case files"
+msgstr "Afișați fișierele cazului"
 
-#: src\qualcoder\ai_chat.py:289 src\qualcoder\ai_chat.py:293
-#: src\qualcoder\ai_chat.py:304 src\qualcoder\ai_chat.py:308
-#: src\qualcoder\ai_chat.py:330 src\qualcoder\ai_chat.py:334
-#: src\qualcoder\ai_chat.py:453 src\qualcoder\ai_chat.py:457
-#: src\qualcoder\ai_chat.py:680 src\qualcoder\ai_chat.py:684
-#: src\qualcoder\ai_chat.py:1161
-msgid "AI not enabled"
-msgstr "AI nu este activat"
+#: src/qualcoder/report_file_summary.py:119 src/qualcoder/code_pdf.py:2857
+#: src/qualcoder/view_image.py:777
+#: src/qualcoder/report_codes_by_segments.py:286
+#: src/qualcoder/report_compare_coder_file.py:172
+#: src/qualcoder/report_codes.py:339 src/qualcoder/report_codes.py:386
+#: src/qualcoder/view_av.py:782 src/qualcoder/code_text.py:5044
+msgid "Sort by name ascending"
+msgstr "Sortare după nume ascendent"
 
-#: src\qualcoder\ai_chat.py:292 src\qualcoder\ai_chat.py:307
-#: src\qualcoder\ai_chat.py:333 src\qualcoder\ai_chat.py:456
-#: src\qualcoder\ai_chat.py:683 src\qualcoder\ai_chat.py:1160
-#: src\qualcoder\code_text.py:7218
-msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
-msgstr "AI este dezactivat. Accesați mai întâi „AI > Asistent de configurare“."
+#: src/qualcoder/report_file_summary.py:120 src/qualcoder/code_pdf.py:2858
+#: src/qualcoder/view_image.py:778
+#: src/qualcoder/report_codes_by_segments.py:287
+#: src/qualcoder/report_compare_coder_file.py:173
+#: src/qualcoder/report_codes.py:340 src/qualcoder/report_codes.py:387
+#: src/qualcoder/view_av.py:783 src/qualcoder/code_text.py:5045
+msgid "Sort by name descending"
+msgstr "Sortare după nume descendent"
 
-#: src\qualcoder\ai_chat.py:311
-msgid ""
-"We will now switch to the text coding workspace.\n"
-" There you can open a document, select a piece of text, right click on it "
-"and choose \"AI Text Analysis\" from the context menu."
-msgstr ""
-"Vom trece acum la spațiul de lucru pentru codarea textului.\n"
-" Aici puteți deschide un document, selecta un fragment de text, faceți clic "
-"dreapta pe el și alegeți „Analiză text AI“ din meniul contextual."
+#: src/qualcoder/report_file_summary.py:121 src/qualcoder/code_pdf.py:2859
+#: src/qualcoder/view_image.py:779
+#: src/qualcoder/report_compare_coder_file.py:174 src/qualcoder/view_av.py:784
+#: src/qualcoder/code_text.py:5046
+msgid "Sort by case ascending"
+msgstr "Sortare după caz ascendent"
 
-#: src\qualcoder\ai_chat.py:316 src\qualcoder\code_text.py:2247
-msgid "AI Text Analysis"
-msgstr "Analiză text AI"
+#: src/qualcoder/report_file_summary.py:122 src/qualcoder/code_pdf.py:2860
+#: src/qualcoder/view_image.py:780
+#: src/qualcoder/report_compare_coder_file.py:175 src/qualcoder/view_av.py:785
+#: src/qualcoder/code_text.py:5047
+msgid "Sort by case descending"
+msgstr "Sortare după caz descendent"
 
-#: src\qualcoder\ai_chat.py:386
-msgid ""
-"No codings found for this particuar combination of coder, document filter, "
-"and code."
-msgstr ""
-"Nu s-au găsit codări pentru această combinație specifică de codator, filtru "
-"de document și cod."
+#: src/qualcoder/report_file_summary.py:123 src/qualcoder/code_pdf.py:2861
+#: src/qualcoder/view_image.py:781
+#: src/qualcoder/report_codes_by_segments.py:288
+#: src/qualcoder/report_compare_coder_file.py:176
+#: src/qualcoder/report_codes.py:341 src/qualcoder/view_av.py:786
+#: src/qualcoder/code_text.py:5048
+msgid "Sort by date ascending"
+msgstr "Sortare după dată ascendent"
 
-#: src\qualcoder\ai_chat.py:387
-msgid "Code analysis"
-msgstr "Analiză cod"
+#: src/qualcoder/report_file_summary.py:124 src/qualcoder/code_pdf.py:2862
+#: src/qualcoder/view_image.py:782
+#: src/qualcoder/report_codes_by_segments.py:289
+#: src/qualcoder/report_compare_coder_file.py:177
+#: src/qualcoder/report_codes.py:342 src/qualcoder/view_av.py:787
+#: src/qualcoder/code_text.py:5049
+msgid "Sort by date descending"
+msgstr "Sortare după dată descendent"
 
-#: src\qualcoder\ai_chat.py:415
-msgid ""
-"No coded text found. Please select another code or category, or refine you "
-"filters."
-msgstr ""
-"Nu s-a găsit text codat. Vă rugăm să selectați un alt cod sau categorie, sau "
-"să rafinați filtrele."
+#: src/qualcoder/report_file_summary.py:152 src/qualcoder/code_pdf.py:2916
+#: src/qualcoder/view_image.py:817
+#: src/qualcoder/report_compare_coder_file.py:205 src/qualcoder/view_av.py:847
+#: src/qualcoder/code_text.py:5110
+msgid "Show all files"
+msgstr "Afișați toate fișierele"
 
-#: src\qualcoder\ai_chat.py:416
-msgid "AI code analysis"
-msgstr "Analiză cod AI"
+#: src/qualcoder/report_file_summary.py:153 src/qualcoder/code_pdf.py:2917
+#: src/qualcoder/view_image.py:818
+#: src/qualcoder/report_compare_coder_file.py:206 src/qualcoder/view_av.py:848
+#: src/qualcoder/code_text.py:5111
+msgid "Select case"
+msgstr "Selectați cazul"
 
-#: src\qualcoder\ai_chat.py:432
-msgid "Analyzing the data coded as \"{}\" ({} pieces of data sent to the AI.)"
-msgstr ""
-"Se analizează datele codate ca „{}” ({} fragmente de date trimise către AI.)"
+#: src/qualcoder/report_file_summary.py:178 src/qualcoder/code_pdf.py:2946
+#: src/qualcoder/view_image.py:849
+#: src/qualcoder/report_compare_coder_file.py:231 src/qualcoder/view_av.py:877
+#: src/qualcoder/code_text.py:5140
+msgid "Show files containing the text. (Blank for all)"
+msgstr "Afișați fișierele care conțin textul. (Gol pentru toate)"
+
+#: src/qualcoder/report_file_summary.py:210 src/qualcoder/code_pdf.py:496
+#: src/qualcoder/view_image.py:467
+#: src/qualcoder/report_codes_by_segments.py:252
+#: src/qualcoder/report_compare_coder_file.py:263 src/qualcoder/view_av.py:501
+#: src/qualcoder/report_cooccurrence.py:284
+#: src/qualcoder/report_exact_matches.py:276 src/qualcoder/code_text.py:1538
+#: src/qualcoder/report_relations.py:198 src/qualcoder/reports.py:153
+msgid "Nothing found"
+msgstr "Nimic găsit"
+
+#: src/qualcoder/report_file_summary.py:210 src/qualcoder/code_pdf.py:496
+#: src/qualcoder/view_image.py:467
+#: src/qualcoder/report_codes_by_segments.py:252
+#: src/qualcoder/report_compare_coder_file.py:263 src/qualcoder/view_av.py:501
+#: src/qualcoder/report_cooccurrence.py:284
+#: src/qualcoder/report_exact_matches.py:276 src/qualcoder/code_text.py:1538
+#: src/qualcoder/report_relations.py:198 src/qualcoder/reports.py:153
+msgid "No matching files found"
+msgstr "Nu s-au găsit fișiere care să corespundă"
+
+#: src/qualcoder/report_file_summary.py:240
+#: src/qualcoder/report_file_summary.py:583 src/qualcoder/code_pdf.py:397
+#: src/qualcoder/code_pdf.py:453 src/qualcoder/manage_files.py:1255
+#: src/qualcoder/manage_files.py:1261 src/qualcoder/manage_files.py:1264
+#: src/qualcoder/report_compare_coder_file.py:294
+#: src/qualcoder/report_codes.py:224 src/qualcoder/report_exact_matches.py:189
+#: src/qualcoder/code_text.py:1437 src/qualcoder/code_text.py:1494
+msgid "Characters: "
+msgstr "Caractere: "
+
+#: src/qualcoder/report_file_summary.py:253 src/qualcoder/code_pdf.py:392
+#: src/qualcoder/view_image.py:407 src/qualcoder/report_attributes.py:465
+#: src/qualcoder/report_compare_coder_file.py:311 src/qualcoder/helpers.py:435
+#: src/qualcoder/case_file_manager.py:96 src/qualcoder/report_codes.py:2437
+#: src/qualcoder/view_graph.py:2593 src/qualcoder/code_in_all_files.py:253
+#: src/qualcoder/view_av.py:449 src/qualcoder/view_charts.py:433
+#: src/qualcoder/view_charts.py:501 src/qualcoder/code_text.py:1435
+msgid "Case: "
+msgstr "Caz: "
 
 #: src\qualcoder\ai_chat.py:434
 msgid ""
@@ -154,13 +221,22 @@ msgstr ""
 "\n"
 "Descriere:"
 
-#: src\qualcoder\ai_chat.py:475
-msgid "Topic"
-msgstr "Temă"
+#: src/qualcoder/report_file_summary.py:303
+#: src/qualcoder/report_code_summary.py:380
+#: src/qualcoder/ai_search_dialog.py:476
+#: src/qualcoder/report_codes_by_segments.py:153 src/qualcoder/helpers.py:1457
+#: src/qualcoder/report_codes.py:270 src/qualcoder/report_codes.py:2396
+#: src/qualcoder/report_codes.py:3129 src/qualcoder/view_av.py:4358
+#: src/qualcoder/code_text.py:880
+msgid "MEMO: "
+msgstr "MEMO: "
 
-#: src\qualcoder\ai_chat.py:485
-msgid "Searching for related data..."
-msgstr "Se caută date conexe..."
+#: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:388
+#: src/qualcoder/view_image.py:402 src/qualcoder/view_av.py:444
+#: src/qualcoder/__main__.py:2423 src/qualcoder/code_text.py:1430
+#: src/qualcoder/reports.py:336
+msgid "Date: "
+msgstr "Dată: "
 
 #: src\qualcoder\ai_chat.py:512 src\qualcoder\ai_chat.py:1296
 msgid "Chat has been canceled by the user."
@@ -345,18 +421,16 @@ msgstr "Vă rugăm să selectați un chat sau să creați unul nou."
 msgid "Chat selection"
 msgstr "Selecție chat"
 
-#: src\qualcoder\ai_chat.py:1298
-msgid ""
-"Error: The AI returned an empty result. This may indicate that the AI model "
-"is not available at the moment. Try again later or choose a different model."
-msgstr ""
-"Eroare: AI-ul a returnat un rezultat gol. Acest lucru poate indica faptul că "
-"modelul AI nu este disponibil în acest moment. Încercați din nou mai târziu "
-"sau alegeți un alt model."
+#: src/qualcoder/code_pdf.py:227 src/qualcoder/view_image.py:173
+#: src/qualcoder/view_av.py:175 src/qualcoder/code_text.py:617
+msgid "Clear file filter"
+msgstr "Ștergeți filtrul de fișiere"
 
-#: src\qualcoder\ai_chat.py:1304
-msgid "Error communicating with "
-msgstr "Eroare de comunicare cu "
+#: src/qualcoder/code_pdf.py:236 src/qualcoder/view_image.py:180
+#: src/qualcoder/view_av.py:158 src/qualcoder/code_text.py:634
+#, fuzzy
+msgid "Clear code filter"
+msgstr "Ștergeți filtrul de coduri"
 
 #: src\qualcoder\ai_chat.py:1311 src\qualcoder\ai_llm.py:704
 #: src\qualcoder\ai_vectorstore.py:64 src\qualcoder\error_dlg.py:95
@@ -407,61 +481,134 @@ msgstr ""
 "putea să fie nevoie să treceți la un alt model AI în dialogul de setări, la "
 "„Setări AI avansate“."
 
-#: src\qualcoder\ai_llm.py:325 src\qualcoder\ai_llm.py:484
-msgid "AI Setup"
-msgstr "Configurare AI"
+#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:2928
+#: src/qualcoder/code_text.py:5300 src/qualcoder/code_text.py:7526
+msgid "Information"
+msgstr "Informații"
 
-#: src\qualcoder\ai_llm.py:474
-msgid "AI: Starting up..."
-msgstr "AI: Se pornește..."
+#: src/qualcoder/code_pdf.py:476 src/qualcoder/code_pdf.py:485
+#: src/qualcoder/code_pdf.py:492 src/qualcoder/code_pdf.py:498
+#: src/qualcoder/code_pdf.py:1782 src/qualcoder/view_image.py:447
+#: src/qualcoder/view_image.py:456 src/qualcoder/view_image.py:463
+#: src/qualcoder/view_image.py:469 src/qualcoder/view_image.py:1628
+#: src/qualcoder/report_codes_by_segments.py:230
+#: src/qualcoder/report_codes_by_segments.py:240
+#: src/qualcoder/report_codes_by_segments.py:248
+#: src/qualcoder/report_codes_by_segments.py:255
+#: src/qualcoder/report_codes.py:1394 src/qualcoder/report_codes.py:1412
+#: src/qualcoder/report_codes.py:1421 src/qualcoder/report_codes.py:1572
+#: src/qualcoder/view_av.py:481 src/qualcoder/view_av.py:490
+#: src/qualcoder/view_av.py:497 src/qualcoder/view_av.py:503
+#: src/qualcoder/view_av.py:1848 src/qualcoder/report_cooccurrence.py:258
+#: src/qualcoder/report_cooccurrence.py:269
+#: src/qualcoder/report_cooccurrence.py:279
+#: src/qualcoder/report_cooccurrence.py:287
+#: src/qualcoder/report_exact_matches.py:254
+#: src/qualcoder/report_exact_matches.py:264
+#: src/qualcoder/report_exact_matches.py:272
+#: src/qualcoder/report_exact_matches.py:279 src/qualcoder/code_text.py:1517
+#: src/qualcoder/code_text.py:1526 src/qualcoder/code_text.py:1534
+#: src/qualcoder/code_text.py:1540 src/qualcoder/code_text.py:3166
+#: src/qualcoder/report_relations.py:173 src/qualcoder/report_relations.py:185
+#: src/qualcoder/report_relations.py:194 src/qualcoder/report_relations.py:201
+#: src/qualcoder/reports.py:129 src/qualcoder/reports.py:141
+#: src/qualcoder/reports.py:149 src/qualcoder/reports.py:156
+msgid "Attributes"
+msgstr "Atribute"
 
-#: src\qualcoder\ai_llm.py:483
-msgid "AI: In the follwoing window, please set up the AI model."
-msgstr "AI: În fereastra următoare, vă rugăm să configurați modelul AI."
+#: src/qualcoder/code_pdf.py:520 src/qualcoder/code_pdf.py:522
+#: src/qualcoder/code_pdf.py:537 src/qualcoder/code_pdf.py:539
+#: src/qualcoder/code_pdf.py:1736 src/qualcoder/code_pdf.py:1762
+#: src/qualcoder/code_text.py:1580 src/qualcoder/code_text.py:1582
+#: src/qualcoder/code_text.py:1596 src/qualcoder/code_text.py:1598
+#: src/qualcoder/code_text.py:3116 src/qualcoder/code_text.py:3143
+#, fuzzy
+msgid "Filtered: "
+msgstr "Filtrat: "
 
-#: src\qualcoder\ai_llm.py:490
-msgid "AI: No model selected, AI is disabled."
-msgstr "AI: Niciun model selectat, AI este dezactivat."
+#: src/qualcoder/code_pdf.py:535 src/qualcoder/code_pdf.py:3040
+#: src/qualcoder/code_pdf.py:3358 src/qualcoder/view_graph.py:1345
+#: src/qualcoder/view_graph.py:1414 src/qualcoder/view_graph.py:1480
+#: src/qualcoder/view_graph.py:2269 src/qualcoder/view_graph.py:2295
+#: src/qualcoder/view_graph.py:2320 src/qualcoder/code_in_all_files.py:152
+#: src/qualcoder/code_in_all_files.py:195
+#: src/qualcoder/code_in_all_files.py:238
+#: src/qualcoder/code_in_all_files.py:587
+#: src/qualcoder/code_in_all_files.py:620
+#: src/qualcoder/code_in_all_files.py:645
+#: src/qualcoder/code_in_all_files.py:673 src/qualcoder/view_av.py:3746
+#: src/qualcoder/view_av.py:4303 src/qualcoder/code_text.py:1594
+#: src/qualcoder/code_text.py:3024
+msgid "Memo: "
+msgstr "Memo: "
 
-#: src\qualcoder\ai_llm.py:502
-msgid ""
-"AI: You are still using the outdated GPT-4 turbo. Consider switching to a "
-"newer model, such as GPT 4.1. Go to Project > Settings to change the AI "
-"profile and model."
-msgstr ""
-"AI: Încă utilizați GPT-4 turbo învechit. Luați în considerare trecerea la un "
-"model mai nou, cum ar fi GPT 4.1. Accesați Proiect > Setări pentru a schimba "
-"profilul și modelul AI."
+#: src/qualcoder/code_pdf.py:579 src/qualcoder/journals.py:186
+#: src/qualcoder/report_code_summary.py:148 src/qualcoder/view_image.py:484
+#: src/qualcoder/ai_search_dialog.py:187 src/qualcoder/coder_names.py:72
+#: src/qualcoder/attributes.py:264 src/qualcoder/manage_files.py:1210
+#: src/qualcoder/code_organiser.py:980
+#: src/qualcoder/report_codes_by_segments.py:379
+#: src/qualcoder/report_codes.py:438 src/qualcoder/view_av.py:544
+#: src/qualcoder/speakers.py:73 src/qualcoder/code_text.py:1619
+msgid "Name"
+msgstr "Nume"
 
-#: src\qualcoder\ai_llm.py:506
-msgid ""
-"AI: You are using the outdated Claude Opus 4 model from Anthropic. Consider "
-"switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
-"change the AI profile and model."
-msgstr ""
-"AI: Utilizați modelul învechit Claude Opus 4 de la Anthropic. Luați în "
-"considerare trecerea la un model mai nou, cum ar fi Opus 4.1. Accesați "
-"Proiect > Setări pentru a schimba profilul și modelul AI."
+#: src/qualcoder/code_pdf.py:579 src/qualcoder/report_code_summary.py:148
+#: src/qualcoder/view_image.py:484 src/qualcoder/manage_files.py:1210
+#: src/qualcoder/code_color_scheme.py:151 src/qualcoder/view_av.py:544
+#: src/qualcoder/report_exact_matches.py:645 src/qualcoder/code_text.py:1619
+#: src/qualcoder/report_relations.py:1148
+msgid "Id"
+msgstr "Id"
 
-#: src\qualcoder\ai_llm.py:515
-msgid "Please enter an API-key for the AI in the following dialog."
-msgstr "Vă rugăm să introduceți o cheie API pentru AI în dialogul următor."
+#: src/qualcoder/code_pdf.py:579 src/qualcoder/code_pdf.py:590
+#: src/qualcoder/code_pdf.py:618 src/qualcoder/code_pdf.py:643
+#: src/qualcoder/code_pdf.py:669 src/qualcoder/code_pdf.py:2684
+#: src/qualcoder/code_pdf.py:2709 src/qualcoder/report_code_summary.py:148
+#: src/qualcoder/report_code_summary.py:159
+#: src/qualcoder/report_code_summary.py:189
+#: src/qualcoder/report_code_summary.py:217
+#: src/qualcoder/report_code_summary.py:245 src/qualcoder/view_image.py:484
+#: src/qualcoder/view_image.py:1997 src/qualcoder/view_image.py:2845
+#: src/qualcoder/view_image.py:2870 src/qualcoder/ai_search_dialog.py:187
+#: src/qualcoder/ai_search_dialog.py:199 src/qualcoder/ai_search_dialog.py:277
+#: src/qualcoder/attributes.py:202 src/qualcoder/attributes.py:264
+#: src/qualcoder/manage_files.py:1210 src/qualcoder/manage_files.py:1564
+#: src/qualcoder/manage_files.py:1599 src/qualcoder/manage_files.py:2729
+#: src/qualcoder/code_organiser.py:929
+#: src/qualcoder/report_codes_by_segments.py:379
+#: src/qualcoder/report_codes_by_segments.py:391
+#: src/qualcoder/report_codes_by_segments.py:478
+#: src/qualcoder/code_color_scheme.py:151 src/qualcoder/report_codes.py:438
+#: src/qualcoder/report_codes.py:450 src/qualcoder/report_codes.py:530
+#: src/qualcoder/code_in_all_files.py:382 src/qualcoder/view_av.py:544
+#: src/qualcoder/view_av.py:638 src/qualcoder/view_av.py:2836
+#: src/qualcoder/view_av.py:2861 src/qualcoder/cases.py:735
+#: src/qualcoder/cases.py:893 src/qualcoder/code_text.py:1619
+#: src/qualcoder/code_text.py:1631 src/qualcoder/code_text.py:1659
+#: src/qualcoder/code_text.py:1684 src/qualcoder/code_text.py:1710
+#: src/qualcoder/code_text.py:3858 src/qualcoder/code_text.py:4866
+#: src/qualcoder/code_text.py:4891 src/qualcoder/report_relations.py:727
+#: src/qualcoder/report_relations.py:911
+msgid "Memo"
+msgstr "Memo"
 
-#: src\qualcoder\ai_llm.py:516
-msgid "AI API-key"
-msgstr "Cheie API AI"
+#: src/qualcoder/code_pdf.py:579 src/qualcoder/report_code_summary.py:148
+#: src/qualcoder/view_image.py:484 src/qualcoder/ai_search_dialog.py:187
+#: src/qualcoder/report_codes_by_segments.py:379
+#: src/qualcoder/report_codes.py:438 src/qualcoder/view_av.py:544
+#: src/qualcoder/speakers.py:73 src/qualcoder/code_text.py:1619
+#: src/qualcoder/report_relations.py:1046
+msgid "Count"
+msgstr "Număr"
 
-#: src\qualcoder\ai_llm.py:522
-msgid "AI: No API key set, AI is disabled."
-msgstr "AI: Nicio cheie API setată, AI este dezactivat."
+#: src/qualcoder/code_pdf.py:942 src/qualcoder/code_text.py:2044
+msgid "Automatic search 3 or more characters"
+msgstr "Căutare automată 3 sau mai multe caractere"
 
-#: src\qualcoder\ai_llm.py:530
-msgid ""
-"In the following dialog, go to \"Advanced AI Options\" and select a large "
-"and a fast AI model (both can be the same)."
-msgstr ""
-"În dialogul următor, accesați „Opțiuni AI avansate” și selectați un model AI "
-"mare și unul rapid (ambele pot fi identice)."
+#: src/qualcoder/code_pdf.py:943 src/qualcoder/code_text.py:2045
+msgid "Automatic search 5 or more characters"
+msgstr "Căutare automată 5 sau mai multe caractere"
 
 #: src\qualcoder\ai_llm.py:531
 msgid "AI Model Selection"
@@ -471,102 +618,107 @@ msgstr "Selecție model AI"
 msgid "AI: No large/fast model selected, AI is disabled."
 msgstr "AI: Niciun model mare/rapid selectat, AI este dezactivat."
 
-#: src\qualcoder\ai_llm.py:608
-msgid "AI: Ready"
-msgstr "AI: Pregătit"
+#: src/qualcoder/code_pdf.py:1026 src/qualcoder/code_text.py:998
+#: src/qualcoder/code_text.py:2207
+msgid "Unmark (U)"
+msgstr "Detașați marcajul (U)"
 
-#: src\qualcoder\ai_llm.py:619
-msgid ""
-"An error occured during AI initialization. The AI features will be disabled. "
-"Click on Project > Settings to reenable them."
-msgstr ""
-"A apărut o eroare în timpul inițializării AI. Funcțiile AI vor fi "
-"dezactivate. Faceți clic pe Proiect > Setări pentru a le reactiva."
+#: src/qualcoder/code_pdf.py:1027 src/qualcoder/code_text.py:999
+#: src/qualcoder/code_text.py:2208
+msgid "Memo coded text (M)"
+msgstr "Memo text codat (M)"
 
-#: src\qualcoder\ai_llm.py:620
-msgid "AI Initialization"
-msgstr "Inițializare AI"
+#: src/qualcoder/code_pdf.py:1029 src/qualcoder/view_av.py:3088
+#: src/qualcoder/code_text.py:2211
+msgid "Add important mark (I)"
+msgstr "Adăugați marcajul important (I)"
 
-#: src\qualcoder\ai_llm.py:634
-msgid "Do you really want to cancel the AI operation?"
-msgstr "Sigur doriți să anulați operațiunea AI?"
+#: src/qualcoder/code_pdf.py:1031 src/qualcoder/view_image.py:2008
+#: src/qualcoder/view_image.py:2011 src/qualcoder/view_av.py:3090
+#: src/qualcoder/view_av.py:4105 src/qualcoder/code_text.py:2213
+msgid "Remove important mark"
+msgstr "Eliminați marcajul important"
 
-#: src\qualcoder\ai_llm.py:645
-msgid ""
-"The AI operation could not be aborted immediately. It may take a moment for "
-"the AI to be ready again."
-msgstr ""
-"Operațiunea AI nu a putut fi oprită imediat. S-ar putea să dureze un moment "
-"până când AI-ul este din nou pregătit."
+#: src/qualcoder/code_pdf.py:1032 src/qualcoder/view_av.py:3084
+#: src/qualcoder/code_text.py:1002 src/qualcoder/code_text.py:2214
+msgid "Change code"
+msgstr "Schimbați codul"
 
-#: src\qualcoder\ai_llm.py:701
-msgid "AI Error:\n"
-msgstr "Eroare AI:\n"
+#: src/qualcoder/code_pdf.py:1033 src/qualcoder/view_av.py:362
+#: src/qualcoder/view_av.py:3085 src/qualcoder/view_av.py:4751
+#: src/qualcoder/code_text.py:1000 src/qualcoder/code_text.py:2215
+msgid "Resize"
+msgstr "Redimensionați"
 
-#: src\qualcoder\ai_llm.py:880
-msgid "AI generate_code_descriptions\n"
-msgstr "AI generate_code_descriptions\n"
+#: src/qualcoder/code_pdf.py:1048 src/qualcoder/view_av.py:3111
+#: src/qualcoder/code_text.py:2218
+msgid "Mark (Q)"
+msgstr "Marcați (Q)"
 
-#: src\qualcoder\ai_llm.py:881
-msgid "Prompt:\n"
-msgstr "Prompt:\n"
+#: src/qualcoder/code_pdf.py:1051 src/qualcoder/view_av.py:3114
+#: src/qualcoder/code_text.py:2221
+msgid "Mark with recent code (R)"
+msgstr "Marcați cu codul recent (R)"
 
-#: src\qualcoder\ai_llm.py:922
-msgid ""
-"Stage 1:\n"
-"Searching data related to \""
-msgstr ""
-"Faza 1:\n"
-"Căutare date conexe cu \""
+#: src/qualcoder/code_pdf.py:1054 src/qualcoder/view_av.py:3117
+#: src/qualcoder/code_text.py:1001 src/qualcoder/code_text.py:2240
+msgid "Annotate (A)"
+msgstr "Adnotați (A)"
 
-#: src\qualcoder\ai_llm.py:999
-msgid ""
-"Stage 2:\n"
-"Inspecting the data more closely..."
-msgstr ""
-"Faza 2:\n"
-"Verificarea mai atentă a datelor..."
+#: src/qualcoder/code_pdf.py:1055 src/qualcoder/report_codes.py:2525
+#: src/qualcoder/report_codes.py:3179 src/qualcoder/manage_references.py:615
+#: src/qualcoder/view_av.py:3118 src/qualcoder/code_text.py:2241
+msgid "Copy to clipboard"
+msgstr "Copiați în clipboard"
 
 #: src\qualcoder\ai_prompts.py:850
 msgid "Delete Prompt"
 msgstr "Ștergeți promptul"
 
-#: src\qualcoder\ai_prompts.py:887 src\qualcoder\ai_prompts.py:892
-#: src\qualcoder\ai_prompts.py:898 src\qualcoder\ai_prompts.py:927
-#: src\qualcoder\ai_prompts.py:935
-msgid "Edit prompts"
-msgstr "Editați prompturile"
+#: src/qualcoder/code_pdf.py:1057 src/qualcoder/code_text.py:2225
+msgid "in vivo code (V)"
+msgstr "cod in vivo (V)"
 
-#: src\qualcoder\ai_prompts.py:887
-msgid "The name cannot be empty"
-msgstr "Numele nu poate fi gol"
+#: src/qualcoder/code_pdf.py:1059 src/qualcoder/view_av.py:3120
+#: src/qualcoder/code_text.py:2244
+msgid "Edit annotation"
+msgstr "Editați adnotarea"
 
-#: src\qualcoder\ai_prompts.py:892
-msgid "The name must be no longer than 60 characters."
-msgstr "Numele nu trebuie să depășească 60 de caractere."
+#: src/qualcoder/code_pdf.py:1063 src/qualcoder/code_text.py:2265
+msgid "Show control panel (H)"
+msgstr "Afișați panoul de control (H)"
 
-#: src\qualcoder\ai_prompts.py:898
-msgid "The name of the prompt must be unique within its type and scope."
-msgstr ""
-"Numele promptului trebuie să fie unic în cadrul tipului și domeniului său."
+#: src/qualcoder/code_pdf.py:1065 src/qualcoder/code_text.py:2267
+msgid "Hide control panel (H)"
+msgstr "Ascundeți panoul de control (H)"
 
-#: src\qualcoder\ai_prompts.py:925
-msgid "Names of prompts must be unique within its type and scope. "
-msgstr ""
-"Numele prompturilor trebuie să fie unice în cadrul tipului și domeniului "
-"lor. "
+#: src/qualcoder/code_pdf.py:1159 src/qualcoder/code_pdf.py:1252
+#: src/qualcoder/code_pdf.py:1625 src/qualcoder/view_image.py:1497
+#: src/qualcoder/report_comparison_table.py:410
+#: src/qualcoder/view_graph.py:1307 src/qualcoder/view_graph.py:1375
+#: src/qualcoder/view_graph.py:1498 src/qualcoder/code_in_all_files.py:481
+#: src/qualcoder/view_av.py:1684 src/qualcoder/view_av.py:3193
+#: src/qualcoder/view_av.py:3258 src/qualcoder/report_cooccurrence.py:316
+#: src/qualcoder/code_text.py:2397 src/qualcoder/code_text.py:2486
+#: src/qualcoder/code_text.py:2962
+msgid "Select codes"
+msgstr "Selectați coduri"
 
-#: src\qualcoder\ai_search_dialog.py:82
-msgid "1) What do you want to search for?"
-msgstr "1) Ce doriți să căutați?"
+#: src/qualcoder/code_pdf.py:1174 src/qualcoder/report_codes.py:2647
+#: src/qualcoder/view_av.py:3205 src/qualcoder/code_text.py:1082
+#: src/qualcoder/code_text.py:2412
+msgid "Select replacement code"
+msgstr "Selectați codul de înlocuire"
 
-#: src\qualcoder\ai_search_dialog.py:89
-msgid "1) Which code do you want to analyze?"
-msgstr "1) Ce cod doriți să analizați?"
+#: src/qualcoder/code_pdf.py:1299 src/qualcoder/code_pdf.py:3433
+#: src/qualcoder/view_av.py:3297 src/qualcoder/code_text.py:2560
+msgid "Select code to memo"
+msgstr "Selectați codul pentru memo"
 
-#: src\qualcoder\ai_search_dialog.py:97
-msgid "1) Which topic do you want to analyze?"
-msgstr "1) Ce temă doriți să analizați?"
+#: src/qualcoder/code_pdf.py:1308 src/qualcoder/view_av.py:3306
+#: src/qualcoder/code_text.py:1061 src/qualcoder/code_text.py:2569
+msgid "Memo for Coded text: "
+msgstr "Memo pentru text codat: "
 
 #: src\qualcoder\ai_search_dialog.py:115 src\qualcoder\ai_search_dialog.py:359
 msgid "Coders: "
@@ -576,396 +728,390 @@ msgstr "Codatori: "
 msgid "The last used prompt"
 msgstr "Ultimul prompt utilizat"
 
-#: src\qualcoder\ai_search_dialog.py:138
-msgid "could not be found. The prompt will be reset to the default."
-msgstr "nu a fost găsit. Promptul va fi resetat la valoarea implicită."
+#: src/qualcoder/code_pdf.py:1354 src/qualcoder/view_image.py:1300
+#: src/qualcoder/view_av.py:1523 src/qualcoder/code_text.py:2689
+msgid "Add new code to category"
+msgstr "Adăugați cod nou la categorie"
 
-#: src\qualcoder\ai_search_dialog.py:139 src\qualcoder\ai_search_dialog.py:504
-#: src\qualcoder\ai_search_dialog.py:524 src\qualcoder\code_text.py:4140
-#: src\qualcoder\report_codes.py:1455 src\qualcoder\report_exact_matches.py:324
-#: src\qualcoder\view_graph.py:759 src\qualcoder\view_graph.py:1331
-#: src\qualcoder\view_graph.py:1401 src\qualcoder\view_graph.py:1460
-msgid "No codes"
-msgstr "Fără coduri"
+#: src/qualcoder/code_pdf.py:1355 src/qualcoder/view_image.py:1301
+#: src/qualcoder/view_av.py:1524 src/qualcoder/code_text.py:2690
+msgid "Add a new category to category"
+msgstr "Adăugați o categorie nouă la categorie"
 
-#: src\qualcoder\ai_search_dialog.py:187 src\qualcoder\attributes.py:264
-#: src\qualcoder\coder_names.py:72 src\qualcoder\code_organiser.py:980
-#: src\qualcoder\code_pdf.py:579 src\qualcoder\code_text.py:1619
-#: src\qualcoder\journals.py:186 src\qualcoder\manage_files.py:1210
-#: src\qualcoder\report_codes.py:438
-#: src\qualcoder\report_codes_by_segments.py:379
-#: src\qualcoder\report_code_summary.py:148 src\qualcoder\speakers.py:73
-#: src\qualcoder\view_av.py:544 src\qualcoder\view_image.py:484
-msgid "Name"
-msgstr "Nume"
+#: src/qualcoder/code_pdf.py:1356 src/qualcoder/view_image.py:1302
+#: src/qualcoder/view_av.py:1525 src/qualcoder/code_text.py:2691
+msgid "Add a new code"
+msgstr "Adăugați un cod nou"
 
-#: src\qualcoder\ai_search_dialog.py:187 src\qualcoder\ai_search_dialog.py:199
-#: src\qualcoder\ai_search_dialog.py:277 src\qualcoder\attributes.py:202
-#: src\qualcoder\attributes.py:264 src\qualcoder\cases.py:735
-#: src\qualcoder\cases.py:893 src\qualcoder\code_color_scheme.py:151
-#: src\qualcoder\code_in_all_files.py:382 src\qualcoder\code_organiser.py:929
-#: src\qualcoder\code_pdf.py:579 src\qualcoder\code_pdf.py:590
-#: src\qualcoder\code_pdf.py:618 src\qualcoder\code_pdf.py:643
-#: src\qualcoder\code_pdf.py:669 src\qualcoder\code_pdf.py:2684
-#: src\qualcoder\code_pdf.py:2709 src\qualcoder\code_text.py:1448
-#: src\qualcoder\code_text.py:1502 src\qualcoder\code_text.py:1619
-#: src\qualcoder\code_text.py:1631 src\qualcoder\code_text.py:1659
-#: src\qualcoder\code_text.py:1684 src\qualcoder\code_text.py:1710
-#: src\qualcoder\code_text.py:3858 src\qualcoder\code_text.py:4866
-#: src\qualcoder\code_text.py:4891 src\qualcoder\manage_files.py:1210
-#: src\qualcoder\manage_files.py:1564 src\qualcoder\manage_files.py:1599
-#: src\qualcoder\manage_files.py:2729 src\qualcoder\report_codes.py:438
-#: src\qualcoder\report_codes.py:450 src\qualcoder\report_codes.py:530
-#: src\qualcoder\report_codes_by_segments.py:379
-#: src\qualcoder\report_codes_by_segments.py:391
-#: src\qualcoder\report_codes_by_segments.py:478
-#: src\qualcoder\report_code_summary.py:148
-#: src\qualcoder\report_code_summary.py:159
-#: src\qualcoder\report_code_summary.py:189
-#: src\qualcoder\report_code_summary.py:217
-#: src\qualcoder\report_code_summary.py:245
-#: src\qualcoder\report_relations.py:727 src\qualcoder\report_relations.py:911
-#: src\qualcoder\view_av.py:544 src\qualcoder\view_av.py:638
-#: src\qualcoder\view_av.py:2836 src\qualcoder\view_av.py:2861
-#: src\qualcoder\view_image.py:484 src\qualcoder\view_image.py:1997
-#: src\qualcoder\view_image.py:2845 src\qualcoder\view_image.py:2870
-msgid "Memo"
-msgstr "Memo"
+#: src/qualcoder/code_pdf.py:1357 src/qualcoder/view_image.py:1303
+#: src/qualcoder/view_av.py:1526 src/qualcoder/code_text.py:2692
+msgid "Add a new category"
+msgstr "Adăugați o categorie nouă"
 
-#: src\qualcoder\ai_search_dialog.py:187 src\qualcoder\code_pdf.py:579
-#: src\qualcoder\code_text.py:1619 src\qualcoder\report_codes.py:438
-#: src\qualcoder\report_codes_by_segments.py:379
-#: src\qualcoder\report_code_summary.py:148
-#: src\qualcoder\report_relations.py:1046 src\qualcoder\speakers.py:73
-#: src\qualcoder\view_av.py:544 src\qualcoder\view_image.py:484
-msgid "Count"
-msgstr "Număr"
+#: src/qualcoder/code_pdf.py:1361 src/qualcoder/view_image.py:1307
+#: src/qualcoder/view_av.py:1530 src/qualcoder/code_text.py:2695
+#: src/qualcoder/reports.py:553 src/qualcoder/reports.py:1066
+msgid "Expand or collapse branch"
+msgstr "Extindeți sau restrângeți ramura"
 
-#: src\qualcoder\ai_search_dialog.py:188 src\qualcoder\report_codes.py:439
-#: src\qualcoder\report_codes_by_segments.py:380
-msgid "Codes and categories"
-msgstr "Coduri și categorii"
+#: src/qualcoder/code_pdf.py:1362 src/qualcoder/code_pdf.py:1378
+#: src/qualcoder/report_code_summary.py:312
+#: src/qualcoder/report_code_summary.py:315 src/qualcoder/view_image.py:1308
+#: src/qualcoder/view_image.py:1326
+#: src/qualcoder/report_codes_by_segments.py:539
+#: src/qualcoder/report_codes_by_segments.py:542 src/qualcoder/view_av.py:1531
+#: src/qualcoder/view_av.py:1546 src/qualcoder/report_exact_matches.py:738
+#: src/qualcoder/report_exact_matches.py:741 src/qualcoder/code_text.py:2696
+#: src/qualcoder/code_text.py:2712 src/qualcoder/reports.py:548
+#: src/qualcoder/reports.py:552 src/qualcoder/reports.py:1061
+#: src/qualcoder/reports.py:1065
+msgid "Show coded files"
+msgstr "Afișați fișierele codate"
 
-#: src\qualcoder\ai_search_dialog.py:348
-msgid "Coder selection"
-msgstr "Selecție codator"
+#: src/qualcoder/code_pdf.py:1363 src/qualcoder/view_image.py:1309
+#: src/qualcoder/view_av.py:1532 src/qualcoder/code_text.py:2697
+#, fuzzy
+msgid "Modify"
+msgstr "Modificați"
 
-#: src\qualcoder\ai_search_dialog.py:426 src\qualcoder\report_attributes.py:450
-#: src\qualcoder\view_charts.py:343
-msgid "Show files:"
-msgstr "Afișați fișiere:"
+#: src/qualcoder/code_pdf.py:1364 src/qualcoder/view_image.py:1310
+#: src/qualcoder/view_av.py:1533 src/qualcoder/code_text.py:2698
+#, fuzzy
+msgid "Rename F2"
+msgstr "Redenumiți"
 
-#: src\qualcoder\ai_search_dialog.py:443
-msgid "<no file filter>"
-msgstr "<fără filtru de fișiere>"
+#: src/qualcoder/code_pdf.py:1365 src/qualcoder/view_image.py:1311
+#: src/qualcoder/view_av.py:1534 src/qualcoder/code_text.py:2699
+msgid "View or edit memo"
+msgstr "Vizualizați sau editați memo"
 
-#: src\qualcoder\ai_search_dialog.py:444
-msgid "Search in all textfiles"
-msgstr "Căutați în toate fișierele text"
+#: src/qualcoder/code_pdf.py:1369 src/qualcoder/view_image.py:1315
+#: src/qualcoder/code_organiser.py:926 src/qualcoder/view_av.py:1538
+#: src/qualcoder/code_text.py:2703
+msgid "Merge category into category"
+msgstr "Îmbinare categorie în categorie"
 
-#: src\qualcoder\ai_search_dialog.py:456
-msgid "Codings: "
-msgstr "Codări: "
+#: src/qualcoder/code_pdf.py:1370 src/qualcoder/view_image.py:1316
+#: src/qualcoder/view_av.py:1539 src/qualcoder/code_text.py:2704
+#, fuzzy
+msgid "Move category under category"
+msgstr "Legare categorie sub categorie"
 
-#: src\qualcoder\ai_search_dialog.py:460 src\qualcoder\report_codes.py:245
-#: src\qualcoder\report_codes_by_segments.py:140
-msgid ""
-"\n"
-"MEMO: "
-msgstr ""
-"\n"
-"MEMO: "
+#: src/qualcoder/code_pdf.py:1371 src/qualcoder/view_image.py:1317
+#: src/qualcoder/manage_files.py:528 src/qualcoder/manage_references.py:618
+#: src/qualcoder/view_av.py:1540 src/qualcoder/code_text.py:2705
+#: src/qualcoder/report_sql.py:438
+msgid "Delete"
+msgstr "Ștergeți"
 
-#: src\qualcoder\ai_search_dialog.py:468
-msgid "Search in all cases"
-msgstr "Căutați în toate cazurile"
+#: src/qualcoder/code_pdf.py:1377 src/qualcoder/view_image.py:1323
+#: src/qualcoder/view_av.py:1543 src/qualcoder/code_text.py:2711
+msgid "Change code color"
+msgstr "Schimbați culoarea codului"
 
-#: src\qualcoder\ai_search_dialog.py:476 src\qualcoder\code_text.py:880
-#: src\qualcoder\helpers.py:1457 src\qualcoder\report_codes.py:270
-#: src\qualcoder\report_codes.py:2396 src\qualcoder\report_codes.py:3129
-#: src\qualcoder\report_codes_by_segments.py:153
-#: src\qualcoder\report_code_summary.py:380
-#: src\qualcoder\report_file_summary.py:303 src\qualcoder\view_av.py:4358
-msgid "MEMO: "
-msgstr "MEMO: "
+#: src/qualcoder/code_pdf.py:1379 src/qualcoder/view_image.py:1324
+#: src/qualcoder/view_av.py:1544 src/qualcoder/code_text.py:2713
+msgid "Move code to"
+msgstr "Mutare cod la"
 
-#: src\qualcoder\ai_search_dialog.py:497
-msgid "The AI ist not ready to fulfill your request (status: "
-msgstr ""
-"AI-ul nu este pregătit să îndeplinească solicitarea dumneavoastră (status: "
+#: src/qualcoder/code_pdf.py:1380 src/qualcoder/view_image.py:1325
+#: src/qualcoder/view_av.py:1545 src/qualcoder/code_text.py:2714
+#, fuzzy
+msgid "Move multiple codes"
+msgstr "Codator: Toți codatorii"
 
-#: src\qualcoder\ai_search_dialog.py:497
-msgid ")."
-msgstr ")."
+#: src/qualcoder/code_pdf.py:1381 src/qualcoder/view_image.py:1328
+#: src/qualcoder/view_av.py:1548 src/qualcoder/code_text.py:2715
+#, fuzzy
+msgid "Filter"
+msgstr "Filtru"
 
-#: src\qualcoder\ai_search_dialog.py:503
-msgid "Please select a code or category (or use \"free search\" instead)."
-msgstr ""
-"Vă rugăm să selectați un cod sau o categorie (sau utilizați „căutare liberă” "
-"în schimb)."
+#: src/qualcoder/code_pdf.py:1382 src/qualcoder/view_image.py:1329
+#: src/qualcoder/view_av.py:1549 src/qualcoder/code_text.py:2716
+msgid "Show codes like"
+msgstr "Afișați coduri precum"
 
-#: src\qualcoder\ai_search_dialog.py:523
-msgid "Please enter text in the \"topic\" field."
-msgstr "Vă rugăm să introduceți text în câmpul „temă“."
+#: src/qualcoder/code_pdf.py:1383 src/qualcoder/view_image.py:1330
+#: src/qualcoder/view_av.py:1550 src/qualcoder/code_text.py:2717
+msgid "Show codes of colour"
+msgstr "Afișați coduri de culoare"
 
-#: src\qualcoder\ai_search_dialog.py:572
-msgid ""
-"After combining all filters, there are not files left for the search. Please "
-"check your settings."
-msgstr ""
-"După combinarea tuturor filtrelor, nu mai există fișiere disponibile pentru "
-"căutare. Vă rugăm să verificați setările."
+#: src/qualcoder/code_pdf.py:1384 src/qualcoder/code_pdf.py:2855
+#: src/qualcoder/view_image.py:775 src/qualcoder/view_image.py:1331
+#: src/qualcoder/view_av.py:780 src/qualcoder/view_av.py:1551
+#: src/qualcoder/code_text.py:2718 src/qualcoder/code_text.py:5042
+msgid "Sort"
+msgstr "Sortați"
 
-#: src\qualcoder\ai_search_dialog.py:573 src\qualcoder\view_graph.py:1428
-msgid "No files"
-msgstr "Fără fișiere"
+#: src/qualcoder/code_pdf.py:1385 src/qualcoder/view_image.py:1332
+#: src/qualcoder/view_av.py:1552 src/qualcoder/report_exact_matches.py:462
+#: src/qualcoder/code_text.py:2719 src/qualcoder/report_relations.py:623
+#: src/qualcoder/report_relations.py:1109 src/qualcoder/report_sql.py:540
+#: src/qualcoder/report_sql.py:637
+msgid "Sort ascending"
+msgstr "Sortare ascendentă"
 
-#: src\qualcoder\ai_vectorstore.py:155
-msgid ""
-"Since you are using the AI integration for the first time, QualCoder needs "
-"to download and install some additional components. \n"
-"\n"
-"This will download about 2.5 GB of data. Do you \n"
-"want to continue?"
-msgstr ""
-"Deoarece utilizați integrarea AI pentru prima dată, QualCoder trebuie să "
-"descarce și să instaleze unele componente suplimentare.\n"
-"\n"
-"Aceasta va descărca aproximativ 2,5 GB de date. Doriți \n"
-"să continuați?"
+#: src/qualcoder/code_pdf.py:1386 src/qualcoder/view_image.py:1333
+#: src/qualcoder/view_av.py:1553 src/qualcoder/report_exact_matches.py:463
+#: src/qualcoder/code_text.py:2720 src/qualcoder/report_relations.py:624
+#: src/qualcoder/report_relations.py:1110 src/qualcoder/report_sql.py:542
+#: src/qualcoder/report_sql.py:639
+msgid "Sort descending"
+msgstr "Sortare descendentă"
 
-#: src\qualcoder\ai_vectorstore.py:164 src\qualcoder\ai_vectorstore.py:175
-msgid "Download AI components"
-msgstr "Descărcați componente AI"
+#: src/qualcoder/code_pdf.py:1387 src/qualcoder/view_image.py:1334
+#: src/qualcoder/view_av.py:1554 src/qualcoder/code_text.py:2721
+msgid "Sort category then code ascending"
+msgstr "Sortați categoria apoi codul ascendent"
 
-#: src\qualcoder\ai_vectorstore.py:194
-msgid "Downloading "
-msgstr "Se descarcă "
+#: src/qualcoder/code_pdf.py:1527 src/qualcoder/code_pdf.py:1561
+#: src/qualcoder/code_pdf.py:1635 src/qualcoder/code_pdf.py:1661
+#: src/qualcoder/view_image.py:1468 src/qualcoder/view_image.py:1507
+#: src/qualcoder/view_image.py:1532 src/qualcoder/view_image.py:2577
+#: src/qualcoder/view_av.py:1694 src/qualcoder/view_av.py:1720
+#: src/qualcoder/view_av.py:1746 src/qualcoder/view_av.py:2573
+#: src/qualcoder/code_text.py:2864 src/qualcoder/code_text.py:2898
+#: src/qualcoder/code_text.py:2972 src/qualcoder/code_text.py:2997
+msgid "Select blank or category"
+msgstr "Selectați gol sau categorie"
 
-#: src\qualcoder\ai_vectorstore.py:272
-msgid ""
-"AI: Could not download all the necessary components, the AI integration will "
-"be disabled."
-msgstr ""
-"AI: Nu s-au putut descărca toate componentele necesare, integrarea AI va fi "
-"dezactivată."
+#: src/qualcoder/code_pdf.py:1536 src/qualcoder/code_pdf.py:1540
+#: src/qualcoder/view_image.py:1477 src/qualcoder/view_image.py:1481
+#: src/qualcoder/view_av.py:1755 src/qualcoder/view_av.py:1759
+#: src/qualcoder/code_text.py:2873 src/qualcoder/code_text.py:2877
+#, fuzzy
+msgid "Moved category: "
+msgstr "Categorie importată: "
 
-#: src\qualcoder\ai_vectorstore.py:274
-msgid "AI: Success, components downloaded and installed."
-msgstr "AI: Succes, componente descărcate și instalate."
+#: src/qualcoder/code_pdf.py:1643 src/qualcoder/view_image.py:1515
+#: src/qualcoder/view_av.py:1702 src/qualcoder/code_text.py:2980
+#, fuzzy
+msgid "Code moved."
+msgstr "Memo cod"
 
-#: src\qualcoder\ai_vectorstore.py:312 src\qualcoder\ai_vectorstore.py:390
-msgid ""
-"It appears that you have already used the AI features with this project "
-"before. Meanwhile, we had to change the internal implementation of the local "
-"AI memory to make it more robust. As a result, the AI has to read through "
-"all your empirical documents again to rebuild the local memory. This may "
-"take a while. Sorry for the inconvenience."
-msgstr ""
-"Se pare că ați utilizat deja funcțiile AI cu acest proiect înainte. Între "
-"timp, am fost nevoiți să schimbăm implementarea internă a memoriei AI locale "
-"pentru a o face mai robustă. Ca urmare, AI-ul trebuie să citească din nou "
-"toate documentele dumneavoastră empirice pentru a reconstrui memoria locală. "
-"Acest lucru poate dura un timp. Ne cerem scuze pentru inconveniențe."
+#: src/qualcoder/code_pdf.py:1676 src/qualcoder/view_image.py:326
+#: src/qualcoder/view_av.py:519 src/qualcoder/code_text.py:3058
+msgid "Showing important codings"
+msgstr "Se afișează codări importante"
 
-#: src\qualcoder\ai_vectorstore.py:377
-msgid "AI: Finished loading (no project open)."
-msgstr "AI: Încărcare finalizată (niciun proiect deschis)."
+#: src/qualcoder/code_pdf.py:1680 src/qualcoder/view_image.py:329
+#: src/qualcoder/view_av.py:522 src/qualcoder/code_text.py:3061
+msgid "Show codings flagged important"
+msgstr "Afișați codările marcate ca importante"
 
-#: src\qualcoder\ai_vectorstore.py:395 src\qualcoder\ai_vectorstore.py:407
-msgid "AI memory"
-msgstr "Memorie AI"
+#: src/qualcoder/code_pdf.py:1696 src/qualcoder/view_image.py:1552
+#: src/qualcoder/view_av.py:1774 src/qualcoder/code_text.py:3077
+msgid "Show some codes"
+msgstr "Afișați unele coduri"
 
-#: src\qualcoder\ai_vectorstore.py:416
-msgid "AI: Checked all documents, memory is up to date."
-msgstr "AI: S-au verificat toate documentele, memoria este actualizată."
+#: src/qualcoder/code_pdf.py:1698 src/qualcoder/view_image.py:1554
+#: src/qualcoder/view_av.py:1776 src/qualcoder/code_text.py:3079
+msgid "Show codes containing the text. (Blank for all)"
+msgstr "Afișați codurile care conțin textul. (Gol pentru toate)"
 
-#: src\qualcoder\ai_vectorstore.py:455
-msgid "Vectorstore: Document import failed, faiss_db not present."
-msgstr "Vectorstore: Importul documentului a eșuat, faiss_db nu este prezent."
+#: src/qualcoder/code_pdf.py:1700 src/qualcoder/view_image.py:1556
+#: src/qualcoder/view_av.py:1778 src/qualcoder/code_text.py:3081
+#, fuzzy
+msgid "Filter: "
+msgstr "Filtru: "
 
-#: src\qualcoder\ai_vectorstore.py:484
-msgid "AI: Adding document to internal memory: "
-msgstr "AI: Se adaugă documentul la memoria internă: "
+#: src/qualcoder/code_pdf.py:1703 src/qualcoder/view_image.py:1559
+#: src/qualcoder/view_av.py:1781 src/qualcoder/code_text.py:3084
+#, fuzzy
+msgid "Case sensitive"
+msgstr "Sensibil la majuscule"
 
-#: src\qualcoder\ai_vectorstore.py:554
-msgid "AI: No documents, AI is ready."
-msgstr "AI: Fără documente, AI este pregătit."
+#: src/qualcoder/code_pdf.py:1745 src/qualcoder/view_image.py:1595
+#: src/qualcoder/view_av.py:1817 src/qualcoder/code_text.py:3126
+msgid "Select code colors"
+msgstr "Selectați culorile codurilor"
 
-#: src\qualcoder\ai_vectorstore.py:558
-msgid "AI: Checking for new documents"
-msgstr "AI: Se verifică existența unor documente noi"
+#: src/qualcoder/code_pdf.py:1846 src/qualcoder/view_image.py:264
+#: src/qualcoder/view_av.py:299 src/qualcoder/code_text.py:1310
+msgid "Search for code"
+msgstr "Căutați cod"
 
-#: src\qualcoder\ai_vectorstore.py:571
-msgid ""
-"AI: Rebuilding memory. The local AI will read through all your documents, "
-"please be patient."
-msgstr ""
-"AI: Se reconstruiește memoria. AI-ul local va citi toate documentele "
-"dumneavoastră, vă rugăm să fiți răbdător."
+#: src/qualcoder/code_pdf.py:1849 src/qualcoder/view_image.py:267
+#: src/qualcoder/view_av.py:302 src/qualcoder/code_text.py:1313
+msgid "Find and select first code that matches text."
+msgstr "Găsiți și selectați primul cod care se potrivește cu textul."
 
-#: src\qualcoder\attributes.py:94 src\qualcoder\attributes.py:259
-#: src\qualcoder\view_charts.py:409 src\qualcoder\view_charts.py:503
-#: src\qualcoder\__main__.py:2985
-msgid "Attributes: "
-msgstr "Atribute: "
+#: src/qualcoder/code_pdf.py:1850 src/qualcoder/view_image.py:268
+#: src/qualcoder/view_av.py:303 src/qualcoder/code_text.py:1314
+msgid "Enter text to match all or partial code:"
+msgstr "Introduceți textul pentru a potrivi codul complet sau parțial:"
 
-#: src\qualcoder\attributes.py:148
-msgid "Attribute added: "
-msgstr "Atribut adăugat: "
+#: src/qualcoder/code_pdf.py:1873 src/qualcoder/view_image.py:290
+#: src/qualcoder/view_av.py:325 src/qualcoder/code_text.py:1337
+msgid "Match not found"
+msgstr "Potrivire negăsită"
 
-#: src\qualcoder\attributes.py:169
-msgid "Attribute deleted: "
-msgstr "Atribut șters: "
+#: src/qualcoder/code_pdf.py:1873 src/qualcoder/view_image.py:290
+#: src/qualcoder/view_av.py:325 src/qualcoder/code_text.py:1337
+msgid "No code with matching text found."
+msgstr "Nu s-a găsit niciun cod cu textul care să corespundă."
 
-#: src\qualcoder\attributes.py:180
-msgid "Attributes deleted: "
-msgstr "Atribute șterse: "
+#: src/qualcoder/code_pdf.py:1879 src/qualcoder/code_pdf.py:2011
+#: src/qualcoder/view_image.py:295 src/qualcoder/view_image.py:2038
+#: src/qualcoder/view_av.py:330 src/qualcoder/code_text.py:1343
+#: src/qualcoder/code_text.py:2103 src/qualcoder/code_text.py:2149
+msgid "Select code"
+msgstr "Selectați cod"
 
-#: src\qualcoder\attributes.py:190
-msgid "Memo for Attribute "
-msgstr "Memo pentru atributul "
+#: src/qualcoder/code_pdf.py:2033 src/qualcoder/view_av.py:2083
+#: src/qualcoder/code_text.py:3307
+msgid "Text position"
+msgstr "Poziția textului"
 
-#: src\qualcoder\attributes.py:216
-msgid "numeric"
-msgstr "numeric"
+#: src/qualcoder/code_pdf.py:2033 src/qualcoder/view_av.py:2083
+#: src/qualcoder/code_text.py:3307
+msgid "Character position: "
+msgstr "Poziția caracterului: "
 
 #: src\qualcoder\attributes.py:217
 msgid "Change to character"
 msgstr "Schimbați la caracter"
 
-#: src\qualcoder\attributes.py:251
-msgid "Attribute renamed from: "
-msgstr "Atribut redenumit din: "
+#: src/qualcoder/code_pdf.py:2404 src/qualcoder/view_image.py:2640
+#: src/qualcoder/view_av.py:2636 src/qualcoder/code_text.py:4589
+msgid "Merge code: "
+msgstr "Îmbinare cod: "
 
-#: src\qualcoder\attributes.py:251 src\qualcoder\code_text.py:5191
-#: src\qualcoder\code_text.py:5247
-msgid " to "
-msgstr " în "
+#: src/qualcoder/code_pdf.py:2404 src/qualcoder/code_text.py:4589
+msgid " into code: "
+msgstr " în codul: "
 
-#: src\qualcoder\attributes.py:264
-msgid "Assigned to"
-msgstr "Atribuit la"
+#: src/qualcoder/code_pdf.py:2405 src/qualcoder/view_image.py:2641
+#: src/qualcoder/view_av.py:2637 src/qualcoder/code_text.py:4590
+msgid "Merge codes"
+msgstr "Îmbinați codurile"
 
-#: src\qualcoder\attributes.py:264 src\qualcoder\manage_links.py:189
-#: src\qualcoder\manage_references.py:387
-msgid "Type"
-msgstr "Tip"
+#: src/qualcoder/code_pdf.py:2484 src/qualcoder/view_image.py:2711
+#: src/qualcoder/view_av.py:2706 src/qualcoder/code_text.py:4665
+msgid "Add new code"
+msgstr "Adăugați cod nou"
 
-#: src\qualcoder\attributes.py:276 src\qualcoder\case_file_manager.py:233
-#: src\qualcoder\case_file_manager.py:306
-msgid "Yes"
-msgstr "Da"
+#: src/qualcoder/code_pdf.py:2484 src/qualcoder/code_pdf.py:2727
+#: src/qualcoder/view_image.py:2711 src/qualcoder/view_image.py:2895
+#: src/qualcoder/view_av.py:2886 src/qualcoder/code_text.py:4665
+#: src/qualcoder/code_text.py:4909
+msgid "Code name"
+msgstr "Nume cod"
 
-#: src\qualcoder\cases.py:262
-msgid "Case attributes file exported to: "
-msgstr "Fișierul de atribute ale cazului exportat în: "
+#: src/qualcoder/code_pdf.py:2504 src/qualcoder/view_image.py:2727
+#: src/qualcoder/report_cooccurrence.py:1020 src/qualcoder/code_text.py:4685
+msgid "New code: "
+msgstr "Cod nou: "
 
-#: src\qualcoder\cases.py:263 src\qualcoder\reports.py:409
-#: src\qualcoder\report_relations.py:979
-msgid "File export"
-msgstr "Export fișier"
+#: src/qualcoder/code_pdf.py:2560 src/qualcoder/view_image.py:2736
+#: src/qualcoder/code_organiser.py:116 src/qualcoder/code_organiser.py:426
+#: src/qualcoder/view_graph.py:2703 src/qualcoder/view_graph.py:4040
+#: src/qualcoder/view_graph.py:4042 src/qualcoder/view_av.py:2729
+#: src/qualcoder/code_text.py:3858 src/qualcoder/code_text.py:4743
+msgid "Category"
+msgstr "Categorie"
 
-#: src\qualcoder\cases.py:355 src\qualcoder\__main__.py:2973
-msgid "Cases: "
-msgstr "Cazuri: "
+#: src/qualcoder/code_pdf.py:2560 src/qualcoder/code_pdf.py:2765
+#: src/qualcoder/view_image.py:2736 src/qualcoder/view_image.py:2927
+#: src/qualcoder/code_organiser.py:116 src/qualcoder/code_organiser.py:426
+#: src/qualcoder/view_av.py:2729 src/qualcoder/view_av.py:2916
+#: src/qualcoder/code_text.py:4743 src/qualcoder/code_text.py:4945
+msgid "Category name"
+msgstr "Nume categorie"
 
-#: src\qualcoder\cases.py:386
-msgid "Attribute added to cases: "
-msgstr "Atribut adăugat la cazuri: "
+#: src/qualcoder/code_pdf.py:2574 src/qualcoder/view_image.py:2750
+#: src/qualcoder/code_text.py:4757
+msgid "New category: "
+msgstr "Categorie nouă: "
 
-#: src\qualcoder\cases.py:386
-msgid "type:"
-msgstr "tip:"
+#: src/qualcoder/code_pdf.py:2604 src/qualcoder/view_image.py:2779
+#: src/qualcoder/report_codes.py:1292 src/qualcoder/view_graph.py:1342
+#: src/qualcoder/view_graph.py:1413 src/qualcoder/view_graph.py:1478
+#: src/qualcoder/view_graph.py:1571 src/qualcoder/view_graph.py:2266
+#: src/qualcoder/view_graph.py:2291 src/qualcoder/view_graph.py:2317
+#: src/qualcoder/view_graph.py:2343 src/qualcoder/view_graph.py:2362
+#: src/qualcoder/view_graph.py:2383 src/qualcoder/view_av.py:2769
+#: src/qualcoder/code_text.py:3021 src/qualcoder/code_text.py:4785
+#: src/qualcoder/reports.py:352
+msgid "Code: "
+msgstr "Cod: "
 
-#: src\qualcoder\cases.py:393
-msgid "Cases have already been created."
-msgstr "Cazurile au fost deja create."
+#: src/qualcoder/code_pdf.py:2615 src/qualcoder/view_image.py:2783
+#: src/qualcoder/view_av.py:2779 src/qualcoder/code_text.py:4796
+msgid "Code deleted: "
+msgstr "Cod șters: "
 
-#: src\qualcoder\cases.py:395
-msgid "Select cases file"
-msgstr "Selectați fișierul de cazuri"
+#: src/qualcoder/code_pdf.py:2638 src/qualcoder/view_image.py:2806
+#: src/qualcoder/report_codes.py:1287 src/qualcoder/view_av.py:2796
+#: src/qualcoder/view_charts.py:499 src/qualcoder/report_cooccurrence.py:374
+#: src/qualcoder/code_text.py:4819 src/qualcoder/reports.py:349
+msgid "Category: "
+msgstr "Categorie: "
 
-#: src\qualcoder\cases.py:466 src\qualcoder\cases.py:542
-msgid "attribute:"
-msgstr "atribut:"
+#: src/qualcoder/code_pdf.py:2654 src/qualcoder/view_image.py:2820
+#: src/qualcoder/view_av.py:2810 src/qualcoder/code_text.py:4835
+msgid "Category deleted: "
+msgstr "Categorie ștearsă: "
 
-#: src\qualcoder\cases.py:481 src\qualcoder\cases.py:557
-msgid "Cases and attributes imported from: "
-msgstr "Cazuri și atribute importate din: "
+#: src/qualcoder/code_pdf.py:2671 src/qualcoder/code_text.py:4853
+msgid "Memo for Code: "
+msgstr "Memo pentru cod: "
 
-#: src\qualcoder\cases.py:502
-msgid "Cannot import from csv, only one row in file"
-msgstr "Nu se poate importa din csv, doar un rând în fișier"
+#: src/qualcoder/code_pdf.py:2685 src/qualcoder/view_image.py:2209
+#: src/qualcoder/code_text.py:4867
+msgid "Memo for code: "
+msgstr "Memo pentru cod: "
 
-#: src\qualcoder\cases.py:568 src\qualcoder\manage_files.py:1210
-#: src\qualcoder\view_graph.py:1795 src\qualcoder\view_graph.py:2870
-#: src\qualcoder\view_graph.py:2898
-msgid "Case"
-msgstr "Caz"
+#: src/qualcoder/code_pdf.py:2695 src/qualcoder/view_image.py:2863
+#: src/qualcoder/code_text.py:4877
+msgid "Memo for Category: "
+msgstr "Memo pentru categorie: "
 
-#: src\qualcoder\cases.py:568
-msgid "Enter case name"
-msgstr "Introduceți numele cazului"
+#: src/qualcoder/code_pdf.py:2710 src/qualcoder/code_text.py:4892
+msgid "Memo for category: "
+msgstr "Memo pentru categorie: "
 
-#: src\qualcoder\cases.py:594
-msgid "Case added: "
-msgstr "Caz adăugat: "
+#: src/qualcoder/code_pdf.py:2727 src/qualcoder/view_image.py:2895
+#: src/qualcoder/view_av.py:2886 src/qualcoder/code_text.py:4909
+msgid "Rename code"
+msgstr "Redenumiți codul"
 
-#: src\qualcoder\cases.py:668 src\qualcoder\journals.py:779
-#: src\qualcoder\manage_files.py:1480
-msgid "This attribute is numeric"
-msgstr "Acest atribut este numeric"
+#: src/qualcoder/code_pdf.py:2765 src/qualcoder/view_image.py:2927
+#: src/qualcoder/view_av.py:2916 src/qualcoder/code_text.py:4945
+msgid "Rename category"
+msgstr "Redenumiți categoria"
 
-#: src\qualcoder\cases.py:669 src\qualcoder\case_file_manager.py:620
-#: src\qualcoder\code_pdf.py:3172 src\qualcoder\code_pdf.py:3678
-#: src\qualcoder\code_pdf.py:3682 src\qualcoder\code_pdf.py:3846
-#: src\qualcoder\code_text.py:2327 src\qualcoder\code_text.py:5762
-#: src\qualcoder\code_text.py:5767 src\qualcoder\code_text.py:5946
-#: src\qualcoder\code_text.py:6043 src\qualcoder\code_text.py:6056
-#: src\qualcoder\code_text.py:6190 src\qualcoder\code_text.py:6334
-#: src\qualcoder\import_survey.py:208 src\qualcoder\journals.py:736
-#: src\qualcoder\journals.py:740 src\qualcoder\journals.py:780
-#: src\qualcoder\journals.py:863 src\qualcoder\journals.py:869
-#: src\qualcoder\manage_files.py:1481 src\qualcoder\manage_files.py:1615
-#: src\qualcoder\manage_files.py:2190 src\qualcoder\manage_files.py:2220
-#: src\qualcoder\manage_files.py:2225 src\qualcoder\manage_files.py:2385
-#: src\qualcoder\refi.py:1226 src\qualcoder\report_attributes.py:654
-#: src\qualcoder\report_attributes.py:658
-#: src\qualcoder\report_attributes.py:661
-#: src\qualcoder\report_attributes.py:669 src\qualcoder\report_codes.py:1328
-#: src\qualcoder\text_file_replacement.py:76
-#: src\qualcoder\text_file_replacement.py:305
-#: src\qualcoder\text_file_replacement.py:308
-#: src\qualcoder\text_file_replacement.py:313 src\qualcoder\view_av.py:3421
-#: src\qualcoder\view_av.py:3425 src\qualcoder\view_av.py:3574
-#: src\qualcoder\view_graph.py:1669
-msgid "Warning"
-msgstr "Avertisment"
+#: src/qualcoder/code_pdf.py:2843 src/qualcoder/view_image.py:769
+#: src/qualcoder/view_av.py:774 src/qualcoder/code_text.py:5023
+msgid "Open memo"
+msgstr "Deschideți memo"
 
 #: src\qualcoder\cases.py:725
 msgid "Memo for case "
 msgstr "Memo pentru cazul "
 
-#: src\qualcoder\cases.py:764 src\qualcoder\manage_files.py:406
-msgid "Show all columns"
-msgstr "Afișați toate coloanele"
+#: src/qualcoder/code_pdf.py:2850 src/qualcoder/view_image.py:770
+#: src/qualcoder/view_av.py:775 src/qualcoder/code_text.py:5030
+msgid "Next file"
+msgstr "Fișierul următor"
 
-#: src\qualcoder\cases.py:767 src\qualcoder\manage_files.py:409
-msgid "Hide column"
-msgstr "Ascundeți coloana"
+#: src/qualcoder/code_pdf.py:2851 src/qualcoder/view_image.py:771
+#: src/qualcoder/view_av.py:776 src/qualcoder/code_text.py:5031
+msgid "File with latest coding"
+msgstr "Fișier cu cea mai recentă codare"
 
-#: src\qualcoder\cases.py:768 src\qualcoder\manage_files.py:410
-msgid "Hide columns starting with"
-msgstr "Ascundeți coloanele care încep cu"
+#: src/qualcoder/code_pdf.py:3027 src/qualcoder/view_image.py:708
+#: src/qualcoder/view_av.py:914 src/qualcoder/code_text.py:2521
+msgid "Memo for file: "
+msgstr "Memo pentru fișier: "
 
-#: src\qualcoder\cases.py:769 src\qualcoder\manage_files.py:411
-msgid "Show columns starting with"
-msgstr "Afișați coloanele care încep cu"
+#: src/qualcoder/code_pdf.py:3039 src/qualcoder/code_text.py:2533
+msgid "Memo:"
+msgstr "Memo:"
 
-#: src\qualcoder\cases.py:781 src\qualcoder\manage_files.py:423
-msgid "Hide columns starting with:"
-msgstr "Ascundeți coloanele care încep cu:"
+#: src/qualcoder/code_pdf.py:3085 src/qualcoder/code_text.py:5446
+msgid "Code text: "
+msgstr "Text cod: "
 
 #: src\qualcoder\cases.py:782 src\qualcoder\manage_files.py:424
 msgid "Hide Columns"
@@ -983,11 +1129,30 @@ msgstr "Afișați coloanele"
 msgid "View case"
 msgstr "Vizualizați cazul"
 
-#: src\qualcoder\cases.py:819 src\qualcoder\cases.py:826
-#: src\qualcoder\manage_files.py:479 src\qualcoder\manage_files.py:485
-#: src\qualcoder\manage_files.py:491 src\qualcoder\manage_files.py:506
-msgid "Order ascending"
-msgstr "Sortare ascendentă"
+#: src/qualcoder/code_pdf.py:3172 src/qualcoder/code_pdf.py:3678
+#: src/qualcoder/code_pdf.py:3682 src/qualcoder/code_pdf.py:3846
+#: src/qualcoder/journals.py:736 src/qualcoder/journals.py:740
+#: src/qualcoder/journals.py:780 src/qualcoder/journals.py:863
+#: src/qualcoder/journals.py:869 src/qualcoder/report_attributes.py:654
+#: src/qualcoder/report_attributes.py:658
+#: src/qualcoder/report_attributes.py:661
+#: src/qualcoder/report_attributes.py:669 src/qualcoder/manage_files.py:1481
+#: src/qualcoder/manage_files.py:1615 src/qualcoder/manage_files.py:2190
+#: src/qualcoder/manage_files.py:2220 src/qualcoder/manage_files.py:2225
+#: src/qualcoder/manage_files.py:2385 src/qualcoder/refi.py:1226
+#: src/qualcoder/case_file_manager.py:620 src/qualcoder/report_codes.py:1328
+#: src/qualcoder/view_graph.py:1669 src/qualcoder/text_file_replacement.py:76
+#: src/qualcoder/text_file_replacement.py:305
+#: src/qualcoder/text_file_replacement.py:308
+#: src/qualcoder/text_file_replacement.py:313 src/qualcoder/view_av.py:3421
+#: src/qualcoder/view_av.py:3425 src/qualcoder/view_av.py:3574
+#: src/qualcoder/import_survey.py:208 src/qualcoder/cases.py:669
+#: src/qualcoder/code_text.py:2327 src/qualcoder/code_text.py:5762
+#: src/qualcoder/code_text.py:5767 src/qualcoder/code_text.py:5946
+#: src/qualcoder/code_text.py:6043 src/qualcoder/code_text.py:6056
+#: src/qualcoder/code_text.py:6190 src/qualcoder/code_text.py:6334
+msgid "Warning"
+msgstr "Avertisment"
 
 #: src\qualcoder\cases.py:820 src\qualcoder\cases.py:827
 #: src\qualcoder\manage_files.py:480 src\qualcoder\manage_files.py:486
@@ -1034,9 +1199,10 @@ msgstr "Afișați valori precum:"
 msgid "Click to edit memo"
 msgstr "Faceți clic pentru a edita memo-ul"
 
-#: src\qualcoder\cases.py:902
-msgid "Click to manage files for this case"
-msgstr "Faceți clic pentru a gestiona fișierele pentru acest caz"
+#: src/qualcoder/code_pdf.py:3419 src/qualcoder/code_pdf.py:3816
+#: src/qualcoder/view_av.py:3544 src/qualcoder/code_text.py:5916
+msgid "Select code to unmark"
+msgstr "Selectați codul pentru detașarea marcajului"
 
 #: src\qualcoder\cases.py:916 src\qualcoder\manage_files.py:172
 #: src\qualcoder\manage_files.py:2766
@@ -1060,49 +1226,52 @@ msgstr "Se vizualizează textul cazului: "
 msgid "File:"
 msgstr "Fișier:"
 
-#: src\qualcoder\cases.py:1006
-msgid "Characters:"
-msgstr "Caractere:"
+#: src/qualcoder/code_pdf.py:3678 src/qualcoder/code_pdf.py:3846
+#: src/qualcoder/code_text.py:2327 src/qualcoder/code_text.py:5762
+#: src/qualcoder/code_text.py:5946
+msgid "No file was selected"
+msgstr "Nu a fost selectat niciun fișier"
 
-#: src\qualcoder\cases.py:1021
-msgid "Image:"
-msgstr "Imagine:"
+#: src/qualcoder/code_pdf.py:3682 src/qualcoder/view_av.py:3425
+#: src/qualcoder/code_text.py:5767 src/qualcoder/code_text.py:6043
+#: src/qualcoder/code_text.py:6190 src/qualcoder/code_text.py:6334
+msgid "No code was selected"
+msgstr "Nu a fost selectat niciun cod"
 
-#: src\qualcoder\cases.py:1033
-msgid "AV media:"
-msgstr "Media AV:"
+#: src/qualcoder/code_pdf.py:3884 src/qualcoder/code_pdf.py:3904
+#: src/qualcoder/view_av.py:3598 src/qualcoder/view_av.py:3619
+#: src/qualcoder/code_text.py:1123 src/qualcoder/code_text.py:1143
+#: src/qualcoder/code_text.py:3047 src/qualcoder/code_text.py:5985
+#: src/qualcoder/code_text.py:6006
+msgid "Annotation: "
+msgstr "Adnotare: "
 
-#: src\qualcoder\cases.py:1057
-msgid "Open"
-msgstr "Deschideți"
+#: src/qualcoder/code_pdf.py:3898 src/qualcoder/view_av.py:3612
+#: src/qualcoder/code_text.py:1136 src/qualcoder/code_text.py:5999
+msgid "Annotation added at position: "
+msgstr "Adnotare adăugată la poziția: "
 
-#: src\qualcoder\cases.py:1101 src\qualcoder\case_file_manager.py:448
-#: src\qualcoder\edit_textfile.py:654 src\qualcoder\report_exact_matches.py:732
-#: src\qualcoder\report_relations.py:561 src\qualcoder\report_sql.py:435
-#: src\qualcoder\speakers.py:289
-msgid "Select all"
-msgstr "Selectați tot"
+#: src/qualcoder/code_pdf.py:3926 src/qualcoder/view_av.py:3639
+#: src/qualcoder/code_text.py:1163 src/qualcoder/code_text.py:6028
+msgid "Annotation removed from position "
+msgstr "Adnotare eliminată din poziția "
 
-#: src\qualcoder\cases.py:1102 src\qualcoder\case_file_manager.py:452
-#: src\qualcoder\edit_textfile.py:655 src\qualcoder\error_dlg.py:44
-#: src\qualcoder\report_sql.py:436
-msgid "Copy"
-msgstr "Copiați"
+#: src/qualcoder/code_pdf.py:4016 src/qualcoder/view_av.py:3819
+#: src/qualcoder/code_text.py:7637
+#, fuzzy
+msgid "Select code to resize"
+msgstr "Selectați codul pentru redimensionare"
 
-#: src\qualcoder\cases.py:1138 src\qualcoder\report_codes.py:3233
-msgid "Right click to view"
-msgstr "Faceți clic dreapta pentru a vizualiza"
+#: src/qualcoder/code_pdf.py:4116 src/qualcoder/view_image.py:2473
+#: src/qualcoder/view_av.py:3917 src/qualcoder/code_text.py:7711
+#, fuzzy
+msgid "Duplicate Error"
+msgstr "Eroare duplicat"
 
-#: src\qualcoder\case_file_manager.py:96 src\qualcoder\code_in_all_files.py:253
-#: src\qualcoder\code_pdf.py:392 src\qualcoder\code_text.py:1435
-#: src\qualcoder\helpers.py:435 src\qualcoder\report_attributes.py:465
-#: src\qualcoder\report_codes.py:2437
-#: src\qualcoder\report_compare_coder_file.py:311
-#: src\qualcoder\report_file_summary.py:253 src\qualcoder\view_av.py:449
-#: src\qualcoder\view_charts.py:433 src\qualcoder\view_charts.py:501
-#: src\qualcoder\view_graph.py:2593 src\qualcoder\view_image.py:407
-msgid "Case: "
-msgstr "Caz: "
+#: src/qualcoder/code_pdf.py:4117 src/qualcoder/view_av.py:3918
+#: src/qualcoder/code_text.py:7712
+msgid "This code already exists at this exact location."
+msgstr "Acest cod există deja în această locație exactă."
 
 #: src\qualcoder\case_file_manager.py:156
 msgid "Files linked: "
@@ -1237,19 +1406,15 @@ msgstr "Vizibilitate"
 msgid "visible"
 msgstr "vizibil"
 
-#: src\qualcoder\coder_names.py:166
-msgid "hidden"
-msgstr "ascuns"
-
-#: src\qualcoder\coder_names.py:202 src\qualcoder\coder_names.py:213
-#: src\qualcoder\coder_names.py:226 src\qualcoder\coder_names.py:237
-#: src\qualcoder\coder_names.py:241 src\qualcoder\coder_names.py:317
-#: src\qualcoder\coder_names.py:333 src\qualcoder\coder_names.py:354
-#: src\qualcoder\coder_names.py:365 src\qualcoder\coder_names.py:368
-#: src\qualcoder\coder_names.py:377 src\qualcoder\coder_names.py:380
-#: src\qualcoder\coder_names.py:384 src\qualcoder\coder_names.py:386
-#: src\qualcoder\code_text.py:3906 src\qualcoder\journals.py:186
-#: src\qualcoder\report_exact_matches.py:540 src\qualcoder\__main__.py:1796
+#: src/qualcoder/journals.py:186 src/qualcoder/coder_names.py:202
+#: src/qualcoder/coder_names.py:213 src/qualcoder/coder_names.py:226
+#: src/qualcoder/coder_names.py:237 src/qualcoder/coder_names.py:241
+#: src/qualcoder/coder_names.py:317 src/qualcoder/coder_names.py:333
+#: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
+#: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
+#: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
+#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1796
+#: src/qualcoder/report_exact_matches.py:540
 msgid "Coder"
 msgstr "Codator"
 
@@ -2449,211 +2614,182 @@ msgstr ""
 "incorect.\n"
 "Diferență de caractere: "
 
-#: src\qualcoder\code_pdf.py:3259
-msgid "TEXT START CHARACTER POSITION: "
-msgstr "POZIȚIA CARACTERULUI DE START A TEXTULUI: "
-
-#: src\qualcoder\code_pdf.py:3260
-msgid "TEXT END CHARACTER POSITION: "
-msgstr "POZIȚIA CARACTERULUI DE FINAL A TEXTULUI: "
-
-#: src\qualcoder\code_pdf.py:3261
-msgid "NUMBER OF CHARACTERS: "
-msgstr "NUMĂRUL DE CARACTERE: "
-
-#: src\qualcoder\code_pdf.py:3360
-msgid "Important"
-msgstr "Important"
-
-#: src\qualcoder\code_pdf.py:3406
-msgid "Code memo"
-msgstr "Memo cod"
-
-#: src\qualcoder\code_pdf.py:3411
-msgid "Flag important"
-msgstr "Marcați ca important"
-
-#: src\qualcoder\code_pdf.py:3419 src\qualcoder\code_pdf.py:3816
-#: src\qualcoder\code_text.py:5916 src\qualcoder\view_av.py:3544
-msgid "Select code to unmark"
-msgstr "Selectați codul pentru detașarea marcajului"
-
-#: src\qualcoder\code_pdf.py:3446
-msgid "Select code for important flag"
-msgstr "Selectați codul pentru marcajul important"
-
-#: src\qualcoder\code_pdf.py:3460
-msgid "Select code to remove important flag"
-msgstr "Selectați codul pentru eliminarea marcajului important"
-
-#: src\qualcoder\code_pdf.py:3673
-msgid "PDF loaded text does not match Imported PDF text length."
+#: src/qualcoder/settings.py:84
+msgid "Another language has been set in the config.ini file."
 msgstr ""
-"Textul încărcat PDF nu se potrivește cu lungimea textului PDF importat."
 
-#: src\qualcoder\code_pdf.py:3674
-msgid "Mark using the right hand side text pane."
-msgstr "Marcați folosind panoul de text din partea dreaptă."
+#: src/qualcoder/settings.py:85
+msgid "Additional community supported languages are found in the i18n folder."
+msgstr ""
 
-#: src\qualcoder\code_pdf.py:3675
-msgid "Cannot mark"
-msgstr "Nu se poate marca"
+#: src/qualcoder/settings.py:86
+msgid "They may not be recently updated"
+msgstr ""
 
-#: src\qualcoder\code_pdf.py:3678 src\qualcoder\code_pdf.py:3846
-#: src\qualcoder\code_text.py:2327 src\qualcoder\code_text.py:5762
-#: src\qualcoder\code_text.py:5946
-msgid "No file was selected"
-msgstr "Nu a fost selectat niciun fișier"
+#: src/qualcoder/settings.py:134
+msgid "original"
+msgstr "original"
 
-#: src\qualcoder\code_pdf.py:3682 src\qualcoder\code_text.py:5767
-#: src\qualcoder\code_text.py:6043 src\qualcoder\code_text.py:6190
-#: src\qualcoder\code_text.py:6334 src\qualcoder\view_av.py:3425
-msgid "No code was selected"
-msgstr "Nu a fost selectat niciun cod"
+#: src/qualcoder/settings.py:134
+msgid "dark"
+msgstr "întunecat"
 
-#: src\qualcoder\code_pdf.py:3884 src\qualcoder\code_pdf.py:3904
-#: src\qualcoder\code_text.py:1123 src\qualcoder\code_text.py:1143
-#: src\qualcoder\code_text.py:3047 src\qualcoder\code_text.py:5985
-#: src\qualcoder\code_text.py:6006 src\qualcoder\view_av.py:3598
-#: src\qualcoder\view_av.py:3619
-msgid "Annotation: "
-msgstr "Adnotare: "
+#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1637
+msgid "blue"
+msgstr "albastru"
 
-#: src\qualcoder\code_pdf.py:3898 src\qualcoder\code_text.py:1136
-#: src\qualcoder\code_text.py:5999 src\qualcoder\view_av.py:3612
-msgid "Annotation added at position: "
-msgstr "Adnotare adăugată la poziția: "
+#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1639
+msgid "green"
+msgstr "verde"
 
-#: src\qualcoder\code_pdf.py:3899 src\qualcoder\code_pdf.py:3927
-msgid "for:"
-msgstr "pentru:"
+#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1640
+msgid "orange"
+msgstr "portocaliu"
 
-#: src\qualcoder\code_pdf.py:3926 src\qualcoder\code_text.py:1163
-#: src\qualcoder\code_text.py:6028 src\qualcoder\view_av.py:3639
-msgid "Annotation removed from position "
-msgstr "Adnotare eliminată din poziția "
+#: src/qualcoder/settings.py:134
+msgid "purple"
+msgstr "mov"
 
-#: src\qualcoder\code_pdf.py:4016 src\qualcoder\code_text.py:7637
-#: src\qualcoder\view_av.py:3819
-#, fuzzy
-msgid "Select code to resize"
-msgstr "Selectați codul pentru redimensionare"
+#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1640
+msgid "yellow"
+msgstr "galben"
 
-#: src\qualcoder\code_pdf.py:4116 src\qualcoder\code_text.py:7711
-#: src\qualcoder\view_av.py:3917 src\qualcoder\view_image.py:2473
-#, fuzzy
-msgid "Duplicate Error"
-msgstr "Eroare duplicat"
+#: src/qualcoder/settings.py:134
+msgid "rainbow"
+msgstr "curcubeu"
 
-#: src\qualcoder\code_pdf.py:4117 src\qualcoder\code_text.py:7712
-#: src\qualcoder\view_av.py:3918
-msgid "This code already exists at this exact location."
-msgstr "Acest cod există deja în această locație exactă."
+#: src/qualcoder/settings.py:134
+msgid "native"
+msgstr "nativ"
 
-#: src\qualcoder\code_text.py:533
-msgid "EDITING TEXT MODE (Ctrl+E)"
-msgstr "MOD EDITARE TEXT (Ctrl+E)"
+#: src/qualcoder/settings.py:157
+msgid "Bold"
+msgstr "Aldin"
 
-#: src\qualcoder\code_text.py:535 src\qualcoder\view_av.py:4450
+#: src/qualcoder/settings.py:157
+msgid "Italic"
+msgstr "Cursiv"
+
+#: src/qualcoder/settings.py:157
+msgid "Bigger"
+msgstr "Mai mare"
+
+#: src/qualcoder/settings.py:168
+msgid "Default folder for storing automatic backups and for file outputs."
+msgstr ""
+"Folderul implicit pentru stocarea copiilor de siguranță automate și pentru "
+"ieșirile de fișiere."
+
+#: src/qualcoder/settings.py:308 src/qualcoder/settings.py:316
+msgid "Edit AI profile name"
+msgstr "Editați numele profilului AI"
+
+#: src/qualcoder/settings.py:308
 msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
 "assigned)."
 msgstr ""
-"Evitați selectarea secțiunilor de text cu o combinație de text neînfrunțit "
-"(necodat / adnotat / atribuit cazului) și înfrunțit (codat, adnotat, "
-"atribuit cazului)."
+"Selectați mai întâi un profil. \n"
+"Puteți edita doar numele unui profil existent. Pentru a crea un profil nou "
+"de la zero, urmați instrucțiunile din wiki-ul QualCoder de pe GitHub."
 
-#: src\qualcoder\code_text.py:538 src\qualcoder\view_av.py:4452
+#: src/qualcoder/settings.py:317 src/qualcoder/settings.py:532
+msgid "Enter new profile name:"
+msgstr "Introduceți numele noului profil:"
+
+#: src/qualcoder/settings.py:377
 msgid ""
 "Positions of the underlying codes / annotations / case-assigned may not "
 "correctly adjust if text is typed over or deleted."
 msgstr ""
-"Pozițiile codurilor / adnotărilor / atribuirilor la caz de subiacente s-ar "
-"putea să nu se ajusteze corect dacă textul este tastat peste sau șters."
+"Cheia API conține caractere non-ASCII și nu poate fi utilizată.\n"
+"Vă rugăm să lipiți din nou cheia exact așa cum a fost furnizată de "
+"furnizorul dvs. AI. \n"
+"\n"
+"Caractere invalide: "
 
-#: src\qualcoder\code_text.py:684 src\qualcoder\code_text.py:1301
+#: src/qualcoder/settings.py:380
+#, fuzzy
+msgid "Invalid API key"
+msgstr "Cheie API invalidă"
+
+#: src/qualcoder/settings.py:464
 #, fuzzy
 msgid "Select document font and size."
 msgstr "Selectați fontul și dimensiunea documentului."
 
-#: src\qualcoder\code_text.py:804
-msgid "Right click for highlighting options"
+#: src/qualcoder/settings.py:476
+msgid "AI temperature parameter must be between 0.0 and 2.0."
 msgstr ""
 
-#: src\qualcoder\code_text.py:882 src\qualcoder\helpers.py:1459
-#: src\qualcoder\view_av.py:4362 src\qualcoder\view_image.py:1128
-msgid "IMPORTANT"
-msgstr "IMPORTANT"
-
-#: src\qualcoder\code_text.py:940
-msgid "Hide code stripes margin"
+#: src/qualcoder/settings.py:484
+msgid "AI top_p parameter must be between 0.0 and 1.0."
 msgstr ""
 
-#: src\qualcoder\code_text.py:942
-#, fuzzy
-msgid "Show code stripes margin"
-msgstr "Afișați fișierele codate"
+#: src/qualcoder/settings.py:507
+msgid "Choose a default output folder"
+msgstr "Alegeți un folder de ieșire implicit"
 
-#: src\qualcoder\code_text.py:949
-msgid "Move margin to the left"
+#: src/qualcoder/settings.py:511 src/qualcoder/settings.py:514
+msgid "Choose another folder"
+msgstr "Alegeți un alt folder"
+
+#: src/qualcoder/settings.py:511
+msgid "Do not use the QualCoder configuration folder."
+msgstr "Nu utilizați folderul de configurare QualCoder."
+
+#: src/qualcoder/settings.py:514
+msgid "Do not use the QualCoder data folder."
+msgstr "Nu utilizați folderul de date QualCoder."
+
+#: src/qualcoder/settings.py:531 src/qualcoder/settings.py:544
+msgid "New AI profile"
+msgstr "Profil AI nou"
+
+#: src/qualcoder/settings.py:544
+msgid "An AI profile with this name already exists: "
+msgstr "Un profil AI cu acest nume există deja: "
+
+#: src/qualcoder/settings.py:601
+msgid "Please select an AI profile or disable the AI altogether."
+msgstr "Vă rugăm să selectați un profil AI sau să dezactivați AI-ul complet."
+
+#: src/qualcoder/settings.py:602
+msgid "AI profile"
+msgstr "Profil AI"
+
+#: src/qualcoder/settings.py:607
+msgid "Please enter a valid API-key for the AI model."
+msgstr "Vă rugăm să introduceți o cheie API validă pentru modelul AI."
+
+#: src/qualcoder/settings.py:608 src/qualcoder/settings.py:614
+msgid "AI model"
+msgstr "Model AI"
+
+#: src/qualcoder/settings.py:613
+msgid "Please select a \"large\" and a \"fast\" AI model."
+msgstr "Vă rugăm să selectați un model AI \"mare\" și unul \"rapid\"."
+
+#: src/qualcoder/settings.py:636
+msgid "Restart QualCoder"
+msgstr "Repornește QualCoder"
+
+#: src/qualcoder/settings.py:636
+msgid "Restart QualCoder to enact some changes"
+msgstr "Repornește QualCoder pentru a aplica unele modificări"
+
+#: src/qualcoder/settings.py:641
+msgid ""
+"It seems that you have made changes to the coder names. These changes will "
+"be lost as well. Do you really want to cancel?"
 msgstr ""
+"Se pare că ați făcut modificări la numele codatorilor. Aceste modificări se "
+"vor pierde și ele. Sigur doriți să anulați?"
 
-#: src\qualcoder\code_text.py:951
-msgid "Move margin to the right"
-msgstr ""
-
-#: src\qualcoder\code_text.py:955
-#, fuzzy
-msgid "Highlight style"
-msgstr "Evidențiați zona - solarizare"
-
-#: src\qualcoder\code_text.py:959
-#, fuzzy
-msgid "Marker"
-msgstr "Marcați"
-
-#: src\qualcoder\code_text.py:961
-msgid "Underline"
-msgstr ""
-
-#: src\qualcoder\code_text.py:1137 src\qualcoder\code_text.py:1164
-#: src\qualcoder\code_text.py:6000 src\qualcoder\code_text.py:6029
-#: src\qualcoder\view_av.py:3613 src\qualcoder\view_av.py:3640
-msgid " for: "
-msgstr " pentru: "
-
-#: src\qualcoder\code_text.py:1455
-msgid "REF"
-msgstr "REF"
-
-#: src\qualcoder\code_text.py:1856
-msgid "Examples:"
-msgstr "Exemple:"
-
-#: src\qualcoder\code_text.py:1879 src\qualcoder\information.py:180
-msgid "Project memo"
-msgstr "Memo proiect"
-
-#: src\qualcoder\code_text.py:1890
-msgid "Delete all codings in this file made by "
-msgstr "Ștergeți toate codările din acest fișier realizate de "
-
-#: src\qualcoder\code_text.py:1901
-msgid "All codes by "
-msgstr "Toate codurile de la "
-
-#: src\qualcoder\code_text.py:1901
-msgid " deleted from "
-msgstr " șterse din "
-
-#: src\qualcoder\code_text.py:2073 src\qualcoder\code_text.py:2123
-msgid "all matches in file"
-msgstr "toate potrivirile din fișier"
-
-#: src\qualcoder\code_text.py:2078 src\qualcoder\code_text.py:2128
-msgid "first match in file"
-msgstr "prima potrivire din fișier"
+#: src/qualcoder/settings.py:642 src/qualcoder/__main__.py:1795
+msgid "Settings"
+msgstr "Setări"
 
 #: src\qualcoder\code_text.py:2083
 msgid "last match in file"
@@ -2749,26 +2885,25 @@ msgid "Journals are linked to this file. Include them in the report?"
 msgstr ""
 "Jurnalele sunt legate de acest fișier. Doriți să le includeți în raport?"
 
-#: src\qualcoder\code_text.py:3554 src\qualcoder\code_text.py:4044
-#: src\qualcoder\code_text.py:4116
-msgid "Software citation"
-msgstr "Citație software"
+#: src/qualcoder/view_image.py:1092 src/qualcoder/view_av.py:374
+#: src/qualcoder/view_av.py:4763
+msgid "Width"
+msgstr "Lățime"
 
-#: src\qualcoder\code_text.py:3570 src\qualcoder\refi.py:2031
-#: src\qualcoder\refi.py:2037 src\qualcoder\__main__.py:2304
-#: src\qualcoder\__main__.py:2324
-msgid "Project"
-msgstr "Proiect"
+#: src/qualcoder/view_image.py:1092 src/qualcoder/view_av.py:377
+#: src/qualcoder/view_av.py:4766
+msgid "Height"
+msgstr "Înălțime"
 
 #: src\qualcoder\code_text.py:3767
 #, fuzzy
 msgid "Code Frequency Table"
 msgstr "Tabel frecvențe cod"
 
-#: src\qualcoder\code_text.py:3789
-#, fuzzy
-msgid "Frequency / Coverage"
-msgstr ", Frecvență: "
+#: src/qualcoder/view_image.py:1128 src/qualcoder/helpers.py:1459
+#: src/qualcoder/view_av.py:4362 src/qualcoder/code_text.py:882
+msgid "IMPORTANT"
+msgstr "IMPORTANT"
 
 #: src\qualcoder\code_text.py:3789
 #, fuzzy
@@ -2903,7 +3038,7 @@ msgstr "Afișați codarea următoare a codului selectat"
 msgid "Code renamed from: "
 msgstr "Cod redenumit din: "
 
-#: src\qualcoder\code_text.py:4967 src\qualcoder\view_image.py:2949
+#: src/qualcoder/view_image.py:2949 src/qualcoder/code_text.py:4967
 msgid "Category renamed from: "
 msgstr "Categorie redenumită din: "
 
@@ -2929,10 +3064,13 @@ msgstr "Mergeți la marcaj"
 msgid "Mark speakers"
 msgstr "Marcați vorbitorii"
 
-#: src\qualcoder\code_text.py:5102
-#, fuzzy
-msgid "Cannot open text file in browser "
-msgstr "Nu se poate deschide fișierul text în browser "
+#: src/qualcoder/ai_search_dialog.py:139 src/qualcoder/ai_search_dialog.py:504
+#: src/qualcoder/ai_search_dialog.py:524 src/qualcoder/report_codes.py:1455
+#: src/qualcoder/view_graph.py:759 src/qualcoder/view_graph.py:1331
+#: src/qualcoder/view_graph.py:1401 src/qualcoder/view_graph.py:1460
+#: src/qualcoder/report_exact_matches.py:324 src/qualcoder/code_text.py:4140
+msgid "No codes"
+msgstr "Fără coduri"
 
 #: src\qualcoder\code_text.py:5191 src\qualcoder\code_text.py:5247
 msgid "From: "
@@ -3055,13 +3193,17 @@ msgstr "Codificați propoziția"
 msgid "Auto code sentence using this text fragment:"
 msgstr "Auto-codificați propoziția folosind acest fragment de text:"
 
-#: src\qualcoder\code_text.py:6214
-msgid ""
-"Define sentence ending. Default is period space.\n"
-"Use \\n for line ending:"
-msgstr ""
-"Defineți terminarea propoziției. Implicit este punct spațiu.\n"
-"Utilizați \\n pentru terminarea liniei:"
+#: src/qualcoder/report_attributes.py:460 src/qualcoder/helpers.py:433
+#: src/qualcoder/report_codes.py:2433 src/qualcoder/view_graph.py:1342
+#: src/qualcoder/view_graph.py:1413 src/qualcoder/view_graph.py:1478
+#: src/qualcoder/view_graph.py:1571 src/qualcoder/view_graph.py:2265
+#: src/qualcoder/view_graph.py:2290 src/qualcoder/view_graph.py:2316
+#: src/qualcoder/view_graph.py:2342 src/qualcoder/view_graph.py:2361
+#: src/qualcoder/view_graph.py:2382 src/qualcoder/view_graph.py:2613
+#: src/qualcoder/view_charts.py:418 src/qualcoder/code_text.py:3508
+#: src/qualcoder/code_text.py:3648 src/qualcoder/code_text.py:6303
+msgid "File: "
+msgstr "Fișier: "
 
 #: src\qualcoder\code_text.py:6236 src\qualcoder\code_text.py:6382
 #, fuzzy
@@ -3310,12 +3452,10 @@ msgstr "Media negăsită"
 msgid "Image error"
 msgstr "Eroare imagine"
 
-#: src\qualcoder\helpers.py:736 src\qualcoder\report_compare_coder_file.py:495
-#: src\qualcoder\report_compare_coder_file.py:620
-#: src\qualcoder\report_compare_coder_file.py:1027
-#: src\qualcoder\view_image.py:991 src\qualcoder\view_image.py:3015
-msgid "Cannot open: "
-msgstr "Nu se poate deschide: "
+#: src/qualcoder/attributes.py:251 src/qualcoder/code_text.py:5191
+#: src/qualcoder/code_text.py:5247
+msgid " to "
+msgstr " în "
 
 #: src\qualcoder\helpers.py:743
 msgid ""
@@ -3545,9 +3685,10 @@ msgstr ""
 msgid "Field name invalid"
 msgstr "Nume câmp invalid"
 
-#: src\qualcoder\import_survey.py:640
-msgid " Already in use"
-msgstr " Deja în uz"
+#: src/qualcoder/manage_files.py:536 src/qualcoder/manage_files.py:1037
+#: src/qualcoder/code_text.py:5041 src/qualcoder/code_text.py:5362
+msgid "Mark speakers"
+msgstr "Marcați vorbitorii"
 
 #: src\qualcoder\import_survey.py:641
 msgid "Field name invalid."
@@ -3621,10 +3762,9 @@ msgstr "Scurtături meniu Fișiere și Cazuri"
 msgid "Open Project menu"
 msgstr "Deschideți meniul Proiect"
 
-#: src\qualcoder\information.py:176
-#, fuzzy
-msgid "New project"
-msgstr "Proiect nou"
+#: src/qualcoder/manage_files.py:1037 src/qualcoder/code_text.py:5362
+msgid "No text file selected."
+msgstr "Niciun fișier text selectat."
 
 #: src\qualcoder\information.py:177
 #, fuzzy
@@ -3744,9 +3884,9 @@ msgstr "Funcții speciale"
 msgid "Colour scheme"
 msgstr "Schema de culori"
 
-#: src\qualcoder\information.py:188 src\qualcoder\reports.py:334
-msgid "Code frequencies"
-msgstr "Frecvențe cod"
+#: src/qualcoder/manage_files.py:1876 src/qualcoder/code_text.py:7466
+msgid "Open file"
+msgstr "Deschideți fișierul"
 
 #: src\qualcoder\information.py:189
 #, fuzzy
@@ -3788,11 +3928,9 @@ msgstr "Gestionați scurtăturile tastelor meniu"
 msgid "Files"
 msgstr "Fișiere"
 
-#: src\qualcoder\information.py:197 src\qualcoder\view_charts.py:722
-#: src\qualcoder\view_charts.py:729 src\qualcoder\view_charts.py:805
-#: src\qualcoder\view_charts.py:812
-msgid "Cases"
-msgstr "Cazuri"
+#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2410
+msgid " created."
+msgstr " creat."
 
 #: src\qualcoder\information.py:198
 #, fuzzy
@@ -3987,10 +4125,11 @@ msgstr "Deschideți memo-ul fișierului"
 msgid "Filter files by attributes"
 msgstr "Filtrați fișierele după atribute"
 
-#: src\qualcoder\information.py:234
-#, fuzzy
-msgid "Show selected code previous"
-msgstr "Afișați codul selectat anterior"
+#: src/qualcoder/codebook.py:184 src/qualcoder/codebook.py:230
+#: src/qualcoder/refi.py:2144 src/qualcoder/refi.py:2145
+#: src/qualcoder/code_text.py:4167
+msgid "Codebook exported"
+msgstr "Glosar de coduri exportat"
 
 #: src\qualcoder\information.py:235
 #, fuzzy
@@ -4353,9 +4492,10 @@ msgstr "Nume jurnal în uz"
 msgid "Warning - invalid characters"
 msgstr "Avertisment - caractere invalide"
 
-#: src\qualcoder\journals.py:746
-msgid "In the journal name use only: a-z, A-z 0-9 - space"
-msgstr "În numele jurnalului utilizați doar: a-z, A-z 0-9 - spațiu"
+#: src/qualcoder/refi.py:2031 src/qualcoder/refi.py:2037
+#: src/qualcoder/__main__.py:2304 src/qualcoder/__main__.py:2324
+msgid "Project"
+msgstr "Proiect"
 
 #: src\qualcoder\journals.py:755
 msgid "Journal name changed from: "
@@ -4793,55 +4933,22 @@ msgstr "Nu se poate importa "
 msgid " imported"
 msgstr " importat"
 
-#: src\qualcoder\manage_files.py:2383
-msgid "Invalid file name. Please rename this file before exporting."
-msgstr ""
-"Nume fișier invalid. Vă rugăm să redenumiți acest fișier înainte de export."
-
-#: src\qualcoder\manage_files.py:2389
-#, fuzzy
-msgid "Linked file. Exported text representation."
-msgstr "Fișier legat. Reprezentare text exportată."
-
-#: src\qualcoder\manage_files.py:2404 src\qualcoder\manage_files.py:2406
-#: src\qualcoder\manage_files.py:2437 src\qualcoder\manage_files.py:2439
-#, fuzzy
-msgid "exported."
-msgstr "exportat."
-
-#: src\qualcoder\manage_files.py:2408 src\qualcoder\manage_files.py:2445
-#: src\qualcoder\report_cooccurrence.py:541
-#: src\qualcoder\report_cooccurrence.py:625
-#: src\qualcoder\report_cooccurrence.py:775
-#: src\qualcoder\report_cooccurrence.py:817 src\qualcoder\report_sql.py:324
-#: src\qualcoder\special_functions.py:116
-#: src\qualcoder\special_functions.py:119
-#: src\qualcoder\special_functions.py:122 src\qualcoder\view_charts.py:583
-#: src\qualcoder\view_graph.py:1946 src\qualcoder\view_graph.py:3411
-#: src\qualcoder\view_graph.py:3426 src\qualcoder\view_graph.py:3444
-#: src\qualcoder\view_graph.py:3786 src\qualcoder\view_graph.py:3946
-msgid "Error"
-msgstr "Eroare"
-
-#: src\qualcoder\manage_files.py:2408
-#, fuzzy
-msgid "File not found: "
-msgstr "Fișier negăsit: "
-
-#: src\qualcoder\manage_files.py:2409
-#, fuzzy
-msgid "Media file NOT exported."
-msgstr "Fișierul media NU a fost exportat."
+#: src/qualcoder/edit_textfile.py:654 src/qualcoder/case_file_manager.py:448
+#: src/qualcoder/report_exact_matches.py:732 src/qualcoder/cases.py:1101
+#: src/qualcoder/speakers.py:289 src/qualcoder/report_relations.py:561
+#: src/qualcoder/report_sql.py:435
+msgid "Select all"
+msgstr "Selectați tot"
 
 #: src\qualcoder\manage_files.py:2414
 #, fuzzy
 msgid "QC or user created file exported."
 msgstr "Fișier creat de QC sau utilizator exportat."
 
-#: src\qualcoder\manage_files.py:2442
-#, fuzzy
-msgid "File NOT exported."
-msgstr "Fișierul NU a fost exportat."
+#: src/qualcoder/helpers.py:642 src/qualcoder/view_av.py:1051
+#: src/qualcoder/view_av.py:4169 src/qualcoder/view_av.py:4598
+msgid "Media not found"
+msgstr "Media negăsită"
 
 #: src\qualcoder\manage_files.py:2448
 #, fuzzy
@@ -4951,21 +5058,25 @@ msgstr "Selectați fișierul"
 msgid "Filename does not match."
 msgstr "Numele fișierului nu se potrivește."
 
-#: src\qualcoder\manage_links.py:134
-msgid "Wrong file"
-msgstr "Fișier greșit"
+#: src/qualcoder/case_file_manager.py:620 src/qualcoder/code_text.py:6056
+msgid "Cannot have blank text marks"
+msgstr "Nu pot exista marcaje de text goale"
 
 #: src\qualcoder\manage_links.py:161
 msgid "Bad link fixed for file: "
 msgstr "Legătură proastă reparată pentru fișier: "
 
-#: src\qualcoder\manage_links.py:161
-msgid " Path: "
-msgstr " Cale: "
+#: src/qualcoder/case_file_manager.py:623 src/qualcoder/code_text.py:6068
+msgid ""
+"\n"
+"Using "
+msgstr ""
+"\n"
+"Utilizând "
 
-#: src\qualcoder\manage_links.py:189 src\qualcoder\report_relations.py:906
-msgid "Filename"
-msgstr "Nume fișier"
+#: src/qualcoder/case_file_manager.py:623 src/qualcoder/code_text.py:6068
+msgid " and "
+msgstr " și "
 
 #: src\qualcoder\manage_links.py:189
 msgid "Current path"
@@ -5289,9 +5400,10 @@ msgstr ""
 "Transcrieri audio/video: codările transcrierii și punctele de sincronizare "
 "nu au fost testate.\n"
 
-#: src\qualcoder\refi.py:459
-msgid "Set components may be imported as file attributes.\n"
-msgstr "Componentele setului pot fi importate ca atribute de fișier.\n"
+#: src/qualcoder/view_graph.py:521 src/qualcoder/code_text.py:3023
+#: src/qualcoder/code_text.py:3046
+msgid "Text: "
+msgstr "Text: "
 
 #: src\qualcoder\refi.py:460
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
@@ -5600,9 +5712,12 @@ msgstr "Selectați filtrul"
 msgid "Not found"
 msgstr "Negăsit"
 
-#: src\qualcoder\report_attributes.py:229
-msgid "Attribute not found"
-msgstr "Atribut negăsit"
+#: src/qualcoder/view_graph.py:2705 src/qualcoder/view_graph.py:4032
+#: src/qualcoder/view_graph.py:4034 src/qualcoder/ai_chat.py:436
+#: src/qualcoder/code_text.py:3789 src/qualcoder/code_text.py:3858
+#: src/qualcoder/report_relations.py:724 src/qualcoder/report_relations.py:1046
+msgid "Code"
+msgstr "Cod"
 
 #: src\qualcoder\report_attributes.py:654
 msgid "No operator was selected"
@@ -6091,19 +6206,20 @@ msgstr "MEMO CAZ: "
 msgid "View in context"
 msgstr "Vizualizați în context"
 
-#: src\qualcoder\report_codes.py:2517 src\qualcoder\view_av.py:4103
-#: src\qualcoder\view_image.py:2006 src\qualcoder\view_image.py:2010
-msgid "Add important mark"
-msgstr "Adăugați marcajul important"
+#: src/qualcoder/ai_chat.py:292 src/qualcoder/ai_chat.py:307
+#: src/qualcoder/ai_chat.py:333 src/qualcoder/ai_chat.py:456
+#: src/qualcoder/ai_chat.py:683 src/qualcoder/ai_chat.py:1160
+#: src/qualcoder/code_text.py:7218
+msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
+msgstr "AI este dezactivat. Accesați mai întâi „AI > Asistent de configurare“."
 
 #: src\qualcoder\report_codes.py:2518
 msgid "Change code to"
 msgstr "Schimbați codul în"
 
-#: src\qualcoder\report_codes.py:2519
-#, fuzzy
-msgid "Edit memo"
-msgstr "Editați memo"
+#: src/qualcoder/ai_chat.py:316 src/qualcoder/code_text.py:2247
+msgid "AI Text Analysis"
+msgstr "Analiză text AI"
 
 #: src\qualcoder\report_codes.py:2520
 msgid "Apply additional code"
@@ -6576,9 +6692,11 @@ msgstr "Co-ocurență exportată: "
 msgid "Co-occurrence exported"
 msgstr "Co-ocurență exportată"
 
-#: src\qualcoder\report_comparison_table.py:598
-msgid "Click for details."
-msgstr "Faceți clic pentru detalii."
+#: src/qualcoder/code_in_all_files.py:256
+#: src/qualcoder/code_in_all_files.py:688 src/qualcoder/code_text.py:4399
+#: src/qualcoder/code_text.py:4469
+msgid "Code:"
+msgstr "Cod:"
 
 #: src\qualcoder\report_comparison_table.py:659
 msgid "Click item for context"
@@ -6604,14 +6722,15 @@ msgstr "Atribute selectate"
 msgid "Select categories"
 msgstr "Selectați categoriile"
 
-#: src\qualcoder\report_cooccurrence.py:362
-msgid "All categories selected"
-msgstr "Toate categoriile selectate"
+#: src/qualcoder/code_in_all_files.py:474 src/qualcoder/code_text.py:3561
+#: src/qualcoder/code_text.py:3716
+msgid "Coded text file exported: "
+msgstr "Fișier text codat exportat: "
 
-#: src\qualcoder\report_cooccurrence.py:372
-#: src\qualcoder\report_cooccurrence.py:386
-msgid "Categories selected"
-msgstr "Categorii selectate"
+#: src/qualcoder/code_in_all_files.py:475 src/qualcoder/code_text.py:3563
+#: src/qualcoder/code_text.py:3718 src/qualcoder/code_text.py:4127
+msgid "Coded text file exported"
+msgstr "Fișier text codat exportat"
 
 #: src\qualcoder\report_cooccurrence.py:376
 #, fuzzy
@@ -6643,22 +6762,28 @@ msgstr "Export Gephi"
 #: src\qualcoder\report_cooccurrence.py:553
 #: src\qualcoder\report_cooccurrence.py:647
 #, fuzzy
-msgid "Label font size 10"
-msgstr "Dimensiune font etichetă 10"
+msgid "Overlaps exported"
+msgstr "Rezultate exportate"
 
-#: src\qualcoder\report_cooccurrence.py:558
-#: src\qualcoder\report_cooccurrence.py:652
-#, fuzzy
-msgid "Label font size 8 "
-msgstr "Dimensiune font etichetă 8 "
+#: src/qualcoder/view_av.py:212 src/qualcoder/view_av.py:1030
+msgid "Media coding"
+msgstr "Codare media"
 
-#: src\qualcoder\report_cooccurrence.py:581
-msgid "There are no visible codes to plot."
-msgstr "Nu există coduri vizibile pentru a fi reprezentate."
+#: src/qualcoder/view_av.py:266 src/qualcoder/view_av.py:4582
+msgid "QualCoder will crash"
+msgstr "QualCoder se va bloca"
 
-#: src\qualcoder\report_cooccurrence.py:594
-msgid "There are no co-occurrences to plot."
-msgstr "Nu există co-ocurențe pentru a fi reprezentate."
+#: src/qualcoder/view_av.py:361 src/qualcoder/view_av.py:4750
+msgid "Screenshot"
+msgstr "Captură de ecran"
+
+#: src/qualcoder/view_av.py:374 src/qualcoder/view_av.py:4763
+msgid "Width:"
+msgstr "Lățime:"
+
+#: src/qualcoder/view_av.py:377 src/qualcoder/view_av.py:4766
+msgid "Height:"
+msgstr "Înălțime:"
 
 #: src\qualcoder\report_cooccurrence.py:598
 #, fuzzy
@@ -6768,10 +6893,11 @@ msgstr "Fără rezultate"
 msgid "Filter equals: "
 msgstr "Filtru egal cu: "
 
-#: src\qualcoder\report_exact_matches.py:465
-#: src\qualcoder\report_relations.py:626
-msgid "Filter greater or equals: "
-msgstr "Filtru mai mare sau egal cu: "
+#: src/qualcoder/view_av.py:3613 src/qualcoder/view_av.py:3640
+#: src/qualcoder/code_text.py:1137 src/qualcoder/code_text.py:1164
+#: src/qualcoder/code_text.py:6000 src/qualcoder/code_text.py:6029
+msgid " for: "
+msgstr " pentru: "
 
 #: src\qualcoder\report_exact_matches.py:466
 #: src\qualcoder\report_relations.py:627
@@ -6845,17 +6971,35 @@ msgstr "Fișier imagine extern: "
 msgid "Internal image file"
 msgstr "Fișier imagine intern"
 
-#: src\qualcoder\report_file_summary.py:326
-msgid "Media path: "
-msgstr "Cale media: "
+#: src/qualcoder/view_av.py:4450 src/qualcoder/code_text.py:535
+msgid ""
+"Avoid selecting sections of text with a combination of not underlined (not "
+"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
+"assigned)."
+msgstr ""
+"Evitați selectarea secțiunilor de text cu o combinație de text neînfrunțit "
+"(necodat / adnotat / atribuit cazului) și înfrunțit (codat, adnotat, "
+"atribuit cazului)."
 
-#: src\qualcoder\report_file_summary.py:346
-msgid "CASE:"
-msgstr "CAZ:"
+#: src/qualcoder/view_av.py:4452 src/qualcoder/code_text.py:538
+msgid ""
+"Positions of the underlying codes / annotations / case-assigned may not "
+"correctly adjust if text is typed over or deleted."
+msgstr ""
+"Pozițiile codurilor / adnotărilor / atribuirilor la caz de subiacente s-ar "
+"putea să nu se ajusteze corect dacă textul este tastat peste sau șters."
 
-#: src\qualcoder\report_file_summary.py:359
-msgid "No case assignment"
-msgstr "Fără atribuire caz"
+#: src/qualcoder/view_av.py:4928
+msgid "Select name to delete"
+msgstr "Selectați numele de șters"
+
+#: src/qualcoder/view_av.py:4947
+msgid "Speaker name"
+msgstr "Nume vorbitor"
+
+#: src/qualcoder/view_av.py:4948
+msgid "Name:"
+msgstr "Nume:"
 
 #: src\qualcoder\report_file_summary.py:367
 msgid "ATTRIBUTES:"
@@ -7245,171 +7389,186 @@ msgstr "Import date nereușit din "
 msgid "Project memo imported"
 msgstr "Memo proiect importat"
 
-#: src\qualcoder\rqda.py:133
-msgid "Duplicate filename: "
-msgstr "Nume fișier duplicat: "
-
-#: src\qualcoder\rqda.py:133
-msgid " --> Replaced with: "
-msgstr " --> Înlocuit cu: "
-
-#: src\qualcoder\rqda.py:136
-msgid " files imported"
-msgstr " fișiere importate"
-
-#: src\qualcoder\rqda.py:145
-msgid " annotations imported"
-msgstr " adnotări importate"
-
-#: src\qualcoder\rqda.py:154
-msgid " journals imported"
-msgstr " jurnale importate"
-
-#: src\qualcoder\rqda.py:165
-msgid " cases imported"
-msgstr " cazuri importate"
-
-#: src\qualcoder\rqda.py:177
-msgid " code categories imported"
-msgstr " categorii cod importate"
-
-#: src\qualcoder\rqda.py:210 src\qualcoder\taguette_import.py:293
-msgid " codings imported"
-msgstr " codări importate"
-
-#: src\qualcoder\rqda.py:212
-msgid " duplicated codings found and ignored"
-msgstr " codări duplicat găsite și ignorate"
-
-#: src\qualcoder\rqda.py:226
-msgid " codings imported from coding2 table"
-msgstr " codări importate din tabela coding2"
-
-#: src\qualcoder\rqda.py:228
-msgid " duplicated codings found and ignored from coding2 table"
-msgstr " codări duplicat găsite și ignorate din tabela coding2"
-
-#: src\qualcoder\rqda.py:248
-msgid " attribute types imported"
-msgstr " tipuri atribut importate"
-
-#: src\qualcoder\rqda.py:259
-msgid " case attribute values imported"
-msgstr " valori atribut caz importate"
-
-#: src\qualcoder\rqda.py:270
-msgid " file attribute values imported"
-msgstr " valori atribut fișier importate"
-
-#: src\qualcoder\rqda.py:281
-msgid " case linked texts imported"
-msgstr " texte legate de caz importate"
-
-#: src\qualcoder\select_items.py:79
-msgid "Dictionary is empty"
-msgstr "Dicționarul este gol"
-
-#: src\qualcoder\select_items.py:79
-msgid "No data to select from"
-msgstr "Fără date din care să selectați"
-
-#: src\qualcoder\select_items.py:93
-msgid "This data does not contain names to select from"
-msgstr "Aceste date nu conțin nume din care să selectați"
-
-#: src\qualcoder\select_items.py:94
-msgid "Dictionary has no \"name\" key"
-msgstr "Dicționarul nu are cheia \"name\""
-
-#: src\qualcoder\select_items.py:98
-msgid "All"
-msgstr "Toate"
-
-#: src\qualcoder\settings.py:84
-msgid "Another language has been set in the config.ini file."
+#: src/qualcoder/__main__.py:673
+msgid ""
+"Cannot load config.ini.\n"
+"Character decoding error.\n"
+"Using QualCoder default settings."
 msgstr ""
+"Nu se poate încărca config.ini.\n"
+"Eroare decodare caractere.\n"
+"Se utilizează setările implicite QualCoder."
 
-#: src\qualcoder\settings.py:85
-msgid "Additional community supported languages are found in the i18n folder."
+#: src/qualcoder/__main__.py:675
+msgid "Cannot load config.ini file"
+msgstr "Nu se poate încărca fișierul config.ini"
+
+#: src/qualcoder/__main__.py:1381
+msgid "There is already a backup with this name"
+msgstr "Există deja o copie de siguranță cu acest nume"
+
+#: src/qualcoder/__main__.py:1390
+msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
+"ATENȚIE: fișierele audio și video NU sunt copiate de siguranță. Consultați "
+"setările."
 
-#: src\qualcoder\settings.py:86
-msgid "They may not be recently updated"
+#: src/qualcoder/__main__.py:1392
+msgid "Project backup created: "
+msgstr "Copie de siguranță proiect creată: "
+
+#: src/qualcoder/__main__.py:1473
+msgid ""
+"Welcome\n"
+"\n"
+"The new AI enhanced functions in QualCoder need some additional setup. Do "
+"you want to enable the AI and start the setup? You can also do this later by "
+"starting the AI Setup Wizard from the AI menu in the main window. Click "
+"\"Yes\" to start now."
 msgstr ""
+"Bine ați venit\n"
+"\n"
+"Noile funcții îmbunătățite cu AI din QualCoder necesită o configurare "
+"suplimentară. Doriți să activați AI-ul și să începeți configurarea? Puteți "
+"face acest lucru mai târziu pornind Asistentul de configurare AI din meniul "
+"AI din fereastra principală. Faceți clic pe „Da” pentru a începe acum."
 
-#: src\qualcoder\settings.py:134
-msgid "original"
-msgstr "original"
+#: src/qualcoder/__main__.py:1479
+msgid "AI Integration"
+msgstr "Integrare AI"
 
-#: src\qualcoder\settings.py:134
-msgid "dark"
-msgstr "întunecat"
+#: src/qualcoder/__main__.py:1797
+msgid "Font"
+msgstr "Font"
 
-#: src\qualcoder\settings.py:134 src\qualcoder\view_graph.py:1637
-msgid "blue"
-msgstr "albastru"
+#: src/qualcoder/__main__.py:1798
+msgid "Tree font size"
+msgstr "Dimensiune font arbore"
 
-#: src\qualcoder\settings.py:134 src\qualcoder\view_graph.py:1639
-msgid "green"
-msgstr "verde"
+#: src/qualcoder/__main__.py:1799
+msgid "Working directory"
+msgstr "Director de lucru"
 
-#: src\qualcoder\settings.py:134 src\qualcoder\view_graph.py:1640
-msgid "orange"
-msgstr "portocaliu"
+#: src/qualcoder/__main__.py:1800
+msgid "Show IDs"
+msgstr "Afișați ID-urile"
 
-#: src\qualcoder\settings.py:134
-msgid "purple"
-msgstr "mov"
+#: src/qualcoder/__main__.py:1801
+msgid "Language"
+msgstr "Limbă"
 
-#: src\qualcoder\settings.py:134 src\qualcoder\view_graph.py:1640
-msgid "yellow"
-msgstr "galben"
+#: src/qualcoder/__main__.py:1802
+msgid "Timestamp format"
+msgstr "Format marcaj temporal"
 
-#: src\qualcoder\settings.py:134
-msgid "rainbow"
-msgstr "curcubeu"
+#: src/qualcoder/__main__.py:1803
+msgid "Speaker name format"
+msgstr "Format nume vorbitor"
 
-#: src\qualcoder\settings.py:134
-msgid "native"
-msgstr "nativ"
+#: src/qualcoder/__main__.py:1804
+msgid "Report text context characters: "
+msgstr "Caractere context text raport: "
 
-#: src\qualcoder\settings.py:157
-msgid "Bold"
-msgstr "Aldin"
+#: src/qualcoder/__main__.py:1805
+msgid "Report text context style: "
+msgstr "Stil context text raport: "
 
-#: src\qualcoder\settings.py:157
-msgid "Italic"
-msgstr "Cursiv"
+#: src/qualcoder/__main__.py:1806
+msgid "Backup on open"
+msgstr "Copie de siguranță la deschidere"
 
-#: src\qualcoder\settings.py:157
-msgid "Bigger"
-msgstr "Mai mare"
+#: src/qualcoder/__main__.py:1807
+msgid "Backup AV files"
+msgstr "Copiați fișierele AV"
 
-#: src\qualcoder\settings.py:168
-msgid "Default folder for storing automatic backups and for file outputs."
+#: src/qualcoder/__main__.py:1809
+msgid "AI integration is enabled"
+msgstr "Integrarea AI este activată"
+
+#: src/qualcoder/__main__.py:1811
+msgid "AI integration is disabled"
+msgstr "Integrarea AI este dezactivată"
+
+#: src/qualcoder/__main__.py:1812
+msgid "Style"
+msgstr "Stil"
+
+#: src/qualcoder/__main__.py:1815
+#, fuzzy
+msgid "Folder paths / represents backslash"
+msgstr "Căile folderelor / reprezintă backslash"
+
+#: src/qualcoder/__main__.py:2049
+msgid "This project contains no text files."
+msgstr "Acest proiect nu conține fișiere text."
+
+#: src/qualcoder/__main__.py:2050
+msgid "No text files"
+msgstr "Fără fișiere text"
+
+#: src/qualcoder/__main__.py:2063
+msgid "This project contains no pdf files."
+msgstr "Acest proiect nu conține fișiere pdf."
+
+#: src/qualcoder/__main__.py:2064
+msgid "No pdf files"
+msgstr "Fără fișiere pdf"
+
+#: src/qualcoder/__main__.py:2079
+msgid "This project contains no image files."
+msgstr "Acest proiect nu conține fișiere imagine."
+
+#: src/qualcoder/__main__.py:2080
+msgid "No image files"
+msgstr "Fără fișiere imagine"
+
+#: src/qualcoder/__main__.py:2088
+msgid "This project contains no audio/video files."
+msgstr "Acest proiect nu conține fișiere audio/video."
+
+#: src/qualcoder/__main__.py:2089
+msgid "No a/v files"
+msgstr "Fără fișiere a/v"
+
+#: src/qualcoder/__main__.py:2092
+msgid "VLC is not installed. Cannot code audio/video files."
+msgstr "VLC nu este instalat. Nu se pot codifica fișierele audio/video."
+
+#: src/qualcoder/__main__.py:2093
+msgid "Install VLC"
+msgstr "Instalați VLC"
+
+#: src/qualcoder/__main__.py:2102
+msgid "A/V Coding"
+msgstr "Codificare A/V"
+
+#: src/qualcoder/__main__.py:2189
+msgid "IMPORTING REFI-QDA PROJECT"
+msgstr "SE IMPORTĂ PROIECTUL REFI-QDA"
+
+#: src/qualcoder/__main__.py:2191
+msgid ""
+"Step 1: You will be asked for a new QualCoder project name.\n"
+"Step 2: You will be asked for the QDPX file."
 msgstr ""
 "Folderul implicit pentru stocarea copiilor de siguranță automate și pentru "
 "ieșirile de fișiere."
 
-#: src\qualcoder\settings.py:308 src\qualcoder\settings.py:316
-msgid "Edit AI profile name"
-msgstr "Editați numele profilului AI"
+#: src/qualcoder/__main__.py:2192
+msgid "REFI-QDA import steps"
+msgstr "Pași import REFI-QDA"
 
-#: src\qualcoder\settings.py:308
-msgid ""
-"Select a profile first. \n"
-"You can only edit the name of an existing profile. To create a new profile "
-"from scratch, follow the instructions in the QualCoder wiki on GitHub."
-msgstr ""
-"Selectați mai întâi un profil. \n"
-"Puteți edita doar numele unui profil existent. Pentru a crea un profil nou "
-"de la zero, urmați instrucțiunile din wiki-ul QualCoder de pe GitHub."
+#: src/qualcoder/__main__.py:2196 src/qualcoder/__main__.py:2213
+#: src/qualcoder/__main__.py:2229
+msgid "Project creation"
+msgstr "Creare proiect"
 
-#: src\qualcoder\settings.py:317 src\qualcoder\settings.py:532
-msgid "Enter new profile name:"
-msgstr "Introduceți numele noului profil:"
+#: src/qualcoder/__main__.py:2196
+msgid "REFI-QDA Project not successfully created"
+msgstr "Proiectul REFI-QDA nu a fost creat cu succes"
 
-#: src\qualcoder\settings.py:377
+#: src/qualcoder/__main__.py:2208
+#, fuzzy
 msgid ""
 "The API key contains non-ASCII characters and cannot be used.\n"
 "Please paste the key again exactly as provided by your AI provider. \n"
@@ -7422,97 +7581,108 @@ msgstr ""
 "\n"
 "Caractere invalide: "
 
-#: src\qualcoder\settings.py:380
-#, fuzzy
-msgid "Invalid API key"
-msgstr "Cheie API invalidă"
+#: src/qualcoder/__main__.py:2209 src/qualcoder/__main__.py:2225
+msgid "RQDA import steps"
+msgstr "Pași import RQDA"
 
-#: src\qualcoder\settings.py:464
-#, fuzzy
-msgid "Invalid input"
-msgstr "Nume fișier invalid."
+#: src/qualcoder/__main__.py:2213 src/qualcoder/__main__.py:2229
+msgid "Project not successfully created"
+msgstr "Proiectul nu a fost creat cu succes"
 
-#: src\qualcoder\settings.py:476
-msgid "AI temperature parameter must be between 0.0 and 2.0."
+#: src/qualcoder/__main__.py:2222
+msgid "IMPORTING RQDA PROJECT"
+msgstr "SE IMPORTĂ PROIECTUL RQDA"
+
+#: src/qualcoder/__main__.py:2224
+msgid ""
+"Step 1: You will be asked for a new QualCoder project name.\n"
+"Step 2: You will be asked for the RQDA file."
 msgstr ""
 
-#: src\qualcoder\settings.py:484
-msgid "AI top_p parameter must be between 0.0 and 1.0."
-msgstr ""
+#: src/qualcoder/__main__.py:2242
+msgid "Are you sure you want to quit?"
+msgstr "Sigur doriți să ieșiți?"
 
-#: src\qualcoder\settings.py:507
-msgid "Choose a default output folder"
-msgstr "Alegeți un folder de ieșire implicit"
+#: src/qualcoder/__main__.py:2300
+msgid "Enter project name"
+msgstr "Introduceți numele proiectului"
 
-#: src\qualcoder\settings.py:511 src\qualcoder\settings.py:514
-msgid "Choose another folder"
-msgstr "Alegeți un alt folder"
+#: src/qualcoder/__main__.py:2304
+msgid "No project created."
+msgstr "Niciun proiect creat."
 
-#: src\qualcoder\settings.py:511
-msgid "Do not use the QualCoder configuration folder."
-msgstr "Nu utilizați folderul de configurare QualCoder."
+#: src/qualcoder/__main__.py:2323
+msgid "Project creation error "
+msgstr "Eroare creare proiect "
 
-#: src\qualcoder\settings.py:514
-msgid "Do not use the QualCoder data folder."
-msgstr "Nu utilizați folderul de date QualCoder."
+#: src/qualcoder/__main__.py:2324
+msgid " not successfully created"
+msgstr " nu a fost creat cu succes"
 
-#: src\qualcoder\settings.py:531 src\qualcoder\settings.py:544
-msgid "New AI profile"
-msgstr "Profil AI nou"
+#: src/qualcoder/__main__.py:2410
+msgid "New project: "
+msgstr "Proiect nou: "
 
-#: src\qualcoder\settings.py:544
-msgid "An AI profile with this name already exists: "
-msgstr "Un profil AI cu acest nume există deja: "
+#: src/qualcoder/__main__.py:2411
+msgid "Opening: "
+msgstr "Se deschide: "
 
-#: src\qualcoder\settings.py:601
-msgid "Please select an AI profile or disable the AI altogether."
-msgstr "Vă rugăm să selectați un profil AI sau să dezactivați AI-ul complet."
+#: src/qualcoder/__main__.py:2421
+msgid "New Project Created"
+msgstr "Proiect nou creat"
 
-#: src\qualcoder\settings.py:602
-msgid "AI profile"
-msgstr "Profil AI"
+#: src/qualcoder/__main__.py:2422
+msgid "DB Version:"
+msgstr "Versiune DB:"
 
-#: src\qualcoder\settings.py:607
-msgid "Please enter a valid API-key for the AI model."
-msgstr "Vă rugăm să introduceți o cheie API validă pentru modelul AI."
+#: src/qualcoder/__main__.py:2424
+msgid "About: "
+msgstr "Despre: "
 
-#: src\qualcoder\settings.py:608 src\qualcoder\settings.py:614
-msgid "AI model"
-msgstr "Model AI"
+#: src/qualcoder/__main__.py:2425
+msgid "Coder:"
+msgstr "Codator:"
 
-#: src\qualcoder\settings.py:613
-msgid "Please select a \"large\" and a \"fast\" AI model."
-msgstr "Vă rugăm să selectați un model AI \"mare\" și unul \"rapid\"."
+#: src/qualcoder/__main__.py:2428
+msgid "Problem creating database "
+msgstr "Problemă la crearea bazei de date "
 
-#: src\qualcoder\settings.py:636
-msgid "Restart QualCoder"
-msgstr "Repornește QualCoder"
+#: src/qualcoder/__main__.py:2483
+msgid "Coder name changed to: "
+msgstr "Numele codatorului schimbat în: "
 
-#: src\qualcoder\settings.py:636
-msgid "Restart QualCoder to enact some changes"
-msgstr "Repornește QualCoder pentru a aplica unele modificări"
-
-#: src\qualcoder\settings.py:641
+#: src/qualcoder/__main__.py:2506
 msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
-"Se pare că ați făcut modificări la numele codatorilor. Aceste modificări se "
-"vor pierde și ele. Sigur doriți să anulați?"
+"**Tema de cercetare, întrebările și obiectivele:** \n"
+"\n"
+"**Metodologia:** \n"
+"\n"
+"**Participanții și datele colectate:** \n"
+"\n"
+"#####\n"
+"(Toate informațiile de sub acest marcaj sunt note personale și nu vor fi "
+"trimise niciodată către AI.)"
 
-#: src\qualcoder\speakers.py:65 src\qualcoder\speakers.py:276
-msgid "Speakers"
-msgstr "Vorbitori"
+#: src/qualcoder/__main__.py:2511
+msgid "Memo for project "
+msgstr "Memo pentru proiect "
 
-#: src\qualcoder\speakers.py:73
-msgid "code as"
-msgstr "codificați ca"
+#: src/qualcoder/__main__.py:2518
+msgid "Project memo entered."
+msgstr "Memo-ul proiectului introdus."
 
-#: src\qualcoder\speakers.py:73
-msgid "Example"
-msgstr "Exemplu"
+#: src/qualcoder/__main__.py:2542 src/qualcoder/special_functions.py:113
+msgid "Open project directory"
+msgstr "Deschideți directorul proiectului"
 
-#: src\qualcoder\speakers.py:276
+#: src/qualcoder/__main__.py:2564
+msgid "Cannot open file"
+msgstr "Nu se poate deschide fișierul"
+
+#: src/qualcoder/__main__.py:2589
 msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
@@ -7520,175 +7690,149 @@ msgstr ""
 "Numele vorbitorului nu poate fi gol. Dacă doriți să excludeți un vorbitor de "
 "la marcare, debifați caseta din stânga."
 
-#: src\qualcoder\speakers.py:290
+#: src/qualcoder/__main__.py:2592
+msgid "Coder name"
+msgstr "Nume codator"
+
+#: src/qualcoder/__main__.py:2594
+msgid "Keep"
+msgstr "Păstrați"
+
+#: src/qualcoder/__main__.py:2595
+msgid "Switch"
+msgstr "Comutați"
+
+#: src/qualcoder/__main__.py:2596
+msgid "Cancel"
+msgstr "Anulați"
+
+#: src/qualcoder/__main__.py:2605
+msgid "Default coder name changed to: "
+msgstr "Numele implicit al codatorului schimbat în: "
+
+#: src/qualcoder/__main__.py:2633 src/qualcoder/__main__.py:2662
+#: src/qualcoder/__main__.py:2682 src/qualcoder/__main__.py:2707
+#: src/qualcoder/__main__.py:2778 src/qualcoder/__main__.py:2802
+#: src/qualcoder/__main__.py:2810 src/qualcoder/__main__.py:2822
+#: src/qualcoder/__main__.py:2830 src/qualcoder/__main__.py:2838
+#: src/qualcoder/__main__.py:2847 src/qualcoder/__main__.py:2855
+#: src/qualcoder/__main__.py:2863
+msgid "Updating database to version"
+msgstr "Se actualizează baza de date la versiunea"
+
+#: src/qualcoder/__main__.py:2870
+msgid "Deleting code_text coding to deleted files: "
+msgstr "Se șterg codările code_text către fișierele șterse: "
+
+#: src/qualcoder/__main__.py:2877
+msgid "Deleting code_image coding to deleted files: "
+msgstr "Se șterg codările code_image către fișierele șterse: "
+
+#: src/qualcoder/__main__.py:2884
+msgid "Deleting code_av coding to deleted files: "
+msgstr "Se șterg codările code_av către fișierele șterse: "
+
+#: src/qualcoder/__main__.py:2928
+msgid "QualCoder project missing folders. Created empty folders"
+msgstr "Proiectului QualCoder îi lipsesc foldere. S-au creat foldere goale"
+
+#: src/qualcoder/__main__.py:2953
+msgid "Project summary"
+msgstr "Sumar proiect"
+
+#: src/qualcoder/__main__.py:2954
+msgid "Date time now: "
+msgstr "Data și ora acum: "
+
+#: src/qualcoder/__main__.py:2962
+msgid "Project memo: "
+msgstr "Memo proiect: "
+
+#: src/qualcoder/__main__.py:2969
+msgid "Files: "
+msgstr "Fișiere: "
+
+#: src/qualcoder/__main__.py:2973 src/qualcoder/cases.py:355
+msgid "Cases: "
+msgstr "Cazuri: "
+
+#: src/qualcoder/__main__.py:2996
 #, fuzzy
-msgid "Deselect all"
-msgstr "Deselectați tot"
+msgid "Folder paths / represents \\"
+msgstr "Căile folderelor / reprezintă \\"
 
-#: src\qualcoder\speakers.py:320
-msgid "This contains all the speakers that have been marked in documents."
-msgstr "Acesta conține toți vorbitorii care au fost marcați în documente."
+#: src/qualcoder/__main__.py:3001
+msgid "Bad links to files"
+msgstr "Legături proaste către fișiere"
 
-#: src\qualcoder\speakers.py:331
-msgid "Speakers category could not be found found or created."
-msgstr "Categoria Vorbitori nu a fost găsită sau creată."
+#: src/qualcoder/__main__.py:3035
+msgid "Closing project: "
+msgstr "Se închide proiectul: "
 
-#: src\qualcoder\speakers.py:368
-msgid "Speaker code could not be found found or created."
-msgstr "Codul Vorbitor nu a fost găsit sau creat."
+#: src/qualcoder/__main__.py:3101
+msgid "Deleting: "
+msgstr "Se șterge: "
 
-#: src\qualcoder\special_functions.py:113 src\qualcoder\__main__.py:2542
-msgid "Open project directory"
-msgstr "Deschideți directorul proiectului"
-
-#: src\qualcoder\special_functions.py:116 src\qualcoder\taguette_import.py:65
-msgid "No project selected"
-msgstr "Niciun proiect selectat"
-
-#: src\qualcoder\special_functions.py:119
-msgid "Not a QualCoder project"
-msgstr "Nu este un proiect QualCoder"
-
-#: src\qualcoder\special_functions.py:122
-msgid "The same project"
-msgstr "Același proiect"
-
-#: src\qualcoder\special_functions.py:124
-msgid "Merge"
-msgstr "Îmbinați"
-
-#: src\qualcoder\special_functions.py:124
-msgid "into"
-msgstr "în"
-
-#: src\qualcoder\special_functions.py:125
-msgid "Press Run Button to merge projects"
-msgstr "Apăsați butonul Executare pentru a îmbina proiectele"
-
-#: src\qualcoder\special_functions.py:126
-msgid "Merge projects"
-msgstr "Îmbinați proiectele"
-
-#: src\qualcoder\special_functions.py:149
-#: src\qualcoder\special_functions.py:181
-msgid "Select text file to replace"
-msgstr "Selectați fișierul text de înlocuit"
-
-#: src\qualcoder\special_functions.py:151
-msgid "Replacing: "
-msgstr "Se înlocuiește: "
-
-#: src\qualcoder\special_functions.py:159
-msgid "Replacement file"
-msgstr "Fișier de înlocuire"
-
-#: src\qualcoder\special_functions.py:163
-#: src\qualcoder\special_functions.py:183
-msgid "Select replacement text file"
-msgstr "Selectați fișierul text de înlocuire"
-
-#: src\qualcoder\special_functions.py:166
-msgid "Replacement file: "
-msgstr "Fișier de înlocuire: "
-
-#: src\qualcoder\special_functions.py:169
-msgid "Press to replace the text file"
-msgstr "Apăsați pentru a înlocui fișierul text"
-
-#: src\qualcoder\special_functions.py:177
-msgid "No files selected"
-msgstr "Niciun fișier selectat"
-
-#: src\qualcoder\special_functions.py:177
-msgid "No existing or replacement file selected"
-msgstr "Niciun fișier existent sau de înlocuire selectat"
-
-#: src\qualcoder\special_functions.py:199
-#: src\qualcoder\GUI\special_functions.py:105
-msgid "Change ALL text code start positions in ALL text files by "
+#: src/qualcoder/__main__.py:3110
+msgid ""
+"The AI is setup and enabled, so there is nothing to do here. Go to AI > "
+"settings to change the current model or other settings."
 msgstr ""
 "Modificați TOATE pozițiile de start ale codurilor text în TOATE fișierele "
 "text cu "
 
-#: src\qualcoder\special_functions.py:200
-#: src\qualcoder\special_functions.py:246
-#: src\qualcoder\GUI\special_functions.py:106
-#: src\qualcoder\GUI\special_functions.py:149
-msgid " characters.\n"
-msgstr " caractere.\n"
+#: src/qualcoder/__main__.py:3112
+msgid "AI Setup Wizard"
+msgstr "Asistent configurare AI"
 
-#: src\qualcoder\special_functions.py:201
-#: src\qualcoder\special_functions.py:247
-#: src\qualcoder\GUI\special_functions.py:107
-#: src\qualcoder\GUI\special_functions.py:150
-msgid "Made by coder: "
-msgstr "Realizat de codator: "
+#: src/qualcoder/__main__.py:3114
+msgid "AI: Setup Wizard"
+msgstr "AI: Asistent configurare"
 
-#: src\qualcoder\special_functions.py:202
-#: src\qualcoder\special_functions.py:248
-#: src\qualcoder\GUI\special_functions.py:108
-#: src\qualcoder\GUI\special_functions.py:151
-msgid " to change."
-msgstr " de modificat."
+#: src/qualcoder/__main__.py:3117
+msgid "AI: Setup Wizard finished"
+msgstr "AI: Asistent configurare finalizat"
 
-#: src\qualcoder\special_functions.py:203
-#: src\qualcoder\special_functions.py:249
-#: src\qualcoder\GUI\special_functions.py:109
-#: src\qualcoder\GUI\special_functions.py:152
-msgid "Backup project before performing this function.\n"
+#: src/qualcoder/__main__.py:3126
+msgid "Please enable the AI first and set it in Settings."
+msgstr "Vă rugăm să activați mai întâi AI-ul și să îl configurați în Setări."
+
+#: src/qualcoder/__main__.py:3127 src/qualcoder/__main__.py:3131
+#: src/qualcoder/__main__.py:3136 src/qualcoder/__main__.py:3161
+msgid "Rebuild AI Memory"
+msgstr "Reconstruiți memoria AI"
+
+#: src/qualcoder/__main__.py:3130
+msgid "The AI is busy or not set up correctly."
+msgstr "AI-ul este ocupat sau nu este configurat corect."
+
+#: src/qualcoder/__main__.py:3134
+msgid ""
+"This will re-read all of your empirical documents, which may take some time. "
+"Do you want to continue?"
 msgstr ""
-"Criați o copie de siguranță a proiectului înainte de a executa această "
-"funcție.\n"
+"Acest lucru va re-citi toate documentele dumneavoastră empirice, ceea ce "
+"poate dura un timp. Doriți să continuați?"
 
-#: src\qualcoder\special_functions.py:204
-#: src\qualcoder\special_functions.py:250
-#: src\qualcoder\GUI\special_functions.py:110
-#: src\qualcoder\GUI\special_functions.py:153
-msgid "Press OK to continue."
-msgstr "Apăsați OK pentru a continua."
+#: src/qualcoder/__main__.py:3152 src/qualcoder/__main__.py:3160
+msgid "Please enable the AI first and set it up in Settings."
+msgstr "Vă rugăm să activați mai întâi AI-ul și să îl configurați în Setări."
 
-#: src\qualcoder\special_functions.py:205
-#: src\qualcoder\GUI\special_functions.py:111
-msgid "Change code start positions"
-msgstr "Modificați pozițiile de start ale codurilor"
+#: src/qualcoder/__main__.py:3153
+msgid "Ai Chat"
+msgstr "Chat AI"
 
-#: src\qualcoder\special_functions.py:226
-#: src\qualcoder\special_functions.py:272
-#: src\qualcoder\GUI\special_functions.py:131
-#: src\qualcoder\GUI\special_functions.py:174
-msgid "All text codings by "
-msgstr "Toate codările text de la "
+#: src/qualcoder/__main__.py:3173
+msgid "This version: "
+msgstr "Această versiune: "
 
-#: src\qualcoder\special_functions.py:226
-#: src\qualcoder\special_functions.py:272
-#: src\qualcoder\GUI\special_functions.py:131
-#: src\qualcoder\GUI\special_functions.py:174
-msgid " resized by "
-msgstr " redimensionate cu "
+#: src/qualcoder/__main__.py:3180
+msgid "Newer release available: "
+msgstr "Versiune nouă disponibilă: "
 
-#: src\qualcoder\special_functions.py:227
-#: src\qualcoder\special_functions.py:273
-#: src\qualcoder\GUI\special_functions.py:131
-#: src\qualcoder\GUI\special_functions.py:174
-msgid " characters."
-msgstr " caractere."
-
-#: src\qualcoder\special_functions.py:245
-#: src\qualcoder\GUI\special_functions.py:148
-msgid "Change ALL text code end positions in ALL text files by "
-msgstr ""
-"Modificați TOATE pozițiile de final ale codurilor text în TOATE fișierele "
-"text cu "
-
-#: src\qualcoder\special_functions.py:251
-#: src\qualcoder\GUI\special_functions.py:154
-msgid "Change code end positions"
-msgstr "Modificați pozițiile de final ale codurilor"
-
-#: src\qualcoder\taguette_import.py:47
-#, fuzzy
-msgid "Select Taguette file"
-msgstr "Selectați fișierul Taguette"
+#: src/qualcoder/__main__.py:3185
+msgid "Latest Release: "
+msgstr "Ultima versiune: "
 
 #: src\qualcoder\taguette_import.py:54
 #, fuzzy
@@ -8162,438 +8306,483 @@ msgstr "Număr cumulativ coduri în fișiere după cod"
 msgid "Cumulative code count in codes by file"
 msgstr "Număr cumulativ coduri în coduri după fișier"
 
-#: src\qualcoder\view_charts.py:991 src\qualcoder\view_charts.py:1138
-msgid "Code count - text, images and Audio/Video"
-msgstr "Număr coduri - text, imagini și Audio/Video"
+#: src/qualcoder/code_text.py:684 src/qualcoder/code_text.py:1301
+#, fuzzy
+msgid "Select document font and size."
+msgstr "Selectați fontul și dimensiunea documentului."
 
-#: src\qualcoder\view_charts.py:1023 src\qualcoder\view_charts.py:1052
-#: src\qualcoder\view_charts.py:1081 src\qualcoder\view_charts.py:1110
-#: src\qualcoder\view_charts.py:1169 src\qualcoder\view_charts.py:1198
-#: src\qualcoder\view_charts.py:1227 src\qualcoder\view_charts.py:1256
-#: src\qualcoder\view_charts.py:1384 src\qualcoder\view_charts.py:1464
-#: src\qualcoder\view_charts.py:1544 src\qualcoder\view_charts.py:1624
-msgid "Values"
-msgstr "Valori"
+#: src/qualcoder/code_text.py:804
+msgid "Right click for highlighting options"
+msgstr ""
 
-#: src\qualcoder\view_charts.py:1031 src\qualcoder\view_charts.py:1177
-msgid "Code text by character count"
-msgstr "Cod text după număr de caractere"
+#: src/qualcoder/code_text.py:940
+msgid "Hide code stripes margin"
+msgstr ""
 
-#: src\qualcoder\view_charts.py:1060 src\qualcoder\view_charts.py:1206
-msgid "Code volume by image area (pixels)"
-msgstr "Volum cod după zona de imagine (pixeli)"
+#: src/qualcoder/code_text.py:942
+#, fuzzy
+msgid "Show code stripes margin"
+msgstr "Afișați fișierele codate"
 
-#: src\qualcoder\view_charts.py:1089 src\qualcoder\view_charts.py:1235
-msgid "Code volume by audio/video segments (milliseconds)"
-msgstr "Volum cod după segmente audio/video (milisecunde)"
+#: src/qualcoder/code_text.py:949
+msgid "Move margin to the left"
+msgstr ""
 
-#: src\qualcoder\view_charts.py:1307
-msgid " chart of counts of codes and categories"
-msgstr " grafic al numărărilor codurilor și categoriilor"
+#: src/qualcoder/code_text.py:951
+msgid "Move margin to the right"
+msgstr ""
 
-#: src\qualcoder\view_charts.py:1401
-msgid " chart of counts of coded text - total characters"
-msgstr " grafic al numărărilor textului codat - total caractere"
+#: src/qualcoder/code_text.py:955
+#, fuzzy
+msgid "Highlight style"
+msgstr "Evidențiați zona - solarizare"
 
-#: src\qualcoder\view_charts.py:1481
-msgid " chart of coded image areas - pixels"
-msgstr " grafic al zonelor de imagine codate - pixeli"
+#: src/qualcoder/code_text.py:959
+#, fuzzy
+msgid "Marker"
+msgstr "Marcați"
 
-#: src\qualcoder\view_charts.py:1561
-msgid " chart of coded audio/video segments - milliseconds"
-msgstr " grafic al segmentelor audio/video codate - milisecunde"
+#: src/qualcoder/code_text.py:961
+msgid "Underline"
+msgstr ""
 
-#: src\qualcoder\view_charts.py:1672
-msgid "Attribute bar chart"
-msgstr "Grafic cu bare atribute"
+#: src/qualcoder/code_text.py:1856
+msgid "Examples:"
+msgstr "Exemple:"
 
-#: src\qualcoder\view_charts.py:1673 src\qualcoder\view_charts.py:1703
-msgid " attribute: "
-msgstr " atribut: "
+#: src/qualcoder/code_text.py:1879
+msgid "Project memo"
+msgstr "Memo proiect"
 
-#: src\qualcoder\view_charts.py:1702
-msgid "Attribute histogram"
-msgstr "Histogramă atribute"
+#: src/qualcoder/code_text.py:1890
+msgid "Delete all codings in this file made by "
+msgstr "Ștergeți toate codările din acest fișier realizate de "
 
-#: src\qualcoder\view_charts.py:1763
-msgid "Too many codes"
-msgstr "Prea multe coduri"
+#: src/qualcoder/code_text.py:1901
+msgid "All codes by "
+msgstr "Toate codurile de la "
 
-#: src\qualcoder\view_charts.py:1763
-msgid "Too many codes for display. Restricted to 40"
-msgstr "Prea multe coduri pentru afișare. Limitat la 40"
+#: src/qualcoder/code_text.py:1901
+msgid " deleted from "
+msgstr " șterse din "
 
-#: src\qualcoder\view_charts.py:1768
-msgid "Heatmap"
-msgstr "Hartă termică"
+#: src/qualcoder/code_text.py:2073 src/qualcoder/code_text.py:2123
+msgid "all matches in file"
+msgstr "toate potrivirile din fișier"
 
-#: src\qualcoder\view_charts.py:1795
-msgid "Too many files"
-msgstr "Prea multe fișiere"
+#: src/qualcoder/code_text.py:2078 src/qualcoder/code_text.py:2128
+msgid "first match in file"
+msgstr "prima potrivire din fișier"
 
-#: src\qualcoder\view_charts.py:1795
-msgid "Too many files for display. Restricted to 40"
-msgstr "Prea multe fișiere pentru afișare. Limitat la 40"
+#: src/qualcoder/code_text.py:2083
+msgid "last match in file"
+msgstr "ultima potrivire din fișier"
 
-#: src\qualcoder\view_charts.py:1812
-msgid "Too many cases"
-msgstr "Prea multe cazuri"
+#: src/qualcoder/code_text.py:2088 src/qualcoder/code_text.py:2137
+msgid "code within code"
+msgstr "cod în interiorul codului"
 
-#: src\qualcoder\view_charts.py:1812
-msgid "Too many cases for display. Restricted to 40"
-msgstr "Prea multe cazuri pentru afișare. Limitat la 40"
+#: src/qualcoder/code_text.py:2224
+msgid "Mark with new code (N)"
+msgstr "Marcați cu cod nou (N)"
 
-#: src\qualcoder\view_graph.py:278
-msgid "Are you sure you want to clear the graph?"
-msgstr "Sigur doriți să ștergeți graficul?"
+#: src/qualcoder/code_text.py:2242
+msgid "Copy with metadata"
+msgstr "Copiați cu metadate"
 
-#: src\qualcoder\view_graph.py:523
-msgid "Link: "
-msgstr "Legătură: "
+#: src/qualcoder/code_text.py:2245
+msgid "Set bookmark (B)"
+msgstr "Setați marcaj (B)"
 
-#: src\qualcoder\view_graph.py:526
-msgid "Reveal hidden items"
-msgstr "Dezvăluiți elementele ascunse"
+#: src/qualcoder/code_text.py:2258
+msgid "Edit text analysis prompts"
+msgstr "Editați prompturile pentru analiza textului"
 
-#: src\qualcoder\view_graph.py:641
-msgid "Insert Text"
-msgstr "Inserează text"
+#: src/qualcoder/code_text.py:2609
+msgid "Shift codings after clicked position"
+msgstr "Mutare codări după poziția clicată"
 
-#: src\qualcoder\view_graph.py:642
-msgid "Insert Line"
-msgstr "Inserează linie"
+#: src/qualcoder/code_text.py:2612
+msgid ""
+"Shift code positions for all codes after you have clicked on a position in "
+"the text.\n"
+"Back up the project before running this action.\n"
+"This function will help if you have edited the coded text and the codes are "
+"out of position.\n"
+"Positive numbers (moves right) or negative numbers (moves left) (-500 to "
+"500)\n"
+"Clicked character position: "
+msgstr ""
+"Mutare poziții coduri pentru toate codurile după ce ați făcut clic pe o "
+"poziție în text.\n"
+"Criați o copie de siguranță a proiectului înainte de a rula această "
+"acțiune.\n"
+"Această funcție vă va ajuta dacă ați editat textul codat și codurile sunt "
+"dezechilibrate.\n"
+"Numere pozitive (se mută la dreapta) sau numere negative (se mută la stânga) "
+"(-500 la 500)\n"
+"Poziția caracterului clicat: "
 
-#: src\qualcoder\view_graph.py:643
-msgid "Insert coded text items"
-msgstr "Inserează elemente text codat"
+#: src/qualcoder/code_text.py:2673
+#, fuzzy
+msgid "Reference: "
+msgstr "Referință: "
 
-#: src\qualcoder\view_graph.py:644
-msgid "Insert coded image items"
-msgstr "Inserează elemente imagine codată"
+#: src/qualcoder/code_text.py:3025
+msgid "Memos for file: "
+msgstr "Memo-uri pentru fișier: "
 
-#: src\qualcoder\view_graph.py:645
-msgid "Insert coded A/V items"
-msgstr "Inserează elemente A/V codate"
+#: src/qualcoder/code_text.py:3048
+msgid "Annotations for file: "
+msgstr "Adnotări pentru fișier: "
 
-#: src\qualcoder\view_graph.py:646
-msgid "Show memos of coded segments"
-msgstr "Afișați memo-urile segmentelor codate"
+#: src/qualcoder/code_text.py:3510 src/qualcoder/code_text.py:3650
+#, fuzzy
+msgid "Generated report: "
+msgstr "Raport generat: "
 
-#: src\qualcoder\view_graph.py:653
-msgid "Radial"
-msgstr "Radial"
+#: src/qualcoder/code_text.py:3538
+#, fuzzy
+msgid "Include journal"
+msgstr "Includeți jurnalul"
 
-#: src\qualcoder\view_graph.py:654
-msgid "Top to Bottom"
-msgstr "Sus în Jos"
+#: src/qualcoder/code_text.py:3539
+msgid "Journals are linked to this file. Include them in the report?"
+msgstr ""
+"Jurnalele sunt legate de acest fișier. Doriți să le includeți în raport?"
 
-#: src\qualcoder\view_graph.py:655
-msgid "Left to Right"
-msgstr "Stânga la Dreapta"
+#: src/qualcoder/code_text.py:3554
+msgid "Software citation"
+msgstr "Citație software"
 
-#: src\qualcoder\view_graph.py:656
+#: src/qualcoder/code_text.py:3767
 #, fuzzy
 msgid "Right to Left"
 msgstr "Dreapta la Stânga"
 
-#: src\qualcoder\view_graph.py:658
-msgid "Refresh view"
-msgstr "Reîmprospătați vizualizarea"
+#: src/qualcoder/code_text.py:3789
+#, fuzzy
+msgid "Frequency / Coverage"
+msgstr ", Frecvență: "
 
-#: src\qualcoder\view_graph.py:759
+#: src/qualcoder/code_text.py:3789
 #, fuzzy
 msgid "There are no codes in this project."
 msgstr "Nu există coduri în acest proiect."
 
-#: src\qualcoder\view_graph.py:1290
-msgid "Select audio/video files"
-msgstr "Selectați fișierele audio/video"
+#: src/qualcoder/code_text.py:3790
+#, fuzzy
+msgid "First coded"
+msgstr "Prima codare"
 
-#: src\qualcoder\view_graph.py:1331 src\qualcoder\view_graph.py:1401
-#: src\qualcoder\view_graph.py:1460
-msgid "No coded segments for selection"
-msgstr "Fără segmente codate pentru selecție"
+#: src/qualcoder/code_text.py:3790
+#, fuzzy
+msgid "Last coded"
+msgstr "Ultima codare"
 
-#: src\qualcoder\view_graph.py:1333
-msgid "Select coded segment"
-msgstr "Selectați segmentul codat"
+#: src/qualcoder/code_text.py:3817
+#, fuzzy
+msgid "Code Co-occurrences"
+msgstr "Co-ocurențe cod"
 
-#: src\qualcoder\view_graph.py:1358
-msgid "Select image files"
-msgstr "Selectați fișierele imagine"
+#: src/qualcoder/code_text.py:3830
+#, fuzzy
+msgid "Code A"
+msgstr "Cod A"
 
-#: src\qualcoder\view_graph.py:1395
-msgid " width"
-msgstr " lățime"
+#: src/qualcoder/code_text.py:3830
+#, fuzzy
+msgid "Code B"
+msgstr "Cod B"
 
-#: src\qualcoder\view_graph.py:1395
-msgid " height:"
-msgstr " înălțime:"
+#: src/qualcoder/code_text.py:3830
+#, fuzzy
+msgid "Co-occurrence frequency"
+msgstr "Frecvență co-ocurență"
 
-#: src\qualcoder\view_graph.py:1403
-msgid "Select coded area"
-msgstr "Selectați zona codată"
+#: src/qualcoder/code_text.py:3841
+msgid "No co-occurrences found in this file."
+msgstr "Nu s-au găsit co-ocurențe în acest fișier."
 
-#: src\qualcoder\view_graph.py:1428
+#: src/qualcoder/code_text.py:3844
 #, fuzzy
 msgid "No text files in this project."
 msgstr "Nu există fișiere text în acest proiect."
 
-#: src\qualcoder\view_graph.py:1430
+#: src/qualcoder/code_text.py:3870
 #, fuzzy
 msgid "Step 1/3: Select text files"
 msgstr "Pasul 1/3: Selectați fișierele text"
 
-#: src\qualcoder\view_graph.py:1437
+#: src/qualcoder/code_text.py:3881
 #, fuzzy
-msgid "Step 2/3: Select codes"
-msgstr "Pasul 2/3: Selectați codurile"
+msgid "Coded Segments"
+msgstr "Segment final"
 
-#: src\qualcoder\view_graph.py:1462
+#: src/qualcoder/code_text.py:3927
+msgid "Full File (highlight)"
+msgstr "Fișier complet (evidențiere)"
+
+#: src/qualcoder/code_text.py:3933
 #, fuzzy
 msgid "Step 3/3: Select coded text segments"
 msgstr "Pasul 3/3: Selectați segmentele de text codat"
 
-#: src\qualcoder\view_graph.py:1531 src\qualcoder\view_graph.py:2365
-msgid "Memo for area: "
-msgstr "Memo pentru zonă: "
+#: src/qualcoder/code_text.py:3939
+#, fuzzy
+msgid "File Journal"
+msgstr "Jurnal fișier"
 
-#: src\qualcoder\view_graph.py:1531 src\qualcoder\view_graph.py:2365
-msgid "width:"
-msgstr "lățime:"
+#: src/qualcoder/code_text.py:4057 src/qualcoder/code_text.py:4125
+msgid "Coded text file exported to: "
+msgstr "Fișier text codat exportat în: "
 
-#: src\qualcoder\view_graph.py:1532 src\qualcoder\view_graph.py:2366
-msgid "height:"
-msgstr "înălțime:"
+#: src/qualcoder/code_text.py:4059
+msgid "Coded html file exported"
+msgstr "Fișier html codat exportat"
 
-#: src\qualcoder\view_graph.py:1548 src\qualcoder\view_graph.py:2386
-msgid "Memo for duration: "
-msgstr "Memo pentru durată: "
+#: src/qualcoder/code_text.py:4106
+#, fuzzy
+msgid "CODES LIST"
+msgstr "LISTĂ CODURI"
 
-#: src\qualcoder\view_graph.py:1553
-msgid "No memos"
-msgstr "Fără memo-uri"
+#: src/qualcoder/code_text.py:4141
+#, fuzzy
+msgid "This file has no assigned codes to export."
+msgstr "Niciun cod nu a fost selectat."
 
-#: src\qualcoder\view_graph.py:1553
-msgid "No memos for selection"
-msgstr "Fără memo-uri pentru selecție"
+#: src/qualcoder/code_text.py:4165
+#, fuzzy
+msgid "Codebook exported to: "
+msgstr "Glosar de coduri exportat în: "
 
-#: src\qualcoder\view_graph.py:1555
-msgid "Select coding memo"
-msgstr "Selectați memo-ul de codare"
+#: src/qualcoder/code_text.py:4243
+msgid "Select a code"
+msgstr "Selectați un cod"
 
-#: src\qualcoder\view_graph.py:1573 src\qualcoder\view_graph.py:2346
-msgid "Memo for: "
-msgstr "Memo pentru: "
+#: src/qualcoder/code_text.py:4422 src/qualcoder/code_text.py:4493
+#: src/qualcoder/code_text.py:4508
+msgid "Show previous coding of selected code"
+msgstr "Afișați codarea anterioară a codului selectat"
 
-#: src\qualcoder\view_graph.py:1582
-msgid "Line start item"
-msgstr "Element start linie"
+#: src/qualcoder/code_text.py:4425 src/qualcoder/code_text.py:4497
+#: src/qualcoder/code_text.py:4511
+msgid "Show next coding of selected code"
+msgstr "Afișați codarea următoare a codului selectat"
 
-#: src\qualcoder\view_graph.py:1602
-msgid "Line end item(s)"
-msgstr "Element(e) final linie"
+#: src/qualcoder/code_text.py:4933
+msgid "Code renamed from: "
+msgstr "Cod redenumit din: "
 
-#: src\qualcoder\view_graph.py:1637
-msgid "gray"
-msgstr "gri"
+#: src/qualcoder/code_text.py:5027
+msgid "view original text file"
+msgstr "vizualizați fișierul text original"
 
-#: src\qualcoder\view_graph.py:1638
-msgid "cyan"
-msgstr "cian"
+#: src/qualcoder/code_text.py:5036
+msgid " next  characters"
+msgstr " următoarele  caractere"
 
-#: src\qualcoder\view_graph.py:1638
-msgid "magenta"
-msgstr "magenta"
+#: src/qualcoder/code_text.py:5039
+msgid " previous  characters"
+msgstr " caracterele anterioare"
 
-#: src\qualcoder\view_graph.py:1639
-msgid "red"
-msgstr "roșu"
+#: src/qualcoder/code_text.py:5040
+msgid "Go to bookmark"
+msgstr "Mergeți la marcaj"
 
-#: src\qualcoder\view_graph.py:1642
-msgid "white"
-msgstr "alb"
+#: src/qualcoder/code_text.py:5102
+#, fuzzy
+msgid "Cannot open text file in browser "
+msgstr "Nu se poate deschide fișierul text în browser "
 
-#: src\qualcoder\view_graph.py:1643
-msgid "black"
-msgstr "negru"
+#: src/qualcoder/code_text.py:5191 src/qualcoder/code_text.py:5247
+msgid "From: "
+msgstr "Din: "
 
-#: src\qualcoder\view_graph.py:1644
-msgid "Colour"
-msgstr "Culoare"
+#: src/qualcoder/code_text.py:5299 src/qualcoder/code_text.py:7525
+msgid "Entire text file will be loaded"
+msgstr "Întregul fișier text va fi încărcat"
 
-#: src\qualcoder\view_graph.py:1663
-msgid "Text object"
-msgstr "Obiect text"
+#: src/qualcoder/code_text.py:5348
+#, fuzzy
+msgid ""
+"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the "
+"speaker codings?"
+msgstr ""
+"Codatorul „{}“ este în prezent ascuns. Doriți să îl faceți vizibil, astfel "
+"încât să puteți vedea codările vorbitorilor?"
 
-#: src\qualcoder\view_graph.py:1663
-msgid "Enter text:"
-msgstr "Introduceți text:"
+#: src/qualcoder/code_text.py:5350
+msgid "Speaker coding"
+msgstr "Codare vorbitor"
 
-#: src\qualcoder\view_graph.py:1669
-msgid "Another item has this exact text"
-msgstr "Un alt element are exact acest text"
+#: src/qualcoder/code_text.py:5818 src/qualcoder/code_text.py:7396
+msgid "AI interpretation: "
+msgstr "Interpretare AI: "
 
-#: src\qualcoder\view_graph.py:1728
-msgid "Free text item"
-msgstr "Element text liber"
+#: src/qualcoder/code_text.py:5819
+msgid ""
+"\n"
+"\n"
+"AI search prompt: "
+msgstr ""
+"\n"
+"\n"
+"Prompt căutare AI: "
 
-#: src\qualcoder\view_graph.py:1730
-msgid "Case item"
-msgstr "Element caz"
+#: src/qualcoder/code_text.py:5820
+msgid ""
+"\n"
+"AI model: "
+msgstr ""
+"\n"
+"Model AI: "
 
-#: src\qualcoder\view_graph.py:1732
-msgid "File item"
-msgstr "Element fișier"
+#: src/qualcoder/code_text.py:5823
+msgid ""
+"Do you want to store the AI interpretation in a memo together with the "
+"coding?<br/><br/>"
+msgstr ""
+"Doriți să stocați interpretarea AI într-un memo împreună cu codarea?<br/><br/"
+">"
 
-#: src\qualcoder\view_graph.py:1983
-msgid "Save graph"
-msgstr "Salvați graficul"
+#: src/qualcoder/code_text.py:5826
+msgid "AI Interpretation"
+msgstr "Interpretare AI"
 
-#: src\qualcoder\view_graph.py:1984
-msgid "Graph name"
-msgstr "Nume grafic"
+#: src/qualcoder/code_text.py:6059 src/qualcoder/code_text.py:6181
+#: src/qualcoder/code_text.py:6366
+msgid "Select files to code"
+msgstr "Selectați fișierele de codificat"
 
-#: src\qualcoder\view_graph.py:1990
-msgid "Must have a name"
-msgstr "Trebuie să aibă un nume"
+#: src/qualcoder/code_text.py:6067
+msgid "Code text using start and end marks: "
+msgstr "Codificați textul folosind marcaje de start și final: "
 
-#: src\qualcoder\view_graph.py:2006
-msgid "Name error"
-msgstr "Eroare nume"
+#: src/qualcoder/code_text.py:6129
+msgid "Coding using start and end marks"
+msgstr "Codificare folosind marcaje de start și final"
 
-#: src\qualcoder\view_graph.py:2006
-msgid "This name already used. Choose another name."
-msgstr "Acest nume este deja utilizat. Alegeți un alt nume."
+#: src/qualcoder/code_text.py:6129 src/qualcoder/code_text.py:6310
+#: src/qualcoder/code_text.py:6315 src/qualcoder/code_text.py:6491
+msgid ""
+"\n"
+"Code: "
+msgstr ""
+"\n"
+"Cod: "
 
-#: src\qualcoder\view_graph.py:2168 src\qualcoder\view_graph.py:2176
-msgid "Alphabet ascending"
-msgstr "Alfabetic ascendent"
+#: src/qualcoder/code_text.py:6130
+msgid ""
+"\n"
+"With start mark: "
+msgstr ""
+"\n"
+"Cu marcaj de start: "
 
-#: src\qualcoder\view_graph.py:2169 src\qualcoder\view_graph.py:2178
-msgid "Alphabet descending"
-msgstr "Alfabetic descendent"
+#: src/qualcoder/code_text.py:6130
+msgid ""
+"\n"
+"End mark: "
+msgstr ""
+"\n"
+"Marcaj de final: "
 
-#: src\qualcoder\view_graph.py:2170 src\qualcoder\view_graph.py:2180
-msgid "Oldest to newest"
-msgstr "Cel mai vechi la cel mai nou"
+#: src/qualcoder/code_text.py:6137
+msgid " new coded sections found."
+msgstr " secțiuni codate noi găsite."
 
-#: src\qualcoder\view_graph.py:2171 src\qualcoder\view_graph.py:2182
-msgid "Newest to oldest"
-msgstr "Cel mai nou la cel mai vechi"
+#: src/qualcoder/code_text.py:6139
+msgid "previously coded."
+msgstr "codate anterior."
 
-#: src\qualcoder\view_graph.py:2183 src\qualcoder\view_graph.py:2416
-msgid "Load graph"
-msgstr "Încărcați graficul"
+#: src/qualcoder/code_text.py:6151
+msgid "Select auto-codings to undo"
+msgstr "Selectați auto-codările de anulat"
 
-#: src\qualcoder\view_graph.py:2463
-msgid "Load graph errors"
-msgstr "Erori încărcare grafic"
+#: src/qualcoder/code_text.py:6168
+msgid "Undo autocoding: "
+msgstr "Anulați auto-codarea: "
 
-#: src\qualcoder\view_graph.py:2464
-msgid "Changing to another report will lose unsaved graph."
-msgstr "Trecerea la un alt raport va pierde graficul nesalvat."
+#: src/qualcoder/code_text.py:6196 src/qualcoder/code_text.py:6209
+msgid "Code sentence"
+msgstr "Codificați propoziția"
 
-#: src\qualcoder\view_graph.py:2706
-msgid " does not exist: "
-msgstr " nu există: "
+#: src/qualcoder/code_text.py:6199
+msgid "Auto code sentence using this text fragment:"
+msgstr "Auto-codificați propoziția folosind acest fragment de text:"
 
-#: src\qualcoder\view_graph.py:2722
-msgid "Delete stored graphs"
-msgstr "Ștergeți graficele stocate"
+#: src/qualcoder/code_text.py:6214
+msgid ""
+"Define sentence ending. Default is period space.\n"
+"Use \\n for line ending:"
+msgstr ""
+"Defineți terminarea propoziției. Implicit este punct spațiu.\n"
+"Utilizați \\n pentru terminarea liniei:"
 
-#: src\qualcoder\view_graph.py:2929 src\qualcoder\view_graph.py:3021
-#: src\qualcoder\view_graph.py:3117 src\qualcoder\view_graph.py:3210
-#: src\qualcoder\view_graph.py:3351 src\qualcoder\view_graph.py:3503
-msgid "Edit text"
-msgstr "Editați textul"
-
-#: src\qualcoder\view_graph.py:2930 src\qualcoder\view_graph.py:3118
-#: src\qualcoder\view_graph.py:3362 src\qualcoder\view_graph.py:4090
-msgid "Bold toggle"
-msgstr "Comutator aldin"
-
-#: src\qualcoder\view_graph.py:2939 src\qualcoder\view_graph.py:3127
-#: src\qualcoder\view_graph.py:3370
+#: src/qualcoder/code_text.py:6236 src/qualcoder/code_text.py:6382
 #, fuzzy
 msgid "Text color"
 msgstr "Culoare text"
 
-#: src\qualcoder\view_graph.py:2940 src\qualcoder\view_graph.py:3128
-#: src\qualcoder\view_graph.py:3371 src\qualcoder\view_graph.py:3574
-#: src\qualcoder\view_graph.py:3765 src\qualcoder\view_graph.py:4479
-msgid "Red"
-msgstr "Roșu"
+#: src/qualcoder/code_text.py:6298 src/qualcoder/code_text.py:6480
+msgid "Autocode insert error "
+msgstr "Eroare inserare auto-cod "
 
-#: src\qualcoder\view_graph.py:2941 src\qualcoder\view_graph.py:3129
-#: src\qualcoder\view_graph.py:3372 src\qualcoder\view_graph.py:3576
-#: src\qualcoder\view_graph.py:3766 src\qualcoder\view_graph.py:4481
-msgid "Green"
-msgstr "Verde"
+#: src/qualcoder/code_text.py:6303
+msgid " added codes"
+msgstr " coduri adăugate"
 
-#: src\qualcoder\view_graph.py:2942 src\qualcoder\view_graph.py:3130
-#: src\qualcoder\view_graph.py:3373 src\qualcoder\view_graph.py:3575
-#: src\qualcoder\view_graph.py:3767 src\qualcoder\view_graph.py:4480
-msgid "Yellow"
-msgstr "Galben"
+#: src/qualcoder/code_text.py:6310
+msgid "Sentence coding: "
+msgstr "Codificare propoziție: "
 
-#: src\qualcoder\view_graph.py:2943 src\qualcoder\view_graph.py:3131
-#: src\qualcoder\view_graph.py:3374 src\qualcoder\view_graph.py:3577
-#: src\qualcoder\view_graph.py:3768 src\qualcoder\view_graph.py:4482
-msgid "Blue"
-msgstr "Albastru"
+#: src/qualcoder/code_text.py:6311 src/qualcoder/code_text.py:6492
+msgid ""
+"\n"
+"With: "
+msgstr ""
+"\n"
+"Cu: "
 
-#: src\qualcoder\view_graph.py:2944 src\qualcoder\view_graph.py:3132
-#: src\qualcoder\view_graph.py:3377 src\qualcoder\view_graph.py:3580
-#: src\qualcoder\view_graph.py:3771 src\qualcoder\view_graph.py:4485
-msgid "Orange"
-msgstr "Portocaliu"
+#: src/qualcoder/code_text.py:6311 src/qualcoder/code_text.py:6318
+msgid ""
+"\n"
+"Using line ending: "
+msgstr ""
+"\n"
+"Utilizând terminarea liniei: "
 
-#: src\qualcoder\view_graph.py:2945 src\qualcoder\view_graph.py:3133
-#: src\qualcoder\view_graph.py:3375 src\qualcoder\view_graph.py:3578
-#: src\qualcoder\view_graph.py:3770 src\qualcoder\view_graph.py:4483
-msgid "Cyan"
-msgstr "Cian"
+#: src/qualcoder/code_text.py:6314
+msgid "Automatic code sentence in files:"
+msgstr "Auto-codificare propoziție în fișiere:"
 
-#: src\qualcoder\view_graph.py:2946 src\qualcoder\view_graph.py:3134
-#: src\qualcoder\view_graph.py:3376 src\qualcoder\view_graph.py:3579
-#: src\qualcoder\view_graph.py:3769 src\qualcoder\view_graph.py:4484
-msgid "Magenta"
-msgstr "Magenta"
+#: src/qualcoder/code_text.py:6316
+msgid ""
+"\n"
+"With text fragment: "
+msgstr ""
+"\n"
+"Cu fragment de text: "
 
-#: src\qualcoder\view_graph.py:2947 src\qualcoder\view_graph.py:3135
-#: src\qualcoder\view_graph.py:3378 src\qualcoder\view_graph.py:3581
-#: src\qualcoder\view_graph.py:3772 src\qualcoder\view_graph.py:4486
-msgid "Gray"
-msgstr "Gri"
+#: src/qualcoder/code_text.py:6340
+msgid "Automatic coding"
+msgstr "Codificare automată"
 
-#: src\qualcoder\view_graph.py:2949 src\qualcoder\view_graph.py:3137
-#: src\qualcoder\view_graph.py:3380
-msgid "Black"
-msgstr "Negru"
+#: src/qualcoder/code_text.py:6343
+msgid "Use | to code multiple texts"
+msgstr "Utilizați | pentru a codifica mai multe texte"
 
-#: src\qualcoder\view_graph.py:2950 src\qualcoder\view_graph.py:3138
-#: src\qualcoder\view_graph.py:3381 src\qualcoder\view_graph.py:3773
-msgid "White"
-msgstr "Alb"
+#: src/qualcoder/code_text.py:6345
+#, fuzzy
+msgid "Auto code files with the current code using Regex:"
+msgstr "Auto-codificați fișierele cu codul curent folosind Regex:"
 
-#: src\qualcoder\view_graph.py:2953 src\qualcoder\view_graph.py:3141
-msgid "Hide attributes"
-msgstr "Ascundeți atributele"
+#: src/qualcoder/code_text.py:6347
+msgid "Auto code files with the current code for this text:"
+msgstr "Auto-codificați fișierele cu codul curent pentru acest text:"
 
-#: src\qualcoder\view_graph.py:2955 src\qualcoder\view_graph.py:3143
-msgid "Show attributes"
-msgstr "Afișați atributele"
-
-#: src\qualcoder\view_graph.py:2957 src\qualcoder\view_graph.py:3145
-#: src\qualcoder\view_graph.py:3383 src\qualcoder\view_graph.py:3583
-#: src\qualcoder\view_graph.py:3775 src\qualcoder\view_graph.py:3932
-msgid "Remove"
-msgstr "Eliminați"
-
-#: src\qualcoder\view_graph.py:2999 src\qualcoder\view_graph.py:3188
-#: src\qualcoder\view_graph.py:3452 src\qualcoder\view_graph.py:3794
-#: src\qualcoder\view_graph.py:3955
+#: src/qualcoder/code_text.py:6388
 #, fuzzy
 msgid "Remove this item from the graph?"
 msgstr "Eliminați acest element din grafic?"
@@ -8602,128 +8791,141 @@ msgstr "Eliminați acest element din grafic?"
 msgid "Update text"
 msgstr "Actualizați textul"
 
-#: src\qualcoder\view_graph.py:3354 src\qualcoder\view_graph.py:3357
-#: src\qualcoder\view_graph.py:3360
+#: src/qualcoder/code_text.py:6487
 #, fuzzy
 msgid "Segment in context"
 msgstr "Segment în context"
 
-#: src\qualcoder\view_graph.py:3388
-msgid "Update text to"
-msgstr "Actualizați textul în"
+#: src/qualcoder/code_text.py:6491
+msgid "Text coding: "
+msgstr "Codificare text: "
 
-#: src\qualcoder\view_graph.py:3411 src\qualcoder\view_graph.py:3946
-msgid "Cannot find image coding in database"
-msgstr "Nu se poate găsi codarea imaginii în baza de date"
+#: src/qualcoder/code_text.py:6535
+msgid "Text reverted to prior to edit"
+msgstr "Textul a fost revocat la starea anterioară editării"
 
-#: src\qualcoder\view_graph.py:3426
-msgid "Cannot find A/V coding in database"
-msgstr "Nu se poate găsi codarea A/V în baza de date"
+#: src/qualcoder/code_text.py:6536
+msgid "Undo last edited text"
+msgstr "Anulați ultimul text editat"
 
-#: src\qualcoder\view_graph.py:3444
-msgid "Cannot find text coding in database"
-msgstr "Nu se poate găsi codarea textului în baza de date"
+#: src/qualcoder/code_text.py:7214
+msgid "Please finish editing the text before starting an AI search."
+msgstr ""
+"Vă rugăm să terminați editarea textului înainte de a începe o căutare AI."
 
-#: src\qualcoder\view_graph.py:3564 src\qualcoder\view_graph.py:4469
-#, fuzzy
-msgid "Line style"
-msgstr "Stil linie"
+#: src/qualcoder/code_text.py:7215 src/qualcoder/code_text.py:7219
+#: src/qualcoder/code_text.py:7223 src/qualcoder/code_text.py:7227
+#: src/qualcoder/code_text.py:7286 src/qualcoder/code_text.py:7327
+#: src/qualcoder/code_text.py:7369 src/qualcoder/code_text.py:7378
+#: src/qualcoder/code_text.py:7478 src/qualcoder/code_text.py:7481
+msgid "AI Search"
+msgstr "Căutare AI"
 
-#: src\qualcoder\view_graph.py:3565 src\qualcoder\view_graph.py:4470
-msgid "Thin (1px)"
-msgstr "Subțire (1px)"
+#: src/qualcoder/code_text.py:7222
+msgid ""
+"The AI is already performing a search. Please stop it before starting a new "
+"one."
+msgstr ""
+"AI-ul efectuează deja o căutare. Vă rugăm să o opriți înainte de a începe "
+"una nouă."
 
-#: src\qualcoder\view_graph.py:3566 src\qualcoder\view_graph.py:4471
-msgid "Normal (2px)"
-msgstr "Normal (2px)"
+#: src/qualcoder/code_text.py:7226
+msgid "The AI is busy, please wait a moment and retry."
+msgstr ""
+"AI-ul este ocupat, vă rugăm să așteptați un moment și să încercați din nou."
 
-#: src\qualcoder\view_graph.py:3567 src\qualcoder\view_graph.py:4472
-msgid "Thick (4px)"
-msgstr "Gros (4px)"
+#: src/qualcoder/code_text.py:7263
+msgid "Searching for related data, please wait..."
+msgstr "Se caută date conexe, vă rugăm să așteptați..."
 
-#: src\qualcoder\view_graph.py:3568 src\qualcoder\view_graph.py:4473
-msgid "Extra thick (6px)"
-msgstr "Foarte gros (6px)"
+#: src/qualcoder/code_text.py:7285
+msgid "AI: No related data found for \""
+msgstr "AI: Nu s-au găsit date conexe pentru \""
 
-#: src\qualcoder\view_graph.py:3570 src\qualcoder\view_graph.py:4475
-msgid "Dotted"
-msgstr "Punctată"
+#: src/qualcoder/code_text.py:7325
+msgid "AI: No new data found for \""
+msgstr "AI: Nu s-au găsit date noi pentru \""
 
-#: src\qualcoder\view_graph.py:3571 src\qualcoder\view_graph.py:4476
-msgid "Solid"
-msgstr "Continuă"
+#: src/qualcoder/code_text.py:7326
+msgid "\" beside what has already been coded with this code."
+msgstr "\" în afara celor care au fost deja codificate cu acest cod."
 
-#: src\qualcoder\view_graph.py:3573 src\qualcoder\view_graph.py:4478
-#, fuzzy
-msgid "Line color"
-msgstr "Culoare linie"
+#: src/qualcoder/code_text.py:7332
+msgid ""
+"Potentially related data found, inspecting it closer. Please be patient..."
+msgstr ""
+"S-au găsit date potențial conexe, se verifică mai îndeaproape. Vă rugăm să "
+"fiți răbdător..."
 
-#: src\qualcoder\view_graph.py:3634
-#, fuzzy
-msgid "Remove this line from the graph?"
-msgstr "Eliminați această linie din grafic?"
+#: src/qualcoder/code_text.py:7366
+msgid "The closer inspection of the first "
+msgstr "Verificarea mai atentă a primelor "
 
-#: src\qualcoder\view_graph.py:3764
-#, fuzzy
-msgid "Color"
-msgstr "Culoare"
+#: src/qualcoder/code_text.py:7367
+msgid ""
+"pieces of data yielded no results. You can continue to inspect more by "
+"clicking on \"find more\" in the list on the left."
+msgstr ""
+"fragmente de date nu au produs rezultate. Puteți continua să verificați mai "
+"mult făcând clic pe „găsiți mai multe” în lista din stânga."
 
-#: src\qualcoder\view_graph.py:3786
-msgid "Cannot find audio/video coding in database"
-msgstr "Nu se poate găsi codarea audio/video în baza de date"
+#: src/qualcoder/code_text.py:7376
+msgid ""
+"Upon closer inspection, no pieces of data relevant to your search query "
+"could be identified. Please start a new search."
+msgstr ""
+"La o verificare mai atentă, nu au putut fi identificate fragmente de date "
+"relevante pentru interogarea dumneavoastră de căutare. Vă rugăm să începeți "
+"o nouă căutare."
 
-#: src\qualcoder\view_graph.py:4069
-#, fuzzy
-msgid "Expand category"
-msgstr "Extindeți categoria"
+#: src/qualcoder/code_text.py:7395
+msgid "Quote: "
+msgstr "Citat: "
 
-#: src\qualcoder\view_graph.py:4071
-#, fuzzy
-msgid "Collapse category"
-msgstr "Restrângeți categoria"
+#: src/qualcoder/code_text.py:7432
+msgid ">> Searching (click here to cancel)"
+msgstr ">> Se caută (faceți clic aici pentru a anula)"
 
-#: src\qualcoder\view_graph.py:4072
-msgid "Toggle: Ellipse/Rectangle"
-msgstr "Comutați: Elipsă/Rectangle"
+#: src/qualcoder/code_text.py:7434
+msgid "Click here to stop the search"
+msgstr "Faceți clic aici pentru a opri căutarea"
 
-#: src\qualcoder\view_graph.py:4079
-#, fuzzy
-msgid "Import and link segments"
-msgstr "Importați și legați segmentele"
+#: src/qualcoder/code_text.py:7439
+msgid ">> Find more..."
+msgstr ">> Găsiți mai multe..."
 
-#: src\qualcoder\view_graph.py:4080
-#, fuzzy
-msgid "Import Co-occurrences"
-msgstr "Importați co-ocurențele"
+#: src/qualcoder/code_text.py:7440
+msgid "Click here to analyze more data"
+msgstr "Faceți clic aici pentru a analiza mai multe date"
 
-#: src\qualcoder\view_graph.py:4081
-#, fuzzy
-msgid "View text and media"
-msgstr "Vizualizați textul și media"
+#: src/qualcoder/code_text.py:7448
+msgid "(search aborted due to an error)"
+msgstr "(căutare anulată din cauza unei erori)"
 
-#: src\qualcoder\view_graph.py:4086
-#, fuzzy
-msgid "Hide memo"
-msgstr "Ascundeți memo"
+#: src/qualcoder/code_text.py:7450
+msgid "(search finished)"
+msgstr "(căutare finalizată)"
 
-#: src\qualcoder\view_graph.py:4137
-#, fuzzy
-msgid "Hide this item?"
-msgstr "Ascundeți acest element?"
+#: src/qualcoder/code_text.py:7465
+msgid "Do you want to stop the search?"
+msgstr "Doriți să opriți căutarea?"
 
-#: src\qualcoder\view_graph.py:4227
-#, fuzzy
-msgid "No segments"
-msgstr "Fără segmente"
+#: src/qualcoder/code_text.py:7477
+msgid ""
+"There are no more pieces of data to analyze for this search. Please start a "
+"new search."
+msgstr ""
+"Nu mai sunt fragmente de date de analizat pentru această căutare. Vă rugăm "
+"să începeți o nouă căutare."
 
-#: src\qualcoder\view_graph.py:4228
-#, fuzzy
-msgid "There are no new coded segments for this code."
-msgstr "Nu există segmente codate noi pentru acest cod."
+#: src/qualcoder/code_text.py:7480
+msgid "The AI is busy. Please wait a moment and retry."
+msgstr ""
+"AI-ul este ocupat. Vă rugăm să așteptați un moment și să încercați din nou."
 
-#: src\qualcoder\view_graph.py:4303
-msgid "No co-ocurrences"
-msgstr "Fără co-ocurențe"
+#: src/qualcoder/code_text.py:7724
+msgid "Font and size"
+msgstr "Font și dimensiune"
 
 #: src\qualcoder\view_graph.py:4488
 msgid "Hide"
@@ -9120,9 +9322,25 @@ msgstr "Memo pentru proiect "
 msgid "Project memo entered."
 msgstr "Memo-ul proiectului introdus."
 
-#: src\qualcoder\__main__.py:2564
-msgid "Cannot open file"
-msgstr "Nu se poate deschide fișierul"
+#~ msgid ""
+#~ "Avoid selecting text combinations of unmarked text sections and coded/"
+#~ "annotated/case-assigned sections."
+#~ msgstr ""
+#~ "Evitați selectarea combinațiilor de text care combină secțiuni de text "
+#~ "nemarcate și secțiuni codate/adnotate/atribuite cazului."
+
+#~ msgid "Positions may not correctly adjust."
+#~ msgstr "Pozițiile s-ar putea să nu se ajusteze corect."
+
+#~ msgid ""
+#~ "Do not code this text until you reload Coding - Code Text from the menu "
+#~ "bar."
+#~ msgstr ""
+#~ "Nu codificați acest text până nu reîncărcați Codificare - Codificare text "
+#~ "din bara de meniu."
+
+#~ msgid "Type:"
+#~ msgstr "Tip:"
 
 #: src\qualcoder\__main__.py:2589
 msgid ""

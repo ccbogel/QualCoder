@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 18:05+1000\n"
+"POT-Creation-Date: 2026-06-08 10:15+0200\n"
 "PO-Revision-Date: 2026-06-08 09:03+0200\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
@@ -19,10 +19,36 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Gtranslator 50.0\n"
 
-#: src\qualcoder\add_attribute.py:76
-msgid "This attribute name already exists in cases, files or journals."
-msgstr ""
-"Ce nom d'attribut existe déjà dans des cas, des dossiers ou des journaux."
+#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
+#: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
+#: src/qualcoder/report_sql.py:436
+msgid "Copy"
+msgstr "Copie"
+
+#: src/qualcoder/error_dlg.py:45
+msgid "Copy error message and traceback to the clipboard."
+msgstr "Copier le message d'erreur dans le presse-papier."
+
+#: src/qualcoder/error_dlg.py:65
+msgid "Exception handler"
+msgstr "Gestionnaire d'exception"
+
+#: src/qualcoder/error_dlg.py:95 src/qualcoder/ai_llm.py:704
+#: src/qualcoder/ai_vectorstore.py:64 src/qualcoder/ai_chat.py:1311
+#: src/qualcoder/GUI/special_functions.py:53
+msgid "Uncaught exception: "
+msgstr "Exception non prise : "
+
+#: src/qualcoder/report_file_summary.py:116
+#: src/qualcoder/report_file_summary.py:175 src/qualcoder/code_pdf.py:2852
+#: src/qualcoder/code_pdf.py:2943 src/qualcoder/view_image.py:772
+#: src/qualcoder/view_image.py:846
+#: src/qualcoder/report_compare_coder_file.py:169
+#: src/qualcoder/report_compare_coder_file.py:228 src/qualcoder/view_av.py:777
+#: src/qualcoder/view_av.py:874 src/qualcoder/code_text.py:5032
+#: src/qualcoder/code_text.py:5137
+msgid "Show files like"
+msgstr "Afficher les fichiers tels que"
 
 #: src\qualcoder\add_attribute.py:77
 msgid "Or is reserved for bibliography attributes:"
@@ -5002,29 +5028,12 @@ msgstr "Ajout d'une catégorie de premier niveau : "
 msgid "Adding sub-category: "
 msgstr "Ajout d'une sous-catégorie : "
 
-#: src\qualcoder\merge_projects.py:141
-msgid " categories not added"
-msgstr " catégories non ajoutées"
-
-#: src\qualcoder\merge_projects.py:176
-msgid "Adding code name: "
-msgstr "Ajout d'un nom de code : "
-
-#: src\qualcoder\merge_projects.py:207
-msgid "Adding journal: "
-msgstr "Ajout d'un journal : "
-
-#: src\qualcoder\merge_projects.py:221
-msgid "Merging coded text"
-msgstr "Fusion de textes codés"
-
-#: src\qualcoder\merge_projects.py:227
-msgid "Merging annotations"
-msgstr "Fusionner les annotations"
-
-#: src\qualcoder\merge_projects.py:235
-msgid "Merging coded image areas"
-msgstr "Fusion des zones d'images codées"
+#: src/qualcoder/edit_textfile.py:654 src/qualcoder/case_file_manager.py:448
+#: src/qualcoder/report_exact_matches.py:732 src/qualcoder/cases.py:1101
+#: src/qualcoder/speakers.py:289 src/qualcoder/report_relations.py:561
+#: src/qualcoder/report_sql.py:435
+msgid "Select all"
+msgstr "Tout sélectionner"
 
 #: src\qualcoder\merge_projects.py:242
 msgid "Merging coded audio/video segments"
@@ -7046,9 +7055,27 @@ msgstr ""
 "Affichage sous forme de tableau\n"
 "Fondé sur la visibilité des noms de codeur⋅euses"
 
-#: src\qualcoder\report_sql.py:374
-msgid "Default Queries"
-msgstr "Requêtes par défaut"
+#: src/qualcoder/view_av.py:4450 src/qualcoder/code_text.py:535
+msgid ""
+"Avoid selecting sections of text with a combination of not underlined (not "
+"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
+"assigned)."
+msgstr ""
+"Évitez de sélectionner des sections de texte avec une combinaison de non "
+"souligné (non codé / annoté / attribué à un cas) et souligné (codé, annoté, "
+"attribué à un cas)."
+
+#: src/qualcoder/view_av.py:4452 src/qualcoder/code_text.py:538
+msgid ""
+"Positions of the underlying codes / annotations / case-assigned may not "
+"correctly adjust if text is typed over or deleted."
+msgstr ""
+"Les codes/annotations/cas attribués peuvent être mal alignés si le texte est "
+"modifié."
+
+#: src/qualcoder/view_av.py:4928
+msgid "Select name to delete"
+msgstr "Sélectionnez le nom à supprimer"
 
 #: src\qualcoder\report_sql.py:390
 msgid "Saved Queries"
@@ -9197,6 +9224,23 @@ msgstr "Uncaught Exception"
 #, python-brace-format
 #~ msgid "You must select a {self.prompt_type} prompt."
 #~ msgstr "Vous devez sélectionnez une instruction {self.prompt_type}."
+
+#~ msgid ""
+#~ "Avoid selecting text combinations of unmarked text sections and coded/"
+#~ "annotated/case-assigned sections."
+#~ msgstr ""
+#~ "Évitez de combiner des sections de texte non marquées avec des sections "
+#~ "codées/annotées/cassées."
+
+#~ msgid "Positions may not correctly adjust."
+#~ msgstr "Les positions peuvent ne pas s'ajuster correctement."
+
+#~ msgid ""
+#~ "Do not code this text until you reload Coding - Code Text from the menu "
+#~ "bar."
+#~ msgstr ""
+#~ "Ne codez pas ce texte avant d'avoir rechargé Codage - Code de texte dans "
+#~ "la barre de menu."
 
 #, fuzzy
 #~ msgid "Codes by XXX"
