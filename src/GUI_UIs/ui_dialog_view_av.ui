@@ -307,7 +307,7 @@ Forward 5 seconds. Press 5</string>
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>890</x>
+        <x>940</x>
         <y>10</y>
         <width>28</width>
         <height>28</height>
@@ -382,7 +382,7 @@ red underline = Assigned to code or annotation</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search for text</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_next">
@@ -467,14 +467,17 @@ red underline = Assigned to code or annotation</string>
      <widget class="QPushButton" name="pushButton_new_speaker">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>470</x>
         <y>3</y>
-        <width>161</width>
+        <width>30</width>
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>New speaker (Ctrl N)</string>
+      </property>
       <property name="text">
-       <string>New speaker</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_insert_timestamp">
@@ -487,7 +490,7 @@ red underline = Assigned to code or annotation</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Insert timestamp</string>
+       <string>Insert timestamp (Ctrl T)</string>
       </property>
       <property name="text">
        <string/>
@@ -496,14 +499,17 @@ red underline = Assigned to code or annotation</string>
      <widget class="QPushButton" name="pushButton_remove_speaker">
       <property name="geometry">
        <rect>
-        <x>650</x>
+        <x>500</x>
         <y>3</y>
-        <width>161</width>
+        <width>30</width>
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Remove speaker (Ctrl D)</string>
+      </property>
       <property name="text">
-       <string>Remove Speaker</string>
+       <string/>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_case_sensitive">
@@ -545,6 +551,38 @@ red underline = Assigned to code or annotation</string>
       </property>
       <property name="toolTip">
        <string>Case sensitive</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_set_bookmark">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set bookmark (Ctrl B)</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_goto_bookmark">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Go to bookmark (Ctrl Shift B)</string>
       </property>
       <property name="text">
        <string/>
