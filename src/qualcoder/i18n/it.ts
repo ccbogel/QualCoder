@@ -1386,178 +1386,184 @@ Il file deve avere una riga di intestazione e la prima colonna deve avere i nomi
   <context>
     <name>Dialog_code_av</name>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="208"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="212"/>
       <source>Code Audio Video</source>
       <translation>Codice Audio VIdeo</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="240"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="246"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Transcript</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="212"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="216"/>
       <source>Start segment</source>
       <translation>Inizio segmento</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Quando un segmento di un audio o video e' realizzato, scegliere un codice dal catalogo codici, cliccare col destro sul codice per assegnarlo al segmento.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="214"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
       <source>Segment:</source>
       <translation>Segmento:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="215"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
       <source>Coder:</source>
       <translation>Autore:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Ctrl Shift &gt;    Increase play rate to maximum 2x 
 Ctrl Shift &lt;    Decrease play rate to minimum 0.1</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="241"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="247"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Cliccare col sinistro sul pulsante di scorrimento e trascinare a sinistra o a destra per cambiare la posizione del video.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="210"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="214"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Volume</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="227"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Diminuire il tasso di gioco   Ctrl Shift &lt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="224"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="228"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Riavvolgere 5 secondi. Shift R</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="220"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="233"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="237"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>File con l'ultima codifica</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="234"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="238"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Prossimo file</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="235"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="239"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Memo di file</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="222"/>
       <source>Scroll transcript while playing.</source>
       <translation>Scorri la trascrizione durante il gioco.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="226"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="230"/>
       <source>Help</source>
       <translation>Aiuto</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="227"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="231"/>
       <source>Show codings flagged important</source>
       <translation>Mostra i codici segnalati come importanti</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="236"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="240"/>
       <source>Show files with selected file attributes</source>
       <translation>Mostra i file con gli attributi selezionati</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
       <source>Cannot code text when play transcript box is checked.</source>
       <translation>Impossibile codificare il testo quando la casella di trascrizione della riproduzione è selezionata.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="209"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
       <source>Ctrl P or Ctrl D Play/Pause</source>
       <translation>Ctrl P o Ctrl D Riproduzione/Pausa</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="225"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="229"/>
       <source>Rewind 5 seconds. Ctrl + R</source>
       <translation>Riavvolgere di 5 secondi. Ctrl + R</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="216"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="220"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Cambiare traccia, se sono disponibili più tracce.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="225"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Riavvolgere di 30 secondi. Alt + Meno</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="229"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="233"/>
       <source>S</source>
       <translation>S</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="211"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="215"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Premere il pulsante Avvia segmento per iniziare la codifica del segmento audio/video. Premere il pulsante Fine segmento per terminare il segmento codificato.
 Scorciatoia da tastiera: Ctrl S
 Scorciatoia da tastiera: G: apre il promemoria e applica il segmento al codice attualmente selezionato.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="222"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="226"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Avanti di 30 secondi. Alt + Più
 Pressione tasto 5: avanti di 5 secondi</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="228"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="232"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Pulsante per selezionare un segmento. 
 Quindi si aprirà un menu di opzioni.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="230"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="234"/>
       <source>Find code</source>
       <translation>Trova il codice</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="231"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="235"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Schermata</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="232"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="236"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Proietta l'immagine dallo screenshot</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="237"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="241"/>
       <source>Clear file filter</source>
       <translation>Cancella filtro file</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="238"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="244"/>
       <source>Clear code filter</source>
       <translation>Cancella filtro codice</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="239"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="245"/>
       <source>Code name filter</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_code_av.py" line="242"/>
+      <source>Go to bookmark (Shift B)
+To set a bookmark press B</source>
       <translation type="unfinished"/>
     </message>
   </context>
@@ -3997,151 +4003,161 @@ Seleziona (✓) quelli che desideri contrassegnare. Facendo clic su OK viene cre
   <context>
     <name>Dialog_view_av</name>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="189"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="199"/>
       <source>View Audio Video</source>
       <translation>Visualizza Audio Video</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="208"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="218"/>
       <source>Transcription:</source>
       <translation>Trascrizione:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="209"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="219"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Aggiungere il nome di un altoparlante alle scorciatoie. pressa Ctrl + n
 Inserire un altoparlante nella trascrizione. pressa Ctrl + 1 up to Ctrl + 8 per il nome degli oratori.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="210"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="220"/>
       <source>Speakers:</source>
       <translation>Oratori:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="194"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="204"/>
       <source>Audio:</source>
       <translation>Audio:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="195"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="205"/>
       <source>Scroll transcript while playing. (Transcript is read only)</source>
       <translation>Scorrere la trascrizione mentre si gioca (Trascrizione in sola lettura)</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="196"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="206"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Ctrl Shift &gt; aumentare il tasso di gioco , massimo 2.0
 Ctrl  Shift &lt; diminuire il tasso di gioco, minimo 0.1</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="193"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="203"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Volumen</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="198"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="208"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Tempo</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="197"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="190"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="200"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Clicca a sinistra sul pulsante di scorrimento e trascina a sinistra o a destra per cambiare la posizione audio/video.&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="205"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="215"/>
       <source>Help</source>
       <translation>Aiuto</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="211"/>
-      <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation>Cerca il testo.</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="215"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="225"/>
       <source>0 / 0</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="206"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="216"/>
       <source>green underline = Assigned to case.
 red underline = Assigned to code or annotation</source>
       <translation>sottolineatura verde = assegnato al caso.
 sottolineatura rossa = assegnato al codice o all'annotazione</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="213"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>La ricerca utilizza le funzioni Regex.
 
 www.rexegg.com/regex-quickstart.html</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="216"/>
-      <source>New speaker</source>
-      <translation>Nuovo altoparlante</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="217"/>
-      <source>Insert timestamp</source>
-      <translation>Inserisci timestamp</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="218"/>
-      <source>Remove Speaker</source>
-      <translation>Rimuovi altoparlante</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="191"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="201"/>
       <source>Ctrl + S start/pause
 Ctrl + P start/pause</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="199"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="209"/>
       <source>Decrease play rate. Ctrl + Shift + &amp;lt; </source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="200"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="210"/>
       <source>Increase play rate. Ctrl + Shift + &amp;gt;</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="201"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="211"/>
       <source>Rewind 5 seconds Ctrl + R</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="202"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="212"/>
       <source>Rewind 30 seconds. Alt + Minus</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="203"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="213"/>
       <source>Forward 30 seconds. Alt + Plus
 Forward 5 seconds. Press 5</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="212"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="222"/>
       <source>Next</source>
       <translation type="unfinished">Avanti</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="214"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="224"/>
       <source>Previous</source>
       <translation type="unfinished">Precedente</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="220"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="230"/>
       <source>Case sensitive</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="221"/>
+      <source>Search for text</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="226"/>
+      <source>New speaker (Ctrl N)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="227"/>
+      <source>Insert timestamp (Ctrl T)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="228"/>
+      <source>Remove speaker (Ctrl D)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="231"/>
+      <source>Set bookmark (Ctrl B)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="232"/>
+      <source>Go to bookmark (Ctrl Shift B)</source>
       <translation type="unfinished"/>
     </message>
   </context>

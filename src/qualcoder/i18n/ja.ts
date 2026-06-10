@@ -1379,179 +1379,185 @@ Right-click for format options
   <context>
     <name>Dialog_code_av</name>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="208"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="212"/>
       <source>Code Audio Video</source>
       <translation>コード オーディオ ビデオ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="233"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="237"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>最新のコーディングファイル</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="234"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="238"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>次のファイル</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="235"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="239"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>ファイルメモ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="236"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="240"/>
       <source>Show files with selected file attributes</source>
       <translation>選択したファイル属性のファイルを表示する</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="240"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="246"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>トランスクリプト</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="209"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
       <source>Ctrl P or Ctrl D Play/Pause</source>
       <translation>Ctrl P または Ctrl D 再生/一時停止</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="210"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="214"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>ボリューム</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="212"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="216"/>
       <source>Start segment</source>
       <translation>開始セグメント</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>オーディオまたはビデオのセグメントが作成されたら、コードツリーからコードを選択し、コード上で右クリックして、セグメントをコードに割り当てます。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="214"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
       <source>Segment:</source>
       <translation>セグメント：</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="215"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
       <source>Coder:</source>
       <translation>コーダー:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="216"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="220"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>トラックを変更する。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
       <source>Cannot code text when play transcript box is checked.</source>
       <translation>トランスクリプトの再生ボックスにチェックが入っていると、テキストをコーディングできない。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="222"/>
       <source>Scroll transcript while playing.</source>
       <translation>再生中にトランスクリプトをスクロールします。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Ctrl Shift &gt; 再生レートを最大2倍まで上げる 
 Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="220"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="225"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>30秒巻き戻し Alt  マイナス</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="227"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>再生速度を下げる Ctrl Shift &lt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="224"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="228"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>再生速度を上げる Ctrl Shift &gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="225"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="229"/>
       <source>Rewind 5 seconds. Ctrl + R</source>
       <translation>5秒巻き戻す。Ctrl + R</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="226"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="230"/>
       <source>Help</source>
       <translation>ヘルプ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="227"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="231"/>
       <source>Show codings flagged important</source>
       <translation>重要なフラグを付けたコーディングを表示する</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="229"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="233"/>
       <source>S</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="241"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="247"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>スライダーボタンを左クリックし、左右にドラッグしてビデオの位置を変更します。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="211"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="215"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>オーディオ/ビデオセグメントのコーディングを開始するには、セグメント開始ボタンを押します。コード化されたセグメントを終了するには、セグメント終了ボタンを押します。
 ショートカットキー Ctrl S
 キーショートカット： G - メモを開き、現在選択されているコードにセグメントを適用します。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="222"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="226"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>30秒進む。Alt + Plus
 キープレス5 - 5秒進む。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="228"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="232"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>ボタンでセグメントを選択する。
 するとオプションのメニューが開きます。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="230"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="234"/>
       <source>Find code</source>
       <translation>コードを検索
 </translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="231"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="235"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>スクリーンショット</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="232"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="236"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>スクリーンショットからの投影画像</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="237"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="241"/>
       <source>Clear file filter</source>
       <translation>ファイルフィルターをクリアする</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="238"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="244"/>
       <source>Clear code filter</source>
       <translation>コードフィルターをクリアする</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="239"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="245"/>
       <source>Code name filter</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_code_av.py" line="242"/>
+      <source>Go to bookmark (Shift B)
+To set a bookmark press B</source>
       <translation type="unfinished"/>
     </message>
   </context>
@@ -3976,148 +3982,158 @@ Select (✓) the ones you want to mark. Clicking OK creates a code for each sele
   <context>
     <name>Dialog_view_av</name>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="189"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="199"/>
       <source>View Audio Video</source>
       <translation>オーディオ・ビデオを見る</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="190"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="200"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>スライダーボタンを左クリックし、左右にドラッグしてオーディオ/ビデオの位置を変更する</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="193"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="203"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>巻</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="194"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="204"/>
       <source>Audio:</source>
       <translation>オーディオ：</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="195"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="205"/>
       <source>Scroll transcript while playing. (Transcript is read only)</source>
       <translation>再生中にトランスクリプトをスクロールします。(読み上げのみ）</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="196"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="206"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Ctrl Shift &gt; 再生レートを上げる、最大2.0 Ctrl Shift &lt; 再生レートを下げる、最小0.1</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="197"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="198"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="208"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>時間</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="205"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="215"/>
       <source>Help</source>
       <translation>ヘルプ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="206"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="216"/>
       <source>green underline = Assigned to case.
 red underline = Assigned to code or annotation</source>
       <translation>緑の下線 = ケースに割り当てられる。
 赤の下線 = コードまたは注釈に割り当てられる。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="208"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="218"/>
       <source>Transcription:</source>
       <translation>テープ起こし：</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="209"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="219"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>ショートカットに話者名を追加する。テキスト入力ボックスでctrl + nを押します。
 発言者をトランスクリプションに挿入します。テキスト入力ボックスで、ctrl + 1からctrl + 8までを押して、話者の名前を入力します。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="210"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="220"/>
       <source>Speakers:</source>
       <translation>スピーカーだ：</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="211"/>
-      <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation>テキスト検索</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="213"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>検索には Regex 関数を使用します。</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="215"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="225"/>
       <source>0 / 0</source>
       <translation/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="216"/>
-      <source>New speaker</source>
-      <translation>新しいスピーカー</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="217"/>
-      <source>Insert timestamp</source>
-      <translation>タイムスタンプを挿入</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="218"/>
-      <source>Remove Speaker</source>
-      <translation>スピーカーを取り外す</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="191"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="201"/>
       <source>Ctrl + S start/pause
 Ctrl + P start/pause</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="199"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="209"/>
       <source>Decrease play rate. Ctrl + Shift + &amp;lt; </source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="200"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="210"/>
       <source>Increase play rate. Ctrl + Shift + &amp;gt;</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="201"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="211"/>
       <source>Rewind 5 seconds Ctrl + R</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="202"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="212"/>
       <source>Rewind 30 seconds. Alt + Minus</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="203"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="213"/>
       <source>Forward 30 seconds. Alt + Plus
 Forward 5 seconds. Press 5</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="212"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="222"/>
       <source>Next</source>
       <translation type="unfinished">次へ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="214"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="224"/>
       <source>Previous</source>
       <translation type="unfinished">前へ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="220"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="230"/>
       <source>Case sensitive</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="221"/>
+      <source>Search for text</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="226"/>
+      <source>New speaker (Ctrl N)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="227"/>
+      <source>Insert timestamp (Ctrl T)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="228"/>
+      <source>Remove speaker (Ctrl D)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="231"/>
+      <source>Set bookmark (Ctrl B)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="232"/>
+      <source>Go to bookmark (Ctrl Shift B)</source>
       <translation type="unfinished"/>
     </message>
   </context>

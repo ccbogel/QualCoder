@@ -1380,177 +1380,183 @@ Högerklicka för formatalternativ</translation>
   <context>
     <name>Dialog_code_av</name>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="208"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="212"/>
       <source>Code Audio Video</source>
       <translation>Kodljudvideo</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="233"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="237"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; fil med senaste kodning &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="234"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="238"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; nästa fil &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="235"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="239"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; filmemo &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="236"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="240"/>
       <source>Show files with selected file attributes</source>
       <translation>Visa filer med utvalda filattribut</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="240"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="246"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; transkript &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="209"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
       <source>Ctrl P or Ctrl D Play/Pause</source>
       <translation>Ctrl P eller Ctrl D Play/Paus</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="210"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="214"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; volym &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="212"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="216"/>
       <source>Start segment</source>
       <translation>Starta segmentet</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; När ett segment av ljud eller video görs, välj en kod från koderträdet, högerklicka på koden och tilldela segmentet till koden. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="214"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
       <source>Segment:</source>
       <translation>Segment:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="215"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
       <source>Coder:</source>
       <translation>Kodare:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="216"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="220"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Ändra spår, om flera tillgängliga. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
       <source>Cannot code text when play transcript box is checked.</source>
       <translation>Det går inte att koda text när speltranskriptlådan kontrolleras.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="222"/>
       <source>Scroll transcript while playing.</source>
       <translation>Bläddra transkript när du spelar.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; ctrl + shift + &amp; gt;Öka spelfrekvensen till maximalt 2x &lt;/p&gt; &lt;p&gt; ctrl + skift + &amp; lt;Minska spelfrekvensen till minimum 0,1 &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="220"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
       <translation>1,0x</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="225"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; spolar in 30 sekunder.Alt + minus &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="227"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; minska spelfrekvensen &lt;/p&gt; &lt;p&gt; ctrl + skift + &amp; lt;&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="224"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="228"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; öka spelfrekvensen &lt;/p&gt; &lt;p&gt; ctrl + shift + &amp; gt;&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="225"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="229"/>
       <source>Rewind 5 seconds. Ctrl + R</source>
       <translation>Spola tillbaka 5 sekunder.Ctrl + r</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="226"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="230"/>
       <source>Help</source>
       <translation>Hjälp</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="227"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="231"/>
       <source>Show codings flagged important</source>
       <translation>Visa kodningar flaggade viktiga</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="229"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="233"/>
       <source>S</source>
       <translation>S</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="241"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="247"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Vänsterklicka på skjutreglaget och dra åt vänster eller höger för att ändra videoposition. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="211"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="215"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Tryck på knappen Start segment för att börja koda ljud-/videosegmentet. Tryck på knappen End segment för att avsluta det kodade segmentet.
 Kortkommando för tangent: Ctrl S
 Kortkommando: G - Öppna memo och applicera segmentet på den aktuella valda koden</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="222"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="226"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Framåt 30 sekunder. Alt + Plus
 Tangenttryckning 5 - Framåt 5 sekunder</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="228"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="232"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Knapp för att välja ett segment. 
 Därefter öppnas en meny med alternativ</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="230"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="234"/>
       <source>Find code</source>
       <translation>Hitta kod</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="231"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="235"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Skärmdump</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="232"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="236"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Projektbild från skärmdump</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="237"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="241"/>
       <source>Clear file filter</source>
       <translation>Rensa filfiltret</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="238"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="244"/>
       <source>Clear code filter</source>
       <translation>Rensa kodfiltret</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_code_av.py" line="239"/>
+      <location filename="../GUI/ui_dialog_code_av.py" line="245"/>
       <source>Code name filter</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_code_av.py" line="242"/>
+      <source>Go to bookmark (Shift B)
+To set a bookmark press B</source>
       <translation type="unfinished"/>
     </message>
   </context>
@@ -3974,147 +3980,157 @@ Markera (✓) de du vill markera. När du klickar på OK skapas en kod för varj
   <context>
     <name>Dialog_view_av</name>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="189"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="199"/>
       <source>View Audio Video</source>
       <translation>Visa ljudvideo</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="190"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="200"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Vänsterklicka på skjutreglaget och dra åt vänster eller höger för att ändra ljud/videoposition. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="193"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="203"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>Volym</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="194"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="204"/>
       <source>Audio:</source>
       <translation>Audio:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="195"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="205"/>
       <source>Scroll transcript while playing. (Transcript is read only)</source>
       <translation>Bläddra transkript när du spelar.(Transkript är endast läst)</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="196"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="206"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; ctrl + shift + &amp; gt;öka spelfrekvensen, maximalt 2,0 &lt;/p&gt; &lt;p&gt; ctrl + skift + &amp; lt;Minska spelfrekvensen, minst 0,1 &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="197"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
       <translation>1,0x</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="198"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="208"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Time &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="205"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="215"/>
       <source>Help</source>
       <translation>Hjälp</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="206"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="216"/>
       <source>green underline = Assigned to case.
 red underline = Assigned to code or annotation</source>
       <translation>Grön understryk = tilldelad fall.
 Röd understrykning = tilldelad kod eller kommentar</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="208"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="218"/>
       <source>Transcription:</source>
       <translation>Transkription:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="209"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="219"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Lägg till ett högtalarnamn till genvägar.I textinmatningsrutan Tryck Ctrl + N &lt;/p&gt; &lt;p&gt; in en högtalare i transkription.Tryck på Ctrl + 1 i textinmatningsrutan + 1 upp till Ctrl + 8 för högtalarens namn. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="210"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="220"/>
       <source>Speakers:</source>
       <translation>Högtalare:</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="211"/>
-      <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök efter text. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="213"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.".Ears" kommer att matcha "björnar" och "år".&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = "bakgrundsfärg: transparent;"&gt; en "*" efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = "bakgrundsfärg: transparent;"&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = "http://www.rexegg.com/regex-quickstart.html"&gt; &lt;span style = "Text-Decoration: understyrning;Färg:#000080; "&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="215"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="225"/>
       <source>0 / 0</source>
       <translation>0/0</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="216"/>
-      <source>New speaker</source>
-      <translation>Ny talare</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="217"/>
-      <source>Insert timestamp</source>
-      <translation>Infoga tidsstämpel</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="218"/>
-      <source>Remove Speaker</source>
-      <translation>Ta bort högtalare</translation>
-    </message>
-    <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="191"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="201"/>
       <source>Ctrl + S start/pause
 Ctrl + P start/pause</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="199"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="209"/>
       <source>Decrease play rate. Ctrl + Shift + &amp;lt; </source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="200"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="210"/>
       <source>Increase play rate. Ctrl + Shift + &amp;gt;</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="201"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="211"/>
       <source>Rewind 5 seconds Ctrl + R</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="202"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="212"/>
       <source>Rewind 30 seconds. Alt + Minus</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="203"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="213"/>
       <source>Forward 30 seconds. Alt + Plus
 Forward 5 seconds. Press 5</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="212"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="222"/>
       <source>Next</source>
       <translation type="unfinished">Nästa</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="214"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="224"/>
       <source>Previous</source>
       <translation type="unfinished">Föregående</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_view_av.py" line="220"/>
+      <location filename="../GUI/ui_dialog_view_av.py" line="230"/>
       <source>Case sensitive</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="221"/>
+      <source>Search for text</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="226"/>
+      <source>New speaker (Ctrl N)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="227"/>
+      <source>Insert timestamp (Ctrl T)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="228"/>
+      <source>Remove speaker (Ctrl D)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="231"/>
+      <source>Set bookmark (Ctrl B)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_view_av.py" line="232"/>
+      <source>Go to bookmark (Ctrl Shift B)</source>
       <translation type="unfinished"/>
     </message>
   </context>
