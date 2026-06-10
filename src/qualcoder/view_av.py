@@ -1932,6 +1932,8 @@ class DialogCodeAV(QtWidgets.QDialog):
          These key presses are not used in edi mode.
 
         A annotate - for current selection
+        Shift B Go to bookmark
+        B set bookmark
         C New category
         G Glue selected segment to selected code, and open segment memo
         Q Quick Mark with code - for current selection
@@ -1973,6 +1975,48 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_ABC and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
             self.save_screenshot()
             return'''
+        # Go to bookmark
+        if key == QtCore.Qt.Key.Key_B and mods & QtCore.Qt.KeyboardModifier.ShiftModifier:
+            cur = self.app.conn.cursor()
+            cur.execute("select avbookmarkfile, avbookmarkmsec, avbookmarktextpos from project")
+            result = cur.fetchone()
+            self.file_ = None
+            for i, f in enumerate(self.files):
+                if f['id'] == result[0]:
+                    self.file_ = f
+                    self.ui.listWidget.setCurrentItem(self.ui.listWidget.findItems(self.file_['name'], QtCore.Qt.MatchFlag.MatchExactly)[0])
+                    self.load_media()
+                    self.load_segments()
+                    self.fill_code_counts_in_tree()
+                    break
+            if self.file_ is None:
+                print("returning")
+                return
+            duration_msecs = self.media.get_duration()
+            self.mediaplayer.set_time(result[1])
+            self.mediaplayer.play()
+            # Playback must be active to set_time(). Also add a small sleep to give vlc time to load the media.
+            time.sleep(0.2)
+            self.mediaplayer.set_time(result[1])
+            self.ui.horizontalSlider.setValue(int(result[1] / self.media.get_duration() * 1000))
+            self.mediaplayer.pause()   
+            cursor = self.ui.plainTextEdit.textCursor()
+            cursor.setPosition(result[2])
+            endpos = result[2] - 1
+            if endpos < 0:
+                endpos = 0
+            cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            self.ui.plainTextEdit.setTextCursor(cursor)
+            return
+        # Set bookmark
+        if key == QtCore.Qt.Key.Key_B:
+            if self.file_ is None:
+                return
+            cur = self.app.conn.cursor()
+            cursor_pos = self.ui.plainTextEdit.textCursor().position()
+            cur.execute("update project set avbookmarkfile=?, avbookmarkmsec=?, avbookmarktextpos=?", [self.file_['id'], self.mediaplayer.get_time(), cursor_pos])
+            self.app.conn.commit()
+            return
         # New category
         if key == QtCore.Qt.Key.Key_C:
             # if category already selected, add new category to that

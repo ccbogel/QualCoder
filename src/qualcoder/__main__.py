@@ -2331,7 +2331,7 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text)")
+            "bookmarkpos integer, codername text, recently_used_codes text, avbookmarkfile integer, avbookmarkmsec integer, avbookmarktext integer)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -2861,6 +2861,16 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v14", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v14")
+        # Database version v15
+        try:
+            cur.execute("select avbookmarkfile from project")
+        except sqlite3.OperationalError:
+            cur.execute("alter table project add avbookmarkfile integer")
+            cur.execute("alter table project add avbookmarkmsec integer")
+            cur.execute("alter table project add avbookmarktextpos integer")
+            cur.execute('update project set databaseversion="v15", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v15")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
