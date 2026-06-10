@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 10:17+0200\n"
+"POT-Creation-Date: 2026-06-08 18:05+1000\n"
 "PO-Revision-Date: 2026-05-02 09:53+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,11 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.9\n"
 
-#: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
-#: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
-#: src/qualcoder/report_sql.py:436
-msgid "Copy"
-msgstr "Kopiera"
+#: src\qualcoder\add_attribute.py:76
+msgid "This attribute name already exists in cases, files or journals."
+msgstr "Det här attributnamnet finns redan i fall, filer eller journaler."
 
 #: src\qualcoder\add_attribute.py:77
 msgid "Or is reserved for bibliography attributes:"
@@ -36,147 +34,78 @@ msgstr "Dubblett"
 msgid "Duplicated"
 msgstr "Duplicerad"
 
-#: src/qualcoder/report_file_summary.py:116
-#: src/qualcoder/report_file_summary.py:175 src/qualcoder/code_pdf.py:2852
-#: src/qualcoder/code_pdf.py:2943 src/qualcoder/view_image.py:772
-#: src/qualcoder/view_image.py:846
-#: src/qualcoder/report_compare_coder_file.py:169
-#: src/qualcoder/report_compare_coder_file.py:228 src/qualcoder/view_av.py:777
-#: src/qualcoder/view_av.py:874 src/qualcoder/code_text.py:5032
-#: src/qualcoder/code_text.py:5137
-msgid "Show files like"
-msgstr "Visa filer som liknar"
+#: src\qualcoder\add_item_name.py:77
+msgid "This already exists"
+msgstr "Detta finns redan"
 
-#: src/qualcoder/report_file_summary.py:117 src/qualcoder/code_pdf.py:2853
-#: src/qualcoder/view_image.py:774
-#: src/qualcoder/report_compare_coder_file.py:170 src/qualcoder/view_av.py:779
-#: src/qualcoder/code_text.py:5033
-msgid "Show files by attributes"
-msgstr "Visa filer efter attribut"
+#: src\qualcoder\ai_chat.py:93
+msgid "<your question>"
+msgstr "<din fråga>"
 
-#: src/qualcoder/report_file_summary.py:118 src/qualcoder/code_pdf.py:2854
-#: src/qualcoder/view_image.py:773
-#: src/qualcoder/report_compare_coder_file.py:171 src/qualcoder/view_av.py:778
-#: src/qualcoder/code_text.py:5034
-msgid "Show case files"
-msgstr "Visa fallfiler"
+#: src\qualcoder\ai_chat.py:288 src\qualcoder\ai_chat.py:303
+#: src\qualcoder\ai_chat.py:329 src\qualcoder\ai_chat.py:452
+#: src\qualcoder\ai_chat.py:679
+msgid "No project open."
+msgstr "Inget projekt är öppet."
 
-#: src/qualcoder/report_file_summary.py:119 src/qualcoder/code_pdf.py:2857
-#: src/qualcoder/view_image.py:777
-#: src/qualcoder/report_codes_by_segments.py:286
-#: src/qualcoder/report_compare_coder_file.py:172
-#: src/qualcoder/report_codes.py:339 src/qualcoder/report_codes.py:386
-#: src/qualcoder/view_av.py:782 src/qualcoder/code_text.py:5044
+#: src\qualcoder\ai_chat.py:289 src\qualcoder\ai_chat.py:293
+#: src\qualcoder\ai_chat.py:304 src\qualcoder\ai_chat.py:308
+#: src\qualcoder\ai_chat.py:330 src\qualcoder\ai_chat.py:334
+#: src\qualcoder\ai_chat.py:453 src\qualcoder\ai_chat.py:457
+#: src\qualcoder\ai_chat.py:680 src\qualcoder\ai_chat.py:684
+#: src\qualcoder\ai_chat.py:1161
+msgid "AI not enabled"
+msgstr "AI inte aktiverad"
+
+#: src\qualcoder\ai_chat.py:292 src\qualcoder\ai_chat.py:307
+#: src\qualcoder\ai_chat.py:333 src\qualcoder\ai_chat.py:456
+#: src\qualcoder\ai_chat.py:683 src\qualcoder\ai_chat.py:1160
+#: src\qualcoder\code_text.py:7218
+msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
+msgstr "AI är avstängd. gå först till \"AI > Installationsguide\"."
+
+#: src\qualcoder\ai_chat.py:311
+msgid ""
+"We will now switch to the text coding workspace.\n"
+" There you can open a document, select a piece of text, right click on it "
+"and choose \"AI Text Analysis\" from the context menu."
+msgstr ""
+"Nu kommer vi att ändra till arbetsytan för kodning.\n"
+"Där kan du öppna dokument, välja delar av en text, högerklicka på den och "
+"välja \"AI textanalys\" från menyn."
+
+#: src\qualcoder\ai_chat.py:316 src\qualcoder\code_text.py:2247
+msgid "AI Text Analysis"
+msgstr "AI-textanalys"
+
+#: src\qualcoder\ai_chat.py:386
+msgid ""
+"No codings found for this particuar combination of coder, document filter, "
+"and code."
+msgstr ""
+"Inga kodningar hittades för denna specifika kombination av kodare, "
+"dokumentfilter och kod."
+
+#: src\qualcoder\ai_chat.py:387
 #, fuzzy
-msgid "Sort by name ascending"
-msgstr "Sortera stigande"
+msgid "Code analysis"
+msgstr "AI-kodanalys"
 
-#: src/qualcoder/report_file_summary.py:120 src/qualcoder/code_pdf.py:2858
-#: src/qualcoder/view_image.py:778
-#: src/qualcoder/report_codes_by_segments.py:287
-#: src/qualcoder/report_compare_coder_file.py:173
-#: src/qualcoder/report_codes.py:340 src/qualcoder/report_codes.py:387
-#: src/qualcoder/view_av.py:783 src/qualcoder/code_text.py:5045
-#, fuzzy
-msgid "Sort by name descending"
-msgstr "Sortera fallande"
+#: src\qualcoder\ai_chat.py:415
+msgid ""
+"No coded text found. Please select another code or category, or refine you "
+"filters."
+msgstr ""
+"Det finns ingen kodad text. Välj en annan kod eller kategori eller förfina "
+"dina filter."
 
-#: src/qualcoder/report_file_summary.py:121 src/qualcoder/code_pdf.py:2859
-#: src/qualcoder/view_image.py:779
-#: src/qualcoder/report_compare_coder_file.py:174 src/qualcoder/view_av.py:784
-#: src/qualcoder/code_text.py:5046
-#, fuzzy
-msgid "Sort by case ascending"
-msgstr "Sortera stigande"
+#: src\qualcoder\ai_chat.py:416
+msgid "AI code analysis"
+msgstr "AI-kodanalys"
 
-#: src/qualcoder/report_file_summary.py:122 src/qualcoder/code_pdf.py:2860
-#: src/qualcoder/view_image.py:780
-#: src/qualcoder/report_compare_coder_file.py:175 src/qualcoder/view_av.py:785
-#: src/qualcoder/code_text.py:5047
-#, fuzzy
-msgid "Sort by case descending"
-msgstr "Sortera fallande"
-
-#: src/qualcoder/report_file_summary.py:123 src/qualcoder/code_pdf.py:2861
-#: src/qualcoder/view_image.py:781
-#: src/qualcoder/report_codes_by_segments.py:288
-#: src/qualcoder/report_compare_coder_file.py:176
-#: src/qualcoder/report_codes.py:341 src/qualcoder/view_av.py:786
-#: src/qualcoder/code_text.py:5048
-#, fuzzy
-msgid "Sort by date ascending"
-msgstr "Sortera fallande"
-
-#: src/qualcoder/report_file_summary.py:124 src/qualcoder/code_pdf.py:2862
-#: src/qualcoder/view_image.py:782
-#: src/qualcoder/report_codes_by_segments.py:289
-#: src/qualcoder/report_compare_coder_file.py:177
-#: src/qualcoder/report_codes.py:342 src/qualcoder/view_av.py:787
-#: src/qualcoder/code_text.py:5049
-#, fuzzy
-msgid "Sort by date descending"
-msgstr "Sortera fallande"
-
-#: src/qualcoder/report_file_summary.py:152 src/qualcoder/code_pdf.py:2916
-#: src/qualcoder/view_image.py:817
-#: src/qualcoder/report_compare_coder_file.py:205 src/qualcoder/view_av.py:847
-#: src/qualcoder/code_text.py:5110
-msgid "Show all files"
-msgstr "Visa alla filer"
-
-#: src/qualcoder/report_file_summary.py:153 src/qualcoder/code_pdf.py:2917
-#: src/qualcoder/view_image.py:818
-#: src/qualcoder/report_compare_coder_file.py:206 src/qualcoder/view_av.py:848
-#: src/qualcoder/code_text.py:5111
-msgid "Select case"
-msgstr "Välj fall"
-
-#: src/qualcoder/report_file_summary.py:178 src/qualcoder/code_pdf.py:2946
-#: src/qualcoder/view_image.py:849
-#: src/qualcoder/report_compare_coder_file.py:231 src/qualcoder/view_av.py:877
-#: src/qualcoder/code_text.py:5140
-msgid "Show files containing the text. (Blank for all)"
-msgstr "Visa filer som innehåller texten. (Tomt visar alla)"
-
-#: src/qualcoder/report_file_summary.py:210 src/qualcoder/code_pdf.py:496
-#: src/qualcoder/view_image.py:467
-#: src/qualcoder/report_codes_by_segments.py:252
-#: src/qualcoder/report_compare_coder_file.py:263 src/qualcoder/view_av.py:501
-#: src/qualcoder/report_cooccurrence.py:284
-#: src/qualcoder/report_exact_matches.py:276 src/qualcoder/code_text.py:1538
-#: src/qualcoder/report_relations.py:198 src/qualcoder/reports.py:153
-msgid "Nothing found"
-msgstr "Ingenting hittades"
-
-#: src/qualcoder/report_file_summary.py:210 src/qualcoder/code_pdf.py:496
-#: src/qualcoder/view_image.py:467
-#: src/qualcoder/report_codes_by_segments.py:252
-#: src/qualcoder/report_compare_coder_file.py:263 src/qualcoder/view_av.py:501
-#: src/qualcoder/report_cooccurrence.py:284
-#: src/qualcoder/report_exact_matches.py:276 src/qualcoder/code_text.py:1538
-#: src/qualcoder/report_relations.py:198 src/qualcoder/reports.py:153
-msgid "No matching files found"
-msgstr "Inga matchande filer hittades"
-
-#: src/qualcoder/report_file_summary.py:240
-#: src/qualcoder/report_file_summary.py:583 src/qualcoder/code_pdf.py:397
-#: src/qualcoder/code_pdf.py:453 src/qualcoder/manage_files.py:1255
-#: src/qualcoder/manage_files.py:1261 src/qualcoder/manage_files.py:1264
-#: src/qualcoder/report_compare_coder_file.py:294
-#: src/qualcoder/report_codes.py:224 src/qualcoder/report_exact_matches.py:189
-#: src/qualcoder/code_text.py:1437 src/qualcoder/code_text.py:1494
-msgid "Characters: "
-msgstr "Tecken: "
-
-#: src/qualcoder/report_file_summary.py:253 src/qualcoder/code_pdf.py:392
-#: src/qualcoder/view_image.py:407 src/qualcoder/report_attributes.py:465
-#: src/qualcoder/report_compare_coder_file.py:311 src/qualcoder/helpers.py:435
-#: src/qualcoder/case_file_manager.py:96 src/qualcoder/report_codes.py:2437
-#: src/qualcoder/view_graph.py:2593 src/qualcoder/code_in_all_files.py:253
-#: src/qualcoder/view_av.py:449 src/qualcoder/view_charts.py:433
-#: src/qualcoder/view_charts.py:501 src/qualcoder/code_text.py:1435
-msgid "Case: "
-msgstr "Fall: "
+#: src\qualcoder\ai_chat.py:432
+msgid "Analyzing the data coded as \"{}\" ({} pieces of data sent to the AI.)"
+msgstr "Analyserar data kodad som \"{}\" ({} dataposter skickade till AI:n.)"
 
 #: src\qualcoder\ai_chat.py:434
 msgid ""
@@ -222,22 +151,13 @@ msgstr ""
 "\n"
 "Översättning:"
 
-#: src/qualcoder/report_file_summary.py:303
-#: src/qualcoder/report_code_summary.py:380
-#: src/qualcoder/ai_search_dialog.py:476
-#: src/qualcoder/report_codes_by_segments.py:153 src/qualcoder/helpers.py:1457
-#: src/qualcoder/report_codes.py:270 src/qualcoder/report_codes.py:2396
-#: src/qualcoder/report_codes.py:3129 src/qualcoder/view_av.py:4358
-#: src/qualcoder/code_text.py:880
-msgid "MEMO: "
-msgstr "ANTECKNING: "
+#: src\qualcoder\ai_chat.py:475
+msgid "Topic"
+msgstr "Ämne"
 
-#: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:388
-#: src/qualcoder/view_image.py:402 src/qualcoder/view_av.py:444
-#: src/qualcoder/__main__.py:2423 src/qualcoder/code_text.py:1430
-#: src/qualcoder/reports.py:336
-msgid "Date: "
-msgstr "Datum: "
+#: src\qualcoder\ai_chat.py:485
+msgid "Searching for related data..."
+msgstr "Söker efter relaterad data..."
 
 #: src\qualcoder\ai_chat.py:512 src\qualcoder\ai_chat.py:1296
 msgid "Chat has been canceled by the user."
@@ -437,17 +357,14 @@ msgstr "Fel vid kommunikation med "
 msgid "Uncaught exception: "
 msgstr "Ohanterat undantag: "
 
-#: src/qualcoder/code_pdf.py:227 src/qualcoder/view_image.py:173
-#: src/qualcoder/view_av.py:175 src/qualcoder/code_text.py:617
-#, fuzzy
-msgid "Clear file filter"
-msgstr "Rensa filter"
+#: src\qualcoder\ai_chat.py:1347 src\qualcoder\ai_chat.py:1368
+#: src\qualcoder\ai_chat.py:1413 src\qualcoder\ai_chat.py:1433
+msgid "Invalid source reference."
+msgstr "Ogiltig källreferens."
 
-#: src/qualcoder/code_pdf.py:236 src/qualcoder/view_image.py:180
-#: src/qualcoder/view_av.py:158 src/qualcoder/code_text.py:634
-#, fuzzy
-msgid "Clear code filter"
-msgstr "Rensa filter"
+#: src\qualcoder\ai_chat.py:1381
+msgid "Error retrieving source text"
+msgstr "Fel vid hämtning av källtext"
 
 #: src\qualcoder\ai_chat.py:1384
 msgid ""
@@ -520,134 +437,53 @@ msgstr ""
 "till en nyare modell, t.ex. GPT 4.1. Gå till Projekt > Inställningar för att "
 "ändra AI-profil och modell."
 
-#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:2928
-#: src/qualcoder/code_text.py:5300 src/qualcoder/code_text.py:7526
-msgid "Information"
-msgstr "Information"
+#: src\qualcoder\ai_llm.py:515
+msgid "Please enter an API-key for the AI in the following dialog."
+msgstr "Vänligen ange en API-nyckel för AI i följande dialogruta."
 
-#: src/qualcoder/code_pdf.py:476 src/qualcoder/code_pdf.py:485
-#: src/qualcoder/code_pdf.py:492 src/qualcoder/code_pdf.py:498
-#: src/qualcoder/code_pdf.py:1782 src/qualcoder/view_image.py:447
-#: src/qualcoder/view_image.py:456 src/qualcoder/view_image.py:463
-#: src/qualcoder/view_image.py:469 src/qualcoder/view_image.py:1628
-#: src/qualcoder/report_codes_by_segments.py:230
-#: src/qualcoder/report_codes_by_segments.py:240
-#: src/qualcoder/report_codes_by_segments.py:248
-#: src/qualcoder/report_codes_by_segments.py:255
-#: src/qualcoder/report_codes.py:1394 src/qualcoder/report_codes.py:1412
-#: src/qualcoder/report_codes.py:1421 src/qualcoder/report_codes.py:1572
-#: src/qualcoder/view_av.py:481 src/qualcoder/view_av.py:490
-#: src/qualcoder/view_av.py:497 src/qualcoder/view_av.py:503
-#: src/qualcoder/view_av.py:1848 src/qualcoder/report_cooccurrence.py:258
-#: src/qualcoder/report_cooccurrence.py:269
-#: src/qualcoder/report_cooccurrence.py:279
-#: src/qualcoder/report_cooccurrence.py:287
-#: src/qualcoder/report_exact_matches.py:254
-#: src/qualcoder/report_exact_matches.py:264
-#: src/qualcoder/report_exact_matches.py:272
-#: src/qualcoder/report_exact_matches.py:279 src/qualcoder/code_text.py:1517
-#: src/qualcoder/code_text.py:1526 src/qualcoder/code_text.py:1534
-#: src/qualcoder/code_text.py:1540 src/qualcoder/code_text.py:3166
-#: src/qualcoder/report_relations.py:173 src/qualcoder/report_relations.py:185
-#: src/qualcoder/report_relations.py:194 src/qualcoder/report_relations.py:201
-#: src/qualcoder/reports.py:129 src/qualcoder/reports.py:141
-#: src/qualcoder/reports.py:149 src/qualcoder/reports.py:156
-msgid "Attributes"
-msgstr "Attribut"
+#: src\qualcoder\ai_llm.py:516
+msgid "AI API-key"
+msgstr "AI API-nyckel"
 
-#: src/qualcoder/code_pdf.py:520 src/qualcoder/code_pdf.py:522
-#: src/qualcoder/code_pdf.py:537 src/qualcoder/code_pdf.py:539
-#: src/qualcoder/code_pdf.py:1736 src/qualcoder/code_pdf.py:1762
-#: src/qualcoder/code_text.py:1580 src/qualcoder/code_text.py:1582
-#: src/qualcoder/code_text.py:1596 src/qualcoder/code_text.py:1598
-#: src/qualcoder/code_text.py:3116 src/qualcoder/code_text.py:3143
-#, fuzzy
-msgid "Filtered: "
-msgstr "Filter är lika med: "
+#: src\qualcoder\ai_llm.py:522
+msgid "AI: No API key set, AI is disabled."
+msgstr "AI: Ingen API-nyckel inställd, AI är avstängd."
 
-#: src/qualcoder/code_pdf.py:535 src/qualcoder/code_pdf.py:3040
-#: src/qualcoder/code_pdf.py:3358 src/qualcoder/view_graph.py:1345
-#: src/qualcoder/view_graph.py:1414 src/qualcoder/view_graph.py:1480
-#: src/qualcoder/view_graph.py:2269 src/qualcoder/view_graph.py:2295
-#: src/qualcoder/view_graph.py:2320 src/qualcoder/code_in_all_files.py:152
-#: src/qualcoder/code_in_all_files.py:195
-#: src/qualcoder/code_in_all_files.py:238
-#: src/qualcoder/code_in_all_files.py:587
-#: src/qualcoder/code_in_all_files.py:620
-#: src/qualcoder/code_in_all_files.py:645
-#: src/qualcoder/code_in_all_files.py:673 src/qualcoder/view_av.py:3746
-#: src/qualcoder/view_av.py:4303 src/qualcoder/code_text.py:1594
-#: src/qualcoder/code_text.py:3024
-msgid "Memo: "
-msgstr "Anteckning: "
+#: src\qualcoder\ai_llm.py:530
+msgid ""
+"In the following dialog, go to \"Advanced AI Options\" and select a large "
+"and a fast AI model (both can be the same)."
+msgstr ""
+"I följande dialogruta går du till ”Advanced AI Options” och väljer en stor "
+"och en snabb AI-modell (båda kan vara desamma)."
 
-#: src/qualcoder/code_pdf.py:579 src/qualcoder/journals.py:186
-#: src/qualcoder/report_code_summary.py:148 src/qualcoder/view_image.py:484
-#: src/qualcoder/ai_search_dialog.py:187 src/qualcoder/coder_names.py:72
-#: src/qualcoder/attributes.py:264 src/qualcoder/manage_files.py:1210
-#: src/qualcoder/code_organiser.py:980
-#: src/qualcoder/report_codes_by_segments.py:379
-#: src/qualcoder/report_codes.py:438 src/qualcoder/view_av.py:544
-#: src/qualcoder/speakers.py:73 src/qualcoder/code_text.py:1619
-msgid "Name"
-msgstr "Namn"
+#: src\qualcoder\ai_llm.py:531
+msgid "AI Model Selection"
+msgstr "Val av AI-modell"
 
-#: src/qualcoder/code_pdf.py:579 src/qualcoder/report_code_summary.py:148
-#: src/qualcoder/view_image.py:484 src/qualcoder/manage_files.py:1210
-#: src/qualcoder/code_color_scheme.py:151 src/qualcoder/view_av.py:544
-#: src/qualcoder/report_exact_matches.py:645 src/qualcoder/code_text.py:1619
-#: src/qualcoder/report_relations.py:1148
-msgid "Id"
-msgstr "ID"
+#: src\qualcoder\ai_llm.py:537
+msgid "AI: No large/fast model selected, AI is disabled."
+msgstr "AI: Ingen stor/snabb modell vald, AI är avaktiverad."
 
-#: src/qualcoder/code_pdf.py:579 src/qualcoder/code_pdf.py:590
-#: src/qualcoder/code_pdf.py:618 src/qualcoder/code_pdf.py:643
-#: src/qualcoder/code_pdf.py:669 src/qualcoder/code_pdf.py:2684
-#: src/qualcoder/code_pdf.py:2709 src/qualcoder/report_code_summary.py:148
-#: src/qualcoder/report_code_summary.py:159
-#: src/qualcoder/report_code_summary.py:189
-#: src/qualcoder/report_code_summary.py:217
-#: src/qualcoder/report_code_summary.py:245 src/qualcoder/view_image.py:484
-#: src/qualcoder/view_image.py:1997 src/qualcoder/view_image.py:2845
-#: src/qualcoder/view_image.py:2870 src/qualcoder/ai_search_dialog.py:187
-#: src/qualcoder/ai_search_dialog.py:199 src/qualcoder/ai_search_dialog.py:277
-#: src/qualcoder/attributes.py:202 src/qualcoder/attributes.py:264
-#: src/qualcoder/manage_files.py:1210 src/qualcoder/manage_files.py:1564
-#: src/qualcoder/manage_files.py:1599 src/qualcoder/manage_files.py:2729
-#: src/qualcoder/code_organiser.py:929
-#: src/qualcoder/report_codes_by_segments.py:379
-#: src/qualcoder/report_codes_by_segments.py:391
-#: src/qualcoder/report_codes_by_segments.py:478
-#: src/qualcoder/code_color_scheme.py:151 src/qualcoder/report_codes.py:438
-#: src/qualcoder/report_codes.py:450 src/qualcoder/report_codes.py:530
-#: src/qualcoder/code_in_all_files.py:382 src/qualcoder/view_av.py:544
-#: src/qualcoder/view_av.py:638 src/qualcoder/view_av.py:2836
-#: src/qualcoder/view_av.py:2861 src/qualcoder/cases.py:735
-#: src/qualcoder/cases.py:893 src/qualcoder/code_text.py:1619
-#: src/qualcoder/code_text.py:1631 src/qualcoder/code_text.py:1659
-#: src/qualcoder/code_text.py:1684 src/qualcoder/code_text.py:1710
-#: src/qualcoder/code_text.py:3858 src/qualcoder/code_text.py:4866
-#: src/qualcoder/code_text.py:4891 src/qualcoder/report_relations.py:727
-#: src/qualcoder/report_relations.py:911
-msgid "Memo"
-msgstr "Anteckning"
+#: src\qualcoder\ai_llm.py:608
+msgid "AI: Ready"
+msgstr "AI: Klar"
 
-#: src/qualcoder/code_pdf.py:579 src/qualcoder/report_code_summary.py:148
-#: src/qualcoder/view_image.py:484 src/qualcoder/ai_search_dialog.py:187
-#: src/qualcoder/report_codes_by_segments.py:379
-#: src/qualcoder/report_codes.py:438 src/qualcoder/view_av.py:544
-#: src/qualcoder/speakers.py:73 src/qualcoder/code_text.py:1619
-#: src/qualcoder/report_relations.py:1046
-msgid "Count"
-msgstr "Antal"
+#: src\qualcoder\ai_llm.py:619
+msgid ""
+"An error occured during AI initialization. The AI features will be disabled. "
+"Click on Project > Settings to reenable them."
+msgstr ""
+"Ett fel inträffade under uppstarten av AI. AI funktionen inaktiverades. "
+"Klicka på Projekt > Inställningar för att aktivera den."
 
-#: src/qualcoder/code_pdf.py:942 src/qualcoder/code_text.py:2044
-msgid "Automatic search 3 or more characters"
-msgstr "Automatisk sökning med 3 eller fler tecken"
+#: src\qualcoder\ai_llm.py:620
+msgid "AI Initialization"
+msgstr "Initiering av AI"
 
-#: src/qualcoder/code_pdf.py:943 src/qualcoder/code_text.py:2045
-msgid "Automatic search 5 or more characters"
-msgstr "Automatisk sökning med 5 eller fler tecken"
+#: src\qualcoder\ai_llm.py:634
+msgid "Do you really want to cancel the AI operation?"
+msgstr "Vill du verkligen avbryta AI-processen?"
 
 #: src\qualcoder\ai_llm.py:645
 msgid ""
@@ -661,107 +497,88 @@ msgstr ""
 msgid "AI Error:\n"
 msgstr "AI-fel:\n"
 
-#: src/qualcoder/code_pdf.py:1026 src/qualcoder/code_text.py:998
-#: src/qualcoder/code_text.py:2207
-msgid "Unmark (U)"
-msgstr "Avmarkera (U)"
+#: src\qualcoder\ai_llm.py:880
+msgid "AI generate_code_descriptions\n"
+msgstr "AI genererar_kodbeskrivningar\n"
 
-#: src/qualcoder/code_pdf.py:1027 src/qualcoder/code_text.py:999
-#: src/qualcoder/code_text.py:2208
-msgid "Memo coded text (M)"
-msgstr "Anteckna kodad text (M)"
+#: src\qualcoder\ai_llm.py:881
+msgid "Prompt:\n"
+msgstr "Uppmaning:\n"
 
-#: src/qualcoder/code_pdf.py:1029 src/qualcoder/view_av.py:3088
-#: src/qualcoder/code_text.py:2211
-msgid "Add important mark (I)"
-msgstr "Lägg till viktig markering (I)"
+#: src\qualcoder\ai_llm.py:922
+msgid ""
+"Stage 1:\n"
+"Searching data related to \""
+msgstr ""
+"Steg 1:\n"
+"Söker data om \""
 
-#: src/qualcoder/code_pdf.py:1031 src/qualcoder/view_image.py:2008
-#: src/qualcoder/view_image.py:2011 src/qualcoder/view_av.py:3090
-#: src/qualcoder/view_av.py:4105 src/qualcoder/code_text.py:2213
-msgid "Remove important mark"
-msgstr "Ta bort viktig markering"
+#: src\qualcoder\ai_llm.py:999
+msgid ""
+"Stage 2:\n"
+"Inspecting the data more closely..."
+msgstr ""
+"Steg 2:\n"
+"Analyserar data djupare..."
 
-#: src/qualcoder/code_pdf.py:1032 src/qualcoder/view_av.py:3084
-#: src/qualcoder/code_text.py:1002 src/qualcoder/code_text.py:2214
-msgid "Change code"
-msgstr "Ãndra kod"
+#: src\qualcoder\ai_prompts.py:850
+msgid "Delete Prompt"
+msgstr "Ta bort uppmaning"
 
-#: src/qualcoder/code_pdf.py:1033 src/qualcoder/view_av.py:362
-#: src/qualcoder/view_av.py:3085 src/qualcoder/view_av.py:4751
-#: src/qualcoder/code_text.py:1000 src/qualcoder/code_text.py:2215
-msgid "Resize"
-msgstr "Ändra storlek"
+#: src\qualcoder\ai_prompts.py:887 src\qualcoder\ai_prompts.py:892
+#: src\qualcoder\ai_prompts.py:898 src\qualcoder\ai_prompts.py:927
+#: src\qualcoder\ai_prompts.py:935
+msgid "Edit prompts"
+msgstr "Redigera uppmaningar"
 
-#: src/qualcoder/code_pdf.py:1048 src/qualcoder/view_av.py:3111
-#: src/qualcoder/code_text.py:2218
-msgid "Mark (Q)"
-msgstr "Markera (Q)"
+#: src\qualcoder\ai_prompts.py:887
+msgid "The name cannot be empty"
+msgstr "Namnet får inte vara tomt"
 
-#: src/qualcoder/code_pdf.py:1051 src/qualcoder/view_av.py:3114
-#: src/qualcoder/code_text.py:2221
-msgid "Mark with recent code (R)"
-msgstr "Markera med senaste kod (R)"
+#: src\qualcoder\ai_prompts.py:892
+msgid "The name must be no longer than 60 characters."
+msgstr "Namnet får inte vara längre än 60 tecken."
 
-#: src/qualcoder/code_pdf.py:1054 src/qualcoder/view_av.py:3117
-#: src/qualcoder/code_text.py:1001 src/qualcoder/code_text.py:2240
-msgid "Annotate (A)"
-msgstr "Anteckna (A)"
+#: src\qualcoder\ai_prompts.py:898
+msgid "The name of the prompt must be unique within its type and scope."
+msgstr "Uppmaningens namn måste vara unikt inom dess typ och räckvidd."
 
-#: src/qualcoder/code_pdf.py:1055 src/qualcoder/report_codes.py:2525
-#: src/qualcoder/report_codes.py:3179 src/qualcoder/manage_references.py:615
-#: src/qualcoder/view_av.py:3118 src/qualcoder/code_text.py:2241
-msgid "Copy to clipboard"
-msgstr "Kopiera till urklipp"
+#: src\qualcoder\ai_prompts.py:925
+msgid "Names of prompts must be unique within its type and scope. "
+msgstr "Namn på uppmaningar måste vara unika inom sin typ och räckvidd. "
 
 #: src\qualcoder\ai_search_dialog.py:82
 msgid "1) What do you want to search for?"
 msgstr "1) Vad vill du söka efter?"
 
-#: src/qualcoder/code_pdf.py:1057 src/qualcoder/code_text.py:2225
-msgid "in vivo code (V)"
-msgstr "in vivo-kod (V)"
+#: src\qualcoder\ai_search_dialog.py:89
+msgid "1) Which code do you want to analyze?"
+msgstr "1) Vilken kod vill du analysera?"
 
-#: src/qualcoder/code_pdf.py:1059 src/qualcoder/view_av.py:3120
-#: src/qualcoder/code_text.py:2244
-msgid "Edit annotation"
-msgstr "Redigera anteckning"
+#: src\qualcoder\ai_search_dialog.py:97
+msgid "1) Which topic do you want to analyze?"
+msgstr "1) Vilket ämne vill du analysera?"
 
-#: src/qualcoder/code_pdf.py:1063 src/qualcoder/code_text.py:2265
-msgid "Show control panel (H)"
-msgstr "Visa kontrollpanel (H)"
+#: src\qualcoder\ai_search_dialog.py:115 src\qualcoder\ai_search_dialog.py:359
+#, fuzzy
+msgid "Coders: "
+msgstr "Kodare: "
 
-#: src/qualcoder/code_pdf.py:1065 src/qualcoder/code_text.py:2267
-msgid "Hide control panel (H)"
-msgstr "Dölj kontrollpanel (H)"
+#: src\qualcoder\ai_search_dialog.py:136
+msgid "The last used prompt"
+msgstr "Senast använda uppmaningen"
 
-#: src/qualcoder/code_pdf.py:1159 src/qualcoder/code_pdf.py:1252
-#: src/qualcoder/code_pdf.py:1625 src/qualcoder/view_image.py:1497
-#: src/qualcoder/report_comparison_table.py:410
-#: src/qualcoder/view_graph.py:1307 src/qualcoder/view_graph.py:1375
-#: src/qualcoder/view_graph.py:1498 src/qualcoder/code_in_all_files.py:481
-#: src/qualcoder/view_av.py:1684 src/qualcoder/view_av.py:3193
-#: src/qualcoder/view_av.py:3258 src/qualcoder/report_cooccurrence.py:316
-#: src/qualcoder/code_text.py:2397 src/qualcoder/code_text.py:2486
-#: src/qualcoder/code_text.py:2962
-msgid "Select codes"
-msgstr "Välj koder"
+#: src\qualcoder\ai_search_dialog.py:138
+msgid "could not be found. The prompt will be reset to the default."
+msgstr "kunde inte hittas. Uppmaningen återställs till standard."
 
-#: src/qualcoder/code_pdf.py:1174 src/qualcoder/report_codes.py:2647
-#: src/qualcoder/view_av.py:3205 src/qualcoder/code_text.py:1082
-#: src/qualcoder/code_text.py:2412
-msgid "Select replacement code"
-msgstr "Välj ersättningskod"
-
-#: src/qualcoder/code_pdf.py:1299 src/qualcoder/code_pdf.py:3433
-#: src/qualcoder/view_av.py:3297 src/qualcoder/code_text.py:2560
-msgid "Select code to memo"
-msgstr "Välj kod för anteckning"
-
-#: src/qualcoder/code_pdf.py:1308 src/qualcoder/view_av.py:3306
-#: src/qualcoder/code_text.py:1061 src/qualcoder/code_text.py:2569
-msgid "Memo for Coded text: "
-msgstr "Anteckning för kodad text: "
+#: src\qualcoder\ai_search_dialog.py:139 src\qualcoder\ai_search_dialog.py:504
+#: src\qualcoder\ai_search_dialog.py:524 src\qualcoder\code_text.py:4140
+#: src\qualcoder\report_codes.py:1455 src\qualcoder\report_exact_matches.py:324
+#: src\qualcoder\view_graph.py:759 src\qualcoder\view_graph.py:1331
+#: src\qualcoder\view_graph.py:1401 src\qualcoder\view_graph.py:1460
+msgid "No codes"
+msgstr "Inga koder"
 
 #: src\qualcoder\ai_search_dialog.py:187 src\qualcoder\attributes.py:264
 #: src\qualcoder\coder_names.py:72 src\qualcoder\code_organiser.py:980
@@ -807,391 +624,354 @@ msgstr "Namn"
 msgid "Memo"
 msgstr "Anteckning"
 
-#: src/qualcoder/code_pdf.py:1354 src/qualcoder/view_image.py:1300
-#: src/qualcoder/view_av.py:1523 src/qualcoder/code_text.py:2689
-msgid "Add new code to category"
-msgstr "Lägg till ny kod till kategori"
+#: src\qualcoder\ai_search_dialog.py:187 src\qualcoder\code_pdf.py:579
+#: src\qualcoder\code_text.py:1619 src\qualcoder\report_codes.py:438
+#: src\qualcoder\report_codes_by_segments.py:379
+#: src\qualcoder\report_code_summary.py:148
+#: src\qualcoder\report_relations.py:1046 src\qualcoder\speakers.py:73
+#: src\qualcoder\view_av.py:544 src\qualcoder\view_image.py:484
+msgid "Count"
+msgstr "Antal"
 
-#: src/qualcoder/code_pdf.py:1355 src/qualcoder/view_image.py:1301
-#: src/qualcoder/view_av.py:1524 src/qualcoder/code_text.py:2690
-msgid "Add a new category to category"
-msgstr "Lägg till ny kategori i kategori"
+#: src\qualcoder\ai_search_dialog.py:188 src\qualcoder\report_codes.py:439
+#: src\qualcoder\report_codes_by_segments.py:380
+msgid "Codes and categories"
+msgstr "Koder och kategorier"
 
-#: src/qualcoder/code_pdf.py:1356 src/qualcoder/view_image.py:1302
-#: src/qualcoder/view_av.py:1525 src/qualcoder/code_text.py:2691
-msgid "Add a new code"
-msgstr "Lägg till ny kod"
-
-#: src/qualcoder/code_pdf.py:1357 src/qualcoder/view_image.py:1303
-#: src/qualcoder/view_av.py:1526 src/qualcoder/code_text.py:2692
-msgid "Add a new category"
-msgstr "Lägg till en ny kategori"
-
-#: src/qualcoder/code_pdf.py:1361 src/qualcoder/view_image.py:1307
-#: src/qualcoder/view_av.py:1530 src/qualcoder/code_text.py:2695
-#: src/qualcoder/reports.py:553 src/qualcoder/reports.py:1066
-msgid "Expand or collapse branch"
-msgstr "Visa eller dölj grenen"
-
-#: src/qualcoder/code_pdf.py:1362 src/qualcoder/code_pdf.py:1378
-#: src/qualcoder/report_code_summary.py:312
-#: src/qualcoder/report_code_summary.py:315 src/qualcoder/view_image.py:1308
-#: src/qualcoder/view_image.py:1326
-#: src/qualcoder/report_codes_by_segments.py:539
-#: src/qualcoder/report_codes_by_segments.py:542 src/qualcoder/view_av.py:1531
-#: src/qualcoder/view_av.py:1546 src/qualcoder/report_exact_matches.py:738
-#: src/qualcoder/report_exact_matches.py:741 src/qualcoder/code_text.py:2696
-#: src/qualcoder/code_text.py:2712 src/qualcoder/reports.py:548
-#: src/qualcoder/reports.py:552 src/qualcoder/reports.py:1061
-#: src/qualcoder/reports.py:1065
-msgid "Show coded files"
-msgstr "Visa kodade filer"
-
-#: src/qualcoder/code_pdf.py:1363 src/qualcoder/view_image.py:1309
-#: src/qualcoder/view_av.py:1532 src/qualcoder/code_text.py:2697
+#: src\qualcoder\ai_search_dialog.py:348
 #, fuzzy
-msgid "Modify"
-msgstr "Ãndrad"
+msgid "Coder selection"
+msgstr "Chattval"
 
-#: src/qualcoder/code_pdf.py:1364 src/qualcoder/view_image.py:1310
-#: src/qualcoder/view_av.py:1533 src/qualcoder/code_text.py:2698
-#, fuzzy
-msgid "Rename F2"
-msgstr "Byt namn"
+#: src\qualcoder\ai_search_dialog.py:426 src\qualcoder\report_attributes.py:450
+#: src\qualcoder\view_charts.py:343
+msgid "Show files:"
+msgstr "Visa filer:"
 
-#: src/qualcoder/code_pdf.py:1365 src/qualcoder/view_image.py:1311
-#: src/qualcoder/view_av.py:1534 src/qualcoder/code_text.py:2699
-msgid "View or edit memo"
-msgstr "Visa eller redigera anteckning"
+#: src\qualcoder\ai_search_dialog.py:443
+msgid "<no file filter>"
+msgstr "<inget filfilter>"
 
-#: src/qualcoder/code_pdf.py:1369 src/qualcoder/view_image.py:1315
-#: src/qualcoder/code_organiser.py:926 src/qualcoder/view_av.py:1538
-#: src/qualcoder/code_text.py:2703
-msgid "Merge category into category"
-msgstr "Slå ihop kategori med annan kategori"
+#: src\qualcoder\ai_search_dialog.py:444
+msgid "Search in all textfiles"
+msgstr "Sök i alla textfiler"
 
-#: src/qualcoder/code_pdf.py:1370 src/qualcoder/view_image.py:1316
-#: src/qualcoder/view_av.py:1539 src/qualcoder/code_text.py:2704
-#, fuzzy
-msgid "Move category under category"
-msgstr "Länka kategori under kategori"
+#: src\qualcoder\ai_search_dialog.py:456
+msgid "Codings: "
+msgstr "Kodningar: "
 
-#: src/qualcoder/code_pdf.py:1371 src/qualcoder/view_image.py:1317
-#: src/qualcoder/manage_files.py:528 src/qualcoder/manage_references.py:618
-#: src/qualcoder/view_av.py:1540 src/qualcoder/code_text.py:2705
-#: src/qualcoder/report_sql.py:438
-msgid "Delete"
-msgstr "Ta bort"
+#: src\qualcoder\ai_search_dialog.py:460 src\qualcoder\report_codes.py:245
+#: src\qualcoder\report_codes_by_segments.py:140
+msgid ""
+"\n"
+"MEMO: "
+msgstr ""
+"\n"
+"MEMO: "
 
-#: src/qualcoder/code_pdf.py:1377 src/qualcoder/view_image.py:1323
-#: src/qualcoder/view_av.py:1543 src/qualcoder/code_text.py:2711
-msgid "Change code color"
-msgstr "Ãndra kodfärg"
+#: src\qualcoder\ai_search_dialog.py:468
+msgid "Search in all cases"
+msgstr "Sök i alla fall"
 
-#: src/qualcoder/code_pdf.py:1379 src/qualcoder/view_image.py:1324
-#: src/qualcoder/view_av.py:1544 src/qualcoder/code_text.py:2713
-msgid "Move code to"
-msgstr "Flytta kod till"
+#: src\qualcoder\ai_search_dialog.py:476 src\qualcoder\code_text.py:880
+#: src\qualcoder\helpers.py:1457 src\qualcoder\report_codes.py:270
+#: src\qualcoder\report_codes.py:2396 src\qualcoder\report_codes.py:3129
+#: src\qualcoder\report_codes_by_segments.py:153
+#: src\qualcoder\report_code_summary.py:380
+#: src\qualcoder\report_file_summary.py:303 src\qualcoder\view_av.py:4358
+msgid "MEMO: "
+msgstr "ANTECKNING: "
 
-#: src/qualcoder/code_pdf.py:1380 src/qualcoder/view_image.py:1325
-#: src/qualcoder/view_av.py:1545 src/qualcoder/code_text.py:2714
-#, fuzzy
-msgid "Move multiple codes"
-msgstr "Kodare: Alla kodare"
+#: src\qualcoder\ai_search_dialog.py:497
+msgid "The AI ist not ready to fulfill your request (status: "
+msgstr "AI:n är inte redo att utföra din begäran (status: "
 
-#: src/qualcoder/code_pdf.py:1381 src/qualcoder/view_image.py:1328
-#: src/qualcoder/view_av.py:1548 src/qualcoder/code_text.py:2715
-#, fuzzy
-msgid "Filter"
-msgstr "Filter är lika med: "
+#: src\qualcoder\ai_search_dialog.py:497
+msgid ")."
+msgstr ")."
 
-#: src/qualcoder/code_pdf.py:1382 src/qualcoder/view_image.py:1329
-#: src/qualcoder/view_av.py:1549 src/qualcoder/code_text.py:2716
-msgid "Show codes like"
-msgstr "Visa koder som liknar"
+#: src\qualcoder\ai_search_dialog.py:503
+msgid "Please select a code or category (or use \"free search\" instead)."
+msgstr "Välj en kod eller kategori (eller använd \"fri sökning\")."
 
-#: src/qualcoder/code_pdf.py:1383 src/qualcoder/view_image.py:1330
-#: src/qualcoder/view_av.py:1550 src/qualcoder/code_text.py:2717
-msgid "Show codes of colour"
-msgstr "Visa koder med färg"
+#: src\qualcoder\ai_search_dialog.py:523
+msgid "Please enter text in the \"topic\" field."
+msgstr "Skriv in text i fältet \"ämne\"."
 
-#: src/qualcoder/code_pdf.py:1384 src/qualcoder/code_pdf.py:2855
-#: src/qualcoder/view_image.py:775 src/qualcoder/view_image.py:1331
-#: src/qualcoder/view_av.py:780 src/qualcoder/view_av.py:1551
-#: src/qualcoder/code_text.py:2718 src/qualcoder/code_text.py:5042
-msgid "Sort"
-msgstr "Sortera"
+#: src\qualcoder\ai_search_dialog.py:572
+msgid ""
+"After combining all filters, there are not files left for the search. Please "
+"check your settings."
+msgstr ""
+"Det finns inga filer kvar att söka i efter att alla filter kombineras. "
+"Kontrollera dina inställningar."
 
-#: src/qualcoder/code_pdf.py:1385 src/qualcoder/view_image.py:1332
-#: src/qualcoder/view_av.py:1552 src/qualcoder/report_exact_matches.py:462
-#: src/qualcoder/code_text.py:2719 src/qualcoder/report_relations.py:623
-#: src/qualcoder/report_relations.py:1109 src/qualcoder/report_sql.py:540
-#: src/qualcoder/report_sql.py:637
-msgid "Sort ascending"
-msgstr "Sortera stigande"
+#: src\qualcoder\ai_search_dialog.py:573 src\qualcoder\view_graph.py:1428
+msgid "No files"
+msgstr "Inga filer"
 
-#: src/qualcoder/code_pdf.py:1386 src/qualcoder/view_image.py:1333
-#: src/qualcoder/view_av.py:1553 src/qualcoder/report_exact_matches.py:463
-#: src/qualcoder/code_text.py:2720 src/qualcoder/report_relations.py:624
-#: src/qualcoder/report_relations.py:1110 src/qualcoder/report_sql.py:542
-#: src/qualcoder/report_sql.py:639
-msgid "Sort descending"
-msgstr "Sortera fallande"
+#: src\qualcoder\ai_vectorstore.py:155
+msgid ""
+"Since you are using the AI integration for the first time, QualCoder needs "
+"to download and install some additional components. \n"
+"\n"
+"This will download about 2.5 GB of data. Do you \n"
+"want to continue?"
+msgstr ""
+"QualCoder behöver ladda ner och installera några ytterligare komponenter "
+"eftersom du använder AI funktionen för första gången.\n"
+"\n"
+"Ungefär 2.5 GB data kommer att laddas ned. Vill du\n"
+"fortsätta?"
 
-#: src/qualcoder/code_pdf.py:1387 src/qualcoder/view_image.py:1334
-#: src/qualcoder/view_av.py:1554 src/qualcoder/code_text.py:2721
-msgid "Sort category then code ascending"
-msgstr "Sortera kategori och sedan kod stigande"
+#: src\qualcoder\ai_vectorstore.py:164 src\qualcoder\ai_vectorstore.py:175
+msgid "Download AI components"
+msgstr "Ladda ner AI-komponenter"
 
-#: src/qualcoder/code_pdf.py:1527 src/qualcoder/code_pdf.py:1561
-#: src/qualcoder/code_pdf.py:1635 src/qualcoder/code_pdf.py:1661
-#: src/qualcoder/view_image.py:1468 src/qualcoder/view_image.py:1507
-#: src/qualcoder/view_image.py:1532 src/qualcoder/view_image.py:2577
-#: src/qualcoder/view_av.py:1694 src/qualcoder/view_av.py:1720
-#: src/qualcoder/view_av.py:1746 src/qualcoder/view_av.py:2573
-#: src/qualcoder/code_text.py:2864 src/qualcoder/code_text.py:2898
-#: src/qualcoder/code_text.py:2972 src/qualcoder/code_text.py:2997
-msgid "Select blank or category"
-msgstr "Välj tom eller kategori"
+#: src\qualcoder\ai_vectorstore.py:194
+msgid "Downloading "
+msgstr "Laddar ner "
 
-#: src/qualcoder/code_pdf.py:1536 src/qualcoder/code_pdf.py:1540
-#: src/qualcoder/view_image.py:1477 src/qualcoder/view_image.py:1481
-#: src/qualcoder/view_av.py:1755 src/qualcoder/view_av.py:1759
-#: src/qualcoder/code_text.py:2873 src/qualcoder/code_text.py:2877
-#, fuzzy
-msgid "Moved category: "
-msgstr "Importerad kategori: "
+#: src\qualcoder\ai_vectorstore.py:272
+msgid ""
+"AI: Could not download all the necessary components, the AI integration will "
+"be disabled."
+msgstr ""
+"AI: Kunde inte ladda ner alla nödvändiga komponenter, AI integrationen "
+"kommer att inaktiveras."
 
-#: src/qualcoder/code_pdf.py:1643 src/qualcoder/view_image.py:1515
-#: src/qualcoder/view_av.py:1702 src/qualcoder/code_text.py:2980
-#, fuzzy
-msgid "Code moved."
-msgstr "Kodanteckning"
+#: src\qualcoder\ai_vectorstore.py:274
+msgid "AI: Success, components downloaded and installed."
+msgstr "AI: Klart, komponenter nedladdade och installerade."
 
-#: src/qualcoder/code_pdf.py:1676 src/qualcoder/view_image.py:326
-#: src/qualcoder/view_av.py:519 src/qualcoder/code_text.py:3058
-msgid "Showing important codings"
-msgstr "Visar viktiga kodningar"
+#: src\qualcoder\ai_vectorstore.py:312 src\qualcoder\ai_vectorstore.py:390
+msgid ""
+"It appears that you have already used the AI features with this project "
+"before. Meanwhile, we had to change the internal implementation of the local "
+"AI memory to make it more robust. As a result, the AI has to read through "
+"all your empirical documents again to rebuild the local memory. This may "
+"take a while. Sorry for the inconvenience."
+msgstr ""
+"Det verkar som att du redan använt AI funktionen i detta projekt tidigare. "
+"Sedan dess har vi ändrat vår interna implementering av det lokala AI minnet "
+"för att göra det mer robust. Som ett resultat av det kommer AIn att behöva "
+"läsa igenom alla empiriska dokument för att bygga upp det lokala minnet "
+"igen. Det kan ta en stund och vi ber om ursäkt för det."
 
-#: src/qualcoder/code_pdf.py:1680 src/qualcoder/view_image.py:329
-#: src/qualcoder/view_av.py:522 src/qualcoder/code_text.py:3061
-msgid "Show codings flagged important"
-msgstr "Visa kodningar markerade som viktiga"
+#: src\qualcoder\ai_vectorstore.py:377
+msgid "AI: Finished loading (no project open)."
+msgstr "AI: Inläsning klar (inget projekt öppet)."
 
-#: src/qualcoder/code_pdf.py:1696 src/qualcoder/view_image.py:1552
-#: src/qualcoder/view_av.py:1774 src/qualcoder/code_text.py:3077
-msgid "Show some codes"
-msgstr "Visa vissa koder"
+#: src\qualcoder\ai_vectorstore.py:395 src\qualcoder\ai_vectorstore.py:407
+msgid "AI memory"
+msgstr "AI-minne"
 
-#: src/qualcoder/code_pdf.py:1698 src/qualcoder/view_image.py:1554
-#: src/qualcoder/view_av.py:1776 src/qualcoder/code_text.py:3079
-msgid "Show codes containing the text. (Blank for all)"
-msgstr "Visa koder som innehåller text. (Tomt visar alla)"
+#: src\qualcoder\ai_vectorstore.py:416
+msgid "AI: Checked all documents, memory is up to date."
+msgstr "AI: Alla dokument kontrollerade, minnet är uppdaterat."
 
-#: src/qualcoder/code_pdf.py:1700 src/qualcoder/view_image.py:1556
-#: src/qualcoder/view_av.py:1778 src/qualcoder/code_text.py:3081
-#, fuzzy
-msgid "Filter: "
-msgstr "Filter är lika med: "
+#: src\qualcoder\ai_vectorstore.py:455
+msgid "Vectorstore: Document import failed, faiss_db not present."
+msgstr "Vectorstore: Dokumentimport misslyckades, faiss_db saknas."
 
-#: src/qualcoder/code_pdf.py:1703 src/qualcoder/view_image.py:1559
-#: src/qualcoder/view_av.py:1781 src/qualcoder/code_text.py:3084
-#, fuzzy
-msgid "Case sensitive"
-msgstr "Case"
+#: src\qualcoder\ai_vectorstore.py:484
+msgid "AI: Adding document to internal memory: "
+msgstr "AI: Lägger till dokument i internt minne: "
 
-#: src/qualcoder/code_pdf.py:1745 src/qualcoder/view_image.py:1595
-#: src/qualcoder/view_av.py:1817 src/qualcoder/code_text.py:3126
-msgid "Select code colors"
-msgstr "Välj kodfärger"
+#: src\qualcoder\ai_vectorstore.py:554
+msgid "AI: No documents, AI is ready."
+msgstr "AI: Inga dokument, AI är redo."
 
-#: src/qualcoder/code_pdf.py:1846 src/qualcoder/view_image.py:264
-#: src/qualcoder/view_av.py:299 src/qualcoder/code_text.py:1310
-msgid "Search for code"
-msgstr "Sök efter kod"
+#: src\qualcoder\ai_vectorstore.py:558
+msgid "AI: Checking for new documents"
+msgstr "AI: Söker efter nya dokument"
 
-#: src/qualcoder/code_pdf.py:1849 src/qualcoder/view_image.py:267
-#: src/qualcoder/view_av.py:302 src/qualcoder/code_text.py:1313
-msgid "Find and select first code that matches text."
-msgstr "Hitta och välj den första koden som matchar texten."
+#: src\qualcoder\ai_vectorstore.py:571
+msgid ""
+"AI: Rebuilding memory. The local AI will read through all your documents, "
+"please be patient."
+msgstr ""
+"AI: Bygger om minnet. Den lokala AIn kommer att läsa igenom alla dina "
+"dokument, det kan ta en stund."
 
-#: src/qualcoder/code_pdf.py:1850 src/qualcoder/view_image.py:268
-#: src/qualcoder/view_av.py:303 src/qualcoder/code_text.py:1314
-msgid "Enter text to match all or partial code:"
-msgstr "Ange text för att matcha hela eller delar av koden:"
+#: src\qualcoder\attributes.py:94 src\qualcoder\attributes.py:259
+#: src\qualcoder\view_charts.py:409 src\qualcoder\view_charts.py:503
+#: src\qualcoder\__main__.py:2985
+msgid "Attributes: "
+msgstr "Attribut: "
 
-#: src/qualcoder/code_pdf.py:1873 src/qualcoder/view_image.py:290
-#: src/qualcoder/view_av.py:325 src/qualcoder/code_text.py:1337
-msgid "Match not found"
-msgstr "Matchningen hittades inte"
+#: src\qualcoder\attributes.py:148
+msgid "Attribute added: "
+msgstr "Attribut tillagt: "
 
-#: src/qualcoder/code_pdf.py:1873 src/qualcoder/view_image.py:290
-#: src/qualcoder/view_av.py:325 src/qualcoder/code_text.py:1337
-msgid "No code with matching text found."
-msgstr "Ingen kod med matchande text hittades."
+#: src\qualcoder\attributes.py:169
+msgid "Attribute deleted: "
+msgstr "Attribut borttaget: "
 
-#: src/qualcoder/code_pdf.py:1879 src/qualcoder/code_pdf.py:2011
-#: src/qualcoder/view_image.py:295 src/qualcoder/view_image.py:2038
-#: src/qualcoder/view_av.py:330 src/qualcoder/code_text.py:1343
-#: src/qualcoder/code_text.py:2103 src/qualcoder/code_text.py:2149
-msgid "Select code"
-msgstr "Välj kod"
+#: src\qualcoder\attributes.py:180
+msgid "Attributes deleted: "
+msgstr "Attribut borttagna: "
 
-#: src/qualcoder/code_pdf.py:2033 src/qualcoder/view_av.py:2083
-#: src/qualcoder/code_text.py:3307
-msgid "Text position"
-msgstr "Textposition"
+#: src\qualcoder\attributes.py:190
+msgid "Memo for Attribute "
+msgstr "Anteckning för attribut "
 
-#: src/qualcoder/code_pdf.py:2033 src/qualcoder/view_av.py:2083
-#: src/qualcoder/code_text.py:3307
-msgid "Character position: "
-msgstr "Teckenposition: "
+#: src\qualcoder\attributes.py:216
+msgid "numeric"
+msgstr "numerisk"
+
+#: src\qualcoder\attributes.py:217
+msgid "Change to character"
+msgstr "Ãndra till tecken"
+
+#: src\qualcoder\attributes.py:251
+msgid "Attribute renamed from: "
+msgstr "Attributets namn ändrades från: "
+
+#: src\qualcoder\attributes.py:251 src\qualcoder\code_text.py:5191
+#: src\qualcoder\code_text.py:5247
+msgid " to "
+msgstr " till "
+
+#: src\qualcoder\attributes.py:264
+msgid "Assigned to"
+msgstr "Tilldelad till"
 
 #: src\qualcoder\attributes.py:264 src\qualcoder\manage_links.py:189
 #: src\qualcoder\manage_references.py:387
 msgid "Type"
 msgstr "Typ"
 
-#: src/qualcoder/code_pdf.py:2404 src/qualcoder/view_image.py:2640
-#: src/qualcoder/view_av.py:2636 src/qualcoder/code_text.py:4589
-msgid "Merge code: "
-msgstr "Slå ihop kod: "
+#: src\qualcoder\attributes.py:276 src\qualcoder\case_file_manager.py:233
+#: src\qualcoder\case_file_manager.py:306
+msgid "Yes"
+msgstr "Ja"
 
-#: src/qualcoder/code_pdf.py:2404 src/qualcoder/code_text.py:4589
-msgid " into code: "
-msgstr " till kod: "
+#: src\qualcoder\cases.py:262
+msgid "Case attributes file exported to: "
+msgstr "Fallattributfil exporterad till: "
 
-#: src/qualcoder/code_pdf.py:2405 src/qualcoder/view_image.py:2641
-#: src/qualcoder/view_av.py:2637 src/qualcoder/code_text.py:4590
-msgid "Merge codes"
-msgstr "Slå ihop koder"
+#: src\qualcoder\cases.py:263 src\qualcoder\reports.py:409
+#: src\qualcoder\report_relations.py:979
+msgid "File export"
+msgstr "Filexport"
 
-#: src/qualcoder/code_pdf.py:2484 src/qualcoder/view_image.py:2711
-#: src/qualcoder/view_av.py:2706 src/qualcoder/code_text.py:4665
-msgid "Add new code"
-msgstr "Lägg till ny kod"
+#: src\qualcoder\cases.py:355 src\qualcoder\__main__.py:2973
+msgid "Cases: "
+msgstr "Fall: "
 
-#: src/qualcoder/code_pdf.py:2484 src/qualcoder/code_pdf.py:2727
-#: src/qualcoder/view_image.py:2711 src/qualcoder/view_image.py:2895
-#: src/qualcoder/view_av.py:2886 src/qualcoder/code_text.py:4665
-#: src/qualcoder/code_text.py:4909
-msgid "Code name"
-msgstr "Kodnamn"
+#: src\qualcoder\cases.py:386
+msgid "Attribute added to cases: "
+msgstr "Attribut tillagt till fall: "
 
-#: src/qualcoder/code_pdf.py:2504 src/qualcoder/view_image.py:2727
-#: src/qualcoder/report_cooccurrence.py:1020 src/qualcoder/code_text.py:4685
-msgid "New code: "
-msgstr "Ny kod: "
+#: src\qualcoder\cases.py:386
+msgid "type:"
+msgstr "typ:"
 
-#: src/qualcoder/code_pdf.py:2560 src/qualcoder/view_image.py:2736
-#: src/qualcoder/code_organiser.py:116 src/qualcoder/code_organiser.py:426
-#: src/qualcoder/view_graph.py:2703 src/qualcoder/view_graph.py:4040
-#: src/qualcoder/view_graph.py:4042 src/qualcoder/view_av.py:2729
-#: src/qualcoder/code_text.py:3858 src/qualcoder/code_text.py:4743
-msgid "Category"
-msgstr "Kategori"
+#: src\qualcoder\cases.py:393
+msgid "Cases have already been created."
+msgstr "Fall har redan skapats."
 
-#: src/qualcoder/code_pdf.py:2560 src/qualcoder/code_pdf.py:2765
-#: src/qualcoder/view_image.py:2736 src/qualcoder/view_image.py:2927
-#: src/qualcoder/code_organiser.py:116 src/qualcoder/code_organiser.py:426
-#: src/qualcoder/view_av.py:2729 src/qualcoder/view_av.py:2916
-#: src/qualcoder/code_text.py:4743 src/qualcoder/code_text.py:4945
-msgid "Category name"
-msgstr "Kategorinamn"
+#: src\qualcoder\cases.py:395
+msgid "Select cases file"
+msgstr "Välj fallfil"
 
-#: src/qualcoder/code_pdf.py:2574 src/qualcoder/view_image.py:2750
-#: src/qualcoder/code_text.py:4757
-msgid "New category: "
-msgstr "Ny kategori: "
+#: src\qualcoder\cases.py:466 src\qualcoder\cases.py:542
+msgid "attribute:"
+msgstr "attribut:"
 
-#: src/qualcoder/code_pdf.py:2604 src/qualcoder/view_image.py:2779
-#: src/qualcoder/report_codes.py:1292 src/qualcoder/view_graph.py:1342
-#: src/qualcoder/view_graph.py:1413 src/qualcoder/view_graph.py:1478
-#: src/qualcoder/view_graph.py:1571 src/qualcoder/view_graph.py:2266
-#: src/qualcoder/view_graph.py:2291 src/qualcoder/view_graph.py:2317
-#: src/qualcoder/view_graph.py:2343 src/qualcoder/view_graph.py:2362
-#: src/qualcoder/view_graph.py:2383 src/qualcoder/view_av.py:2769
-#: src/qualcoder/code_text.py:3021 src/qualcoder/code_text.py:4785
-#: src/qualcoder/reports.py:352
-msgid "Code: "
-msgstr "Kod: "
+#: src\qualcoder\cases.py:481 src\qualcoder\cases.py:557
+msgid "Cases and attributes imported from: "
+msgstr "Fall och attribut importerade från: "
 
-#: src/qualcoder/code_pdf.py:2615 src/qualcoder/view_image.py:2783
-#: src/qualcoder/view_av.py:2779 src/qualcoder/code_text.py:4796
-msgid "Code deleted: "
-msgstr "Kod raderad: "
+#: src\qualcoder\cases.py:502
+msgid "Cannot import from csv, only one row in file"
+msgstr "Kan inte importera från csv, endast en rad i filen"
 
-#: src/qualcoder/code_pdf.py:2638 src/qualcoder/view_image.py:2806
-#: src/qualcoder/report_codes.py:1287 src/qualcoder/view_av.py:2796
-#: src/qualcoder/view_charts.py:499 src/qualcoder/report_cooccurrence.py:374
-#: src/qualcoder/code_text.py:4819 src/qualcoder/reports.py:349
-msgid "Category: "
-msgstr "Kategori: "
+#: src\qualcoder\cases.py:568 src\qualcoder\manage_files.py:1210
+#: src\qualcoder\view_graph.py:1795 src\qualcoder\view_graph.py:2870
+#: src\qualcoder\view_graph.py:2898
+msgid "Case"
+msgstr "Fall"
 
-#: src/qualcoder/code_pdf.py:2654 src/qualcoder/view_image.py:2820
-#: src/qualcoder/view_av.py:2810 src/qualcoder/code_text.py:4835
-msgid "Category deleted: "
-msgstr "Kategori raderad: "
+#: src\qualcoder\cases.py:568
+msgid "Enter case name"
+msgstr "Ange fallnamn"
 
-#: src/qualcoder/code_pdf.py:2671 src/qualcoder/code_text.py:4853
-msgid "Memo for Code: "
-msgstr "Anteckning för kod: "
+#: src\qualcoder\cases.py:594
+msgid "Case added: "
+msgstr "Fall tillagt: "
 
-#: src/qualcoder/code_pdf.py:2685 src/qualcoder/view_image.py:2209
-#: src/qualcoder/code_text.py:4867
-msgid "Memo for code: "
-msgstr "Anteckning för kod: "
+#: src\qualcoder\cases.py:668 src\qualcoder\journals.py:779
+#: src\qualcoder\manage_files.py:1480
+msgid "This attribute is numeric"
+msgstr "Detta attribut är numeriskt"
 
-#: src/qualcoder/code_pdf.py:2695 src/qualcoder/view_image.py:2863
-#: src/qualcoder/code_text.py:4877
-msgid "Memo for Category: "
-msgstr "Anteckning för kategori: "
+#: src\qualcoder\cases.py:669 src\qualcoder\case_file_manager.py:620
+#: src\qualcoder\code_pdf.py:3172 src\qualcoder\code_pdf.py:3678
+#: src\qualcoder\code_pdf.py:3682 src\qualcoder\code_pdf.py:3846
+#: src\qualcoder\code_text.py:2327 src\qualcoder\code_text.py:5762
+#: src\qualcoder\code_text.py:5767 src\qualcoder\code_text.py:5946
+#: src\qualcoder\code_text.py:6043 src\qualcoder\code_text.py:6056
+#: src\qualcoder\code_text.py:6190 src\qualcoder\code_text.py:6334
+#: src\qualcoder\import_survey.py:208 src\qualcoder\journals.py:736
+#: src\qualcoder\journals.py:740 src\qualcoder\journals.py:780
+#: src\qualcoder\journals.py:863 src\qualcoder\journals.py:869
+#: src\qualcoder\manage_files.py:1481 src\qualcoder\manage_files.py:1615
+#: src\qualcoder\manage_files.py:2190 src\qualcoder\manage_files.py:2220
+#: src\qualcoder\manage_files.py:2225 src\qualcoder\manage_files.py:2385
+#: src\qualcoder\refi.py:1226 src\qualcoder\report_attributes.py:654
+#: src\qualcoder\report_attributes.py:658
+#: src\qualcoder\report_attributes.py:661
+#: src\qualcoder\report_attributes.py:669 src\qualcoder\report_codes.py:1328
+#: src\qualcoder\text_file_replacement.py:76
+#: src\qualcoder\text_file_replacement.py:305
+#: src\qualcoder\text_file_replacement.py:308
+#: src\qualcoder\text_file_replacement.py:313 src\qualcoder\view_av.py:3421
+#: src\qualcoder\view_av.py:3425 src\qualcoder\view_av.py:3574
+#: src\qualcoder\view_graph.py:1669
+msgid "Warning"
+msgstr "Varning"
 
-#: src/qualcoder/code_pdf.py:2710 src/qualcoder/code_text.py:4892
-msgid "Memo for category: "
-msgstr "Anteckning för kategori: "
+#: src\qualcoder\cases.py:725
+msgid "Memo for case "
+msgstr "Anteckning för fall "
 
-#: src/qualcoder/code_pdf.py:2727 src/qualcoder/view_image.py:2895
-#: src/qualcoder/view_av.py:2886 src/qualcoder/code_text.py:4909
-msgid "Rename code"
-msgstr "Byt namn på kod"
+#: src\qualcoder\cases.py:764 src\qualcoder\manage_files.py:406
+msgid "Show all columns"
+msgstr "Visa alla kolumner"
 
-#: src/qualcoder/code_pdf.py:2765 src/qualcoder/view_image.py:2927
-#: src/qualcoder/view_av.py:2916 src/qualcoder/code_text.py:4945
-msgid "Rename category"
-msgstr "Byt namn på kategori"
+#: src\qualcoder\cases.py:767 src\qualcoder\manage_files.py:409
+msgid "Hide column"
+msgstr "Dölj kolumn"
 
-#: src/qualcoder/code_pdf.py:2843 src/qualcoder/view_image.py:769
-#: src/qualcoder/view_av.py:774 src/qualcoder/code_text.py:5023
-msgid "Open memo"
-msgstr "Ãppna anteckning"
+#: src\qualcoder\cases.py:768 src\qualcoder\manage_files.py:410
+msgid "Hide columns starting with"
+msgstr "Dölj kolumner som börjar med"
 
 #: src\qualcoder\cases.py:769 src\qualcoder\manage_files.py:411
 msgid "Show columns starting with"
 msgstr "Visa kolumner som börjar med"
 
-#: src/qualcoder/code_pdf.py:2850 src/qualcoder/view_image.py:770
-#: src/qualcoder/view_av.py:775 src/qualcoder/code_text.py:5030
-msgid "Next file"
-msgstr "Nästa fil"
+#: src\qualcoder\cases.py:781 src\qualcoder\manage_files.py:423
+msgid "Hide columns starting with:"
+msgstr "Dölj kolumner som börjar med:"
 
-#: src/qualcoder/code_pdf.py:2851 src/qualcoder/view_image.py:771
-#: src/qualcoder/view_av.py:776 src/qualcoder/code_text.py:5031
-msgid "File with latest coding"
-msgstr "Fil med senaste kodning"
+#: src\qualcoder\cases.py:782 src\qualcoder\manage_files.py:424
+msgid "Hide Columns"
+msgstr "Dölj kolumner"
 
-#: src/qualcoder/code_pdf.py:3027 src/qualcoder/view_image.py:708
-#: src/qualcoder/view_av.py:914 src/qualcoder/code_text.py:2521
-msgid "Memo for file: "
-msgstr "Anteckning för fil: "
+#: src\qualcoder\cases.py:790 src\qualcoder\manage_files.py:431
+msgid "Show columns starting with:"
+msgstr "Visa kolumner som börjar med:"
 
-#: src/qualcoder/code_pdf.py:3039 src/qualcoder/code_text.py:2533
-msgid "Memo:"
-msgstr "Anteckning:"
+#: src\qualcoder\cases.py:791 src\qualcoder\manage_files.py:432
+msgid "Show Columns"
+msgstr "Visa kolumner"
 
-#: src/qualcoder/code_pdf.py:3085 src/qualcoder/code_text.py:5446
-msgid "Code text: "
-msgstr "Kodtext: "
+#: src\qualcoder\cases.py:818
+msgid "View case"
+msgstr "Visa fall"
 
 #: src\qualcoder\cases.py:819 src\qualcoder\cases.py:826
 #: src\qualcoder\manage_files.py:479 src\qualcoder\manage_files.py:485
@@ -1215,30 +995,10 @@ msgstr "Visa värden som liknar"
 msgid "Show this value"
 msgstr "Visa detta värde"
 
-#: src/qualcoder/code_pdf.py:3172 src/qualcoder/code_pdf.py:3678
-#: src/qualcoder/code_pdf.py:3682 src/qualcoder/code_pdf.py:3846
-#: src/qualcoder/journals.py:736 src/qualcoder/journals.py:740
-#: src/qualcoder/journals.py:780 src/qualcoder/journals.py:863
-#: src/qualcoder/journals.py:869 src/qualcoder/report_attributes.py:654
-#: src/qualcoder/report_attributes.py:658
-#: src/qualcoder/report_attributes.py:661
-#: src/qualcoder/report_attributes.py:669 src/qualcoder/manage_files.py:1481
-#: src/qualcoder/manage_files.py:1615 src/qualcoder/manage_files.py:2190
-#: src/qualcoder/manage_files.py:2220 src/qualcoder/manage_files.py:2225
-#: src/qualcoder/manage_files.py:2385 src/qualcoder/refi.py:1226
-#: src/qualcoder/case_file_manager.py:620 src/qualcoder/report_codes.py:1328
-#: src/qualcoder/view_graph.py:1669 src/qualcoder/text_file_replacement.py:76
-#: src/qualcoder/text_file_replacement.py:305
-#: src/qualcoder/text_file_replacement.py:308
-#: src/qualcoder/text_file_replacement.py:313 src/qualcoder/view_av.py:3421
-#: src/qualcoder/view_av.py:3425 src/qualcoder/view_av.py:3574
-#: src/qualcoder/import_survey.py:208 src/qualcoder/cases.py:669
-#: src/qualcoder/code_text.py:2327 src/qualcoder/code_text.py:5762
-#: src/qualcoder/code_text.py:5767 src/qualcoder/code_text.py:5946
-#: src/qualcoder/code_text.py:6043 src/qualcoder/code_text.py:6056
-#: src/qualcoder/code_text.py:6190 src/qualcoder/code_text.py:6334
-msgid "Warning"
-msgstr "Varning"
+#: src\qualcoder\cases.py:828 src\qualcoder\journals.py:447
+#: src\qualcoder\manage_files.py:539
+msgid "Show all rows Ctrl A"
+msgstr "Visa alla rader Ctrl A"
 
 #: src\qualcoder\cases.py:832 src\qualcoder\manage_files.py:543
 msgid "Open URL"
@@ -1281,10 +1041,9 @@ msgstr "Min:"
 msgid "Maximum:"
 msgstr "Max:"
 
-#: src/qualcoder/code_pdf.py:3419 src/qualcoder/code_pdf.py:3816
-#: src/qualcoder/view_av.py:3544 src/qualcoder/code_text.py:5916
-msgid "Select code to unmark"
-msgstr "Välj kod att avmarkera"
+#: src\qualcoder\cases.py:959
+msgid "Viewing text of case: "
+msgstr "Visar text för fall: "
 
 #: src\qualcoder\cases.py:1006 src\qualcoder\code_text.py:4038
 #: src\qualcoder\code_text.py:4094 src\qualcoder\report_codes.py:2851
@@ -1307,52 +1066,50 @@ msgstr "AV-media:"
 msgid "Open"
 msgstr "Ãppna"
 
-#: src/qualcoder/code_pdf.py:3678 src/qualcoder/code_pdf.py:3846
-#: src/qualcoder/code_text.py:2327 src/qualcoder/code_text.py:5762
-#: src/qualcoder/code_text.py:5946
-msgid "No file was selected"
-msgstr "Ingen fil valdes"
+#: src\qualcoder\cases.py:1101 src\qualcoder\case_file_manager.py:448
+#: src\qualcoder\edit_textfile.py:654 src\qualcoder\report_exact_matches.py:732
+#: src\qualcoder\report_relations.py:561 src\qualcoder\report_sql.py:435
+#: src\qualcoder\speakers.py:289
+msgid "Select all"
+msgstr "Markera alla"
 
-#: src/qualcoder/code_pdf.py:3682 src/qualcoder/view_av.py:3425
-#: src/qualcoder/code_text.py:5767 src/qualcoder/code_text.py:6043
-#: src/qualcoder/code_text.py:6190 src/qualcoder/code_text.py:6334
-msgid "No code was selected"
-msgstr "Ingen kod valdes"
+#: src\qualcoder\cases.py:1102 src\qualcoder\case_file_manager.py:452
+#: src\qualcoder\edit_textfile.py:655 src\qualcoder\error_dlg.py:44
+#: src\qualcoder\report_sql.py:436
+msgid "Copy"
+msgstr "Kopiera"
 
-#: src/qualcoder/code_pdf.py:3884 src/qualcoder/code_pdf.py:3904
-#: src/qualcoder/view_av.py:3598 src/qualcoder/view_av.py:3619
-#: src/qualcoder/code_text.py:1123 src/qualcoder/code_text.py:1143
-#: src/qualcoder/code_text.py:3047 src/qualcoder/code_text.py:5985
-#: src/qualcoder/code_text.py:6006
-msgid "Annotation: "
-msgstr "Anteckning: "
+#: src\qualcoder\cases.py:1138 src\qualcoder\report_codes.py:3233
+msgid "Right click to view"
+msgstr "Högerklicka för att visa"
 
-#: src/qualcoder/code_pdf.py:3898 src/qualcoder/view_av.py:3612
-#: src/qualcoder/code_text.py:1136 src/qualcoder/code_text.py:5999
-msgid "Annotation added at position: "
-msgstr "Anteckning tillagd på position: "
+#: src\qualcoder\case_file_manager.py:96 src\qualcoder\code_in_all_files.py:253
+#: src\qualcoder\code_pdf.py:392 src\qualcoder\code_text.py:1435
+#: src\qualcoder\helpers.py:435 src\qualcoder\report_attributes.py:465
+#: src\qualcoder\report_codes.py:2437
+#: src\qualcoder\report_compare_coder_file.py:311
+#: src\qualcoder\report_file_summary.py:253 src\qualcoder\view_av.py:449
+#: src\qualcoder\view_charts.py:433 src\qualcoder\view_charts.py:501
+#: src\qualcoder\view_graph.py:2593 src\qualcoder\view_image.py:407
+msgid "Case: "
+msgstr "Fall: "
 
-#: src/qualcoder/code_pdf.py:3926 src/qualcoder/view_av.py:3639
-#: src/qualcoder/code_text.py:1163 src/qualcoder/code_text.py:6028
-msgid "Annotation removed from position "
-msgstr "Anteckning borttagen från position "
+#: src\qualcoder\case_file_manager.py:156
+msgid "Files linked: "
+msgstr "Filer länkade: "
 
-#: src/qualcoder/code_pdf.py:4016 src/qualcoder/view_av.py:3819
-#: src/qualcoder/code_text.py:7637
-#, fuzzy
-msgid "Select code to resize"
-msgstr "Välj kod för anteckning"
+#: src\qualcoder\case_file_manager.py:164
+msgid "Add files to case"
+msgstr "Lägg till filer i fall"
 
-#: src/qualcoder/code_pdf.py:4116 src/qualcoder/view_image.py:2473
-#: src/qualcoder/view_av.py:3917 src/qualcoder/code_text.py:7711
-#, fuzzy
-msgid "Duplicate Error"
-msgstr "Dubblett"
+#: src\qualcoder\case_file_manager.py:165
+msgid "Remove files from case"
+msgstr "Ta bort filer från fall"
 
-#: src/qualcoder/code_pdf.py:4117 src/qualcoder/view_av.py:3918
-#: src/qualcoder/code_text.py:7712
-msgid "This code already exists at this exact location."
-msgstr "Den här koden finns redan på just den här platsen."
+#: src\qualcoder\case_file_manager.py:193
+#: src\qualcoder\case_file_manager.py:671
+msgid "File added to case"
+msgstr "Fil tillagd till fall"
 
 #: src\qualcoder\case_file_manager.py:219
 msgid "This file has already been linked to this case "
@@ -1475,15 +1232,15 @@ msgstr "synlig"
 msgid "hidden"
 msgstr "dold"
 
-#: src/qualcoder/journals.py:186 src/qualcoder/coder_names.py:202
-#: src/qualcoder/coder_names.py:213 src/qualcoder/coder_names.py:226
-#: src/qualcoder/coder_names.py:237 src/qualcoder/coder_names.py:241
-#: src/qualcoder/coder_names.py:317 src/qualcoder/coder_names.py:333
-#: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
-#: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
-#: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
-#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1796
-#: src/qualcoder/report_exact_matches.py:540
+#: src\qualcoder\coder_names.py:202 src\qualcoder\coder_names.py:213
+#: src\qualcoder\coder_names.py:226 src\qualcoder\coder_names.py:237
+#: src\qualcoder\coder_names.py:241 src\qualcoder\coder_names.py:317
+#: src\qualcoder\coder_names.py:333 src\qualcoder\coder_names.py:354
+#: src\qualcoder\coder_names.py:365 src\qualcoder\coder_names.py:368
+#: src\qualcoder\coder_names.py:377 src\qualcoder\coder_names.py:380
+#: src\qualcoder\coder_names.py:384 src\qualcoder\coder_names.py:386
+#: src\qualcoder\code_text.py:3906 src\qualcoder\journals.py:186
+#: src\qualcoder\report_exact_matches.py:540 src\qualcoder\__main__.py:1796
 msgid "Coder"
 msgstr "Kodare"
 
@@ -1848,76 +1605,71 @@ msgstr "Slå ihop kategori med annan kategori"
 msgid "Remove category from category"
 msgstr "Ta bort kategori från kategori"
 
-#: src/qualcoder/settings.py:84
-msgid "Another language has been set in the config.ini file."
+#: src\qualcoder\code_organiser.py:930
+msgid "Rename"
+msgstr "Byt namn"
+
+#: src\qualcoder\code_organiser.py:932 src\qualcoder\view_graph.py:4088
+msgid "Display memo"
+msgstr "Visa anteckning"
+
+#: src\qualcoder\code_organiser.py:980
+msgid "Update name"
+msgstr "Uppdatera namn"
+
+#: src\qualcoder\code_organiser.py:1022
+msgid "Link code: Select category"
+msgstr "Länka kod: Välj kategori"
+
+#: src\qualcoder\code_organiser.py:1048
+msgid "Merge into: Select code"
+msgstr "Slå ihop med: Välj kod"
+
+#: src\qualcoder\code_organiser.py:1106
+msgid "Link under: Select category"
+msgstr "Länka under: Välj kategori"
+
+#: src\qualcoder\code_organiser.py:1130
+msgid "Merge into: Select category"
+msgstr "Slå ihop med: Välj kategori"
+
+#: src\qualcoder\code_pdf.py:220
+msgid "View original file"
+msgstr "Visa originalfil"
+
+#: src\qualcoder\code_pdf.py:227 src\qualcoder\code_text.py:617
+#: src\qualcoder\view_av.py:175 src\qualcoder\view_image.py:173
+#, fuzzy
+msgid "Clear file filter"
+msgstr "Rensa filter"
+
+#: src\qualcoder\code_pdf.py:236 src\qualcoder\code_text.py:634
+#: src\qualcoder\view_av.py:158 src\qualcoder\view_image.py:180
+#, fuzzy
+msgid "Clear code filter"
+msgstr "Rensa filter"
+
+#: src\qualcoder\code_pdf.py:281
+msgid "QualCoder roughly displays PDFs."
+msgstr "QualCoder visar PDF:er ungefärligt."
+
+#: src\qualcoder\code_pdf.py:283
+msgid "Original fonts or bold or italic are not applied."
+msgstr "Ursprungliga typsnitt, fetstil eller kursiv används inte."
+
+#: src\qualcoder\code_pdf.py:285
+msgid "Plain text must match exactly for Code PDF to work correctly."
+msgstr "Ren text måste stämma exakt för att PDF-kodning ska fungera korrekt."
+
+#: src\qualcoder\code_pdf.py:286
+msgid ""
+"A warning will display if the parsed PDF text does not match the database "
+"stored plain text."
 msgstr ""
+"En varning kommer att visas om den inlästa PDF filens text inte matchar "
+"texten som lagrats i databasen."
 
-#: src/qualcoder/settings.py:85
-msgid "Additional community supported languages are found in the i18n folder."
-msgstr ""
-
-#: src/qualcoder/settings.py:86
-msgid "They may not be recently updated"
-msgstr ""
-
-#: src/qualcoder/settings.py:134
-msgid "original"
-msgstr "original"
-
-#: src/qualcoder/settings.py:134
-msgid "dark"
-msgstr "mörk"
-
-#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1637
-msgid "blue"
-msgstr "blå"
-
-#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1639
-msgid "green"
-msgstr "grön"
-
-#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1640
-msgid "orange"
-msgstr "orange"
-
-#: src/qualcoder/settings.py:134
-msgid "purple"
-msgstr "lila"
-
-#: src/qualcoder/settings.py:134 src/qualcoder/view_graph.py:1640
-msgid "yellow"
-msgstr "gul"
-
-#: src/qualcoder/settings.py:134
-msgid "rainbow"
-msgstr "regnbåge"
-
-#: src/qualcoder/settings.py:134
-msgid "native"
-msgstr "inbyggd"
-
-#: src/qualcoder/settings.py:157
-msgid "Bold"
-msgstr "Fetstil"
-
-#: src/qualcoder/settings.py:157
-msgid "Italic"
-msgstr "Kursiv"
-
-#: src/qualcoder/settings.py:157
-msgid "Bigger"
-msgstr "Större"
-
-#: src/qualcoder/settings.py:168
-msgid "Default folder for storing automatic backups and for file outputs."
-msgstr ""
-"Standardmapp för lagring av automatiska säkerhetskopior och för filutdata."
-
-#: src/qualcoder/settings.py:308 src/qualcoder/settings.py:316
-msgid "Edit AI profile name"
-msgstr "Redigera AI-profilens namn"
-
-#: src/qualcoder/settings.py:308
+#: src\qualcoder\code_pdf.py:288
 msgid ""
 "Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
 "the plain text positions correct for PDF display."
@@ -1925,11 +1677,11 @@ msgstr ""
 "Oformatterad text från PDF filer som laddats in i en  version av QualCoder "
 "tidigare än 3.4 kommer inte att visa textpositionen korrekt i PDF visaren."
 
-#: src/qualcoder/settings.py:317 src/qualcoder/settings.py:532
-msgid "Enter new profile name:"
-msgstr "Ange nytt profilnamn:"
+#: src\qualcoder\code_pdf.py:289
+msgid "This means coding stripes will show in incorrect positions."
+msgstr "Det innebär att kodremsor visas på felaktiga positioner."
 
-#: src/qualcoder/settings.py:377
+#: src\qualcoder\code_pdf.py:291
 msgid ""
 "Similarly, if the PDF plain text has been edited in any way, this will "
 "affect coding stripes display."
@@ -1937,90 +1689,164 @@ msgstr ""
 "Om PDF-texten i klartext har redigerats på något sätt kommer detta också att "
 "påverka visningen av kodningsremsor."
 
-#: src/qualcoder/settings.py:380
-#, fuzzy
-msgid "Invalid API key"
-msgstr "AI API-nyckel"
+#: src\qualcoder\code_pdf.py:292 src\qualcoder\code_text.py:5300
+#: src\qualcoder\code_text.py:7526 src\qualcoder\__main__.py:2928
+msgid "Information"
+msgstr "Information"
 
-#: src/qualcoder/settings.py:464
-#, fuzzy
-msgid "Invalid input"
-msgstr "Ãngra namnbyte av fil"
+#: src\qualcoder\code_pdf.py:388 src\qualcoder\code_text.py:1430
+#: src\qualcoder\reports.py:336 src\qualcoder\report_file_summary.py:308
+#: src\qualcoder\view_av.py:444 src\qualcoder\view_image.py:402
+#: src\qualcoder\__main__.py:2423
+msgid "Date: "
+msgstr "Datum: "
 
-#: src/qualcoder/settings.py:476
-msgid "AI temperature parameter must be between 0.0 and 2.0."
-msgstr ""
+#: src\qualcoder\code_pdf.py:397 src\qualcoder\code_pdf.py:453
+#: src\qualcoder\code_text.py:1437 src\qualcoder\code_text.py:1494
+#: src\qualcoder\manage_files.py:1255 src\qualcoder\manage_files.py:1261
+#: src\qualcoder\manage_files.py:1264 src\qualcoder\report_codes.py:224
+#: src\qualcoder\report_compare_coder_file.py:294
+#: src\qualcoder\report_exact_matches.py:189
+#: src\qualcoder\report_file_summary.py:240
+#: src\qualcoder\report_file_summary.py:583
+msgid "Characters: "
+msgstr "Tecken: "
 
-#: src/qualcoder/settings.py:484
-msgid "AI top_p parameter must be between 0.0 and 1.0."
-msgstr ""
+#: src\qualcoder\code_pdf.py:405 src\qualcoder\code_pdf.py:458
+#: src\qualcoder\code_text.py:1445 src\qualcoder\code_text.py:1499
+msgid "Codings:"
+msgstr "Kodningar:"
 
-#: src/qualcoder/settings.py:507
-msgid "Choose a default output folder"
-msgstr "Välj en standardutmatningsmapp"
+#: src\qualcoder\code_pdf.py:406 src\qualcoder\code_pdf.py:459
+#: src\qualcoder\code_text.py:1446 src\qualcoder\code_text.py:1500
+msgid "From:"
+msgstr "Från:"
 
-#: src/qualcoder/settings.py:511 src/qualcoder/settings.py:514
+#: src\qualcoder\code_pdf.py:476 src\qualcoder\code_pdf.py:485
+#: src\qualcoder\code_pdf.py:492 src\qualcoder\code_pdf.py:498
+#: src\qualcoder\code_pdf.py:1782 src\qualcoder\code_text.py:1517
+#: src\qualcoder\code_text.py:1526 src\qualcoder\code_text.py:1534
+#: src\qualcoder\code_text.py:1540 src\qualcoder\code_text.py:3166
+#: src\qualcoder\reports.py:129 src\qualcoder\reports.py:141
+#: src\qualcoder\reports.py:149 src\qualcoder\reports.py:156
+#: src\qualcoder\report_codes.py:1394 src\qualcoder\report_codes.py:1412
+#: src\qualcoder\report_codes.py:1421 src\qualcoder\report_codes.py:1572
+#: src\qualcoder\report_codes_by_segments.py:230
+#: src\qualcoder\report_codes_by_segments.py:240
+#: src\qualcoder\report_codes_by_segments.py:248
+#: src\qualcoder\report_codes_by_segments.py:255
+#: src\qualcoder\report_cooccurrence.py:258
+#: src\qualcoder\report_cooccurrence.py:269
+#: src\qualcoder\report_cooccurrence.py:279
+#: src\qualcoder\report_cooccurrence.py:287
+#: src\qualcoder\report_exact_matches.py:254
+#: src\qualcoder\report_exact_matches.py:264
+#: src\qualcoder\report_exact_matches.py:272
+#: src\qualcoder\report_exact_matches.py:279
+#: src\qualcoder\report_relations.py:173 src\qualcoder\report_relations.py:185
+#: src\qualcoder\report_relations.py:194 src\qualcoder\report_relations.py:201
+#: src\qualcoder\view_av.py:481 src\qualcoder\view_av.py:490
+#: src\qualcoder\view_av.py:497 src\qualcoder\view_av.py:503
+#: src\qualcoder\view_av.py:1848 src\qualcoder\view_image.py:447
+#: src\qualcoder\view_image.py:456 src\qualcoder\view_image.py:463
+#: src\qualcoder\view_image.py:469 src\qualcoder\view_image.py:1628
+msgid "Attributes"
+msgstr "Attribut"
+
+#: src\qualcoder\code_pdf.py:496 src\qualcoder\code_text.py:1538
+#: src\qualcoder\reports.py:153 src\qualcoder\report_codes_by_segments.py:252
+#: src\qualcoder\report_compare_coder_file.py:263
+#: src\qualcoder\report_cooccurrence.py:284
+#: src\qualcoder\report_exact_matches.py:276
+#: src\qualcoder\report_file_summary.py:210
+#: src\qualcoder\report_relations.py:198 src\qualcoder\view_av.py:501
+#: src\qualcoder\view_image.py:467
+msgid "Nothing found"
+msgstr "Ingenting hittades"
+
+#: src\qualcoder\code_pdf.py:496 src\qualcoder\code_text.py:1538
+#: src\qualcoder\reports.py:153 src\qualcoder\report_codes_by_segments.py:252
+#: src\qualcoder\report_compare_coder_file.py:263
+#: src\qualcoder\report_cooccurrence.py:284
+#: src\qualcoder\report_exact_matches.py:276
+#: src\qualcoder\report_file_summary.py:210
+#: src\qualcoder\report_relations.py:198 src\qualcoder\view_av.py:501
+#: src\qualcoder\view_image.py:467
+msgid "No matching files found"
+msgstr "Inga matchande filer hittades"
+
+#: src\qualcoder\code_pdf.py:520 src\qualcoder\code_pdf.py:522
+#: src\qualcoder\code_pdf.py:537 src\qualcoder\code_pdf.py:539
+#: src\qualcoder\code_pdf.py:1736 src\qualcoder\code_pdf.py:1762
+#: src\qualcoder\code_text.py:1580 src\qualcoder\code_text.py:1582
+#: src\qualcoder\code_text.py:1596 src\qualcoder\code_text.py:1598
+#: src\qualcoder\code_text.py:3116 src\qualcoder\code_text.py:3143
 #, fuzzy
 msgid "Filtered: "
 msgstr "Filter är lika med: "
 
-#: src/qualcoder/settings.py:511
-msgid "Do not use the QualCoder configuration folder."
-msgstr "Använd inte QualCoder-konfigurationsmappen."
+#: src\qualcoder\code_pdf.py:942 src\qualcoder\code_text.py:2044
+msgid "Automatic search 3 or more characters"
+msgstr "Automatisk sökning med 3 eller fler tecken"
 
-#: src/qualcoder/settings.py:514
-msgid "Do not use the QualCoder data folder."
-msgstr "Använd inte QualCoder-datamappen."
+#: src\qualcoder\code_pdf.py:943 src\qualcoder\code_text.py:2045
+msgid "Automatic search 5 or more characters"
+msgstr "Automatisk sökning med 5 eller fler tecken"
 
-#: src/qualcoder/settings.py:531 src/qualcoder/settings.py:544
-#, fuzzy
-msgid "New AI profile"
-msgstr "AI profil"
+#: src\qualcoder\code_pdf.py:944
+msgid "Press Enter to search"
+msgstr "Tryck Enter för att söka"
 
-#: src/qualcoder/settings.py:544
-#, fuzzy
-msgid "An AI profile with this name already exists: "
-msgstr "Variabelnamnet finns redan: "
+#: src\qualcoder\code_pdf.py:976
+msgid "PDF objects"
+msgstr "PDF-objekt"
 
-#: src/qualcoder/settings.py:601
-msgid "Please select an AI profile or disable the AI altogether."
-msgstr "Välj en AI-profil eller avaktivera AI helt och hållet."
+#: src\qualcoder\code_pdf.py:1026 src\qualcoder\code_text.py:998
+#: src\qualcoder\code_text.py:2207
+msgid "Unmark (U)"
+msgstr "Avmarkera (U)"
 
-#: src/qualcoder/settings.py:602
-msgid "AI profile"
-msgstr "AI profil"
+#: src\qualcoder\code_pdf.py:1027 src\qualcoder\code_text.py:999
+#: src\qualcoder\code_text.py:2208
+msgid "Memo coded text (M)"
+msgstr "Anteckna kodad text (M)"
 
-#: src/qualcoder/settings.py:607
-msgid "Please enter a valid API-key for the AI model."
-msgstr "Ange en giltig API-nyckel för AI-modellen."
+#: src\qualcoder\code_pdf.py:1029 src\qualcoder\code_text.py:2211
+#: src\qualcoder\view_av.py:3088
+msgid "Add important mark (I)"
+msgstr "Lägg till viktig markering (I)"
 
-#: src/qualcoder/settings.py:608 src/qualcoder/settings.py:614
-msgid "AI model"
-msgstr "AI-modell"
+#: src\qualcoder\code_pdf.py:1031 src\qualcoder\code_text.py:2213
+#: src\qualcoder\view_av.py:3090 src\qualcoder\view_av.py:4105
+#: src\qualcoder\view_image.py:2008 src\qualcoder\view_image.py:2011
+msgid "Remove important mark"
+msgstr "Ta bort viktig markering"
 
-#: src/qualcoder/settings.py:613
-msgid "Please select a \"large\" and a \"fast\" AI model."
-msgstr "Vänligen välj en \"stor\" och en \"snabb\" AI-modell."
+#: src\qualcoder\code_pdf.py:1032 src\qualcoder\code_text.py:1002
+#: src\qualcoder\code_text.py:2214 src\qualcoder\view_av.py:3084
+msgid "Change code"
+msgstr "Ãndra kod"
 
-#: src/qualcoder/settings.py:636
-msgid "Restart QualCoder"
-msgstr "Starta om QualCoder"
+#: src\qualcoder\code_pdf.py:1033 src\qualcoder\code_text.py:1000
+#: src\qualcoder\code_text.py:2215 src\qualcoder\view_av.py:362
+#: src\qualcoder\view_av.py:3085 src\qualcoder\view_av.py:4751
+msgid "Resize"
+msgstr "Ändra storlek"
 
-#: src/qualcoder/settings.py:636
-msgid "Restart QualCoder to enact some changes"
-msgstr "Starta om QualCoder för att genomföra vissa ändringar"
+#: src\qualcoder\code_pdf.py:1048 src\qualcoder\code_text.py:2218
+#: src\qualcoder\view_av.py:3111
+msgid "Mark (Q)"
+msgstr "Markera (Q)"
 
-#: src/qualcoder/settings.py:641
-msgid ""
-"It seems that you have made changes to the coder names. These changes will "
-"be lost as well. Do you really want to cancel?"
-msgstr ""
-"Det verkar som om du har gjort ändringar i kodarnamnen. Dessa ändringar "
-"kommer också att gå förlorade. Vill du verkligen avbryta?"
+#: src\qualcoder\code_pdf.py:1051 src\qualcoder\code_text.py:2221
+#: src\qualcoder\view_av.py:3114
+msgid "Mark with recent code (R)"
+msgstr "Markera med senaste kod (R)"
 
-#: src/qualcoder/settings.py:642 src/qualcoder/__main__.py:1795
-msgid "Settings"
-msgstr "Inställningar"
+#: src\qualcoder\code_pdf.py:1054 src\qualcoder\code_text.py:1001
+#: src\qualcoder\code_text.py:2240 src\qualcoder\view_av.py:3117
+msgid "Annotate (A)"
+msgstr "Anteckna (A)"
 
 #: src\qualcoder\code_pdf.py:1055 src\qualcoder\code_text.py:2241
 #: src\qualcoder\manage_references.py:615 src\qualcoder\report_codes.py:2525
@@ -2158,25 +1984,27 @@ msgstr "Ãndra kodfärg"
 msgid "Move code to"
 msgstr "Flytta kod till"
 
-#: src/qualcoder/view_image.py:1092 src/qualcoder/view_av.py:374
-#: src/qualcoder/view_av.py:4763
-msgid "Width"
-msgstr "Bredd"
+#: src\qualcoder\code_pdf.py:1380 src\qualcoder\code_text.py:2714
+#: src\qualcoder\view_av.py:1545 src\qualcoder\view_image.py:1325
+#, fuzzy
+msgid "Move multiple codes"
+msgstr "Kodare: Alla kodare"
 
-#: src/qualcoder/view_image.py:1092 src/qualcoder/view_av.py:377
-#: src/qualcoder/view_av.py:4766
-msgid "Height"
-msgstr "Höjd"
+#: src\qualcoder\code_pdf.py:1381 src\qualcoder\code_text.py:2715
+#: src\qualcoder\view_av.py:1548 src\qualcoder\view_image.py:1328
+#, fuzzy
+msgid "Filter"
+msgstr "Filter är lika med: "
 
 #: src\qualcoder\code_pdf.py:1382 src\qualcoder\code_text.py:2716
 #: src\qualcoder\view_av.py:1549 src\qualcoder\view_image.py:1329
 msgid "Show codes like"
 msgstr "Visa koder som liknar"
 
-#: src/qualcoder/view_image.py:1128 src/qualcoder/helpers.py:1459
-#: src/qualcoder/view_av.py:4362 src/qualcoder/code_text.py:882
-msgid "IMPORTANT"
-msgstr "VIKTIGT"
+#: src\qualcoder\code_pdf.py:1383 src\qualcoder\code_text.py:2717
+#: src\qualcoder\view_av.py:1550 src\qualcoder\view_image.py:1330
+msgid "Show codes of colour"
+msgstr "Visa koder med färg"
 
 #: src\qualcoder\code_pdf.py:1384 src\qualcoder\code_pdf.py:2855
 #: src\qualcoder\code_text.py:2718 src\qualcoder\code_text.py:5042
@@ -2340,9 +2168,10 @@ msgstr "Välj kod"
 msgid "Text position"
 msgstr "Textposition"
 
-#: src/qualcoder/view_image.py:2949 src/qualcoder/code_text.py:4967
-msgid "Category renamed from: "
-msgstr "Kategorins namn ändrades från: "
+#: src\qualcoder\code_pdf.py:2033 src\qualcoder\code_text.py:3307
+#: src\qualcoder\view_av.py:2083
+msgid "Character position: "
+msgstr "Teckenposition: "
 
 #: src\qualcoder\code_pdf.py:2170
 msgid "PDF Image exported"
@@ -2402,13 +2231,10 @@ msgstr "Ny kategori: "
 msgid "Code: "
 msgstr "Kod: "
 
-#: src/qualcoder/ai_search_dialog.py:139 src/qualcoder/ai_search_dialog.py:504
-#: src/qualcoder/ai_search_dialog.py:524 src/qualcoder/report_codes.py:1455
-#: src/qualcoder/view_graph.py:759 src/qualcoder/view_graph.py:1331
-#: src/qualcoder/view_graph.py:1401 src/qualcoder/view_graph.py:1460
-#: src/qualcoder/report_exact_matches.py:324 src/qualcoder/code_text.py:4140
-msgid "No codes"
-msgstr "Inga koder"
+#: src\qualcoder\code_pdf.py:2615 src\qualcoder\code_text.py:4796
+#: src\qualcoder\view_av.py:2779 src\qualcoder\view_image.py:2783
+msgid "Code deleted: "
+msgstr "Kod raderad: "
 
 #: src\qualcoder\code_pdf.py:2638 src\qualcoder\code_text.py:4819
 #: src\qualcoder\reports.py:349 src\qualcoder\report_codes.py:1287
@@ -2588,17 +2414,10 @@ msgstr "Visa filer som innehåller texten. (Tomt visar alla)"
 msgid "Memo for file: "
 msgstr "Anteckning för fil: "
 
-#: src/qualcoder/report_attributes.py:460 src/qualcoder/helpers.py:433
-#: src/qualcoder/report_codes.py:2433 src/qualcoder/view_graph.py:1342
-#: src/qualcoder/view_graph.py:1413 src/qualcoder/view_graph.py:1478
-#: src/qualcoder/view_graph.py:1571 src/qualcoder/view_graph.py:2265
-#: src/qualcoder/view_graph.py:2290 src/qualcoder/view_graph.py:2316
-#: src/qualcoder/view_graph.py:2342 src/qualcoder/view_graph.py:2361
-#: src/qualcoder/view_graph.py:2382 src/qualcoder/view_graph.py:2613
-#: src/qualcoder/view_charts.py:418 src/qualcoder/code_text.py:3508
-#: src/qualcoder/code_text.py:3648 src/qualcoder/code_text.py:6303
-msgid "File: "
-msgstr "Fil: "
+#: src\qualcoder\code_pdf.py:3039 src\qualcoder\code_text.py:2533
+#: src\qualcoder\code_text.py:2534
+msgid "Memo:"
+msgstr "Anteckning:"
 
 #: src\qualcoder\code_pdf.py:3085 src\qualcoder\code_text.py:5446
 msgid "Code text: "
@@ -2854,10 +2673,9 @@ msgstr "Markera med ny kod"
 msgid "Copy with metadata"
 msgstr "Kopiera med metadata"
 
-#: src/qualcoder/attributes.py:251 src/qualcoder/code_text.py:5191
-#: src/qualcoder/code_text.py:5247
-msgid " to "
-msgstr " till "
+#: src\qualcoder\code_text.py:2245
+msgid "Set bookmark (B)"
+msgstr "Sätt bokmärke (B)"
 
 #: src\qualcoder\code_text.py:2258
 msgid "Edit text analysis prompts"
@@ -3107,8 +2925,8 @@ msgstr " föregående  tecken"
 msgid "Go to bookmark"
 msgstr "Gå till bokmärke"
 
-#: src/qualcoder/manage_files.py:536 src/qualcoder/manage_files.py:1037
-#: src/qualcoder/code_text.py:5041 src/qualcoder/code_text.py:5362
+#: src\qualcoder\code_text.py:5041 src\qualcoder\code_text.py:5362
+#: src\qualcoder\manage_files.py:536 src\qualcoder\manage_files.py:1037
 msgid "Mark speakers"
 msgstr "Markera högtalare"
 
@@ -3208,10 +3026,13 @@ msgstr ""
 "\n"
 "Med startpunkt: "
 
-#: src/qualcoder/manage_files.py:1037 src/qualcoder/code_text.py:5362
-#, fuzzy
-msgid "No text file selected."
-msgstr "Inga filer valda"
+#: src\qualcoder\code_text.py:6130
+msgid ""
+"\n"
+"End mark: "
+msgstr ""
+"\n"
+"Slutpunkt: "
 
 #: src\qualcoder\code_text.py:6137
 msgid " new coded sections found."
@@ -3368,9 +3189,10 @@ msgstr "AI: Ingen ny data hittades för \""
 msgid "\" beside what has already been coded with this code."
 msgstr "\" utöver vad som redan har kodats med denna kod."
 
-#: src/qualcoder/manage_files.py:1876 src/qualcoder/code_text.py:7466
-msgid "Open file"
-msgstr "Öppna fil"
+#: src\qualcoder\code_text.py:7332
+msgid ""
+"Potentially related data found, inspecting it closer. Please be patient..."
+msgstr "Eventuellt relaterade data funnen, undersöker den närmare. Håll ut..."
 
 #: src\qualcoder\code_text.py:7366
 msgid "The closer inspection of the first "
@@ -3420,9 +3242,9 @@ msgstr "(sökningen avbröts på grund av ett fel)"
 msgid "(search finished)"
 msgstr "(sökningen är klar)"
 
-#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2410
-msgid " created."
-msgstr " skapad."
+#: src\qualcoder\code_text.py:7465
+msgid "Do you want to stop the search?"
+msgstr "Vill du stoppa sökningen?"
 
 #: src\qualcoder\code_text.py:7466 src\qualcoder\manage_files.py:1876
 msgid "Open file"
@@ -3617,11 +3439,9 @@ msgstr "Fält:"
 msgid "Rows:"
 msgstr "Rader:"
 
-#: src/qualcoder/codebook.py:184 src/qualcoder/codebook.py:230
-#: src/qualcoder/refi.py:2144 src/qualcoder/refi.py:2145
-#: src/qualcoder/code_text.py:4167
-msgid "Codebook exported"
-msgstr "Kodbok exporterad"
+#: src\qualcoder\import_survey.py:330
+msgid "Attribute name error"
+msgstr "Fel i attributnamn"
 
 #: src\qualcoder\import_survey.py:331
 msgid "Survey Not Imported. Attribute duplicate name error: "
@@ -3928,10 +3748,9 @@ msgstr "Projektsammanfattning"
 msgid "Code summary"
 msgstr "Projektsammanfattning"
 
-#: src/qualcoder/refi.py:2031 src/qualcoder/refi.py:2037
-#: src/qualcoder/__main__.py:2304 src/qualcoder/__main__.py:2324
-msgid "Project"
-msgstr "Projekt"
+#: src\qualcoder\information.py:191 src\qualcoder\report_relations.py:1038
+msgid "Code relations"
+msgstr "Kodrelationer"
 
 #: src\qualcoder\information.py:192
 #, fuzzy
@@ -4393,21 +4212,53 @@ msgstr "Starta och avsluta skapandet av ett segment"
 msgid "Database Queries key shortcuts"
 msgstr "Genvägar för databasfrågor"
 
-#: src/qualcoder/edit_textfile.py:654 src/qualcoder/case_file_manager.py:448
-#: src/qualcoder/report_exact_matches.py:732 src/qualcoder/cases.py:1101
-#: src/qualcoder/speakers.py:289 src/qualcoder/report_relations.py:561
-#: src/qualcoder/report_sql.py:435
-msgid "Select all"
-msgstr "Markera alla"
+#: src\qualcoder\information.py:338
+#, fuzzy
+msgid "Run SQL query"
+msgstr "Spara fråga"
+
+#: src\qualcoder\journals.py:186
+msgid "Modified"
+msgstr "Ãndrad"
+
+#: src\qualcoder\journals.py:186
+msgid "jid"
+msgstr "jid"
+
+#: src\qualcoder\journals.py:209 src\qualcoder\journals.py:491
+#: src\qualcoder\journals.py:506 src\qualcoder\journals.py:529
+#: src\qualcoder\journals.py:551 src\qualcoder\journals.py:719
+#: src\qualcoder\journals.py:757
+msgid "Journal: "
+msgstr "Journal: "
+
+#: src\qualcoder\journals.py:252
+msgid "Attribute added to journals:"
+msgstr "Attribut tillagt till journaler:"
+
+#: src\qualcoder\journals.py:252 src\qualcoder\manage_files.py:1414
+msgid "type"
+msgstr "typ"
 
 #: src\qualcoder\journals.py:356 src\qualcoder\__main__.py:2989
 msgid "Journals: "
 msgstr "Journaler: "
 
-#: src/qualcoder/helpers.py:642 src/qualcoder/view_av.py:1051
-#: src/qualcoder/view_av.py:4169 src/qualcoder/view_av.py:4598
-msgid "Media not found"
-msgstr "Media hittades inte"
+#: src\qualcoder\journals.py:368 src\qualcoder\journals.py:373
+#: src\qualcoder\journals.py:378 src\qualcoder\journals.py:420
+#: src\qualcoder\journals.py:426 src\qualcoder\journals.py:443
+#: src\qualcoder\manage_references.py:217
+#: src\qualcoder\manage_references.py:237
+#: src\qualcoder\manage_references.py:476
+#: src\qualcoder\manage_references.py:481
+#: src\qualcoder\manage_references.py:486
+#: src\qualcoder\manage_references.py:491
+#: src\qualcoder\manage_references.py:496
+#: src\qualcoder\manage_references.py:501
+#: src\qualcoder\manage_references.py:506
+#: src\qualcoder\manage_references.py:511
+msgid "Ascending"
+msgstr "Stigande"
 
 #: src\qualcoder\journals.py:369 src\qualcoder\journals.py:374
 #: src\qualcoder\journals.py:379 src\qualcoder\journals.py:421
@@ -4514,9 +4365,9 @@ msgstr "Loggen är tom. Det finns inget att konvertera."
 msgid "Converted from journal: "
 msgstr "Kodens namn ändrades från: "
 
-#: src/qualcoder/case_file_manager.py:620 src/qualcoder/code_text.py:6056
-msgid "Cannot have blank text marks"
-msgstr "Kan inte ha tomma textmarkeringar"
+#: src\qualcoder\journals.py:956
+msgid "Skipping non-numeric value for attribute "
+msgstr "Utelämna icke-numeriska värden för attributet "
 
 #: src\qualcoder\journals.py:965
 #, fuzzy
@@ -4880,10 +4731,10 @@ msgstr ""
 msgid "Copy file permission error"
 msgstr "Fel i behörigheten för kopieringsfil"
 
-#: src/qualcoder/view_graph.py:521 src/qualcoder/code_text.py:3023
-#: src/qualcoder/code_text.py:3046
-msgid "Text: "
-msgstr "Text: "
+#: src\qualcoder\manage_files.py:1980
+#, fuzzy
+msgid "Not supported file type"
+msgstr "Inga sparade filter"
 
 #: src\qualcoder\manage_files.py:1981
 msgid "Cannot import file"
@@ -5183,12 +5034,9 @@ msgstr "Referens borttagen."
 msgid "Merging: "
 msgstr "Sammanfogar: "
 
-#: src/qualcoder/view_graph.py:2705 src/qualcoder/view_graph.py:4032
-#: src/qualcoder/view_graph.py:4034 src/qualcoder/ai_chat.py:436
-#: src/qualcoder/code_text.py:3789 src/qualcoder/code_text.py:3858
-#: src/qualcoder/report_relations.py:724 src/qualcoder/report_relations.py:1046
-msgid "Code"
-msgstr "Kod"
+#: src\qualcoder\merge_projects.py:76
+msgid "Into: "
+msgstr "Till: "
 
 #: src\qualcoder\merge_projects.py:93
 msgid "Finished merging "
@@ -5647,12 +5495,9 @@ msgstr "Exportera till Excel"
 msgid "No coders selected"
 msgstr "Inga kodare valda"
 
-#: src/qualcoder/ai_chat.py:292 src/qualcoder/ai_chat.py:307
-#: src/qualcoder/ai_chat.py:333 src/qualcoder/ai_chat.py:456
-#: src/qualcoder/ai_chat.py:683 src/qualcoder/ai_chat.py:1160
-#: src/qualcoder/code_text.py:7218
-msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
-msgstr "AI är avstängd. gå först till \"AI > Installationsguide\"."
+#: src\qualcoder\reports.py:756
+msgid "Coder comparisons report exported: "
+msgstr "Kodarsjämförelserapport exporterad: "
 
 #: src\qualcoder\reports.py:757 src\qualcoder\report_codes.py:708
 #: src\qualcoder\report_codes.py:768 src\qualcoder\report_codes.py:796
@@ -5665,9 +5510,9 @@ msgstr "AI är avstängd. gå först till \"AI > Installationsguide\"."
 msgid "Report exported"
 msgstr "Rapport exporterad"
 
-#: src/qualcoder/ai_chat.py:316 src/qualcoder/code_text.py:2247
-msgid "AI Text Analysis"
-msgstr "AI-textanalys"
+#: src\qualcoder\reports.py:780
+msgid "CODER COMPARISON"
+msgstr "KODARJÃMFÃRELSE"
 
 #: src\qualcoder\reports.py:780
 msgid "Selected coders: "
@@ -6145,11 +5990,13 @@ msgstr "Koder: "
 msgid "Attributes:"
 msgstr "Attribut:"
 
-#: src/qualcoder/code_in_all_files.py:256
-#: src/qualcoder/code_in_all_files.py:688 src/qualcoder/code_text.py:4399
-#: src/qualcoder/code_text.py:4469
-msgid "Code:"
-msgstr "Kod:"
+#: src\qualcoder\report_codes.py:1521
+msgid ""
+"\n"
+"Files:\n"
+msgstr ""
+"\n"
+"Filer:\n"
 
 #: src\qualcoder\report_codes.py:1526
 msgid " Files: "
@@ -6177,15 +6024,13 @@ msgstr "Antal:"
 msgid "Percent of file:"
 msgstr "Andel av fil:"
 
-#: src/qualcoder/code_in_all_files.py:474 src/qualcoder/code_text.py:3561
-#: src/qualcoder/code_text.py:3716
-msgid "Coded text file exported: "
-msgstr "Kodad textfil exporterad: "
+#: src\qualcoder\report_codes.py:2023
+msgid "Image code statistics:"
+msgstr "Statistik för bildkodning:"
 
-#: src/qualcoder/code_in_all_files.py:475 src/qualcoder/code_text.py:3563
-#: src/qualcoder/code_text.py:3718 src/qualcoder/code_text.py:4127
-msgid "Coded text file exported"
-msgstr "Kodad textfil exporterad"
+#: src\qualcoder\report_codes.py:2098
+msgid "A/V code statistics:"
+msgstr "Statistik för ljud-/videokodning:"
 
 #: src\qualcoder\report_codes.py:2104
 msgid "Percent of file: Unknown. Either VLC not installer or file not found."
@@ -6219,21 +6064,25 @@ msgstr "KODMEMO: "
 msgid " FILE MEMO: "
 msgstr " FILANTECKNING: "
 
-#: src/qualcoder/view_av.py:266 src/qualcoder/view_av.py:4582
-msgid "QualCoder will crash"
-msgstr "QualCoder kommer att krascha"
+#: src\qualcoder\report_codes.py:2443
+msgid "CASE MEMO: "
+msgstr "FALLMEMO: "
 
-#: src/qualcoder/view_av.py:361 src/qualcoder/view_av.py:4750
-msgid "Screenshot"
-msgstr "Skärmdump"
+#: src\qualcoder\report_codes.py:2515 src\qualcoder\report_codes.py:3176
+#: src\qualcoder\report_exact_matches.py:461
+#: src\qualcoder\report_relations.py:622 src\qualcoder\view_graph.py:3761
+#: src\qualcoder\view_graph.py:3930
+msgid "View in context"
+msgstr "Visa i kontext"
 
-#: src/qualcoder/view_av.py:374 src/qualcoder/view_av.py:4763
-msgid "Width:"
-msgstr "Bredd:"
+#: src\qualcoder\report_codes.py:2517 src\qualcoder\view_av.py:4103
+#: src\qualcoder\view_image.py:2006 src\qualcoder\view_image.py:2010
+msgid "Add important mark"
+msgstr "Lägg till viktig markering"
 
-#: src/qualcoder/view_av.py:377 src/qualcoder/view_av.py:4766
-msgid "Height:"
-msgstr "Höjd:"
+#: src\qualcoder\report_codes.py:2518
+msgid "Change code to"
+msgstr "Ãndra kod till"
 
 #: src\qualcoder\report_codes.py:2519
 #, fuzzy
@@ -6349,11 +6198,14 @@ msgstr "Totalt antal tecken: "
 msgid "Average characters: "
 msgstr "Genomsnittligt antal tecken: "
 
-#: src/qualcoder/view_av.py:3613 src/qualcoder/view_av.py:3640
-#: src/qualcoder/code_text.py:1137 src/qualcoder/code_text.py:1164
-#: src/qualcoder/code_text.py:6000 src/qualcoder/code_text.py:6029
-msgid " for: "
-msgstr " för: "
+#: src\qualcoder\report_code_summary.py:491
+#, fuzzy
+msgid ""
+"Word calculations: Words use alphabet characters and include the apostrophe. "
+"All other characters are word separators."
+msgstr ""
+"Ord beräkningar: Ord använder alfabetiska tecken och inkluderar apostrofer. "
+"Alla andra tecken ses som avdelare"
 
 #: src\qualcoder\report_code_summary.py:494
 #: src\qualcoder\report_file_summary.py:632
@@ -6443,35 +6295,17 @@ msgstr ""
 "\n"
 "Memo: "
 
-#: src/qualcoder/view_av.py:4450 src/qualcoder/code_text.py:535
-msgid ""
-"Avoid selecting sections of text with a combination of not underlined (not "
-"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
-"assigned)."
-msgstr ""
-"Undvik att välja sektioner av text med en kombination av icke understrukna "
-"(okodade / annoterade / case tilldelade) och understrukna (kodade, "
-"annoterade, case tilldelade)."
+#: src\qualcoder\report_compare_coder_file.py:434
+msgid "CODER COMPARISON FOR FILE"
+msgstr "KODARJÃMFÃRELSE FÃR FIL"
 
-#: src/qualcoder/view_av.py:4452 src/qualcoder/code_text.py:538
-msgid ""
-"Positions of the underlying codes / annotations / case-assigned may not "
-"correctly adjust if text is typed over or deleted."
-msgstr ""
-"Positionen för underliggande koder / kommentarer / case tilldelningar "
-"riskerar att inte korrigeras korrekt om text skrivs över eller raderas."
+#: src\qualcoder\report_compare_coder_file.py:436
+msgid "(YELLOW CODER 0)"
+msgstr "(GUL KODARE 0)"
 
-#: src/qualcoder/view_av.py:4928
-msgid "Select name to delete"
-msgstr "Välj namn att ta bort"
-
-#: src/qualcoder/view_av.py:4947
-msgid "Speaker name"
-msgstr "Talarnamn"
-
-#: src/qualcoder/view_av.py:4948
-msgid "Name:"
-msgstr "Namn:"
+#: src\qualcoder\report_compare_coder_file.py:438
+msgid "(BLUE CODER 1)"
+msgstr "(BLÃ KODARE 1)"
 
 #: src\qualcoder\report_compare_coder_file.py:440
 msgid "FILE: "
@@ -6898,186 +6732,192 @@ msgstr "Ingen fil har valts."
 msgid "No file"
 msgstr "Ingen fil"
 
-#: src/qualcoder/__main__.py:673
-msgid ""
-"Cannot load config.ini.\n"
-"Character decoding error.\n"
-"Using QualCoder default settings."
-msgstr ""
-"Det går inte att ladda config.ini.\n"
-"Fel i teckenavkodningen.\n"
-"Använder QualCoders standardinställningar."
+#: src\qualcoder\report_exact_matches.py:327
+msgid "Only one code has been selected."
+msgstr "Endast en kod har valts."
 
-#: src/qualcoder/__main__.py:675
-msgid "Cannot load config.ini file"
-msgstr "Det går inte att ladda filen config.ini"
+#: src\qualcoder\report_exact_matches.py:328
+msgid "One code selected"
+msgstr "En kod vald"
 
-#: src/qualcoder/__main__.py:1381
-msgid "There is already a backup with this name"
-msgstr "Det finns redan en säkerhetskopia med det namnet"
+#: src\qualcoder\report_exact_matches.py:396
+#: src\qualcoder\report_relations.py:860
+msgid "No exact matches found."
+msgstr "Inga exakta träffar hittades."
 
-#: src/qualcoder/__main__.py:1390
-msgid "WARNING: audio and video files NOT backed up. See settings."
-msgstr ""
-"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se inställningarna."
-"VARNING: ljud och videofilerna är INTE säkerhetskopierade, gå till "
-"inställningarna."
+#: src\qualcoder\report_exact_matches.py:398
+msgid "ALL selected codes need to be exactly overlapping."
+msgstr "ALLA valda koder måste överlappa exakt."
 
-#: src/qualcoder/__main__.py:1392
-msgid "Project backup created: "
-msgstr "Säkerhetskopia av projektet skapad: "
+#: src\qualcoder\report_exact_matches.py:399
+#: src\qualcoder\report_relations.py:861
+msgid "No results"
+msgstr "Inga resultat"
 
-#: src/qualcoder/__main__.py:1473
-msgid ""
-"Welcome\n"
-"\n"
-"The new AI enhanced functions in QualCoder need some additional setup. Do "
-"you want to enable the AI and start the setup? You can also do this later by "
-"starting the AI Setup Wizard from the AI menu in the main window. Click "
-"\"Yes\" to start now."
-msgstr ""
-"Välkommen\n"
-"\n"
-"Den förbättrade AI funktionen i QualCoder behöver lite extra inställningar. "
-"Vill du använda AI och börja ställa in det? Du kan också göra det senare "
-"genom att starta AI-wizard från AI menyn i programfönstret. Klicka \"Ja\" "
-"för att påbörja inställningen."
+#: src\qualcoder\report_exact_matches.py:464
+#: src\qualcoder\report_relations.py:625 src\qualcoder\report_relations.py:1111
+#: src\qualcoder\report_sql.py:534 src\qualcoder\report_sql.py:631
+msgid "Filter equals: "
+msgstr "Filter är lika med: "
 
-#: src/qualcoder/__main__.py:1479
-msgid "AI Integration"
-msgstr "AI-integrering"
+#: src\qualcoder\report_exact_matches.py:465
+#: src\qualcoder\report_relations.py:626
+msgid "Filter greater or equals: "
+msgstr "Filter större än eller lika med: "
 
-#: src/qualcoder/__main__.py:1797
-msgid "Font"
-msgstr "Typsnitt"
+#: src\qualcoder\report_exact_matches.py:466
+#: src\qualcoder\report_relations.py:627
+msgid "Filter lower or equals: "
+msgstr "Filter mindre än eller lika med: "
 
-#: src/qualcoder/__main__.py:1798
-msgid "Tree font size"
-msgstr "Trädets teckenstorlek"
+#: src\qualcoder\report_exact_matches.py:467
+#: src\qualcoder\report_relations.py:628 src\qualcoder\report_relations.py:1112
+#: src\qualcoder\report_sql.py:532 src\qualcoder\report_sql.py:629
+msgid "Clear filter"
+msgstr "Rensa filter"
 
-#: src/qualcoder/__main__.py:1799
-msgid "Working directory"
-msgstr "Arbetskatalog"
+#: src\qualcoder\report_exact_matches.py:540
+msgid "code name"
+msgstr "kodnamn"
 
-#: src/qualcoder/__main__.py:1800
-msgid "Show IDs"
-msgstr "Visa ID:n"
+#: src\qualcoder\report_exact_matches.py:540
+msgid "text"
+msgstr "text"
 
-#: src/qualcoder/__main__.py:1801
-msgid "Language"
-msgstr "Språk"
+#: src\qualcoder\report_exact_matches.py:540
+msgid "File name"
+msgstr "Filnamn"
 
-#: src/qualcoder/__main__.py:1802
-msgid "Timestamp format"
-msgstr "Format för tidsstämpel"
+#: src\qualcoder\report_exact_matches.py:620
+msgid "Report of exact matches for text codings for file"
+msgstr "Rapport över exakta träffar för textkodning för fil"
 
-#: src/qualcoder/__main__.py:1803
-msgid "Speaker name format"
-msgstr "Talarnamnformat"
+#: src\qualcoder\report_exact_matches.py:731
+#: src\qualcoder\report_relations.py:560
+msgid "Clear all"
+msgstr "Rensa alla"
 
-#: src/qualcoder/__main__.py:1804
-msgid "Report text context characters: "
-msgstr "Kontexttecken  för  rapporttext: "
+#: src\qualcoder\report_exact_matches.py:735
+msgid "Exclude code"
+msgstr "Uteslut kod"
 
-#: src/qualcoder/__main__.py:1805
-msgid "Report text context style: "
-msgstr "Kontekststil för rapporttext: "
+#: src\qualcoder\report_file_summary.py:308
+msgid "Owner: "
+msgstr "Ãgare: "
 
-#: src/qualcoder/__main__.py:1806
-msgid "Backup on open"
-msgstr "Säkerhetskopiera vid öppning"
+#: src\qualcoder\report_file_summary.py:311
+msgid "Internal text document"
+msgstr "Internt textdokument"
 
-#: src/qualcoder/__main__.py:1807
-msgid "Backup AV files"
-msgstr "Säkerhetskopiera AV-filer"
+#: src\qualcoder\report_file_summary.py:313
+msgid "External text document: "
+msgstr "Externt textdokument: "
 
-#: src/qualcoder/__main__.py:1809
-msgid "AI integration is enabled"
-msgstr "AI-integrering Är aktiverad"
+#: src\qualcoder\report_file_summary.py:315
+msgid "External audio file: "
+msgstr "Extern ljudfil: "
 
-#: src/qualcoder/__main__.py:1811
-msgid "AI integration is disabled"
-msgstr "AI-integrering Är avstängd"
+#: src\qualcoder\report_file_summary.py:317
+msgid "Internal audio file"
+msgstr "Intern ljudfil"
 
-#: src/qualcoder/__main__.py:1812
-msgid "Style"
-msgstr "Stil"
+#: src\qualcoder\report_file_summary.py:319
+msgid "External video file: "
+msgstr "Extern videofil: "
 
-#: src/qualcoder/__main__.py:1815
-#, fuzzy
-msgid "Folder paths / represents backslash"
-msgstr "Sökvägar till kataloger (mappar) / representerar backslash"
+#: src\qualcoder\report_file_summary.py:321
+msgid "Internal video file"
+msgstr "Intern videofil"
 
-#: src/qualcoder/__main__.py:2049
-msgid "This project contains no text files."
-msgstr "Det här projektet innehåller inga textfiler."
+#: src\qualcoder\report_file_summary.py:323
+msgid "External image file: "
+msgstr "Extern bildfil: "
 
-#: src/qualcoder/__main__.py:2050
-msgid "No text files"
-msgstr "Inga textfiler"
+#: src\qualcoder\report_file_summary.py:325
+msgid "Internal image file"
+msgstr "Intern bildfil"
 
-#: src/qualcoder/__main__.py:2063
-msgid "This project contains no pdf files."
-msgstr "Det här projektet innehåller inga PDF filer."
+#: src\qualcoder\report_file_summary.py:326
+msgid "Media path: "
+msgstr "Mediaväg: "
 
-#: src/qualcoder/__main__.py:2064
-msgid "No pdf files"
-msgstr "Inga pdf-filer"
+#: src\qualcoder\report_file_summary.py:346
+msgid "CASE:"
+msgstr "FALL:"
 
-#: src/qualcoder/__main__.py:2079
-msgid "This project contains no image files."
-msgstr "Det här projektet innehåller inga bildfiler."
+#: src\qualcoder\report_file_summary.py:359
+msgid "No case assignment"
+msgstr "Inget fall tilldelat"
 
-#: src/qualcoder/__main__.py:2080
-msgid "No image files"
-msgstr "Inga bildfiler"
+#: src\qualcoder\report_file_summary.py:367
+msgid "ATTRIBUTES:"
+msgstr "ATTRIBUT:"
 
-#: src/qualcoder/__main__.py:2088
-msgid "This project contains no audio/video files."
-msgstr "Det här projektet innehåller inga ljud-/videofiler."
+#: src\qualcoder\report_file_summary.py:385
+#: src\qualcoder\report_file_summary.py:446
+#: src\qualcoder\report_file_summary.py:497
+msgid "METADATA:"
+msgstr "METADATA:"
 
-#: src/qualcoder/__main__.py:2089
-msgid "No a/v files"
-msgstr "Inga ljud-/videofiler"
+#: src\qualcoder\report_file_summary.py:415
+#: src\qualcoder\report_file_summary.py:468
+msgid "Duration: Cannot obtain. VLC not installed."
+msgstr "Varaktighet: Kan ej hämtas. VLC ej installerat."
 
-#: src/qualcoder/__main__.py:2092
-msgid "VLC is not installed. Cannot code audio/video files."
-msgstr "VLC är inte installerat. Kan inte koda ljud-/videofiler."
+#: src\qualcoder\report_file_summary.py:424
+#: src\qualcoder\report_file_summary.py:477
+#: src\qualcoder\report_file_summary.py:563
+#: src\qualcoder\report_file_summary.py:665
+msgid "CODE COUNTS:"
+msgstr "KODANTAL:"
 
-#: src/qualcoder/__main__.py:2093
-msgid "Install VLC"
-msgstr "Installera VLC"
+#: src\qualcoder\report_file_summary.py:428
+#: src\qualcoder\report_file_summary.py:480
+#: src\qualcoder\report_file_summary.py:568
+#: src\qualcoder\report_file_summary.py:669
+msgid "Percent: "
+msgstr "Procent: "
 
-#: src/qualcoder/__main__.py:2102
-msgid "A/V Coding"
-msgstr "Ljud-/videokodning"
+#: src\qualcoder\report_file_summary.py:429
+#: src\qualcoder\report_file_summary.py:481
+msgid "Average segment: "
+msgstr "Genomsnittligt segment: "
 
-#: src/qualcoder/__main__.py:2189
-msgid "IMPORTING REFI-QDA PROJECT"
-msgstr "IMPORT AV REFI-QDA-PROJEKT"
+#: src\qualcoder\report_file_summary.py:429
+#: src\qualcoder\report_file_summary.py:481 src\qualcoder\view_graph.py:1325
+msgid " msecs"
+msgstr " ms"
 
-#: src/qualcoder/__main__.py:2191
-msgid ""
-"Step 1: You will be asked for a new QualCoder project name.\n"
-"Step 2: You will be asked for the QDPX file."
-msgstr ""
-"Steg 1: Du kommer att behöva ange ett nytt QualCoder projektnamn.\n"
-"Steg 2: Du kommer att behöva ange QDPX filen."
+#: src\qualcoder\report_file_summary.py:437
+msgid "TRANSCRIPT:"
+msgstr "TRANSKRIPTION:"
 
-#: src/qualcoder/__main__.py:2192
-msgid "REFI-QDA import steps"
-msgstr "Importsteg från REFI-QDA"
+#: src\qualcoder\report_file_summary.py:439
+#: src\qualcoder\report_file_summary.py:490
+msgid "END OF TRANSCRIPT"
+msgstr "SLUT PÃ TRANSKRIPTION"
 
-#: src/qualcoder/__main__.py:2196 src/qualcoder/__main__.py:2213
-#: src/qualcoder/__main__.py:2229
-msgid "Project creation"
-msgstr "Projekt skapande"
+#: src\qualcoder\report_file_summary.py:488
+msgid "TRANSCRIPT: "
+msgstr "TRANSKRIPTION: "
 
-#: src/qualcoder/__main__.py:2196
-msgid "REFI-QDA Project not successfully created"
-msgstr "REFI-QDA-projektet skapades inte korrekt"
+#: src\qualcoder\report_file_summary.py:513
+msgid "PDF IMAGE DETAILS"
+msgstr "PDF-BILDDETALJER"
 
-#: src/qualcoder/__main__.py:2208
+#: src\qualcoder\report_file_summary.py:515
+msgid "Pages"
+msgstr "Sidor"
+
+#: src\qualcoder\report_file_summary.py:524 src\qualcoder\view_image.py:3062
+msgid "Width: "
+msgstr "Bredd: "
+
+#: src\qualcoder\report_file_summary.py:524
+msgid "Height: "
+msgstr "Höjd: "
+
+#: src\qualcoder\report_file_summary.py:550
 #, fuzzy
 msgid "Image too large"
 msgstr "Bild exporterad"
@@ -7108,194 +6948,170 @@ msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
 "All other characters are word separators"
 msgstr ""
-"Steg 1: Du kommer att behöva ange ett nytt QualCoder projektnamn.\n"
-"Steg 2: Du kommer att behöva ange RQDA filen."
+"Ord beräkningar: Ord använder alfabetiska tecken och inkluderar apostrofer. "
+"Alla andra tecken ses som avdelare"
 
-#: src/qualcoder/__main__.py:2242
-msgid "Are you sure you want to quit?"
-msgstr "Är du säker på att du vill avsluta?"
-
-#: src/qualcoder/__main__.py:2300
-msgid "Enter project name"
-msgstr "Ange projektnamn"
-
-#: src/qualcoder/__main__.py:2304
-msgid "No project created."
-msgstr "Inget projekt har skapats."
-
-#: src/qualcoder/__main__.py:2323
-msgid "Project creation error "
-msgstr "Fel vid skapande av projekt "
-
-#: src/qualcoder/__main__.py:2324
-msgid " not successfully created"
-msgstr " skapades inte korrekt"
-
-#: src/qualcoder/__main__.py:2410
-msgid "New project: "
-msgstr "Nytt projekt: "
-
-#: src/qualcoder/__main__.py:2411
-msgid "Opening: "
-msgstr "Öppnar: "
-
-#: src/qualcoder/__main__.py:2421
-msgid "New Project Created"
-msgstr "Nytt projekt skapat"
-
-#: src/qualcoder/__main__.py:2422
-msgid "DB Version:"
-msgstr "Databasversion:"
-
-#: src/qualcoder/__main__.py:2424
-msgid "About: "
-msgstr "Om: "
-
-#: src/qualcoder/__main__.py:2425
-msgid "Coder:"
-msgstr "Kodare:"
-
-#: src/qualcoder/__main__.py:2428
-msgid "Problem creating database "
-msgstr "Problem vid skapande av databas "
-
-#: src/qualcoder/__main__.py:2483
-msgid "Coder name changed to: "
-msgstr "Kodarnamn ändrat till: "
-
-#: src/qualcoder/__main__.py:2506
+#: src\qualcoder\report_relations.py:268
 msgid ""
-"**Research topic, questions and objectives:** \n"
-"\n"
-"**Methodology:** \n"
-"\n"
-"**Participants and data collected:** \n"
-"\n"
-"#####\n"
-"(Everything below this mark is a personal note and will never be sent to the "
-"AI.)"
+"Select 2 or more codes\n"
+"Use Ctrl or Shift and mouse click"
 msgstr ""
-"**Ämne, frågor och syfte:**\n"
-"\n"
-"**Metod:**\n"
-"\n"
-"**Informanter och insamlad data:**\n"
-"\n"
-"#####\n"
-"(Allting efter de här uppgifterna är en personlig anteckning och kommer inte "
-"att skickas till AI.)"
+"Välj 2 eller fler koder\n"
+"Använd Ctrl eller Shift och musklick"
 
-#: src/qualcoder/__main__.py:2511
-msgid "Memo for project "
-msgstr "Projektanteckning "
+#: src\qualcoder\report_relations.py:269
+msgid "Selection warning"
+msgstr "Valvarning"
 
-#: src/qualcoder/__main__.py:2518
-msgid "Project memo entered."
-msgstr "Projektanteckning sparad."
+#: src\qualcoder\report_relations.py:724 src\qualcoder\report_relations.py:725
+#: src\qualcoder\report_relations.py:726 src\qualcoder\report_relations.py:754
+#: src\qualcoder\report_relations.py:909
+msgid "Overlap"
+msgstr "Ãverlappning"
 
-#: src/qualcoder/__main__.py:2542 src/qualcoder/special_functions.py:113
-msgid "Open project directory"
-msgstr "Öppna projektmapp"
+#: src\qualcoder\report_relations.py:725 src\qualcoder\report_relations.py:909
+#: src\qualcoder\report_relations.py:910
+msgid "Union"
+msgstr "Union"
 
-#: src/qualcoder/__main__.py:2564
-msgid "Cannot open file"
-msgstr "Kan inte öppna fil"
+#: src\qualcoder\report_relations.py:726 src\qualcoder\report_relations.py:910
+msgid "Distance"
+msgstr "Avstånd"
 
-#: src/qualcoder/__main__.py:2589
-msgid ""
-"Your current coder name (\"{}\") differs from the one last used in the "
-"project (\"{}\"). Do you want to keep your current name or switch to the one "
-"from the project?"
-msgstr ""
-"Ditt nuvarande kodarnamn (”{}”) skiljer sig från det som senast användes i "
-"projektet (”{}”). Vill du behålla ditt nuvarande namn eller byta till det "
-"från projektet?"
+#: src\qualcoder\report_relations.py:726 src\qualcoder\report_relations.py:910
+msgid "Text before"
+msgstr "Text före"
 
-#: src/qualcoder/__main__.py:2592
+#: src\qualcoder\report_relations.py:726 src\qualcoder\report_relations.py:910
+msgid "Text after"
+msgstr "Text efter"
+
+#: src\qualcoder\report_relations.py:726 src\qualcoder\report_relations.py:910
+msgid "Owner"
+msgstr "Ãgare"
+
+#: src\qualcoder\report_relations.py:752
+msgid "Proximity"
+msgstr "Närhet"
+
+#: src\qualcoder\report_relations.py:756
+msgid "Exact"
+msgstr "Exakt"
+
+#: src\qualcoder\report_relations.py:758
+msgid "Inclusion"
+msgstr "Inkludering"
+
+#: src\qualcoder\report_relations.py:886
+msgid "Report of exact matches for text codings by file and code"
+msgstr "Rapport över exakta träffar för textkodning per fil och kod"
+
+#: src\qualcoder\report_relations.py:887
+msgid "Each row contains filename, codename, pos0, pos1, text, owner."
+msgstr "Varje rad innehåller filnamn, kodnamn, pos0, pos1, text, ägare."
+
+#: src\qualcoder\report_relations.py:906 src\qualcoder\report_relations.py:907
+#: src\qualcoder\report_relations.py:959
+msgid "name"
+msgstr "namn"
+
+#: src\qualcoder\report_relations.py:908
+msgid "Relation"
+msgstr "Relation"
+
+#: src\qualcoder\report_relations.py:908 src\qualcoder\report_relations.py:959
+msgid "Minimum"
+msgstr "Minimum"
+
+#: src\qualcoder\report_relations.py:908 src\qualcoder\report_relations.py:960
+msgid "Maximum"
+msgstr "Maximum"
+
+#: src\qualcoder\report_relations.py:910
+msgid "Text overlap"
+msgstr "Textöverlapp"
+
+#: src\qualcoder\report_relations.py:978
 #, fuzzy
 msgid "Code relations file exported to: "
 msgstr "Relationsfil för koder exporterad till: "
 
-#: src/qualcoder/__main__.py:2594
-msgid "Keep"
-msgstr "Behåll"
+#: src\qualcoder\report_relations.py:1029
+#: src\qualcoder\report_relations.py:1038
+msgid "Code pair"
+msgstr "Kodpar"
 
-#: src/qualcoder/__main__.py:2595
-msgid "Switch"
-msgstr "Växla"
+#: src\qualcoder\report_relations.py:1029
+#: src\qualcoder\report_relations.py:1038
+msgid "Distance (characters)"
+msgstr "Avstånd (tecken)"
 
-#: src/qualcoder/__main__.py:2596
-msgid "Cancel"
-msgstr "Avbryt"
+#: src\qualcoder\report_sql.py:141 src\qualcoder\report_sql.py:193
+msgid "No select query"
+msgstr "Ingen SELECT-fråga"
 
-#: src/qualcoder/__main__.py:2605
-msgid "Default coder name changed to: "
-msgstr "Standardkodarnamn ändrat  till: "
+#: src\qualcoder\report_sql.py:141 src\qualcoder\report_sql.py:193
+msgid "No data to export"
+msgstr "Ingen data att exportera"
 
-#: src/qualcoder/__main__.py:2633 src/qualcoder/__main__.py:2662
-#: src/qualcoder/__main__.py:2682 src/qualcoder/__main__.py:2707
-#: src/qualcoder/__main__.py:2778 src/qualcoder/__main__.py:2802
-#: src/qualcoder/__main__.py:2810 src/qualcoder/__main__.py:2822
-#: src/qualcoder/__main__.py:2830 src/qualcoder/__main__.py:2838
-#: src/qualcoder/__main__.py:2847 src/qualcoder/__main__.py:2855
-#: src/qualcoder/__main__.py:2863
-msgid "Updating database to version"
-msgstr "Uppdaterar databas till version"
+#: src\qualcoder\report_sql.py:146 src\qualcoder\report_sql.py:198
+msgid "SQL error"
+msgstr "SQL-fel"
 
-#: src/qualcoder/__main__.py:2870
-msgid "Deleting code_text coding to deleted files: "
-msgstr "Tar bort textkodning för borttagna filer: "
+#: src\qualcoder\report_sql.py:182
+msgid "Results exported: "
+msgstr "Resultat exporterade: "
 
-#: src/qualcoder/__main__.py:2877
-msgid "Deleting code_image coding to deleted files: "
-msgstr "Tar bort bildkodning för borttagna filer: "
+#: src\qualcoder\report_sql.py:183
+msgid "Results exported"
+msgstr "Resultat exporterade"
 
-#: src/qualcoder/__main__.py:2884
-msgid "Deleting code_av coding to deleted files: "
-msgstr "Tar bort ljud-/videokodning för borttagna filer: "
+#: src\qualcoder\report_sql.py:220
+msgid "SQL Results exported to: "
+msgstr "SQL-resultat exporterade till: "
 
-#: src/qualcoder/__main__.py:2928
-msgid "QualCoder project missing folders. Created empty folders"
-msgstr "QualCoder-projekt saknade mappar. Tomma mappar skapades"
+#: src\qualcoder\report_sql.py:222
+msgid "Query:"
+msgstr "Fråga:"
 
-#: src/qualcoder/__main__.py:2953
-msgid "Project summary"
-msgstr "Projektsammanfattning"
+#: src\qualcoder\report_sql.py:223
+msgid "CSV file export"
+msgstr "Export av CSV-fil"
 
-#: src/qualcoder/__main__.py:2954
-msgid "Date time now: "
-msgstr "Aktuellt datum och tid: "
+#: src\qualcoder\report_sql.py:260
+msgid "Running query. Please wait."
+msgstr "Kör fråga. Vänta..."
 
-#: src/qualcoder/__main__.py:2962
-msgid "Project memo: "
-msgstr "Projektmemo: "
+#: src\qualcoder\report_sql.py:280 src\qualcoder\report_sql.py:603
+msgid " rows"
+msgstr " rader"
 
-#: src/qualcoder/__main__.py:2969
-msgid "Files: "
-msgstr "Filer: "
+#: src\qualcoder\report_sql.py:283
+msgid "Table created"
+msgstr "Tabell skapad"
 
-#: src/qualcoder/__main__.py:2973 src/qualcoder/cases.py:355
-msgid "Cases: "
-msgstr "Fall: "
+#: src\qualcoder\report_sql.py:286
+msgid "Index created"
+msgstr "Index skapat"
 
-#: src/qualcoder/__main__.py:2996
+#: src\qualcoder\report_sql.py:290
+msgid " rows deleted"
+msgstr " rader raderade"
+
+#: src\qualcoder\report_sql.py:294
+msgid " rows updated"
+msgstr " rader uppdaterade"
+
+#: src\qualcoder\report_sql.py:298
 #, fuzzy
-msgid "Folder paths / represents \\"
-msgstr "Katalogvägar / motsvarar \\"
+msgid "Using selected text"
+msgstr "Länka segment till markerad text"
 
-#: src/qualcoder/__main__.py:3001
-msgid "Bad links to files"
-msgstr "Felaktiga länkar till filer"
+#: src\qualcoder\report_sql.py:325
+msgid "SQL Error"
+msgstr "SQL-fel"
 
-#: src/qualcoder/__main__.py:3035
-msgid "Closing project: "
-msgstr "Stänger projekt: "
-
-#: src/qualcoder/__main__.py:3101
-msgid "Deleting: "
-msgstr "Tar bort: "
-
-#: src/qualcoder/__main__.py:3110
+#: src\qualcoder\report_sql.py:360
 msgid ""
 "Table view\n"
 "Based on coder_names visibility"
@@ -7303,58 +7119,83 @@ msgstr ""
 "Tabellvy\n"
 "Baserat på synligheten för coder_names"
 
-#: src/qualcoder/__main__.py:3112
-msgid "AI Setup Wizard"
-msgstr "AI-installationsguide"
+#: src\qualcoder\report_sql.py:374
+msgid "Default Queries"
+msgstr "Standardfrågor"
 
-#: src/qualcoder/__main__.py:3114
-msgid "AI: Setup Wizard"
-msgstr "AI: Installationsguide"
+#: src\qualcoder\report_sql.py:390
+msgid "Saved Queries"
+msgstr "Sparade frågor"
 
-#: src/qualcoder/__main__.py:3117
-msgid "AI: Setup Wizard finished"
-msgstr "AI: Installationen är klar"
+#: src\qualcoder\report_sql.py:408
+msgid "Delete stored sql"
+msgstr "Radera sparad SQL"
 
-#: src/qualcoder/__main__.py:3126
-msgid "Please enable the AI first and set it in Settings."
-msgstr "Aktivera först AI i inställningarna."
+#: src\qualcoder\report_sql.py:437
+msgid "Paste"
+msgstr "Klistra in"
 
-#: src/qualcoder/__main__.py:3127 src/qualcoder/__main__.py:3131
-#: src/qualcoder/__main__.py:3136 src/qualcoder/__main__.py:3161
-msgid "Rebuild AI Memory"
-msgstr "Återskapa AI-minne"
+#: src\qualcoder\report_sql.py:442
+msgid "Save query"
+msgstr "Spara fråga"
 
-#: src/qualcoder/__main__.py:3130
-msgid "The AI is busy or not set up correctly."
-msgstr "AI:n är upptagen eller inte korrekt inställd."
+#: src\qualcoder\report_sql.py:446
+#, fuzzy
+msgid "Comment out selected text"
+msgstr "Länka segment till markerad text"
 
-#: src/qualcoder/__main__.py:3134
-msgid ""
-"This will re-read all of your empirical documents, which may take some time. "
-"Do you want to continue?"
-msgstr ""
-"Alla dina empiriska dokument kommer att läsas in igen vilket kan ta tid. "
-"Vill du fortsätta?"
+#: src\qualcoder\report_sql.py:504
+msgid "The query must have a name"
+msgstr "Frågan måste ha ett namn"
 
-#: src/qualcoder/__main__.py:3152 src/qualcoder/__main__.py:3160
-msgid "Please enable the AI first and set it up in Settings."
-msgstr "Aktivera AI först innan du konfigurerar den i inställningar."
+#: src\qualcoder\report_sql.py:505 src\qualcoder\report_sql.py:515
+#: src\qualcoder\view_graph.py:1991
+msgid "Cannot save"
+msgstr "Kan inte spara"
 
-#: src/qualcoder/__main__.py:3153
-msgid "Ai Chat"
-msgstr "AI-chatt"
+#: src\qualcoder\report_sql.py:536 src\qualcoder\report_sql.py:633
+msgid "Filter on text like"
+msgstr "Filtrera på text som liknar"
 
-#: src/qualcoder/__main__.py:3173
-msgid "This version: "
-msgstr "Den här versionen: "
+#: src\qualcoder\report_sql.py:538 src\qualcoder\report_sql.py:635
+msgid "Filter on text starts with"
+msgstr "Filtrera på text som börjar med"
 
-#: src/qualcoder/__main__.py:3180
-msgid "Newer release available: "
-msgstr "Nyare version tillgänglig: "
+#: src\qualcoder\report_sql.py:550 src\qualcoder\report_sql.py:556
+msgid " rows ["
+msgstr " rader ["
 
-#: src/qualcoder/__main__.py:3185
-msgid "Latest Release: "
-msgstr "Senaste version: "
+#: src\qualcoder\report_sql.py:550
+msgid " asc]"
+msgstr " stigande]"
+
+#: src\qualcoder\report_sql.py:556
+msgid " desc]"
+msgstr " fallande]"
+
+#: src\qualcoder\report_sql.py:561 src\qualcoder\report_sql.py:575
+#: src\qualcoder\report_sql.py:656 src\qualcoder\report_sql.py:666
+msgid "Text contains:"
+msgstr "Text innehåller:"
+
+#: src\qualcoder\report_sql.py:567 src\qualcoder\report_sql.py:581
+#: src\qualcoder\report_sql.py:593
+msgid " rows [filtered]"
+msgstr " rader [filtrerade]"
+
+#: src\qualcoder\report_sql.py:584
+msgid " starts with: "
+msgstr " börjar med: "
+
+#: src\qualcoder\ris.py:327
+#, fuzzy
+msgid "Select RIS or NBIB references file"
+msgstr "Välj fallfil"
+
+#: src\qualcoder\ris.py:429
+#, fuzzy
+msgid "Bibliography loaded from: "
+msgstr "Bild inläst från pdf:"
 
 #: src\qualcoder\ris.py:430
 #, fuzzy
@@ -7835,311 +7676,68 @@ msgstr " tecken."
 msgid "Change ALL text code end positions in ALL text files by "
 msgstr "Ändra slutpositionen för ALL textkodning i ALLA textfiler med "
 
-#: src/qualcoder/special_functions.py:251
-#: src/qualcoder/GUI/special_functions.py:154
+#: src\qualcoder\special_functions.py:251
+#: src\qualcoder\GUI\special_functions.py:154
 msgid "Change code end positions"
 msgstr "Ändra slutposition för kod"
 
-#: src/qualcoder/code_text.py:684 src/qualcoder/code_text.py:1301
-#, fuzzy
-msgid "Select document font and size."
-msgstr "Välj ersättningskod"
-
-#: src/qualcoder/code_text.py:804
-msgid "Right click for highlighting options"
-msgstr ""
-
-#: src/qualcoder/code_text.py:940
-msgid "Hide code stripes margin"
-msgstr ""
-
-#: src/qualcoder/code_text.py:942
-#, fuzzy
-msgid "Show code stripes margin"
-msgstr "Visa kodade filer"
-
-#: src/qualcoder/code_text.py:949
-msgid "Move margin to the left"
-msgstr ""
-
-#: src/qualcoder/code_text.py:951
-msgid "Move margin to the right"
-msgstr ""
-
-#: src/qualcoder/code_text.py:955
-#, fuzzy
-msgid "Highlight style"
-msgstr "Markera område â solarisera"
-
-#: src/qualcoder/code_text.py:959
-#, fuzzy
-msgid "Marker"
-msgstr "Markera"
-
-#: src/qualcoder/code_text.py:961
-msgid "Underline"
-msgstr ""
-
-#: src/qualcoder/code_text.py:1856
-msgid "Examples:"
-msgstr "Exempel:"
-
-#: src/qualcoder/code_text.py:1879
-msgid "Project memo"
-msgstr "Projektanteckning"
-
-#: src/qualcoder/code_text.py:1890
-msgid "Delete all codings in this file made by "
-msgstr "Ta bort alla kodningar i denna fil gjorda av "
-
-#: src/qualcoder/code_text.py:1901
-msgid "All codes by "
-msgstr "Alla koder av "
-
-#: src/qualcoder/code_text.py:1901
-msgid " deleted from "
-msgstr " raderades från "
-
-#: src/qualcoder/code_text.py:2073 src/qualcoder/code_text.py:2123
-msgid "all matches in file"
-msgstr "alla träffar i filen"
-
-#: src/qualcoder/code_text.py:2078 src/qualcoder/code_text.py:2128
-msgid "first match in file"
-msgstr "första träffen i filen"
-
-#: src/qualcoder/code_text.py:2083
-msgid "last match in file"
-msgstr "sista träffen i filen"
-
-#: src/qualcoder/code_text.py:2088 src/qualcoder/code_text.py:2137
-#, fuzzy
-msgid "code within code"
-msgstr "Slå ihop kod med annan kod"
-
-#: src/qualcoder/code_text.py:2224
-#, fuzzy
-msgid "Mark with new code (N)"
-msgstr "Markera med ny kod"
-
-#: src/qualcoder/code_text.py:2242
-msgid "Copy with metadata"
-msgstr "Kopiera med metadata"
-
-#: src/qualcoder/code_text.py:2245
-msgid "Set bookmark (B)"
-msgstr "Sätt bokmärke (B)"
-
-#: src/qualcoder/code_text.py:2258
-msgid "Edit text analysis prompts"
-msgstr "Redigera uppmaningar för textanalys"
-
-#: src/qualcoder/code_text.py:2609
-msgid "Shift codings after clicked position"
-msgstr "Flytta kodningar efter klickad position"
-
-#: src/qualcoder/code_text.py:2612
-msgid ""
-"Shift code positions for all codes after you have clicked on a position in "
-"the text.\n"
-"Back up the project before running this action.\n"
-"This function will help if you have edited the coded text and the codes are "
-"out of position.\n"
-"Positive numbers (moves right) or negative numbers (moves left) (-500 to "
-"500)\n"
-"Clicked character position: "
-msgstr ""
-"Flytta plats för alla koder efter att du har klickat på en plats i teten.\n"
-"Säkerhetskopiera projektet innan du väljer att tillämpa ditt val.\n"
-"Den här funktionen kan hjälpa om du har ändrat den kodade texten så att "
-"kodernas position har förflyttats.\n"
-"Positiva tal (flyttar till höger) eller negativa tal (flyttar åt vänster) "
-"(-500 till 500)\n"
-"Vald position: "
-
-#: src/qualcoder/code_text.py:2673
-#, fuzzy
-msgid "Reference: "
-msgstr "Referens"
-
-#: src/qualcoder/code_text.py:3025
-msgid "Memos for file: "
-msgstr "Anteckningar för fil: "
-
-#: src/qualcoder/code_text.py:3048
-msgid "Annotations for file: "
-msgstr "Anteckningar för fil: "
-
-#: src/qualcoder/code_text.py:3510 src/qualcoder/code_text.py:3650
-#, fuzzy
-msgid "Generated report: "
-msgstr "Rapport exporterad: "
-
-#: src/qualcoder/code_text.py:3538
-#, fuzzy
-msgid "Include journal"
-msgstr "Ny journal"
-
-#: src/qualcoder/code_text.py:3539
-msgid "Journals are linked to this file. Include them in the report?"
-msgstr ""
-"Det finns tidskrifter kopplade till den här filen. Ska de inkluderas i "
-"rapporten?"
-
-#: src/qualcoder/code_text.py:3554
-msgid "Software citation"
-msgstr "Programvarucitering"
-
-#: src/qualcoder/code_text.py:3767
-#, fuzzy
-msgid "Code Frequency Table"
-msgstr "Kodfrekvens"
-
-#: src/qualcoder/code_text.py:3789
-#, fuzzy
-msgid "Frequency / Coverage"
-msgstr ", Frekvens: "
-
-#: src/qualcoder/code_text.py:3789
-#, fuzzy
-msgid "Coder(s)"
-msgstr "Kodare"
-
-#: src/qualcoder/code_text.py:3790
-#, fuzzy
-msgid "First coded"
-msgstr "Filtypordning"
-
-#: src/qualcoder/code_text.py:3790
-#, fuzzy
-msgid "Last coded"
-msgstr "Dubbelt kodad: "
-
-#: src/qualcoder/code_text.py:3817
-#, fuzzy
-msgid "Code Co-occurrences"
-msgstr "Samband exporterade"
-
-#: src/qualcoder/code_text.py:3830
-#, fuzzy
-msgid "Code A"
-msgstr "Kod: "
-
-#: src/qualcoder/code_text.py:3830
-#, fuzzy
-msgid "Code B"
-msgstr "Kod: "
-
-#: src/qualcoder/code_text.py:3830
-#, fuzzy
-msgid "Co-occurrence frequency"
-msgstr "Samband exporterade"
-
-#: src/qualcoder/code_text.py:3841
-msgid "No co-occurrences found in this file."
-msgstr "Inga samförekomster hittades i den här filen."
-
-#: src/qualcoder/code_text.py:3844
-#, fuzzy
-msgid "Codes and Memos"
-msgstr "Koder och kategorier"
-
-#: src/qualcoder/code_text.py:3870
-#, fuzzy
-msgid "No memo"
-msgstr "Inga anteckningar"
-
-#: src/qualcoder/code_text.py:3881
-#, fuzzy
-msgid "Coded Segments"
-msgstr "Avsluta segment"
-
-#: src/qualcoder/code_text.py:3927
-msgid "Full File (highlight)"
-msgstr "Hela filen (markering)"
-
-#: src/qualcoder/code_text.py:3933
-#, fuzzy
-msgid "File Memo"
-msgstr "Fil"
-
-#: src/qualcoder/code_text.py:3939
-#, fuzzy
-msgid "File Journal"
-msgstr "Ny journal"
-
-#: src/qualcoder/code_text.py:4057 src/qualcoder/code_text.py:4125
-msgid "Coded text file exported to: "
-msgstr "Kodad textfil exporterad till: "
-
-#: src/qualcoder/code_text.py:4059
-msgid "Coded html file exported"
-msgstr "Kodad HTML-fil exporterad"
-
-#: src/qualcoder/code_text.py:4106
+#: src\qualcoder\taguette_import.py:47
 #, fuzzy
 msgid "Select Taguette file"
 msgstr "Välj bildfiler"
 
-#: src/qualcoder/code_text.py:4141
+#: src\qualcoder\taguette_import.py:54
 #, fuzzy
 msgid "Beginning import from Taguette.sqlite3"
 msgstr "Påbörjar import från RQDA"
 
-#: src/qualcoder/code_text.py:4165
+#: src\qualcoder\taguette_import.py:65
 #, fuzzy
-msgid "Codebook exported to: "
-msgstr "Kodbok exporterad till "
+msgid " from: "
+msgstr "Från: "
 
-#: src/qualcoder/code_text.py:4243
-msgid "Select a code"
-msgstr "Välj en kod"
+#: src\qualcoder\taguette_import.py:68
+#, fuzzy
+msgid "Cannot import from "
+msgstr "Kan inte importera "
 
-#: src/qualcoder/code_text.py:4422 src/qualcoder/code_text.py:4493
-#: src/qualcoder/code_text.py:4508
-msgid "Show previous coding of selected code"
-msgstr "Visa föregående kodning av vald kod"
+#: src\qualcoder\taguette_import.py:69
+msgid "Expected Taguette sqlite. Required database tables are missing."
+msgstr "Förväntad Taguette sqlite. Obligatoriska databastabeller saknas."
 
-#: src/qualcoder/code_text.py:4425 src/qualcoder/code_text.py:4497
-#: src/qualcoder/code_text.py:4511
-msgid "Show next coding of selected code"
-msgstr "Visa nästa kodning av vald kod"
+#: src\qualcoder\taguette_import.py:258
+#, fuzzy
+msgid " documents imported"
+msgstr " fall importerade"
 
-#: src/qualcoder/code_text.py:4933
-msgid "Code renamed from: "
-msgstr "Kodens namn ändrades från: "
+#: src\qualcoder\taguette_import.py:275
+#, fuzzy
+msgid " codes imported"
+msgstr " kodningar importerade"
 
-#: src/qualcoder/code_text.py:5027
-msgid "view original text file"
-msgstr "visa originaltextfil"
+#: src\qualcoder\taguette_import.py:295
+#, fuzzy
+msgid "Taguette project imported"
+msgstr "Projektanteckning importerad"
 
-#: src/qualcoder/code_text.py:5036
-msgid " next  characters"
-msgstr " nästa  tecken"
-
-#: src/qualcoder/code_text.py:5039
-msgid " previous  characters"
-msgstr " föregående  tecken"
-
-#: src/qualcoder/code_text.py:5040
-msgid "Go to bookmark"
-msgstr "Gå till bokmärke"
-
-#: src/qualcoder/code_text.py:5102
+#: src\qualcoder\taguette_import.py:296
 #, fuzzy
 msgid "Taguette imported"
 msgstr " importerad"
 
-#: src/qualcoder/code_text.py:5191 src/qualcoder/code_text.py:5247
-msgid "From: "
-msgstr "Från: "
+#: src\qualcoder\text_file_replacement.py:75
+msgid " New file name matches another existing file name"
+msgstr "Nytt filnamn matchar ett annat befintligt filnamn"
 
-#: src/qualcoder/code_text.py:5299 src/qualcoder/code_text.py:7525
-msgid "Entire text file will be loaded"
-msgstr "Hela textfilen kommer att läsas in"
+#: src\qualcoder\text_file_replacement.py:83
+msgid ""
+"Reload the other tabs.\n"
+"Check accuracy of codings and annotations.\n"
+msgstr ""
+"Ladda om de andra flikarna.\\nKontrollera noggrannheten hos kodningar och "
+"anteckningar.\\n\n"
 
-#: src/qualcoder/code_text.py:5348
-#, fuzzy
+#: src\qualcoder\text_file_replacement.py:84
 msgid ""
 "Function works by identifying the first matching text segment for each "
 "coding and annotation."
@@ -8147,16 +7745,14 @@ msgstr ""
 "Funktionen fungerar genom att identifiera det första matchande textsegmentet "
 "för varje kodning och anteckning."
 
-#: src/qualcoder/code_text.py:5350
+#: src\qualcoder\text_file_replacement.py:86
 #, fuzzy
-msgid "Speaker coding"
-msgstr "Talarnamn"
+msgid "File replaced"
+msgstr "Fil skapad: "
 
-#: src/qualcoder/code_text.py:5818 src/qualcoder/code_text.py:7396
-msgid "AI interpretation: "
-msgstr "AI-tolkning: "
-
-#: src/qualcoder/code_text.py:5819
+#: src\qualcoder\text_file_replacement.py:109
+#: src\qualcoder\text_file_replacement.py:134
+#: src\qualcoder\text_file_replacement.py:161
 msgid ""
 "\n"
 "Found "
@@ -8184,7 +7780,7 @@ msgstr "Ta bort"
 msgid " unmatched codings"
 msgstr "Automatisk kodning"
 
-#: src/qualcoder/code_text.py:5820
+#: src\qualcoder\text_file_replacement.py:312
 msgid ""
 "\n"
 "Please check if the file is empty."
@@ -8192,221 +7788,215 @@ msgstr ""
 "\n"
 "Kontrollera om filen är tom."
 
-#: src/qualcoder/code_text.py:5823
-msgid ""
-"Do you want to store the AI interpretation in a memo together with the "
-"coding?<br/><br/>"
-msgstr ""
-"Vill du spara AI tolkningen i ett memo tillsammans med kodningen?<br/><br/>"
+#: src\qualcoder\view_av.py:212 src\qualcoder\view_av.py:1030
+msgid "Media coding"
+msgstr "Mediakodning"
 
-#: src/qualcoder/code_text.py:5826
+#: src\qualcoder\view_av.py:266 src\qualcoder\view_av.py:4582
+msgid "QualCoder will crash"
+msgstr "QualCoder kommer att krascha"
+
+#: src\qualcoder\view_av.py:361 src\qualcoder\view_av.py:4750
+msgid "Screenshot"
+msgstr "Skärmdump"
+
+#: src\qualcoder\view_av.py:374 src\qualcoder\view_av.py:4763
+#: src\qualcoder\view_image.py:1092
+msgid "Width"
+msgstr "Bredd"
+
+#: src\qualcoder\view_av.py:374 src\qualcoder\view_av.py:4763
+msgid "Width:"
+msgstr "Bredd:"
+
+#: src\qualcoder\view_av.py:377 src\qualcoder\view_av.py:4766
+#: src\qualcoder\view_image.py:1092
+msgid "Height"
+msgstr "Höjd"
+
+#: src\qualcoder\view_av.py:377 src\qualcoder\view_av.py:4766
+msgid "Height:"
+msgstr "Höjd:"
+
+#: src\qualcoder\view_av.py:1058
+msgid "Media coding: "
+msgstr "Mediakodning: "
+
+#: src\qualcoder\view_av.py:1476 src\qualcoder\view_av.py:1495
+msgid "Clear segment"
+msgstr "Rensa segment"
+
+#: src\qualcoder\view_av.py:1489
+msgid "End segment"
+msgstr "Avsluta segment"
+
+#: src\qualcoder\view_av.py:1490 src\qualcoder\view_av.py:1504
+#: src\qualcoder\view_av.py:3746 src\qualcoder\view_av.py:4303
+msgid "Segment: "
+msgstr "Segment: "
+
+#: src\qualcoder\view_av.py:1547 src\qualcoder\view_image.py:1327
 #, fuzzy
-msgid "AI Interpretation"
-msgstr "AI-tolkning: "
+msgid "Find code"
+msgstr " till kod: "
 
-#: src/qualcoder/code_text.py:6059 src/qualcoder/code_text.py:6181
-#: src/qualcoder/code_text.py:6366
-msgid "Select files to code"
-msgstr "Välj filer att koda"
+#: src\qualcoder\view_av.py:1989
+msgid "Memo for Segment"
+msgstr "Memo för segment"
 
-#: src/qualcoder/code_text.py:6067
-msgid "Code text using start and end marks: "
-msgstr "Koda text med start- och slutmarkeringar: "
+#: src\qualcoder\view_av.py:2117
+msgid "Screenshot saved"
+msgstr "Skärmdump sparad"
 
-#: src/qualcoder/code_text.py:6129
-msgid "Coding using start and end marks"
-msgstr "Kodning med start- och slutmarkeringar"
+#: src\qualcoder\view_av.py:2118
+msgid "Screenshot saved: "
+msgstr "Skärmdump sparad:"
 
-#: src/qualcoder/code_text.py:6129 src/qualcoder/code_text.py:6310
-#: src/qualcoder/code_text.py:6315 src/qualcoder/code_text.py:6491
-msgid ""
-"\n"
-"Code: "
-msgstr ""
-"\n"
-"Kod: "
-
-#: src/qualcoder/code_text.py:6130
-msgid ""
-"\n"
-"With start mark: "
-msgstr ""
-"\n"
-"Med startpunkt: "
-
-#: src/qualcoder/code_text.py:6130
-msgid ""
-"\n"
-"End mark: "
-msgstr ""
-"\n"
-"Slutpunkt: "
-
-#: src/qualcoder/code_text.py:6137
-msgid " new coded sections found."
-msgstr " nya kodade sektioner hittades."
-
-#: src/qualcoder/code_text.py:6139
-msgid "previously coded."
-msgstr "tidigare kodad."
-
-#: src/qualcoder/code_text.py:6151
-msgid "Select auto-codings to undo"
-msgstr "Välj autokodningar att ångra"
-
-#: src/qualcoder/code_text.py:6168
-msgid "Undo autocoding: "
-msgstr "Ãngra autokodning: "
-
-#: src/qualcoder/code_text.py:6196 src/qualcoder/code_text.py:6209
-msgid "Code sentence"
-msgstr "Koda mening"
-
-#: src/qualcoder/code_text.py:6199
-msgid "Auto code sentence using this text fragment:"
-msgstr "Automatkoda mening med hjälp av detta textfragment:"
-
-#: src/qualcoder/code_text.py:6214
-msgid ""
-"Define sentence ending. Default is period space.\n"
-"Use \\n for line ending:"
-msgstr ""
-"Definiera var en mening slutar. Default är punkt mellanslag.\n"
-"Använd\\n för avslut av raden:"
-
-#: src/qualcoder/code_text.py:6236 src/qualcoder/code_text.py:6382
+#: src\qualcoder\view_av.py:2141
 #, fuzzy
 msgid "This source name already exists:"
 msgstr "Det här kodnamnet används redan."
 
-#: src/qualcoder/code_text.py:6298 src/qualcoder/code_text.py:6480
-msgid "Autocode insert error "
-msgstr "Fel vid insättning av automatkod "
-
-#: src/qualcoder/code_text.py:6303
-msgid " added codes"
-msgstr " tillagda koder"
-
-#: src/qualcoder/code_text.py:6310
-msgid "Sentence coding: "
-msgstr "Meningskodning: "
-
-#: src/qualcoder/code_text.py:6311 src/qualcoder/code_text.py:6492
-msgid ""
-"\n"
-"With: "
-msgstr ""
-"\n"
-"Med: "
-
-#: src/qualcoder/code_text.py:6311 src/qualcoder/code_text.py:6318
-msgid ""
-"\n"
-"Using line ending: "
-msgstr ""
-"\n"
-"Använder meningsslut: "
-
-#: src/qualcoder/code_text.py:6314
-msgid "Automatic code sentence in files:"
-msgstr "Automatisk kodning av meningar i filer:"
-
-#: src/qualcoder/code_text.py:6316
-msgid ""
-"\n"
-"With text fragment: "
-msgstr ""
-"\n"
-"Med textfragment: "
-
-#: src/qualcoder/code_text.py:6340
-msgid "Automatic coding"
-msgstr "Automatisk kodning"
-
-#: src/qualcoder/code_text.py:6343
-msgid "Use | to code multiple texts"
-msgstr "Använd | för att koda flera texter"
-
-#: src/qualcoder/code_text.py:6345
+#: src\qualcoder\view_av.py:2143
 #, fuzzy
-msgid "Auto code files with the current code using Regex:"
-msgstr "Automatkoda filer med aktuell kod för denna text:"
+msgid "Name exists"
+msgstr "Filtrets namn finns"
 
-#: src/qualcoder/code_text.py:6347
-msgid "Auto code files with the current code for this text:"
-msgstr "Automatkoda filer med aktuell kod för denna text:"
+#: src\qualcoder\view_av.py:2145
+msgid "Screenshot imported"
+msgstr "Skärmdump importerad"
 
-#: src/qualcoder/code_text.py:6388
-#, fuzzy
-msgid "Autocode Text"
-msgstr "Fel vid insättning av automatkod "
+#: src\qualcoder\view_av.py:2146
+msgid "Screenshot imports: "
+msgstr "Import av skärmdumpar:"
 
-#: src/qualcoder/code_text.py:6487
-#, fuzzy
-msgid "Autocoding error: "
-msgstr "Fel vid insättning av automatkod "
+#: src\qualcoder\view_av.py:2476
+msgid "Segment:"
+msgstr "Segment:"
 
-#: src/qualcoder/code_text.py:6491
-msgid "Text coding: "
-msgstr "Textkodning: "
+#: src\qualcoder\view_av.py:2477
+msgid "Start segment"
+msgstr "Start av segment"
 
-#: src/qualcoder/code_text.py:6535
-msgid "Text reverted to prior to edit"
-msgstr "Text återställd till före redigering"
+#: src\qualcoder\view_av.py:2706
+msgid "New code name"
+msgstr "Nytt kodnamn"
 
-#: src/qualcoder/code_text.py:6536
-msgid "Undo last edited text"
-msgstr "Ãngra senast redigerad text"
+#: src\qualcoder\view_av.py:2719
+msgid "Code added: "
+msgstr "Kod tillagd: "
 
-#: src/qualcoder/code_text.py:7214
-msgid "Please finish editing the text before starting an AI search."
-msgstr "Avsluta redigering av texten innan du startar en AI-sökning."
+#: src\qualcoder\view_av.py:2829 src\qualcoder\view_graph.py:4343
+#: src\qualcoder\view_image.py:2838
+msgid "Memo for Code "
+msgstr "Anteckning för kod "
 
-#: src/qualcoder/code_text.py:7215 src/qualcoder/code_text.py:7219
-#: src/qualcoder/code_text.py:7223 src/qualcoder/code_text.py:7227
-#: src/qualcoder/code_text.py:7286 src/qualcoder/code_text.py:7327
-#: src/qualcoder/code_text.py:7369 src/qualcoder/code_text.py:7378
-#: src/qualcoder/code_text.py:7478 src/qualcoder/code_text.py:7481
-msgid "AI Search"
-msgstr "AI-sökning"
+#: src\qualcoder\view_av.py:2854 src\qualcoder\view_graph.py:4350
+msgid "Memo for Category "
+msgstr "Anteckning för kategori "
 
-#: src/qualcoder/code_text.py:7222
-msgid ""
-"The AI is already performing a search. Please stop it before starting a new "
-"one."
-msgstr ""
-"AIn genomför redan en sökning. Du måste stoppa den innan du kan starta en ny."
+#: src\qualcoder\view_av.py:2903 src\qualcoder\view_image.py:2914
+msgid "Code renamed: "
+msgstr "Kod bytt namn: "
 
-#: src/qualcoder/code_text.py:7226
-msgid "The AI is busy, please wait a moment and retry."
-msgstr "AI:n är upptagen, vänta en stund och försök igen."
+#: src\qualcoder\view_av.py:2934
+msgid "Category renamed: "
+msgstr "Kategori bytt namn: "
 
-#: src/qualcoder/code_text.py:7263
-msgid "Searching for related data, please wait..."
-msgstr "Söker efter relaterad data, vänta..."
+#: src\qualcoder\view_av.py:3079
+msgid "Play text"
+msgstr "Spela text"
 
-#: src/qualcoder/code_text.py:7285
-msgid "AI: No related data found for \""
-msgstr "AI: Ingen relaterad data hittades för \""
+#: src\qualcoder\view_av.py:3083
+msgid "Memo coded text M"
+msgstr "Anteckning kodad text M"
 
-#: src/qualcoder/code_text.py:7325
-msgid "AI: No new data found for \""
-msgstr "AI: Ingen ny data hittades för \""
+#: src\qualcoder\view_av.py:3124
+msgid "Video position to timestamp"
+msgstr "Videoposition till tidsstämpel"
 
-#: src/qualcoder/code_text.py:7326
-msgid "\" beside what has already been coded with this code."
-msgstr "\" utöver vad som redan har kodats med denna kod."
+#: src\qualcoder\view_av.py:3421
+msgid "No transcription"
+msgstr "Ingen transkription"
 
-#: src/qualcoder/code_text.py:7332
-msgid ""
-"Potentially related data found, inspecting it closer. Please be patient..."
-msgstr "Eventuellt relaterade data funnen, undersöker den närmare. Håll ut..."
+#: src\qualcoder\view_av.py:3446 src\qualcoder\view_av.py:4228
+msgid "Already Coded"
+msgstr "Redan kodad"
 
-#: src/qualcoder/code_text.py:7366
-msgid "The closer inspection of the first "
-msgstr "Närmare granskning av den första "
+#: src\qualcoder\view_av.py:3447
+msgid "This segment has already been coded with this code by "
+msgstr "Detta segment har redan kodats med denna kod av "
 
-#: src/qualcoder/code_text.py:7367
+#: src\qualcoder\view_av.py:3574
+msgid "No media transcription selected"
+msgstr "Ingen medietranskription vald"
+
+#: src\qualcoder\view_av.py:3662 src\qualcoder\view_av.py:3714
+#: src\qualcoder\view_av.py:4086 src\qualcoder\view_av.py:4333
+msgid "Memo for segment"
+msgstr "Anteckning för segment"
+
+#: src\qualcoder\view_av.py:3663 src\qualcoder\view_av.py:4087
+msgid "Delete segment"
+msgstr "Ta bort segment"
+
+#: src\qualcoder\view_av.py:3664 src\qualcoder\view_av.py:4088
+msgid "Play segment"
+msgstr "Spela segment"
+
+#: src\qualcoder\view_av.py:3665
+msgid "Important mark"
+msgstr "Viktig markering"
+
+#: src\qualcoder\view_av.py:3666
+msgid "Edit start position"
+msgstr "Redigera startposition"
+
+#: src\qualcoder\view_av.py:3667
+msgid "Edit end position"
+msgstr "Redigera slutposition"
+
+#: src\qualcoder\view_av.py:4040
+msgid "Segment menu"
+msgstr "Segmentmeny"
+
+#: src\qualcoder\view_av.py:4089
+msgid "Edit segment start position"
+msgstr "Redigera segments startposition"
+
+#: src\qualcoder\view_av.py:4090
+msgid "Edit segment end position"
+msgstr "Redigera segments slutposition"
+
+#: src\qualcoder\view_av.py:4094
+msgid "Export segment to file"
+msgstr "Exportera segment till fil"
+
+#: src\qualcoder\view_av.py:4101
+msgid "Link segment to selected text"
+msgstr "Länka segment till markerad text"
+
+#: src\qualcoder\view_av.py:4157
+msgid "Export segment"
+msgstr "Export segment"
+
+#: src\qualcoder\view_av.py:4181
+msgid "A/V segment exported: "
+msgstr "A/V-segment exporterades: "
+
+#: src\qualcoder\view_av.py:4182
+msgid "Segment exported"
+msgstr "Segment exporterades"
+
+#: src\qualcoder\view_av.py:4228
+msgid "This segment has already been coded with this code."
+msgstr "Detta segment har redan kodats med denna kod."
+
+#: src\qualcoder\view_av.py:4360
+msgid "LINKED TEXT: "
+msgstr "LÄNKAD TEXT: "
+
+#: src\qualcoder\view_av.py:4448
 msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
@@ -8414,61 +8004,53 @@ msgstr ""
 "Transkriptionsområde: Ctrl+T (infoga tidsstämpel) Ctrl+N (ny högtalare) "
 "Ctrl+1-8 (välj högtalare) Ctrl+D (ta bort högtalare)"
 
-#: src/qualcoder/code_text.py:7376
-msgid ""
-"Upon closer inspection, no pieces of data relevant to your search query "
-"could be identified. Please start a new search."
-msgstr ""
-"Inga relevanta data från din sökning kunde identifieras vid närmare "
-"undersökning. Starta en ny sökning."
+#: src\qualcoder\view_av.py:4928
+msgid "Select name to delete"
+msgstr "Välj namn att ta bort"
 
-#: src/qualcoder/code_text.py:7395
-msgid "Quote: "
-msgstr "Citat: "
+#: src\qualcoder\view_av.py:4947
+msgid "Speaker name"
+msgstr "Talarnamn"
 
-#: src/qualcoder/code_text.py:7432
-msgid ">> Searching (click here to cancel)"
-msgstr ">> Söker (klicka här för att avbryta)"
+#: src\qualcoder\view_av.py:4948
+msgid "Name:"
+msgstr "Namn:"
 
-#: src/qualcoder/code_text.py:7434
-msgid "Click here to stop the search"
-msgstr "Klicka här för att stoppa sökningen"
+#: src\qualcoder\view_charts.py:124 src\qualcoder\view_charts.py:142
+msgid "Code frequency"
+msgstr "Kodfrekvens"
 
-#: src/qualcoder/code_text.py:7439
-msgid ">> Find more..."
-msgstr ">> Hitta fler..."
+#: src\qualcoder\view_charts.py:125 src\qualcoder\view_charts.py:143
+msgid "Code by characters"
+msgstr "Kod efter tecken"
 
-#: src/qualcoder/code_text.py:7440
-msgid "Click here to analyze more data"
-msgstr "Klicka här för att analysera mer data"
+#: src\qualcoder\view_charts.py:126 src\qualcoder\view_charts.py:144
+msgid "Code by image area"
+msgstr "Kod efter bildområde"
 
-#: src/qualcoder/code_text.py:7448
-msgid "(search aborted due to an error)"
-msgstr "(sökningen avbröts på grund av ett fel)"
+#: src\qualcoder\view_charts.py:127 src\qualcoder\view_charts.py:145
+msgid "Code by audio/video segments"
+msgstr "Kod efter ljud-/videosegment"
 
-#: src/qualcoder/code_text.py:7450
-msgid "(search finished)"
-msgstr "(sökningen är klar)"
+#: src\qualcoder\view_charts.py:131
+msgid "Code frequency sunburst"
+msgstr "Kodfrekvens solfjädersdiagram"
 
-#: src/qualcoder/code_text.py:7465
-msgid "Do you want to stop the search?"
-msgstr "Vill du stoppa sökningen?"
+#: src\qualcoder\view_charts.py:132
+msgid "Code frequency treemap"
+msgstr "Kodfrekvensträddiagram"
 
-#: src/qualcoder/code_text.py:7477
-msgid ""
-"There are no more pieces of data to analyze for this search. Please start a "
-"new search."
-msgstr ""
-"Det finns inga mer delar från data att analysera med den här sökningen. "
-"Starta en ny sökning."
+#: src\qualcoder\view_charts.py:133
+msgid "Code by characters sunburst"
+msgstr "Kod efter tecken solfjädersdiagram"
 
-#: src/qualcoder/code_text.py:7480
-msgid "The AI is busy. Please wait a moment and retry."
-msgstr "AI:n är upptagen. Vänta en stund och försök igen."
+#: src\qualcoder\view_charts.py:134
+msgid "Code by characters treemap"
+msgstr "Kod efter tecken träddiagram"
 
-#: src/qualcoder/code_text.py:7724
-msgid "Font and size"
-msgstr "Teckensnitt och storlek"
+#: src\qualcoder\view_charts.py:135
+msgid "Code by image area sunburst"
+msgstr "Kod efter bildområde solfjädersdiagram"
 
 #: src\qualcoder\view_charts.py:136
 msgid "Code by image area treemap"
@@ -8855,25 +8437,9 @@ msgstr "Text"
 msgid "Enter text:"
 msgstr "Ange text:"
 
-#~ msgid ""
-#~ "Avoid selecting text combinations of unmarked text sections and coded/"
-#~ "annotated/case-assigned sections."
-#~ msgstr ""
-#~ "Undvik att välja kombinationer av omarkerad text och kodad/kommenterad/"
-#~ "case tilldelade sektioner."
-
-#~ msgid "Positions may not correctly adjust."
-#~ msgstr "Positioner kan vara felaktigt justerade."
-
-#~ msgid ""
-#~ "Do not code this text until you reload Coding - Code Text from the menu "
-#~ "bar."
-#~ msgstr ""
-#~ "Koda inte denna text innan du laddar om Kodning - Koda text från "
-#~ "menylisten."
-
-#~ msgid "Type:"
-#~ msgstr "Typ:"
+#: src\qualcoder\view_graph.py:1669
+msgid "Another item has this exact text"
+msgstr "Ett annat objekt har exakt denna text"
 
 #: src\qualcoder\view_graph.py:1728
 msgid "Free text item"
