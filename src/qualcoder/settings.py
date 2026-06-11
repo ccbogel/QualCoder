@@ -568,7 +568,7 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['showids'] = 'False'
         index = self.ui.comboBox_style.currentIndex()
-        styles = ["original", "native", "dark", "blue", "green", "orange", "yellow", "purple", "rainbow"]
+        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow", "native"]
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
