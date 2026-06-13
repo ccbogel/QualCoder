@@ -78,7 +78,6 @@ from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 from qualcoder.taguette_import import TaguetteImport
-# from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
@@ -1603,7 +1602,8 @@ Click "Yes" to start now.')
         
         self.ui.tabWidget.setCurrentIndex(0)
         self.ai_chat()
-        # add tab widget icons
+
+        # Add tab widget icons
         try:
             self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.cog', color=self.app.highlight_color()))  # Action Log
             self.ui.tabWidget.setTabIcon(1, qta.icon('mdi6.file-outline', color=self.app.highlight_color()))  # Manage
@@ -1769,9 +1769,7 @@ Click "Yes" to start now.')
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
-        # TODO FOR FUTURE EXPANSION text mining
-        self.ui.actionText_mining.setEnabled(False)
-        self.ui.actionText_mining.setVisible(False)
+
 
     def keyPressEvent(self, event):
         """ Used to open top level menus. """
@@ -1820,89 +1818,89 @@ Click "Yes" to start now.')
     def text_segments_codes_table(self):
         """ Show table of text segments (rows) by codes (columns). """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogCodesBySegments(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_sql(self):
         """ Run SQL statements on database. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding_comparison(self):
         """ Compare two or more coders across all text files using Cohens Kappa. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_comparison_table(self):
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportComparisonTable(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_compare_coders_by_file(self):
         """ Compare two coders selection by file - text, A/V or image. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogCompareCoderByFile(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_relations(self):
         """ Show code relations in text files. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportRelations(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def co_occurence(self):
         """ Show overlapping codes in text files. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCooccurrence(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_exact_text_matches(self):
         """ Show exact text coding matches in text files. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportExactTextMatches(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding(self):
         """ Report on coding and categories. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCodes(self.app, self.ui.textEdit, self.ui.tab_coding)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_file_summary(self):
         """ Report on file details. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportFileSummary(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_summary(self):
         """ Report on code details. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCodeSummary(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
         """ Show list or acyclic graph of codes and categories. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = ViewGraph(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
@@ -1910,7 +1908,7 @@ Click "Yes" to start now.')
     def view_charts(self):
         """ Show charts of codes and categories. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = ViewCharts(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
@@ -1949,7 +1947,7 @@ Click "Yes" to start now.')
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -1975,7 +1973,7 @@ Click "Yes" to start now.')
         Identify qualitative questions and assign these data to the source table for
         coding and review. Modal dialog. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -1983,7 +1981,7 @@ Click "Yes" to start now.')
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogCases(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -1992,7 +1990,7 @@ Click "Yes" to start now.')
         plain text. Rename, delete and add memos to files.
         """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports, self)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -2000,7 +1998,7 @@ Click "Yes" to start now.')
         """ Fix any bad links to files.
         File names must match but paths can be different. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
@@ -2011,7 +2009,6 @@ Click "Yes" to start now.')
         """ Create and edit journals.
         From version 3.4 in a non-modal window. """
 
-        self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.journal_display = ui
@@ -2030,7 +2027,7 @@ Click "Yes" to start now.')
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
-            self.ui.label_coding.hide()
+            self.ui.textBrowser_coding.hide()
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -2055,7 +2052,7 @@ Click "Yes" to start now.')
 
         files = self.app.get_pdf_filenames()
         if len(files) > 0:
-            self.ui.label_coding.hide()
+            self.ui.textBrowser_coding.hide()
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -2071,7 +2068,7 @@ Click "Yes" to start now.')
         pdf_files = self.app.get_pdf_filenames()
 
         if len(image_files) + len(pdf_files) > 0:
-            self.ui.label_coding.hide()
+            self.ui.textBrowser_coding.hide()
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -2092,7 +2089,7 @@ Click "Yes" to start now.')
             msg = _("VLC is not installed. Cannot code audio/video files.")
             Message(self.app, _('Install VLC'), msg).exec()
             return
-        self.ui.label_coding.hide()
+        self.ui.textBrowser_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
@@ -2111,7 +2108,7 @@ Click "Yes" to start now.')
     def code_organiser(self):
         """ Organise codes structure. """
 
-        self.ui.label_coding.setText("")
+        self.ui.textBrowser_coding.setText("")
         ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, None)
