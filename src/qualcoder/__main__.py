@@ -847,7 +847,7 @@ class App(object):
         QMenu::item:disabled {color: #707070;}\n\
         QPushButton {background-color: #858585;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
-        QRadioButton::indicator {border: 1px solid #858585; background-color: #2a2a2a;}\n\
+        QRadioButton::indicator {border: 2px solid #858585; background-color: None;}\n\
         QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
         QSplitter::handle {background-color: #909090;}\n\
@@ -900,6 +900,9 @@ class App(object):
         QMenu {background-color: #efefef; border: 1px solid #808080;}\n\
         QMenu::item:selected {background-color: #fafafa;}\n\
         QMenu::item:disabled {background-color: #efefef; color: #707070;}\n\
+        QRadioButton{background-color: None;}\n\
+        QRadioButton::indicator {border: 2px solid #858585; background-color: None;}\n\
+        QRadioButton::indicator::checked {border: 2px solid #858585; background-color: efefef;}\n\
         QSpinBox {border: 1px solid #808080;}\n\
         QSplitter::handle {background-color: #808080;}\n\
         QSplitter::handle:horizontal {width: 2px;}\n\
