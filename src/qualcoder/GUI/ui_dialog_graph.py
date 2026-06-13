@@ -70,6 +70,8 @@ class Ui_DialogGraph(object):
         self.pushButton_clear.setObjectName("pushButton_clear")
         self.label_loaded_graph = QtWidgets.QLabel(parent=self.groupBox_header)
         self.label_loaded_graph.setGeometry(QtCore.QRect(590, 2, 461, 40))
+        self.label_loaded_graph.setWordWrap(True)
+        self.label_loaded_graph.setOpenExternalLinks(True)
         self.label_loaded_graph.setObjectName("label_loaded_graph")
         self.pushButton_codes_of_text = QtWidgets.QPushButton(parent=self.groupBox_header)
         self.pushButton_codes_of_text.setGeometry(QtCore.QRect(193, 3, 28, 28))
@@ -146,3 +148,13 @@ class Ui_DialogGraph(object):
         self.pushButton_codes_of_av.setToolTip(_translate("DialogGraph", "Show coded av segments"))
         self.pushButton_export_pdf.setToolTip(_translate("DialogGraph", "Export Pdf image"))
         self.pushButton_export_drawio.setToolTip(_translate("DialogGraph", "Export to Draw.io"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    DialogGraph = QtWidgets.QDialog()
+    ui = Ui_DialogGraph()
+    ui.setupUi(DialogGraph)
+    DialogGraph.show()
+    sys.exit(app.exec())
