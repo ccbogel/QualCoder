@@ -2398,7 +2398,7 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null)",
                     ('v14', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
