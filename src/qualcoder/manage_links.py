@@ -28,6 +28,7 @@ import time
 from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .code_text import DialogCodeText  # for isinstance()
+from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
 from .helpers import Message
 from .view_av import DialogCodeAV  # for isinstance()
@@ -84,19 +85,46 @@ class DialogManageLinks(QtWidgets.QDialog):
         msg += _("e.g. C:/Users/olduser/Images  To replace olduser enter: olduser\n")
         msg += _("The put in the replacement value: newuser\n")
         msg += _("The result will be: C:/newuser/Images\n")
-        msg += _("NOTE: Even on Windows only use forward slashes when entering in folder paths")
+        msg += _("NOTE: The original text must occur only once in the path that is being updated.\n")
+        msg += _("NOTE: For Windows use forward slashes to represent backslashes for folder paths")
         Message(self.app, _("Replace the folder path"), msg).exec()
-        old_path, ok = QtWidgets.QInputDialog.getText(None, "Input Dialog", _("Old value:"))
-        old_percent_path = "%" + old_path + "%"
-        if not ok or old_path == "":
+        old_text, ok = QtWidgets.QInputDialog.getText(None, "original text", _("Old value:"))
+        old_text = old_text.replace("\\", "/")
+        new_text, ok = QtWidgets.QInputDialog.getText(None, "Replacement text", _("Replace with:"))
+        if not ok or new_text == "":
+            Message(self.app, _("Bulk edit"), _("Aborted")).exec()
             return
-        new_path, ok = QtWidgets.QInputDialog.getText(None, "Input Dialog", _("Replace with:"))
-        if not ok or new_path == "":
-            return
+        new_text = new_text.replace("\\", "/")
+
+        # Must ensure the links only contain old_text ONCE.
         cur = self.app.conn.cursor()
-        sql = "UPDATE source SET mediapath = REPLACE(mediapath, ?, ?) WHERE mediapath LIKE ?"
-        cur.execute(sql, [old_path, new_path, old_percent_path])
-        self.app.conn.commit()
+        multiples = 0
+        example = ""
+        for link in self.links:
+            type_and_path = link['mediapath'].split(':', 1)
+            instances = type_and_path[1].count(old_text)
+            if instances == 1:
+                example = type_and_path[1] + "\n" + type_and_path[1].replace(old_text, new_text)
+        if example == "":
+            Message(self.app, _("No matches"), old_text).exec()
+            return
+        else:
+            ui = DialogConfirmDelete(self.app, example, _("Confirm this change"))
+            ok = ui.exec()
+            if not ok:
+                return
+
+        for link in self.links:
+            type_and_path = link['mediapath'].split(':', 1)
+            instances = type_and_path[1].count(old_text)
+            if instances == 1:
+                new_path = type_and_path[0] + ":" + type_and_path[1].replace(old_text, new_text)
+                cur.execute("update source set mediapath=? where id=?", [new_path, link['id']])
+                self.app.conn.commit()
+            if instances > 1:
+                multiples += 1
+        if multiples > 0:
+            Message(self.app, _("Multiple occurrences"), _("Multiples of text in path. Some links not updated.") + f"\n{old_text}").exec()
         self.links = self.app.check_bad_file_links()
         for link in self.links:
             link['filepaths'] = []
