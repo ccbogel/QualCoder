@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-10 13:49+0200\n"
+"POT-Creation-Date: 2026-06-14 11:01+0200\n"
 "PO-Revision-Date: 2026-06-08 09:03+0200\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
@@ -207,7 +207,7 @@ msgstr "MÉMO : "
 
 #: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:388
 #: src/qualcoder/view_image.py:402 src/qualcoder/view_av.py:451
-#: src/qualcoder/__main__.py:2423 src/qualcoder/code_text.py:1430
+#: src/qualcoder/__main__.py:2424 src/qualcoder/code_text.py:1430
 #: src/qualcoder/reports.py:336
 msgid "Date: "
 msgstr "Date : "
@@ -486,7 +486,7 @@ msgstr ""
 "De même, si le texte brut du PDF a été modifié de quelque manière que ce "
 "soit, cela affectera l'affichage des bandes de codage."
 
-#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:2938
+#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:2939
 #: src/qualcoder/code_text.py:5300 src/qualcoder/code_text.py:7526
 msgid "Information"
 msgstr "Information"
@@ -1376,7 +1376,7 @@ msgstr "Modifié"
 #: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
 #: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
 #: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
-#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1796
+#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1798
 #: src/qualcoder/report_exact_matches.py:540
 msgid "Coder"
 msgstr "Codeur·euse"
@@ -1906,7 +1906,7 @@ msgstr ""
 "Les modifications des noms des codeurs⋅euses seront perdues. Êtes-vous sûr "
 "de vouloir annuler ?"
 
-#: src/qualcoder/settings.py:642 src/qualcoder/__main__.py:1795
+#: src/qualcoder/settings.py:642 src/qualcoder/__main__.py:1797
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -3048,7 +3048,7 @@ msgstr " relié"
 msgid " imported."
 msgstr " importé."
 
-#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2410
+#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2411
 msgid " created."
 msgstr " Créé."
 
@@ -3547,7 +3547,7 @@ msgid "Project export error "
 msgstr "Erreur d'exportation de projet "
 
 #: src/qualcoder/refi.py:2031 src/qualcoder/refi.py:2037
-#: src/qualcoder/__main__.py:2304 src/qualcoder/__main__.py:2324
+#: src/qualcoder/__main__.py:2305 src/qualcoder/__main__.py:2325
 msgid "Project"
 msgstr "Projet"
 
@@ -6375,20 +6375,20 @@ msgstr ""
 msgid "Cannot load config.ini file"
 msgstr "Impossible de charger le fichier config.ini"
 
-#: src/qualcoder/__main__.py:1381
+#: src/qualcoder/__main__.py:1384
 msgid "There is already a backup with this name"
 msgstr "Il existe déjà une sauvegarde à ce nom"
 
-#: src/qualcoder/__main__.py:1390
+#: src/qualcoder/__main__.py:1393
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "AVERTISSEMENT : fichiers audio et vidéo NON sauvegardés. Voir les paramètres."
 
-#: src/qualcoder/__main__.py:1392
+#: src/qualcoder/__main__.py:1395
 msgid "Project backup created: "
 msgstr "Création d'une sauvegarde de projet : "
 
-#: src/qualcoder/__main__.py:1473
+#: src/qualcoder/__main__.py:1476
 msgid ""
 "Welcome\n"
 "\n"
@@ -6405,119 +6405,119 @@ msgstr ""
 "l'assistant de configuration de l'IA à partir du menu AI de la fenêtre "
 "principale. Cliquez sur « Oui » pour commencer maintenant."
 
-#: src/qualcoder/__main__.py:1479
+#: src/qualcoder/__main__.py:1482
 msgid "AI Integration"
 msgstr "Intégration IA"
 
-#: src/qualcoder/__main__.py:1797
+#: src/qualcoder/__main__.py:1799
 msgid "Font"
 msgstr "Police"
 
-#: src/qualcoder/__main__.py:1798
+#: src/qualcoder/__main__.py:1800
 msgid "Tree font size"
 msgstr "Taille de la police de l'arbre"
 
-#: src/qualcoder/__main__.py:1799
+#: src/qualcoder/__main__.py:1801
 msgid "Working directory"
 msgstr "Répertoire de travail"
 
-#: src/qualcoder/__main__.py:1800
+#: src/qualcoder/__main__.py:1802
 msgid "Show IDs"
 msgstr "Afficher les IDs"
 
-#: src/qualcoder/__main__.py:1801
+#: src/qualcoder/__main__.py:1803
 msgid "Language"
 msgstr "Langue"
 
-#: src/qualcoder/__main__.py:1802
+#: src/qualcoder/__main__.py:1804
 msgid "Timestamp format"
 msgstr "Format d'horodatage"
 
-#: src/qualcoder/__main__.py:1803
+#: src/qualcoder/__main__.py:1805
 msgid "Speaker name format"
 msgstr "Format du nom de l'orateur"
 
-#: src/qualcoder/__main__.py:1804
+#: src/qualcoder/__main__.py:1806
 msgid "Report text context characters: "
 msgstr "Rapporter les caractères du contexte du texte : "
 
-#: src/qualcoder/__main__.py:1805
+#: src/qualcoder/__main__.py:1807
 msgid "Report text context style: "
 msgstr "Contexte et style du texte du rapport : "
 
-#: src/qualcoder/__main__.py:1806
-msgid "Backup on open"
-msgstr "Sauvegarde sur les ouvertures"
-
-#: src/qualcoder/__main__.py:1807
-msgid "Backup AV files"
-msgstr "Sauvegarde des fichiers multimédias"
-
-#: src/qualcoder/__main__.py:1809
-msgid "AI integration is enabled"
-msgstr "L'intégration de l'IA est activé"
-
-#: src/qualcoder/__main__.py:1811
-msgid "AI integration is disabled"
-msgstr "L'intégration de l'IA est désactivée"
-
-#: src/qualcoder/__main__.py:1812
+#: src/qualcoder/__main__.py:1808
 msgid "Style"
 msgstr "Style"
 
-#: src/qualcoder/__main__.py:1815
-msgid "Folder paths / represents backslash"
-msgstr "Les chemins d’accès au dossier est représenté par un antislash (\\)"
+#: src/qualcoder/__main__.py:1809
+msgid "Backup on open"
+msgstr "Sauvegarde sur les ouvertures"
 
-#: src/qualcoder/__main__.py:2049
+#: src/qualcoder/__main__.py:1810
+msgid "Backup AV files"
+msgstr "Sauvegarde des fichiers multimédias"
+
+#: src/qualcoder/__main__.py:1812
+msgid "AI integration is enabled"
+msgstr "L'intégration de l'IA est activé"
+
+#: src/qualcoder/__main__.py:1814
+msgid "AI integration is disabled"
+msgstr "L'intégration de l'IA est désactivée"
+
+#: src/qualcoder/__main__.py:1817
+msgid "Folder paths / represents \\"
+msgstr "Chemins d'accès aux dossiers / représente \\"
+
+#: src/qualcoder/__main__.py:2050
 msgid "This project contains no text files."
 msgstr "Ce projet ne contient aucun fichier texte."
 
-#: src/qualcoder/__main__.py:2050
+#: src/qualcoder/__main__.py:2051
 msgid "No text files"
 msgstr "Pas de fichiers texte"
 
-#: src/qualcoder/__main__.py:2063
+#: src/qualcoder/__main__.py:2064
 msgid "This project contains no pdf files."
 msgstr "Ce projet ne contient aucun fichier PDF."
 
-#: src/qualcoder/__main__.py:2064
+#: src/qualcoder/__main__.py:2065
 msgid "No pdf files"
 msgstr "Aucun fichier PDF"
 
-#: src/qualcoder/__main__.py:2079
+#: src/qualcoder/__main__.py:2080
 msgid "This project contains no image files."
 msgstr "Ce projet ne contient aucun fichier image."
 
-#: src/qualcoder/__main__.py:2080
+#: src/qualcoder/__main__.py:2081
 msgid "No image files"
 msgstr "Pas de fichiers d'images"
 
-#: src/qualcoder/__main__.py:2088
+#: src/qualcoder/__main__.py:2089
 msgid "This project contains no audio/video files."
 msgstr "Ce projet ne contient pas de fichiers audio/vidéo."
 
-#: src/qualcoder/__main__.py:2089
+#: src/qualcoder/__main__.py:2090
 msgid "No a/v files"
 msgstr "Pas de fichiers a/v"
 
-#: src/qualcoder/__main__.py:2092
+#: src/qualcoder/__main__.py:2093
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr "VLC n'est pas installé. Impossible de coder les fichiers audio/vidéo."
 
-#: src/qualcoder/__main__.py:2093
+#: src/qualcoder/__main__.py:2094
 msgid "Install VLC"
 msgstr "Installer VLC"
 
-#: src/qualcoder/__main__.py:2102
+#: src/qualcoder/__main__.py:2103
 msgid "A/V Coding"
 msgstr "Codage A/V"
 
-#: src/qualcoder/__main__.py:2189
+#: src/qualcoder/__main__.py:2190
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "IMPORTATION DU PROJET REFI-QDA"
 
-#: src/qualcoder/__main__.py:2191
+#: src/qualcoder/__main__.py:2192
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -6525,20 +6525,20 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Etape 2 : On vous demandera le fichier QDPX."
 
-#: src/qualcoder/__main__.py:2192
+#: src/qualcoder/__main__.py:2193
 msgid "REFI-QDA import steps"
 msgstr "Étapes d'importation REFI-QDA"
 
-#: src/qualcoder/__main__.py:2196 src/qualcoder/__main__.py:2213
-#: src/qualcoder/__main__.py:2229
+#: src/qualcoder/__main__.py:2197 src/qualcoder/__main__.py:2214
+#: src/qualcoder/__main__.py:2230
 msgid "Project creation"
 msgstr "Création du projet"
 
-#: src/qualcoder/__main__.py:2196
+#: src/qualcoder/__main__.py:2197
 msgid "REFI-QDA Project not successfully created"
 msgstr "Le projet REFI-QDA n'a pas été créé avec succès"
 
-#: src/qualcoder/__main__.py:2208
+#: src/qualcoder/__main__.py:2209
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Taguette.sqlite3 file."
@@ -6546,19 +6546,19 @@ msgstr ""
 "Étape 1 : Vous devrez saisir un nouveau nom pour votre projet QualCoder.\n"
 "Étape 2 : Vous devrez sélectionner le fichier Taguette.sqlite3."
 
-#: src/qualcoder/__main__.py:2209 src/qualcoder/__main__.py:2225
+#: src/qualcoder/__main__.py:2210 src/qualcoder/__main__.py:2226
 msgid "RQDA import steps"
 msgstr "Étapes d'importation du RQDA"
 
-#: src/qualcoder/__main__.py:2213 src/qualcoder/__main__.py:2229
+#: src/qualcoder/__main__.py:2214 src/qualcoder/__main__.py:2230
 msgid "Project not successfully created"
 msgstr "Échec dans la création du projet"
 
-#: src/qualcoder/__main__.py:2222
+#: src/qualcoder/__main__.py:2223
 msgid "IMPORTING RQDA PROJECT"
 msgstr "PROJET RQDA D'IMPORTATION"
 
-#: src/qualcoder/__main__.py:2224
+#: src/qualcoder/__main__.py:2225
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -6566,59 +6566,59 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Étape 2 : On vous demandera le fichier RQDA."
 
-#: src/qualcoder/__main__.py:2242
+#: src/qualcoder/__main__.py:2243
 msgid "Are you sure you want to quit?"
 msgstr "Êtes-vous sûr de vouloir quitter ?"
 
-#: src/qualcoder/__main__.py:2300
+#: src/qualcoder/__main__.py:2301
 msgid "Enter project name"
 msgstr "Entrez le nom du projet"
 
-#: src/qualcoder/__main__.py:2304
+#: src/qualcoder/__main__.py:2305
 msgid "No project created."
 msgstr "Aucun projet créé."
 
-#: src/qualcoder/__main__.py:2323
+#: src/qualcoder/__main__.py:2324
 msgid "Project creation error "
 msgstr "Erreur de création de projet "
 
-#: src/qualcoder/__main__.py:2324
+#: src/qualcoder/__main__.py:2325
 msgid " not successfully created"
 msgstr " n'a pas été créé avec succès"
 
-#: src/qualcoder/__main__.py:2410
+#: src/qualcoder/__main__.py:2411
 msgid "New project: "
 msgstr "Nouveau projet : "
 
-#: src/qualcoder/__main__.py:2411
+#: src/qualcoder/__main__.py:2412
 msgid "Opening: "
 msgstr "Ouvrir : "
 
-#: src/qualcoder/__main__.py:2421
+#: src/qualcoder/__main__.py:2422
 msgid "New Project Created"
 msgstr "Nouveau projet créé"
 
-#: src/qualcoder/__main__.py:2422
+#: src/qualcoder/__main__.py:2423
 msgid "DB Version:"
 msgstr "Version BDD :"
 
-#: src/qualcoder/__main__.py:2424
+#: src/qualcoder/__main__.py:2425
 msgid "About: "
 msgstr "À propos : "
 
-#: src/qualcoder/__main__.py:2425
+#: src/qualcoder/__main__.py:2426
 msgid "Coder:"
 msgstr "Codeur·euse :"
 
-#: src/qualcoder/__main__.py:2428
+#: src/qualcoder/__main__.py:2429
 msgid "Problem creating database "
 msgstr "Problème lors de la création de la base de données "
 
-#: src/qualcoder/__main__.py:2483
+#: src/qualcoder/__main__.py:2484
 msgid "Coder name changed to: "
 msgstr "Nom du codeur·euse changé en : "
 
-#: src/qualcoder/__main__.py:2506
+#: src/qualcoder/__main__.py:2507
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -6640,23 +6640,23 @@ msgstr ""
 "(Tout ce qui est en dessous de cette marque est une note personnelle et ne "
 "sera jamais envoyé à l'IA)."
 
-#: src/qualcoder/__main__.py:2511
+#: src/qualcoder/__main__.py:2512
 msgid "Memo for project "
 msgstr "Mémo pour le projet "
 
-#: src/qualcoder/__main__.py:2518
+#: src/qualcoder/__main__.py:2519
 msgid "Project memo entered."
 msgstr "Mémo de projet entré."
 
-#: src/qualcoder/__main__.py:2542 src/qualcoder/special_functions.py:113
+#: src/qualcoder/__main__.py:2543 src/qualcoder/special_functions.py:113
 msgid "Open project directory"
 msgstr "Ouvrir le répertoire du projet"
 
-#: src/qualcoder/__main__.py:2564
+#: src/qualcoder/__main__.py:2565
 msgid "Cannot open file"
 msgstr "Ne peut pas ouvrir le fichier"
 
-#: src/qualcoder/__main__.py:2589
+#: src/qualcoder/__main__.py:2590
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
@@ -6666,59 +6666,55 @@ msgstr ""
 "dans le projet (« {} »). Souhaitez-vous conserver votre nom actuel ou "
 "changer à celui du projet ?"
 
-#: src/qualcoder/__main__.py:2592
+#: src/qualcoder/__main__.py:2593
 msgid "Coder name"
 msgstr "Nom du codeur⋅euse"
 
-#: src/qualcoder/__main__.py:2594
+#: src/qualcoder/__main__.py:2595
 msgid "Keep"
 msgstr "Conserver"
 
-#: src/qualcoder/__main__.py:2595
+#: src/qualcoder/__main__.py:2596
 msgid "Switch"
 msgstr "Changer"
 
-#: src/qualcoder/__main__.py:2596
+#: src/qualcoder/__main__.py:2597
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/qualcoder/__main__.py:2605
+#: src/qualcoder/__main__.py:2606
 msgid "Default coder name changed to: "
 msgstr "Le nom du codeur·euse par défaut a été changé en : "
 
-#: src/qualcoder/__main__.py:2633 src/qualcoder/__main__.py:2662
-#: src/qualcoder/__main__.py:2682 src/qualcoder/__main__.py:2707
-#: src/qualcoder/__main__.py:2778 src/qualcoder/__main__.py:2802
-#: src/qualcoder/__main__.py:2810 src/qualcoder/__main__.py:2822
-#: src/qualcoder/__main__.py:2830 src/qualcoder/__main__.py:2838
-#: src/qualcoder/__main__.py:2847 src/qualcoder/__main__.py:2855
-#: src/qualcoder/__main__.py:2863 src/qualcoder/__main__.py:2873
+#: src/qualcoder/__main__.py:2634 src/qualcoder/__main__.py:2663
+#: src/qualcoder/__main__.py:2683 src/qualcoder/__main__.py:2708
+#: src/qualcoder/__main__.py:2779 src/qualcoder/__main__.py:2803
+#: src/qualcoder/__main__.py:2811 src/qualcoder/__main__.py:2823
+#: src/qualcoder/__main__.py:2831 src/qualcoder/__main__.py:2839
+#: src/qualcoder/__main__.py:2848 src/qualcoder/__main__.py:2856
+#: src/qualcoder/__main__.py:2864 src/qualcoder/__main__.py:2874
 msgid "Updating database to version"
 msgstr "Mise à jour de la base de données à la version"
 
-#: src/qualcoder/__main__.py:2880
+#: src/qualcoder/__main__.py:2881
 msgid "Deleting code_text coding to deleted files: "
 msgstr "Suppression du code_texte codant pour les fichiers supprimés : "
 
-#: src/qualcoder/__main__.py:2887
+#: src/qualcoder/__main__.py:2888
 msgid "Deleting code_image coding to deleted files: "
 msgstr "Suppression du codage code_image dans les fichiers supprimés : "
 
-#: src/qualcoder/__main__.py:2894
+#: src/qualcoder/__main__.py:2895
 msgid "Deleting code_av coding to deleted files: "
 msgstr "Suppression du codage code_av dans les fichiers supprimés : "
 
-#: src/qualcoder/__main__.py:2938
+#: src/qualcoder/__main__.py:2939
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr "Dossiers manquants dans le projet QualCoder. Dossiers vides créés"
 
-#: src/qualcoder/__main__.py:2963
+#: src/qualcoder/__main__.py:2964
 msgid "Project summary"
 msgstr "Résumé du projet"
-
-#: src/qualcoder/__main__.py:2964
-msgid "Date time now: "
-msgstr "Date et heure actuelles : "
 
 #: src/qualcoder/__main__.py:2972
 msgid "Project memo: "
@@ -6728,27 +6724,19 @@ msgstr "Mémo de projet : "
 msgid "Files: "
 msgstr "Fichiers : "
 
-#: src/qualcoder/__main__.py:2983 src/qualcoder/cases.py:355
-msgid "Cases: "
-msgstr "Cas : "
-
-#: src/qualcoder/__main__.py:3006
-msgid "Folder paths / represents \\"
-msgstr "Chemins d'accès aux dossiers / représente \\"
-
-#: src/qualcoder/__main__.py:3011
+#: src/qualcoder/__main__.py:3012
 msgid "Bad links to files"
 msgstr "Mauvais liens avec les dossiers"
 
-#: src/qualcoder/__main__.py:3045
+#: src/qualcoder/__main__.py:3046
 msgid "Closing project: "
 msgstr "Fermer le projet : "
 
-#: src/qualcoder/__main__.py:3111
+#: src/qualcoder/__main__.py:3112
 msgid "Deleting: "
 msgstr "Suppression : "
 
-#: src/qualcoder/__main__.py:3120
+#: src/qualcoder/__main__.py:3121
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
@@ -6756,32 +6744,32 @@ msgstr ""
 "L’IA est configurée et activée. Allez dans IA > Paramètres pour modifier les "
 "paramètres."
 
-#: src/qualcoder/__main__.py:3122
+#: src/qualcoder/__main__.py:3123
 msgid "AI Setup Wizard"
 msgstr "Assistant de configuration IA"
 
-#: src/qualcoder/__main__.py:3124
+#: src/qualcoder/__main__.py:3125
 msgid "AI: Setup Wizard"
 msgstr "IA : Assistant de configuration"
 
-#: src/qualcoder/__main__.py:3127
+#: src/qualcoder/__main__.py:3128
 msgid "AI: Setup Wizard finished"
 msgstr "IA : L'assistant d'installation est terminé"
 
-#: src/qualcoder/__main__.py:3136
+#: src/qualcoder/__main__.py:3137
 msgid "Please enable the AI first and set it in Settings."
 msgstr "Veuillez d'abord activer l'IA et la définir dans les paramètres."
 
-#: src/qualcoder/__main__.py:3137 src/qualcoder/__main__.py:3141
-#: src/qualcoder/__main__.py:3146 src/qualcoder/__main__.py:3171
+#: src/qualcoder/__main__.py:3138 src/qualcoder/__main__.py:3142
+#: src/qualcoder/__main__.py:3147 src/qualcoder/__main__.py:3172
 msgid "Rebuild AI Memory"
 msgstr "Reconstruire la mémoire de l'IA"
 
-#: src/qualcoder/__main__.py:3140
+#: src/qualcoder/__main__.py:3141
 msgid "The AI is busy or not set up correctly."
 msgstr "L'IA est occupée ou n'est pas configurée correctement."
 
-#: src/qualcoder/__main__.py:3144
+#: src/qualcoder/__main__.py:3145
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
@@ -6789,23 +6777,23 @@ msgstr ""
 "Cette opération relit tous vos documents empiriques, ce qui peut prendre un "
 "certain temps. Voulez-vous continuer ?"
 
-#: src/qualcoder/__main__.py:3162 src/qualcoder/__main__.py:3170
+#: src/qualcoder/__main__.py:3163 src/qualcoder/__main__.py:3171
 msgid "Please enable the AI first and set it up in Settings."
 msgstr "Veuillez d'abord activer l'IA et la configurer dans les paramètres."
 
-#: src/qualcoder/__main__.py:3163
+#: src/qualcoder/__main__.py:3164
 msgid "Ai Chat"
 msgstr "Discuter avec l'IA"
 
-#: src/qualcoder/__main__.py:3183
+#: src/qualcoder/__main__.py:3184
 msgid "This version: "
 msgstr "Cette version : "
 
-#: src/qualcoder/__main__.py:3190
+#: src/qualcoder/__main__.py:3191
 msgid "Newer release available: "
 msgstr "Une version plus récente est disponible : "
 
-#: src/qualcoder/__main__.py:3195
+#: src/qualcoder/__main__.py:3196
 msgid "Latest Release: "
 msgstr "Dernière mise à jour : "
 
@@ -7035,6 +7023,10 @@ msgstr "Fichier d'attributs de cas exporté vers : "
 #: src/qualcoder/reports.py:409
 msgid "File export"
 msgstr "Export du fichier"
+
+#: src/qualcoder/cases.py:355
+msgid "Cases: "
+msgstr "Cas : "
 
 #: src/qualcoder/cases.py:386
 msgid "Attribute added to cases: "
@@ -8205,6 +8197,12 @@ msgstr " commence avec : "
 #: src/qualcoder/GUI/special_functions.py:54
 msgid "Uncaught Exception"
 msgstr "Uncaught Exception"
+
+#~ msgid "Folder paths / represents backslash"
+#~ msgstr "Les chemins d’accès au dossier est représenté par un antislash (\\)"
+
+#~ msgid "Date time now: "
+#~ msgstr "Date et heure actuelles : "
 
 #, fuzzy
 #~ msgid "Type:"
