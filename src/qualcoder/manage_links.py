@@ -73,6 +73,34 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.home = os.path.expanduser('~')
         self.fill_table()
         self.ui.pushButton_search_folders.pressed.connect(self.find_filepaths)
+        self.ui.pushButton_bulk.pressed.connect(self.bulk_path_rename)
+
+    def bulk_path_rename(self):
+        """ Update all the linked by changing the path.
+        Typically occurs when moving to another computer. """
+
+        msg = _("It is best to save a copy of the project first.")
+        msg += _("Select the section of the path you want to replace.\n")
+        msg += _("e.g. C:/Users/olduser/Images  To replace olduser enter: olduser\n")
+        msg += _("The put in the replacement value: newuser\n")
+        msg += _("The result will be: C:/newuser/Images\n")
+        msg += _("NOTE: Even on Windows only use forward slashes when entering in folder paths")
+        Message(self.app, _("Replace the folder path"), msg).exec()
+        old_path, ok = QtWidgets.QInputDialog.getText(None, "Input Dialog", _("Old value:"))
+        old_percent_path = "%" + old_path + "%"
+        if not ok or old_path == "":
+            return
+        new_path, ok = QtWidgets.QInputDialog.getText(None, "Input Dialog", _("Replace with:"))
+        if not ok or new_path == "":
+            return
+        cur = self.app.conn.cursor()
+        sql = "UPDATE source SET mediapath = REPLACE(mediapath, ?, ?) WHERE mediapath LIKE ?"
+        cur.execute(sql, [old_path, new_path, old_percent_path])
+        self.app.conn.commit()
+        self.links = self.app.check_bad_file_links()
+        for link in self.links:
+            link['filepaths'] = []
+        self.fill_table()
 
     def find_filepaths(self):
         """ Get file paths of this file name. """
@@ -108,7 +136,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         menu = QtWidgets.QMenu()
         action_open_file_dialog = menu.addAction(_("Select file"))
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
