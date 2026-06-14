@@ -1772,8 +1772,6 @@ Click "Yes" to start now.')
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
-
-
     def keyPressEvent(self, event):
         """ Used to open top level menus. """
 
@@ -1795,22 +1793,22 @@ Click "Yes" to start now.')
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
         self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}</p>")
-        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
-        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}\n"
-        msg += _("Working directory") + f": {self.app.settings['directory']}\n"
-        msg += _("Show IDs") + f": {self.app.settings['showids']}\n"
-        msg += _("Language") + f": {self.app.settings['language']}\n"
-        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}\n"
-        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}\n"
-        msg += _("Report text context characters: ") + str(self.app.settings['report_text_context_characters']) + "\n"
-        msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
-        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
-        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
+        msg = "<p>" + _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}</p>"
+        msg += "<p>" + _("Tree font size") + f": {self.app.settings['treefontsize']}</p>"
+        msg += "<p>" + _("Working directory") + f": {self.app.settings['directory']}</p>"
+        msg += "<p>" + _("Show IDs") + f": {self.app.settings['showids']}</p>"
+        msg += "<p>" + _("Language") + f": {self.app.settings['language']}</p>"
+        msg += "<p>" + _("Timestamp format") + f": {self.app.settings['timestampformat']}</p>"
+        msg += "<p>" + _("Speaker name format") + f": {self.app.settings['speakernameformat']}</p>"
+        msg += "<p>" + _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}</p>"
+        msg += "<p>" + _("Report text context style: ") + f"{self.app.settings['report_text_context_style']}</p>"
+        msg += "<p>" + _("Backup on open") + f": {self.app.settings['backup_on_open']}</p>"
+        msg += "<p>" + _("Backup AV files") + f": {self.app.settings['backup_av_files']}</p>"
         if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI integration is enabled") + "\n"
+            msg += "<p>" + _("AI integration is enabled") + "</p>"
         else:
-            msg += _("AI integration is disabled") + "\n"
-        msg += _("Style") + f"; {self.app.settings['stylesheet']}"
+            msg += "<p>"+ _("AI integration is disabled") + "</p>"
+        msg += "<p>" + _("Style") + f": {self.app.settings['stylesheet']}</p>"
         self.ui.textEdit.append(msg)
         if platform.system() == "Windows":
             self.ui.textEdit.append("<p>" + _("Folder paths / represents backslash") + "</p>")
