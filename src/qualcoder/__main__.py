@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
@@ -55,7 +56,7 @@ from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
+from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display, manage_menu_info
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
@@ -1606,6 +1607,8 @@ Click "Yes" to start now.')
         self.ui.tabWidget.setCurrentIndex(0)
         self.ai_chat()
 
+        self.ui.textBrowser_manage.setHtml(manage_menu_info)
+
         # Add tab widget icons
         try:
             self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.cog', color=self.app.highlight_color()))  # Action Log
@@ -1792,27 +1795,27 @@ Click "Yes" to start now.')
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}</p>")
-        msg = "<p>" + _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}</p>"
-        msg += "<p>" + _("Tree font size") + f": {self.app.settings['treefontsize']}</p>"
-        msg += "<p>" + _("Working directory") + f": {self.app.settings['directory']}</p>"
-        msg += "<p>" + _("Show IDs") + f": {self.app.settings['showids']}</p>"
-        msg += "<p>" + _("Language") + f": {self.app.settings['language']}</p>"
-        msg += "<p>" + _("Timestamp format") + f": {self.app.settings['timestampformat']}</p>"
-        msg += "<p>" + _("Speaker name format") + f": {self.app.settings['speakernameformat']}</p>"
-        msg += "<p>" + _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}</p>"
-        msg += "<p>" + _("Report text context style: ") + f"{self.app.settings['report_text_context_style']}</p>"
-        msg += "<p>" + _("Backup on open") + f": {self.app.settings['backup_on_open']}</p>"
-        msg += "<p>" + _("Backup AV files") + f": {self.app.settings['backup_av_files']}</p>"
+        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}<br />")
+        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}<br />"
+        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}<br />"
+        msg += _("Working directory") + f": {self.app.settings['directory']}<br />"
+        msg += _("Show IDs") + f": {self.app.settings['showids']}<br />"
+        msg += _("Language") + f": {self.app.settings['language']}<br />"
+        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}<br />"
+        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}<br />"
+        msg += _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}<br />"
+        msg += _("Report text context style: ") + f"{self.app.settings['report_text_context_style']}<br />"
+        msg += _("Style") + f": {self.app.settings['stylesheet']}<br />"
+        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}<br />"
+        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}</p>"
         if self.app.settings['ai_enable'] == 'True':
-            msg += "<p>" + _("AI integration is enabled") + "</p>"
+            msg += _("AI integration is enabled") + "<br />"
         else:
-            msg += "<p>"+ _("AI integration is disabled") + "</p>"
-        msg += "<p>" + _("Style") + f": {self.app.settings['stylesheet']}</p>"
+            msg += _("AI integration is disabled") + "<br />"
         self.ui.textEdit.append(msg)
         if platform.system() == "Windows":
-            self.ui.textEdit.append("<p>" + _("Folder paths / represents backslash") + "</p>")
-        self.ui.textEdit.append("<p>&nbsp;</p>")
+            self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
+        self.ui.textEdit.append("<p></p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
@@ -2939,7 +2942,7 @@ Click "Yes" to start now.')
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             msg, backup_name = self.app.save_backup()
             self.ui.textEdit.append(msg)
-        msg = f"\n{_('Project Opened: ')}{self.app.project_name}"
+        msg = f"<p>{_('Project Opened: ')}{self.app.project_name}</p>"
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
@@ -2957,51 +2960,51 @@ Click "Yes" to start now.')
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
-        self.ui.textEdit.append("\n")
+        self.ui.textEdit.append("<br />")
         self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
-        msg = _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
-        msg += self.app.project_name + "\n"
-        msg += f'{_("Project path: ")}{self.app.project_path}\n'
-        msg += f"{_('Project date: ')}{self.project['date']}\n"
+        msg = f"<p>{self.app.project_name}<br />"
+        msg += f'{_("Project path: ")}{self.app.project_path}<br />'
+        msg += f"{_('Project date: ')}{self.project['date']}</p>"
         sql = "select memo from project"
         cur.execute(sql)
         memo_res = cur.fetchone()
         if memo_res[0] != "":
-            msg += _("Project memo: ") + f"\n---------------------\n{memo_res[0]}\n---------------------\n"
+            msg += "<p>" + _("Project memo: ") + f"<br />---------------------<br />{memo_res[0]}<br />---------------------</p>"
         sql = "select count(id) from source"
         cur.execute(sql)
         files_res = cur.fetchone()
         text_res = self.app.get_text_filenames()
         image_res = self.app.get_image_filenames()
         av_res = self.app.get_av_filenames()
-        msg += _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}\n"
+        msg += "<p>" + _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}</p>"
         sql = "select count(caseid) from cases"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Cases: ") + f"{res[0]}\n"
+        msg += "<p>"
+        msg += f"{_('Cases: ')}{res[0]}<br />"
         sql = "select count(catid) from code_cat"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Code categories: ")}{res[0]}\n'
+        msg += f"{_('Code categories: ')}{res[0]}<br />"
         sql = "select count(cid) from code_name"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Codes: ")}{res[0]}\n'
+        msg += f"{_('Codes: ')}{res[0]}<br />"
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Attributes: ")}{res[0]}\n'
+        msg += f"{_('Attributes: ')}{res[0]}<br />"
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Journals: ")}{res[0]}\n'
+        msg += f"{_('Journals: ')}{res[0]}<br />"
+        msg += "</p>"
+        self.ui.textEdit.append(msg)
+        msg = ""
         cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
-            msg += f"\nText Bookmark: {bookmark_filename[0]}"
-            msg += f", position: {result[5]}\n"
-        if platform.system() == "Windows":
-            msg += "\n" + _("Folder paths / represents \\")
+            msg += f"<p>Text Bookmark: {bookmark_filename[0]}, position: {result[5]}</p>"
         self.ui.textEdit.append(msg)
         bad_links = self.app.check_bad_file_links()
         if bad_links:
@@ -3012,7 +3015,7 @@ Click "Yes" to start now.')
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
-        self.ui.textEdit.append("\n")
+        self.ui.textEdit.append("< br/>")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
