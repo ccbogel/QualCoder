@@ -366,7 +366,7 @@ manage_tab_info = '''
 	</style>
 </head>
 <body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
-The manage tab</h1>
+Manage tab</h1>
 <p style="line-height: 100%; margin-bottom: 0cm">The manage tab
 displays cases, files, attributes and references. Use the Manage menu
 above to organise files, cases (collections of files), write
@@ -477,7 +477,7 @@ coding_tab_info = '''
 Coding tab</h1>
 <p style="line-height: 100%; margin-bottom: 0cm">The coding tab
 displays the coding area for coding text, images, audio/video and
-PDFs. Depending on the files loaded in Mange Files, select a menu
+PDFs. Depending on the files loaded in Manage Files, select a menu
 option above to begin coding text, images, audio/video or PDFs.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.1.-Coding-Text/">Coding
 Text – QualCoder</a></p>
@@ -496,3 +496,59 @@ scheme,</p>
 </body>
 </html>
 '''
+
+reports_tab_info = '''
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
+	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
+	<meta name="changed" content="2026-06-16T09:49:22.649405100"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
+		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
+		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
+		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
+Reports tab</h1>
+<p style="line-height: 100%; margin-bottom: 0cm">The reports tab
+displays analyses and report summaries. Select from the Analysis and
+Reports menus.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.3.-Reports/">Reports
+menu options – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Analysis menu</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">The analysis menu
+has options of Code retrieval, co-occurrence and exact matches. The
+graph option is a way to visualise the coding through the development
+of mind maps.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.4.-Graph/">Graph
+– QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Reports menu</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">The menu options
+list: coder comparisons, overall and by file. Code counts overall or
+by file or case. Code and file summaries. Charts for pie charts, bar
+charts, treemaps, sunbursts, heatmaps and word clouds. Another option
+is Database queries where you can directly interact with the
+underlying database.</p>
+</body>
+</html>
+'''
+
