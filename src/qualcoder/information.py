@@ -341,7 +341,7 @@ Ctrl + Enter {_("Run SQL query")}<br />'
 coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
 
-manage_menu_info = '''
+manage_tab_info = '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -449,6 +449,50 @@ pressing the Link key.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
 
 </p>
+</body>
+</html>
+'''
+
+coding_tab_info = '''
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
+	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
+	<meta name="changed" content="2026-06-16T09:09:04.124392600"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
+		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
+Coding tab</h1>
+<p style="line-height: 100%; margin-bottom: 0cm">The coding tab
+displays the coding area for coding text, images, audio/video and
+PDFs. Depending on the files loaded in Mange Files, select a menu
+option above to begin coding text, images, audio/video or PDFs.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.1.-Coding-Text/">Coding
+Text – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.3.-Coding-Text-on-PDFs/">Coding
+PDFs – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.4.-Coding-Images/">Coding
+images – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.5.-Coding-Audio-and-Video/">Coding
+audio and video – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.2.-AI-Assisted-Coding/">AI
+Assisted Coding - QualCoder</a> 
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm">Additionally there
+are menu options for organising the codes and changing the colour
+scheme,</p>
 </body>
 </html>
 '''
