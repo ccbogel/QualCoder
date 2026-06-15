@@ -80,7 +80,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         """ Update all the linked by changing the path.
         Typically occurs when moving to another computer. """
 
-        msg = _("It is best to save a copy of the project first.")
+        msg = _("It is best to save a copy of the project first.\n")
         msg += _("Select the section of the path you want to replace.\n")
         msg += _("e.g. C:/Users/olduser/Images  To replace olduser enter: olduser\n")
         msg += _("The put in the replacement value: newuser\n")
