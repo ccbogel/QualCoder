@@ -562,7 +562,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
@@ -591,7 +591,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                        child.setToolTip(0, c['name'])
+                        child.setToolTip(0, '')
                         if len(c['name']) > 52:
                             child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
@@ -617,7 +617,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
@@ -647,7 +647,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QColor(color)))
-                    child.setToolTip(0, c['name'])
+                    child.setToolTip(0, '')
                     if len(c['name']) > 52:
                         child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])

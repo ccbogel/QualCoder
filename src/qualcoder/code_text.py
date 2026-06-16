@@ -1684,7 +1684,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
@@ -1710,7 +1710,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                     child.setToolTip(2, c['memo'])
-                    child.setToolTip(0, c['name'])
+                    child.setToolTip(0, '')
                     if len(c['name']) > 52:
                         child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
