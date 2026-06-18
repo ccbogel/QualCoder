@@ -46,9 +46,14 @@ Fedora has a segmentation fault (software crashes) which is, we believe, is curr
 
 ## Manual install
 
-For install from source code, download the zip file below and use the instructions in the README file to install on your operating system.
+For install from source code, download the zip file below and use the instructions in the README file to install on your operating system. Existing projects are migrated automatically when opened.
 
 # Changes in this release
+
+## Data structure change
+
+One major requested change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
+
 
 ## Menus and tabs
 
@@ -109,6 +114,10 @@ Can move a dragged item to the top and bottom of the visible tree, and the tree 
 Can resize coded areas using rightclick menu option and resize using handles.
 
 Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
+
+## Code Audio / Video
+
+A bookmark option has been added. So after it is aplied, in code A/V and view A/V (from mamage files) the ime position in the A/V will be restored and the text postiion will be restored. Key presses are B (make bookmark) and Shift B (go to bookmark).
 
 ## Co-occurrence report
 
