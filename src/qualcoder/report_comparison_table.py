@@ -444,7 +444,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if not ok:
             return
         category = ui.get_selected()
-        if category['id'] == -1:
+        if not category or category.get('id') == -1:  # <- L (categories carry 'catid', not 'id')
             self.codes, categories = self.app.get_codes_categories()
             Message(self.app, _("Everything selected"), _("All codes selected")).exec()
             return
@@ -495,6 +495,16 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             for code in codes:
                 if code['catid'] == cat['catid']:
                     selected_codes.append(code)
+        # Include descendant sub-codes (supercid) of the selected codes, cascading. <- L
+        selected_cids = {c['cid'] for c in selected_codes}
+        changed = True
+        while changed:
+            changed = False
+            for code in codes:
+                if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                    selected_codes.append(code)
+                    selected_cids.add(code['cid'])
+                    changed = True
         return selected_codes
 
     def export_to_excel(self):
