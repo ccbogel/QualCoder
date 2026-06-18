@@ -1562,6 +1562,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     if cid == code_['cid']:
                         branch_codes.append(code_)
                         break
+                self.recursive_get_branch_codes(item.child(i), branch_codes)  # Also gather sub-codes nested under this code (supercid) <- L
             if item.child(i).text(1)[0:3] == "cat":
                 self.recursive_get_branch_codes(item.child(i), branch_codes)
         return branch_codes
