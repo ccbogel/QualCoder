@@ -322,15 +322,15 @@ class App(object):
 
         cur = self.conn.cursor()
         if not cids:
-            cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+            cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color, supercid from code_name order by lower(name)")
         if cids:
             cids_str = ",".join(map(str, cids))
-            sql = "select name, ifnull(memo,''), owner, date, cid, catid, color from code_name where "
+            sql = "select name, ifnull(memo,''), owner, date, cid, catid, color, supercid from code_name where "
             sql += f"cid in ({cids_str}) order by lower(name)"
             cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
+        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color', 'supercid'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -592,9 +592,9 @@ class App(object):
             categories.append(dict(zip(keys, row)))
         codes = []
         cur = self.conn.cursor()
-        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color, supercid from code_name order by lower(name)")
         result = cur.fetchall()
-        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
+        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color', 'supercid'
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
@@ -2370,7 +2370,7 @@ Click "Yes" to start now.')
             "unique(cid,fid,pos0,pos1, owner))")
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
-            "date text, color text, unique(name))")
+            "date text, color text, supercid integer, unique(name))")  # supercid: sub-code (parent code) <- L
         # Database version v6 - unique name for journal
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text, "
                     "unique(name))")
@@ -2406,7 +2406,7 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null)",
-                    ('v14', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v16', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -2875,6 +2875,14 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v15", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v15")
+        # Database version v16 - sub-codes: a code can be nested under another code (supercid) <- L
+        try:
+            cur.execute("select supercid from code_name")
+        except sqlite3.OperationalError:
+            cur.execute("alter table code_name add supercid integer")
+            cur.execute('update project set databaseversion="v16", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v16")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
@@ -2905,6 +2913,47 @@ Click "Yes" to start now.')
         sql += "(select catid from code_cat)"
         cur.execute(sql)
         self.app.conn.commit()
+        # Fix 'lost' sub-codes if present (parent code deleted but supercid not cleared). <- L
+        sql = "update code_name set supercid=null where supercid is not null and supercid not in "
+        sql += "(select cid from code_name)"
+        cur.execute(sql)
+        # Mutual exclusivity: if a code somehow has both catid and supercid, supercid wins. <- L
+        cur.execute("update code_name set catid=null where supercid is not null and catid is not null")
+        self.app.conn.commit()
+        # Break hierarchy cycles (a corrupted project could make a branch disappear). <- L
+        # Categories: code_cat.supercatid
+        cur.execute("select catid, supercatid from code_cat")
+        cat_parent = {row[0]: row[1] for row in cur.fetchall()}
+        cat_changed = False
+        for start in list(cat_parent.keys()):
+            seen = set()
+            node = start
+            while node is not None and node in cat_parent:
+                if node in seen:
+                    cur.execute("update code_cat set supercatid=null where catid=?", [node])
+                    cat_parent[node] = None
+                    cat_changed = True
+                    break
+                seen.add(node)
+                node = cat_parent[node]
+        # Codes: code_name.supercid
+        cur.execute("select cid, supercid from code_name")
+        code_parent = {row[0]: row[1] for row in cur.fetchall()}
+        code_changed = False
+        for start in list(code_parent.keys()):
+            seen = set()
+            node = start
+            while node is not None and node in code_parent:
+                if node in seen:
+                    cur.execute("update code_name set supercid=null where cid=?", [node])
+                    code_parent[node] = None
+                    code_changed = True
+                    break
+                seen.add(node)
+                node = code_parent[node]
+        if cat_changed or code_changed:
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Repaired a cyclic code/category hierarchy."))
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()
