@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
@@ -173,6 +174,7 @@ class CodeOrganiser(QDialog):
             code['original_cid'] = code['cid']
             code['original_catid'] = code['catid']
             code['original_memo'] = code['memo']
+            code['original_supercid'] = code['supercid']
             code['x'] = None
             code['y'] = None
             code['delete'] = False
@@ -195,6 +197,7 @@ class CodeOrganiser(QDialog):
             category['x'] = None
             category['y'] = None
             category['cid'] = None
+            category['supercid'] = None
             category['color'] = '#FFFFFF'
             category['delete'] = False  # True if merged
         global model  # noqa: F824
@@ -233,7 +236,11 @@ class CodeOrganiser(QDialog):
             append_list = []
             for n in refined_model:
                 for m in model:
-                    if m['supercatid'] == n['catid']:
+                    # m is a category/code under category n (supercatid == catid, only when n
+                    # has a real catid), or a sub-code under code n (supercid == cid). The catid
+                    # guard avoids a None == None false match between unrelated sub-codes. <- L
+                    if (n['catid'] is not None and m['supercatid'] == n['catid']) or \
+                            (n.get('cid') is not None and m.get('supercid') == n['cid']):
                         append_list.append(m)
             for n in append_list:
                 refined_model.append(n)
@@ -243,16 +250,16 @@ class CodeOrganiser(QDialog):
         model = refined_model
 
     def named_children_of_node(self, node):
-        """ Get child categories and codes of this category node.
-        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
+        """ Get child categories and codes of this node.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a node.
+        For a category node: descendant sub-categories and the codes inside them.
+        For a code node: descendant sub-codes (recursive, via supercid).  # <- L
 
-        param: node : Dictionary of category
+        param: node : Dictionary of category or code
 
         return: child_names : List
         """
 
-        if node['cid'] is not None:
-            return []
         child_names = []
         codes_, categories_ = self.app.get_codes_categories()
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
@@ -262,6 +269,19 @@ class CodeOrganiser(QDialog):
             for cat in categories_:
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
+
+        # If node is a code, return the names of its descendant sub-codes (recursive, via supercid). <- L
+        if node['cid'] is not None:
+            frontier = [node['cid']]
+            guard = 0
+            while frontier and guard < 10000:
+                guard += 1
+                current_cid = frontier.pop()
+                for code in codes_:
+                    if code.get('supercid') == current_cid:
+                        child_names.append(code['name'])
+                        frontier.append(code['cid'])
+            return child_names
 
         """ Create a list of this category (node) and all its category children.
         Maximum depth of 200. """
@@ -302,9 +322,10 @@ class CodeOrganiser(QDialog):
         global model  # noqa: F824
         # Order the model by supercatid, subcats, codes
         ordered_model = []
-        # Top level categories
+        # Top level categories (exclude sub-codes, which nest under a parent code)
         for code_or_cat in model:
-            if code_or_cat['x'] is None and code_or_cat['supercatid'] is None:
+            if code_or_cat['x'] is None and code_or_cat['supercatid'] is None \
+                    and not code_or_cat.get('supercid'):
                 code_or_cat['x'] = 10
                 ordered_model.append(code_or_cat)
         for om in ordered_model:
@@ -317,6 +338,11 @@ class CodeOrganiser(QDialog):
                 for sub_cat in model:
                     # subordinate categories
                     if sub_cat['supercatid'] == om['catid'] and sub_cat['x'] is None:
+                        sub_cat['x'] = om['x'] + 120
+                        ordered_model.insert(ordered_model.index(om), sub_cat)
+                    # sub-codes nested under their parent code
+                    if sub_cat.get('supercid') is not None and sub_cat['supercid'] == om.get('cid') \
+                            and sub_cat['x'] is None:
                         sub_cat['x'] = om['x'] + 120
                         ordered_model.insert(ordered_model.index(om), sub_cat)
             i += 1
@@ -550,8 +576,12 @@ class CodeOrganiser(QDialog):
                 code_name = item['name']
                 if item['name'][-1] == " ":
                     code_name = item['name'][:-1]
-                cur.execute("update code_name set name=?, memo=?, catid=? where cid=?",
-                            [code_name, item['memo'], item['catid'], item['cid']])
+                # Keep sub-code nesting consistent: a code in a category cannot also be a
+                # sub-code. If it has a category now, clear supercid; otherwise preserve the
+                # code's existing parent code (supercid).
+                new_supercid = None if item['catid'] is not None else item.get('original_supercid')
+                cur.execute("update code_name set name=?, memo=?, catid=?, supercid=? where cid=?",
+                            [code_name, item['memo'], item['catid'], new_supercid, item['cid']])
                 self.app.conn.commit()
 
         # Update merged codes: coded text, images and A/V. Using new cid and original_cid
@@ -565,6 +595,25 @@ class CodeOrganiser(QDialog):
         sql = "update code_cat set supercatid=null where supercatid is not null and supercatid not in " \
               "(select catid from code_cat)"
         cur.execute(sql)
+        self.app.conn.commit()
+
+        # Repair dangling and cyclic supercid after a merge/delete (mirrors project-open repair). <- L
+        cur.execute("update code_name set supercid=null where supercid is not null and supercid not in "
+                    "(select cid from code_name)")  # dangling parent
+        cur.execute("update code_name set catid=null where supercid is not null and catid is not null")  # supercid wins
+        self.app.conn.commit()
+        cur.execute("select cid, supercid from code_name")  # break cycles
+        code_parent = {row[0]: row[1] for row in cur.fetchall()}
+        for start in list(code_parent.keys()):
+            seen = set()
+            node = start
+            while node is not None and node in code_parent:
+                if node in seen:
+                    cur.execute("update code_name set supercid=null where cid=?", [node])
+                    code_parent[node] = None
+                    break
+                seen.add(node)
+                node = code_parent[node]
         self.app.conn.commit()
 
         # Wrap up
@@ -606,6 +655,8 @@ class CodeOrganiser(QDialog):
             except sqlite3.IntegrityError as e_:
                 # print(e_)
                 cur.execute("delete from code_image where imid=?", [img[0]])
+        # Re-parent the merged code's sub-codes onto the target code (no orphans). <- L
+        cur.execute("update code_name set supercid=?, catid=null where supercid=?", [new_cid, old_cid])
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
 
@@ -645,17 +696,17 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         return self.scene_height
 
     def named_children_of_node(self, node):
-        """ Get names of child categories and codes of this category node.
-        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
+        """ Get names of child categories and codes of this node.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a node.
+        For a category node: descendant sub-categories and the codes inside them.
+        For a code node: descendant sub-codes (recursive, via supercid).  # <- L
         All category and code names are unique.
 
-        param: node : Dictionary of category
+        param: node : Dictionary of category or code
 
         return: child_names : List
         """
 
-        if node['cid'] is not None:
-            return []
         child_names = []
         codes_ = []
         categories_ = []
@@ -666,6 +717,19 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 categories_.append(item)
             else:
                 codes_.append(item)
+
+        # If node is a code, return the names of its descendant sub-codes (recursive, via supercid). <- L
+        if node['cid'] is not None:
+            frontier = [node['cid']]
+            guard = 0
+            while frontier and guard < 10000:
+                guard += 1
+                current_cid = frontier.pop()
+                for code in codes_:
+                    if code.get('supercid') == current_cid:
+                        child_names.append(code['name'])
+                        frontier.append(code['cid'])
+            return child_names
 
         """ Create a list of this category (node) and all its category children.
         Maximum depth of 200. """
@@ -702,7 +766,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         This slows re-drawing down, but is dynamic.
         """
 
-        super(GraphicsScene, self).mousePressEvent(mouse_event)
+        super(GraphicsScene, self).mouseMoveEvent(mouse_event) # REPLACED
 
         x_diff = 0
         y_diff = 0
@@ -804,10 +868,25 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     if isinstance(item2, TextGraphicsItem) and item1.code_or_cat['supercatid'] is not None and \
                             item1.code_or_cat['supercatid'] == item2.code_or_cat['catid'] and \
                             (item1.code_or_cat['cid'] is None and item2.code_or_cat['cid'] is None):
-                        item = LinkGraphicsItem(item2, item1)
+                        link_item = LinkGraphicsItem(item2, item1)
                         if item1.isVisible() and item2.isVisible():
-                            self.addItem(item)
-                            point_item = PointGraphicsItem(item.pointer_x, item.pointer_y)
+                            self.addItem(link_item)
+                            point_item = PointGraphicsItem(link_item.pointer_x, link_item.pointer_y)
+                            self.addItem(point_item)
+
+        # Link from parent code to sub-code (supercid). Parent -> child.
+        for parent_item in self.items():
+            if isinstance(parent_item, TextGraphicsItem):
+                for child_item in self.items():
+                    if isinstance(child_item, TextGraphicsItem) and \
+                            child_item.code_or_cat.get('cid') is not None and \
+                            child_item.code_or_cat.get('supercid') is not None and \
+                            parent_item.code_or_cat.get('cid') is not None and \
+                            child_item.code_or_cat['supercid'] == parent_item.code_or_cat['cid']:
+                        link_item = LinkGraphicsItem(parent_item, child_item)
+                        if parent_item.isVisible() and child_item.isVisible():
+                            self.addItem(link_item)
+                            point_item = PointGraphicsItem(link_item.pointer_x, link_item.pointer_y)
                             self.addItem(point_item)
 
     def adjust_for_negative_positions(self):
@@ -908,6 +987,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         coded_action = None
         case_action = None
         link_code_to_category_action = None
+        link_code_under_code_action = None
+        remove_code_from_parent_code_action = None
         merge_code_into_code_action = None
         remove_code_from_category_action = None
         link_category_under_category_action = None
@@ -916,9 +997,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         show_memo_action = None
         if self.code_or_cat['cid'] is not None:
             link_code_to_category_action = menu.addAction(_('Link code to category'))
+            link_code_under_code_action = menu.addAction(_('Link code under code'))
             merge_code_into_code_action = menu.addAction(_('Merge code into code'))
             if self.code_or_cat['catid'] is not None:
                 remove_code_from_category_action = menu.addAction(_('Remove code from category'))
+            if self.code_or_cat.get('supercid') is not None:
+                remove_code_from_parent_code_action = menu.addAction(_('Remove code from parent code'))
             coded_action = menu.addAction(_('Coded text and media'))
             case_action = menu.addAction(_('Case text and media'))
         if self.code_or_cat['cid'] is None:
@@ -955,6 +1039,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.case_media()
         if action == link_code_to_category_action:
             self.link_code_to_category()
+        if action == link_code_under_code_action:
+            self.link_code_under_code()
+        if action == remove_code_from_parent_code_action:
+            self.remove_code_from_parent_code()
         if action == merge_code_into_code_action:
             self.merge_code_into_code()
         if action == remove_code_from_category_action:
@@ -1034,14 +1122,92 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         update_graphics_item_models = True
         self.code_or_cat['catid'] = category['catid']
 
+    def link_code_under_code(self):
+        """ Nest this code under another code as a sub-code (supercid).
+         Uses child_names to prevent circular nesting. """
+
+        codes_ = []
+        global model  # noqa: F824
+        # Exclude the code's own descendant sub-codes to prevent a supercid cycle. Codes do
+        # not populate child_names, so a code must still not be nested under one of its own
+        # sub-codes. Walk the current supercid relationships to collect the descendants. <- L
+        src_cid = self.code_or_cat['cid']
+        children_map = {}
+        for it_ in model:
+            if it_['cid'] is not None and it_.get('supercid') is not None:
+                children_map.setdefault(it_['supercid'], []).append(it_['cid'])
+        descendants = set()
+        stack = list(children_map.get(src_cid, []))
+        while stack:
+            d = stack.pop()
+            if d in descendants:
+                continue
+            descendants.add(d)
+            stack.extend(children_map.get(d, []))
+        for item in model:
+            if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "" \
+                    and item['cid'] not in descendants \
+                    and item['name'] not in self.code_or_cat.get('child_names', []):
+                codes_.append(item)
+        codes_ = sorted(codes_, key=lambda d: d['name'])
+        ui = DialogSelectItems(self.app, codes_, _('Nest under: Select parent code'), 'single')
+        ok = ui.exec()
+        if not ok:
+            return
+        parent_code = ui.get_selected()
+        if not parent_code:
+            return
+        self.code_or_cat['supercid'] = parent_code['cid']
+        self.code_or_cat['original_supercid'] = parent_code['cid']
+        self.code_or_cat['catid'] = None
+        self.code_or_cat['supercatid'] = None
+        for item in model:
+            if item['cid'] == self.code_or_cat['cid']:
+                item['supercid'] = parent_code['cid']
+                item['original_supercid'] = parent_code['cid']
+                item['catid'] = None
+                item['supercatid'] = None
+                break
+        global update_graphics_item_models  # noqa: F824
+        update_graphics_item_models = True
+
+    def remove_code_from_parent_code(self):
+        """ Detach this sub-code from its parent code, making it a top level code. """
+
+        self.code_or_cat['supercid'] = None
+        self.code_or_cat['original_supercid'] = None
+        global model  # noqa: F824
+        for item in model:
+            if item['cid'] == self.code_or_cat['cid']:
+                item['supercid'] = None
+                item['original_supercid'] = None
+                break
+        global update_graphics_item_models  # noqa: F824
+        update_graphics_item_models = True
+
     def merge_code_into_code(self):
         """ Merge code into another code.
          Keep nameless code in model. """
 
         unsorted_codes = []
         global model  # noqa: F824
+        # Exclude own descendant sub-codes (merging into a descendant would create a supercid cycle). <- L
+        src_cid = self.code_or_cat['cid']
+        children_map = {}
+        for it_ in model:
+            if it_['cid'] is not None and it_.get('supercid') is not None:
+                children_map.setdefault(it_['supercid'], []).append(it_['cid'])
+        descendants = set()
+        stack = list(children_map.get(src_cid, []))
+        while stack:
+            d = stack.pop()
+            if d in descendants:
+                continue
+            descendants.add(d)
+            stack.extend(children_map.get(d, []))
         for item in model:
-            if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "":
+            if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "" \
+                    and item['cid'] not in descendants:  # skip own sub-codes
                 unsorted_codes.append(item)
         # Sort codes alphabetically
         codes = sorted(unsorted_codes, key=lambda d: d['name'])

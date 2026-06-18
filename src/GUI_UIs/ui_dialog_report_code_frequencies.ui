@@ -28,13 +28,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>75</height>
+       <height>100</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>75</height>
+       <height>100</height>
       </size>
      </property>
      <property name="title">
@@ -195,6 +195,22 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_source_breakdown">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>68</y>
+        <width>451</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show frequencies broken down by where they were coded</string>
+      </property>
+      <property name="text">
+       <string>Breakdown by source (text / image / A/V)</string>
       </property>
      </widget>
     </widget>

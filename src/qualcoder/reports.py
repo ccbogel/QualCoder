@@ -24,7 +24,9 @@ from copy import copy, deepcopy
 import datetime
 import logging
 import openpyxl
-from openpyxl.styles import Font, PatternFill
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.properties import Outline
 import os
 import qtawesome as qta
 
@@ -86,7 +88,43 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
+        self.ui.checkBox_source_breakdown.stateChanged.connect(self._toggle_source_columns)
+        tree_header = self.ui.treeWidget.header()
+        tree_header.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        tree_header.customContextMenuRequested.connect(self._header_menu)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+
+    def _toggle_source_columns(self):
+        """ Show or hide the per-source (text / image / A-V) breakdown columns (2, 3, 4).
+        The data is always calculated; only the visibility changes. """
+        breakdown = self.ui.checkBox_source_breakdown.isChecked()
+        for col in (2, 3, 4):
+            self.ui.treeWidget.setColumnHidden(col, not breakdown)
+
+    def _header_menu(self, position):
+        """ Right click on a tree header: hide that column, or re-show hidden columns.
+        Column 0 (the code tree itself) cannot be hidden. Exports follow visibility. """
+        tree_header = self.ui.treeWidget.header()
+        col = tree_header.logicalIndexAt(position)
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_hide = None
+        if col > 0 and not self.ui.treeWidget.isColumnHidden(col):
+            action_hide = menu.addAction(_("Hide column: ") + self.ui.treeWidget.headerItem().text(col))
+        show_actions = {}
+        for i in range(1, self.ui.treeWidget.columnCount()):
+            if self.ui.treeWidget.isColumnHidden(i):
+                act = menu.addAction(_("Show column: ") + self.ui.treeWidget.headerItem().text(i))
+                show_actions[act] = i
+        if action_hide is None and not show_actions:
+            return
+        action = menu.exec(tree_header.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_hide:
+            self.ui.treeWidget.setColumnHidden(col, True)
+        elif action in show_actions:
+            self.ui.treeWidget.setColumnHidden(show_actions[action], False)
 
     def select_files_button(self):
         """ Report code frequencies for all files or selected files.
@@ -189,11 +227,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                                     'date': row[3], 'memo': row[4], 'supercatid': row[5],
                                     'display_list': [row[0], 'catid:' + str(row[1])]})
         self.codes = []
-        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color, supercid from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-                               'cid': row[4], 'catid': row[5], 'color': row[6],
+                               'cid': row[4], 'catid': row[5], 'color': row[6], 'supercid': row[7],
                                'display_list': [row[0], 'cid:' + str(row[4])]})
         self.coders = []
         cur.execute("select distinct owner from code_text union select distinct owner from code_image union "
@@ -208,17 +246,17 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             result = cur.fetchall()
             for row in result:
                 if row[2] in self.file_ids or self.file_ids == []:
-                    self.coded.append(row)
+                    self.coded.append((row[0], row[1], row[2], 'text'))
             cur.execute("select cid, owner, id from code_image")
             result = cur.fetchall()
             for row in result:
                 if row[2] in self.file_ids or self.file_ids == []:
-                    self.coded.append(row)
+                    self.coded.append((row[0], row[1], row[2], 'image'))
             cur.execute("select cid, owner, id from code_av")
             result = cur.fetchall()
             for row in result:
                 if row[2] in self.file_ids or self.file_ids == []:
-                    self.coded.append(row)
+                    self.coded.append((row[0], row[1], row[2], 'av'))
 
     def calculate_code_frequencies(self):
         """ Calculate the frequency of each code for all coders and the total.
@@ -227,6 +265,17 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         """
 
         for c in self.codes:
+            # Per-source breakdown first: these columns sit between Id and the coder columns
+            n_text = n_image = n_av = 0
+            for cit in self.coded:
+                if cit[0] == c['cid']:
+                    if cit[3] == 'text':
+                        n_text += 1
+                    elif cit[3] == 'image':
+                        n_image += 1
+                    elif cit[3] == 'av':
+                        n_av += 1
+            c['display_list'] += [n_text, n_image, n_av]
             total = 0
             for cn in self.coders:
                 count = 0
@@ -237,12 +286,28 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 c['display_list'].append(count)
             c['display_list'].append(total)
 
-        # Add the number of codes directly under each category to the category
+        # Map each code to the category of its top ancestor code, so a sub-code's codings
+        # are counted under the category that its parent code belongs to.
+        def effective_catid(code):
+            seen = set()
+            cur = code
+            while cur is not None and cur['catid'] is None and cur.get('supercid') \
+                    and cur['cid'] not in seen:
+                seen.add(cur['cid'])
+                parent = None
+                for cc in self.codes:
+                    if cc['cid'] == cur['supercid']:
+                        parent = cc
+                        break
+                cur = parent
+            return cur['catid'] if cur else None
+
+        # Add the number of codings of each code (including nested sub-codes) to its category
         for cat in self.categories:
-            # magic 3 = cat name, cat id and total columns
-            cat_list = [0] * (len(self.coders) + 3)
+            # 6 = cat name, cat id, total, and the three per-source columns
+            cat_list = [0] * (len(self.coders) + 6)
             for c in self.codes:
-                if c['catid'] == cat['catid']:
+                if effective_catid(c) == cat['catid']:
                     for i in range(2, len(c['display_list'])):
                         cat_list[i] += c['display_list'][i]
             cat_list = cat_list[2:]
@@ -324,7 +389,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         return depth
 
     def export_text_file(self):
-        """ Export coding frequencies to text file. """
+        """ Export coding frequencies to a structured text file, mirroring the tree view:
+        full hierarchy (indented), full names, and exactly the columns currently visible
+        (breakdown, coders, total, ids). """
 
         filename = "Code_frequencies.txt"
         e = ExportDirectoryPathDialog(self.app, filename)
@@ -332,25 +399,28 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if filepath is None:
             return
         text_ = _("Code frequencies") + "\n"
-        text_ += f"{self.app.project_name}\n"
+        text_ += _("Project: ") + f"{self.app.project_name}\n"
         text_ += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
+        if self.file_ids:
+            text_ += _("Files: ") + f"{len(self.file_ids)} " + _("selected") + "\n"
+        else:
+            text_ += _("Files: ") + _("All files") + "\n"
+        text_ += "\n"
+        headers = self.ui.treeWidget.headerItem()
+        visible_cols = [i for i in range(1, self.ui.treeWidget.columnCount())
+                        if not self.ui.treeWidget.isColumnHidden(i)]
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        item_total_position = 1 + len(self.coders)
         while item:
-            self.depthgauge(item)
-            cat = False
-            if item.text(1).split(':')[0] == "catid":
-                cat = True
-            prefix = ""
-            for i in range(0, self.depthgauge(item)):
-                prefix += "--"
-            if cat:
-                text_ += f"\n{prefix}" + _("Category: ") + item.text(0)
-                text_ += f", Frequency: {item.text(item_total_position)}"
-            else:
-                text_ += f"\n{prefix}" + _("Code: ") + item.text(0)
-                text_ += _(", Frequency: ") + item.text(item_total_position)
+            prefix = "  " * self.depthgauge(item)
+            is_cat = item.text(1).split(':')[0] == "catid"
+            label = _("Category: ") if is_cat else _("Code: ")
+            # Tooltip holds the full (untruncated) name
+            name = item.toolTip(0) if item.toolTip(0) != "" else item.text(0)
+            line = f"{prefix}{label}{name}"
+            for i in visible_cols:
+                line += f" | {headers.text(i)}: {item.text(i)}"
+            text_ += line + "\n"
             it += 1
             item = it.value()
         with open(filepath, 'w', encoding='utf-8-sig') as file_:
@@ -360,45 +430,128 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
 
     def export_excel_file(self):
-        """ Export data as excel. """
+        """ Export to a three-sheet Excel workbook, mirroring the current view (only the
+        visible columns are exported):
+        1. Report  - the indented hierarchy, exactly as displayed.
+        2. Outline - the same report with native Excel row grouping, so each branch can
+                     be collapsed/expanded with the +/- margin buttons.
+        3. Data    - a flat 'tidy' sheet (one column per level, plus type and depth),
+                     suited to pivot tables, filters and formulas. """
 
-        header = [_("Code Tree"), "Id"]
-        for coder in self.coders:
-            header.append(coder)
-        header.append("Total")
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        # Column headings
-        for col, code in enumerate(header):
-            ws.cell(column=col + 1, row=1, value=code)
-            ws.cell(column=col + 1, row=1).font = Font(b=True)
-        # Data
-        data = []
-        code_colors = []
+        headers_item = self.ui.treeWidget.headerItem()
+        visible_cols = [i for i in range(1, self.ui.treeWidget.columnCount())
+                        if not self.ui.treeWidget.isColumnHidden(i)]
+        # Walk the tree once, collecting every row with its depth, ancestry and values
+        rows = []
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:
-            row = []
-            for i in range(0, len(header)):
-                row.append(item.text(i))
-            if row[1][:3] == "cid":
-                cid = int(row[1][4:])
+            is_code = item.text(1)[:3] == "cid"
+            # Tooltip holds the full (untruncated) name
+            name = item.toolTip(0) if item.toolTip(0) != "" else item.text(0)
+            color = None
+            if is_code:
+                cid = int(item.text(1)[4:])
                 for code_ in self.codes:
                     if cid == code_['cid']:
-                        row[0] = code_['name']  # Full not abbreviated name
-                        code_colors.append(code_['color'][1:])
-            else:
-                code_colors.append(None)
+                        color = code_['color']
+                        break
+            ancestors = []  # (name, is_code) pairs, topmost first
+            parent = item.parent()
+            while parent is not None:
+                p_name = parent.toolTip(0) if parent.toolTip(0) != "" else parent.text(0)
+                ancestors.insert(0, (p_name, parent.text(1)[:3] == "cid"))
+                parent = parent.parent()
+            chain = ancestors + [(name, is_code)]
+            cat_chain = [n for n, code_flag in chain if not code_flag]
+            code_chain = [n for n, code_flag in chain if code_flag]
+            values = []
+            for col in visible_cols:
+                try:
+                    values.append(int(item.text(col)))
+                except ValueError:
+                    values.append(item.text(col))
+            rows.append({'depth': len(ancestors), 'name': name, 'is_code': is_code,
+                         'color': color, 'cat_chain': cat_chain, 'code_chain': code_chain,
+                         'values': values})
             it += 1
             item = it.value()
-            data.append(row)
 
-        for row, data_row in enumerate(data):
-            for col, datum in enumerate(data_row):
-                ws.cell(column=col + 1, row=row + 2, value=datum)
-            if code_colors[row]:
-                pf = PatternFill(start_color=code_colors[row], end_color=code_colors[row], fill_type="solid")
-                ws.cell(column=1, row=row + 2).fill = pf
+        date_str = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        if self.file_ids:
+            files_txt = f"{len(self.file_ids)} " + _("selected files")
+        else:
+            files_txt = _("All files")
+        header = [_("Code Tree")] + [headers_item.text(i) for i in visible_cols]
+        wb = openpyxl.Workbook()
+
+        def write_report_sheet(ws, outline):
+            """ Indented report; with outline=True adds native Excel row grouping. """
+            ws.cell(column=1, row=1,
+                    value=_("Code frequencies") + " - " + self.app.project_name).font = Font(b=True, size=12)
+            ws.cell(column=1, row=2, value=_("Date: ") + date_str)
+            ws.cell(column=1, row=3, value=_("Files: ") + files_txt)
+            header_row = 5
+            for col, head in enumerate(header):
+                ws.cell(column=col + 1, row=header_row, value=head).font = Font(b=True)
+            ws.freeze_panes = f"A{header_row + 1}"
+            if outline:
+                # +/- buttons at the parent (summary) row, above each branch
+                ws.sheet_properties.outlinePr = Outline(summaryBelow=False, summaryRight=False)
+            row_n = header_row
+            for r in rows:
+                row_n += 1
+                # Native cell indentation: the hierarchy stays visible but the cell value
+                # is the clean name, without padding spaces
+                name_cell = ws.cell(column=1, row=row_n, value=r['name'])
+                if r['depth'] > 0:
+                    name_cell.alignment = Alignment(horizontal='left', indent=r['depth'])
+                if r['is_code'] and r['color']:
+                    name_cell.fill = PatternFill(start_color=r['color'][1:],
+                                                 end_color=r['color'][1:], fill_type="solid")
+                    name_cell.font = Font(color=TextColor(r['color']).recommendation[1:])
+                elif not r['is_code']:
+                    name_cell.font = Font(b=True)
+                for out_col, value in enumerate(r['values'], start=2):
+                    ws.cell(column=out_col, row=row_n, value=value)
+                if outline and r['depth'] > 0:
+                    # Excel supports at most 7 grouping levels
+                    ws.row_dimensions[row_n].outline_level = min(r['depth'], 7)
+            ws.column_dimensions['A'].width = 45
+
+        ws1 = wb.active
+        ws1.title = _("Report")[:31]
+        write_report_sheet(ws1, outline=False)
+        ws2 = wb.create_sheet(_("Outline")[:31])
+        write_report_sheet(ws2, outline=True)
+
+        # Tidy data sheet: only code and sub-code rows (category rows are aggregates and
+        # would add blank cells and double counting when pivoting). Each row repeats its
+        # ancestry, split into typed columns: the category chain (Category level 1..N,
+        # topmost first) and the code chain (Code level 1, then Sub-code level 2..N).
+        data_rows = [r for r in rows if r['is_code']]
+        max_cat = max((len(r['cat_chain']) for r in data_rows), default=0)
+        max_code = max((len(r['code_chain']) for r in data_rows), default=0)
+        ws3 = wb.create_sheet(_("Data")[:31])
+        tidy_header = [_("Category level") + f" {i + 1}" for i in range(max_cat)]
+        for i in range(max_code):
+            tidy_header.append(_("Code level 1") if i == 0 else _("Sub-code level") + f" {i + 1}")
+        tidy_header += [_("Depth")] + [headers_item.text(i) for i in visible_cols]
+        for col, head in enumerate(tidy_header):
+            ws3.cell(column=col + 1, row=1, value=head).font = Font(b=True)
+        ws3.freeze_panes = "A2"
+        for row_i, r in enumerate(data_rows, start=2):
+            for col, level_name in enumerate(r['cat_chain']):
+                ws3.cell(column=col + 1, row=row_i, value=level_name)
+            for j, level_name in enumerate(r['code_chain']):
+                ws3.cell(column=max_cat + 1 + j, row=row_i, value=level_name)
+            base = max_cat + max_code + 1  # 1-based column of Depth
+            ws3.cell(column=base, row=row_i, value=r['depth'] + 1)
+            for off, value in enumerate(r['values']):
+                ws3.cell(column=base + 1 + off, row=row_i, value=value)
+        for i in range(max_cat + max_code):
+            ws3.column_dimensions[get_column_letter(i + 1)].width = 28
+
         filename = "Code_frequencies.xlsx"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
@@ -421,6 +574,55 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
 
+    def _nest_subcodes_in_tree(self):
+        """ Re-parent code tree items so sub-codes (supercid) nest under their parent
+        code. Runs after fill_tree has placed every code. Preserves item flags,
+        checkboxes, colour and count because the existing item is moved, not rebuilt.
+        No-op for projects without sub-codes. """
+        tree = getattr(getattr(self, 'ui', None), 'treeWidget', None) or getattr(self, 'tree', None)
+        if tree is None:
+            return
+        code_list = getattr(self, 'code_names', None)
+        if code_list is None:
+            code_list = getattr(self, 'codes', [])
+        supercid_of = {c['cid']: c.get('supercid') for c in code_list}
+        if not any(supercid_of.values()):
+            return
+        guard = 0
+        moved = True
+        while moved and guard < 10000:
+            moved = False
+            guard += 1
+            cid_item = {}
+            it = QtWidgets.QTreeWidgetItemIterator(tree)
+            while it.value():
+                node = it.value()
+                t = node.text(1)
+                if t.startswith('cid:'):
+                    try:
+                        cid_item[int(t[4:])] = node
+                    except ValueError:
+                        pass
+                it += 1
+            for cid_, node in cid_item.items():
+                sup = supercid_of.get(cid_)
+                if sup is None:
+                    continue
+                parent_node = cid_item.get(sup)
+                if parent_node is None or node.parent() is parent_node:
+                    continue
+                cur_parent = node.parent()
+                if cur_parent is None:
+                    idx = tree.indexOfTopLevelItem(node)
+                    taken = tree.takeTopLevelItem(idx)
+                else:
+                    taken = cur_parent.takeChild(cur_parent.indexOfChild(node))
+                parent_node.addChild(taken)
+                parent_node.setExpanded(True)  # show the nested sub-code from the start <- L
+                taken.setExpanded(True)
+                moved = True
+                break
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -428,7 +630,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        header = [_("Code Tree"), "Id"]
+        header = [_("Code Tree"), "Id", _("Text"), _("Image"), "A/V"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
@@ -438,6 +640,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
+        # The per-source columns (2, 3, 4) are shown only when the breakdown checkbox is ticked
+        breakdown = self.ui.checkBox_source_breakdown.isChecked()
+        for col in (2, 3, 4):
+            self.ui.treeWidget.setColumnHidden(col, not breakdown)
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -530,8 +736,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     item.addChild(child)
                 it += 1
                 item = it.value()
+        self._nest_subcodes_in_tree()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         restore_persistent_tree_widths(self.ui.treeWidget)
+        # Show the full hierarchy expanded (categories, sub-categories, codes and
+        # sub-codes), without altering the app-wide collapsed-categories memory.
+        self.ui.treeWidget.blockSignals(True)
+        self.ui.treeWidget.expandAll()
+        self.ui.treeWidget.blockSignals(False)
 
     def tree_menu(self, position):
         menu = QtWidgets.QMenu()
@@ -952,6 +1164,55 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
 
+    def _nest_subcodes_in_tree(self):
+        """ Re-parent code tree items so sub-codes (supercid) nest under their parent
+        code. Runs after fill_tree has placed every code. Preserves item flags,
+        checkboxes, colour and count because the existing item is moved, not rebuilt.
+        No-op for projects without sub-codes. """
+        tree = getattr(getattr(self, 'ui', None), 'treeWidget', None) or getattr(self, 'tree', None)
+        if tree is None:
+            return
+        code_list = getattr(self, 'code_names', None)
+        if code_list is None:
+            code_list = getattr(self, 'codes', [])
+        supercid_of = {c['cid']: c.get('supercid') for c in code_list}
+        if not any(supercid_of.values()):
+            return
+        guard = 0
+        moved = True
+        while moved and guard < 10000:
+            moved = False
+            guard += 1
+            cid_item = {}
+            it = QtWidgets.QTreeWidgetItemIterator(tree)
+            while it.value():
+                node = it.value()
+                t = node.text(1)
+                if t.startswith('cid:'):
+                    try:
+                        cid_item[int(t[4:])] = node
+                    except ValueError:
+                        pass
+                it += 1
+            for cid_, node in cid_item.items():
+                sup = supercid_of.get(cid_)
+                if sup is None:
+                    continue
+                parent_node = cid_item.get(sup)
+                if parent_node is None or node.parent() is parent_node:
+                    continue
+                cur_parent = node.parent()
+                if cur_parent is None:
+                    idx = tree.indexOfTopLevelItem(node)
+                    taken = tree.takeTopLevelItem(idx)
+                else:
+                    taken = cur_parent.takeChild(cur_parent.indexOfChild(node))
+                parent_node.addChild(taken)
+                parent_node.setExpanded(True)  # show the nested sub-code from the start <- L
+                taken.setExpanded(True)
+                moved = True
+                break
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -1043,6 +1304,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                     item.addChild(child)
                 it += 1
                 item = it.value()
+        self._nest_subcodes_in_tree()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         restore_persistent_tree_widths(self.ui.treeWidget)
 

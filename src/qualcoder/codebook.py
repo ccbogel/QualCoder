@@ -49,6 +49,55 @@ class Codebook:
         self.fill_tree()
         self.export_odt()
 
+    def _nest_subcodes_in_tree(self):
+        """ Re-parent code tree items so sub-codes (supercid) nest under their parent
+        code. Runs after fill_tree has placed every code. Preserves item flags,
+        checkboxes, colour and count because the existing item is moved, not rebuilt.
+        No-op for projects without sub-codes. """
+        tree = getattr(getattr(self, 'ui', None), 'treeWidget', None) or getattr(self, 'tree', None)
+        if tree is None:
+            return
+        code_list = getattr(self, 'code_names', None)
+        if code_list is None:
+            code_list = getattr(self, 'codes', [])
+        supercid_of = {c['cid']: c.get('supercid') for c in code_list}
+        if not any(supercid_of.values()):
+            return
+        guard = 0
+        moved = True
+        while moved and guard < 10000:
+            moved = False
+            guard += 1
+            cid_item = {}
+            it = QtWidgets.QTreeWidgetItemIterator(tree)
+            while it.value():
+                node = it.value()
+                t = node.text(1)
+                if t.startswith('cid:'):
+                    try:
+                        cid_item[int(t[4:])] = node
+                    except ValueError:
+                        pass
+                it += 1
+            for cid_, node in cid_item.items():
+                sup = supercid_of.get(cid_)
+                if sup is None:
+                    continue
+                parent_node = cid_item.get(sup)
+                if parent_node is None or node.parent() is parent_node:
+                    continue
+                cur_parent = node.parent()
+                if cur_parent is None:
+                    idx = tree.indexOfTopLevelItem(node)
+                    taken = tree.takeTopLevelItem(idx)
+                else:
+                    taken = cur_parent.takeChild(cur_parent.indexOfChild(node))
+                parent_node.addChild(taken)
+                parent_node.setExpanded(True)  # show the nested sub-code from the start <- L
+                taken.setExpanded(True)
+                moved = True
+                break
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes
         """
@@ -117,6 +166,7 @@ class Codebook:
                     c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
+        self._nest_subcodes_in_tree()
 
     def export_odt(self):
         """ Export ODT version of the codebook """

@@ -431,6 +431,17 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             for code in codes:
                 if code['catid'] == category['catid']:
                     selected_codes.append(code)
+        # Include descendant sub-codes (supercid) of the selected codes, cascading, so a
+        # category selection also analyses the sub-codes nested under its codes. <- L
+        selected_cids = {c['cid'] for c in selected_codes}
+        changed = True
+        while changed:
+            changed = False
+            for code in codes:
+                if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                    selected_codes.append(code)
+                    selected_cids.add(code['cid'])
+                    changed = True
         return selected_codes
 
     def process_data(self):
