@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\GUI_UIs\ui_main.ui'
+# Form implementation generated from reading ui file 'src/GUI_UIs/ui_main.ui'
 #
 # Created by: PyQt6 UI code generator 6.9.1
 #
@@ -36,24 +36,24 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_action_log, "")
         self.tab_manage = QtWidgets.QWidget()
         self.tab_manage.setObjectName("tab_manage")
-        self.label_manage = QtWidgets.QLabel(parent=self.tab_manage)
-        self.label_manage.setGeometry(QtCore.QRect(20, 20, 861, 71))
-        self.label_manage.setWordWrap(True)
-        self.label_manage.setObjectName("label_manage")
+        self.textBrowser_manage = QtWidgets.QTextBrowser(parent=self.tab_manage)
+        self.textBrowser_manage.setGeometry(QtCore.QRect(10, 10, 780, 500))
+        self.textBrowser_manage.setOpenExternalLinks(True)
+        self.textBrowser_manage.setObjectName("textBrowser_manage")
         self.tabWidget.addTab(self.tab_manage, "")
         self.tab_coding = QtWidgets.QWidget()
         self.tab_coding.setObjectName("tab_coding")
-        self.label_coding = QtWidgets.QLabel(parent=self.tab_coding)
-        self.label_coding.setGeometry(QtCore.QRect(20, 20, 811, 71))
-        self.label_coding.setWordWrap(True)
-        self.label_coding.setObjectName("label_coding")
+        self.textBrowser_coding = QtWidgets.QTextBrowser(parent=self.tab_coding)
+        self.textBrowser_coding.setGeometry(QtCore.QRect(10, 10, 780, 500))
+        self.textBrowser_coding.setOpenExternalLinks(True)
+        self.textBrowser_coding.setObjectName("textBrowser_coding")
         self.tabWidget.addTab(self.tab_coding, "")
         self.tab_reports = QtWidgets.QWidget()
         self.tab_reports.setObjectName("tab_reports")
-        self.label_reports = QtWidgets.QLabel(parent=self.tab_reports)
-        self.label_reports.setGeometry(QtCore.QRect(20, 20, 831, 71))
-        self.label_reports.setWordWrap(True)
-        self.label_reports.setObjectName("label_reports")
+        self.textBrowser_reports = QtWidgets.QTextBrowser(parent=self.tab_reports)
+        self.textBrowser_reports.setGeometry(QtCore.QRect(10, 10, 780, 500))
+        self.textBrowser_reports.setOpenExternalLinks(True)
+        self.textBrowser_reports.setObjectName("textBrowser_reports")
         self.tabWidget.addTab(self.tab_reports, "")
         self.tab_ai_chat = QtWidgets.QWidget()
         self.tab_ai_chat.setObjectName("tab_ai_chat")
@@ -326,18 +326,39 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "QualCoder"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_action_log), _translate("MainWindow", "Action Log"))
-        self.label_manage.setText(_translate("MainWindow", "Select an option in the Files and Cases menu. "))
+        self.textBrowser_manage.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:\'Segoe UI\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select an option from the Manage menu</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_manage), _translate("MainWindow", "Manage"))
-        self.label_coding.setText(_translate("MainWindow", "Select an option in the Coding menu. "))
+        self.textBrowser_coding.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:\'Segoe UI\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select an option from the coding menu</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_coding), _translate("MainWindow", "Coding"))
-        self.label_reports.setText(_translate("MainWindow", "Select an option in the Reports menu. "))
+        self.textBrowser_reports.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:\'Segoe UI\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select an option from the Analysis or Reports menu</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_reports), _translate("MainWindow", "Reports"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_ai_chat), _translate("MainWindow", "AI Chat"))
         self.menuProject.setTitle(_translate("MainWindow", "Project"))

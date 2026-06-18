@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
@@ -56,7 +57,7 @@ from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
-from qualcoder.locale.base64_lang_helper import *
+from qualcoder.information import manage_tab_info, coding_tab_info, reports_tab_info
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
@@ -79,7 +80,6 @@ from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 from qualcoder.taguette_import import TaguetteImport
-# from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
@@ -129,7 +129,7 @@ logger.addHandler(handler)
 
 class ProjectEventBus(QtCore.QObject):
     """Application-wide event bus for project database changes.
-    This is used to notify other dialogs (e.g. reports) of changes to the project database, 
+    This is used to notify other dialogs (e.g. reports) of changes to the project database,
     so they can update their UI (e.g the code tree)."""
 
     project_data_changed = QtCore.pyqtSignal(list, object)
@@ -173,7 +173,7 @@ class App(object):
     # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
     ai_embedding_function = None
     project_events = None
-    
+
     def __init__(self):
         self.conn = None
         self.project_path = ""
@@ -289,7 +289,7 @@ class App(object):
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
-        
+
     def get_project_memo(self) -> str:
         # Might be called from a different thread (ai asynch operations), so have to create a new database connection
         conn = sqlite3.connect(os.path.join(self.project_path, 'data.qda'))
@@ -401,7 +401,7 @@ class App(object):
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
-    
+
     def get_text_fulltext(self, id_, start_pos=None, length=None) -> str:
         """Extracts text from the database in the document with the given id_.
 
@@ -441,10 +441,10 @@ class App(object):
         cumulative_length = 0
         start_line_number = 0
         end_line_number = 0
-        
+
         # Iterate through each line and find the line numbers
         for i, line in enumerate(lines):
-            cumulative_length += len(line) + 1  # +1 for the newline character          
+            cumulative_length += len(line) + 1  # +1 for the newline character
             # Determine if the start position falls within this line
             if start_line_number == 0 and cumulative_length > quote_start:
                 start_line_number = i + 1  # Line numbers are usually 1-indexed
@@ -452,7 +452,7 @@ class App(object):
             if end_line_number == 0 and cumulative_length > quote_end:
                 end_line_number = i + 1  # Line numbers are usually 1-indexed
                 break  # We can break early since both start and end line numbers are found
-                
+
         return start_line_number, end_line_number
 
     def get_pdf_filenames(self, ids:list[int]|None = None):
@@ -598,7 +598,7 @@ class App(object):
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
-    
+
     def check_bad_file_links(self, id_:int|None=None):
         """ Check all linked files are present.
         Will not state a bad link to an internally created text file.
@@ -656,9 +656,9 @@ class App(object):
             config[model_section]['reasoning_effort'] = model['reasoning_effort']
             config[model_section]['api_base'] = model['api_base']
             config[model_section]['api_key'] = model['api_key']
-        
+
         with open(self.configpath, 'w', encoding='utf-8') as configfile:
-            config.write(configfile)            
+            config.write(configfile)
 
     def _load_config_ini(self):
         """ load config settings, and convert some to Integer or Boolean. """
@@ -695,7 +695,7 @@ class App(object):
                 result['showids'] = True
         if 'report_text_context_characters' in default:
             result['report_text_context_characters'] = default.getint('report_text_context_characters')
-        
+
         # load AI model list
         ai_models = []
         for section in config.sections():
@@ -716,7 +716,7 @@ class App(object):
         if len(ai_models) == 0:  # no models loaded, create default
             ai_models = get_default_ai_models()
         else:
-            current_ai_model_index = int(result.get('ai_model_index', -1)) 
+            current_ai_model_index = int(result.get('ai_model_index', -1))
             ai_models, result['ai_model_index'] = update_ai_models(ai_models, current_ai_model_index)
         return result, ai_models
 
@@ -796,7 +796,7 @@ class App(object):
                 if key == 'ai_enable':
                     settings_data[key] = 'False'
                 if key == 'ai_first_startup':
-                    settings_data[key] = 'True' 
+                    settings_data[key] = 'True'
                 if key == 'ai_model_index':
                     settings_data[key] = '0'
                 if key == 'ai_permissions':
@@ -821,7 +821,7 @@ class App(object):
         if settings_updated or len(settings_data) > dict_len:
             self.write_config_ini(settings_data, ai_models)
         return settings_data, ai_models
-    
+
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
@@ -867,7 +867,7 @@ class App(object):
         QMenu::item:disabled {color: #707070;}\n\
         QPushButton {background-color: #858585;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
-        QRadioButton::indicator {border: 1px solid #858585; background-color: #2a2a2a;}\n\
+        QRadioButton::indicator {border: 2px solid #858585; background-color: None;}\n\
         QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
         QSplitter::handle {background-color: #909090;}\n\
@@ -920,6 +920,9 @@ class App(object):
         QMenu {background-color: #efefef; border: 1px solid #808080;}\n\
         QMenu::item:selected {background-color: #fafafa;}\n\
         QMenu::item:disabled {background-color: #efefef; color: #707070;}\n\
+        QRadioButton{background-color: None;}\n\
+        QRadioButton::indicator {border: 2px solid #858585; background-color: None;}\n\
+        QRadioButton::indicator::checked {border: 2px solid #858585; background-color: efefef;}\n\
         QSpinBox {border: 1px solid #808080;}\n\
         QSplitter::handle {background-color: #808080;}\n\
         QSplitter::handle:horizontal {width: 2px;}\n\
@@ -999,7 +1002,7 @@ class App(object):
         style = "\n".join(style_lines)'''
         # print("\nSTYLE\n", style)
         return style
-    
+
     def highlight_color(self):
         """ Get the default highlight color, depending on the current style
         """
@@ -1232,9 +1235,9 @@ class App(object):
         for row in cur.fetchall():
             result.append(dict(zip(keys, row)))
         return result
-    
+
     def get_last_project_coder(self) -> str:
-        """Returns the last coder name stored in the project table or 
+        """Returns the last coder name stored in the project table or
         an empty string if nothing is found there (old dab version 1-4)"""
         if self.conn is None:
             return ""
@@ -1243,29 +1246,29 @@ class App(object):
             cur.execute("SELECT codername FROM project")
             res = cur.fetchone()
             if res is not None and res[0] is not None:
-                return res[0]                   
+                return res[0]
         except sqlite3.OperationalError:  # db vers. 1-4 did not have codername in project table
             return ""
-        
+
     def update_coder_names(self):
         """
-        Collects names from the 'owner' field in all tables, and updates the 
+        Collects names from the 'owner' field in all tables, and updates the
         table 'coder_names' accordingly. The table will be created if not present.
-        
-        The function also creates views that filter out invisible coders for the 
-        following tables: 
-        code_image --> code_image_visible 
-        code_text  --> code_text_visible 
-        code_av    --> code_av_visible 
+
+        The function also creates views that filter out invisible coders for the
+        following tables:
+        code_image --> code_image_visible
+        code_text  --> code_text_visible
+        code_av    --> code_av_visible
         annotation --> annotation_visible
         """
         if self.conn is None:
             return
         system_coder_names = [speaker_coder_name]  # in the future, we could add '🤖 AI' to the list, and more...
-        
+
         cur = self.conn.cursor()
         initial_changes = self.conn.total_changes
-        
+
         try:
             # create table 'coder_names' if not already present
             sql = """
@@ -1273,7 +1276,7 @@ class App(object):
                     name TEXT UNIQUE NOT NULL,
                     visibility INTEGER NOT NULL DEFAULT 1 CHECK (visibility IN (0, 1))
                 );
-            """        
+            """
             cur.execute(sql)
 
             # Collect used coder names from all tables and add them to 'coder_names'.
@@ -1299,23 +1302,23 @@ class App(object):
 
             # Ensure current coder is added and visible
             sql = """
-                INSERT INTO coder_names (name, visibility) 
-                VALUES (?, 1) 
-                ON CONFLICT(name) 
+                INSERT INTO coder_names (name, visibility)
+                VALUES (?, 1)
+                ON CONFLICT(name)
                 DO UPDATE SET visibility = 1
                 WHERE coder_names.visibility <> 1
             """
             cur.execute(sql, (self.settings['codername'],))
-            
+
             # Ensure last coder from project is added
             last_project_coder = self.get_last_project_coder()
             if last_project_coder != "":
-                cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (last_project_coder, ))                    
-            
+                cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (last_project_coder, ))
+
             # Ensure system coder names are added
             for name in system_coder_names:
                 cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (name, ))
-            
+
             # create views
             cur.execute("""
                 CREATE VIEW IF NOT EXISTS code_image_visible AS
@@ -1369,7 +1372,7 @@ class App(object):
             print(err)
             self.conn.rollback()
             raise
-    
+
     def get_coder_names_in_project(self, only_visible=False):
         """ Get all coder names from all tables and from the config.ini file
         Design flaw is that current codername is not stored in a specific table in Database Versions 1 to 4.
@@ -1379,7 +1382,7 @@ class App(object):
         Returns:
             List of String coder names
         """
-        
+
         if self.conn is None:
             return [self.settings['codername']]
 
@@ -1396,9 +1399,9 @@ class App(object):
             for r in res:
                 coder_names.append(r[0])
         except sqlite3.OperationalError:
-            pass        
+            pass
         return coder_names
-         
+
     def save_backup(self, suffix:str=""):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
@@ -1461,7 +1464,7 @@ class App(object):
         # Delete backup path - delete the backup if no changes occurred in the project during the session
         self.delete_backup_path_name = backup
         return msg, backup
-        
+
     def help_wiki(self, page_path:str):
         """ Open website doc help page in https://qualcoder.org.
         Assumes English pages are present as a default.
@@ -1477,7 +1480,7 @@ class App(object):
             if err.code == 404:
                 lang = "en"
         webbrowser.open(f"https://qualcoder.org/doc/{lang}/{page_path}")
-       
+
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -1504,13 +1507,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_chat_sidebar_mode = False
         self.ai_chat_tab_sidebar_button = None
         self.last_non_ai_chat_tab = None
-        
+
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
             # Make 'Fusion' the standard native style on Windows https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
             # The default 'Windows' style seems partially broken at the moment, in combination with the native dark mode.
             # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
             QtWidgets.QApplication.instance().setStyle("Fusion")
-       
+
         QtWidgets.QMainWindow.__init__(self)
         self.ai_sidebar_splitter_save_timer = QtCore.QTimer(self)
         self.ai_sidebar_splitter_save_timer.setSingleShot(True)
@@ -1562,11 +1565,11 @@ Click "Yes" to start now.')
                 while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
                     reply = msg_box.exec()
                     if reply == QtWidgets.QMessageBox.StandardButton.Help:
-                        self.app.help_wiki("2.3.-AI-Setup")                
+                        self.app.help_wiki("2.3.-AI-Setup")
                 if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                     self.ai_setup_wizard()  # (will also init the llm)
             else:
-                self.app.ai.init_llm(self)      
+                self.app.ai.init_llm(self)
             self.app.settings['ai_first_startup'] = 'False'
             self.app.write_config_ini(self.app.settings, self.app.ai_models)
         except Exception as err:
@@ -1575,7 +1578,7 @@ Click "Yes" to start now.')
             tb_obj = err.__traceback__
             # log the exception and show error msg
             qt_exception_hook.exception_hook(type_e, value, tb_obj)
-    
+
     def init_ui(self):
         """ Set up menu triggers """
 
@@ -1683,11 +1686,16 @@ Click "Yes" to start now.')
         self.ui.sidebar.setMinimumWidth(0)
         self.ui.splitter.splitterMoved.connect(self.on_main_splitter_moved)
         self.settings_report()
-        
+
         self.ui.tabWidget.setCurrentIndex(0)
         self.last_non_ai_chat_tab = self.ui.tab_action_log
         self.ai_chat()
-        # add tab widget icons
+
+        self.ui.textBrowser_manage.setHtml(manage_tab_info)
+        self.ui.textBrowser_coding.setHtml(coding_tab_info)
+        self.ui.textBrowser_reports.setHtml(reports_tab_info)
+
+        # Add tab widget icons
         try:
             self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.cog', color=self.app.highlight_color()))  # Action Log
             self.ui.tabWidget.setTabIcon(1, qta.icon('mdi6.file-outline', color=self.app.highlight_color()))  # Manage
@@ -1697,7 +1705,7 @@ Click "Yes" to start now.')
         except Exception as e_:
             logger.log(e_)
         self._setup_ai_chat_tab_sidebar_button()
-        
+
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
         Add up to five recent projects to the menu. """
@@ -1854,10 +1862,6 @@ Click "Yes" to start now.')
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
-        # TODO FOR FUTURE EXPANSION text mining
-        self.ui.actionText_mining.setEnabled(False)
-        self.ui.actionText_mining.setVisible(False)
-
     def keyPressEvent(self, event):
         """ Used to open top level menus. """
 
@@ -1878,123 +1882,123 @@ Click "Yes" to start now.')
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}</p>")
-        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
-        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}\n"
-        msg += _("Working directory") + f": {self.app.settings['directory']}\n"
-        msg += _("Show IDs") + f": {self.app.settings['showids']}\n"
-        msg += _("Language") + f": {self.app.settings['language']}\n"
-        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}\n"
-        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}\n"
-        msg += _("Report text context characters: ") + str(self.app.settings['report_text_context_characters']) + "\n"
-        msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
-        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
-        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
+        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}<br />")
+        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}<br />"
+        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}<br />"
+        msg += _("Working directory") + f": {self.app.settings['directory']}<br />"
+        msg += _("Show IDs") + f": {self.app.settings['showids']}<br />"
+        msg += _("Language") + f": {self.app.settings['language']}<br />"
+        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}<br />"
+        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}<br />"
+        msg += _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}<br />"
+        msg += _("Report text context style: ") + f"{self.app.settings['report_text_context_style']}<br />"
+        msg += _("Style") + f": {self.app.settings['stylesheet']}<br />"
+        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}<br />"
+        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}<br />"
         if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI integration is enabled") + "\n"
+            msg += _("AI integration is enabled") + "<br />"
         else:
-            msg += _("AI integration is disabled") + "\n"
+            msg += _("AI integration is disabled") + "<br />"
         ai_permissions = self.app.settings.get('ai_permissions', 1)
         ai_permissions_labels = {
             0: 'Read-only',
             1: 'Sandboxed',
             2: 'Full access'
         }
-        msg += _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}\n"
-        msg += _("Style") + f"; {self.app.settings['stylesheet']}"
+        msg += _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}</p>"
         self.ui.textEdit.append(msg)
         if platform.system() == "Windows":
-            self.ui.textEdit.append("<p>" + _("Folder paths / represents backslash") + "</p>")
-        self.ui.textEdit.append("<p>&nbsp;</p>")
+            self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
+        self.ui.textEdit.append("<p></p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def text_segments_codes_table(self):
         """ Show table of text segments (rows) by codes (columns). """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogCodesBySegments(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_sql(self):
         """ Run SQL statements on database. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding_comparison(self):
         """ Compare two or more coders across all text files using Cohens Kappa. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_comparison_table(self):
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportComparisonTable(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_compare_coders_by_file(self):
         """ Compare two coders selection by file - text, A/V or image. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogCompareCoderByFile(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_relations(self):
         """ Show code relations in text files. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportRelations(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def co_occurence(self):
         """ Show overlapping codes in text files. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCooccurrence(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_exact_text_matches(self):
         """ Show exact text coding matches in text files. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportExactTextMatches(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding(self):
         """ Report on coding and categories. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCodes(self.app, self.ui.textEdit, self.ui.tab_coding)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_file_summary(self):
         """ Report on file details. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportFileSummary(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_summary(self):
         """ Report on code details. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = DialogReportCodeSummary(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
         """ Show list or acyclic graph of codes and categories. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = ViewGraph(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
@@ -2002,7 +2006,7 @@ Click "Yes" to start now.')
     def view_charts(self):
         """ Show charts of codes and categories. """
 
-        self.ui.label_reports.hide()
+        self.ui.textBrowser_reports.hide()
         ui = ViewCharts(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
@@ -2016,7 +2020,7 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(menu_shortcuts_display)
         self.ui.textEdit.append(coding_shortcuts_display)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
-        
+
     def action_log_scroll_bottom(self):
         """Scrolls the action log to the very bottom, malking new entries visible."""
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
@@ -2041,7 +2045,7 @@ Click "Yes" to start now.')
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -2067,7 +2071,7 @@ Click "Yes" to start now.')
         Identify qualitative questions and assign these data to the source table for
         coding and review. Modal dialog. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -2075,7 +2079,7 @@ Click "Yes" to start now.')
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogCases(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -2084,7 +2088,7 @@ Click "Yes" to start now.')
         plain text. Rename, delete and add memos to files.
         """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports, self)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -2092,7 +2096,7 @@ Click "Yes" to start now.')
         """ Fix any bad links to files.
         File names must match but paths can be different. """
 
-        self.ui.label_manage.hide()
+        self.ui.textBrowser_manage.hide()
         ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
@@ -2103,7 +2107,6 @@ Click "Yes" to start now.')
         """ Create and edit journals.
         From version 3.4 in a non-modal window. """
 
-        self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.journal_display = ui
@@ -2111,7 +2114,7 @@ Click "Yes" to start now.')
 
     def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. 
+        text in imported text files.
         Args:
             task: "documents": The default, shows the tab with the text documents
                   "ai_search": Shows the tab "AI Search"
@@ -2122,7 +2125,7 @@ Click "Yes" to start now.')
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
-            self.ui.label_coding.hide()
+            self.ui.textBrowser_coding.hide()
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -2136,7 +2139,7 @@ Click "Yes" to start now.')
                 ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
                 if doc_id is not None:
                     ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
-                    ui.mark_speakers()                               
+                    ui.mark_speakers()
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
@@ -2147,7 +2150,7 @@ Click "Yes" to start now.')
 
         files = self.app.get_pdf_filenames()
         if len(files) > 0:
-            self.ui.label_coding.hide()
+            self.ui.textBrowser_coding.hide()
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -2163,7 +2166,7 @@ Click "Yes" to start now.')
         pdf_files = self.app.get_pdf_filenames()
 
         if len(image_files) + len(pdf_files) > 0:
-            self.ui.label_coding.hide()
+            self.ui.textBrowser_coding.hide()
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -2184,7 +2187,7 @@ Click "Yes" to start now.')
             msg = _("VLC is not installed. Cannot code audio/video files.")
             Message(self.app, _('Install VLC'), msg).exec()
             return
-        self.ui.label_coding.hide()
+        self.ui.textBrowser_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
@@ -2203,7 +2206,7 @@ Click "Yes" to start now.')
     def code_organiser(self):
         """ Organise codes structure. """
 
-        self.ui.label_coding.setText("")
+        self.ui.textBrowser_coding.setText("")
         ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, None)
@@ -2650,7 +2653,8 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text, last_ai_chat_id integer)")
+            "bookmarkpos integer, codername text, recently_used_codes text, last_ai_chat_id integer, "
+            "avbookmarkfile integer, avbookmarkmsec integer, avbookmarktextpos integer)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -2720,9 +2724,9 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,?)",
-                    ('v15', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
-                     0, self.app.settings['codername'], "", None))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                    ('v15', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version,
+                     0, 0, self.app.settings['codername'], "", None, None, None, None))
         self.app.conn.commit()
         try:
             # Get and display some project details
@@ -2775,7 +2779,7 @@ Click "Yes" to start now.')
         Language, Backup options.
         As this dialog affects all others if the coder name changes, on exit of the dialog,
         all other opened dialogs are destroyed.
-        
+
         section = 'AI' moves to the AI settings at the bottom of the dialog
         enable_ai = if True, the AI will be enabled in settings
         """
@@ -2790,12 +2794,12 @@ Click "Yes" to start now.')
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ai_chat_window.init_styles()
-        
+
         if self.app.settings['ai_enable'] == 'True':
             self.app.ai.init_llm(self, rebuild_vectorstore=False)
-        else:  
+        else:
             self.app.ai.close()
-            
+
         # Change in coder names: Close all opened dialogs as coder names needs to change everywhere
         if ui.coder_names_changes:
             if current_coder != self.app.settings['codername']:
@@ -2816,11 +2820,11 @@ Click "Yes" to start now.')
                 for i in reversed(range(contents.count())):
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
-                    
+
     def project_memo(self):
         """ Give the entire project a memo. """
         memo = self.app.get_project_memo()
-        # If the memo is empty, add a template that defines all the necessary information for the AI  
+        # If the memo is empty, add a template that defines all the necessary information for the AI
         if memo is None or memo == '':
             memo = _('**Research topic, questions and objectives:** \n\n'
                      '**Methodology:** \n\n'
@@ -2913,17 +2917,17 @@ Click "Yes" to start now.')
             keep_button = msg_box.addButton(_('Keep'), QtWidgets.QMessageBox.ButtonRole.YesRole)
             switch_button = msg_box.addButton(_('Switch'), QtWidgets.QMessageBox.ButtonRole.NoRole)
             cancel_button = msg_box.addButton(_('Cancel'), QtWidgets.QMessageBox.ButtonRole.RejectRole)
-            msg_box.setDefaultButton(keep_button) 
+            msg_box.setDefaultButton(keep_button)
             msg_box.exec()
             res = msg_box.clickedButton()
             if res == keep_button:
-                pass                
+                pass
             elif res == switch_button:
                 self.app.settings['codername'] = last_project_coder
                 self.app.write_config_ini(self.app.settings, self.app.ai_models)
-                self.ui.textEdit.append(_("Default coder name changed to: ") + last_project_coder)                
+                self.ui.textEdit.append(_("Default coder name changed to: ") + last_project_coder)
             else:  # Cancel or closed
-                self.close_project()                
+                self.close_project()
                 return
 
         # Display some project details
@@ -3181,10 +3185,18 @@ Click "Yes" to start now.')
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v14")
         # Database version v15
-        try:
-            cur.execute("select last_ai_chat_id from project")
-        except sqlite3.OperationalError:
-            cur.execute('ALTER TABLE project ADD last_ai_chat_id integer')
+        v15_updated = False
+        for column_name, alter_sql in (
+                ("last_ai_chat_id", "ALTER TABLE project ADD last_ai_chat_id integer"),
+                ("avbookmarkfile", "ALTER TABLE project ADD avbookmarkfile integer"),
+                ("avbookmarkmsec", "ALTER TABLE project ADD avbookmarkmsec integer"),
+                ("avbookmarktextpos", "ALTER TABLE project ADD avbookmarktextpos integer")):
+            try:
+                cur.execute(f"select {column_name} from project")
+            except sqlite3.OperationalError:
+                cur.execute(alter_sql)
+                v15_updated = True
+        if v15_updated:
             cur.execute('update project set databaseversion="v15", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v15")
@@ -3221,7 +3233,7 @@ Click "Yes" to start now.')
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()
-        
+
         # Update coder_names table and current coder in project
         self.app.update_coder_names()
         cur.execute('update project set codername=?', [self.app.settings['codername']])
@@ -3254,11 +3266,10 @@ Click "Yes" to start now.')
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             msg, backup_name = self.app.save_backup()
             self.ui.textEdit.append(msg)
-
         # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
         self.app.ai.init_llm(self)
         self.ai_chat_window.init_ai_chat(self.app)
-        msg = f"\n{_('Project Opened: ')}{self.app.project_name}"
+        msg = f"<p>{_('Project Opened: ')}{self.app.project_name}</p>"
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
@@ -3276,51 +3287,51 @@ Click "Yes" to start now.')
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
-        self.ui.textEdit.append("\n")
+        self.ui.textEdit.append("<br />")
         self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
-        msg = _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
-        msg += self.app.project_name + "\n"
-        msg += f'{_("Project path: ")}{self.app.project_path}\n'
-        msg += f"{_('Project date: ')}{self.project['date']}\n"
+        msg = f"<p>{self.app.project_name}<br />"
+        msg += f'{_("Project path: ")}{self.app.project_path}<br />'
+        msg += f"{_('Project date: ')}{self.project['date']}</p>"
         sql = "select memo from project"
         cur.execute(sql)
         memo_res = cur.fetchone()
         if memo_res[0] != "":
-            msg += _("Project memo: ") + f"\n---------------------\n{memo_res[0]}\n---------------------\n"
+            msg += "<p>" + _("Project memo: ") + f"<br />---------------------<br />{memo_res[0]}<br />---------------------</p>"
         sql = "select count(id) from source"
         cur.execute(sql)
         files_res = cur.fetchone()
         text_res = self.app.get_text_filenames()
         image_res = self.app.get_image_filenames()
         av_res = self.app.get_av_filenames()
-        msg += _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}\n"
+        msg += "<p>" + _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}</p>"
         sql = "select count(caseid) from cases"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Cases: ") + f"{res[0]}\n"
+        msg += "<p>"
+        msg += f"{_('Cases: ')}{res[0]}<br />"
         sql = "select count(catid) from code_cat"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Code categories: ")}{res[0]}\n'
+        msg += f"{_('Code categories: ')}{res[0]}<br />"
         sql = "select count(cid) from code_name"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Codes: ")}{res[0]}\n'
+        msg += f"{_('Codes: ')}{res[0]}<br />"
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Attributes: ")}{res[0]}\n'
+        msg += f"{_('Attributes: ')}{res[0]}<br />"
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Journals: ")}{res[0]}\n'
+        msg += f"{_('Journals: ')}{res[0]}<br />"
+        msg += "</p>"
+        self.ui.textEdit.append(msg)
+        msg = ""
         cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
-            msg += f"\nText Bookmark: {bookmark_filename[0]}"
-            msg += f", position: {result[5]}\n"
-        if platform.system() == "Windows":
-            msg += "\n" + _("Folder paths / represents \\")
+            msg += f"<p>Text Bookmark: {bookmark_filename[0]}, position: {result[5]}</p>"
         self.ui.textEdit.append(msg)
         bad_links = self.app.check_bad_file_links()
         if bad_links:
@@ -3331,7 +3342,7 @@ Click "Yes" to start now.')
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
-        self.ui.textEdit.append("\n")
+        self.ui.textEdit.append("<br />")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
@@ -3365,7 +3376,7 @@ Click "Yes" to start now.')
         # AI
         self.ai_chat_window.close()
         self.app.ai.close()
-        
+
         if self.app.conn is not None:
             try:
                 self.app.conn.commit()
@@ -3436,13 +3447,13 @@ Click "Yes" to start now.')
         if self.app.settings['ai_enable'] == 'True':
             msg = _('The AI is setup and enabled, so there is nothing to do here. '
                     'Go to AI > settings to change the current model or other settings.')
-            Message(self.app, _('AI Setup Wizard'), msg).exec() 
+            Message(self.app, _('AI Setup Wizard'), msg).exec()
             return
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
         self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
-        
+
     def ai_settings(self):
         """ Action triggered by AI Settings menu item."""
         self.change_settings(section='AI')
@@ -3451,13 +3462,13 @@ Click "Yes" to start now.')
         """ Action triggered by AI Rebuild Internal Memory menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it in Settings.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            Message(self.app, _('Rebuild AI Memory'), msg).exec()
             return
         if not self.app.ai.is_ready():
             msg = _('The AI is busy or not set up correctly.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec()
-            return 
-        
+            return
+
         msg = _('This will re-read all of your empirical documents, which may take some time. Do you want to continue?')
         mb = QtWidgets.QMessageBox(self)
         mb.setWindowTitle(_('Rebuild AI Memory'))
@@ -3465,10 +3476,10 @@ Click "Yes" to start now.')
         mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok |
                             QtWidgets.QMessageBox.StandardButton.Abort)
         mb.setStyleSheet(f'* {{font-size: {self.app.settings["fontsize"]}pt}}')
-        if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
+        if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok:
             self.ui.tabWidget.setCurrentIndex(0)  # Show action log
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
-    
+
     def ai_prompts(self, initial_prompt_name: str = "", initial_prompt_scope: str = ""):
         """ Action triggered by AI Prompts menu item."""
         DialogAiEditPrompts(
@@ -3481,7 +3492,7 @@ Click "Yes" to start now.')
         """ Action triggered by AI Chat menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('Ai Chat'), msg).exec() 
+            Message(self.app, _('Ai Chat'), msg).exec()
             return
         if self.ai_chat_sidebar_mode:
             self.set_ai_chat_sidebar_mode(True, persist=False)
@@ -3493,7 +3504,7 @@ Click "Yes" to start now.')
         """ Action triggered by AI Search and Coding menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            Message(self.app, _('Rebuild AI Memory'), msg).exec()
             return
         self.text_coding(task='ai_search')
 
@@ -3531,13 +3542,15 @@ Click "Yes" to start now.')
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
-    app = QtWidgets.QApplication(sys.argv)    
+    app = QtWidgets.QApplication(sys.argv)
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
     project_path = qual_app.get_most_recent_projectpath()
-    # Check Noto Sans installed  - for general application
+    # Noto Sans - for general application
     install_noto_sans()
     QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
+    # DroidSandMono - for wordcloud
+    install_droid_sans_mono()
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     qta.reset_cache()
@@ -3551,68 +3564,32 @@ def gui():
         pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32_icon), "png")
         app.setWindowIcon(QtGui.QIcon(pm))
 
-    # Use two character language setting
     lang = settings.get('language', 'en')
-    # Test for pyinstall data files
-    locale_dir = os.path.join(path, 'locale')
-    # Need to get the external data directory for PyInstaller
+    i18n_dir = os.path.join(path, 'i18n')
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        ext_data_dir = sys._MEIPASS
-        locale_dir = os.path.join(ext_data_dir, 'qualcoder')
-        locale_dir = os.path.join(locale_dir, 'locale')
-        # locale_dir = os.path.join(locale_dir, lang)
-        # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-    # print("LISTDIR: ", os.listdir(locale_dir))
-    install_language(lang)  # Install language files on every start, so updates are reflected
-    # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
-    translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-    if lang in ["de", "es", "fr", "it", "ja", "pt", "sv", "zh"]:
-        # qt translator applies to ui designed GUI widgets only
-        # qt_locale_dir = os.path.join(locale_dir, lang)
-        # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
-        # print("qt qm translation file: ", qt_locale_file)
+        i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')  # For pyinstaller: abs path to bundled files
+
+    translator = gettext.NullTranslations()
+    if lang != 'en':
         qt_translator = QtCore.QTranslator()
-        # qt_translator.load(qt_locale_file)
-        ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
-        A solution to this error [Errno 13] Permission denied:
-        Replace 'lang' with the short language name, e.g. app_de.qm '''
-        if qt_translator.isEmpty():
-            print("trying to load translation qm file from .qualcoder folder")
-            qm = os.path.join(home, '.qualcoder')
-            qm = os.path.join(qm, f"app_{lang}.qm")
-            print("qm file located at: ", qm)
-            qt_translator.load(qm)
-            '''if qt_translator.isEmpty():
-                print(f"Installing app_{lang}.qm to .qualcoder folder")
-                install_language(lang)
-                qt_translator.load(qm)'''
+        qt_translator.load(os.path.join(i18n_dir, f'{lang}.qm'))
         app.installTranslator(qt_translator)
-        '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
-        A solution to this [Errno 13] Permission denied:
-        Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
-        Replace 'lang' with the language short name e.g. de, el, es ...
-        '''
+
         try:
-            translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
-            print("locale directory for python translations: ", locale_dir)
+            with open(os.path.join(i18n_dir, f'{lang}.mo'), 'rb') as file_:
+                translator = gettext.GNUTranslations(file_)
         except Exception as err:
-            print("Error accessing python translations mo file\n", err)
-            print("Locale directory for python translations: ", locale_dir)
-            try:
-                print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
-                mo_dir = os.path.join(home, '.qualcoder')
-                translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-            except Exception as err2:
-                print(f"No {lang}.mo translation file loaded", err2)
+            print(err)
+            logger.error(err)
+
     translator.install()
-    # Check DroidSandMono installed  - for wordcloud
-    install_droid_sans_mono()
+
     ex = MainWindow(qual_app)
     try:
         if project_path:
             split_ = project_path.split("|")
             proj_path = ""
-            # Only the path - older and rarer format - legacy
+            # Only the path - legacy format
             if len(split_) == 1:
                 proj_path = split_[0]
             # Newer datetime | path
@@ -3627,59 +3604,6 @@ def gui():
         qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
     sys.exit(app.exec())
-
-
-def install_language(lang):
-    """ Mainly for pyinstaller on Windows, as cannot access language data files.
-    So, recreate them from base64 data into home/.qualcoder folder.
-    Install Qt translation file into folder .qualcoder/app_lang.qm
-    Install poedit.mo file into folder .qualcoder/lang/LC_MESSAGES/lang.mo
-    """
-
-    qm = os.path.join(home, '.qualcoder')
-    qm = os.path.join(qm, f'app_{lang}.qm')
-    qm_data = None
-    mo_data = None
-    if lang == "de":
-        qm_data = de_qm
-        mo_data = de_mo
-    if lang == "es":
-        qm_data = es_qm
-        mo_data = es_mo
-    if lang == "fr":
-        qm_data = fr_qm
-        mo_data = fr_mo
-    if lang == "it":
-        qm_data = it_qm
-        mo_data = it_mo
-    if lang == "ja":
-        qm_data = ja_qm
-        mo_data = ja_mo
-    if lang == "pt":
-        qm_data = pt_qm
-        mo_data = pt_mo
-    if lang == "sv":
-        qm_data = sv_qm
-        mo_data = sv_mo
-    if lang == "zh":
-        qm_data = zh_qm
-        mo_data = zh_mo
-    if qm_data is None or mo_data is None:
-        return
-    with open(qm, 'wb') as file_:
-        decoded_data = base64.decodebytes(qm_data)
-        file_.write(decoded_data)
-    mo_path = os.path.join(home, '.qualcoder')
-    mo_path = os.path.join(mo_path, lang)
-    if not os.path.exists(mo_path):
-        os.mkdir(mo_path)
-    mo_path = os.path.join(mo_path, "LC_MESSAGES")
-    if not os.path.exists(mo_path):
-        os.mkdir(mo_path)
-    mo = os.path.join(mo_path, lang + ".mo")
-    with open(mo, 'wb') as file_:
-        decoded_data = base64.decodebytes(mo_data)
-        file_.write(decoded_data)
 
 
 def install_droid_sans_mono():

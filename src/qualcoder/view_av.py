@@ -133,6 +133,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.ui.splitter_2.setSizes([h0, h1])
         except KeyError:
             pass
+        # Header section
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         self.ui.label_volume.setPixmap(qta.icon('mdi6.volume-high').pixmap(22, 22))
@@ -149,37 +150,43 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        self.ui.pushButton_add_image_to_project.setIcon(
+            qta.icon('mdi6.image-plus-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_add_image_to_project.pressed.connect(self.import_screenshot_into_project)
+        self.ui.pushButton_add_image_to_project.setEnabled(False)
+        self.ui.pushButton_screensshot.setIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_screensshot.pressed.connect(self.save_screenshot)
+        self.ui.pushButton_screensshot.setEnabled(False)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
 
-        # Widgets under codes tree
-        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter code <- L
-        self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
-        self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
-        self.ui.pushButton_clear_filter_code.setVisible(False)
-        self.ui.lineEdit_code_filter.textChanged.connect(lambda textchanged: self.show_codes_like(self.ui.lineEdit_code_filter.text()))
 
-        # The buttons in the splitter are smaller 24x24 pixels
+        # The buttons under the files list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
         self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter file <- L
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)
-        self.ui.pushButton_add_image_to_project.setIcon(qta.icon('mdi6.image-plus-outline', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_add_image_to_project.pressed.connect(self.import_screenshot_into_project)
-        self.ui.pushButton_add_image_to_project.setEnabled(False)
-        self.ui.pushButton_screensshot.setIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_screensshot.pressed.connect(self.save_screenshot)
-        self.ui.pushButton_screensshot.setEnabled(False)
+        self.ui.pushButton_goto_bookmark.setIcon(qta.icon('mdi6.bookmark', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_goto_bookmark.pressed.connect(self.go_to_bookmark)
+
+        # Widgets under codes tree
+        self.ui.pushButton_clear_filter_code.setIcon(
+            qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter code <- L
+        self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
+        self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
+        self.ui.pushButton_clear_filter_code.setVisible(False)
+        self.ui.lineEdit_code_filter.textChanged.connect(
+            lambda textchanged: self.show_codes_like(self.ui.lineEdit_code_filter.text()))
 
         # Until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
@@ -555,7 +562,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
@@ -584,7 +591,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                        child.setToolTip(0, c['name'])
+                        child.setToolTip(0, '')
                         if len(c['name']) > 52:
                             child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
@@ -610,7 +617,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
@@ -640,7 +647,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QColor(color)))
-                    child.setToolTip(0, c['name'])
+                    child.setToolTip(0, '')
                     if len(c['name']) > 52:
                         child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
@@ -854,7 +861,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         if selection['id'] == -1:
             self.get_files()
-            self.ui.pushButton_clear_filter_file.setVisible(False)  # rreset filter button when showing all <- L
+            self.ui.pushButton_clear_filter_file.setVisible(False)  # reset filter button when showing all
             self.ui.pushButton_clear_filter_file.setStyleSheet("")
             return
         cur = self.app.conn.cursor()
@@ -869,7 +876,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Show files that contain specified filename text.
         If blank, show all files. """
 
-        dialog = QtWidgets.QInputDialog(None) #correct: dialog embedded in workspace instead of floating
+        dialog = QtWidgets.QInputDialog(None) # correct: dialog embedded in workspace instead of floating
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}}")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -1303,15 +1310,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         pos = self.ui.horizontalSlider.value()
         msecs = self.mediaplayer.get_time()
         self.mediaplayer.set_position(pos / 1000.0)
-
-        '''  # This code may not be needed - blockSignals seems to fix a problem where msecs returns -1
-        counter = 0
-        while pos > 0 and msecs == -1 and counter < 10000:
-            self.mediaplayer.set_position(pos / 1000.0)
-            msecs = self.mediaplayer.get_time()
-            counter += 1
-            #print("slider pos", pos, pos/1000.0 , "msecs", msecs, "counter", counter)'''
-
         self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
         self.ui.horizontalSlider.blockSignals(False)
 
@@ -1702,7 +1700,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
         self.update_dialog_codes_and_categories(["code_name"])
 
-
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
@@ -1932,6 +1929,8 @@ class DialogCodeAV(QtWidgets.QDialog):
          These key presses are not used in edi mode.
 
         A annotate - for current selection
+        Shift B Go to bookmark
+        B set bookmark
         C New category
         G Glue selected segment to selected code, and open segment memo
         Q Quick Mark with code - for current selection
@@ -1966,13 +1965,19 @@ class DialogCodeAV(QtWidgets.QDialog):
             if hasattr(self, 'active_handles') and self.active_handles:
                 self.hide_resize_handles()
                 return
-        '''# Get screenshot and load in project for coding - D
-        if key == QtCore.Qt.Key.Key_D and not self.ddialog.isHidden():
-            self.import_screenshot_into_project()
+        # Go to bookmark
+        if key == QtCore.Qt.Key.Key_B and mods & QtCore.Qt.KeyboardModifier.ShiftModifier:
+            self.go_to_bookmark()
             return
-        if key == QtCore.Qt.Key.Key_ABC and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
-            self.save_screenshot()
-            return'''
+        # Set bookmark
+        if key == QtCore.Qt.Key.Key_B:
+            if self.file_ is None:
+                return
+            cur = self.app.conn.cursor()
+            cursor_pos = self.ui.plainTextEdit.textCursor().position()
+            cur.execute("update project set avbookmarkfile=?, avbookmarkmsec=?, avbookmarktextpos=?", [self.file_['id'], self.mediaplayer.get_time(), cursor_pos])
+            self.app.conn.commit()
+            return
         # New category
         if key == QtCore.Qt.Key.Key_C:
             # if category already selected, add new category to that
@@ -2108,6 +2113,39 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.plainTextEdit.textCursor().selectedText() != "":
             self.textedit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
             return
+
+    def go_to_bookmark(self):
+        """ B or button. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select avbookmarkfile, avbookmarkmsec, avbookmarktextpos from project")
+        result = cur.fetchone()
+        self.file_ = None
+        for i, f in enumerate(self.files):
+            if f['id'] == result[0]:
+                self.file_ = f
+                self.ui.listWidget.setCurrentItem(
+                    self.ui.listWidget.findItems(self.file_['name'], QtCore.Qt.MatchFlag.MatchExactly)[0])
+                self.load_media()
+                self.load_segments()
+                self.fill_code_counts_in_tree()
+                break
+        if self.file_ is None:
+            return
+        self.mediaplayer.set_time(result[1])
+        self.mediaplayer.play()
+        # Playback must be active to set_time(). Also add a small sleep to give vlc time to load the media.
+        time.sleep(0.2)
+        self.mediaplayer.set_time(result[1])
+        self.ui.horizontalSlider.setValue(int(result[1] / self.media.get_duration() * 1000))
+        self.mediaplayer.pause()
+        cursor = self.ui.plainTextEdit.textCursor()
+        cursor.setPosition(result[2])
+        endpos = result[2] - 1
+        if endpos < 0:
+            endpos = 0
+        cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
 
     def save_screenshot(self):
         hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
@@ -4452,7 +4490,7 @@ class DialogViewAV(QtWidgets.QDialog):
             "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
         self.ui.label_note.setToolTip(tt)
         self.ui.textEdit.installEventFilter(self)
-        self.installEventFilter(self)  # for rewind, play/stop
+        self.installEventFilter(self)  # for rewind, play/stop, etc
         if platform.system() in ("Windows", "Darwin"):
             self.get_waveform()  # Crashes on Fedora 40, segmentation fault with ffmpeg
         # Get the transcription text and fill textedit
@@ -4517,6 +4555,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
         # Search text in transcription
         self.ui.label_search_regex.setPixmap(qta.icon('mdi6.text-search').pixmap(22, 22))
+        self.ui.label_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
@@ -4526,16 +4565,26 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        self.ui.checkBox_case_sensitive.stateChanged.connect(self.search_for_text)
         # Transcription buttons
         self.ui.pushButton_new_speaker.setIcon(qta.icon('mdi6.account-plus-outline'))
-        self.ui.pushButton_new_speaker.setToolTip("Ctrl+N")
         self.ui.pushButton_new_speaker.pressed.connect(self.add_speakername)
         self.ui.pushButton_remove_speaker.setIcon(qta.icon('mdi6.account-minus-outline'))
-        self.ui.pushButton_remove_speaker.setToolTip("Ctrl+D")
         self.ui.pushButton_remove_speaker.pressed.connect(self.delete_speakernames)
         self.ui.pushButton_insert_timestamp.setIcon(qta.icon('mdi6.clock-outline'))
-        self.ui.pushButton_insert_timestamp.setToolTip("Ctrl+T")
         self.ui.pushButton_insert_timestamp.pressed.connect(self.insert_timestamp)
+        # Bookmark buttons
+        self.ui.pushButton_goto_bookmark.setIcon(qta.icon('mdi6.bookmark-off'))
+        self.ui.pushButton_goto_bookmark.setEnabled(False)
+        cur = self.app.conn.cursor()
+        cur.execute("select avbookmarkfile from project")
+        result = cur.fetchone()
+        if self.file_['id'] == result[0]:
+            self.ui.pushButton_goto_bookmark.setIcon(qta.icon('mdi6.bookmark-check'))
+            self.ui.pushButton_goto_bookmark.setEnabled(True)
+        self.ui.pushButton_goto_bookmark.pressed.connect(self.go_to_bookmark)
+        self.ui.pushButton_set_bookmark.setIcon(qta.icon('mdi6.bookmark'))
+        self.ui.pushButton_set_bookmark.pressed.connect(self.set_bookmark)
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -4724,17 +4773,6 @@ class DialogViewAV(QtWidgets.QDialog):
         if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
             self.no_codes_annotes_cases = False
 
-    ''' Problem with pydub pyaudioop module
-    def speech_to_text(self):
-        """ Convert speech to text using online service. """
-
-        ui = SpeechToText(self.app, self.abs_path)
-        ok = ui.exec()
-        if not ok:
-            return
-        txt = ui.text
-        self.ui.textEdit.setText(txt)'''
-
     def help(self):
         """ Open help for transcribe section in browser. """
 
@@ -4744,7 +4782,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Context menu to export a screenshot, to resize dialog """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_screenshot = menu.addAction(_("Screenshot"))
         action_resize = menu.addAction(_("Resize"))
 
@@ -4783,16 +4821,18 @@ class DialogViewAV(QtWidgets.QDialog):
     def eventFilter(self, object_, event):
         """ Add key options to improve manual transcribing.
         Options are:
-            Alt + minus to rewind 30 seconds.
-            Ctrl + R rewind 5 seconds
-            Alt + plus forward 30 seconds
-            Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
-            Ctrl + T to insert timestamp in format [hh.mm.ss]
-            Ctrl + N to enter a new speakers name into shortcuts
-            Ctrl + D to delete speaker names from shortcuts
-            Ctrl + 1 .. 8 to insert speaker in format [speaker name]
-            Ctrl + Shift + > to increase play rate
-            Ctrl + Shift + < to decrease play rate
+            Crtl B Set Bookmark
+            Ctrl Shift B Go to Bookmart
+            Ctrl D Delete speaker names from shortcuts
+            Ctrl N Enter a new speakers name into shortcuts
+            Ctrl R Rewind 5 seconds
+            Ctrl S OR ctrl + P Start/pause On start rewind slightly
+            Ctrl T Insert timestamp in format [hh.mm.ss]
+            Ctrl +1 .. 8 Insert speaker in format [speaker name]
+            Ctrl Shift > Increase play rate
+            Ctrl Shift < Decrease play rate
+            Alt plus Forward 30 seconds
+            Alt minus Rewind 30 seconds.
         """
 
         if event.type() != 7:  # QtGui.QKeyEvent
@@ -4830,15 +4870,55 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_D and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.pause()
             self.delete_speakernames()
-        # Increase play rate  Ctrl + Shift + >
+        # Increase play rate  Ctrl Shift >
         if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
                 (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.increase_play_rate()
-        # Decrease play rate  Ctrl + Shift + <
+        # Decrease play rate  Ctrl Shift <
         if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
                 (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.decrease_play_rate()
+        # Go to bookmark, if this is the correct a/v file
+        if key == QtCore.Qt.Key.Key_B and mods & QtCore.Qt.KeyboardModifier.ShiftModifier and \
+                mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.go_to_bookmark()
+        # Set bookmark
+        if key == QtCore.Qt.Key.Key_B and mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.set_bookmark()
         return True
+
+    def go_to_bookmark(self):
+        """ Only if this file is bookmarked. Ctrl Shift B or button. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select avbookmarkfile, avbookmarkmsec, avbookmarktextpos from project")
+        result = cur.fetchone()
+        if self.file_['id'] != result[0]:
+            return True
+        self.mediaplayer.play()
+        # Playback must be active to set_time().
+        time.sleep(0.1)
+        self.mediaplayer.set_time(result[1])
+        self.ui.horizontalSlider.setValue(int(result[1] / self.media.get_duration() * 1000))
+        self.mediaplayer.pause()
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(result[2])
+        endpos = result[2] - 1
+        if endpos < 0:
+            endpos = 0
+        cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+
+    def set_bookmark(self):
+        """ Ctrl B or button. """
+
+        cur = self.app.conn.cursor()
+        cursor_pos = self.ui.textEdit.textCursor().position()
+        cur.execute("update project set avbookmarkfile=?, avbookmarkmsec=?, avbookmarktextpos=?",
+                    [self.file_['id'], self.mediaplayer.get_time(), cursor_pos])
+        self.app.conn.commit()
+        self.ui.pushButton_goto_bookmark.setIcon(qta.icon('mdi6.bookmark-check'))
+        self.ui.pushButton_goto_bookmark.setEnabled(True)
 
     def rewind_30_seconds(self):
         """ Rewind 30 seconds. Alt + R """
@@ -5265,7 +5345,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is three or more characters long.
         Resets current search_index.
-        NOT IMPLEMENTED If case sensitive is checked then text searched is matched for case sensitivity.
+        If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
         if not self.search_indices:
@@ -5279,8 +5359,8 @@ class DialogViewAV(QtWidgets.QDialog):
             return
         pattern = None
         flags = 0
-        '''if not self.ui.checkBox_search_case.isChecked():
-            flags |= re.IGNORECASE'''
+        if not self.ui.checkBox_case_sensitive.isChecked():
+            flags |= re.IGNORECASE
         try:
             pattern = re.compile(search_term, flags)
         except Exception as e_:

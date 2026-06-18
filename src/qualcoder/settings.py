@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
 https://qualcoder.org/
+
 """
 
 import logging
@@ -79,11 +79,19 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.pushButton_set_coder.clicked.connect(self.set_coder)        
         self.ui.fontComboBox.setCurrentFont(new_font)
         languages = ["Deutsch de", "English en", "Español es", "Français fr",
-                     "Italiano it", "日本語 ja", "Português pt", "Svenska sv", "中国人 zh"]
+                     "日本語 ja", "Português pt", "Svenska sv", "中国人 zh"]
+        if self.settings['language'] not in ['de', 'en', 'es', 'fr', 'ja', 'pt', 'sv', 'zh']:
+            msg = _("Another language has been set in the config.ini file.") + "\n"
+            msg += _("Additional community supported languages are found in the i18n folder.") + "\n"
+            msg += _("They may not be recently updated") + "\n"
+            msg += f"language = {self.settings['language']}"
+            self.ui.comboBox_language.setToolTip(msg)
+            languages.append(f"Other {self.settings['language']}")
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
-            if lang[-2:] == self.settings['language']:
+            if lang.split()[1] == self.settings['language']:
                 self.ui.comboBox_language.setCurrentIndex(index)
+
         timestampformats = ["[mm.ss]", "[mm:ss]", "[hh.mm.ss]", "[hh:mm:ss]",
                             "{hh:mm:ss}", "#hh:mm:ss.sss#"]
         self.ui.comboBox_timestamp.addItems(timestampformats)
@@ -276,7 +284,7 @@ class DialogSettings(QtWidgets.QDialog):
             curr_ai_model = self.ai_models[int(self.settings['ai_model_index'])]
             self.ui.label_ai_model_desc.setText(curr_ai_model['desc'])
             self.ui.label_ai_access_info_url.setText(f'<a href="{curr_ai_model["access_info_url"]}">{curr_ai_model["access_info_url"]}</a>')
-            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_available_models() to trigger
                 self.ui.lineEdit_ai_api_key.setText(curr_ai_model['api_key']) 
             with QtCore.QSignalBlocker(self.ui.comboBox_AI_model_large):
                 self.ui.comboBox_AI_model_large.setCurrentText(curr_ai_model['large_model'])
@@ -299,7 +307,7 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
-            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_available_models() to trigger
                 self.ui.lineEdit_ai_api_key.setText('')
             self.ui.comboBox_AI_model_large.setCurrentText('')
             self.ui.comboBox_AI_model_fast.setCurrentText('')
@@ -308,7 +316,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_reasoning.setCurrentText('default')
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_base):
                 self.ui.lineEdit_ai_api_base.setText('')    
-        self.ai_update_avaliable_models()     
+        self.ai_update_available_models()
         
     def ai_profile_name_edit(self):
         if int(self.settings['ai_model_index']) < 0:
@@ -396,12 +404,12 @@ class DialogSettings(QtWidgets.QDialog):
             if not self.validate_ai_api_key(api_key, focus_field=True):
                 return
             self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = api_key
-        self.ai_update_avaliable_models()    
+        self.ai_update_available_models()
         
     def ai_api_key_show(self, checked):
         self.ui.lineEdit_ai_api_key.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal if checked else QtWidgets.QLineEdit.EchoMode.PasswordEchoOnEdit) 
 
-    def ai_update_avaliable_models(self):
+    def ai_update_available_models(self):
         if not self.ui.widget_AI_advanced_options.isVisible():
             return
         model_list = []
@@ -494,7 +502,7 @@ class DialogSettings(QtWidgets.QDialog):
     def ai_api_base_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
             self.ai_models[int(self.settings['ai_model_index'])]['api_base'] = self.ui.lineEdit_ai_api_base.text()   
-        self.ai_update_avaliable_models()    
+        self.ai_update_available_models()
             
     def set_coder(self):
         """ Edit the coder names and select the current one.
@@ -525,7 +533,7 @@ class DialogSettings(QtWidgets.QDialog):
     def toggle_ai_advanced_options(self):
         if self.ui.pushButton_advanced_AI_options.isChecked():
             self.ui.widget_AI_advanced_options.show()
-            self.ai_update_avaliable_models()
+            self.ai_update_available_models()
             QtCore.QTimer.singleShot(100, lambda: self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum()))
         else:
             self.ui.widget_AI_advanced_options.hide()
@@ -579,9 +587,9 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
-        if self.settings['language'] != self.ui.comboBox_language.currentText()[-2:]:
+        if self.settings['language'] != self.ui.comboBox_language.currentText().split()[1]:
             restart_qualcoder = True
-        self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
+        self.settings['language'] = self.ui.comboBox_language.currentText().split()[1]
         self.settings['codetext_chunksize'] = int(self.ui.comboBox_text_chunk_size.currentText())
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()

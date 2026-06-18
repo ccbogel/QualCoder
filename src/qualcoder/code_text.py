@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
@@ -467,7 +466,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_recent_codes()  # After codes obtained!
 
         # Search text variables
-        self.search_type = "3"  # Three characters entered before search can begin
+        self.search_threshold = 3  # Three characters entered before search can begin
         self.search_indices = []  # List of file data, start, end, start_line, start char, String len
         self.search_index = 0
         self.search_term = ""
@@ -544,6 +543,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_edit_next.clicked.connect(lambda pressed: self.edit_mode_find("next"))
         self.ui.pushButton_edit_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_edit_prev.clicked.connect(lambda pressed: self.edit_mode_find("previous"))
+        self.ui.label_edit_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
+        self.ui.checkBox_edit_case_sensitive.stateChanged.connect(self.edit_mode_find)
+        self.ui.lineEdit_edit_search.returnPressed.connect(self.edit_mode_find)
         self.edit_pos = 0
         self.edit_mode = False
         # Revert to original if edit text caused problems
@@ -590,10 +592,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        self.search_type = "3"  # 3 character threshold for text search
+        self.search_threshold = 3  # 3 character threshold for text search
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
-        self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+        self.ui.lineEdit_search.returnPressed.connect(self.move_to_next_search_text)
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
 
@@ -1762,7 +1764,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
@@ -1788,7 +1790,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                     child.setToolTip(2, c['memo'])
-                    child.setToolTip(0, c['name'])
+                    child.setToolTip(0, '')
                     if len(c['name']) > 52:
                         child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
@@ -1998,10 +2000,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
-        if self.search_type == 3 and len(self.search_term) < 3:
+        if self.search_threshold == 3 and len(self.search_term) < 3:
             self.ui.label_search_totals.setText("")
             return
-        if self.search_type == 5 and len(self.search_term) < 5:
+        if self.search_threshold == 5 and len(self.search_term) < 5:
             self.ui.label_search_totals.setText("")
             return
         self.ui.label_search_totals.setText("0 / 0")
@@ -2046,6 +2048,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None or self.search_indices == []:
             return
+        self.search_term = self.ui.lineEdit_search.text()
+        if self.search_threshold == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
+        if self.search_threshold == 5 and len(self.search_term) < 5:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
         self.search_index += 1
         if self.search_index >= len(self.search_indices):
             self.search_index = 0
@@ -2075,6 +2088,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None or self.search_indices == []:
             return
+        self.search_term = self.ui.lineEdit_search.text()
+        if self.search_threshold == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
+        if self.search_threshold == 5 and len(self.search_term) < 5:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
@@ -2099,19 +2123,19 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_char3 = QtGui.QAction(_("Automatic search 3 or more characters"))
         action_char5 = QtGui.QAction(_("Automatic search 5 or more characters"))
-        if self.search_type != 3:
+        if self.search_threshold != 3:
             menu.addAction(action_char3)
-        if self.search_type != 5:
+        if self.search_threshold != 5:
             menu.addAction(action_char5)
         action = menu.exec(self.ui.lineEdit_search.mapToGlobal(position))
         if action is None:
             return
         if action == action_char3:
-            self.search_type = 3
+            self.search_threshold = 3
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             return
         if action == action_char5:
-            self.search_type = 5
+            self.search_threshold = 5
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             return
 
@@ -6737,17 +6761,24 @@ class DialogCodeText(QtWidgets.QWidget):
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
 
-    def edit_mode_find(self, direction="next"):
+    def edit_mode_find(self, direction:str="next"):
         """  Move forward or backward through the edit document.
-        Uses REGEX. """
+        Uses REGEX.
+        Args:
+            direction: string '', next, previous """
 
+        if direction == "":
+            direction = "next"
         cursor = self.ui.plainTextEdit.textCursor()
         search_term = self.ui.lineEdit_edit_search.text()
         if search_term == "":
             return
         pattern = None
+        flags = 0
+        if not self.ui.checkBox_edit_case_sensitive.isChecked():
+            flags |= re.IGNORECASE
         try:
-            pattern = re.compile(search_term)
+            pattern = re.compile(search_term, flags)
         except re.error as err:
             logger.warning(f're module error Bad escape {err}')
         if pattern is None:
@@ -6769,7 +6800,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
         except re.error:
             logger.exception('Failed searching text for %s', search_term)
-        print("Match position:", result)
         if result is None:
             return
         cursor.setPosition(result)

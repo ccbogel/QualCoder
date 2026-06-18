@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -339,3 +340,215 @@ Ctrl + Enter {_("Run SQL query")}<br />'
 
 coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
+
+manage_tab_info = '''
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
+	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
+	<meta name="changed" content="2026-06-14T11:17:58.643329100"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
+		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
+		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
+		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
+Manage tab</h1>
+<p style="line-height: 100%; margin-bottom: 0cm">The manage tab
+displays cases, files, attributes and references. Use the Manage menu
+above to organise files, cases (collections of files), write
+journals. Manage file, case and journal attributes (variables).
+Import and assign references to files. Edit incorrect links to files
+located outside the project folder.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Manage files</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">The Manage Files
+menu option allows you to add, and remove files in a QualCoder
+project. You can also import a survey, through this menu option.</p>
+<p style="line-height: 100%; margin-bottom: 0cm">Before importing any
+text files, you might to create pseudonyms to protect the privacy of
+people or organisations. This is set up through the Pseudonym button.</p>
+<p style="line-height: 100%; margin-bottom: 0cm">If you are beginning
+with QualCoder, open the Examples folder and import the following
+text and image files: ID1.docx, ID2.odt, seascape.jpg</p>
+<p style="line-height: 100%; margin-bottom: 0cm">Once imported, open
+each to view the file, by double-clicking on the file name, or by
+right-click on the name and selecting view from the many options. See
+that ID2.docx contains a name – Joe Bloggs. Test the
+pseudonymisation function by deleting the ID2.odt file. Before
+importing again, click the Pseudonymise button and add Joe Bloggs, by
+typing the name and pressing the plus button. Click OK to exit. Then
+import ID2.odt again. View the file and see the automatic change
+applied to the name.</p>
+<p style="line-height: 100%; margin-bottom: 0cm">You can add
+attributes (variables) to the files by clicking the (x) button. Add a
+character variable called location. And fill out that column with a
+location, such city names.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.2.-Files/">Manage
+Files - QualCoder</a> 
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Manage Cases</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">A case is a
+collection of files on a topic, or related to a person. Not all
+projects need to use cases.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.3.-Cases/">Manage
+cases - QualCoder</a> 
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Manage Journals</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">Journals are used to
+record your thoughts when coding. The journals window pops up
+separately from the main window, so you can quickly move from one to
+the other when writing a journal.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/5.2.-Journals/">Journals
+– QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Manage attributes</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">Files cases and
+journal can have attributes (variables) describing their purpose.
+Variables can be created, renamed and deleted here.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.4.-Attributes/">Attributes
+– QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Manage references</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">References can be
+imported from NBIB and RIS formats. Try importing the
+bibliography.ris file from the Examples folder. Assign a refernce to
+a file, by selecting the reference row, selecting the file and
+pressing the Link key.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>
+'''
+
+coding_tab_info = '''
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
+	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
+	<meta name="changed" content="2026-06-16T09:09:04.124392600"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
+		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
+Coding tab</h1>
+<p style="line-height: 100%; margin-bottom: 0cm">The coding tab
+displays the coding area for coding text, images, audio/video and
+PDFs. Depending on the files loaded in Manage Files, select a menu
+option above to begin coding text, images, audio/video or PDFs.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.1.-Coding-Text/">Coding
+Text – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.3.-Coding-Text-on-PDFs/">Coding
+PDFs – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.4.-Coding-Images/">Coding
+images – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.5.-Coding-Audio-and-Video/">Coding
+audio and video – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.2.-AI-Assisted-Coding/">AI
+Assisted Coding - QualCoder</a> 
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm">Additionally there
+are menu options for organising the codes and changing the colour
+scheme,</p>
+</body>
+</html>
+'''
+
+reports_tab_info = '''
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
+	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
+	<meta name="changed" content="2026-06-16T09:49:22.649405100"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
+		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
+		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
+		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
+		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
+Reports tab</h1>
+<p style="line-height: 100%; margin-bottom: 0cm">The reports tab
+displays analyses and report summaries. Select from the Analysis and
+Reports menus.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.3.-Reports/">Reports
+menu options – QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Analysis menu</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">The analysis menu
+has options of Code retrieval, co-occurrence and exact matches. The
+graph option is a way to visualise the coding through the development
+of mind maps.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.4.-Graph/">Graph
+– QualCoder</a></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">Reports menu</h2>
+<p style="line-height: 100%; margin-bottom: 0cm">The menu options
+list: coder comparisons, overall and by file. Code counts overall or
+by file or case. Code and file summaries. Charts for pie charts, bar
+charts, treemaps, sunbursts, heatmaps and word clouds. Another option
+is Database queries where you can directly interact with the
+underlying database.</p>
+</body>
+</html>
+'''
+

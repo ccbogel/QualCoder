@@ -29,13 +29,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>35</height>
+       <height>50</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>10</height>
+       <height>50</height>
       </size>
      </property>
      <property name="title">
@@ -46,28 +46,50 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>441</width>
-        <height>16</height>
+        <width>421</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
        <string>Click on the file name to browse to the correct file location.</string>
       </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_search_folders">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>430</x>
         <y>0</y>
         <width>171</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatic search through folders for the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Automatic search through folders for the file</string>
       </property>
       <property name="text">
        <string>Search folders</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_bulk">
+      <property name="geometry">
+       <rect>
+        <x>610</x>
+        <y>0</y>
+        <width>151</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Change file path link across all the files.
+This is useful when you have a big change such as copying the project and external files to another computer.
+
+e.g. from C:/users/OldUser/Images to C:/usersNewUser/Images</string>
+      </property>
+      <property name="text">
+       <string>Bulk change</string>
       </property>
      </widget>
     </widget>

@@ -57,10 +57,10 @@
       <number>0</number>
      </property>
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="tickPosition">
-      <enum>QSlider::TicksBelow</enum>
+      <enum>QSlider::TickPosition::TicksBelow</enum>
      </property>
      <property name="tickInterval">
       <number>10</number>
@@ -94,7 +94,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Ctrl + S start/pause
+Ctrl + P start/pause</string>
       </property>
       <property name="text">
        <string/>
@@ -116,7 +117,7 @@
        <number>100</number>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
      </widget>
      <widget class="QLabel" name="label_volume">
@@ -135,7 +136,7 @@
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
      </widget>
      <widget class="QLabel" name="label_time">
@@ -174,7 +175,7 @@
        <string>Audio:</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -232,7 +233,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Decrease play rate. Ctrl + Shift + &amp;lt; </string>
       </property>
       <property name="text">
        <string/>
@@ -248,7 +249,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Increase play rate. Ctrl + Shift + &amp;gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -264,7 +265,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rewind 5 seconds Ctrl + R</string>
       </property>
       <property name="text">
        <string/>
@@ -280,7 +281,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rewind 30 seconds. Alt + Minus</string>
       </property>
       <property name="text">
        <string/>
@@ -296,7 +297,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Forward 30 seconds. Alt + Plus
+Forward 5 seconds. Press 5</string>
       </property>
       <property name="text">
        <string/>
@@ -305,7 +307,7 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>890</x>
+        <x>940</x>
         <y>10</y>
         <width>28</width>
         <height>28</height>
@@ -373,27 +375,27 @@ red underline = Assigned to code or annotation</string>
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>96</x>
         <y>3</y>
-        <width>191</width>
+        <width>161</width>
         <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search for text</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>290</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Next</string>
       </property>
       <property name="text">
        <string/>
@@ -415,7 +417,7 @@ red underline = Assigned to code or annotation</string>
        <bool>false</bool>
       </property>
       <property name="frameShape">
-       <enum>QFrame::Box</enum>
+       <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="lineWidth">
        <number>0</number>
@@ -424,7 +426,7 @@ red underline = Assigned to code or annotation</string>
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -433,14 +435,14 @@ red underline = Assigned to code or annotation</string>
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>260</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Previous</string>
       </property>
       <property name="text">
        <string/>
@@ -449,9 +451,9 @@ red underline = Assigned to code or annotation</string>
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>320</x>
         <y>7</y>
-        <width>111</width>
+        <width>101</width>
         <height>22</height>
        </rect>
       </property>
@@ -459,20 +461,23 @@ red underline = Assigned to code or annotation</string>
        <string>0 / 0</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_new_speaker">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>470</x>
         <y>3</y>
-        <width>161</width>
+        <width>30</width>
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>New speaker (Ctrl N)</string>
+      </property>
       <property name="text">
-       <string>New speaker</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_insert_timestamp">
@@ -485,7 +490,7 @@ red underline = Assigned to code or annotation</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Insert timestamp</string>
+       <string>Insert timestamp (Ctrl T)</string>
       </property>
       <property name="text">
        <string/>
@@ -494,14 +499,93 @@ red underline = Assigned to code or annotation</string>
      <widget class="QPushButton" name="pushButton_remove_speaker">
       <property name="geometry">
        <rect>
-        <x>650</x>
+        <x>500</x>
         <y>3</y>
-        <width>161</width>
+        <width>30</width>
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Remove speaker (Ctrl D)</string>
+      </property>
       <property name="text">
-       <string>Remove Speaker</string>
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_case_sensitive">
+      <property name="geometry">
+       <rect>
+        <x>38</x>
+        <y>7</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Case sensitive</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_case_sensitive">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>4</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Case sensitive</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_set_bookmark">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set bookmark (Ctrl B)</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_goto_bookmark">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Go to bookmark (Ctrl Shift B)</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>

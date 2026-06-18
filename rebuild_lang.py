@@ -29,21 +29,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
 https://qualcoder.org/
+https://
 """
 
+from lxml import etree
 import os
+from pathlib import Path
+import polib
 import subprocess
 import sys
-import polib
-from lxml import etree
 from typing import Dict, Any, List
 
-SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
+project_root = os.path.dirname(os.path.abspath(__file__))
+i18n_directory = os.path.join(project_root, "src", "qualcoder", "i18n")
+languages = []
+for root, dirs, files in os.walk(i18n_directory):
+    for file in files:
+        # For ISO 639-1 2 letter langauge codes and ISO 639-3 for 3 letter language codes
+        if len(Path(file).stem) in (2, 3) and Path(file).stem not in languages:
+            languages.append(Path(file).stem)
 
 
-def extract_pot_file(directory, pot_filename):
+def extract_pot_file(directory: str, pot_filename: str):
     """ Called by: update_translation_placeholders """
     # List all .py files within the specified directory
     py_files = []
@@ -67,9 +75,10 @@ def extract_pot_file(directory, pot_filename):
         print("No Python files found to extract translatable strings from.")
 
 
-def update_po_files(directory, pot_filename, lang_=None):
+def update_po_files(directory: str, pot_filename: str, lang_: str | None = None):
     """ List all .po files within the specified directory.
     called by: update_translation_placeholders """
+
     for root, dirs, files in os.walk(directory):
         for file in files:
             if lang_ is None or file.startswith(lang_):
@@ -101,35 +110,38 @@ def delete_obsolete_ts(file_ts):
     tree.write(file_ts, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
-def update_qt_ts_files(lang_=None):
+def update_qt_ts_files(lang_: str | None = None):
     """ Requires pyludate5
     pip install pyqt5-tools
     Run from QualCoder-master folder
     Warning: pylupdate6 overrides ,but does not update, existing ts files.
     Called by: update_translation_placeholders
+    Args:
+        lang_ : String es, fr, etc
     """
 
-    translation_files = [f"app_{lang}.ts" for lang in SUPPORTED_LANGUAGES]
-    
-    if lang_ is not None:
-        translation_files = [f for f in translation_files if f.startswith(f"app_{lang_}")]
+    translation_files = [f"{lang}.ts" for lang in languages]
 
+    if lang_ is not None:
+        translation_files = [f for f in translation_files if f.startswith(f"{lang_}")]
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
     i18n_directory = os.path.join(script_path, "src", "qualcoder", "i18n")
-    
+
     # Build a .pro file, which can then be used by pylupdate5 to create ts files
     def rel_for_pro(path):
         rel_path = os.path.relpath(path, gui_directory)
         return rel_path.replace(os.path.sep, "/")
 
     ui_files = []
-    for file in os.listdir(gui_directory):
-        if file.startswith("ui_") and file.endswith(".py"):
-            ui_files.append(rel_for_pro(os.path.join(gui_directory, file)))
+    for ui_file in os.listdir(gui_directory):
+        if ui_file.startswith("ui_") and ui_file.endswith(".py"):
+            ui_files.append(rel_for_pro(os.path.join(gui_directory, ui_file)))
     ui_files.sort()
 
-    ts_files = [rel_for_pro(os.path.join(i18n_directory, t)) for t in translation_files]
+    ts_files = []
+    for translation_file in translation_files:
+        ts_files.append(rel_for_pro(i18n_directory) + "/" + translation_file)
     text = "SOURCES = \\\n"
     text += " \\\n".join(ui_files)
     text += "\n\nTRANSLATIONS = \\\n"
@@ -137,52 +149,62 @@ def update_qt_ts_files(lang_=None):
     text += "\n\nCODECFORTR = ISO-8859-5\n"
 
     pro_file_path = os.path.join(gui_directory, "project.pro")
-    with open(pro_file_path, 'w',) as pro_file:
+    with open(pro_file_path, 'w', ) as pro_file:
         pro_file.write(text)
     print("Created project.pro file")
-    
     # Compile ts files
     subprocess.call(f'pylupdate5 "{pro_file_path}"', shell=True)
     print("Updated ts translation files")
-    
+
     # Delete old .ts files
     for ts_file in translation_files:
-        ts_path = os.path.join(gui_directory, ts_file)
+        ts_path = os.path.join(i18n_directory, ts_file)
         if os.path.exists(ts_path):
             delete_obsolete_ts(ts_path)
             print(f"Cleaned obsolete entries in {ts_file}")
 
 
-def update_translation_placeholders(language=None):
+def update_translation_placeholders(language: str | None = None):
     """ Update po files, update GUI ts files """
 
     directory = os.path.join('src', 'qualcoder')
-    directory_po = os.path.join(directory, 'i18n')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
-    update_po_files(directory_po, pot_filename, language)
+    update_po_files(i18n_directory, pot_filename, language)
     update_qt_ts_files(language)
 
 
-def recompile_translation(language=None):
+def create_new_language_placeholders(language: str):
+    """ Create a new set of po, (NOT ts) files for a new language. """
+
+    if language and language not in languages:
+        print(f"Creating placeholder files po and ts from {lang}")
+        new_po_file = os.path.join(i18n_directory, f'{language}.po')
+        with open(new_po_file, 'w', ) as po_file:
+            po_file.write("")
+        ''' This does not work:
+        new_ts_file = os.path.join(i18n_directory, f'{language}.ts')
+        gui_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src', 'qualcoder', 'GUI')
+        print(gui_directory, new_ts_file)
+        subprocess.run(["pylupdate5", gui_directory,  "-ts", new_ts_file])  # or lupdate'''
+        update_translation_placeholders(lang)
+        print("New placeholder files created.")
+
+
+def recompile_translation(language: str | None = None):
     """ Make sure lrelease.exe is in path.
      e.g. C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
      This is a user path environment variable """
 
-    project_root = os.path.dirname(os.path.abspath(__file__))
-
-    language_list = SUPPORTED_LANGUAGES
+    language_list = languages
     if language in language_list:
         language_list = [language]
 
     # GETTEXT TRANSLATION
     # .po-files
-    po_dir = os.path.join(project_root, "src", "qualcoder", "i18n")
-    po_files = [os.path.join(po_dir, f'{lang_}.po') for lang_ in language_list]
-
+    po_files = [os.path.join(i18n_directory, f'{lang_}.po') for lang_ in language_list]
     # .mo-files
-    mo_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
-    mo_files = [os.path.join(mo_basedir, lang_, 'LC_MESSAGES', f'{lang_}.mo') for lang_ in language_list]
+    mo_files = [os.path.join(i18n_directory, f'{lang_}.mo') for lang_ in language_list]
 
     for po_file, mo_file in zip(po_files, mo_files):
         if os.path.exists(po_file):
@@ -197,15 +219,11 @@ def recompile_translation(language=None):
                     print(f'Skipping "{mo_file}".')
 
     # Qt TRANSLATIONS
-
     # .ts-files
-    ts_dir = os.path.join(project_root, "src", "qualcoder", 'GUI')
-    ts_files = [os.path.join(ts_dir, f'app_{lang_}.ts') for lang_ in language_list]
-
+    ts_dir = os.path.join(project_root, "src", "qualcoder", 'i18n')
+    ts_files = [os.path.join(ts_dir, f'{lang_}.ts') for lang_ in language_list]
     # .qm-files
-    qm_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
-    qm_files = [os.path.join(qm_basedir, lang_, f'app_{lang_}.qm') for lang_ in language_list]
-
+    qm_files = [os.path.join(i18n_directory, f'{lang_}.qm') for lang_ in language_list]
     for ts_file, qm_file in zip(ts_files, qm_files):
         if os.path.exists(ts_file):
             # Check if ts-file has been updated and is newer than the corresponding qm-file
@@ -216,14 +234,6 @@ def recompile_translation(language=None):
                     print(f"{qm_file} has been updated.")
                 else:
                     print(f'Skipping "{qm_file}".')
-
-    # Update base_64_lang_helper.py
-    answer = input(f'Do you want to update "base_64_lang_helper.py"? (y/n)')
-    if answer == 'y':
-        os.chdir(os.path.join(project_root, "src", 'qualcoder', 'locale'))
-        cmd = os.path.join(project_root, "src", 'qualcoder', 'locale', 'create_lang_script_base64.py')
-        subprocess.call(cmd, shell=True)
-        print('Updated base_64_lang_helper.py')
     print("Finished")
 
 
@@ -274,23 +284,20 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
                 "partial": obsolete,
                 "untranslated": untranslated,
             })
-
     except Exception as e:
         stats["error"] = str(e)
-
     return stats
 
 
-def analyze_translation_status(language: str = None) -> str:
-    """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report."""
-    project_root = os.path.dirname(os.path.abspath(__file__))
-    languages = SUPPORTED_LANGUAGES
-    if language and language in languages:
+def analyze_translation_status(language: str | None = None) -> str:
+    """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report. """
+
+    global languages
+    if language:
         languages = [language]
 
     # Collect data for all languages
     report_data: Dict[str, Dict[str, Dict[str, Any]]] = {}
-
     for lang in languages:
         report_data[lang] = {
             "gettext": analyze_translation_file(
@@ -298,7 +305,7 @@ def analyze_translation_status(language: str = None) -> str:
                 "po",
             ),
             "qt": analyze_translation_file(
-                os.path.join(project_root, "src", "qualcoder", "GUI", f"app_{lang}.ts"),
+                os.path.join(project_root, "src", "qualcoder", "i18n", f"{lang}.ts"),
                 "ts",
             ),
         }
@@ -313,8 +320,8 @@ def analyze_translation_status(language: str = None) -> str:
         "- 🟥: Untranslated",
         "- ❌: File missing or error",
         "",
-        "| Language | Progress | Gettext | Qt | **Total** | **Translated** | **% Complete** |",
-        "|----------|----------|---------|----|-----------|----------------|----------------|",
+        "| Language | Progress | Status  |",
+        "|----------|----------|---------|",
     ]
 
     for lang in languages:
@@ -364,15 +371,14 @@ def analyze_translation_status(language: str = None) -> str:
 
         # Generate combined progress bar
         progress_bar = generate_progress_bar(percent_complete, percent_partial)
-
         markdown_lines.append(
-            f"| {lang} | {progress_bar} | {gettext_str} | {qt_str} | **{total_entries}** | **{total_translated}** | **{percent_complete:.1f}%** |"
+            f"| {lang} | {progress_bar} {percent_complete:.1f}% ({total_translated} / {total_entries}) | |"
         )
-
-    markdown_lines.extend(["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."])
+    markdown_lines.extend(
+        ["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."])
 
     # Write to LANGUAGES.md
-    output_path = os.path.join(project_root, "LANGUAGES.md")
+    output_path = os.path.join(project_root, "LANGUAGES_REPORT.md")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(markdown_lines))
     print(f"Translation status report generated: {output_path}")
@@ -386,7 +392,8 @@ def main():
     print("--compile compiles language files ts to qm files and po to mo files")
     print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile only that language.")
     print("e.g. --update --lang fr")
-    print("--status Creates LANGUAGES.md file which shows translation status of files.")
+    print("--status makes LANGUAGES_REPORT.md file which shows translation status of files.")
+    print("--create Creates placeholder files po (NOT YET) ts for a new language. use 2 or 3 letter ISO639 codes.")
 
 
 if __name__ == "__main__":
@@ -397,7 +404,9 @@ if __name__ == "__main__":
             lang_index = sys.argv.index("--lang") + 1
             if lang_index < len(sys.argv):
                 lang = sys.argv[lang_index]
-        if mode == "--update":
+        if "--create" in sys.argv:
+            create_new_language_placeholders(lang)
+        elif mode == "--update":
             update_translation_placeholders(lang)
         elif mode == "--compile":
             recompile_translation(lang)
