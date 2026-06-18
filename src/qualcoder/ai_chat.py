@@ -3088,32 +3088,34 @@ class DialogAIChat(QtWidgets.QDialog):
                 result["stream_messages"] = []
                 return result
 
-            planned_calls = self._normalize_mcp_calls(plan_data.get("calls", []), allowed_methods, max_queued_calls)
-            proposed_plan_calls = self._normalize_mcp_calls(
-                plan_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
+            plan_state = self._parse_mcp_planner_response(
+                plan_data,
+                allowed_methods,
+                max_queued_calls,
+                max_calls_per_round,
             )
-            needs_mcp = self._json_bool(plan_data.get("needs_mcp", True), True)
-            plan_summary = str(plan_data.get("plan_summary", "")).strip()
+            planned_calls = plan_state["planned_calls"]
+            proposed_plan_calls = plan_state["proposed_next_calls"]
+            planner_action = plan_state["action"]
+            plan_summary = plan_state["plan_summary"]
             if plan_summary != "":
                 latest_plan_summary = plan_summary
                 self._emit_mcp_status_text(signals, chat_idx, plan_summary, status_kind="planning")
-            initial_brief = str(plan_data.get("answer_brief", "")).strip()
+            initial_brief = plan_state["answer_brief"]
             if initial_brief != "":
                 final_hint = initial_brief
-            planner_methodology_gate = self._extract_methodology_gate(plan_data)
+            planner_methodology_gate = plan_state["methodology_gate"]
             methodology_gate = self._merge_methodology_gate(methodology_gate, planner_methodology_gate)
+            planner_user_decision_required = plan_state["user_decision_required"]
+            planner_decision_question = plan_state["decision_question"]
+            planner_decision_context = plan_state["decision_context"]
             if self._is_methodology_gate_blocking(planner_methodology_gate):
                 planned_calls = []
                 proposed_plan_calls = []
-                needs_mcp = False
+                planner_action = "final_answer"
                 stop_reason = "methodology_" + planner_methodology_gate["decision"]
             else:
-                planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
-                planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
-                planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
-                if planner_user_decision_required and planner_decision_question == "":
-                    planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
-                if planner_user_decision_required and planner_decision_question != "":
+                if planner_action == "ask_user" and planner_decision_question != "":
                     pending_user_decision = {
                         "phase": "planning",
                         "question": planner_decision_question,
@@ -3122,6 +3124,95 @@ class DialogAIChat(QtWidgets.QDialog):
                     }
                     result["direct_ai_message"] = planner_decision_question
                     stop_reason = "awaiting_user_decision"
+            if self._planner_output_missing_calls(
+                planner_action,
+                planned_calls,
+                stop_reason,
+            ):
+                repair_note = _('The AI skipped the retrieval steps; retrying planning.')
+                latest_plan_summary = repair_note
+                self._emit_mcp_status_text(signals, chat_idx, repair_note, status_kind="planning")
+                repair_user_prompt = (
+                    "Your previous planner output was inconsistent: it used action=call_mcp but returned no executable calls. "
+                    "Return corrected planner JSON now. If more project evidence is needed, set action=call_mcp and include at least one concrete MCP call. "
+                    "If no MCP call is needed, set action=final_answer."
+                )
+                append_single_instruct_log(
+                    "replanning",
+                    "user",
+                    build_phase_request_message(planner_system_prompt, repair_user_prompt).content,
+                )
+                repair_messages = build_phase_messages(planner_system_prompt, repair_user_prompt)
+                try:
+                    repair_plan_data = self._invoke_json_llm_with_step_timeout(
+                        repair_messages,
+                        schema_name='mcp_replanner_control',
+                        response_schema=planner_json_schema,
+                        context='mcp_json_replanner',
+                        step_name=_("Internal replanning"),
+                        status_kind="planning",
+                        signals=signals,
+                        chat_idx=chat_idx,
+                    )
+                except TimeoutError:
+                    timeout_msg = _('Internal replanning timed out. Please try again.')
+                    self._emit_mcp_status_text(signals, chat_idx, timeout_msg, status_kind="planning")
+                    result["direct_ai_message"] = timeout_msg
+                    result["tool_messages"] = tool_messages
+                    result["stream_messages"] = []
+                    return result
+                plan_state = self._parse_mcp_planner_response(
+                    repair_plan_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                planned_calls = plan_state["planned_calls"]
+                proposed_plan_calls = plan_state["proposed_next_calls"]
+                planner_action = plan_state["action"]
+                plan_summary = plan_state["plan_summary"]
+                pending_user_decision = None
+                if plan_summary != "":
+                    latest_plan_summary = plan_summary
+                    self._emit_mcp_status_text(signals, chat_idx, plan_summary, status_kind="planning")
+                initial_brief = plan_state["answer_brief"]
+                if initial_brief != "":
+                    final_hint = initial_brief
+                planner_methodology_gate = plan_state["methodology_gate"]
+                methodology_gate = self._merge_methodology_gate(methodology_gate, planner_methodology_gate)
+                planner_user_decision_required = plan_state["user_decision_required"]
+                planner_decision_question = plan_state["decision_question"]
+                planner_decision_context = plan_state["decision_context"]
+                if self._is_methodology_gate_blocking(planner_methodology_gate):
+                    planned_calls = []
+                    proposed_plan_calls = []
+                    planner_action = "final_answer"
+                    stop_reason = "methodology_" + planner_methodology_gate["decision"]
+                else:
+                    stop_reason = ""
+                    if planner_action == "ask_user" and planner_decision_question != "":
+                        pending_user_decision = {
+                            "phase": "planning",
+                            "question": planner_decision_question,
+                            "context": planner_decision_context,
+                            "proposed_next_calls": proposed_plan_calls,
+                        }
+                        result["direct_ai_message"] = planner_decision_question
+                        stop_reason = "awaiting_user_decision"
+                if self._planner_output_missing_calls(
+                    planner_action,
+                    planned_calls,
+                    stop_reason,
+                ):
+                    invalid_msg = _(
+                        'Error: The AI returned an inconsistent retrieval plan without executable steps. '
+                        'Please try again or choose a different model.'
+                    )
+                    self._emit_mcp_status_text(signals, chat_idx, invalid_msg, status_kind="planning")
+                    result["direct_ai_message"] = invalid_msg
+                    result["tool_messages"] = tool_messages
+                    result["stream_messages"] = []
+                    return result
             if pending_user_decision is not None:
                 agent_state_snapshot = {
                     "type": "mcp_agent_state",
@@ -3153,7 +3244,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 result["tool_messages"] = tool_messages
                 result["stream_messages"] = []
                 return result
-            if not needs_mcp:
+            if planner_action != "call_mcp":
                 planned_calls = []
             if len(planned_calls) == 0 and stop_reason == "":
                 stop_reason = "enough_information"
@@ -6752,7 +6843,10 @@ data collected. This information will accompany every prompt sent to the AI, res
         return {
             "type": "object",
             "properties": {
-                "needs_mcp": {"type": "boolean"},
+                "action": {
+                    "type": "string",
+                    "enum": ["call_mcp", "final_answer", "ask_user"],
+                },
                 "plan_summary": {"type": "string"},
                 "methodology_decision": {
                     "type": "string",
@@ -6767,7 +6861,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "answer_brief": {"type": "string"},
             },
             "required": [
-                "needs_mcp",
+                "action",
                 "plan_summary",
                 "methodology_decision",
                 "methodology_note",
@@ -6777,6 +6871,47 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "proposed_next_calls",
                 "calls",
                 "answer_brief",
+            ],
+            "allOf": [
+                {
+                    "if": {"properties": {"action": {"const": "call_mcp"}}},
+                    "then": {
+                        "properties": {
+                            "methodology_decision": {
+                                "enum": ["allow", "allow_with_caveat"],
+                            },
+                            "user_decision_required": {"const": False},
+                            "decision_question": {"const": ""},
+                            "decision_context": {"const": ""},
+                            "calls": {"type": "array", "items": call_schema, "minItems": 1},
+                        },
+                    },
+                },
+                {
+                    "if": {"properties": {"action": {"const": "final_answer"}}},
+                    "then": {
+                        "properties": {
+                            "user_decision_required": {"const": False},
+                            "decision_question": {"const": ""},
+                            "decision_context": {"const": ""},
+                            "proposed_next_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                            "calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                        },
+                    },
+                },
+                {
+                    "if": {"properties": {"action": {"const": "ask_user"}}},
+                    "then": {
+                        "properties": {
+                            "methodology_decision": {
+                                "enum": ["allow", "allow_with_caveat"],
+                            },
+                            "user_decision_required": {"const": True},
+                            "decision_question": {"type": "string", "minLength": 1},
+                            "calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                        },
+                    },
+                },
             ],
             "additionalProperties": False,
         }
@@ -7184,6 +7319,53 @@ data collected. This information will accompany every prompt sent to the AI, res
             if text in ("false", "0", "no", ""):
                 return False
         return default
+
+    def _parse_mcp_planner_response(self, plan_data: Any, allowed_methods: set[str],
+                                    max_queued_calls: int, max_calls_per_round: int) -> Dict[str, Any]:
+        """Normalize one planner/replanner JSON payload into controller state."""
+
+        data = plan_data if isinstance(plan_data, dict) else {}
+        plan_summary = str(data.get("plan_summary", "")).strip()
+        methodology_gate = self._extract_methodology_gate(data)
+        user_decision_required = self._json_bool(data.get("user_decision_required", False), False)
+        decision_question = self._normalize_progress_note(data.get("decision_question", ""), max_length=600)
+        if user_decision_required and decision_question == "":
+            decision_question = self._normalize_progress_note(plan_summary, max_length=600)
+        planner_action = str(data.get("action", "")).strip().lower()
+        if planner_action not in ("call_mcp", "final_answer", "ask_user"):
+            if user_decision_required:
+                planner_action = "ask_user"
+            elif self._is_methodology_gate_blocking(methodology_gate):
+                planner_action = "final_answer"
+            elif self._json_bool(data.get("needs_mcp", True), True):
+                planner_action = "call_mcp"
+            else:
+                planner_action = "final_answer"
+        return {
+            "action": planner_action,
+            "planned_calls": self._normalize_mcp_calls(data.get("calls", []), allowed_methods, max_queued_calls),
+            "proposed_next_calls": self._normalize_mcp_calls(
+                data.get("proposed_next_calls", []),
+                allowed_methods,
+                max_calls_per_round,
+            ),
+            "plan_summary": plan_summary,
+            "answer_brief": str(data.get("answer_brief", "")).strip(),
+            "methodology_gate": methodology_gate,
+            "user_decision_required": user_decision_required,
+            "decision_question": decision_question,
+            "decision_context": self._normalize_progress_note(data.get("decision_context", ""), max_length=600),
+        }
+
+    def _planner_output_missing_calls(self, planner_action: str, planned_calls: List[Dict[str, Any]],
+                                      stop_reason: str) -> bool:
+        """Return whether planner JSON requests MCP work but omitted executable calls."""
+
+        if str(stop_reason).strip() != "":
+            return False
+        if str(planner_action).strip().lower() != "call_mcp":
+            return False
+        return len(planned_calls) == 0
 
     def _mcp_call_key(self, method: str, params: Dict[str, Any]) -> str:
         try:
@@ -7692,34 +7874,36 @@ data collected. This information will accompany every prompt sent to the AI, res
                 result["tool_messages"] = tool_messages
                 result["stream_messages"] = []
                 return result
-            planned_calls = self._normalize_mcp_calls(plan_data.get("calls", []), allowed_methods, max_queued_calls)
-            proposed_plan_calls = self._normalize_mcp_calls(
-                plan_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
+            plan_state = self._parse_mcp_planner_response(
+                plan_data,
+                allowed_methods,
+                max_queued_calls,
+                max_calls_per_round,
             )
-            needs_mcp = self._json_bool(plan_data.get("needs_mcp", True), True)
-            plan_summary = str(plan_data.get("plan_summary", "")).strip()
+            planned_calls = plan_state["planned_calls"]
+            proposed_plan_calls = plan_state["proposed_next_calls"]
+            planner_action = plan_state["action"]
+            plan_summary = plan_state["plan_summary"]
             latest_plan_summary = plan_summary
             latest_reflection_summary = ""
             pending_user_decision = None
             if plan_summary != "":
                 self._emit_mcp_status_text(signals, chat_idx, plan_summary, status_kind="planning")
-            initial_brief = str(plan_data.get("answer_brief", "")).strip()
+            initial_brief = plan_state["answer_brief"]
             if initial_brief != "":
                 final_hint = initial_brief
-            planner_methodology_gate = self._extract_methodology_gate(plan_data)
+            planner_methodology_gate = plan_state["methodology_gate"]
             methodology_gate = self._merge_methodology_gate(methodology_gate, planner_methodology_gate)
+            planner_user_decision_required = plan_state["user_decision_required"]
+            planner_decision_question = plan_state["decision_question"]
+            planner_decision_context = plan_state["decision_context"]
             if self._is_methodology_gate_blocking(planner_methodology_gate):
                 planned_calls = []
                 proposed_plan_calls = []
-                needs_mcp = False
+                planner_action = "final_answer"
                 stop_reason = "methodology_" + planner_methodology_gate["decision"]
             else:
-                planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
-                planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
-                planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
-                if planner_user_decision_required and planner_decision_question == "":
-                    planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
-                if planner_user_decision_required and planner_decision_question != "":
+                if planner_action == "ask_user" and planner_decision_question != "":
                     pending_user_decision = {
                         "phase": "planning",
                         "question": planner_decision_question,
@@ -7728,6 +7912,95 @@ data collected. This information will accompany every prompt sent to the AI, res
                     }
                     result["direct_ai_message"] = planner_decision_question
                     stop_reason = "awaiting_user_decision"
+            if self._planner_output_missing_calls(
+                planner_action,
+                planned_calls,
+                stop_reason,
+            ):
+                repair_note = _('The AI skipped the retrieval steps; retrying planning.')
+                latest_plan_summary = repair_note
+                self._emit_mcp_status_text(signals, chat_idx, repair_note, status_kind="planning")
+                repair_user_prompt = (
+                    "Your previous planner output was inconsistent: it used action=call_mcp but returned no executable calls. "
+                    "Return corrected planner JSON now. If more project evidence is needed, set action=call_mcp and include at least one concrete MCP call. "
+                    "If no MCP call is needed, set action=final_answer."
+                )
+                append_single_instruct_log(
+                    "replanning",
+                    "user",
+                    build_phase_request_message(planner_system_prompt, repair_user_prompt).content,
+                )
+                repair_messages = build_phase_messages(planner_system_prompt, repair_user_prompt)
+                try:
+                    repair_plan_data = self._invoke_json_llm_with_step_timeout(
+                        repair_messages,
+                        schema_name='mcp_replanner_control',
+                        response_schema=planner_json_schema,
+                        context='mcp_json_replanner',
+                        step_name=_("Internal replanning"),
+                        status_kind="planning",
+                        signals=signals,
+                        chat_idx=chat_idx,
+                    )
+                except TimeoutError:
+                    timeout_msg = _('Internal replanning timed out. Please try again.')
+                    self._emit_mcp_status_text(signals, chat_idx, timeout_msg, status_kind="planning")
+                    result["direct_ai_message"] = timeout_msg
+                    result["tool_messages"] = tool_messages
+                    result["stream_messages"] = []
+                    return result
+                plan_state = self._parse_mcp_planner_response(
+                    repair_plan_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                planned_calls = plan_state["planned_calls"]
+                proposed_plan_calls = plan_state["proposed_next_calls"]
+                planner_action = plan_state["action"]
+                plan_summary = plan_state["plan_summary"]
+                pending_user_decision = None
+                if plan_summary != "":
+                    latest_plan_summary = plan_summary
+                    self._emit_mcp_status_text(signals, chat_idx, plan_summary, status_kind="planning")
+                initial_brief = plan_state["answer_brief"]
+                if initial_brief != "":
+                    final_hint = initial_brief
+                planner_methodology_gate = plan_state["methodology_gate"]
+                methodology_gate = self._merge_methodology_gate(methodology_gate, planner_methodology_gate)
+                planner_user_decision_required = plan_state["user_decision_required"]
+                planner_decision_question = plan_state["decision_question"]
+                planner_decision_context = plan_state["decision_context"]
+                if self._is_methodology_gate_blocking(planner_methodology_gate):
+                    planned_calls = []
+                    proposed_plan_calls = []
+                    planner_action = "final_answer"
+                    stop_reason = "methodology_" + planner_methodology_gate["decision"]
+                else:
+                    stop_reason = ""
+                    if planner_action == "ask_user" and planner_decision_question != "":
+                        pending_user_decision = {
+                            "phase": "planning",
+                            "question": planner_decision_question,
+                            "context": planner_decision_context,
+                            "proposed_next_calls": proposed_plan_calls,
+                        }
+                        result["direct_ai_message"] = planner_decision_question
+                        stop_reason = "awaiting_user_decision"
+                if self._planner_output_missing_calls(
+                    planner_action,
+                    planned_calls,
+                    stop_reason,
+                ):
+                    invalid_msg = _(
+                        'Error: The AI returned an inconsistent retrieval plan without executable steps. '
+                        'Please try again or choose a different model.'
+                    )
+                    self._emit_mcp_status_text(signals, chat_idx, invalid_msg, status_kind="planning")
+                    result["direct_ai_message"] = invalid_msg
+                    result["tool_messages"] = tool_messages
+                    result["stream_messages"] = []
+                    return result
             if pending_user_decision is not None:
                 agent_state_snapshot = {
                     "type": "mcp_agent_state",
@@ -7759,7 +8032,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 result["tool_messages"] = tool_messages
                 result["stream_messages"] = []
                 return result
-            if not needs_mcp:
+            if planner_action != "call_mcp":
                 planned_calls = []
             if len(planned_calls) == 0 and stop_reason == "":
                 stop_reason = "enough_information"

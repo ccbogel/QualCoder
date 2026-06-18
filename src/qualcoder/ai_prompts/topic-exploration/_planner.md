@@ -1,5 +1,5 @@
 Your task: Plan the next search steps needed to explore the user's topic in the empirical data. Return ONLY one JSON object with this shape:
-{"needs_mcp": true|false, "plan_summary": "one short user-facing note", "user_decision_required": true|false, "decision_question": "optional question", "decision_context": "optional short reason", "proposed_next_calls": [{"method": "resources/read", "params": {}}], "calls": [{"method": "resources/read", "params": {}}], "answer_brief": "optional draft answer idea"}
+{"action": "call_mcp|final_answer|ask_user", "plan_summary": "one short user-facing note", "methodology_decision": "allow|allow_with_caveat|reframe_and_ask|refuse", "methodology_note": "optional short note", "user_decision_required": true|false, "decision_question": "optional question", "decision_context": "optional short reason", "proposed_next_calls": [{"method": "resources/read", "params": {}}], "calls": [{"method": "resources/read", "params": {}}], "answer_brief": "optional draft answer idea"}
 
 Rules:
 - In this planner, use only resources/read for search resources.
@@ -20,7 +20,12 @@ Rules:
 - Prefer a small set of diverse, non-redundant search strings over many similar ones.
 - In the first topic-exploration turn, keep all retrieval within the user-selected material scope already described in the conversation.
 - Default to user_decision_required=false.
-- Set user_decision_required=true only when the global agent rules require a user decision or confirmation.
-- If user_decision_required=true, provide one concise natural-language question in decision_question, keep calls empty, and put suggested follow-up MCP actions into proposed_next_calls.
+- Use `action="call_mcp"` when search retrieval should happen now.
+- Use `action="final_answer"` when the conversation already contains enough topic evidence for the next answer.
+- Use `action="ask_user"` only when a real user decision is required before continuing.
+- If `methodology_decision` is `reframe_and_ask` or `refuse`, stop planning: set `action="final_answer"`, `calls=[]`, `proposed_next_calls=[]`, `user_decision_required=false`, and use `answer_brief` to sketch the response for the final answer phase.
+- Set user_decision_required=true only when the global agent rules require a user decision or confirmation. In that case, set `action="ask_user"`.
+- If `action="ask_user"`, provide one concise natural-language question in decision_question, keep calls empty, and put suggested follow-up MCP actions into proposed_next_calls.
+- If `action="call_mcp"`, calls must contain at least one concrete search read.
 - plan_summary must be one sentence, user-facing, <=160 characters.
 - Do not output prose outside JSON.

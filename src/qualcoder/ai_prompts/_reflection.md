@@ -20,6 +20,7 @@ Rules:
 - Do not stop with explanations only if executable actions are still pending.
 - If the task was about collecting information and you now have enough evidence for a final answer, set enough_information=true and revised_calls=[].
 - If more information or actions are still needed, set enough_information=false and propose only the necessary revised_calls.
+- If enough_information=false, return at least one executable next step through revised_calls, or explicitly continue deferred_calls.
 - reflection_summary must be one sentence, user-facing, <=160 characters.
 - Avoid boilerplate like "I will" or "Next step is" unless strictly needed.
 - next_step_note is optional and only used when reflection_summary is empty.
