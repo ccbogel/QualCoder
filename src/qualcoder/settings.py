@@ -104,19 +104,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_coderName.setText(self.settings['codername'])
         self.ui.pushButton_set_coder.clicked.connect(self.set_coder)        
         self.ui.fontComboBox.setCurrentFont(new_font)
-        languages = ["Deutsch de", "English en", "Español es", "Français fr",
-                     "日本語 ja", "Português pt", "Svenska sv", "中国人 zh"]
-        if self.settings['language'] not in ['de', 'en', 'es', 'fr', 'ja', 'pt', 'sv', 'zh']:
-            msg = _("Another language has been set in the config.ini file.") + "\n"
-            msg += _("Additional community supported languages are found in the i18n folder.") + "\n"
-            msg += _("They may not be recently updated") + "\n"
-            msg += f"language = {self.settings['language']}"
-            self.ui.comboBox_language.setToolTip(msg)
-            languages.append(f"Other {self.settings['language']}")
-        self.ui.comboBox_language.addItems(languages)
-        for index, lang in enumerate(languages):
-            if lang.split()[1] == self.settings['language']:
-                self.ui.comboBox_language.setCurrentIndex(index)
         self.selected_language_index = -1
         self.populate_language_combo()
         self.ui.comboBox_language.currentIndexChanged.connect(self.language_index_changed)
@@ -287,9 +274,7 @@ class DialogSettings(QtWidgets.QDialog):
 
         tooltip_lines = [
             _("Close and open the software for the change in language to occur."),
-            _("Additional community supported languages are found in the i18n folder."),
-            _("They may not be recently updated"),
-            os.path.join(self.app.get_user_i18n_dir(), "Readme.txt"),
+            _("Additional community supported languages can be installed by selecting \"Add more languages...\" in the dropdown."),
         ]
         self.ui.comboBox_language.clear()
         builtin_codes = set()
