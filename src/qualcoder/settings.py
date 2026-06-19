@@ -36,6 +36,32 @@ home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+USER_I18N_README = """QualCoder additional translations
+
+This folder can contain additional compiled translation files for QualCoder.
+It can also contain a zip package for one language.
+
+How to add a language
+1. Download additional language files from here:
+   https://github.com/ccbogel/QualCoder/tree/master/other_languages/
+   If you want to add your own language, follow the instructions here on 
+   how to translate the software: https://qualcoder.org/doc/en/7.6.-How-to-contribute/   
+2. Put either the zip package or the .qm and .mo files into this folder.
+3. Use the same language code for all filenames, for example:
+   sv.qm
+   sv.mo
+   sv.txt (optional)
+   sv.zip
+4. A zip package should contain both files for the same language.
+   It may also contain an optional text file with extra information.
+5. Restart QualCoder after selecting the language in Settings.
+
+Notes
+- A language is only listed in Settings when a zip package or both the .qm and .mo files are present.
+- The zip package will be unpacked automatically when that language is used.
+- If a language exists both here and inside QualCoder, the newer file is used.
+"""
+
 
 class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
     """Treat fully-parseable out-of-range numbers as invalid while typing."""
@@ -91,6 +117,11 @@ class DialogSettings(QtWidgets.QDialog):
         for index, lang in enumerate(languages):
             if lang.split()[1] == self.settings['language']:
                 self.ui.comboBox_language.setCurrentIndex(index)
+        self.selected_language_index = -1
+        self.populate_language_combo()
+        self.ui.comboBox_language.currentIndexChanged.connect(self.language_index_changed)
+        self.ui.comboBox_language.activated.connect(self.language_activated)
+        self.ui.comboBox_language.installEventFilter(self)
 
         timestampformats = ["[mm.ss]", "[mm:ss]", "[hh.mm.ss]", "[hh:mm:ss]",
                             "{hh:mm:ss}", "#hh:mm:ss.sss#"]
@@ -226,6 +257,127 @@ class DialogSettings(QtWidgets.QDialog):
             QtCore.QTimer.singleShot(700, lambda: self.ui.widget_ai.setStyleSheet('#widget_ai { border: none; }'))
         else:
             self.ui.widget_ai.setStyleSheet('')
+
+    def get_selected_language_code(self):
+        """Return the currently selected language code, excluding the action item."""
+
+        current_index = self.ui.comboBox_language.currentIndex()
+        item_type = self.ui.comboBox_language.itemData(current_index, QtCore.Qt.ItemDataRole.UserRole + 1)
+        if item_type == 'language':
+            return self.ui.comboBox_language.itemData(current_index, QtCore.Qt.ItemDataRole.UserRole)
+        if self.selected_language_index >= 0:
+            return self.ui.comboBox_language.itemData(self.selected_language_index, QtCore.Qt.ItemDataRole.UserRole)
+        return 'en'
+
+    def set_language_combo_selection(self, lang_code):
+        """Select a language entry in the combobox by code."""
+
+        for index in range(self.ui.comboBox_language.count()):
+            item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+            if item_type != 'language':
+                continue
+            if self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole) == lang_code:
+                self.ui.comboBox_language.setCurrentIndex(index)
+                self.selected_language_index = index
+                return True
+        return False
+
+    def populate_language_combo(self, preferred_language=None):
+        """Populate built-in languages, user languages and the add-language action."""
+
+        tooltip_lines = [
+            _("Close and open the software for the change in language to occur."),
+            _("Additional community supported languages are found in the i18n folder."),
+            _("They may not be recently updated"),
+            os.path.join(self.app.get_user_i18n_dir(), "Readme.txt"),
+        ]
+        self.ui.comboBox_language.clear()
+        builtin_codes = set()
+        for code, label in self.app.get_builtin_language_labels():
+            builtin_codes.add(code)
+            index = self.ui.comboBox_language.count()
+            self.ui.comboBox_language.addItem(f"{label} {code}")
+            self.ui.comboBox_language.setItemData(index, code, QtCore.Qt.ItemDataRole.UserRole)
+            self.ui.comboBox_language.setItemData(index, 'language', QtCore.Qt.ItemDataRole.UserRole + 1)
+
+        for code in self.app.get_complete_user_language_codes():
+            if code in builtin_codes:
+                continue
+            index = self.ui.comboBox_language.count()
+            self.ui.comboBox_language.addItem(f"other - {code}")
+            self.ui.comboBox_language.setItemData(index, code, QtCore.Qt.ItemDataRole.UserRole)
+            self.ui.comboBox_language.setItemData(index, 'language', QtCore.Qt.ItemDataRole.UserRole + 1)
+
+        current_language = preferred_language if preferred_language is not None else self.settings['language']
+        if not self.set_language_combo_selection(current_language):
+            if not self.set_language_combo_selection('en'):
+                for index in range(self.ui.comboBox_language.count()):
+                    item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+                    if item_type == 'language':
+                        self.ui.comboBox_language.setCurrentIndex(index)
+                        self.selected_language_index = index
+                        break
+
+        action_index = self.ui.comboBox_language.count()
+        self.ui.comboBox_language.addItem(_("Add more languages..."))
+        self.ui.comboBox_language.setItemData(action_index, 'add_other_language', QtCore.Qt.ItemDataRole.UserRole)
+        self.ui.comboBox_language.setItemData(action_index, 'action', QtCore.Qt.ItemDataRole.UserRole + 1)
+        self.ui.comboBox_language.setToolTip("\n".join(tooltip_lines))
+
+    def language_index_changed(self, index):
+        """Remember the last selected language entry."""
+
+        item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+        if item_type == 'language':
+            self.selected_language_index = index
+
+    def refresh_language_combo(self):
+        """Reload user languages while preserving the current selection."""
+
+        preferred_language = self.get_selected_language_code()
+        with QtCore.QSignalBlocker(self.ui.comboBox_language):
+            self.populate_language_combo(preferred_language)
+
+    def eventFilter(self, obj, event):
+        if obj == self.ui.comboBox_language:
+            if event.type() == QtCore.QEvent.Type.MouseButtonPress:
+                self.refresh_language_combo()
+            if event.type() == QtCore.QEvent.Type.KeyPress:
+                if event.key() in (QtCore.Qt.Key.Key_F4, QtCore.Qt.Key.Key_Down):
+                    self.refresh_language_combo()
+        return super().eventFilter(obj, event)
+
+    def language_activated(self, index):
+        """Handle the action item in the language combobox."""
+
+        item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+        if item_type != 'action':
+            return
+        self.open_user_language_folder()
+        if self.selected_language_index >= 0:
+            with QtCore.QSignalBlocker(self.ui.comboBox_language):
+                self.ui.comboBox_language.setCurrentIndex(self.selected_language_index)
+
+    def open_user_language_folder(self):
+        """Create the user i18n folder and readme if needed, then open it."""
+
+        user_i18n_dir = self.app.get_user_i18n_dir()
+        try:
+            os.makedirs(user_i18n_dir, exist_ok=True)
+            readme_path = os.path.join(user_i18n_dir, "README.TXT")
+            if not os.path.exists(readme_path):
+                with open(readme_path, 'w', encoding='utf-8') as file_:
+                    file_.write(USER_I18N_README)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Add more languages..."), str(err), "warning").exec()
+            return
+
+        opened = QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(user_i18n_dir))
+        if not opened:
+            Message(self.app, _("Add more languages..."),
+                    _("Could not open the user translation folder.") + "\n" + user_i18n_dir,
+                    "warning").exec()
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -572,9 +724,10 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
-        if self.settings['language'] != self.ui.comboBox_language.currentText().split()[1]:
+        selected_language = self.get_selected_language_code()
+        if self.settings['language'] != selected_language:
             restart_qualcoder = True
-        self.settings['language'] = self.ui.comboBox_language.currentText().split()[1]
+        self.settings['language'] = selected_language
         self.settings['codetext_chunksize'] = int(self.ui.comboBox_text_chunk_size.currentText())
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()

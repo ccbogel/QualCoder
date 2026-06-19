@@ -1,0 +1,2 @@
+Partial romanian translation, created by https://github.com/maninthemiddle01
+QualCoder version 4 pre release, June 2, 2026
