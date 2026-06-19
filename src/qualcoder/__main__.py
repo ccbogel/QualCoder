@@ -30,6 +30,7 @@ import gettext
 import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
+import locale as py_locale
 import os
 import platform
 import shutil
@@ -314,6 +315,48 @@ class App(object):
         """Return the language labels shown in the settings dialog."""
 
         return list(BUILTIN_LANGUAGE_LABELS)
+
+    def get_initial_language_code(self):
+        """Return the best initial language code based on the system locale."""
+
+        available_codes = {code for code, _label in self.get_builtin_language_labels()}
+        available_codes.update(self.get_complete_user_language_codes())
+        if 'en' not in available_codes:
+            available_codes.add('en')
+
+        candidates = []
+        try:
+            for entry in QtCore.QLocale.system().uiLanguages():
+                if entry:
+                    candidates.append(entry)
+        except Exception:
+            pass
+        try:
+            locale_name = QtCore.QLocale.system().name()
+            if locale_name:
+                candidates.append(locale_name)
+        except Exception:
+            pass
+        try:
+            default_locale = py_locale.getdefaultlocale()[0]
+            if default_locale:
+                candidates.append(default_locale)
+        except Exception:
+            pass
+
+        seen = set()
+        for candidate in candidates:
+            normalized = candidate.replace('-', '_')
+            parts = [p for p in normalized.split('_') if p]
+            if not parts:
+                continue
+            primary = parts[0].lower()
+            if primary in seen:
+                continue
+            seen.add(primary)
+            if primary in available_codes:
+                return primary
+        return 'en'
 
     @staticmethod
     def _is_valid_language_code(code):
@@ -1189,7 +1232,7 @@ class App(object):
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
             'showids': False,
-            'language': 'en',
+            'language': self.get_initial_language_code(),
             'backup_on_open': True,
             'backup_av_files': True,
             'timestampformat': "[hh.mm.ss]",
