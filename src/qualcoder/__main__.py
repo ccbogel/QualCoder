@@ -3451,7 +3451,8 @@ Click "Yes" to start now.')
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
-    app = QtWidgets.QApplication(sys.argv)    
+    app = QtWidgets.QApplication(sys.argv)
+    app._qc_installed_translators = []
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
     project_path = qual_app.get_most_recent_projectpath()
@@ -3491,6 +3492,26 @@ def gui():
             with open(mo_path, 'rb') as file_:
                 translator = gettext.GNUTranslations(file_)
             app.installTranslator(qt_translator)
+            app._qc_installed_translators.append(qt_translator)
+
+            qt_translations_path = QtCore.QLibraryInfo.path(QtCore.QLibraryInfo.LibraryPath.TranslationsPath)
+            qt_base_candidates = [f"qtbase_{lang}"]
+            locale_name = QtCore.QLocale(lang).name()
+            if locale_name:
+                qt_base_candidates.append(f"qtbase_{locale_name}")
+            qt_base_candidates = list(dict.fromkeys(qt_base_candidates))
+            qt_base_translator = QtCore.QTranslator()
+            qt_base_loaded = False
+            for candidate in qt_base_candidates:
+                if qt_base_translator.load(candidate, qt_translations_path):
+                    app.installTranslator(qt_base_translator)
+                    app._qc_installed_translators.append(qt_base_translator)
+                    qt_base_loaded = True
+                    break
+            if not qt_base_loaded:
+                logger.warning(
+                    f"No Qt base translation found for language '{lang}' in '{qt_translations_path}'"
+                )
         except Exception as err:
             print(err)
             logger.error(err)
