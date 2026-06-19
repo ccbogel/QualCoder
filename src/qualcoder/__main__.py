@@ -30,6 +30,7 @@ import gettext
 import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
+import locale as py_locale
 import os
 import platform
 import shutil
@@ -38,6 +39,7 @@ import sqlite3
 import urllib.request
 import urllib.error as urllib_err
 import webbrowser
+import zipfile
 from copy import copy
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -125,6 +127,17 @@ logger.setLevel(logging.DEBUG)
 # The rotating file handler does not work on Windows
 handler = RotatingFileHandler(logfile, maxBytes=log_maxBytes, backupCount=2)
 logger.addHandler(handler)
+
+BUILTIN_LANGUAGE_LABELS = [
+    ("de", "Deutsch"),
+    ("en", "English"),
+    ("es", "Español"),
+    ("fr", "Français"),
+    ("ja", "日本語"),
+    ("pt", "Português"),
+    ("sv", "Svenska"),
+    ("zh", "中国人"),
+]
 
 
 class ProjectEventBus(QtCore.QObject):
@@ -279,6 +292,185 @@ class App(object):
         result = self.read_previous_project_paths()
         if result:
             return result[0]
+
+    def get_builtin_i18n_dir(self):
+        """Return the directory that contains bundled translation files."""
+
+        i18n_dir = os.path.join(path, 'i18n')
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')
+        return i18n_dir
+
+    def get_user_i18n_dir(self):
+        """Return the user directory for additional translations."""
+
+        return os.path.join(self.confighome, 'i18n')
+
+    def get_user_language_zip_path(self, lang_code):
+        """Return the expected zip package path for one user language."""
+
+        return os.path.join(self.get_user_i18n_dir(), f'{lang_code}.zip')
+
+    def get_builtin_language_labels(self):
+        """Return the language labels shown in the settings dialog."""
+
+        return list(BUILTIN_LANGUAGE_LABELS)
+
+    def get_initial_language_code(self):
+        """Return the best initial language code based on the system locale."""
+
+        available_codes = {code for code, _label in self.get_builtin_language_labels()}
+        available_codes.update(self.get_complete_user_language_codes())
+        if 'en' not in available_codes:
+            available_codes.add('en')
+
+        candidates = []
+        try:
+            for entry in QtCore.QLocale.system().uiLanguages():
+                if entry:
+                    candidates.append(entry)
+        except Exception:
+            pass
+        try:
+            locale_name = QtCore.QLocale.system().name()
+            if locale_name:
+                candidates.append(locale_name)
+        except Exception:
+            pass
+        try:
+            default_locale = py_locale.getdefaultlocale()[0]
+            if default_locale:
+                candidates.append(default_locale)
+        except Exception:
+            pass
+
+        seen = set()
+        for candidate in candidates:
+            normalized = candidate.replace('-', '_')
+            parts = [p for p in normalized.split('_') if p]
+            if not parts:
+                continue
+            primary = parts[0].lower()
+            if primary in seen:
+                continue
+            seen.add(primary)
+            if primary in available_codes:
+                return primary
+        return 'en'
+
+    @staticmethod
+    def _is_valid_language_code(code):
+        if not code:
+            return False
+        allowed = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-@")
+        return all(char in allowed for char in code)
+
+    def _find_available_language_codes(self, directory, extension):
+        if not os.path.isdir(directory):
+            return set()
+        codes = set()
+        suffix = f".{extension.lower()}"
+        for entry in os.scandir(directory):
+            if not entry.is_file():
+                continue
+            name = entry.name
+            if not name.lower().endswith(suffix):
+                continue
+            code = os.path.splitext(name)[0]
+            if self._is_valid_language_code(code):
+                codes.add(code)
+        return codes
+
+    def get_user_language_zip_codes(self):
+        """Return language codes from user zip packages."""
+
+        user_i18n_dir = self.get_user_i18n_dir()
+        if not os.path.isdir(user_i18n_dir):
+            return []
+
+        codes = []
+        for entry in os.scandir(user_i18n_dir):
+            if not entry.is_file() or not entry.name.lower().endswith('.zip'):
+                continue
+            code = os.path.splitext(entry.name)[0]
+            if not self._is_valid_language_code(code):
+                continue
+            codes.append(code)
+        return sorted(set(codes))
+
+    def get_complete_user_language_codes(self):
+        """Return language codes that have both user .qm and .mo files."""
+
+        user_i18n_dir = self.get_user_i18n_dir()
+        qm_codes = self._find_available_language_codes(user_i18n_dir, 'qm')
+        mo_codes = self._find_available_language_codes(user_i18n_dir, 'mo')
+        zip_codes = set(self.get_user_language_zip_codes())
+        return sorted((qm_codes & mo_codes) | zip_codes)
+
+    def sync_current_language_zip(self, lang_code):
+        """Extract one current-language zip package when it is new or files are missing."""
+
+        zip_path = self.get_user_language_zip_path(lang_code)
+        if not os.path.exists(zip_path):
+            return False
+
+        required_names = (f'{lang_code}.qm', f'{lang_code}.mo')
+        optional_name = f'{lang_code}.txt'
+
+        user_i18n_dir = self.get_user_i18n_dir()
+        os.makedirs(user_i18n_dir, exist_ok=True)
+        zip_mtime = os.path.getmtime(zip_path)
+        target_paths = {
+            'qm': os.path.join(user_i18n_dir, f'{lang_code}.qm'),
+            'mo': os.path.join(user_i18n_dir, f'{lang_code}.mo'),
+        }
+        needs_update = False
+        for extension, target_path in target_paths.items():
+            if not os.path.exists(target_path) or os.path.getmtime(target_path) < zip_mtime:
+                needs_update = True
+                break
+        if not needs_update:
+            return False
+
+        with zipfile.ZipFile(zip_path, 'r') as zip_file:
+            for required_name in required_names:
+                try:
+                    zip_file.getinfo(required_name)
+                except KeyError as err:
+                    raise FileNotFoundError(
+                        f'Language package "{os.path.basename(zip_path)}" must contain '
+                        f'"{required_names[0]}" and "{required_names[1]}" in the zip root.'
+                    ) from err
+            for extension, target_path in target_paths.items():
+                data = zip_file.read(f'{lang_code}.{extension}')
+                with open(target_path, 'wb') as file_:
+                    file_.write(data)
+            try:
+                data = zip_file.read(optional_name)
+                txt_path = os.path.join(user_i18n_dir, f'{lang_code}.txt')
+                with open(txt_path, 'wb') as file_:
+                    file_.write(data)
+            except KeyError:
+                pass
+        return True
+
+    def get_language_file_path(self, lang_code, extension):
+        """Return the newest translation file for one language and extension."""
+
+        candidates = []
+        for directory in (self.get_builtin_i18n_dir(), self.get_user_i18n_dir()):
+            candidate = os.path.join(directory, f"{lang_code}.{extension}")
+            if os.path.exists(candidate):
+                candidates.append(candidate)
+        if not candidates:
+            return None
+        return max(candidates, key=os.path.getmtime)
+
+    def language_has_runtime_files(self, lang_code):
+        """Check if a language can be loaded with both gettext and Qt translations."""
+
+        return (self.get_language_file_path(lang_code, 'qm') is not None and
+                self.get_language_file_path(lang_code, 'mo') is not None)
 
     def create_connection(self, project_path:str):
         """ Create connection to recent project.
@@ -1040,7 +1232,7 @@ class App(object):
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
             'showids': False,
-            'language': 'en',
+            'language': self.get_initial_language_code(),
             'backup_on_open': True,
             'backup_av_files': True,
             'timestampformat': "[hh.mm.ss]",
@@ -3259,7 +3451,8 @@ Click "Yes" to start now.')
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
-    app = QtWidgets.QApplication(sys.argv)    
+    app = QtWidgets.QApplication(sys.argv)
+    app._qc_installed_translators = []
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
     project_path = qual_app.get_most_recent_projectpath()
@@ -3277,24 +3470,64 @@ def gui():
         app.setWindowIcon(QtGui.QIcon(pm))
 
     lang = settings.get('language', 'en')
-    i18n_dir = os.path.join(path, 'i18n')
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')  # For pyinstaller: abs path to bundled files
-
     translator = gettext.NullTranslations()
+    startup_language_error = None
     if lang != 'en':
-        qt_translator = QtCore.QTranslator()
-        qt_translator.load(os.path.join(i18n_dir, f'{lang}.qm'))
-        app.installTranslator(qt_translator)
-
+        zip_sync_error = None
         try:
-            with open(os.path.join(i18n_dir, f'{lang}.mo'), 'rb') as file_:
-                translator = gettext.GNUTranslations(file_)
+            qual_app.sync_current_language_zip(lang)
         except Exception as err:
             print(err)
             logger.error(err)
+            zip_sync_error = err
+
+        qm_path = qual_app.get_language_file_path(lang, 'qm')
+        mo_path = qual_app.get_language_file_path(lang, 'mo')
+        try:
+            if qm_path is None or mo_path is None:
+                raise FileNotFoundError(f"Missing translation files for language '{lang}'")
+            qt_translator = QtCore.QTranslator()
+            if not qt_translator.load(qm_path):
+                raise RuntimeError(f"Could not load Qt translation file: {qm_path}")
+            with open(mo_path, 'rb') as file_:
+                translator = gettext.GNUTranslations(file_)
+            app.installTranslator(qt_translator)
+            app._qc_installed_translators.append(qt_translator)
+
+            qt_translations_path = QtCore.QLibraryInfo.path(QtCore.QLibraryInfo.LibraryPath.TranslationsPath)
+            qt_base_candidates = [f"qtbase_{lang}"]
+            locale_name = QtCore.QLocale(lang).name()
+            if locale_name:
+                qt_base_candidates.append(f"qtbase_{locale_name}")
+            qt_base_candidates = list(dict.fromkeys(qt_base_candidates))
+            qt_base_translator = QtCore.QTranslator()
+            qt_base_loaded = False
+            for candidate in qt_base_candidates:
+                if qt_base_translator.load(candidate, qt_translations_path):
+                    app.installTranslator(qt_base_translator)
+                    app._qc_installed_translators.append(qt_base_translator)
+                    qt_base_loaded = True
+                    break
+            if not qt_base_loaded:
+                logger.warning(
+                    f"No Qt base translation found for language '{lang}' in '{qt_translations_path}'"
+                )
+        except Exception as err:
+            print(err)
+            logger.error(err)
+            translator = gettext.NullTranslations()
+            details = f'{type(err).__name__}: {err}'
+            if zip_sync_error is not None:
+                details = f'{type(zip_sync_error).__name__}: {zip_sync_error}\n{details}'
+            startup_language_error = (
+                f'The configured language "{lang}" could not be loaded.\n'
+                'QualCoder will start in English.\n\n'
+                f'{details}'
+            )
 
     translator.install()
+    if startup_language_error is not None:
+        Message(qual_app, "Translation error", startup_language_error, "warning").exec()
 
     ex = MainWindow(qual_app)
     try:
