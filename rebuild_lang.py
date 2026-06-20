@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 https://github.com/ccbogel/QualCoder
 https://qualcoder.org/
+https://
 """
 
 from lxml import etree
@@ -195,20 +196,87 @@ def update_translation_placeholders(language: str | None = None):
     update_qt_ts_files(language)
 
 def create_new_language_placeholders(language: str):
-    """ Create a new set of po, (NOT ts) files for a new language. """
+    """Create a new set of .po and .ts files for a new language in other_languages directory."""
+ 
+    print(f"Creating placeholder files for language: {language}")
 
-    if language and language not in languages:
-        print(f"Creating placeholder files po and ts from {lang}")
-        new_po_file = os.path.join(other_languages_directory, f'{language}.po')
-        with open(new_po_file, 'w', ) as po_file:
-            po_file.write("")
-        ''' This does not work:
-        new_ts_file = os.path.join(i18n_directory, f'{language}.ts')
-        gui_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src', 'qualcoder', 'GUI')
-        print(gui_directory, new_ts_file)
-        subprocess.run(["pylupdate5", gui_directory,  "-ts", new_ts_file])  # or lupdate'''
-        update_translation_placeholders(lang)
-        print("New placeholder files created.")
+    # Create .po file in other_languages
+    new_po_file = os.path.join(other_languages_directory, f'{language}.po')
+    with open(new_po_file, 'w', encoding='utf-8') as po_file:
+        po_file.write("")
+    print(f"Created empty .po file: {new_po_file}")
+
+    # Create .ts file using the existing project.pro
+    new_ts_file = os.path.join(other_languages_directory, f'{language}.ts')
+    gui_directory = os.path.join(project_root, "src", "qualcoder", "GUI")
+    project_pro = os.path.join(gui_directory, "project.pro")
+
+    # Check if project.pro exists
+    if not os.path.exists(project_pro):
+        print(f"Error: {project_pro} does not exist. Run --update first to create it.")
+        return
+
+    # Read the existing project.pro
+    with open(project_pro, 'r', encoding='utf-8') as f:
+        pro_content = f.read()
+
+    # Add the new .ts file to TRANSLATIONS
+    rel_ts_path = os.path.relpath(other_languages_directory, gui_directory)
+    new_ts_entry = f"{rel_ts_path}/{language}.ts"
+
+    # Check if the new .ts file is already in the project.pro
+    if new_ts_entry in pro_content:
+        print(f"Language {language} already in project.pro")
+    else:
+        # Find the TRANSLATIONS section and add the new entry
+        lines = pro_content.split('\n')
+        new_lines = []
+        in_translations = False
+        translations_added = False
+
+        for line in lines:
+            new_lines.append(line)
+            if line.startswith("TRANSLATIONS"):
+                in_translations = True
+                continue
+            if in_translations and line.strip() and not line.strip().startswith('#'):
+                if line.strip().endswith('.ts') and not translations_added:
+                    # Add the new entry after the last .ts file
+                    new_lines.append(new_ts_entry)
+                    translations_added = True
+                    in_translations = False
+
+        # If we didn't find a TRANSLATIONS section or any .ts files, add it at the end
+        if not translations_added:
+            new_lines.append("\nTRANSLATIONS = \\")
+            new_lines.append(new_ts_entry)
+
+        # Write the updated project.pro
+        with open(project_pro, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(new_lines))
+
+    # Run pylupdate5 to create/update the .ts file
+    try:
+        result = subprocess.run(
+            ['pylupdate5', project_pro],
+            check=True,
+            cwd=gui_directory,
+            capture_output=True,
+            text=True
+        )
+        print(f"Created/updated .ts file: {new_ts_file}")
+        if result.stdout:
+            print(f"pylupdate5 output: {result.stdout}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error creating .ts file: {e}")
+        if e.stdout:
+            print(f"pylupdate5 stdout: {e.stdout}")
+        if e.stderr:
+            print(f"pylupdate5 stderr: {e.stderr}")
+
+    # Update the language placeholders
+    update_translation_placeholders(language)
+    print("New placeholder files created.")
 
 def recompile_translation(language: str | None = None):
     """Make sure lrelease.exe is in path.
