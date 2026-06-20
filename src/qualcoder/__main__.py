@@ -287,11 +287,15 @@ class App(object):
                 f.write(os.linesep)
 
     def get_most_recent_projectpath(self):
-        """ Get most recent project path from .qualcoder/recent_projects.txt """
+        """ Get most recent project path from .qualcoder/recent_projects.txt
+        Return:
+            path - String or None
+        """
 
         result = self.read_previous_project_paths()
         if result:
             return result[0]
+        return None
 
     def get_builtin_i18n_dir(self):
         """Return the directory that contains bundled translation files."""
@@ -442,14 +446,14 @@ class App(object):
                         f'"{required_names[0]}" and "{required_names[1]}" in the zip root.'
                     ) from err
             for extension, target_path in target_paths.items():
-                data = zip_file.read(f'{lang_code}.{extension}')
+                lang_data = zip_file.read(f'{lang_code}.{extension}')
                 with open(target_path, 'wb') as file_:
-                    file_.write(data)
+                    file_.write(lang_data)
             try:
-                data = zip_file.read(optional_name)
+                lang_data = zip_file.read(optional_name)
                 txt_path = os.path.join(user_i18n_dir, f'{lang_code}.txt')
                 with open(txt_path, 'wb') as file_:
-                    file_.write(data)
+                    file_.write(lang_data)
             except KeyError:
                 pass
         return True
@@ -906,7 +910,10 @@ class App(object):
         if len(ai_models) == 0:  # no models loaded, create default
             ai_models = get_default_ai_models()
         else:
-            current_ai_model_index = int(result.get('ai_model_index', -1)) 
+            try:
+                current_ai_model_index = int(result.get('ai_model_index', -1))
+            except ValueError:
+                current_ai_model_index = 0
             ai_models, result['ai_model_index'] = update_ai_models(ai_models, current_ai_model_index)
         return result, ai_models
 
@@ -1058,6 +1065,7 @@ class App(object):
         QTabWidget::pane {border: 1px solid #858585;}\n\
         QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QTextBrowser::document::link {color:red;}\n\
         QTextEdit {border: 1px solid #ffaa00; selection-color: #000000; selection-background-color:#ffffff;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QToolTip {background-color: #2a2a2a; color:#eeeeee; border: 1px solid #f89407; }\n\
@@ -1627,15 +1635,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app = app
         self.force_quit = force_quit
         self.journal_display = None
-
         self.ai_chat_window = None
-        
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
             # Make 'Fusion' the standard native style on Windows https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
             # The default 'Windows' style seems partially broken at the moment, in combination with the native dark mode.
             # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
             QtWidgets.QApplication.instance().setStyle("Fusion")
-       
+
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -2715,7 +2721,7 @@ Click "Yes" to start now.')
             self.app.delete_backup = False
 
     def open_project(self, path_:str|bool="", newproject:str="no"):
-        """ Open an existing project.
+        """ Open an existing project. TODO: WHY IS PATH TYPE AS str AND bool ? should be only str
         if set, also save a backup datetime stamped copy at the same time.
         Do not back up on a newly created project, as it will not contain data.
         A backup is created if settings backup is True.
@@ -2725,7 +2731,7 @@ Click "Yes" to start now.')
         Update older databases to current version mainly by adding columns and tables.
         Table constraints are not updated (code_text duplicated codings).
         Args:
-            path: if path is "" then get the path from a dialog, otherwise use the supplied path
+            path_: if path is "" then get the path from a dialog, otherwise use the supplied path
             newproject: yes or no  if yes then do not make an initial backup
         """
 
@@ -3447,7 +3453,6 @@ Click "Yes" to start now.')
         citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.app.version} [Computer software].\n"
         citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{tag}\n"
         self.ui.textEdit.append(citation)
-
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
