@@ -361,8 +361,8 @@ manage_tab_info = '''
 		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
 		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
 		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
-		a:link { color: #000080; text-decoration: underline }
-		a:visited { color: #800000; text-decoration: underline }
+		a:link { color: deepskyblue; text-decoration: underline }
+		a:visited { color: red; text-decoration: underline }
 	</style>
 </head>
 <body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
@@ -374,7 +374,6 @@ journals. Manage file, case and journal attributes (variables).
 Import and assign references to files. Edit incorrect links to files
 located outside the project folder.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Manage files</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">The Manage Files
@@ -403,7 +402,6 @@ location, such city names.</p>
 Files - QualCoder</a> 
 </p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Manage Cases</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">A case is a
@@ -413,7 +411,6 @@ projects need to use cases.</p>
 cases - QualCoder</a> 
 </p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Manage Journals</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">Journals are used to
@@ -423,7 +420,6 @@ the other when writing a journal.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/5.2.-Journals/">Journals
 – QualCoder</a></p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Manage attributes</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">Files cases and
@@ -432,7 +428,6 @@ Variables can be created, renamed and deleted here.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.4.-Attributes/">Attributes
 – QualCoder</a></p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Manage references</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">References can be
@@ -441,13 +436,10 @@ bibliography.ris file from the Examples folder. Assign a refernce to
 a file, by selecting the reference row, selecting the file and
 pressing the Link key.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 </body>
 </html>
@@ -469,7 +461,7 @@ coding_tab_info = '''
 		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
 		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
 		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
-		a:link { color: #000080; text-decoration: underline }
+		a:link { color: deepskyblue; text-decoration: underline }
 		a:visited { color: #800000; text-decoration: underline }
 	</style>
 </head>
@@ -517,7 +509,7 @@ reports_tab_info = '''
 		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
 		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
 		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
-		a:link { color: #000080; text-decoration: underline }
+		a:link { color: deepskyblue; text-decoration: underline }
 		a:visited { color: #800000; text-decoration: underline }
 	</style>
 </head>
@@ -529,7 +521,6 @@ Reports menus.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.3.-Reports/">Reports
 menu options – QualCoder</a></p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Analysis menu</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">The analysis menu
@@ -539,7 +530,6 @@ of mind maps.</p>
 <p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.4.-Graph/">Graph
 – QualCoder</a></p>
 <p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
 </p>
 <h2 class="western">Reports menu</h2>
 <p style="line-height: 100%; margin-bottom: 0cm">The menu options
