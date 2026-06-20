@@ -283,24 +283,63 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
     return stats
 
 def analyze_translation_status(language: str | None = None) -> str:
-    """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report. """
+    """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report.
+    Includes languages from both i18n (officially maintained) and other_languages (community maintained)."""
 
-    global languages
+    # Mapping language code with language name
+    language_names = {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pt": "Português",
+        "ro": "Română",
+        "sv": "Svenska",
+        "zh": "中文",
+        # Add new language here
+    }
+
+    # Collect all languages from i18n and other_languages
+    all_languages = {}
+
+    # Add languages from i18n directory (officially maintained)
+    for root, dirs, files in os.walk(i18n_directory):
+        for file in files:
+            stem = Path(file).stem
+            if len(stem) in (2, 3) and stem not in all_languages:
+                all_languages[stem] = {"source": "i18n", "status": "officially maintained"}
+
+    # Add languages from other_languages directory (community maintained)
+    if os.path.exists(other_languages_directory):
+        for file in os.listdir(other_languages_directory):
+            stem = Path(file).stem
+            if len(stem) in (2, 3) and stem not in all_languages:
+                all_languages[stem] = {"source": "other_languages", "status": "community maintained"}
+
+    # Filter by language if specified
     if language:
-        languages = [language]
+        if language in all_languages:
+            all_languages = {language: all_languages[language]}
+        else:
+            print(f"Language {language} not found.")
+            return ""
 
     # Collect data for all languages
     report_data: Dict[str, Dict[str, Dict[str, Any]]] = {}
-    for lang in languages:
+    for lang, lang_info in all_languages.items():
+        source_dir = i18n_directory if lang_info["source"] == "i18n" else other_languages_directory
         report_data[lang] = {
             "gettext": analyze_translation_file(
-                os.path.join(project_root, "src", "qualcoder", "i18n", f"{lang}.po"),
+                os.path.join(source_dir, f"{lang}.po"),
                 "po",
             ),
             "qt": analyze_translation_file(
-                os.path.join(project_root, "src", "qualcoder", "i18n", f"{lang}.ts"),
+                os.path.join(source_dir, f"{lang}.ts"),
                 "ts",
             ),
+            "status": lang_info["status"],
         }
 
     # Generate markdown lines
@@ -313,13 +352,18 @@ def analyze_translation_status(language: str | None = None) -> str:
         "- 🟥: Untranslated",
         "- ❌: File missing or error",
         "",
-        "| Language | Progress | Status  |",
-        "|----------|----------|---------|",
+        "| Language | Progress | Status |",
+        "|----------|----------|--------|",
     ]
 
-    for lang in languages:
-        gettext_stats = report_data[lang]["gettext"]
-        qt_stats = report_data[lang]["qt"]
+    for lang, lang_data in report_data.items():
+        gettext_stats = lang_data["gettext"]
+        qt_stats = lang_data["qt"]
+        status = lang_data["status"]
+
+        # Get the full language name or use the code if not found
+        lang_display_name = language_names.get(lang, lang)
+        lang_display = f"{lang_display_name} ({lang})"
 
         # Handle Gettext data
         if gettext_stats.get("missing"):
@@ -365,10 +409,12 @@ def analyze_translation_status(language: str | None = None) -> str:
         # Generate combined progress bar
         progress_bar = generate_progress_bar(percent_complete, percent_partial)
         markdown_lines.append(
-            f"| {lang} | {progress_bar} {percent_complete:.1f}% ({total_translated} / {total_entries}) | |"
+            f"| {lang_display} | {progress_bar} {percent_complete:.1f}% ({total_translated} / {total_entries}) | {status} |"
         )
+
     markdown_lines.extend(
-        ["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."])
+        ["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."]
+    )
 
     # Write to LANGUAGES.md
     output_path = os.path.join(project_root, "LANGUAGES_REPORT.md")
