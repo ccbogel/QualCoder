@@ -7,6 +7,8 @@ Using --lang option
 Change only a specific language
 Using --status option
 Check status of translation
+Using --zip option
+Create zip for communauty languages
 
 Requires polib and PyQt5
 
@@ -30,7 +32,6 @@ THE SOFTWARE.
 
 https://github.com/ccbogel/QualCoder
 https://qualcoder.org/
-https://
 """
 
 from lxml import etree
@@ -39,17 +40,18 @@ from pathlib import Path
 import polib
 import subprocess
 import sys
+import zipfile
 from typing import Dict, Any, List
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 i18n_directory = os.path.join(project_root, "src", "qualcoder", "i18n")
+other_languages_directory = os.path.join(project_root, "other_languages")
 languages = []
 for root, dirs, files in os.walk(i18n_directory):
     for file in files:
         # For ISO 639-1 2 letter langauge codes and ISO 639-3 for 3 letter language codes
         if len(Path(file).stem) in (2, 3) and Path(file).stem not in languages:
             languages.append(Path(file).stem)
-
 
 def extract_pot_file(directory: str, pot_filename: str):
     """ Called by: update_translation_placeholders """
@@ -73,7 +75,6 @@ def extract_pot_file(directory: str, pot_filename: str):
             print(f"Error creating POT file: {exc}")
     else:
         print("No Python files found to extract translatable strings from.")
-
 
 def update_po_files(directory: str, pot_filename: str, lang_: str | None = None):
     """ List all .po files within the specified directory.
@@ -99,7 +100,6 @@ def update_po_files(directory: str, pot_filename: str, lang_: str | None = None)
                     except FileNotFoundError:
                         pass
 
-
 def delete_obsolete_ts(file_ts):
     parser = etree.XMLParser(remove_blank_text=True)
     tree = etree.parse(file_ts, parser)
@@ -108,7 +108,6 @@ def delete_obsolete_ts(file_ts):
     for message in obsolete_messages:
         message.getparent().remove(message)
     tree.write(file_ts, encoding='utf-8', xml_declaration=True, pretty_print=True)
-
 
 def update_qt_ts_files(lang_: str | None = None):
     """ Requires pyludate5
@@ -163,7 +162,6 @@ def update_qt_ts_files(lang_: str | None = None):
             delete_obsolete_ts(ts_path)
             print(f"Cleaned obsolete entries in {ts_file}")
 
-
 def update_translation_placeholders(language: str | None = None):
     """ Update po files, update GUI ts files """
 
@@ -172,7 +170,6 @@ def update_translation_placeholders(language: str | None = None):
     extract_pot_file(directory, pot_filename)
     update_po_files(i18n_directory, pot_filename, language)
     update_qt_ts_files(language)
-
 
 def create_new_language_placeholders(language: str):
     """ Create a new set of po, (NOT ts) files for a new language. """
@@ -189,7 +186,6 @@ def create_new_language_placeholders(language: str):
         subprocess.run(["pylupdate5", gui_directory,  "-ts", new_ts_file])  # or lupdate'''
         update_translation_placeholders(lang)
         print("New placeholder files created.")
-
 
 def recompile_translation(language: str | None = None):
     """ Make sure lrelease.exe is in path.
@@ -236,7 +232,6 @@ def recompile_translation(language: str | None = None):
                     print(f'Skipping "{qm_file}".')
     print("Finished")
 
-
 def generate_progress_bar(translated_percent: float, partial_percent: float) -> str:
     """Generate a 10-square progress bar using 🟩 (translated), 🟨 (partial), 🟥 (untranslated)."""
     total_squares = 10
@@ -244,7 +239,6 @@ def generate_progress_bar(translated_percent: float, partial_percent: float) -> 
     partial = min(total_squares - translated, int(round(partial_percent / 10)))
     untranslated = total_squares - translated - partial
     return "🟩" * translated + "🟨" * partial + "🟥" * untranslated
-
 
 def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
     """Analyze a single translation file (.po or .ts) and return its statistics."""
@@ -287,7 +281,6 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
     except Exception as e:
         stats["error"] = str(e)
     return stats
-
 
 def analyze_translation_status(language: str | None = None) -> str:
     """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report. """
@@ -384,17 +377,62 @@ def analyze_translation_status(language: str | None = None) -> str:
     print(f"Translation status report generated: {output_path}")
     return output_path
 
+def zip_language_files(language: str | None = None):
+    """ Zip .mo, .qm and .txt files for each language in other_languages directory.
+
+    Args:
+        language: Optional language code to zip only that language. If None, zips all languages.
+    """
+    if not os.path.exists(other_languages_directory):
+        print(f"Directory {other_languages_directory} does not exist.")
+        return
+
+    # Get all language codes from files in other_languages directory
+    other_languages = []
+    for file in os.listdir(other_languages_directory):
+        stem = Path(file).stem
+        if len(stem) in (2, 3) and stem not in other_languages:
+            other_languages.append(stem)
+
+    if language is not None:
+        if language in other_languages:
+            other_languages = [language]
+        else:
+            print(f"Language {language} not found in {other_languages_directory}")
+            return
+
+    for lang in other_languages:
+        # Find all files with this language code
+        files_to_zip = []
+        for file in os.listdir(other_languages_directory):
+            if file.startswith(f"{lang}.") and file.endswith(('.mo', '.qm', '.txt')):
+                files_to_zip.append(file)
+
+        if not files_to_zip:
+            print(f"No files found for language {lang}")
+            continue
+
+        # Create zip file
+        zip_filename = os.path.join(other_languages_directory, f"{lang}.zip")
+        with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file in files_to_zip:
+                file_path = os.path.join(other_languages_directory, file)
+                zipf.write(file_path, file)
+                print(f"Added {file} to {zip_filename}")
+
+        print(f"Created zip file: {zip_filename}")
 
 def main():
     print("Run from the QualCoder-master folder")
-    print("Choose option: --update --compile")
+    print("Choose option: --update --compile --zip")
     print("--update updates language placeholders for ts and po files.")
     print("--compile compiles language files ts to qm files and po to mo files")
-    print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile only that language.")
+    print("--zip zips .mo, .qm and .txt files in other_languages directory")
+    print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile/zip only that language.")
     print("e.g. --update --lang fr")
+    print("e.g. --zip --lang ro")
     print("--status makes LANGUAGES_REPORT.md file which shows translation status of files.")
     print("--create Creates placeholder files po (NOT YET) ts for a new language. use 2 or 3 letter ISO639 codes.")
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -412,6 +450,8 @@ if __name__ == "__main__":
             recompile_translation(lang)
         elif mode == "--status":
             analyze_translation_status(lang)
+        elif mode == "--zip":
+            zip_language_files(lang)
         else:
             main()
     else:
