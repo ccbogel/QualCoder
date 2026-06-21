@@ -1645,6 +1645,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.init_placeholder_tab_layouts()
         # Test of macOS menu bar
         if self.app.settings['stylesheet'] == "native":
             self.ui.menubar.setNativeMenuBar(True)
@@ -1701,6 +1702,65 @@ Click "Yes" to start now.')
             tb_obj = err.__traceback__
             # log the exception and show error msg
             qt_exception_hook.exception_hook(type_e, value, tb_obj)
+
+    def init_placeholder_tab_layouts(self):
+        """Put the startup placeholder browsers into real tab layouts."""
+
+        self.tab_placeholders = {
+            self.ui.tab_manage: self.ui.textBrowser_manage,
+            self.ui.tab_coding: self.ui.textBrowser_coding,
+            self.ui.tab_reports: self.ui.textBrowser_reports,
+        }
+        for tab_widget, placeholder in self.tab_placeholders.items():
+            layout = tab_widget.layout()
+            if layout is None:
+                layout = QtWidgets.QVBoxLayout(tab_widget)
+                layout.setContentsMargins(9, 9, 9, 9)
+            if layout.indexOf(placeholder) == -1:
+                layout.addWidget(placeholder)
+            placeholder.show()
+        self.update_placeholder_tab_styles()
+
+    def update_placeholder_tab_styles(self):
+        """Match placeholder browser colors and link styling to the application theme."""
+
+        browser_style = """
+            QTextBrowser {{
+                border: none;
+            }}
+            QTextBrowser:focus {{
+                border: none;
+            }}
+        """
+                
+        for tab_widget, placeholder in self.tab_placeholders.items():
+            placeholder.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+            placeholder.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
+            # placeholder.viewport().setAutoFillBackground(True)
+            placeholder.viewport().setStyleSheet(f"border: none;")
+            placeholder.setStyleSheet(browser_style)
+            placeholder.document().setDefaultStyleSheet(
+                f"a {{ color: {self.app.highlight_color()}; }} "
+                f"a:visited {{ color: {self.app.highlight_color()}; }}"
+            )
+
+    def clear_tab_widgets(self, tab_widget, show_placeholder=True):
+        """Remove loaded tab content and optionally show the placeholder browser."""
+
+        layout = tab_widget.layout()
+        if layout is None:
+            return
+        placeholder = self.tab_placeholders.get(tab_widget)
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget is None or widget == placeholder:
+                continue
+            widget.close()
+            widget.setParent(None)
+        if placeholder is not None:
+            if layout.indexOf(placeholder) == -1:
+                layout.addWidget(placeholder)
+            placeholder.setVisible(show_placeholder)
     
     def init_ui(self):
         """ Set up menu triggers """
@@ -2331,21 +2391,13 @@ Click "Yes" to start now.')
          If there is a layout, then remove all widgets from it and add the new widget. """
 
         self.ui.tabWidget.setCurrentWidget(tab_widget)
-        # Check the tab has a layout and widgets
         contents = tab_widget.layout()
         if contents is None:
-            # Tab has no layout so add one with widget
-            layout = QtWidgets.QVBoxLayout()
-            if ui is not None:
-                layout.addWidget(ui)
-            tab_widget.setLayout(layout)
-        else:
-            # Remove widgets from layout
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
-            if ui is not None:
-                contents.addWidget(ui)
+            contents = QtWidgets.QVBoxLayout(tab_widget)
+            contents.setContentsMargins(9, 9, 9, 9)
+        self.clear_tab_widgets(tab_widget, show_placeholder=ui is None)
+        if ui is not None:
+            contents.addWidget(ui)
 
     def codebook(self):
         """ Export a text file code book of categories and codes. """
@@ -2636,22 +2688,8 @@ Click "Yes" to start now.')
         # New project, so tell open project NOT to back up, as there will be nothing in there to back up
         self.open_project(self.app.project_path, "yes")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
-        # Remove widgets from each tab
-        contents = self.ui.tab_reports.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
-        contents = self.ui.tab_coding.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
-        contents = self.ui.tab_manage.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
+        for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
+            self.clear_tab_widgets(tab_widget, show_placeholder=True)
 
     def change_settings(self, section=None, enable_ai=False):
         """ Change default settings - the coder name, font, font size.
@@ -2672,6 +2710,7 @@ Click "Yes" to start now.')
         self.settings_report()
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
+        self.update_placeholder_tab_styles()
         self.ai_chat_window.init_styles()
         
         if self.app.settings['ai_enable'] == 'True':
@@ -2683,22 +2722,8 @@ Click "Yes" to start now.')
         if ui.coder_names_changes:
             if current_coder != self.app.settings['codername']:
                 self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
-            # Remove widgets from each tab
-            contents = self.ui.tab_reports.layout()
-            if contents:
-                for i in reversed(range(contents.count())):
-                    contents.itemAt(i).widget().close()
-                    contents.itemAt(i).widget().setParent(None)
-            contents = self.ui.tab_coding.layout()
-            if contents:
-                for i in reversed(range(contents.count())):
-                    contents.itemAt(i).widget().close()
-                    contents.itemAt(i).widget().setParent(None)
-            contents = self.ui.tab_manage.layout()
-            if contents:
-                for i in reversed(range(contents.count())):
-                    contents.itemAt(i).widget().close()
-                    contents.itemAt(i).widget().setParent(None)
+            for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
+                self.clear_tab_widgets(tab_widget, show_placeholder=True)
                     
     def project_memo(self):
         """ Give the entire project a memo. """
@@ -3275,22 +3300,8 @@ Click "Yes" to start now.')
         Delete old backups. Hide menu options. """
 
         self.journal_display = None
-        # Remove widgets from each tab
-        contents = self.ui.tab_reports.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
-        contents = self.ui.tab_coding.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
-        contents = self.ui.tab_manage.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                contents.itemAt(i).widget().close()
-                contents.itemAt(i).widget().setParent(None)
+        for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
+            self.clear_tab_widgets(tab_widget, show_placeholder=True)
         # Added if statement for the first opening of QualCoder. Looks odd closing a project that is not there.
         if self.app.project_name != "":
             self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
