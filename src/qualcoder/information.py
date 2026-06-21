@@ -366,19 +366,19 @@ You can add file attributes by clicking the `(x)` button. For example, create a 
 
 A case is a collection of files on a topic or related to a person. Not all projects need to use cases.
 
-[Manage cases - QualCoder](https://qualcoder.org/doc/en/3.3.-Cases/)
+[Help: Manage cases](qualcoder://help/3.3.-Cases/)
 
 ## Manage journals
 
 Journals are used to record your thoughts when coding. The journal window opens separately from the main window so you can move between them easily.
 
-[Journals - QualCoder](https://qualcoder.org/doc/en/5.2.-Journals/)
+[Help: Journals](qualcoder://help/5.2.-Journals/)
 
 ## Manage attributes
 
 Files, cases, and journals can have attributes that describe their purpose. Variables can be created, renamed, and deleted here.
 
-[Attributes - QualCoder](https://qualcoder.org/doc/en/3.4.-Attributes/)
+[Help: Attributes](qualcoder://help/3.4.-Attributes/)
 
 ## Manage references
 
@@ -392,15 +392,15 @@ def coding_tab_info():
 
 The Coding tab displays the work area for coding text, images, audio or video, and PDFs. Depending on the files loaded in Manage Files, select a coding option from the menus above to begin.
 
-[Coding text - QualCoder](https://qualcoder.org/doc/en/4.1.-Coding-Text/)
+[Help: Coding text](qualcoder://help/4.1.-Coding-Text/)
 
-[Coding PDFs - QualCoder](https://qualcoder.org/doc/en/4.3.-Coding-Text-on-PDFs/)
+[Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)
 
-[Coding images - QualCoder](https://qualcoder.org/doc/en/4.4.-Coding-Images/)
+[Help: Coding images](qualcoder://help/4.4.-Coding-Images/)
 
-[Coding audio and video - QualCoder](https://qualcoder.org/doc/en/4.5.-Coding-Audio-and-Video/)
+[Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)
 
-[AI assisted coding - QualCoder](https://qualcoder.org/doc/en/4.2.-AI-Assisted-Coding/)
+[Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)
 
 There are also menu options for organising codes and changing the colour scheme.""")
 
@@ -412,13 +412,13 @@ def reports_tab_info():
 
 The Reports tab displays analyses and report summaries. Select items from the Analysis and Reports menus.
 
-[Reports menu options - QualCoder](https://qualcoder.org/doc/en/5.3.-Reports/)
+[Help: Reports menu options](qualcoder://help/5.3.-Reports/)
 
 ## Analysis menu
 
 The Analysis menu includes code retrieval, co-occurrence, and exact match tools. The Graph option helps visualise coding through mind-map style views.
 
-[Graph - QualCoder](https://qualcoder.org/doc/en/5.4.-Graph/)
+[Help: Graph](qualcoder://help/5.4.-Graph/)
 
 ## Reports menu
 
