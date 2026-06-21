@@ -1872,9 +1872,9 @@ Click "Yes" to start now.')
         self.ui.tabWidget.setCurrentIndex(0)
         self.ai_chat()
 
-        self.ui.textBrowser_manage.setMarkdown(manage_tab_info)
-        self.ui.textBrowser_coding.setMarkdown(coding_tab_info)
-        self.ui.textBrowser_reports.setMarkdown(reports_tab_info)
+        self.ui.textBrowser_manage.setMarkdown(manage_tab_info())
+        self.ui.textBrowser_coding.setMarkdown(coding_tab_info())
+        self.ui.textBrowser_reports.setMarkdown(reports_tab_info())
 
         # Add tab widget icons
         try:

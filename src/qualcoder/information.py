@@ -341,8 +341,10 @@ Ctrl + Enter {_("Run SQL query")}<br />'
 coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
 
-manage_tab_info = """
-# Manage tab
+def manage_tab_info():
+    """Return translated Markdown for the Manage tab placeholder."""
+
+    return _("""# Manage tab
 
 The Manage tab displays cases, files, attributes, and references. Use the Manage menu to organise files, cases, journals, and project metadata.
 
@@ -380,11 +382,13 @@ Files, cases, and journals can have attributes that describe their purpose. Vari
 
 ## Manage references
 
-References can be imported from NBIB and RIS formats. Try importing `bibliography.ris` from the `Examples` folder, then assign a reference to a file by selecting the reference row, selecting the file, and pressing `Link`.
-"""
+References can be imported from NBIB and RIS formats. Try importing `bibliography.ris` from the `Examples` folder, then assign a reference to a file by selecting the reference row, selecting the file, and pressing `Link`.""")
 
-coding_tab_info = """
-# Coding tab
+
+def coding_tab_info():
+    """Return translated Markdown for the Coding tab placeholder."""
+
+    return _("""# Coding tab
 
 The Coding tab displays the work area for coding text, images, audio or video, and PDFs. Depending on the files loaded in Manage Files, select a coding option from the menus above to begin.
 
@@ -398,11 +402,13 @@ The Coding tab displays the work area for coding text, images, audio or video, a
 
 [AI assisted coding - QualCoder](https://qualcoder.org/doc/en/4.2.-AI-Assisted-Coding/)
 
-There are also menu options for organising codes and changing the colour scheme.
-"""
+There are also menu options for organising codes and changing the colour scheme.""")
 
-reports_tab_info = """
-# Reports tab
+
+def reports_tab_info():
+    """Return translated Markdown for the Reports tab placeholder."""
+
+    return _("""# Reports tab
 
 The Reports tab displays analyses and report summaries. Select items from the Analysis and Reports menus.
 
@@ -416,6 +422,5 @@ The Analysis menu includes code retrieval, co-occurrence, and exact match tools.
 
 ## Reports menu
 
-The Reports menu includes coder comparisons, code counts by file or case, code and file summaries, charts, and database queries for direct access to the underlying database.
-"""
+The Reports menu includes coder comparisons, code counts by file or case, code and file summaries, charts, and database queries for direct access to the underlying database.""")
 
