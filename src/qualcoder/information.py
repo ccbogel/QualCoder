@@ -341,6 +341,8 @@ Ctrl + Enter {_("Run SQL query")}<br />'
 coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
 
+
+# TODO put these in a dictionary with en, de, etc ..
 manage_tab_info = '''
 <!DOCTYPE html>
 <html>
@@ -361,8 +363,7 @@ manage_tab_info = '''
 		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
 		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
 		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
-		a:link { color: deepskyblue; text-decoration: underline }
-		a:visited { color: red; text-decoration: underline }
+		
 	</style>
 </head>
 <body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
@@ -461,8 +462,6 @@ coding_tab_info = '''
 		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
 		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
 		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
-		a:link { color: deepskyblue; text-decoration: underline }
-		a:visited { color: #800000; text-decoration: underline }
 	</style>
 </head>
 <body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
@@ -509,8 +508,6 @@ reports_tab_info = '''
 		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
 		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
 		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
-		a:link { color: deepskyblue; text-decoration: underline }
-		a:visited { color: #800000; text-decoration: underline }
 	</style>
 </head>
 <body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
