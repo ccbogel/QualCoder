@@ -1741,6 +1741,11 @@ Click "Yes" to start now.')
 
         return segment.casefold() in self._object_name_aliases(obj.objectName())
 
+    def _top_level_menus(self):
+        """Return all top-level menus from the menubar."""
+
+        return [action.menu() for action in self.ui.menubar.actions() if action.menu() is not None]
+
     def _resolve_placeholder_menu_link(self, url):
         """Resolve a qualcoder://menu/... link to a QMenu or QAction."""
 
@@ -1750,9 +1755,8 @@ Click "Yes" to start now.')
         if not path_segments:
             raise ValueError(_("Menu link has no target path."))
 
-        top_level_menus = [action.menu() for action in self.ui.menubar.actions() if action.menu() is not None]
         current_menu = next(
-            (menu for menu in top_level_menus if self._matches_object_name(path_segments[0], menu)),
+            (menu for menu in self._top_level_menus() if self._matches_object_name(path_segments[0], menu)),
             None,
         )
         if current_menu is None:
@@ -1782,7 +1786,51 @@ Click "Yes" to start now.')
             return match, menu_chain
         return current_menu, menu_chain
 
-    def _popup_menu_chain(self, menu_chain):
+    def _iter_actions_with_menu_chain(self, menu=None, menu_chain=None):
+        """Yield actions together with the chain of menus containing them."""
+
+        if menu is None:
+            for top_menu in self._top_level_menus():
+                yield from self._iter_actions_with_menu_chain(top_menu, [top_menu])
+            return
+        if menu_chain is None:
+            menu_chain = [menu]
+        for action in menu.actions():
+            if action.isSeparator():
+                continue
+            yield action, list(menu_chain)
+            submenu = action.menu()
+            if submenu is not None:
+                yield from self._iter_actions_with_menu_chain(submenu, menu_chain + [submenu])
+
+    def _resolve_placeholder_action_link(self, url):
+        """Resolve a qualcoder://action/... link to a QAction."""
+
+        if url.host().casefold() != "action":
+            raise ValueError(_("Unsupported QualCoder link target: ") + url.host())
+        path_segments = [segment for segment in url.path().split("/") if segment]
+        if not path_segments:
+            raise ValueError(_("Action link has no target path."))
+        if len(path_segments) == 1:
+            matches = [
+                (action, menu_chain)
+                for action, menu_chain in self._iter_actions_with_menu_chain()
+                if self._matches_object_name(path_segments[0], action)
+            ]
+            if not matches:
+                raise ValueError(_("Action not found: ") + path_segments[0])
+            if len(matches) > 1:
+                raise ValueError(_("Action name is ambiguous: ") + path_segments[0])
+            return matches[0]
+
+        resolved, menu_chain = self._resolve_placeholder_menu_link(
+            QtCore.QUrl(f"qualcoder://menu/{'/'.join(path_segments)}")
+        )
+        if isinstance(resolved, QtWidgets.QMenu):
+            raise ValueError(_("Action link must end with a menu action."))
+        return resolved, menu_chain
+
+    def _popup_menu_chain(self, menu_chain, active_action=None):
         """Display a top-level menu and any nested submenu chain."""
 
         if not menu_chain:
@@ -1798,12 +1846,22 @@ Click "Yes" to start now.')
         else:
             popup_pos = QtGui.QCursor.pos()
         top_menu.popup(popup_pos)
+        if len(menu_chain) > 1:
+            top_menu.setActiveAction(menu_chain[1].menuAction())
+        elif active_action is not None:
+            top_menu.setActiveAction(active_action)
 
         parent_menu = top_menu
         for submenu in menu_chain[1:]:
             QtWidgets.QApplication.processEvents()
             rect = parent_menu.actionGeometry(submenu.menuAction())
             submenu.popup(parent_menu.mapToGlobal(rect.topRight()))
+            submenu_index = menu_chain.index(submenu)
+            next_menu = menu_chain[submenu_index + 1] if submenu_index + 1 < len(menu_chain) else None
+            if next_menu is not None:
+                submenu.setActiveAction(next_menu.menuAction())
+            elif active_action is not None:
+                submenu.setActiveAction(active_action)
             parent_menu = submenu
 
     def _show_placeholder_link_error(self, url_text, details):
@@ -1835,6 +1893,10 @@ Click "Yes" to start now.')
                 if isinstance(target, QtWidgets.QMenu):
                     self._popup_menu_chain(menu_chain)
                     return
+                self._popup_menu_chain(menu_chain, active_action=target)
+                return
+            if host == "action":
+                target, menu_chain = self._resolve_placeholder_action_link(url)
                 if not target.isEnabled():
                     raise ValueError(_("Menu action is currently disabled."))
                 target.trigger()
