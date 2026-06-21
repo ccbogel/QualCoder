@@ -1724,11 +1724,16 @@ Click "Yes" to start now.')
     def update_placeholder_tab_styles(self):
         """Match placeholder browser colors and link styling to the application theme."""
 
-        browser_style = """
+        action_log_background = self.ui.textEdit.viewport().palette().color(
+            QtGui.QPalette.ColorRole.Base
+        ).name()
+        browser_style = f"""
             QTextBrowser {{
+                background-color: {action_log_background};
                 border: none;
             }}
             QTextBrowser:focus {{
+                background-color: {action_log_background};
                 border: none;
             }}
         """
@@ -1736,8 +1741,9 @@ Click "Yes" to start now.')
         for tab_widget, placeholder in self.tab_placeholders.items():
             placeholder.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
             placeholder.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
-            # placeholder.viewport().setAutoFillBackground(True)
-            placeholder.viewport().setStyleSheet(f"border: none;")
+            placeholder.viewport().setStyleSheet(
+                f"background-color: {action_log_background}; border: none;"
+            )
             placeholder.setStyleSheet(browser_style)
             placeholder.document().setDefaultStyleSheet(
                 f"a {{ color: {self.app.highlight_color()}; }} "
