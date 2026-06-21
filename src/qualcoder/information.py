@@ -36,6 +36,8 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 tab_info_markdown_renderer = MarkdownIt("commonmark")
 help_link_pattern = re.compile(r'(<a href="qualcoder://help/[^"]*">)', re.IGNORECASE)
+menu_link_pattern = re.compile(r'(<a href="qualcoder://menu/[^"]*">)', re.IGNORECASE)
+action_link_pattern = re.compile(r'(<a href="qualcoder://action/[^"]*">)', re.IGNORECASE)
 
 
 def _qtawesome_icon_data_uri(icon_name, color, size=16):
@@ -62,11 +64,23 @@ def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_
     icon_size = max(14, round(doc_font_size * 1.45))
     rendered_html = tab_info_markdown_renderer.render(markdown_text)
     help_icon_uri = _qtawesome_icon_data_uri("mdi.help-circle-outline", link_color, size=icon_size)
+    menu_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-outline", link_color, size=icon_size)
+    action_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-click-outline", link_color, size=icon_size)
     help_icon_html = (
         f'<img src="{help_icon_uri}" width="{icon_size}" height="{icon_size}" '
         'style="vertical-align: middle; margin-right: 0.3em;" />'
     )
+    menu_icon_html = (
+        f'<img src="{menu_icon_uri}" width="{icon_size}" height="{icon_size}" '
+        'style="vertical-align: middle; margin-right: 0.3em;" />'
+    )
+    action_icon_html = (
+        f'<img src="{action_icon_uri}" width="{icon_size}" height="{icon_size}" '
+        'style="vertical-align: middle; margin-right: 0.3em;" />'
+    )
     rendered_html = help_link_pattern.sub(rf"\1{help_icon_html}", rendered_html)
+    rendered_html = menu_link_pattern.sub(rf"\1{menu_icon_html}", rendered_html)
+    rendered_html = action_link_pattern.sub(rf"\1{action_icon_html}", rendered_html)
     safe_font_family = html.escape(doc_font_family, quote=True)
     return (
         "<style>"
