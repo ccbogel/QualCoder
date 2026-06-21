@@ -1825,13 +1825,21 @@ Click "Yes" to start now.')
             self._show_placeholder_link_error(url_text, _("Unsupported link scheme."))
             return
         try:
-            target, menu_chain = self._resolve_placeholder_menu_link(url)
-            if isinstance(target, QtWidgets.QMenu):
-                self._popup_menu_chain(menu_chain)
+            host = url.host().casefold()
+            if host == "help":
+                page_path = url.path().lstrip("/")
+                self.app.help_wiki(page_path)
                 return
-            if not target.isEnabled():
-                raise ValueError(_("Menu action is currently disabled."))
-            target.trigger()
+            if host == "menu":
+                target, menu_chain = self._resolve_placeholder_menu_link(url)
+                if isinstance(target, QtWidgets.QMenu):
+                    self._popup_menu_chain(menu_chain)
+                    return
+                if not target.isEnabled():
+                    raise ValueError(_("Menu action is currently disabled."))
+                target.trigger()
+                return
+            raise ValueError(_("Unsupported QualCoder link target: ") + url.host())
         except ValueError as err:
             self._show_placeholder_link_error(url_text, str(err))
 
