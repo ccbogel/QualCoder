@@ -1718,8 +1718,122 @@ Click "Yes" to start now.')
                 layout.setContentsMargins(9, 9, 9, 9)
             if layout.indexOf(placeholder) == -1:
                 layout.addWidget(placeholder)
+            placeholder.setOpenExternalLinks(False)
+            placeholder.setOpenLinks(False)
+            placeholder.anchorClicked.connect(self.handle_placeholder_link)
             placeholder.show()
         self.update_placeholder_tab_styles()
+
+    @staticmethod
+    def _object_name_aliases(object_name):
+        """Return case-insensitive aliases for a menu or action objectName."""
+
+        if not object_name:
+            return set()
+        aliases = {object_name.casefold()}
+        for prefix in ("menu", "action"):
+            if object_name.startswith(prefix) and len(object_name) > len(prefix):
+                aliases.add(object_name[len(prefix):].casefold())
+        return aliases
+
+    def _matches_object_name(self, segment, obj):
+        """Check whether a URI segment matches an object by name."""
+
+        return segment.casefold() in self._object_name_aliases(obj.objectName())
+
+    def _resolve_placeholder_menu_link(self, url):
+        """Resolve a qualcoder://menu/... link to a QMenu or QAction."""
+
+        if url.host().casefold() != "menu":
+            raise ValueError(_("Unsupported QualCoder link target: ") + url.host())
+        path_segments = [segment for segment in url.path().split("/") if segment]
+        if not path_segments:
+            raise ValueError(_("Menu link has no target path."))
+
+        top_level_menus = [action.menu() for action in self.ui.menubar.actions() if action.menu() is not None]
+        current_menu = next(
+            (menu for menu in top_level_menus if self._matches_object_name(path_segments[0], menu)),
+            None,
+        )
+        if current_menu is None:
+            raise ValueError(_("Menu not found: ") + path_segments[0])
+
+        menu_chain = [current_menu]
+        for index, segment in enumerate(path_segments[1:], start=1):
+            match = None
+            for action in current_menu.actions():
+                if action.isSeparator():
+                    continue
+                submenu = action.menu()
+                if submenu is not None and self._matches_object_name(segment, submenu):
+                    match = submenu
+                    menu_chain.append(submenu)
+                    break
+                if self._matches_object_name(segment, action):
+                    match = action
+                    break
+            if match is None:
+                raise ValueError(_("Menu entry not found: ") + segment)
+            if isinstance(match, QtWidgets.QMenu):
+                current_menu = match
+                continue
+            if index != len(path_segments) - 1:
+                raise ValueError(_("Action cannot contain subentries: ") + segment)
+            return match, menu_chain
+        return current_menu, menu_chain
+
+    def _popup_menu_chain(self, menu_chain):
+        """Display a top-level menu and any nested submenu chain."""
+
+        if not menu_chain:
+            return
+        top_menu = menu_chain[0]
+        menu_bar_action = next(
+            (action for action in self.ui.menubar.actions() if action.menu() == top_menu),
+            None,
+        )
+        if menu_bar_action is not None:
+            rect = self.ui.menubar.actionGeometry(menu_bar_action)
+            popup_pos = self.ui.menubar.mapToGlobal(rect.bottomLeft())
+        else:
+            popup_pos = QtGui.QCursor.pos()
+        top_menu.popup(popup_pos)
+
+        parent_menu = top_menu
+        for submenu in menu_chain[1:]:
+            QtWidgets.QApplication.processEvents()
+            rect = parent_menu.actionGeometry(submenu.menuAction())
+            submenu.popup(parent_menu.mapToGlobal(rect.topRight()))
+            parent_menu = submenu
+
+    def _show_placeholder_link_error(self, url_text, details):
+        """Show a visible error for an invalid placeholder link."""
+
+        msg = _("Cannot open link: ") + url_text + "\n\n" + details
+        logger.warning(msg)
+        Message(self.app, _("Link error"), msg, "warning").exec()
+
+    def handle_placeholder_link(self, url):
+        """Open external links or dispatch custom qualcoder:// menu links."""
+
+        url_text = url.toString()
+        scheme = url.scheme().casefold()
+        if scheme in ("http", "https"):
+            webbrowser.open(url_text)
+            return
+        if scheme != "qualcoder":
+            self._show_placeholder_link_error(url_text, _("Unsupported link scheme."))
+            return
+        try:
+            target, menu_chain = self._resolve_placeholder_menu_link(url)
+            if isinstance(target, QtWidgets.QMenu):
+                self._popup_menu_chain(menu_chain)
+                return
+            if not target.isEnabled():
+                raise ValueError(_("Menu action is currently disabled."))
+            target.trigger()
+        except ValueError as err:
+            self._show_placeholder_link_error(url_text, str(err))
 
     def update_placeholder_tab_styles(self):
         """Match placeholder browser colors and link styling to the application theme."""

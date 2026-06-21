@@ -346,11 +346,11 @@ def manage_tab_info():
 
     return _("""# Manage tab
 
-The Manage tab displays cases, files, attributes, and references. Use the Manage menu to organise files, cases, journals, and project metadata.
+The Manage tab displays cases, files, attributes, and references. Use the [Manage menu](qualcoder://menu/files_and_cases) to organise files, cases, journals, and project metadata.
 
 ## Manage files
 
-The Manage Files menu lets you add and remove files and import surveys.
+The [Manage Files](qualcoder://menu/files_and_cases/manage_files) menu lets you add and remove files and import surveys.
 
 Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.
 
@@ -360,7 +360,7 @@ After import, open each file by double-clicking it or by using the right-click m
 
 You can add file attributes by clicking the `(x)` button. For example, create a character variable called `location` and fill it with city names.
 
-[Manage files - QualCoder](https://qualcoder.org/doc/en/3.2.-Files/)
+[Help: Manage files](qualcoder://help/3.2.-Files/)
 
 ## Manage cases
 
