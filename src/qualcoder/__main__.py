@@ -59,7 +59,7 @@ from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
-from qualcoder.information import manage_tab_info, coding_tab_info, reports_tab_info
+from qualcoder.information import manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
@@ -2056,9 +2056,9 @@ Click "Yes" to start now.')
         self.ui.tabWidget.setCurrentIndex(0)
         self.ai_chat()
 
-        self.ui.textBrowser_manage.setMarkdown(manage_tab_info())
-        self.ui.textBrowser_coding.setMarkdown(coding_tab_info())
-        self.ui.textBrowser_reports.setMarkdown(reports_tab_info())
+        self.ui.textBrowser_manage.setHtml(render_tab_info_markdown(manage_tab_info()))
+        self.ui.textBrowser_coding.setHtml(render_tab_info_markdown(coding_tab_info()))
+        self.ui.textBrowser_reports.setHtml(render_tab_info_markdown(reports_tab_info()))
 
         # Add tab widget icons
         try:

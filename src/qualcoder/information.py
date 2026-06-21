@@ -21,6 +21,7 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
+from markdown_it import MarkdownIt
 from PyQt6 import QtWidgets, QtCore
 import os
 import logging
@@ -29,6 +30,17 @@ from .GUI.ui_dialog_information import Ui_Dialog_information
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+tab_info_markdown_renderer = MarkdownIt("commonmark")
+
+
+def render_tab_info_markdown(markdown_text):
+    """Render placeholder tab Markdown to HTML.
+
+    Kept separate from other Markdown use cases because the placeholder tabs
+    will likely gain their own formatting and link decoration rules.
+    """
+
+    return tab_info_markdown_renderer.render(markdown_text)
 
 
 class DialogInformation(QtWidgets.QDialog):
