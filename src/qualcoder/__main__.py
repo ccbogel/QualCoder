@@ -1921,6 +1921,7 @@ Click "Yes" to start now.')
                 border: none;
             }}
         """
+        link_color = self.app.highlight_color()
                 
         for tab_widget, placeholder in self.tab_placeholders.items():
             placeholder.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
@@ -1930,9 +1931,26 @@ Click "Yes" to start now.')
             )
             placeholder.setStyleSheet(browser_style)
             placeholder.document().setDefaultStyleSheet(
-                f"a {{ color: {self.app.highlight_color()}; }} "
-                f"a:visited {{ color: {self.app.highlight_color()}; }}"
+                f"a {{ color: {link_color}; }} "
+                f"a:visited {{ color: {link_color}; }}"
             )
+        self.refresh_placeholder_tab_content()
+
+    def refresh_placeholder_tab_content(self):
+        """Render placeholder tab Markdown with the current theme colors."""
+
+        link_color = self.app.highlight_color()
+        doc_font_size = self.app.settings["docfontsize"]
+        doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
+        self.ui.textBrowser_manage.setHtml(
+            render_tab_info_markdown(manage_tab_info(), link_color, doc_font_size, doc_font_family)
+        )
+        self.ui.textBrowser_coding.setHtml(
+            render_tab_info_markdown(coding_tab_info(), link_color, doc_font_size, doc_font_family)
+        )
+        self.ui.textBrowser_reports.setHtml(
+            render_tab_info_markdown(reports_tab_info(), link_color, doc_font_size, doc_font_family)
+        )
 
     def clear_tab_widgets(self, tab_widget, show_placeholder=True):
         """Remove loaded tab content and optionally show the placeholder browser."""
@@ -2056,9 +2074,7 @@ Click "Yes" to start now.')
         self.ui.tabWidget.setCurrentIndex(0)
         self.ai_chat()
 
-        self.ui.textBrowser_manage.setHtml(render_tab_info_markdown(manage_tab_info()))
-        self.ui.textBrowser_coding.setHtml(render_tab_info_markdown(coding_tab_info()))
-        self.ui.textBrowser_reports.setHtml(render_tab_info_markdown(reports_tab_info()))
+        self.refresh_placeholder_tab_content()
 
         # Add tab widget icons
         try:

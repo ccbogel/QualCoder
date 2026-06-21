@@ -21,26 +21,63 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
+import html
+import re
+
 from markdown_it import MarkdownIt
 from PyQt6 import QtWidgets, QtCore
 import os
 import logging
+import qtawesome as qta
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 tab_info_markdown_renderer = MarkdownIt("commonmark")
+help_link_pattern = re.compile(r'(<a href="qualcoder://help/[^"]*">)', re.IGNORECASE)
 
 
-def render_tab_info_markdown(markdown_text):
+def _qtawesome_icon_data_uri(icon_name, color, size=16):
+    """Render a qtawesome icon as a PNG data URI for rich text."""
+
+    icon = qta.icon(icon_name, color=color)
+    pixmap = icon.pixmap(size, size)
+    byte_array = QtCore.QByteArray()
+    buffer = QtCore.QBuffer(byte_array)
+    buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+    pixmap.save(buffer, "PNG")
+    buffer.close()
+    encoded = bytes(byte_array.toBase64()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
+def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_family):
     """Render placeholder tab Markdown to HTML.
 
     Kept separate from other Markdown use cases because the placeholder tabs
     will likely gain their own formatting and link decoration rules.
     """
 
-    return tab_info_markdown_renderer.render(markdown_text)
+    icon_size = max(14, round(doc_font_size * 1.45))
+    rendered_html = tab_info_markdown_renderer.render(markdown_text)
+    help_icon_uri = _qtawesome_icon_data_uri("mdi.help-circle-outline", link_color, size=icon_size)
+    help_icon_html = (
+        f'<img src="{help_icon_uri}" width="{icon_size}" height="{icon_size}" '
+        'style="vertical-align: middle; margin-right: 0.3em;" />'
+    )
+    rendered_html = help_link_pattern.sub(rf"\1{help_icon_html}", rendered_html)
+    safe_font_family = html.escape(doc_font_family, quote=True)
+    return (
+        "<style>"
+        f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; }}"
+        f"p, li {{ font-size: {doc_font_size}pt; }}"
+        f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 0.4em 0 0.3em 0; }}"
+        f"h2 {{ font-size: {doc_font_size + 4}pt; margin: 0.8em 0 0.3em 0; }}"
+        f"h3 {{ font-size: {doc_font_size + 2}pt; margin: 0.8em 0 0.3em 0; }}"
+        "</style>"
+        + rendered_html
+    )
 
 
 class DialogInformation(QtWidgets.QDialog):
