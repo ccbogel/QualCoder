@@ -132,11 +132,7 @@ BUILTIN_LANGUAGE_LABELS = [
     ("de", "Deutsch"),
     ("en", "English"),
     ("es", "Español"),
-    ("fr", "Français"),
-    ("ja", "日本語"),
-    ("pt", "Português"),
-    ("sv", "Svenska"),
-    ("zh", "中国人"),
+    ("fr", "Français")
 ]
 
 
