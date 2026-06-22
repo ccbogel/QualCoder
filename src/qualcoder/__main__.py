@@ -1943,13 +1943,31 @@ Click "Yes" to start now.')
         doc_font_size = self.app.settings["docfontsize"]
         doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
         self.ui.textBrowser_manage.setHtml(
-            render_tab_info_markdown(manage_tab_info(), link_color, doc_font_size, doc_font_family)
+            render_tab_info_markdown(
+                manage_tab_info(),
+                link_color,
+                doc_font_size,
+                doc_font_family,
+                heading_icon_name="mdi6.file-outline",
+            )
         )
         self.ui.textBrowser_coding.setHtml(
-            render_tab_info_markdown(coding_tab_info(), link_color, doc_font_size, doc_font_family)
+            render_tab_info_markdown(
+                coding_tab_info(),
+                link_color,
+                doc_font_size,
+                doc_font_family,
+                heading_icon_name="mdi6.tag-text-outline",
+            )
         )
         self.ui.textBrowser_reports.setHtml(
-            render_tab_info_markdown(reports_tab_info(), link_color, doc_font_size, doc_font_family)
+            render_tab_info_markdown(
+                reports_tab_info(),
+                link_color,
+                doc_font_size,
+                doc_font_family,
+                heading_icon_name="mdi6.format-list-group",
+            )
         )
 
     def clear_tab_widgets(self, tab_widget, show_placeholder=True):

@@ -25,7 +25,7 @@ import html
 import re
 
 from markdown_it import MarkdownIt
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import logging
 import qtawesome as qta
@@ -38,13 +38,22 @@ tab_info_markdown_renderer = MarkdownIt("commonmark")
 help_link_pattern = re.compile(r'(<a href="qualcoder://help/[^"]*">)', re.IGNORECASE)
 menu_link_pattern = re.compile(r'(<a href="qualcoder://menu/[^"]*">)', re.IGNORECASE)
 action_link_pattern = re.compile(r'(<a href="qualcoder://action/[^"]*">)', re.IGNORECASE)
+first_h1_pattern = re.compile(r"<h1>(.*?)</h1>", re.IGNORECASE | re.DOTALL)
 
 
-def _qtawesome_icon_data_uri(icon_name, color, size=16):
+def _qtawesome_icon_data_uri(icon_name, color, size=16, y_offset=0):
     """Render a qtawesome icon as a PNG data URI for rich text."""
 
     icon = qta.icon(icon_name, color=color)
-    pixmap = icon.pixmap(size, size)
+    source_pixmap = icon.pixmap(size, size)
+    canvas_width = size
+    canvas_height = size + (y_offset // 2)
+    pixmap = QtGui.QPixmap(canvas_width, canvas_height)
+    pixmap.fill(QtCore.Qt.GlobalColor.transparent)
+    painter = QtGui.QPainter(pixmap)
+    painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform, True)
+    painter.drawPixmap(0, y_offset, source_pixmap)
+    painter.end()
     byte_array = QtCore.QByteArray()
     buffer = QtCore.QBuffer(byte_array)
     buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
@@ -54,11 +63,8 @@ def _qtawesome_icon_data_uri(icon_name, color, size=16):
     return f"data:image/png;base64,{encoded}"
 
 
-def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_family):
-    """Render placeholder tab Markdown to HTML.
-
-    Kept separate from other Markdown use cases because the placeholder tabs
-    will likely gain their own formatting and link decoration rules.
+def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_family, heading_icon_name=None):
+    """Render placeholder tab Markdown to HTML, icluding link decoration, etc.
     """
 
     icon_size = max(14, round(doc_font_size * 1.45))
@@ -81,16 +87,31 @@ def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_
     rendered_html = help_link_pattern.sub(rf"\1{help_icon_html}", rendered_html)
     rendered_html = menu_link_pattern.sub(rf"\1{menu_icon_html}", rendered_html)
     rendered_html = action_link_pattern.sub(rf"\1{action_icon_html}", rendered_html)
+    if heading_icon_name:
+        heading_size = max(64, icon_size * 4)
+        heading_offset = max(4, round(heading_size * 0.28))
+        heading_width_em = heading_size / (heading_size + heading_offset)
+        heading_icon_uri = _qtawesome_icon_data_uri(
+            heading_icon_name,
+            link_color,
+            size=heading_size,
+            y_offset=heading_offset,
+        )
+        heading_icon_html = (
+            f'<img src="{heading_icon_uri}" '
+            f'style="width: {heading_width_em:.3f}em; height: 1em; margin-right: 0.25em;" />'
+        )
+        rendered_html = first_h1_pattern.sub(rf"<h1>{heading_icon_html}\1</h1>", rendered_html, count=1)
     safe_font_family = html.escape(doc_font_family, quote=True)
     return (
         "<style>"
-        f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; }}"
+        f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; margin: 0; }}"
         f"p, li {{ font-size: {doc_font_size}pt; }}"
         f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 0.4em 0 0.3em 0; }}"
         f"h2 {{ font-size: {doc_font_size + 4}pt; margin: 0.8em 0 0.3em 0; }}"
         f"h3 {{ font-size: {doc_font_size + 2}pt; margin: 0.8em 0 0.3em 0; }}"
         "</style>"
-        + rendered_html
+        + f'<div style="margin-left: 20px; margin-right: 20px;">{rendered_html}</div>'
     )
 
 
