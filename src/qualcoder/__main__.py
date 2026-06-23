@@ -1911,6 +1911,7 @@ Click "Yes" to start now.')
         action_log_background = self.ui.textEdit.viewport().palette().color(
             QtGui.QPalette.ColorRole.Base
         ).name()
+        text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
         browser_style = f"""
             QTextBrowser {{
                 background-color: {action_log_background};
@@ -1921,8 +1922,6 @@ Click "Yes" to start now.')
                 border: none;
             }}
         """
-        link_color = self.app.highlight_color()
-                
         for tab_widget, placeholder in self.tab_placeholders.items():
             placeholder.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
             placeholder.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
@@ -1931,21 +1930,23 @@ Click "Yes" to start now.')
             )
             placeholder.setStyleSheet(browser_style)
             placeholder.document().setDefaultStyleSheet(
-                f"a {{ color: {link_color}; }} "
-                f"a:visited {{ color: {link_color}; }}"
+                f"a {{ color: {text_color}; }} "
+                f"a:visited {{ color: {text_color}; }}"
             )
         self.refresh_placeholder_tab_content()
 
     def refresh_placeholder_tab_content(self):
         """Render placeholder tab Markdown with the current theme colors."""
 
-        link_color = self.app.highlight_color()
+        highlight_color = self.app.highlight_color()
+        text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
         doc_font_size = self.app.settings["docfontsize"]
         doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
         self.ui.textBrowser_manage.setHtml(
             render_tab_info_markdown(
                 manage_tab_info(),
-                link_color,
+                highlight_color,
+                text_color,
                 doc_font_size,
                 doc_font_family,
                 heading_icon_name="mdi6.file-outline",
@@ -1954,7 +1955,8 @@ Click "Yes" to start now.')
         self.ui.textBrowser_coding.setHtml(
             render_tab_info_markdown(
                 coding_tab_info(),
-                link_color,
+                highlight_color,
+                text_color,
                 doc_font_size,
                 doc_font_family,
                 heading_icon_name="mdi6.tag-text-outline",
@@ -1963,7 +1965,8 @@ Click "Yes" to start now.')
         self.ui.textBrowser_reports.setHtml(
             render_tab_info_markdown(
                 reports_tab_info(),
-                link_color,
+                highlight_color,
+                text_color,
                 doc_font_size,
                 doc_font_family,
                 heading_icon_name="mdi6.format-list-group",

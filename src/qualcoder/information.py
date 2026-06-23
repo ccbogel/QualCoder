@@ -63,15 +63,15 @@ def _qtawesome_icon_data_uri(icon_name, color, size=16, y_offset=0):
     return f"data:image/png;base64,{encoded}"
 
 
-def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_family, heading_icon_name=None):
+def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_font_size, doc_font_family, heading_icon_name=None):
     """Render placeholder tab Markdown to HTML, icluding link decoration, etc.
     """
 
-    icon_size = max(14, round(doc_font_size * 1.45))
+    icon_size = round(doc_font_size * 2)
     rendered_html = tab_info_markdown_renderer.render(markdown_text)
-    help_icon_uri = _qtawesome_icon_data_uri("mdi.help-circle-outline", link_color, size=icon_size)
-    menu_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-outline", link_color, size=icon_size)
-    action_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-click-outline", link_color, size=icon_size)
+    help_icon_uri = _qtawesome_icon_data_uri("mdi.help-circle-outline", highlight_color, size=icon_size)
+    menu_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-outline", highlight_color, size=icon_size)
+    action_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-click-outline", highlight_color, size=icon_size)
     help_icon_html = (
         f'<img src="{help_icon_uri}" width="{icon_size}" height="{icon_size}" '
         'style="vertical-align: middle; margin-right: 0.3em;" />'
@@ -93,7 +93,7 @@ def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_
         heading_width_em = heading_size / (heading_size + heading_offset)
         heading_icon_uri = _qtawesome_icon_data_uri(
             heading_icon_name,
-            link_color,
+            highlight_color,
             size=heading_size,
             y_offset=heading_offset,
         )
@@ -105,11 +105,11 @@ def render_tab_info_markdown(markdown_text, link_color, doc_font_size, doc_font_
     safe_font_family = html.escape(doc_font_family, quote=True)
     return (
         "<style>"
-        f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; margin: 0; }}"
-        f"p, li {{ font-size: {doc_font_size}pt; }}"
-        f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 0.4em 0 0.3em 0; }}"
-        f"h2 {{ font-size: {doc_font_size + 4}pt; margin: 0.8em 0 0.3em 0; }}"
-        f"h3 {{ font-size: {doc_font_size + 2}pt; margin: 0.8em 0 0.3em 0; }}"
+        f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; margin: 0; color: {text_color}; }}"
+        f"p, li {{ font-size: {doc_font_size}pt; margin: 0 0 0.1em 0; }}"
+        f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 2em -0.5em 0.5em 0; }}"
+        f"h2 {{ font-size: {doc_font_size + 4}pt; font-weight: normal; margin: 1.5em 0 0.5em 0; }}"
+        f"h3 {{ font-size: {doc_font_size + 2}pt; font-weight: normal; margin: 0.8em 0 0.3em 0; }}"
         "</style>"
         + f'<div style="margin-left: 20px; margin-right: 20px;">{rendered_html}</div>'
     )
@@ -428,45 +428,50 @@ coding_shortcuts_display += database_queries_shortcuts
 def manage_tab_info():
     """Return translated Markdown for the Manage tab placeholder."""
 
-    return _("""# Manage tab
+    return _("""# Manage
 
-The Manage tab displays cases, files, attributes, and references. Use the [Manage menu](qualcoder://menu/files_and_cases) to organise files, cases, journals, and project metadata.
+The Manage tab displays workspaces for organising cases, files, attributes, journals, and references.
+Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among them.
 
-## Manage files
 
-The [Manage Files](qualcoder://menu/files_and_cases/manage_files) menu lets you add and remove files and import surveys.
+## [Manage Files](qualcoder://menu/files_and_cases/manage_files)
 
-Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.
+- This menu lets you add and remove empirical data in your project.
+- You can import plain text and many other document types,
+including PDFs, images, audio, and video.
+- You may also import survey data.
+- Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.
+- [Help: Import files](qualcoder://help/3.2.-Files/)
 
-If you are beginning with QualCoder, open the `Examples` folder and import `ID1.docx`, `ID2.odt`, and `seascape.jpg`.
 
-After import, open each file by double-clicking it or by using the right-click menu. You can test pseudonymisation by removing `ID2.odt`, adding `Joe Bloggs` through the Pseudonymise button, and then importing the file again.
+## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)
 
-You can add file attributes by clicking the `(x)` button. For example, create a character variable called `location` and fill it with city names.
+- You can use cases to group files together that are related to a topic, person, organisation, or any other empirical entity in your study. 
+- This can be useful for organising your data and for running reports on specific groups of files.
+- [Help: Cases](qualcoder://help/3.3.-Cases/)
 
-[Help: Manage files](qualcoder://help/3.2.-Files/)
 
-## Manage cases
+## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)
 
-A case is a collection of files on a topic or related to a person. Not all projects need to use cases.
+- Journals are used to record your thoughts when coding and analysing data. 
+- The journal window opens separately from the main window so you can move between them easily.
+- [Help: Journals](qualcoder://help/5.2.-Journals/)
 
-[Help: Manage cases](qualcoder://help/3.3.-Cases/)
 
-## Manage journals
+## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)
 
-Journals are used to record your thoughts when coding. The journal window opens separately from the main window so you can move between them easily.
+- Files, cases, and journals can have attributes (variables) that describe their characteristics. 
+- They can be used to filter and organise data, and to run reports based on specific criteria. 
+- Use this menu to create and manage such attributes. They can be attached to files, cases, and journals directly in the respective workspaces. 
+- [Help: Attributes](qualcoder://help/3.4.-Attributes/)
 
-[Help: Journals](qualcoder://help/5.2.-Journals/)
 
-## Manage attributes
+## [Manage References](qualcoder://menu/files_and_cases/manage_references)
 
-Files, cases, and journals can have attributes that describe their purpose. Variables can be created, renamed, and deleted here.
-
-[Help: Attributes](qualcoder://help/3.4.-Attributes/)
-
-## Manage references
-
-References can be imported from NBIB and RIS formats. Try importing `bibliography.ris` from the `Examples` folder, then assign a reference to a file by selecting the reference row, selecting the file, and pressing `Link`.""")
+- Bibliographic references can be imported from NBIB and RIS files.
+- After that, references can be linked to files in the project.
+- [Help: Import References](qualcoder://help/6.1.-Imports-and-Exports/)
+""")
 
 
 def coding_tab_info():
