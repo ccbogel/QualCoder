@@ -325,12 +325,18 @@ class RefiImport:
         self.pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         self.pd_value = 0
 
+        contents = os.listdir(self.folder_name)
+        # Not all proejcts has a project.qde, it may have another name.qde
+        projectqde = "project.qde"
+        for c in contents:
+            if pathlib.Path(c).suffix == ".qde":
+                projectqde = c
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(self.folder_name + "/project.qde", "r", encoding="utf8") as xml_file:
+        with open(os.path.join(self.folder_name, projectqde), "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
         '''result = self.xml_validation("project")
         self.parent_textedit.append(f"Project XML parsing successful: {result}")'''
-        tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
+        tree = etree.parse(os.path.join(self.folder_name, projectqde))  # get element tree object
         # Look for xmlns version. Have found 1.0, 0:4
         root = tree.getroot()
         for child in root:
