@@ -1938,38 +1938,33 @@ Click "Yes" to start now.')
     def refresh_placeholder_tab_content(self):
         """Render placeholder tab Markdown with the current theme colors."""
 
+        for tab_widget in self.tab_placeholders:
+            self.refresh_placeholder_browser(tab_widget)
+
+    def refresh_placeholder_browser(self, tab_widget):
+        """Render one placeholder browser with the current theme colors."""
+
+        placeholder = self.tab_placeholders.get(tab_widget)
+        if placeholder is None:
+            return
         highlight_color = self.app.highlight_color()
         text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
         doc_font_size = self.app.settings["docfontsize"]
         doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
-        self.ui.textBrowser_manage.setHtml(
+        placeholder_map = {
+            self.ui.tab_manage: (manage_tab_info, "mdi6.file-outline"),
+            self.ui.tab_coding: (coding_tab_info, "mdi6.tag-text-outline"),
+            self.ui.tab_reports: (reports_tab_info, "mdi6.format-list-group"),
+        }
+        markdown_text_func, heading_icon_name = placeholder_map[tab_widget]
+        placeholder.setHtml(
             render_tab_info_markdown(
-                manage_tab_info(),
+                markdown_text_func(),
                 highlight_color,
                 text_color,
                 doc_font_size,
                 doc_font_family,
-                heading_icon_name="mdi6.file-outline",
-            )
-        )
-        self.ui.textBrowser_coding.setHtml(
-            render_tab_info_markdown(
-                coding_tab_info(),
-                highlight_color,
-                text_color,
-                doc_font_size,
-                doc_font_family,
-                heading_icon_name="mdi6.tag-text-outline",
-            )
-        )
-        self.ui.textBrowser_reports.setHtml(
-            render_tab_info_markdown(
-                reports_tab_info(),
-                highlight_color,
-                text_color,
-                doc_font_size,
-                doc_font_family,
-                heading_icon_name="mdi6.format-list-group",
+                heading_icon_name=heading_icon_name,
             )
         )
 
@@ -1989,6 +1984,10 @@ Click "Yes" to start now.')
         if placeholder is not None:
             if layout.indexOf(placeholder) == -1:
                 layout.addWidget(placeholder)
+            if show_placeholder:
+                # Re-render the placeholder when it is restored so project switches
+                # and tab resets never leave a previously cleared browser blank.
+                self.refresh_placeholder_browser(tab_widget)
             placeholder.setVisible(show_placeholder)
     
     def init_ui(self):
@@ -2600,7 +2599,6 @@ Click "Yes" to start now.')
     def code_organiser(self):
         """ Organise codes structure. """
 
-        self.ui.textBrowser_coding.setText("")
         ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, None)

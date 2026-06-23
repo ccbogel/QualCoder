@@ -477,21 +477,58 @@ including PDFs, images, audio, and video.
 def coding_tab_info():
     """Return translated Markdown for the Coding tab placeholder."""
 
-    return _("""# Coding tab
+    return _("""# Coding
 
-The Coding tab displays the work area for coding text, images, audio or video, and PDFs. Depending on the files loaded in Manage Files, select a coding option from the menus above to begin.
+The Coding tab displays workspaces for coding text, PDFs, images, audio, and video.
+Use the [Coding menu](qualcoder://menu/coding) to select an option to begin. 
+Note that you can only open a particular coding workspace if that type of data is actually present in the current project. 
 
-[Help: Coding text](qualcoder://help/4.1.-Coding-Text/)
 
-[Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)
+## [Code Text](qualcoder://menu/coding/codes)
 
-[Help: Coding images](qualcoder://help/4.4.-Coding-Images/)
+- Use this workspace to read textual data closely and assign codes to selected passages.
+- You can organise codes in a tree, add memos and annotations, create bookmarks, and mark especially useful segments as important.
+- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)
 
-[Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)
 
-[Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)
+## [Code Images](qualcoder://menu/coding/code_image)
 
-There are also menu options for organising codes and changing the colour scheme.""")
+- In this workspace, you can select regions in photographs, diagrams, screenshots, or other visual material and assign codes to them.
+- Coded areas are displayed as coloured rectangles linked to your code system.
+- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)
+
+
+## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)
+
+- Use this workspace to transcribe and/or code time-based media such as interviews, focus groups, and field recordings.
+- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)
+
+
+## [Code PDFs](qualcoder://menu/coding/code_pdf)
+
+- This workspace allows you to code text directly in PDF documents when you want to keep the original page layout in view.
+- This is useful for articles, reports, and other source material where page position and formatting matter.
+- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)
+
+
+## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)
+
+- This loads a variant of the text coding workspace that uses AI to explore your data and suggest segments for a selected code.
+- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)
+
+
+## [Code Organiser](qualcoder://menu/coding/code_organiser)
+
+- Use this workspace to reorganise your code system using a graphical, mind-map style interface.
+- You can move, merge, and rename codes and categories as your analytic structure becomes clearer.
+- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)
+
+
+## [Colour Scheme](qualcoder://menu/coding/colour_scheme)
+
+- This allows you to change the colour scheme of your codes and categories. 
+- Special schemes for colour-blind users are available. 
+""")
 
 
 def reports_tab_info():
