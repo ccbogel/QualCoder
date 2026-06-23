@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 08:28+0200\n"
+"POT-Creation-Date: 2026-06-23 11:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -201,7 +201,7 @@ msgstr ""
 
 #: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:388
 #: src/qualcoder/view_image.py:402 src/qualcoder/view_av.py:451
-#: src/qualcoder/__main__.py:2619 src/qualcoder/code_text.py:1430
+#: src/qualcoder/__main__.py:2621 src/qualcoder/code_text.py:1430
 #: src/qualcoder/reports.py:403 src/qualcoder/reports.py:492
 msgid "Date: "
 msgstr ""
@@ -462,7 +462,7 @@ msgid ""
 "affect coding stripes display."
 msgstr ""
 
-#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3183
+#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3185
 #: src/qualcoder/code_text.py:5545 src/qualcoder/code_text.py:7771
 msgid "Information"
 msgstr ""
@@ -1173,7 +1173,7 @@ msgstr ""
 #: src/qualcoder/report_attributes.py:669 src/qualcoder/manage_files.py:1481
 #: src/qualcoder/manage_files.py:1615 src/qualcoder/manage_files.py:2190
 #: src/qualcoder/manage_files.py:2220 src/qualcoder/manage_files.py:2225
-#: src/qualcoder/manage_files.py:2385 src/qualcoder/refi.py:1205
+#: src/qualcoder/manage_files.py:2385 src/qualcoder/refi.py:1211
 #: src/qualcoder/case_file_manager.py:620 src/qualcoder/report_codes.py:1395
 #: src/qualcoder/view_graph.py:1685 src/qualcoder/text_file_replacement.py:76
 #: src/qualcoder/text_file_replacement.py:305
@@ -1464,7 +1464,7 @@ msgstr ""
 #: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
 #: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
 #: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
-#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1993
+#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1995
 #: src/qualcoder/report_exact_matches.py:540
 msgid "Coder"
 msgstr ""
@@ -1958,7 +1958,7 @@ msgid ""
 "be lost as well. Do you really want to cancel?"
 msgstr ""
 
-#: src/qualcoder/settings.py:780 src/qualcoder/__main__.py:1992
+#: src/qualcoder/settings.py:780 src/qualcoder/__main__.py:1994
 msgid "Settings"
 msgstr ""
 
@@ -2869,7 +2869,7 @@ msgid "Bulk Rename of database file name entries"
 msgstr ""
 
 #: src/qualcoder/manage_files.py:929 src/qualcoder/codebook.py:243
-#: src/qualcoder/refi.py:2067 src/qualcoder/refi.py:2116
+#: src/qualcoder/refi.py:2073 src/qualcoder/refi.py:2122
 #: src/qualcoder/helpers.py:363
 msgid "Select directory to save file"
 msgstr ""
@@ -3061,7 +3061,7 @@ msgstr ""
 msgid " imported."
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2606
+#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2608
 msgid " created."
 msgstr ""
 
@@ -3071,7 +3071,7 @@ msgstr ""
 msgid " lines not imported"
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2220 src/qualcoder/refi.py:1205
+#: src/qualcoder/manage_files.py:2220 src/qualcoder/refi.py:1211
 #: src/qualcoder/text_file_replacement.py:304
 msgid "Cannot import"
 msgstr ""
@@ -3227,7 +3227,7 @@ msgid "Autocode text segments using column name"
 msgstr ""
 
 #: src/qualcoder/codebook.py:234 src/qualcoder/codebook.py:280
-#: src/qualcoder/refi.py:2126 src/qualcoder/refi.py:2127
+#: src/qualcoder/refi.py:2132 src/qualcoder/refi.py:2133
 #: src/qualcoder/code_text.py:4276
 msgid "Codebook exported"
 msgstr ""
@@ -3381,196 +3381,196 @@ msgstr ""
 msgid "Project Import"
 msgstr ""
 
-#: src/qualcoder/refi.py:356
+#: src/qualcoder/refi.py:362
 msgid "Parse users. Loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:363
+#: src/qualcoder/refi.py:369
 msgid "Parse codes and categories. Loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:366
+#: src/qualcoder/refi.py:372
 msgid "Parse variables. Loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:368
+#: src/qualcoder/refi.py:374
 msgid "Parsing and loading project memo"
 msgstr ""
 
-#: src/qualcoder/refi.py:382
+#: src/qualcoder/refi.py:388
 msgid "Parsed cases for file variables. Loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:390
+#: src/qualcoder/refi.py:396
 msgid "Parsing sources. Loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:397
+#: src/qualcoder/refi.py:403
 msgid "Parsing Notes. Journals loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:409
+#: src/qualcoder/refi.py:415
 msgid "Parsing cases. Loaded: "
 msgstr ""
 
-#: src/qualcoder/refi.py:418
+#: src/qualcoder/refi.py:424
 msgid "Parsing sets."
 msgstr ""
 
-#: src/qualcoder/refi.py:420
+#: src/qualcoder/refi.py:426
 msgid " loaded."
 msgstr ""
 
-#: src/qualcoder/refi.py:436
+#: src/qualcoder/refi.py:442
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:437
+#: src/qualcoder/refi.py:443
 msgid ""
 "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:438
+#: src/qualcoder/refi.py:444
 msgid "Set components may be imported as file attributes.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:439
+#: src/qualcoder/refi.py:445
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:440
+#: src/qualcoder/refi.py:446
 msgid ""
 "Boolean variables treated as character (text). Integer variables treated as "
 "floating point. \n"
 msgstr ""
 
-#: src/qualcoder/refi.py:441
+#: src/qualcoder/refi.py:447
 msgid ""
 "All variables are stored as text. Cast as text or float for SQL operations.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:442
+#: src/qualcoder/refi.py:448
 msgid "Relative paths to external files are untested.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:443
+#: src/qualcoder/refi.py:449
 msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
 msgstr ""
 
-#: src/qualcoder/refi.py:444
+#: src/qualcoder/refi.py:450
 msgid "REFI-QDA Project import"
 msgstr ""
 
-#: src/qualcoder/refi.py:483
+#: src/qualcoder/refi.py:489
 msgid "Cannot read text source from Note: "
 msgstr ""
 
-#: src/qualcoder/refi.py:619 src/qualcoder/refi.py:1857
+#: src/qualcoder/refi.py:625 src/qualcoder/refi.py:1863
 msgid "Variable import error"
 msgstr ""
 
-#: src/qualcoder/refi.py:619 src/qualcoder/refi.py:1857
+#: src/qualcoder/refi.py:625 src/qualcoder/refi.py:1863
 msgid "Variable name already exists: "
 msgstr ""
 
-#: src/qualcoder/refi.py:683
+#: src/qualcoder/refi.py:689
 msgid "Error entering Case into database"
 msgstr ""
 
-#: src/qualcoder/refi.py:901
+#: src/qualcoder/refi.py:907
 msgid "Cannot copy Image file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:912
+#: src/qualcoder/refi.py:918
 msgid "Cannot copy image file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1003 src/qualcoder/refi.py:1014
+#: src/qualcoder/refi.py:1009 src/qualcoder/refi.py:1020
 msgid "Cannot copy Audio file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1070 src/qualcoder/refi.py:1081
+#: src/qualcoder/refi.py:1076 src/qualcoder/refi.py:1087
 msgid "Cannot copy Video file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1184
+#: src/qualcoder/refi.py:1190
 msgid "Cannot copy transcript file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1360 src/qualcoder/refi.py:1371
+#: src/qualcoder/refi.py:1366 src/qualcoder/refi.py:1377
 msgid "Cannot copy PDF file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1482
+#: src/qualcoder/refi.py:1488
 msgid "Cannot read from TextSource: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1492
+#: src/qualcoder/refi.py:1498
 msgid "Cannot copy text file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1504 src/qualcoder/refi.py:1518
+#: src/qualcoder/refi.py:1510 src/qualcoder/refi.py:1524
 msgid "Cannot copy TextSource file from: "
 msgstr ""
 
-#: src/qualcoder/refi.py:1641
+#: src/qualcoder/refi.py:1647
 msgid "Duplicated text coding for code and coder. Only one loaded."
 msgstr ""
 
-#: src/qualcoder/refi.py:1642
+#: src/qualcoder/refi.py:1648
 msgid " Positions:"
 msgstr ""
 
-#: src/qualcoder/refi.py:1731
+#: src/qualcoder/refi.py:1737
 msgid "Trying to read Note element: "
 msgstr ""
 
-#: src/qualcoder/refi.py:2012
+#: src/qualcoder/refi.py:2018
 msgid "Project export error "
 msgstr ""
 
-#: src/qualcoder/refi.py:2013 src/qualcoder/refi.py:2019
-#: src/qualcoder/__main__.py:2500 src/qualcoder/__main__.py:2520
+#: src/qualcoder/refi.py:2019 src/qualcoder/refi.py:2025
+#: src/qualcoder/__main__.py:2502 src/qualcoder/__main__.py:2522
 msgid "Project"
 msgstr ""
 
-#: src/qualcoder/refi.py:2013 src/qualcoder/refi.py:2019
+#: src/qualcoder/refi.py:2019 src/qualcoder/refi.py:2025
 msgid "Project not exported. Exiting. "
 msgstr ""
 
-#: src/qualcoder/refi.py:2102
+#: src/qualcoder/refi.py:2108
 msgid "REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:2103
+#: src/qualcoder/refi.py:2109
 msgid ""
 "This project exchange is not guaranteed compliant with the exchange "
 "standard.\n"
 msgstr ""
 
-#: src/qualcoder/refi.py:2107 src/qualcoder/refi.py:2108
+#: src/qualcoder/refi.py:2113 src/qualcoder/refi.py:2114
 msgid "Project exported"
 msgstr ""
 
-#: src/qualcoder/refi.py:2124
+#: src/qualcoder/refi.py:2130
 msgid "Codebook has been exported to "
 msgstr ""
 
-#: src/qualcoder/refi.py:2130 src/qualcoder/refi.py:2131
+#: src/qualcoder/refi.py:2136 src/qualcoder/refi.py:2137
 msgid "Codebook NOT exported"
 msgstr ""
 
-#: src/qualcoder/refi.py:3021
+#: src/qualcoder/refi.py:3027
 msgid "A/V Media not found"
 msgstr ""
 
-#: src/qualcoder/refi.py:3024
+#: src/qualcoder/refi.py:3030
 msgid "VLC not installed, final end character timepoint will be inaccurate"
 msgstr ""
 
-#: src/qualcoder/refi.py:3025
+#: src/qualcoder/refi.py:3031
 msgid "VLC not found"
 msgstr ""
 
@@ -6261,19 +6261,19 @@ msgstr ""
 msgid "Cannot load config.ini file"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1577
+#: src/qualcoder/__main__.py:1581
 msgid "There is already a backup with this name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1586
+#: src/qualcoder/__main__.py:1590
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1588
+#: src/qualcoder/__main__.py:1592
 msgid "Project backup created: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1669
+#: src/qualcoder/__main__.py:1671
 msgid ""
 "Welcome\n"
 "\n"
@@ -6283,214 +6283,214 @@ msgid ""
 "\"Yes\" to start now."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1675
+#: src/qualcoder/__main__.py:1677
 msgid "AI Integration"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1994
+#: src/qualcoder/__main__.py:1996
 msgid "Font"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1995
+#: src/qualcoder/__main__.py:1997
 msgid "Tree font size"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1996
+#: src/qualcoder/__main__.py:1998
 msgid "Working directory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1997
+#: src/qualcoder/__main__.py:1999
 msgid "Show IDs"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1998
+#: src/qualcoder/__main__.py:2000
 msgid "Language"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1999
+#: src/qualcoder/__main__.py:2001
 msgid "Timestamp format"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2000
+#: src/qualcoder/__main__.py:2002
 msgid "Speaker name format"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2001
+#: src/qualcoder/__main__.py:2003
 msgid "Report text context characters: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2002
+#: src/qualcoder/__main__.py:2004
 msgid "Report text context style: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2003
+#: src/qualcoder/__main__.py:2005
 msgid "Style"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2004
+#: src/qualcoder/__main__.py:2006
 msgid "Backup on open"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2005
+#: src/qualcoder/__main__.py:2007
 msgid "Backup AV files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2007
+#: src/qualcoder/__main__.py:2009
 msgid "AI integration is enabled"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2009
+#: src/qualcoder/__main__.py:2011
 msgid "AI integration is disabled"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2012
+#: src/qualcoder/__main__.py:2014
 msgid "Folder paths / represents \\"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2245
+#: src/qualcoder/__main__.py:2247
 msgid "This project contains no text files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2246
+#: src/qualcoder/__main__.py:2248
 msgid "No text files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2259
+#: src/qualcoder/__main__.py:2261
 msgid "This project contains no pdf files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2260
+#: src/qualcoder/__main__.py:2262
 msgid "No pdf files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2275
+#: src/qualcoder/__main__.py:2277
 msgid "This project contains no image files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2276
+#: src/qualcoder/__main__.py:2278
 msgid "No image files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2284
+#: src/qualcoder/__main__.py:2286
 msgid "This project contains no audio/video files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2285
+#: src/qualcoder/__main__.py:2287
 msgid "No a/v files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2288
+#: src/qualcoder/__main__.py:2290
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2289
+#: src/qualcoder/__main__.py:2291
 msgid "Install VLC"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2298
+#: src/qualcoder/__main__.py:2300
 msgid "A/V Coding"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2385
+#: src/qualcoder/__main__.py:2387
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2387
+#: src/qualcoder/__main__.py:2389
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2388
+#: src/qualcoder/__main__.py:2390
 msgid "REFI-QDA import steps"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2392 src/qualcoder/__main__.py:2409
-#: src/qualcoder/__main__.py:2425
+#: src/qualcoder/__main__.py:2394 src/qualcoder/__main__.py:2411
+#: src/qualcoder/__main__.py:2427
 msgid "Project creation"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2392
+#: src/qualcoder/__main__.py:2394
 msgid "REFI-QDA Project not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2404
+#: src/qualcoder/__main__.py:2406
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Taguette.sqlite3 file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2405 src/qualcoder/__main__.py:2421
+#: src/qualcoder/__main__.py:2407 src/qualcoder/__main__.py:2423
 msgid "RQDA import steps"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2409 src/qualcoder/__main__.py:2425
+#: src/qualcoder/__main__.py:2411 src/qualcoder/__main__.py:2427
 msgid "Project not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2418
+#: src/qualcoder/__main__.py:2420
 msgid "IMPORTING RQDA PROJECT"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2420
+#: src/qualcoder/__main__.py:2422
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2438
+#: src/qualcoder/__main__.py:2440
 msgid "Are you sure you want to quit?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2496
+#: src/qualcoder/__main__.py:2498
 msgid "Enter project name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2500
+#: src/qualcoder/__main__.py:2502
 msgid "No project created."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2519
+#: src/qualcoder/__main__.py:2521
 msgid "Project creation error "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2520
+#: src/qualcoder/__main__.py:2522
 msgid " not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2606
+#: src/qualcoder/__main__.py:2608
 msgid "New project: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2607
+#: src/qualcoder/__main__.py:2609
 msgid "Opening: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2617
+#: src/qualcoder/__main__.py:2619
 msgid "New Project Created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2618
+#: src/qualcoder/__main__.py:2620
 msgid "DB Version:"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2620
+#: src/qualcoder/__main__.py:2622
 msgid "About: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2621
+#: src/qualcoder/__main__.py:2623
 msgid "Coder:"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2624
+#: src/qualcoder/__main__.py:2626
 msgid "Problem creating database "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2679
+#: src/qualcoder/__main__.py:2681
 msgid "Coder name changed to: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2702
+#: src/qualcoder/__main__.py:2704
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -6503,159 +6503,159 @@ msgid ""
 "AI.)"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2707
+#: src/qualcoder/__main__.py:2709
 msgid "Memo for project "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2714
+#: src/qualcoder/__main__.py:2716
 msgid "Project memo entered."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2738 src/qualcoder/special_functions.py:113
+#: src/qualcoder/__main__.py:2740 src/qualcoder/special_functions.py:113
 msgid "Open project directory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2760
+#: src/qualcoder/__main__.py:2762
 msgid "Cannot open file"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2785
+#: src/qualcoder/__main__.py:2787
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2788
+#: src/qualcoder/__main__.py:2790
 msgid "Coder name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2790
+#: src/qualcoder/__main__.py:2792
 msgid "Keep"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2791
+#: src/qualcoder/__main__.py:2793
 msgid "Switch"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2792
+#: src/qualcoder/__main__.py:2794
 msgid "Cancel"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2801
+#: src/qualcoder/__main__.py:2803
 msgid "Default coder name changed to: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2829 src/qualcoder/__main__.py:2858
-#: src/qualcoder/__main__.py:2878 src/qualcoder/__main__.py:2903
-#: src/qualcoder/__main__.py:2974 src/qualcoder/__main__.py:2998
-#: src/qualcoder/__main__.py:3006 src/qualcoder/__main__.py:3018
-#: src/qualcoder/__main__.py:3026 src/qualcoder/__main__.py:3034
-#: src/qualcoder/__main__.py:3043 src/qualcoder/__main__.py:3051
-#: src/qualcoder/__main__.py:3059 src/qualcoder/__main__.py:3069
-#: src/qualcoder/__main__.py:3077
+#: src/qualcoder/__main__.py:2831 src/qualcoder/__main__.py:2860
+#: src/qualcoder/__main__.py:2880 src/qualcoder/__main__.py:2905
+#: src/qualcoder/__main__.py:2976 src/qualcoder/__main__.py:3000
+#: src/qualcoder/__main__.py:3008 src/qualcoder/__main__.py:3020
+#: src/qualcoder/__main__.py:3028 src/qualcoder/__main__.py:3036
+#: src/qualcoder/__main__.py:3045 src/qualcoder/__main__.py:3053
+#: src/qualcoder/__main__.py:3061 src/qualcoder/__main__.py:3071
+#: src/qualcoder/__main__.py:3079
 msgid "Updating database to version"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3084
+#: src/qualcoder/__main__.py:3086
 msgid "Deleting code_text coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3091
+#: src/qualcoder/__main__.py:3093
 msgid "Deleting code_image coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3098
+#: src/qualcoder/__main__.py:3100
 msgid "Deleting code_av coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3148
+#: src/qualcoder/__main__.py:3150
 msgid "Repaired a cyclic code/category hierarchy."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3183
+#: src/qualcoder/__main__.py:3185
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3208
+#: src/qualcoder/__main__.py:3210
 msgid "Project summary"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3216
+#: src/qualcoder/__main__.py:3218
 msgid "Project memo: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3223 src/qualcoder/reports.py:405
+#: src/qualcoder/__main__.py:3225 src/qualcoder/reports.py:405
 #: src/qualcoder/reports.py:407 src/qualcoder/reports.py:493
 msgid "Files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3256
+#: src/qualcoder/__main__.py:3258
 msgid "Bad links to files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3290
+#: src/qualcoder/__main__.py:3292
 msgid "Closing project: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3356
+#: src/qualcoder/__main__.py:3358
 msgid "Deleting: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3365
+#: src/qualcoder/__main__.py:3367
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3367
+#: src/qualcoder/__main__.py:3369
 msgid "AI Setup Wizard"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3369
+#: src/qualcoder/__main__.py:3371
 msgid "AI: Setup Wizard"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3372
+#: src/qualcoder/__main__.py:3374
 msgid "AI: Setup Wizard finished"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3381
+#: src/qualcoder/__main__.py:3383
 msgid "Please enable the AI first and set it in Settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3382 src/qualcoder/__main__.py:3386
-#: src/qualcoder/__main__.py:3391 src/qualcoder/__main__.py:3416
+#: src/qualcoder/__main__.py:3384 src/qualcoder/__main__.py:3388
+#: src/qualcoder/__main__.py:3393 src/qualcoder/__main__.py:3418
 msgid "Rebuild AI Memory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3385
+#: src/qualcoder/__main__.py:3387
 msgid "The AI is busy or not set up correctly."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3389
+#: src/qualcoder/__main__.py:3391
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3407 src/qualcoder/__main__.py:3415
+#: src/qualcoder/__main__.py:3409 src/qualcoder/__main__.py:3417
 msgid "Please enable the AI first and set it up in Settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3408
+#: src/qualcoder/__main__.py:3410
 msgid "Ai Chat"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3428
+#: src/qualcoder/__main__.py:3430
 msgid "This version: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3435
+#: src/qualcoder/__main__.py:3437
 msgid "Newer release available: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3440
+#: src/qualcoder/__main__.py:3442
 msgid "Latest Release: "
 msgstr ""
 
