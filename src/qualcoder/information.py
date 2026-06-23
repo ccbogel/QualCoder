@@ -109,7 +109,7 @@ def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_fon
         f"p, li {{ font-size: {doc_font_size}pt; margin: 0 0 0.1em 0; }}"
         f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 2em -0.5em 0.5em 0; }}"
         f"h2 {{ font-size: {doc_font_size + 4}pt; font-weight: normal; margin: 1.5em 0 0.5em 0; }}"
-        f"h3 {{ font-size: {doc_font_size + 2}pt; font-weight: normal; margin: 0.8em 0 0.3em 0; }}"
+        f"h3 {{ font-size: {doc_font_size + 2}pt; font-weight: normal; font-style: italic; margin: 0.8em 0 0.3em 0; }}"
         "</style>"
         + f'<div style="margin-left: 20px; margin-right: 20px;">{rendered_html}</div>'
     )
@@ -536,17 +536,58 @@ def reports_tab_info():
 
     return _("""# Reports tab
 
-The Reports tab displays analyses and report summaries. Select items from the Analysis and Reports menus.
+This tab displays tools from both the [Analysis](qualcoder://menu/analysis) and [Reports](qualcoder://menu/reports) menus.
 
-[Help: Reports menu options](qualcoder://help/5.3.-Reports/)
 
-## Analysis menu
+## [Analysis](qualcoder://menu/analysis)
 
-The Analysis menu includes code retrieval, co-occurrence, and exact match tools. The Graph option helps visualise coding through mind-map style views.
+Use these tools when you want to explore coded segments and relationships in detail.
 
-[Help: Graph](qualcoder://help/5.4.-Graph/)
+[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)
 
-## Reports menu
 
-The Reports menu includes coder comparisons, code counts by file or case, code and file summaries, charts, and database queries for direct access to the underlying database.""")
+### Retrieval and segment-based analysis
+
+These tools help you inspect the actual coded material in your project.
+
+- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible analysis tool. It gathers all segments for selected codes or categories and lets you narrow the results by file, case, attributes, or search text.
+- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) generates a table with text segments and all associated codes.
+
+
+### Code relationships and overlaps
+
+Use these tools to examine how codes relate to one another. They only work with text files.
+
+- [Code relations](qualcoder://menu/analysis/code_relations) shows proximity, overlap, inclusion, and exact matches between selected codes.
+- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses on where two codes overlap or directly touch.
+- [Code text exact matches](qualcoder://menu/analysis/code_text_exact_matches) lists passages where different codes were applied to exactly the same text.
+- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map style view of linked project elements like codes, cases, files, etc. [Help: Graph](qualcoder://help/5.4.-Graph/)
+
+
+## Reports
+
+Use these tools when you want summaries, comparisons, counts, charts, or exports for reporting purposes.
+
+[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)
+
+
+### Inter-Coder Comparisons
+
+- [Coding comparison](qualcoder://menu/reports/coding_comparison) and [Coding comparison by file](qualcoder://menu/reports/coding_comparison_by_file) are especially useful for collaborative work and inter-coder checking.
+
+
+### Summaries, frequencies, and charts
+
+These reports summarise patterns across the project rather than showing every coded segment in detail.
+
+- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how often codes and categories have been used.
+- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) gives a compact overview of where selected codes appear most often.
+- [File summary](qualcoder://menu/reports/file_summary) and [Code summary](qualcoder://menu/reports/code_summary) give focused overviews of one file or one code at a time.
+- [Charts](qualcoder://menu/reports/charts) visualises distributions and comparisons with diagrams such as bar charts, treemaps, and heatmaps.
+
+
+### Advanced reporting
+
+- [Database queries](qualcoder://menu/reports/sql_statements) gives direct access to the project database for custom analyses. This is most useful when the standard reports do not answer a specific research question in the exact form you need.
+""")
 
