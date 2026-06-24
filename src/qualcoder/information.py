@@ -573,7 +573,7 @@ Use these tools to examine how codes relate to one another. They only work with 
 - [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map style view of linked project elements like codes, cases, files, etc. [Help: Graph](qualcoder://help/5.4.-Graph/)
 
 
-## Reports
+## [Reports](qualcoder://menu/reports)
 
 Use these tools when you want summaries, comparisons, counts, charts, or exports for reporting purposes.
 

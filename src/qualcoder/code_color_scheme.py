@@ -324,7 +324,13 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
         # Update code perspective color for filling tree background
         for c in self.codes:
-            color_index = colors.index(c['color'])
+            try:
+                color_index = colors.index(c['color'])
+            except ValueError:
+                # This might rarely occur - maybe from a database edit of the colour, or import from QDPX project?
+                print(f"{c['color']} is not in the list of QualCoder colours")
+                logger.info(f"{c['color']} is not in the list of QualCoder colours")
+                continue
             if self.perspective_idx == 0:
                 c['perspective'] = colors[color_index]
             if self.perspective_idx == 1:
