@@ -94,7 +94,7 @@ class AiHelpIndex:
                     "title": title,
                     "heading": heading,
                     "snippet": snippet_text,
-                    "help_href": f"help:{slug}",
+                    "help_href": f"qualcoder://help/page/{slug}",
                     "score": float(row["score"]) if row["score"] is not None else 0.0,
                 }
             )
@@ -140,7 +140,7 @@ class AiHelpIndex:
             "title": str(row["title"]),
             "source_path": str(row["source_path"]),
             "source_url": str(row["source_url"]),
-            "help_href": f'help:{row["slug"]}',
+            "help_href": f'qualcoder://help/page/{row["slug"]}',
             "text": excerpt,
             "start": start,
             "length": len(excerpt),
@@ -169,7 +169,7 @@ class AiHelpIndex:
                 "title": str(row["title"]),
                 "source_path": str(row["source_path"]),
                 "updated_at": str(row["updated_at"]),
-                "help_href": f'help:{row["slug"]}',
+                "help_href": f'qualcoder://help/page/{row["slug"]}',
             }
             for row in rows
         ]

@@ -8733,6 +8733,35 @@ data collected. This information will accompany every prompt sent to the AI, res
             doc_sel_start=int(start),
             doc_sel_end=int(end)
         )
+
+    def _dispatch_qualcoder_link(self, link: str) -> bool:
+        """Validate AI-generated qualcoder:// links, normalize help page links and
+        delegate the final URL to the main-window handler."""
+
+        url = QtCore.QUrl(link)
+        if not url.isValid() or url.scheme().casefold() != 'qualcoder':
+            return False
+
+        if url.host().casefold() == 'help':
+            path_segments = [segment for segment in url.path().split('/') if segment]
+            if path_segments[:1] == ['pages'] or path_segments[:1] == ['search']:
+                msg = _('This help link is only for internal AI help lookup, not for opening a help page.')
+                Message(self.app, _('AI Chat'), msg, icon='warning').exec()
+                return True
+            if path_segments[:1] == ['page']:
+                if len(path_segments) != 2:
+                    msg = _('Invalid help reference.')
+                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
+                    return True
+                slug = unquote(path_segments[1]).strip().strip('/')
+                if slug == '':
+                    msg = _('Invalid help reference.')
+                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
+                    return True
+                url = QtCore.QUrl(f"qualcoder://help/{quote(slug, safe='-._~')}")
+
+        self.main_window.handle_placeholder_link(url)
+        return True
             
     def on_linkActivated(self, link: str):
 
@@ -8777,15 +8806,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_id, start, length = quote_id.split('_')
                     end = int(start) + int(length)
                     self._open_text_reference(int(source_id), int(start), end)
-            elif link.startswith('help:'):
-                page_path = unquote(link[len('help:'):]).strip().strip('/')
-                if page_path.endswith('.md'):
-                    page_path = page_path[:-3]
-                if page_path == '':
-                    msg = _('Invalid help reference.')
-                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
-                    return
-                self.app.help_wiki(page_path)
+            elif self._dispatch_qualcoder_link(link):
+                return
             elif link.startswith('action:topic_chat_analyze_more'):
                 self.topic_chat_analyze_more()
             elif link.startswith('promptref:'):

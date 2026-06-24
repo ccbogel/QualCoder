@@ -113,7 +113,7 @@ For example, if the user asks you how to approach something, you should do your 
   - `qualcoder://help/search?q=...` to find relevant pages and sections
   - `qualcoder://help/page/{slug}` to read one help page in more detail
 - Help pages are not empirical data. Do NOT use `{REF: "..."}` markup for them.
-- When you refer the user to a help page, include an HTML link of the form `<a href="help:5.1.-AI-chat-based-analysis">AI chat based analysis</a>`. The application will open the correct UI-language version of the help page automatically. You can only reference pages, not text on help pages.
+- When you refer the user to a help page, include an HTML link of the form `<a href="qualcoder://help/page/5.1.-AI-chat-based-analysis">AI chat based analysis</a>`. The application will open the correct UI-language version of the help page automatically. You can only reference pages, not text on help pages.
 - When answering help related questions, skip the short assessment of the users request at the beginning and go directly to the point.
 - If you cannot access the help system or don't find relevant information, say so clearly and don't speculate.
 
