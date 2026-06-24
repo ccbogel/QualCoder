@@ -2810,29 +2810,45 @@ Pour les enquêtes comportant un grand nombre d&apos;entrées (par exemple, plus
 <context>
     <name>Dialog_manage_links</name>
     <message>
-        <location filename="../GUI/ui_dialog_manage_links.py" line="44"/>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="48"/>
         <source>Manage file links</source>
         <translation>Gérer les liens entre les fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_links.py" line="46"/>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="50"/>
         <source>Click on the file name to browse to the correct file location.</source>
         <translation>Cliquez sur le nom du fichier pour naviguer jusqu&apos;à l&apos;emplacement correct du fichier.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_links.py" line="45"/>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="49"/>
         <source>Manage bad links to files</source>
         <translation>Gérer les mauvais liens vers les fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_links.py" line="47"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatic search through folders for the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Recherche automatique du fichier dans les dossiers</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_manage_links.py" line="48"/>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="52"/>
         <source>Search folders</source>
         <translation>Recherche de dossiers</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="51"/>
+        <source>Automatic search through folders for the file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="53"/>
+        <source>Change file path link across all the files.
+This is useful when you have a big change such as copying the project and external files to another computer.
+
+e.g. from C:/users/OldUser/Images to C:/usersNewUser/Images</source>
+        <translation>Modifiez les liens vers les chemins d&apos;accès dans tous les fichiers.
+Cette opération s&apos;avère utile en cas de changement important, comme la copie du projet et des fichiers externes vers un autre ordinateur.
+
+Par exemple, de C:/users/OldUser/Images vers C:/usersNewUser/Images</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_links.py" line="57"/>
+        <source>Bulk change</source>
+        <translation>Modification groupée</translation>
     </message>
 </context>
 <context>
@@ -3013,49 +3029,59 @@ Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, 
 <context>
     <name>Dialog_reportCodeFrequencies</name>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="82"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="85"/>
         <source>Code frequencies</source>
         <translation>Effectifs des codes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="84"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="87"/>
         <source>Export text file</source>
         <translation>Exporter un fichier texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="83"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="86"/>
         <source>Code and category frequencies: overall and by coder</source>
         <translation>Effectifs des codes et des catégories: globale et par codeur·euse</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="87"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="90"/>
         <source>Select files</source>
         <translation>Sélectionner les fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="88"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="91"/>
         <source>Alphabetic ascending</source>
         <translation>Alphabétique ascendant</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="89"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="92"/>
         <source>Totals descending</source>
         <translation>Totaux décroissants</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="86"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="89"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Sélectionner les fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="85"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="88"/>
         <source>Export Excel</source>
         <translation>Exporter un fichier Excel</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="90"/>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="93"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File Attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Attributs du fichier</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="94"/>
+        <source>Show frequencies broken down by where they were coded</source>
+        <translation>Afficher les fréquences ventilées selon le lieu où elles ont été saisies</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_report_code_frequencies.py" line="95"/>
+        <source>Breakdown by source (text / image / A/V)</source>
+        <translation>Répartition par source (texte / image / audio/vidéo)</translation>
     </message>
 </context>
 <context>
@@ -3807,7 +3833,7 @@ Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="544"/>
         <source>Change</source>
-        <translation>Modification</translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="548"/>

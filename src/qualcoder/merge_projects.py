@@ -173,7 +173,25 @@ class MergeProjects:
                 cur_d.execute("select last_insert_rowid()")
                 cid = cur_d.fetchone()[0]
                 code_s['newcid'] = cid
+                code_s['inserted'] = True
                 self.summary_msg += _("Adding code name: ") + code_s['name'] + "\n"
+
+        # Resolve sub-code parents (supercid) for newly inserted codes, by parent code name.
+        # Only inserted codes are touched, so the destination's existing hierarchy is preserved.
+        name_to_newcid = {}
+        for code_s in self.codes_s:
+            if code_s['newcid'] != -1:
+                name_to_newcid.setdefault(code_s['name'], code_s['newcid'])
+        cur_d.execute("select cid, name from code_name")
+        for r in cur_d.fetchall():
+            name_to_newcid.setdefault(r[1], r[0])
+        for code_s in self.codes_s:
+            if code_s.get('inserted') and code_s.get('supercodename'):
+                parent_newcid = name_to_newcid.get(code_s['supercodename'])
+                if parent_newcid is not None and parent_newcid != code_s['newcid']:
+                    cur_d.execute("update code_name set supercid=?, catid=null where cid=?",
+                                  [parent_newcid, code_s['newcid']])
+        self.conn_d.commit()
 
         # Update code_text, code_image, code_av cids to destination values
         for code_s in self.codes_s:
@@ -545,12 +563,12 @@ class MergeProjects:
             if res is not None:
                 cat['supercatname'] = res[0]
         # Code data
-        sql_codenames = "select cid, name, memo, owner, date, color, catid from code_name"
+        sql_codenames = "select cid, name, memo, owner, date, color, catid, supercid from code_name"
         cur_s.execute(sql_codenames)
         res_codes = cur_s.fetchall()
         for i in res_codes:
             code_s = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
-                      "catid": i[6], "catname": None}
+                      "catid": i[6], "catname": None, "supercid": i[7], "supercodename": None}
             self.codes_s.append(code_s)
         # Get and fill category name if code is in a category
         for code_s in self.codes_s:
@@ -558,6 +576,13 @@ class MergeProjects:
             res = cur_s.fetchone()
             if res is not None:
                 code_s['catname'] = res[0]
+        # Fill parent code name if this is a sub-code (nested under another code via supercid)
+        for code_s in self.codes_s:
+            if code_s['supercid'] is not None:
+                cur_s.execute("select name from code_name where cid=?", [code_s['supercid']])
+                res = cur_s.fetchone()
+                if res is not None:
+                    code_s['supercodename'] = res[0]
         # Code text data
         sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
         cur_s.execute(sql_codetext)

@@ -92,11 +92,13 @@ class DialogTextMining(QtWidgets.QDialog):
             'date': row[3], 'memo': row[4], 'supercatid': row[5]})
 
         self.code_names = []
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        # supercid is required so _nest_subcodes_in_tree() can nest sub-codes under their
+        # parent code; without it the helper sees no parents and sub-codes stay top level. <- L
+        cur.execute("select name, memo, owner, date, cid, catid, color, supercid from code_name")
         result = cur.fetchall()
         for row in result:
             self.code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6]})
+            'cid': row[4], 'catid': row[5], 'color': row[6], 'supercid': row[7]})
 
         self.coders = []
         cur.execute("select distinct owner from code_text")
@@ -106,7 +108,7 @@ class DialogTextMining(QtWidgets.QDialog):
             self.coders.append(row[0])
 
         self.sources = []
-        cur.execute("select name, id, file, owner from source order by name")
+        cur.execute("select name, id, fulltext, owner from source order by name")  # columna 'file' renombrada a 'fulltext' en QC actual <- L
         result = cur.fetchall()
         for row in result:
             self.sources.append({'name': row[0], 'id': row[1], 'file': row[2], 'owner': row[3]})
@@ -119,7 +121,7 @@ class DialogTextMining(QtWidgets.QDialog):
             case = {'caseid': row[0], 'name': row[1], 'owner': row[2], 'text': ""}
             self.cases.append(case)
         for case in self.cases:
-            sql = "select fid, selfirst, selend from case_text where caseid = ? order by fid, selfirst"
+            sql = "select fid, pos0, pos1 from case_text where caseid = ? order by fid, pos0"  # selfirst/selend -> pos0/pos1 en QC actual <- L
             cur.execute(sql, [case['caseid'], ])
             result = cur.fetchall()
             for row in result:
@@ -162,6 +164,55 @@ class DialogTextMining(QtWidgets.QDialog):
 
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
+
+    def _nest_subcodes_in_tree(self):
+        """ Re-parent code tree items so sub-codes (supercid) nest under their parent
+        code. Runs after fill_tree has placed every code. Preserves item flags,
+        checkboxes, colour and count because the existing item is moved, not rebuilt.
+        No-op for projects without sub-codes. <- L """
+        tree = getattr(getattr(self, 'ui', None), 'treeWidget', None) or getattr(self, 'tree', None)
+        if tree is None:
+            return
+        code_list = getattr(self, 'code_names', None)
+        if code_list is None:
+            code_list = getattr(self, 'codes', [])
+        supercid_of = {c['cid']: c.get('supercid') for c in code_list}
+        if not any(supercid_of.values()):
+            return
+        guard = 0
+        moved = True
+        while moved and guard < 10000:
+            moved = False
+            guard += 1
+            cid_item = {}
+            it = QtWidgets.QTreeWidgetItemIterator(tree)
+            while it.value():
+                node = it.value()
+                t = node.text(1)
+                if t.startswith('cid:'):
+                    try:
+                        cid_item[int(t[4:])] = node
+                    except ValueError:
+                        pass
+                it += 1
+            for cid_, node in cid_item.items():
+                sup = supercid_of.get(cid_)
+                if sup is None:
+                    continue
+                parent_node = cid_item.get(sup)
+                if parent_node is None or node.parent() is parent_node:
+                    continue
+                cur_parent = node.parent()
+                if cur_parent is None:
+                    idx = tree.indexOfTopLevelItem(node)
+                    taken = tree.takeTopLevelItem(idx)
+                else:
+                    taken = cur_parent.takeChild(cur_parent.indexOfChild(node))
+                parent_node.addChild(taken)
+                parent_node.setExpanded(True)  # show the nested sub-code from the start <- L
+                taken.setExpanded(True)
+                moved = True
+                break
 
     def fill_tree(self):
         ''' Fill tree widget, top level items are main categories and unlinked codes '''
@@ -240,6 +291,7 @@ class DialogTextMining(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
+        self._nest_subcodes_in_tree()  # <- L
 
     def export_selected_file(self):
         ''' Export selected text to a plain text file, filename will have .txt ending '''
@@ -336,7 +388,7 @@ class DialogTextMining(QtWidgets.QDialog):
         # get coded text via selected files
         parameters = []
         if files_selected:
-            sql = "select code_name.name, source.name, selfirst, selend, seltext, code_text.owner from "
+            sql = "select code_name.name, source.name, pos0, pos1, seltext, code_text.owner from "  # selfirst/selend -> pos0/pos1 <- L
             sql += "code_text "
             sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
 
@@ -362,13 +414,13 @@ class DialogTextMining(QtWidgets.QDialog):
         # get coded text via selected cases
         if not files_selected:
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.selfirst, code_text.selend, seltext, code_text.owner from code_text "
+            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from code_text "  # selfirst/selend -> pos0/pos1 <- L
             sql += " join code_name on code_name.cid = code_text.cid "
             sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += " code_text.fid = case_text.fid "
             sql += " where code_name.cid in (" + ','.join(code_ids) + ") "
             sql += " and case_text.caseid in (" + ','.join(ids) + ") "
-            sql += " and (code_text.selfirst >= case_text.selfirst and code_text.selend <= case_text.selend)"
+            sql += " and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"  # selfirst/selend -> pos0/pos1 <- L
 
             # need to group by or can get multiple results
             #sql += " group by cases.name, freecode.name, " + coder + ".selfirst, " + coder + ".selend"

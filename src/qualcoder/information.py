@@ -21,14 +21,97 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtWidgets, QtCore
+import html
+from markdown_it import MarkdownIt
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import logging
+import qtawesome as qta
+import re
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+tab_info_markdown_renderer = MarkdownIt("commonmark")
+help_link_pattern = re.compile(r'(<a href="qualcoder://help/[^"]*">)', re.IGNORECASE)
+menu_link_pattern = re.compile(r'(<a href="qualcoder://menu/[^"]*">)', re.IGNORECASE)
+action_link_pattern = re.compile(r'(<a href="qualcoder://action/[^"]*">)', re.IGNORECASE)
+first_h1_pattern = re.compile(r"<h1>(.*?)</h1>", re.IGNORECASE | re.DOTALL)
+
+
+def _qtawesome_icon_data_uri(icon_name, color, size=16, y_offset=0):
+    """Render a qtawesome icon as a PNG data URI for rich text."""
+
+    icon = qta.icon(icon_name, color=color)
+    source_pixmap = icon.pixmap(size, size)
+    canvas_width = size
+    canvas_height = size + (y_offset // 2)
+    pixmap = QtGui.QPixmap(canvas_width, canvas_height)
+    pixmap.fill(QtCore.Qt.GlobalColor.transparent)
+    painter = QtGui.QPainter(pixmap)
+    painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform, True)
+    painter.drawPixmap(0, y_offset, source_pixmap)
+    painter.end()
+    byte_array = QtCore.QByteArray()
+    buffer = QtCore.QBuffer(byte_array)
+    buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+    pixmap.save(buffer, "PNG")
+    buffer.close()
+    encoded = bytes(byte_array.toBase64()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
+def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_font_size, doc_font_family, heading_icon_name=None):
+    """Render placeholder tab Markdown to HTML, including link decoration, etc.
+    """
+
+    icon_size = round(doc_font_size * 2)
+    rendered_html = tab_info_markdown_renderer.render(markdown_text)
+    help_icon_uri = _qtawesome_icon_data_uri("mdi.help-circle-outline", highlight_color, size=icon_size)
+    menu_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-outline", highlight_color, size=icon_size)
+    action_icon_uri = _qtawesome_icon_data_uri("mdi.cursor-default-click-outline", highlight_color, size=icon_size)
+    help_icon_html = (
+        f'<img src="{help_icon_uri}" width="{icon_size}" height="{icon_size}" '
+        'style="vertical-align: middle; margin-right: 0.3em;" />'
+    )
+    menu_icon_html = (
+        f'<img src="{menu_icon_uri}" width="{icon_size}" height="{icon_size}" '
+        'style="vertical-align: middle; margin-right: 0.3em;" />'
+    )
+    action_icon_html = (
+        f'<img src="{action_icon_uri}" width="{icon_size}" height="{icon_size}" '
+        'style="vertical-align: middle; margin-right: 0.3em;" />'
+    )
+    rendered_html = help_link_pattern.sub(rf"\1{help_icon_html}", rendered_html)
+    rendered_html = menu_link_pattern.sub(rf"\1{menu_icon_html}", rendered_html)
+    rendered_html = action_link_pattern.sub(rf"\1{action_icon_html}", rendered_html)
+    if heading_icon_name:
+        heading_size = max(64, icon_size * 4)
+        heading_offset = max(4, round(heading_size * 0.28))
+        heading_width_em = heading_size / (heading_size + heading_offset)
+        heading_icon_uri = _qtawesome_icon_data_uri(
+            heading_icon_name,
+            highlight_color,
+            size=heading_size,
+            y_offset=heading_offset,
+        )
+        heading_icon_html = (
+            f'<img src="{heading_icon_uri}" '
+            f'style="width: {heading_width_em:.3f}em; height: 1em; margin-right: 0.25em;" />'
+        )
+        rendered_html = first_h1_pattern.sub(rf"<h1>{heading_icon_html}\1</h1>", rendered_html, count=1)
+    safe_font_family = html.escape(doc_font_family, quote=True)
+    return (
+        "<style>"
+        f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; margin: 0; color: {text_color}; }}"
+        f"p, li {{ font-size: {doc_font_size}pt; margin: 0 0 0.1em 0; }}"
+        f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 2em -0.5em 0.5em 0; }}"
+        f"h2 {{ font-size: {doc_font_size + 4}pt; font-weight: normal; margin: 1.5em 0 0.5em 0; }}"
+        f"h3 {{ font-size: {doc_font_size + 2}pt; font-weight: normal; font-style: italic; margin: 0.8em 0 0.3em 0; }}"
+        "</style>"
+        + f'<div style="margin-left: 20px; margin-right: 20px;">{rendered_html}</div>'
+    )
 
 
 class DialogInformation(QtWidgets.QDialog):
@@ -41,9 +124,14 @@ class DialogInformation(QtWidgets.QDialog):
          view_graph_original.ViewGraphOriginal.circular_graph.TextGraphicsItem
     """
 
-    def __init__(self, app, title, html=""):
+    def __init__(self, app, title, html_string=""):
         """Display information text in dialog.
-        If no html is given, fill with About html. """
+        If no html is given, fill with About html.
+        Args:
+            app: App object
+            title: String
+            html_string: html string for contents
+        """
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
@@ -54,19 +142,22 @@ class DialogInformation(QtWidgets.QDialog):
         self.text = ""
         self.information = ""
         self.setWindowTitle(title)
-        if html == "":
+        if html_string == "":
             qualcoder_tag = app.version.split("QualCoder ")[1]
             about_modifed = about.replace("QualCoderVersion", app.version)
             about_modifed = about_modifed.replace("QualCoderTag", qualcoder_tag)
             self.setHtml(about_modifed)
         else:
-            self.setHtml(html)
+            self.setHtml(html_string)
 
-    def setHtml(self, html):
+    def setHtml(self, html_string):
         """This method is used to populate the textEdit.
-        Usually called from a View_graph TextGraphicsItem via a context menu. """
+        Usually called from a View_graph TextGraphicsItem via a context menu.
+        Args:
+            html_string: string of html
+        """
 
-        self.text = html
+        self.text = html_string
         self.ui.textEdit.setHtml(self.text)
 
     def accept(self):
@@ -313,6 +404,8 @@ Ctrl 4 {_("Filter files by attributes")}<br />\
 Ctrl 9 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
 A {_("Annotate - for current selection")}<br />\
+B <br />\
+Shift B <br />\
 C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 G {_("Assign segment to currently selected code, and open memo for segment.")}<br />\
 I {_("Tag important")}<br />\
@@ -341,214 +434,169 @@ Ctrl + Enter {_("Run SQL query")}<br />'
 coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
 
-manage_tab_info = '''
-<!DOCTYPE html>
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title></title>
-	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
-	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
-	<meta name="changed" content="2026-06-14T11:17:58.643329100"/>
-	<style type="text/css">
-		@page { size: 21cm 29.7cm; margin: 2cm }
-		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
-		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
-		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
-		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
-		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
-		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
-		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
-		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
-		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
-		a:link { color: #000080; text-decoration: underline }
-		a:visited { color: #800000; text-decoration: underline }
-	</style>
-</head>
-<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
-Manage tab</h1>
-<p style="line-height: 100%; margin-bottom: 0cm">The manage tab
-displays cases, files, attributes and references. Use the Manage menu
-above to organise files, cases (collections of files), write
-journals. Manage file, case and journal attributes (variables).
-Import and assign references to files. Edit incorrect links to files
-located outside the project folder.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+def manage_tab_info():
+    """Return translated Markdown for the Manage tab placeholder."""
 
-</p>
-<h2 class="western">Manage files</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">The Manage Files
-menu option allows you to add, and remove files in a QualCoder
-project. You can also import a survey, through this menu option.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">Before importing any
-text files, you might to create pseudonyms to protect the privacy of
-people or organisations. This is set up through the Pseudonym button.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">If you are beginning
-with QualCoder, open the Examples folder and import the following
-text and image files: ID1.docx, ID2.odt, seascape.jpg</p>
-<p style="line-height: 100%; margin-bottom: 0cm">Once imported, open
-each to view the file, by double-clicking on the file name, or by
-right-click on the name and selecting view from the many options. See
-that ID2.docx contains a name – Joe Bloggs. Test the
-pseudonymisation function by deleting the ID2.odt file. Before
-importing again, click the Pseudonymise button and add Joe Bloggs, by
-typing the name and pressing the plus button. Click OK to exit. Then
-import ID2.odt again. View the file and see the automatic change
-applied to the name.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">You can add
-attributes (variables) to the files by clicking the (x) button. Add a
-character variable called location. And fill out that column with a
-location, such city names.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.2.-Files/">Manage
-Files - QualCoder</a> 
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+    return _("""# Manage
 
-</p>
-<h2 class="western">Manage Cases</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">A case is a
-collection of files on a topic, or related to a person. Not all
-projects need to use cases.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.3.-Cases/">Manage
-cases - QualCoder</a> 
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+The Manage tab displays workspaces for organising cases, files, attributes, journals, and references.
+Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among them.
 
-</p>
-<h2 class="western">Manage Journals</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">Journals are used to
-record your thoughts when coding. The journals window pops up
-separately from the main window, so you can quickly move from one to
-the other when writing a journal.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/5.2.-Journals/">Journals
-– QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
 
-</p>
-<h2 class="western">Manage attributes</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">Files cases and
-journal can have attributes (variables) describing their purpose.
-Variables can be created, renamed and deleted here.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="https://qualcoder.org/doc/en/3.4.-Attributes/">Attributes
-– QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+## [Manage Files](qualcoder://menu/files_and_cases/manage_files)
 
-</p>
-<h2 class="western">Manage references</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">References can be
-imported from NBIB and RIS formats. Try importing the
-bibliography.ris file from the Examples folder. Assign a refernce to
-a file, by selecting the reference row, selecting the file and
-pressing the Link key.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+- This menu lets you add and remove empirical data in your project.
+- You can import plain text and many other document types,
+including PDFs, images, audio, and video.
+- You may also import survey data.
+- Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.
+- [Help: Import files](qualcoder://help/3.2.-Files/)
 
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
 
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)
 
-</p>
-</body>
-</html>
-'''
+- You can use cases to group files together that are related to a topic, person, organisation, or any other empirical entity in your study. 
+- This can be useful for organising your data and for running reports on specific groups of files.
+- [Help: Cases](qualcoder://help/3.3.-Cases/)
 
-coding_tab_info = '''
-<!DOCTYPE html>
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title></title>
-	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
-	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
-	<meta name="changed" content="2026-06-16T09:09:04.124392600"/>
-	<style type="text/css">
-		@page { size: 21cm 29.7cm; margin: 2cm }
-		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
-		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
-		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
-		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
-		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
-		a:link { color: #000080; text-decoration: underline }
-		a:visited { color: #800000; text-decoration: underline }
-	</style>
-</head>
-<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
-Coding tab</h1>
-<p style="line-height: 100%; margin-bottom: 0cm">The coding tab
-displays the coding area for coding text, images, audio/video and
-PDFs. Depending on the files loaded in Manage Files, select a menu
-option above to begin coding text, images, audio/video or PDFs.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.1.-Coding-Text/">Coding
-Text – QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.3.-Coding-Text-on-PDFs/">Coding
-PDFs – QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.4.-Coding-Images/">Coding
-images – QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.5.-Coding-Audio-and-Video/">Coding
-audio and video – QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/4.2.-AI-Assisted-Coding/">AI
-Assisted Coding - QualCoder</a> 
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm">Additionally there
-are menu options for organising the codes and changing the colour
-scheme,</p>
-</body>
-</html>
-'''
 
-reports_tab_info = '''
-<!DOCTYPE html>
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title></title>
-	<meta name="generator" content="LibreOffice 26.2.3.2 (Windows)"/>
-	<meta name="created" content="2026-06-13T17:04:39.992368600"/>
-	<meta name="changed" content="2026-06-16T09:49:22.649405100"/>
-	<style type="text/css">
-		@page { size: 21cm 29.7cm; margin: 2cm }
-		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
-		h1 { margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
-		h1.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 18pt }
-		h1.cjk { font-size: 18pt; font-family: "Microsoft YaHei"; font-weight: bold }
-		h1.ctl { font-family: "Lucida Sans"; font-size: 18pt; font-weight: bold }
-		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
-		h2.western { font-family: "Liberation Sans", sans-serif; font-weight: bold; font-size: 16pt }
-		h2.cjk { font-size: 16pt; font-family: "Microsoft YaHei"; font-weight: bold }
-		h2.ctl { font-family: "Lucida Sans"; font-size: 16pt; font-weight: bold }
-		a:link { color: #000080; text-decoration: underline }
-		a:visited { color: #800000; text-decoration: underline }
-	</style>
-</head>
-<body lang="en-AU" link="#000080" vlink="#800000" dir="ltr"><h1 class="western">
-Reports tab</h1>
-<p style="line-height: 100%; margin-bottom: 0cm">The reports tab
-displays analyses and report summaries. Select from the Analysis and
-Reports menus.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.3.-Reports/">Reports
-menu options – QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)
 
-</p>
-<h2 class="western">Analysis menu</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">The analysis menu
-has options of Code retrieval, co-occurrence and exact matches. The
-graph option is a way to visualise the coding through the development
-of mind maps.</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><a href="http://qualcoder.org/doc/en/5.4.-Graph/">Graph
-– QualCoder</a></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+- Journals are used to record your thoughts when coding and analysing data. 
+- The journal window opens separately from the main window so you can move between them easily.
+- [Help: Journals](qualcoder://help/5.2.-Journals/)
 
-</p>
-<h2 class="western">Reports menu</h2>
-<p style="line-height: 100%; margin-bottom: 0cm">The menu options
-list: coder comparisons, overall and by file. Code counts overall or
-by file or case. Code and file summaries. Charts for pie charts, bar
-charts, treemaps, sunbursts, heatmaps and word clouds. Another option
-is Database queries where you can directly interact with the
-underlying database.</p>
-</body>
-</html>
-'''
+
+## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)
+
+- Files, cases, and journals can have attributes (variables) that describe their characteristics. 
+- They can be used to filter and organise data, and to run reports based on specific criteria. 
+- Use this menu to create and manage such attributes. They can be attached to files, cases, and journals directly in the respective workspaces. 
+- [Help: Attributes](qualcoder://help/3.4.-Attributes/)
+
+
+## [Manage References](qualcoder://menu/files_and_cases/manage_references)
+
+- Bibliographic references can be imported from NBIB and RIS files.
+- After that, references can be linked to files in the project.
+- [Help: Import References](qualcoder://help/6.1.-Imports-and-Exports/)
+""")
+
+
+def coding_tab_info():
+    """Return translated Markdown for the Coding tab placeholder."""
+
+    return _("""# Coding
+
+The Coding tab displays workspaces for coding text, PDFs, images, audio, and video.
+Use the [Coding menu](qualcoder://menu/coding) to select an option to begin. 
+Note that you can only open a particular coding workspace if that type of data is actually present in the current project. 
+
+
+## [Code Text](qualcoder://menu/coding/codes)
+
+- Use this workspace to read textual data closely and assign codes to selected passages.
+- You can organise codes in a tree, add memos and annotations, create bookmarks, and mark especially useful segments as important.
+- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)
+
+
+## [Code Images](qualcoder://menu/coding/code_image)
+
+- In this workspace, you can select regions in photographs, diagrams, screenshots, or other visual material and assign codes to them.
+- Coded areas are displayed as coloured rectangles linked to your code system.
+- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)
+
+
+## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)
+
+- Use this workspace to transcribe and/or code time-based media such as interviews, focus groups, and field recordings.
+- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)
+
+
+## [Code PDFs](qualcoder://menu/coding/code_pdf)
+
+- This workspace allows you to code text directly in PDF documents when you want to keep the original page layout in view.
+- This is useful for articles, reports, and other source material where page position and formatting matter.
+- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)
+
+
+## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)
+
+- This loads a variant of the text coding workspace that uses AI to explore your data and suggest segments for a selected code.
+- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)
+
+
+## [Code Organiser](qualcoder://menu/coding/code_organiser)
+
+- Use this workspace to reorganise your code system using a graphical, mind-map style interface.
+- You can move, merge, and rename codes and categories as your analytic structure becomes clearer.
+- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)
+
+
+## [Colour Scheme](qualcoder://menu/coding/colour_scheme)
+
+- This allows you to change the colour scheme of your codes and categories. 
+- Special schemes for colour-blind users are available. 
+""")
+
+
+def reports_tab_info():
+    """Return translated Markdown for the Reports tab placeholder."""
+
+    return _("""# Reports tab
+
+This tab displays tools from both the [Analysis](qualcoder://menu/analysis) and [Reports](qualcoder://menu/reports) menus.
+
+
+## [Analysis](qualcoder://menu/analysis)
+
+Use these tools when you want to explore coded segments and relationships in detail.
+
+[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)
+
+
+### Retrieval and segment-based analysis
+
+These tools help you inspect the actual coded material in your project.
+
+- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible analysis tool. It gathers all segments for selected codes or categories and lets you narrow the results by file, case, attributes, or search text.
+- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) generates a table with text segments and all associated codes.
+
+
+### Code relationships and overlaps
+
+Use these tools to examine how codes relate to one another. They only work with text files.
+
+- [Code relations](qualcoder://menu/analysis/code_relations) shows proximity, overlap, inclusion, and exact matches between selected codes.
+- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses on where two codes overlap or directly touch.
+- [Code text exact matches](qualcoder://menu/analysis/code_text_exact_matches) lists passages where different codes were applied to exactly the same text.
+- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map style view of linked project elements like codes, cases, files, etc. [Help: Graph](qualcoder://help/5.4.-Graph/)
+
+
+## Reports
+
+Use these tools when you want summaries, comparisons, counts, charts, or exports for reporting purposes.
+
+[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)
+
+
+### Inter-Coder Comparisons
+
+- [Coding comparison](qualcoder://menu/reports/coding_comparison) and [Coding comparison by file](qualcoder://menu/reports/coding_comparison_by_file) are especially useful for collaborative work and inter-coder checking.
+
+
+### Summaries, frequencies, and charts
+
+These reports summarise patterns across the project rather than showing every coded segment in detail.
+
+- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how often codes and categories have been used.
+- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) gives a compact overview of where selected codes appear most often.
+- [File summary](qualcoder://menu/reports/file_summary) and [Code summary](qualcoder://menu/reports/code_summary) give focused overviews of one file or one code at a time.
+- [Charts](qualcoder://menu/reports/charts) visualises distributions and comparisons with diagrams such as bar charts, treemaps, and heatmaps.
+
+
+### Advanced reporting
+
+- [Database queries](qualcoder://menu/reports/sql_statements) gives direct access to the project database for custom analyses. This is most useful when the standard reports do not answer a specific research question in the exact form you need.
+""")
 

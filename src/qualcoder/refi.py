@@ -147,7 +147,7 @@ class RefiImport:
                 code_elements = list(child)  # list of children of child element
                 for el_ in code_elements:
                     # Recursive search through each Code element
-                    counter += self.sub_codes(child, None)
+                    counter += self.sub_codes(el_, None)  # <- L (pre-existing: pass each Code, not the <Codes> container)
                 msg = str(counter) + _(" categories and codes imported from ") + self.file_path
                 Message(self.app, _("Codebook imported"), msg).exec()
                 self.parent_textedit.append(msg)
@@ -155,22 +155,28 @@ class RefiImport:
         self.parent_textedit.append(_("Codebook not imported. "))
         Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec()
 
-    def sub_codes(self, parent, cat_id) -> int:
+    def sub_codes(self, parent, cat_id, super_cid=None) -> int:
         """ Get subcode elements, if any.
         Determines whether the Code is a Category item or a Code item.
-        Uses the parent entered cat_id ot give a Code a category alignment,
-        or if a category, gives the category alignment to a super_category.
-        Called from: import_project, import_codebook
 
-        Some software e.g. MAXQDA, Nvivo categories are also codes
-        in this case QualCoder will create a category, and also a code with the same name underneath that category.
+        Per the REFI-QDA standard, isCodable defaults to true; a node is treated as a
+        CATEGORY only when it is explicitly isCodable="false". A codable node - even one
+        that contains child Code elements - is a CODE, and its codable children are
+        imported as sub-codes (code_name.supercid), reconstructing the nested-code
+        hierarchy rather than flattening it into a category plus a mirror code.
+
+        Linkage passed down the recursion:
+          - cat_id    : parent category id (code_cat.catid) when the parent is a category
+          - super_cid : parent code id (code_name.cid) when the parent is a code
+        A code is linked to its parent code (super_cid) if present, otherwise to its
+        parent category (cat_id); the two are mutually exclusive.
 
         Recursive, until no more child Codes found.
-        Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
+        Called from: import_project, import_codebook
         Note: urn difference between codebook.qdc and project.qdpx
 
         Args:
-            parent element, cat_id
+            parent element, cat_id, super_cid
         Return:
             counter of inserted codes and categories
         """
@@ -184,22 +190,21 @@ class RefiImport:
                           f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
                 description = el.text
 
-        # Determine if the parent is a code or a category
-        # if parent has Code element children, so must be a category, insert into code_cat table
-        is_category = False
+        # Child Code elements (potential sub-codes or sub-categories)
+        child_code_elements = []
         for el in elements:
             if el.tag in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Code",
                           f"{{urn:QDA-XML:project:{self.xmlns_version}}}Code"):
-                is_category = True
-        # if parent does not have Code element children and isCodable is false, it must be a category
-        if parent.get("isCodable") == "false":
-            is_category = True
+                child_code_elements.append(el)
+
+        # A node is a category only if explicitly non-codable. Everything else is a code.
+        is_category = parent.get("isCodable") == "false"
+
         if is_category:
             last_insert_id = None
             name = parent.get("name")
             if name is not None:
                 cur = self.app.conn.cursor()
-                # Insert this category into code_cat table
                 try:
                     cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)",
                                 [name, description, now_date, cat_id])
@@ -208,83 +213,57 @@ class RefiImport:
                     last_insert_id = cur.fetchone()[0]
                     counter += 1
                 except sqlite3.IntegrityError:
-                    pass
-                # This category may ALSO be a code (e.g. MAXQDA has categories as codes also)
-                # So create a code for this codable category
-                is_codable = parent.get("isCodable")
-                if is_codable == "true":
-                    color = parent.get("color")
-                    if color is None:
-                        color = colors[randint(0, 119)]
-                    else:
-                        # Convert other software hex color to a similar one listed in color_selector.py
-                        color = color_matcher(color)
+                    # Category name already exists - reuse its catid so children still nest
                     try:
-                        # print(is_codable, name, "inserting into code name")
-                        cur = self.app.conn.cursor()
-                        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
-                                    [name, description, now_date, last_insert_id, color])
-                        self.app.conn.commit()
-                        cur.execute("select last_insert_rowid()")
-                        code_last_insert_id = cur.fetchone()[0]
-                        self.codes.append({'guid': parent.get('guid'), 'cid': code_last_insert_id})
-                        counter += 1
-                    except sqlite3.IntegrityError:
+                        cur.execute("select catid from code_cat where name=?", [name])
+                        row = cur.fetchone()
+                        if row is not None:
+                            last_insert_id = row[0]
+                    except sqlite3.Error:
                         pass
-            for el in elements:
-                if el.tag not in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
-                                  f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
-                    counter += self.sub_codes(el, last_insert_id)
-                    # print("tag:", el.tag, el.text, el.get("name"), el.get("color"), el.get("isCodable"))
+            # Children of a category attach to the category (cat_id), never to a code
+            for el in child_code_elements:
+                counter += self.sub_codes(el, last_insert_id, None)
             return counter
 
-        # No children and no Description child element so, insert this code into code_name table
-        if is_category is False and elements == []:
-            name = parent.get("name")
-            # print("No children or description ", name)
-            color = parent.get("color")
-            if color is None:
-                color = colors[randint(0, 119)]
-            else:
-                # Convert other software hex color to a similar one listed in color_selector.py
-                color = color_matcher(color)
+        # Otherwise this is a codable Code (a leaf, or a code with sub-codes)
+        name = parent.get("name")
+        color = parent.get("color")
+        if color is None:
+            color = colors[randint(0, 119)]
+        else:
+            # Convert other software hex color to a similar one listed in color_selector.py
+            color = color_matcher(color)
+        # A code nested under a parent code uses supercid; otherwise it sits in a category.
+        if super_cid is not None:
+            link_catid = None
+            link_supercid = super_cid
+        else:
+            link_catid = cat_id
+            link_supercid = None
+        code_insert_id = None
+        if name is not None:
+            cur = self.app.conn.cursor()
             try:
-                cur = self.app.conn.cursor()
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
-                            [name, description, now_date, cat_id, color])
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,'',?,?,?,?)",
+                            [name, description, now_date, link_catid, color, link_supercid])
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
-                last_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
+                code_insert_id = cur.fetchone()[0]
+                self.codes.append({'guid': parent.get('guid'), 'cid': code_insert_id})
                 counter += 1
             except sqlite3.IntegrityError:
-                pass  # Code name already exists
-            return counter
-
-        # One child, a description so, insert this code into code_name table
-        if is_category is False and len(elements) == 1 and elements[0].tag in (
-                f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
-                f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
-            name = parent.get("name")
-            # print("Only a description child: ", name)
-            color = parent.get("color")
-            if color is None:
-                color = colors[randint(0, 119)]
-            else:
-                # Convert other software hex color to a similar one listed in color_selector.py
-                color = color_matcher(color)
-            try:
-                cur = self.app.conn.cursor()
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
-                            [name, description, now_date, cat_id, color])
-                self.app.conn.commit()
-                cur.execute("select last_insert_rowid()")
-                last_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
-                counter += 1
-            except sqlite3.IntegrityError:
-                pass
-            return counter
+                # Code name already exists - reuse its cid so children can still nest under it
+                try:
+                    cur.execute("select cid from code_name where name=?", [name])
+                    row = cur.fetchone()
+                    if row is not None:
+                        code_insert_id = row[0]
+                except sqlite3.Error:
+                    pass
+        # Child Codes of a codable code become its sub-codes (supercid)
+        for el in child_code_elements:
+            counter += self.sub_codes(el, None, code_insert_id)
         return counter
 
     def import_project(self):
@@ -346,12 +325,18 @@ class RefiImport:
         self.pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         self.pd_value = 0
 
+        contents = os.listdir(self.folder_name)
+        # Not all proejcts has a project.qde, it may have another name.qde
+        projectqde = "project.qde"
+        for c in contents:
+            if pathlib.Path(c).suffix == ".qde":
+                projectqde = c
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(self.folder_name + "/project.qde", "r", encoding="utf8") as xml_file:
+        with open(os.path.join(self.folder_name, projectqde), "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
         '''result = self.xml_validation("project")
         self.parent_textedit.append(f"Project XML parsing successful: {result}")'''
-        tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
+        tree = etree.parse(os.path.join(self.folder_name, projectqde))  # get element tree object
         # Look for xmlns version. Have found 1.0, 0:4
         root = tree.getroot()
         for child in root:
@@ -2004,14 +1989,14 @@ class RefiExport(QtWidgets.QDialog):
 
     def export_project(self):
         """ Create a REFI-QDA project folder project.qdpx zipfile
-        This contains the .qde project xml and a Sources folder.
+        This contains the .qde project xml and a sources folder.
 
         Source types:
         Plain text, PDF,md, odt, docx, md, epub
         Images must be jpeg or png
         mp3, ogg, mp4, mov, wav
 
-        Create an unzipped folder with a /Sources folder and project.qde xml document
+        Create an unzipped folder with a /sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
 
         #TODO put file variables inside Cases.Case elements as with Quirkos
@@ -2025,13 +2010,16 @@ class RefiExport(QtWidgets.QDialog):
             pass
         try:
             os.mkdir(prep_path)
-            os.mkdir(os.path.join(prep_path, "Sources"))
+            # REFI-QDA standard (section 8.1) requires the sources folder to be named
+            # "sources" (lowercase). ZIP entries are case-sensitive, so other software
+            # (e.g. ATLAS.ti) rejects the project if the folder is capitalised.
+            os.mkdir(os.path.join(prep_path, "sources"))
         except Exception as err:
             logger.error(_("Project export error ") + str(err))
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
             return
         try:
-            with open(os.path.join(prep_path, 'project.qde'), 'w', encoding='utf-8-sig') as f:
+            with open(os.path.join(prep_path, 'project.qde'), 'w', encoding='utf-8') as f:  # FIX: era 'utf-8-sig' (anadia BOM antes de <?xml)
                 f.write(self.xml)
         except Exception as err:
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
@@ -2046,7 +2034,7 @@ class RefiExport(QtWidgets.QDialog):
         txt_errors = ""
         for s in self.sources:
             # print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
-            destination = f"/Sources/{s['filename']}"
+            destination = f"/sources/{s['filename']}"
             if s['mediapath'] is not None and s['mediapath'] != "" and s['external'] is None:
                 # print("Source\n", self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"))
                 # print("dest\n", prep_path + destination)
@@ -2067,7 +2055,7 @@ class RefiExport(QtWidgets.QDialog):
             # Also need to export a plain text file as a source
             # plaintext has different guid from richtext, and also might be associated with media - eg transcripts
             if s['plaintext_filename'] is not None:
-                with open(os.path.join(prep_path, 'Sources', s['plaintext_filename']), "w", encoding="utf-8-sig") as f:
+                with open(os.path.join(prep_path, 'sources', s['plaintext_filename']), "w", encoding="utf-8-sig") as f:
                     try:
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
@@ -2078,7 +2066,7 @@ class RefiExport(QtWidgets.QDialog):
                         print(err)
 
         for notefile in self.note_files:
-            with open(os.path.join(prep_path, 'Sources', notefile[0]), "w", encoding="utf-8-sig") as f:
+            with open(os.path.join(prep_path, 'sources', notefile[0]), "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -2540,13 +2528,20 @@ class RefiExport(QtWidgets.QDialog):
             # Text document
             if ((s['mediapath'] is None) and (s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')) or \
                     (s['mediapath'] is not None and s['mediapath'][0:6] == '/docs/' and (
-                            s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
+                            s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')):  # FIX: era 'or' (dejaba pasar PDFs a TextSource)
                 xml += '<TextSource '
-                if s['external'] is None:
-                    # Internal filename is a guid identifier
-                    xml += f'richTextPath="internal://{s["filename"]}" '
-                else:
-                    xml += f'richTextPath="absolute://{html.escape(s["external"])}" '
+                # Only declare a richTextPath for a genuine rich-text file (e.g. docx/odt/rtf).
+                # For a plain-text source the "rich" file would be a .txt, which other software
+                # (e.g. ATLAS.ti) tries to parse as rich text; it fails, loads an empty document
+                # and rejects the whole import ("range start larger than document length").
+                # In that case emit only plainTextPath, exactly as MAXQDA does.
+                rich_name = s['external'] if s['external'] is not None else s['filename']
+                if rich_name is not None and not rich_name.lower().endswith('.txt'):
+                    if s['external'] is None:
+                        # Internal filename is a guid identifier
+                        xml += f'richTextPath="internal://{s["filename"]}" '
+                    else:
+                        xml += f'richTextPath="absolute://{html.escape(s["external"])}" '
                 # Internal filename is a guid identifier
                 xml += f'plainTextPath="internal://{s["plaintext_filename"]}" '
                 xml += f'creatingUser="{self.user_guid(s["owner"])}" '
@@ -2557,17 +2552,19 @@ class RefiExport(QtWidgets.QDialog):
                 if memo != "":
                     xml += f"<Description>{memo}</Description>\n"
                 xml += self.text_selection_xml(s['id'])
-                xml += self.source_variables_xml(s['id'])
+                # REFI-QDA TextSourceType sequence requires NoteRef BEFORE VariableValue
                 for a in self.annotations:
                     if a['fid'] == s['id']:
                         a['NoteRef_guid'] = self.create_guid()
                         xml += f'<NoteRef targetGUID="{a["NoteRef_guid"]}" />\n'
                         break
+                xml += self.source_variables_xml(s['id'])
                 xml += '</TextSource>\n'
             # PDF document
             if (s['mediapath'] is None and s['name'][-4:].lower() == '.pdf') or \
-                    (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and s['name'][
-                                                                                       -4:].lower() == '.pdf'):
+                    (s['mediapath'] is not None
+                     and (s['mediapath'].startswith('/docs/') or s['mediapath'].startswith('docs:'))
+                     and s['name'][-4:].lower() == '.pdf'):  # FIX: antes solo 'docs:', el PDF venia como '/docs/'
                 xml += '<PDFSource '
                 if s['external'] is None:
                     # Internal filename is a guid identifier
@@ -2769,7 +2766,7 @@ class RefiExport(QtWidgets.QDialog):
             if code_guid != "":
                 xml += f'<CodeRef targetGUID="{code_guid}"/>\n'
             xml += '</Coding>\n'
-            xml += f"</{mediatype}'Selection>\n"
+            xml += f"</{mediatype}Selection>\n"  # FIX: la etiqueta de cierre llevaba un apostrofo intruso que rompia el XML
         return xml
 
     def transcript_xml(self, source):
@@ -3114,11 +3111,11 @@ class RefiExport(QtWidgets.QDialog):
 
         self.codes = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color, supercid from code_name")
         result = cur.fetchall()
         for row in result:
             c = {'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3].replace(' ', 'T'),
-                 'cid': row[4], 'catid': row[5], 'color': row[6], 'guid': self.create_guid()}
+                 'cid': row[4], 'catid': row[5], 'color': row[6], 'supercid': row[7], 'guid': self.create_guid()}
             xml = f'<Code guid="{c["guid"]}" '
             xml += f'name="{html.escape(c["name"])}" '
             xml += 'isCodable="true" '
@@ -3132,6 +3129,28 @@ class RefiExport(QtWidgets.QDialog):
                 xml += ' />\n'
             c['xml'] = xml
             self.codes.append(c)
+
+    def code_xml(self, code_):
+        """ Recursive XML for a code and any sub-codes nested under it (supercid).
+        A code with children is exported as <Code isCodable="true"> ... </Code>
+        containing its child <Code> elements - valid REFI-QDA understood by other QDA software. """
+
+        children = [c for c in self.codes if c.get('supercid') == code_['cid']]
+        memo = html.escape(code_['memo'])
+        xml = f'<Code guid="{code_["guid"]}" '
+        xml += f'name="{html.escape(code_["name"])}" '
+        xml += 'isCodable="true" '
+        xml += f'color="{code_["color"]}"'
+        if memo == "" and not children:
+            xml += ' />\n'
+            return xml
+        xml += '>\n'
+        if memo != "":
+            xml += f"<Description>{memo}</Description>\n"
+        for child in children:
+            xml += self.code_xml(child)
+        xml += '</Code>\n'
+        return xml
 
     def get_categories(self):
         """ get categories and assign guid.
@@ -3161,10 +3180,10 @@ class RefiExport(QtWidgets.QDialog):
         xml += '<Codes>\n'
         cats = copy(self.categories)
 
-        # Add unlinked codes as top level items
+        # Add unlinked codes as top level items (codes without a category AND without a parent code)
         for code_ in self.codes:
-            if code_['catid'] is None:
-                xml += code_['xml']
+            if code_['catid'] is None and code_.get('supercid') is None:
+                xml += self.code_xml(code_)
         # Add top level categories
         for ca in cats:
             if ca['supercatid'] is None and ca['examine']:
@@ -3176,10 +3195,10 @@ class RefiExport(QtWidgets.QDialog):
                 memo = html.escape(ca['memo'])
                 if memo != "":
                     xml += f"<Description>{memo}</Description>\n"
-                # Add codes in this category
+                # Add codes in this category (each emits its own sub-codes recursively)
                 for code_ in self.codes:
                     if code_['catid'] == ca['catid']:
-                        xml += code_['xml']
+                        xml += self.code_xml(code_)
                 xml += self.add_sub_categories(ca['catid'], cats)
                 xml += '</Code>\n'
         xml += '</Codes>\n'
@@ -3210,10 +3229,10 @@ class RefiExport(QtWidgets.QDialog):
                     if memo != "":
                         xml += f"<Description>{memo}</Description>\n"
                     xml += self.add_sub_categories(c['catid'], cats)
-                    # add codes
+                    # add codes (each emits its own sub-codes recursively)
                     for co in self.codes:
                         if co['catid'] == c['catid']:
-                            xml += co['xml']
+                            xml += self.code_xml(co)
                     xml += '</Code>\n'
 
             # Are there any categories remaining to examine

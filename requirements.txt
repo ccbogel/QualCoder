@@ -5,6 +5,7 @@ diff-match-patch
 EbookLib
 emoji
 matplotlib
+markdown-it-py
 network
 odfpy
 openpyxl

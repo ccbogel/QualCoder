@@ -478,6 +478,17 @@ class ViewCharts(QDialog):
             for code in self.codes:
                 if code['catid'] == cat['catid']:
                     selected_codes.append(code)
+        # Include descendant sub-codes (supercid) of the selected codes, cascading, so a
+        # category selection also charts the sub-codes nested under its codes. <- L
+        selected_cids = {c['cid'] for c in selected_codes}
+        changed = True
+        while changed:
+            changed = False
+            for code in self.codes:
+                if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                    selected_codes.append(code)
+                    selected_cids.add(code['cid'])
+                    changed = True
         self.codes = selected_codes
 
     # CODING CHARTS SECTION
@@ -1299,6 +1310,56 @@ class ViewCharts(QDialog):
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
 
+    @staticmethod
+    def _contrast_text(hex_colour):
+        """ Black or white label for readability over a given sector colour. <- L """
+        h = (hex_colour or '').lstrip('#')
+        if len(h) != 6:
+            return '#000000'
+        try:
+            r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        except ValueError:
+            return '#000000'
+        luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        return '#000000' if luminance > 0.5 else '#FFFFFF'
+
+    def _apply_code_colours(self, fig, colours_map):
+        """ Colour each sunburst/treemap sector with its code colour (neutral grey for
+        categories) and set a black or white label per sector for readable contrast.
+        Sectors are matched by name read from the trace, so the order stays correct. <- L """
+        try:
+            labels = list(fig.data[0].labels)
+        except (IndexError, AttributeError, TypeError):
+            return
+        text_colours = [self._contrast_text(colours_map.get(lbl, '#BFBFBF')) for lbl in labels]
+        fig.update_traces(insidetextfont_color=text_colours)
+
+    def _rollup_subcodes_into_parent_codes(self):
+        """ Hierarchy charts: nest sub-codes under their parent code. <- L
+        Sub-codes have a null catid, so the category roll-up leaves them parentless and they
+        float at the root. Here each sub-code count is rolled up the code hierarchy (deepest
+        first) so a parent code total includes its descendants, and each sub-code parentname
+        is set to its parent code name. Run AFTER own counts and BEFORE the category roll-up,
+        so categories receive each top code complete subtree total. Used with
+        branchvalues='total': a parent code arc then spans own + descendants, its own codings
+        shown as the inner remainder and sub-codes as outer ring segments. """
+        code_by_cid = {c['cid']: c for c in self.codes}
+
+        def _depth(c):
+            d, seen, cur = 0, set(), c
+            while cur is not None and cur.get('supercid') is not None and cur['cid'] not in seen:
+                seen.add(cur['cid'])
+                d += 1
+                cur = code_by_cid.get(cur['supercid'])
+            return d
+
+        for code_ in sorted(self.codes, key=_depth, reverse=True):
+            sup = code_.get('supercid')
+            if sup is not None and sup in code_by_cid:
+                parent_code = code_by_cid[sup]
+                parent_code['count'] += code_['count']
+                code_['parentname'] = parent_code['name']
+
     def hierarchy_code_frequency(self, chart="sunburst"):
         """ Count of codes across text, images and A/V.
         Calculates code count and category count and displays in sunburst or treemap chart.
@@ -1336,6 +1397,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += 1
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1370,10 +1432,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1383,13 +1447,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1416,6 +1484,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1450,10 +1519,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1463,13 +1534,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1496,6 +1571,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1530,10 +1606,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1543,13 +1621,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1576,6 +1658,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1610,10 +1693,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1623,13 +1708,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 

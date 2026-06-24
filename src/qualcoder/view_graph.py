@@ -449,21 +449,27 @@ class ViewGraph(QDialog):
 
         # Order the model by supercatid, subcats, codes
         ordered_model = []
-        # Top level categories
+        # Top level categories (exclude sub-codes, which nest under a parent code) <- L
         for code_or_category in model:
-            if code_or_category['x'] is None and code_or_category['supercatid'] is None:
+            if code_or_category['x'] is None and code_or_category['supercatid'] is None \
+                    and not code_or_category.get('supercid'):
                 code_or_category['x'] = 10
                 ordered_model.append(code_or_category)
         for om in ordered_model:
             model.remove(om)
 
-        # Sub-categories and codes
+        # Sub-categories, codes and sub-codes
         i = 0
         while i < 1000 and len(model) > 0:
             for om in ordered_model:
                 for sub_cat in model:
                     # subordinate categories
                     if sub_cat['supercatid'] == om['catid'] and sub_cat['x'] is None:
+                        sub_cat['x'] = om['x'] + 120
+                        ordered_model.insert(ordered_model.index(om), sub_cat)
+                    # sub-codes nested under their parent code (supercid) <- L
+                    if sub_cat.get('supercid') is not None and sub_cat['supercid'] == om.get('cid') \
+                            and sub_cat['x'] is None:
                         sub_cat['x'] = om['x'] + 120
                         ordered_model.insert(ordered_model.index(om), sub_cat)
             i += 1
@@ -504,6 +510,16 @@ class ViewGraph(QDialog):
                             scene_item2.code_or_cat['cid'] is not None and \
                             scene_item.code_or_cat['cid'] is None and \
                             scene_item.code_or_cat['catid'] == scene_item2.code_or_cat['catid']:
+                        item = LinkGraphicsItem(scene_item, scene_item2, 2, "solid", "gray", True)
+                        self.scene.addItem(item)
+        # Add links from sub-codes to their parent code (supercid). Child code -> parent code. <- L
+        for scene_item in self.scene.items():
+            if isinstance(scene_item, TextGraphicsItem):
+                for scene_item2 in self.scene.items():
+                    if isinstance(scene_item2, TextGraphicsItem) and \
+                            scene_item.code_or_cat.get('supercid') is not None and \
+                            scene_item2.code_or_cat['cid'] is not None and \
+                            scene_item.code_or_cat['supercid'] == scene_item2.code_or_cat['cid']:
                         item = LinkGraphicsItem(scene_item, scene_item2, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Expand scene width and height if needed
@@ -2681,12 +2697,14 @@ class ViewGraph(QDialog):
         for i in res_cdct:
             name = ""
             color = '#FFFFFF'  # Default / needed for category items
+            supercid_val = None  # parent code id for sub-codes, filled below for code nodes <- L
             if i[4] is not None:
-                cur.execute("select name, color from code_name where cid=?", [i[4]])
+                cur.execute("select name, color, supercid from code_name where cid=?", [i[4]])
                 res = cur.fetchone()
                 if res is not None:
                     name = res[0]
                     color = res[1]
+                    supercid_val = res[2]  # <- L
             else:
                 cur.execute("select name from code_cat where catid=?", [i[3]])
                 res = cur.fetchone()
@@ -2695,7 +2713,7 @@ class ViewGraph(QDialog):
                     color = '#FFFFFF'
             if name != "":
                 cdct = {'name': name, 'supercatid': i[2], 'catid': i[3], 'cid': i[4], 'x': i[0], 'y': i[1],
-                        'color': color, 'displaytext': i[8]}
+                        'color': color, 'displaytext': i[8], 'supercid': supercid_val}  # <- L
                 cdct['child_names'] = self.named_children_of_node(cdct)
                 self.scene.addItem(TextGraphicsItem(self.app, cdct, i[5], i[6], i[7]))
             else:
