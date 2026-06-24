@@ -75,7 +75,7 @@ When in the file name column pressing delete will delete the file(s).
 
 ## All coding screens
 
-Added sub-menus for Modify (Code or ecategoert selected), Filter, Sort.
+Added sub-menus for Modify (Code or categories selected), Filter, Sort.
 
 Added a code namestext filter under neathte codes tree.
 
