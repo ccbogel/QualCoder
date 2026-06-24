@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-23 11:25+0200\n"
-"PO-Revision-Date: 2026-06-20 08:31+0200\n"
-"Last-Translator: Justin <>\n"
+"POT-Creation-Date: 2026-06-24 07:55+0200\n"
+"PO-Revision-Date: 2026-06-24 10:10+0200\n"
+"Last-Translator: Justin\n"
 "Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Gtranslator 50.0\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
 #: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
@@ -207,7 +207,7 @@ msgstr "MÉMO : "
 
 #: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:388
 #: src/qualcoder/view_image.py:402 src/qualcoder/view_av.py:451
-#: src/qualcoder/__main__.py:2621 src/qualcoder/code_text.py:1430
+#: src/qualcoder/__main__.py:2898 src/qualcoder/code_text.py:1430
 #: src/qualcoder/reports.py:403 src/qualcoder/reports.py:492
 msgid "Date: "
 msgstr "Date : "
@@ -486,7 +486,7 @@ msgstr ""
 "De même, si le texte brut du PDF a été modifié de quelque manière que ce "
 "soit, cela affectera l'affichage des bandes de codage."
 
-#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3185
+#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3435
 #: src/qualcoder/code_text.py:5545 src/qualcoder/code_text.py:7771
 msgid "Information"
 msgstr "Information"
@@ -996,7 +996,7 @@ msgstr "Impossible de déplacer la catégorie"
 #: src/qualcoder/view_av.py:2674 src/qualcoder/code_text.py:4655
 msgid "Cannot move a category under one of its own sub-categories."
 msgstr ""
-"Une catégorie ne peut pas être déplacée sous l'une de ses sous-catégories/"
+"Une catégorie ne peut pas être déplacée sous l'une de ses sous-catégories."
 
 #: src/qualcoder/code_pdf.py:2526 src/qualcoder/view_image.py:2679
 #: src/qualcoder/view_av.py:2709 src/qualcoder/code_text.py:4691
@@ -1342,7 +1342,7 @@ msgstr "Sélectionner le chemin que vous souhaitez remplacer.\n"
 #: src/qualcoder/manage_links.py:85
 msgid "e.g. C:/Users/olduser/Images  To replace olduser enter: olduser\n"
 msgstr ""
-"Exemple : C:/Users/olduser/Images  Pour remplacer olduser, saisissez : "
+"exemple : C:/Users/olduser/Images  Pour remplacer olduser, saisissez : "
 "olduser\n"
 
 #: src/qualcoder/manage_links.py:86
@@ -1513,7 +1513,7 @@ msgstr "Modifié"
 #: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
 #: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
 #: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
-#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1995
+#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:2281
 #: src/qualcoder/report_exact_matches.py:540
 msgid "Coder"
 msgstr "Codeur·euse"
@@ -2053,7 +2053,7 @@ msgstr ""
 "Les modifications des noms des codeurs⋅euses seront perdues. Êtes-vous sûr "
 "de vouloir annuler ?"
 
-#: src/qualcoder/settings.py:780 src/qualcoder/__main__.py:1994
+#: src/qualcoder/settings.py:780 src/qualcoder/__main__.py:2280
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -3195,7 +3195,7 @@ msgstr " relié"
 msgid " imported."
 msgstr " importé."
 
-#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2608
+#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2885
 msgid " created."
 msgstr " Créé."
 
@@ -3702,7 +3702,7 @@ msgid "Project export error "
 msgstr "Erreur d'exportation de projet "
 
 #: src/qualcoder/refi.py:2019 src/qualcoder/refi.py:2025
-#: src/qualcoder/__main__.py:2502 src/qualcoder/__main__.py:2522
+#: src/qualcoder/__main__.py:2779 src/qualcoder/__main__.py:2799
 msgid "Project"
 msgstr "Projet"
 
@@ -5279,6 +5279,439 @@ msgstr ""
 msgid "This will update the database schema. Then try merging again."
 msgstr "Mettez à jour la base de données et essayez de fusionner à nouveau."
 
+#: src/qualcoder/information.py:440
+msgid ""
+"# Manage\n"
+"\n"
+"The Manage tab displays workspaces for organising cases, files, attributes, "
+"journals, and references.\n"
+"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among "
+"them.\n"
+"\n"
+"\n"
+"## [Manage Files](qualcoder://menu/files_and_cases/manage_files)\n"
+"\n"
+"- This menu lets you add and remove empirical data in your project.\n"
+"- You can import plain text and many other document types,\n"
+"including PDFs, images, audio, and video.\n"
+"- You may also import survey data.\n"
+"- Before importing text files, you may want to create pseudonyms to protect "
+"the privacy of people or organisations.\n"
+"- [Help: Import files](qualcoder://help/3.2.-Files/)\n"
+"\n"
+"\n"
+"## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)\n"
+"\n"
+"- You can use cases to group files together that are related to a topic, "
+"person, organisation, or any other empirical entity in your study. \n"
+"- This can be useful for organising your data and for running reports on "
+"specific groups of files.\n"
+"- [Help: Cases](qualcoder://help/3.3.-Cases/)\n"
+"\n"
+"\n"
+"## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)\n"
+"\n"
+"- Journals are used to record your thoughts when coding and analysing "
+"data. \n"
+"- The journal window opens separately from the main window so you can move "
+"between them easily.\n"
+"- [Help: Journals](qualcoder://help/5.2.-Journals/)\n"
+"\n"
+"\n"
+"## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)\n"
+"\n"
+"- Files, cases, and journals can have attributes (variables) that describe "
+"their characteristics. \n"
+"- They can be used to filter and organise data, and to run reports based on "
+"specific criteria. \n"
+"- Use this menu to create and manage such attributes. They can be attached "
+"to files, cases, and journals directly in the respective workspaces. \n"
+"- [Help: Attributes](qualcoder://help/3.4.-Attributes/)\n"
+"\n"
+"\n"
+"## [Manage References](qualcoder://menu/files_and_cases/manage_references)\n"
+"\n"
+"- Bibliographic references can be imported from NBIB and RIS files.\n"
+"- After that, references can be linked to files in the project.\n"
+"- [Help: Import References](qualcoder://help/6.1.-Imports-and-Exports/)\n"
+msgstr ""
+"# Gérer\n"
+"\n"
+"L'onglet « Gérer » affiche les espaces de travail permettant d'organiser les "
+"cas, les fichiers, les attributs, les journaux et les références.\n"
+"Utilisez le [menu Gérer](qualcoder://menu/files_and_cases) pour faire votre "
+"choix parmi ceux-ci.\n"
+"\n"
+"\n"
+"## [Gérer les fichiers](qualcoder://menu/files_and_cases/manage_files)\n"
+"\n"
+"- Ce menu vous permet d’ajouter et de supprimer des données empiriques dans "
+"votre projet.\n"
+"- Vous pouvez importer du texte brut et de nombreux autres types de "
+"documents,\n"
+"notamment des PDF, des images, des fichiers audio et vidéo.\n"
+"- Vous pouvez également importer des données d’enquête.\n"
+"- Avant d’importer des fichiers texte, vous pouvez créer des pseudonymes "
+"afin de protéger la vie privée des personnes ou des organisations.\n"
+"- [Aide : Importer des fichiers](qualcoder://help/3.2.-Files/)\n"
+"\n"
+"\n"
+"## [Gérer les cas](qualcoder://menu/files_and_cases/manage_cases)\n"
+"\n"
+"- Vous pouvez utiliser les dossiers pour regrouper des fichiers liés à un "
+"sujet, une personne, une organisation ou toute autre entité empirique de "
+"votre étude. \n"
+"- Cela peut s'avérer utile pour organiser vos données et générer des "
+"rapports sur des groupes spécifiques de fichiers.\n"
+"- [Aide : Dossiers](qualcoder://help/3.3.-Cases/) \n"
+"\n"
+"\n"
+"## [Gérer les journaux](qualcoder://menu/files_and_cases/manage_journals)\n"
+"\n"
+"- Les journaux servent à consigner vos réflexions lors du codage et de "
+"l'analyse des données. \n"
+"- La fenêtre du journal s'ouvre séparément de la fenêtre principale, ce qui "
+"vous permet de passer facilement de l'une à l'autre.\n"
+"- [Aide : Carnets de notes](qualcoder://help/5.2.-Journals/)\n"
+"\n"
+"\n"
+"## [Gérer les attributs](qualcoder://menu/files_and_cases/"
+"manage_attributes)\n"
+"\n"
+"- Les fichiers, les cas et les carnets de notes peuvent comporter des "
+"attributs (variables) qui décrivent leurs caractéristiques. \n"
+"- Ils peuvent être utilisés pour filtrer et organiser les données, ainsi que "
+"pour générer des rapports selon des critères spécifiques. \n"
+"- Utilisez ce menu pour créer et gérer ces attributs. Ils peuvent être "
+"associés à des fichiers, des cas et des journaux directement dans les "
+"espaces de travail respectifs. \n"
+"- [Aide : Attributs](qualcoder://help/3.4.-Attributes/)\n"
+"\n"
+"\n"
+"## [Gérer les références](qualcoder://menu/files_and_cases/"
+"manage_references)\n"
+"\n"
+"- Les références bibliographiques peuvent être importées à partir de "
+"fichiers NBIB et RIS.\n"
+"- Elles peuvent ensuite être associées à des fichiers du projet.\n"
+"- [Aide : Importer des références](qualcoder://help/6.1.-Imports-and-"
+"Exports/)\n"
+
+#: src/qualcoder/information.py:489
+msgid ""
+"# Coding\n"
+"\n"
+"The Coding tab displays workspaces for coding text, PDFs, images, audio, and "
+"video.\n"
+"Use the [Coding menu](qualcoder://menu/coding) to select an option to "
+"begin. \n"
+"Note that you can only open a particular coding workspace if that type of "
+"data is actually present in the current project. \n"
+"\n"
+"\n"
+"## [Code Text](qualcoder://menu/coding/codes)\n"
+"\n"
+"- Use this workspace to read textual data closely and assign codes to "
+"selected passages.\n"
+"- You can organise codes in a tree, add memos and annotations, create "
+"bookmarks, and mark especially useful segments as important.\n"
+"- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)\n"
+"\n"
+"\n"
+"## [Code Images](qualcoder://menu/coding/code_image)\n"
+"\n"
+"- In this workspace, you can select regions in photographs, diagrams, "
+"screenshots, or other visual material and assign codes to them.\n"
+"- Coded areas are displayed as coloured rectangles linked to your code "
+"system.\n"
+"- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)\n"
+"\n"
+"\n"
+"## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)\n"
+"\n"
+"- Use this workspace to transcribe and/or code time-based media such as "
+"interviews, focus groups, and field recordings.\n"
+"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-"
+"Video/)\n"
+"\n"
+"\n"
+"## [Code PDFs](qualcoder://menu/coding/code_pdf)\n"
+"\n"
+"- This workspace allows you to code text directly in PDF documents when you "
+"want to keep the original page layout in view.\n"
+"- This is useful for articles, reports, and other source material where page "
+"position and formatting matter.\n"
+"- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
+"\n"
+"\n"
+"## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)\n"
+"\n"
+"- This loads a variant of the text coding workspace that uses AI to explore "
+"your data and suggest segments for a selected code.\n"
+"- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
+"\n"
+"\n"
+"## [Code Organiser](qualcoder://menu/coding/code_organiser)\n"
+"\n"
+"- Use this workspace to reorganise your code system using a graphical, mind-"
+"map style interface.\n"
+"- You can move, merge, and rename codes and categories as your analytic "
+"structure becomes clearer.\n"
+"- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)\n"
+"\n"
+"\n"
+"## [Colour Scheme](qualcoder://menu/coding/colour_scheme)\n"
+"\n"
+"- This allows you to change the colour scheme of your codes and "
+"categories. \n"
+"- Special schemes for colour-blind users are available. \n"
+msgstr ""
+"# Codage\n"
+"\n"
+"L'onglet « Codage » affiche les espaces de travail permettant de coder du "
+"texte, des PDF, des images, des fichiers audio et des vidéos.\n"
+"Utilisez le [menu « Codage »](qualcoder://menu/coding) pour sélectionner une "
+"option et commencer. \n"
+"Notez que vous ne pouvez ouvrir un espace de travail de codage spécifique "
+"que si ce type de données est effectivement présent dans le projet en "
+"cours. \n"
+"\n"
+"\n"
+"## [Codage de texte](qualcoder://menu/coding/codes)\n"
+"\n"
+"- Utilisez cet espace de travail pour lire attentivement les données "
+"textuelles et attribuer des codes aux passages sélectionnés.\n"
+"- Vous pouvez organiser les codes dans une arborescence, ajouter des notes "
+"et des annotations, créer des signets et marquer comme importants les "
+"segments particulièrement utiles.\n"
+"- [Aide : Codage de texte](qualcoder://help/4.1.-Coding-Text/)\n"
+"\n"
+"\n"
+"## [Codage d’images](qualcoder://menu/coding/code_image)\n"
+"\n"
+"- Dans cet espace de travail, vous pouvez sélectionner des zones dans des "
+"photographies, des diagrammes, des captures d’écran ou tout autre support "
+"visuel, puis leur attribuer des codes.\n"
+"- Les zones codées s’affichent sous forme de rectangles colorés liés à votre "
+"système de codage.\n"
+"- [Aide : Codage d’images](qualcoder://help/4.4.-Coding-Images/)\n"
+"\n"
+"\n"
+"## [Codage audio et vidéo](qualcoder://menu/coding/code_audio_video)\n"
+"\n"
+"- Utilisez cet espace de travail pour transcrire et/ou coder des supports "
+"temporels tels que des entretiens, des groupes de discussion et des "
+"enregistrements sur le terrain.\n"
+"- [Aide : Codage audio et vidéo](qualcoder://help/4.5.-Coding-Audio-and-"
+"Video/)\n"
+"\n"
+"\n"
+"## [Codage de PDF](qualcoder://menu/coding/code_pdf)\n"
+"\n"
+"- Cet espace de travail vous permet de coder du texte directement dans des "
+"documents PDF lorsque vous souhaitez conserver la mise en page d'origine.\n"
+"- Cela s'avère utile pour les articles, les rapports et autres documents "
+"sources où la position et la mise en forme des pages sont importantes.\n"
+"- [Aide : Codage de PDF](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
+"\n"
+"\n"
+"## [Codage assisté par IA](qualcoder://menu/coding/ai_assisted_coding)\n"
+"\n"
+"- Cette fonctionnalité charge une variante de l’espace de travail de codage "
+"de texte qui utilise l’IA pour explorer vos données et suggérer des segments "
+"correspondant à un code sélectionné.\n"
+"- [Aide : Codage assisté par IA](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
+"\n"
+"\n"
+"## [Organisateur de codes](qualcoder://menu/coding/code_organiser)\n"
+"\n"
+"- Utilisez cet espace de travail pour réorganiser votre système de codage à "
+"l’aide d’une interface graphique de type carte mentale.\n"
+"- Vous pouvez déplacer, fusionner et renommer des codes et des catégories à "
+"mesure que votre structure analytique se précise.\n"
+"- [Aide : Organisateur de codes](qualcoder://help/4.6-Code-Organiser/)\n"
+"\n"
+"\n"
+"## [Palette de couleurs](qualcoder://menu/coding/colour_scheme)\n"
+"\n"
+"- Cette fonctionnalité vous permet de modifier la palette de couleurs de vos "
+"codes et catégories. \n"
+"- Des palettes spéciales sont disponibles pour les utilisateurs daltoniens.\n"
+
+#: src/qualcoder/information.py:546
+msgid ""
+"# Reports tab\n"
+"\n"
+"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) "
+"and [Reports](qualcoder://menu/reports) menus.\n"
+"\n"
+"\n"
+"## [Analysis](qualcoder://menu/analysis)\n"
+"\n"
+"Use these tools when you want to explore coded segments and relationships in "
+"detail.\n"
+"\n"
+"[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
+"\n"
+"\n"
+"### Retrieval and segment-based analysis\n"
+"\n"
+"These tools help you inspect the actual coded material in your project.\n"
+"\n"
+"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible "
+"analysis tool. It gathers all segments for selected codes or categories and "
+"lets you narrow the results by file, case, attributes, or search text.\n"
+"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) "
+"generates a table with text segments and all associated codes.\n"
+"\n"
+"\n"
+"### Code relationships and overlaps\n"
+"\n"
+"Use these tools to examine how codes relate to one another. They only work "
+"with text files.\n"
+"\n"
+"- [Code relations](qualcoder://menu/analysis/code_relations) shows "
+"proximity, overlap, inclusion, and exact matches between selected codes.\n"
+"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses "
+"on where two codes overlap or directly touch.\n"
+"- [Code text exact matches](qualcoder://menu/analysis/"
+"code_text_exact_matches) lists passages where different codes were applied "
+"to exactly the same text.\n"
+"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map "
+"style view of linked project elements like codes, cases, files, etc. [Help: "
+"Graph](qualcoder://help/5.4.-Graph/)\n"
+"\n"
+"\n"
+"## Reports\n"
+"\n"
+"Use these tools when you want summaries, comparisons, counts, charts, or "
+"exports for reporting purposes.\n"
+"\n"
+"[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
+"\n"
+"\n"
+"### Inter-Coder Comparisons\n"
+"\n"
+"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and "
+"[Coding comparison by file](qualcoder://menu/reports/"
+"coding_comparison_by_file) are especially useful for collaborative work and "
+"inter-coder checking.\n"
+"\n"
+"\n"
+"### Summaries, frequencies, and charts\n"
+"\n"
+"These reports summarise patterns across the project rather than showing "
+"every coded segment in detail.\n"
+"\n"
+"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how "
+"often codes and categories have been used.\n"
+"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) "
+"gives a compact overview of where selected codes appear most often.\n"
+"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary]"
+"(qualcoder://menu/reports/code_summary) give focused overviews of one file "
+"or one code at a time.\n"
+"- [Charts](qualcoder://menu/reports/charts) visualises distributions and "
+"comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
+"\n"
+"\n"
+"### Advanced reporting\n"
+"\n"
+"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct "
+"access to the project database for custom analyses. This is most useful when "
+"the standard reports do not answer a specific research question in the exact "
+"form you need.\n"
+msgstr ""
+"# Onglet « Rapports »\n"
+"\n"
+"Cet onglet affiche les outils des menus [Analyse](qualcoder://menu/analysis) "
+"et [Rapports](qualcoder://menu/reports).\n"
+"\n"
+"\n"
+"## [Analyse](qualcoder://menu/analysis)\n"
+"\n"
+"Utilisez ces outils lorsque vous souhaitez explorer en détail les segments "
+"codés et les relations entre eux.\n"
+"\n"
+"[Aide : Options des menus Analyse et Rapports](qualcoder://help/5.3.-"
+"Reports/)\n"
+"\n"
+"\n"
+"### Récupération et analyse par segment\n"
+"\n"
+"Ces outils vous aident à examiner le matériel codé de votre projet.\n"
+"\n"
+"- [Récupération des codes](qualcoder://menu/analysis/coding_reports) est un "
+"outil d’analyse flexible. Il rassemble tous les segments correspondant aux "
+"codes ou catégories sélectionnés et vous permet d’affiner les résultats par "
+"fichier, cas, attributs ou texte de recherche.\n"
+"- [Codes par segments de texte](qualcoder://menu/analysis/"
+"text_segments_by_codes) génère un tableau contenant les segments de texte et "
+"tous les codes associés.\n"
+"\n"
+"\n"
+"### Relations et chevauchements entre codes\n"
+"\n"
+"Utilisez ces outils pour examiner les relations entre les codes. Ils ne "
+"fonctionnent qu’avec des fichiers texte.\n"
+"\n"
+"- [Relations entre codes](qualcoder://menu/analysis/code_relations) affiche "
+"la proximité, les chevauchements, l’inclusion et les correspondances exactes "
+"entre les codes sélectionnés.\n"
+"- [Co-occurrence des codes](qualcoder://menu/analysis/code_co_occurrence) "
+"met l’accent sur les endroits où deux codes se chevauchent ou se touchent "
+"directement.\n"
+"- [Correspondances exactes de texte de codes](qualcoder://menu/analysis/"
+"code_text_exact_matches) répertorie les passages où des codes différents ont "
+"été appliqués à exactement le même texte.\n"
+"- [Graphique](qualcoder://menu/analysis/view_graph) offre une vue visuelle, "
+"de type carte mentale, des éléments liés du projet tels que les codes, les "
+"cas, les fichiers, etc. [Aide : Graphique](qualcoder://help/5.4.-Graph/)\n"
+"\n"
+"\n"
+"## Rapports\n"
+"\n"
+"Utilisez ces outils lorsque vous souhaitez obtenir des résumés, des "
+"comparaisons, des décomptes, des graphiques ou des exportations à des fins "
+"de reporting.\n"
+"\n"
+"[Aide : Options du menu Analyse et rapports](qualcoder://help/5.3.-"
+"Reports/)\n"
+"\n"
+"\n"
+"### Comparaisons entre codeurs\n"
+"\n"
+"- [Comparaison de codage](qualcoder://menu/reports/coding_comparison) et "
+"[Comparaison de codage par fichier](qualcoder://menu/reports/"
+"coding_comparison_by_file) sont particulièrement utiles pour le travail "
+"collaboratif et la vérification entre codeurs.\n"
+"\n"
+"\n"
+"### Résumés, fréquences et graphiques\n"
+"\n"
+"Ces rapports résument les tendances observées à l’échelle du projet plutôt "
+"que de présenter en détail chaque segment codé.\n"
+"\n"
+"- [Fréquences des codes](qualcoder://menu/reports/code_frequencies) recense "
+"le nombre de fois où les codes et les catégories ont été utilisés.\n"
+"- [Nombre de codes par fichier/cas](qualcoder://menu/reports/"
+"code_comparison_table) offre un aperçu concis des endroits où les codes "
+"sélectionnés apparaissent le plus souvent.\n"
+"- [Résumé du fichier](qualcoder://menu/reports/file_summary) et [Résumé des "
+"codes](qualcoder://menu/reports/code_summary) offrent des aperçus ciblés "
+"d'un fichier ou d'un code à la fois.\n"
+"- [Graphiques](qualcoder://menu/reports/charts) permet de visualiser les "
+"distributions et les comparaisons à l’aide de diagrammes tels que des "
+"histogrammes, des treemaps et des cartes thermiques.\n"
+"\n"
+"\n"
+"### Rapports avancés\n"
+"\n"
+"- [Requêtes de base de données](qualcoder://menu/reports/sql_statements) "
+"permet d’accéder directement à la base de données du projet pour effectuer "
+"des analyses personnalisées. Cette fonctionnalité est particulièrement utile "
+"lorsque les rapports standard ne répondent pas à une question de recherche "
+"spécifique sous la forme exacte dont vous avez besoin.\n"
+
 #: src/qualcoder/rqda.py:49
 msgid "Select RQDA file"
 msgstr "Sélectionnez le fichier RQDA"
@@ -6544,7 +6977,7 @@ msgstr ""
 msgid "Project backup created: "
 msgstr "Création d'une sauvegarde de projet : "
 
-#: src/qualcoder/__main__.py:1671
+#: src/qualcoder/__main__.py:1672
 msgid ""
 "Welcome\n"
 "\n"
@@ -6561,119 +6994,172 @@ msgstr ""
 "l'assistant de configuration de l'IA à partir du menu AI de la fenêtre "
 "principale. Cliquez sur « Oui » pour commencer maintenant."
 
-#: src/qualcoder/__main__.py:1677
+#: src/qualcoder/__main__.py:1678
 msgid "AI Integration"
 msgstr "Intégration IA"
 
-#: src/qualcoder/__main__.py:1996
+#: src/qualcoder/__main__.py:1749 src/qualcoder/__main__.py:1806
+#: src/qualcoder/__main__.py:1900
+msgid "Unsupported QualCoder link target: "
+msgstr "Cible du lien QualCoder non prise en charge : "
+
+#: src/qualcoder/__main__.py:1752
+msgid "Menu link has no target path."
+msgstr "Le lien du menu n'a pas de chemin de destination."
+
+#: src/qualcoder/__main__.py:1759
+msgid "Menu not found: "
+msgstr "Menu non trouvé : "
+
+#: src/qualcoder/__main__.py:1776
+msgid "Menu entry not found: "
+msgstr "Entrée du menu non trouvée : "
+
+#: src/qualcoder/__main__.py:1781
+msgid "Action cannot contain subentries: "
+msgstr "Une action ne peut pas contenir de sous-entrées : "
+
+#: src/qualcoder/__main__.py:1809
+msgid "Action link has no target path."
+msgstr "Le lien d'action ne comporte pas de chemin de destination."
+
+#: src/qualcoder/__main__.py:1817
+msgid "Action not found: "
+msgstr "Action non trouvée : "
+
+#: src/qualcoder/__main__.py:1819
+msgid "Action name is ambiguous: "
+msgstr "Le nom de l'action est ambigu : "
+
+#: src/qualcoder/__main__.py:1826
+msgid "Action link must end with a menu action."
+msgstr "Le lien d'action doit se terminer par une action de menu."
+
+#: src/qualcoder/__main__.py:1866
+msgid "Cannot open link: "
+msgstr "Impossible d'ouvrir le lien: "
+
+#: src/qualcoder/__main__.py:1868
+msgid "Link error"
+msgstr "Erreur d elien"
+
+#: src/qualcoder/__main__.py:1879
+msgid "Unsupported link scheme."
+msgstr "Schéma de liens non supporté."
+
+#: src/qualcoder/__main__.py:1897
+msgid "Menu action is currently disabled."
+msgstr "L'action du menu est actuellement désactivée."
+
+#: src/qualcoder/__main__.py:2282
 msgid "Font"
 msgstr "Police"
 
-#: src/qualcoder/__main__.py:1997
+#: src/qualcoder/__main__.py:2283
 msgid "Tree font size"
 msgstr "Taille de la police de l'arbre"
 
-#: src/qualcoder/__main__.py:1998
+#: src/qualcoder/__main__.py:2284
 msgid "Working directory"
 msgstr "Répertoire de travail"
 
-#: src/qualcoder/__main__.py:1999
+#: src/qualcoder/__main__.py:2285
 msgid "Show IDs"
 msgstr "Afficher les IDs"
 
-#: src/qualcoder/__main__.py:2000
+#: src/qualcoder/__main__.py:2286
 msgid "Language"
 msgstr "Langue"
 
-#: src/qualcoder/__main__.py:2001
+#: src/qualcoder/__main__.py:2287
 msgid "Timestamp format"
 msgstr "Format d'horodatage"
 
-#: src/qualcoder/__main__.py:2002
+#: src/qualcoder/__main__.py:2288
 msgid "Speaker name format"
 msgstr "Format du nom de l'orateur"
 
-#: src/qualcoder/__main__.py:2003
+#: src/qualcoder/__main__.py:2289
 msgid "Report text context characters: "
 msgstr "Rapporter les caractères du contexte du texte : "
 
-#: src/qualcoder/__main__.py:2004
+#: src/qualcoder/__main__.py:2290
 msgid "Report text context style: "
 msgstr "Contexte et style du texte du rapport : "
 
-#: src/qualcoder/__main__.py:2005
+#: src/qualcoder/__main__.py:2291
 msgid "Style"
 msgstr "Style"
 
-#: src/qualcoder/__main__.py:2006
+#: src/qualcoder/__main__.py:2292
 msgid "Backup on open"
 msgstr "Sauvegarde sur les ouvertures"
 
-#: src/qualcoder/__main__.py:2007
+#: src/qualcoder/__main__.py:2293
 msgid "Backup AV files"
 msgstr "Sauvegarde des fichiers multimédias"
 
-#: src/qualcoder/__main__.py:2009
+#: src/qualcoder/__main__.py:2295
 msgid "AI integration is enabled"
 msgstr "L'intégration de l'IA est activé"
 
-#: src/qualcoder/__main__.py:2011
+#: src/qualcoder/__main__.py:2297
 msgid "AI integration is disabled"
 msgstr "L'intégration de l'IA est désactivée"
 
-#: src/qualcoder/__main__.py:2014
+#: src/qualcoder/__main__.py:2300
 msgid "Folder paths / represents \\"
 msgstr "Chemins d'accès aux dossiers / représente \\"
 
-#: src/qualcoder/__main__.py:2247
+#: src/qualcoder/__main__.py:2533
 msgid "This project contains no text files."
 msgstr "Ce projet ne contient aucun fichier texte."
 
-#: src/qualcoder/__main__.py:2248
+#: src/qualcoder/__main__.py:2534
 msgid "No text files"
 msgstr "Pas de fichiers texte"
 
-#: src/qualcoder/__main__.py:2261
+#: src/qualcoder/__main__.py:2547
 msgid "This project contains no pdf files."
 msgstr "Ce projet ne contient aucun fichier PDF."
 
-#: src/qualcoder/__main__.py:2262
+#: src/qualcoder/__main__.py:2548
 msgid "No pdf files"
 msgstr "Aucun fichier PDF"
 
-#: src/qualcoder/__main__.py:2277
+#: src/qualcoder/__main__.py:2563
 msgid "This project contains no image files."
 msgstr "Ce projet ne contient aucun fichier image."
 
-#: src/qualcoder/__main__.py:2278
+#: src/qualcoder/__main__.py:2564
 msgid "No image files"
 msgstr "Pas de fichiers d'images"
 
-#: src/qualcoder/__main__.py:2286
+#: src/qualcoder/__main__.py:2572
 msgid "This project contains no audio/video files."
 msgstr "Ce projet ne contient pas de fichiers audio/vidéo."
 
-#: src/qualcoder/__main__.py:2287
+#: src/qualcoder/__main__.py:2573
 msgid "No a/v files"
 msgstr "Pas de fichiers a/v"
 
-#: src/qualcoder/__main__.py:2290
+#: src/qualcoder/__main__.py:2576
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr "VLC n'est pas installé. Impossible de coder les fichiers audio/vidéo."
 
-#: src/qualcoder/__main__.py:2291
+#: src/qualcoder/__main__.py:2577
 msgid "Install VLC"
 msgstr "Installer VLC"
 
-#: src/qualcoder/__main__.py:2300
+#: src/qualcoder/__main__.py:2586
 msgid "A/V Coding"
 msgstr "Codage A/V"
 
-#: src/qualcoder/__main__.py:2387
+#: src/qualcoder/__main__.py:2664
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "IMPORTATION DU PROJET REFI-QDA"
 
-#: src/qualcoder/__main__.py:2389
+#: src/qualcoder/__main__.py:2666
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -6681,20 +7167,20 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Etape 2 : On vous demandera le fichier QDPX."
 
-#: src/qualcoder/__main__.py:2390
+#: src/qualcoder/__main__.py:2667
 msgid "REFI-QDA import steps"
 msgstr "Étapes d'importation REFI-QDA"
 
-#: src/qualcoder/__main__.py:2394 src/qualcoder/__main__.py:2411
-#: src/qualcoder/__main__.py:2427
+#: src/qualcoder/__main__.py:2671 src/qualcoder/__main__.py:2688
+#: src/qualcoder/__main__.py:2704
 msgid "Project creation"
 msgstr "Création du projet"
 
-#: src/qualcoder/__main__.py:2394
+#: src/qualcoder/__main__.py:2671
 msgid "REFI-QDA Project not successfully created"
 msgstr "Le projet REFI-QDA n'a pas été créé avec succès"
 
-#: src/qualcoder/__main__.py:2406
+#: src/qualcoder/__main__.py:2683
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Taguette.sqlite3 file."
@@ -6702,19 +7188,19 @@ msgstr ""
 "Étape 1 : Vous devrez saisir un nouveau nom pour votre projet QualCoder.\n"
 "Étape 2 : Vous devrez sélectionner le fichier Taguette.sqlite3."
 
-#: src/qualcoder/__main__.py:2407 src/qualcoder/__main__.py:2423
+#: src/qualcoder/__main__.py:2684 src/qualcoder/__main__.py:2700
 msgid "RQDA import steps"
 msgstr "Étapes d'importation du RQDA"
 
-#: src/qualcoder/__main__.py:2411 src/qualcoder/__main__.py:2427
+#: src/qualcoder/__main__.py:2688 src/qualcoder/__main__.py:2704
 msgid "Project not successfully created"
 msgstr "Échec dans la création du projet"
 
-#: src/qualcoder/__main__.py:2420
+#: src/qualcoder/__main__.py:2697
 msgid "IMPORTING RQDA PROJECT"
 msgstr "PROJET RQDA D'IMPORTATION"
 
-#: src/qualcoder/__main__.py:2422
+#: src/qualcoder/__main__.py:2699
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -6722,59 +7208,59 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Étape 2 : On vous demandera le fichier RQDA."
 
-#: src/qualcoder/__main__.py:2440
+#: src/qualcoder/__main__.py:2717
 msgid "Are you sure you want to quit?"
 msgstr "Êtes-vous sûr de vouloir quitter ?"
 
-#: src/qualcoder/__main__.py:2498
+#: src/qualcoder/__main__.py:2775
 msgid "Enter project name"
 msgstr "Entrez le nom du projet"
 
-#: src/qualcoder/__main__.py:2502
+#: src/qualcoder/__main__.py:2779
 msgid "No project created."
 msgstr "Aucun projet créé."
 
-#: src/qualcoder/__main__.py:2521
+#: src/qualcoder/__main__.py:2798
 msgid "Project creation error "
 msgstr "Erreur de création de projet "
 
-#: src/qualcoder/__main__.py:2522
+#: src/qualcoder/__main__.py:2799
 msgid " not successfully created"
 msgstr " n'a pas été créé avec succès"
 
-#: src/qualcoder/__main__.py:2608
+#: src/qualcoder/__main__.py:2885
 msgid "New project: "
 msgstr "Nouveau projet : "
 
-#: src/qualcoder/__main__.py:2609
+#: src/qualcoder/__main__.py:2886
 msgid "Opening: "
 msgstr "Ouvrir : "
 
-#: src/qualcoder/__main__.py:2619
+#: src/qualcoder/__main__.py:2896
 msgid "New Project Created"
 msgstr "Nouveau projet créé"
 
-#: src/qualcoder/__main__.py:2620
+#: src/qualcoder/__main__.py:2897
 msgid "DB Version:"
 msgstr "Version BDD :"
 
-#: src/qualcoder/__main__.py:2622
+#: src/qualcoder/__main__.py:2899
 msgid "About: "
 msgstr "À propos : "
 
-#: src/qualcoder/__main__.py:2623
+#: src/qualcoder/__main__.py:2900
 msgid "Coder:"
 msgstr "Codeur·euse :"
 
-#: src/qualcoder/__main__.py:2626
+#: src/qualcoder/__main__.py:2903
 msgid "Problem creating database "
 msgstr "Problème lors de la création de la base de données "
 
-#: src/qualcoder/__main__.py:2681
+#: src/qualcoder/__main__.py:2945
 msgid "Coder name changed to: "
 msgstr "Nom du codeur·euse changé en : "
 
-#: src/qualcoder/__main__.py:2704
+#: src/qualcoder/__main__.py:2954
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -6796,23 +7282,23 @@ msgstr ""
 "(Tout ce qui est en dessous de cette marque est une note personnelle et ne "
 "sera jamais envoyé à l'IA)."
 
-#: src/qualcoder/__main__.py:2709
+#: src/qualcoder/__main__.py:2959
 msgid "Memo for project "
 msgstr "Mémo pour le projet "
 
-#: src/qualcoder/__main__.py:2716
+#: src/qualcoder/__main__.py:2966
 msgid "Project memo entered."
 msgstr "Mémo de projet entré."
 
-#: src/qualcoder/__main__.py:2740 src/qualcoder/special_functions.py:113
+#: src/qualcoder/__main__.py:2990 src/qualcoder/special_functions.py:113
 msgid "Open project directory"
 msgstr "Ouvrir le répertoire du projet"
 
-#: src/qualcoder/__main__.py:2762
+#: src/qualcoder/__main__.py:3012
 msgid "Cannot open file"
 msgstr "Ne peut pas ouvrir le fichier"
 
-#: src/qualcoder/__main__.py:2787
+#: src/qualcoder/__main__.py:3037
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
@@ -6822,83 +7308,83 @@ msgstr ""
 "dans le projet (« {} »). Souhaitez-vous conserver votre nom actuel ou "
 "changer à celui du projet ?"
 
-#: src/qualcoder/__main__.py:2790
+#: src/qualcoder/__main__.py:3040
 msgid "Coder name"
 msgstr "Nom du codeur⋅euse"
 
-#: src/qualcoder/__main__.py:2792
+#: src/qualcoder/__main__.py:3042
 msgid "Keep"
 msgstr "Conserver"
 
-#: src/qualcoder/__main__.py:2793
+#: src/qualcoder/__main__.py:3043
 msgid "Switch"
 msgstr "Changer"
 
-#: src/qualcoder/__main__.py:2794
+#: src/qualcoder/__main__.py:3044
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/qualcoder/__main__.py:2803
+#: src/qualcoder/__main__.py:3053
 msgid "Default coder name changed to: "
 msgstr "Le nom du codeur·euse par défaut a été changé en : "
 
-#: src/qualcoder/__main__.py:2831 src/qualcoder/__main__.py:2860
-#: src/qualcoder/__main__.py:2880 src/qualcoder/__main__.py:2905
-#: src/qualcoder/__main__.py:2976 src/qualcoder/__main__.py:3000
-#: src/qualcoder/__main__.py:3008 src/qualcoder/__main__.py:3020
-#: src/qualcoder/__main__.py:3028 src/qualcoder/__main__.py:3036
-#: src/qualcoder/__main__.py:3045 src/qualcoder/__main__.py:3053
-#: src/qualcoder/__main__.py:3061 src/qualcoder/__main__.py:3071
-#: src/qualcoder/__main__.py:3079
+#: src/qualcoder/__main__.py:3081 src/qualcoder/__main__.py:3110
+#: src/qualcoder/__main__.py:3130 src/qualcoder/__main__.py:3155
+#: src/qualcoder/__main__.py:3226 src/qualcoder/__main__.py:3250
+#: src/qualcoder/__main__.py:3258 src/qualcoder/__main__.py:3270
+#: src/qualcoder/__main__.py:3278 src/qualcoder/__main__.py:3286
+#: src/qualcoder/__main__.py:3295 src/qualcoder/__main__.py:3303
+#: src/qualcoder/__main__.py:3311 src/qualcoder/__main__.py:3321
+#: src/qualcoder/__main__.py:3329
 msgid "Updating database to version"
 msgstr "Mise à jour de la base de données à la version"
 
-#: src/qualcoder/__main__.py:3086
+#: src/qualcoder/__main__.py:3336
 msgid "Deleting code_text coding to deleted files: "
 msgstr "Suppression du code_texte codant pour les fichiers supprimés : "
 
-#: src/qualcoder/__main__.py:3093
+#: src/qualcoder/__main__.py:3343
 msgid "Deleting code_image coding to deleted files: "
 msgstr "Suppression du codage code_image dans les fichiers supprimés : "
 
-#: src/qualcoder/__main__.py:3100
+#: src/qualcoder/__main__.py:3350
 msgid "Deleting code_av coding to deleted files: "
 msgstr "Suppression du codage code_av dans les fichiers supprimés : "
 
-#: src/qualcoder/__main__.py:3150
+#: src/qualcoder/__main__.py:3400
 msgid "Repaired a cyclic code/category hierarchy."
 msgstr "Hiérarchie cyclique de code/catégorie réparée."
 
-#: src/qualcoder/__main__.py:3185
+#: src/qualcoder/__main__.py:3435
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr "Dossiers manquants dans le projet QualCoder. Dossiers vides créés"
 
-#: src/qualcoder/__main__.py:3210
+#: src/qualcoder/__main__.py:3460
 msgid "Project summary"
 msgstr "Résumé du projet"
 
-#: src/qualcoder/__main__.py:3218
+#: src/qualcoder/__main__.py:3468
 msgid "Project memo: "
 msgstr "Mémo de projet : "
 
-#: src/qualcoder/__main__.py:3225 src/qualcoder/reports.py:405
+#: src/qualcoder/__main__.py:3475 src/qualcoder/reports.py:405
 #: src/qualcoder/reports.py:407 src/qualcoder/reports.py:493
 msgid "Files: "
 msgstr "Fichiers : "
 
-#: src/qualcoder/__main__.py:3258
+#: src/qualcoder/__main__.py:3508
 msgid "Bad links to files"
 msgstr "Mauvais liens avec les dossiers"
 
-#: src/qualcoder/__main__.py:3292
+#: src/qualcoder/__main__.py:3528
 msgid "Closing project: "
 msgstr "Fermer le projet : "
 
-#: src/qualcoder/__main__.py:3358
+#: src/qualcoder/__main__.py:3594
 msgid "Deleting: "
 msgstr "Suppression : "
 
-#: src/qualcoder/__main__.py:3367
+#: src/qualcoder/__main__.py:3603
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
@@ -6906,32 +7392,32 @@ msgstr ""
 "L’IA est configurée et activée. Allez dans IA > Paramètres pour modifier les "
 "paramètres."
 
-#: src/qualcoder/__main__.py:3369
+#: src/qualcoder/__main__.py:3605
 msgid "AI Setup Wizard"
 msgstr "Assistant de configuration IA"
 
-#: src/qualcoder/__main__.py:3371
+#: src/qualcoder/__main__.py:3607
 msgid "AI: Setup Wizard"
 msgstr "IA : Assistant de configuration"
 
-#: src/qualcoder/__main__.py:3374
+#: src/qualcoder/__main__.py:3610
 msgid "AI: Setup Wizard finished"
 msgstr "IA : L'assistant d'installation est terminé"
 
-#: src/qualcoder/__main__.py:3383
+#: src/qualcoder/__main__.py:3619
 msgid "Please enable the AI first and set it in Settings."
 msgstr "Veuillez d'abord activer l'IA et la définir dans les paramètres."
 
-#: src/qualcoder/__main__.py:3384 src/qualcoder/__main__.py:3388
-#: src/qualcoder/__main__.py:3393 src/qualcoder/__main__.py:3418
+#: src/qualcoder/__main__.py:3620 src/qualcoder/__main__.py:3624
+#: src/qualcoder/__main__.py:3629 src/qualcoder/__main__.py:3654
 msgid "Rebuild AI Memory"
 msgstr "Reconstruire la mémoire de l'IA"
 
-#: src/qualcoder/__main__.py:3387
+#: src/qualcoder/__main__.py:3623
 msgid "The AI is busy or not set up correctly."
 msgstr "L'IA est occupée ou n'est pas configurée correctement."
 
-#: src/qualcoder/__main__.py:3391
+#: src/qualcoder/__main__.py:3627
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
@@ -6939,23 +7425,23 @@ msgstr ""
 "Cette opération relit tous vos documents empiriques, ce qui peut prendre un "
 "certain temps. Voulez-vous continuer ?"
 
-#: src/qualcoder/__main__.py:3409 src/qualcoder/__main__.py:3417
+#: src/qualcoder/__main__.py:3645 src/qualcoder/__main__.py:3653
 msgid "Please enable the AI first and set it up in Settings."
 msgstr "Veuillez d'abord activer l'IA et la configurer dans les paramètres."
 
-#: src/qualcoder/__main__.py:3410
+#: src/qualcoder/__main__.py:3646
 msgid "Ai Chat"
 msgstr "Discuter avec l'IA"
 
-#: src/qualcoder/__main__.py:3430
+#: src/qualcoder/__main__.py:3666
 msgid "This version: "
 msgstr "Cette version : "
 
-#: src/qualcoder/__main__.py:3437
+#: src/qualcoder/__main__.py:3673
 msgid "Newer release available: "
 msgstr "Une version plus récente est disponible : "
 
-#: src/qualcoder/__main__.py:3442
+#: src/qualcoder/__main__.py:3678
 msgid "Latest Release: "
 msgstr "Dernière mise à jour : "
 
@@ -8152,11 +8638,11 @@ msgstr "Relations entre codes"
 
 #: src/qualcoder/reports.py:113
 msgid "Hide column: "
-msgstr "Masquer la colonne :"
+msgstr "Masquer la colonne : "
 
 #: src/qualcoder/reports.py:117
 msgid "Show column: "
-msgstr "Afficher la colonne :"
+msgstr "Afficher la colonne : "
 
 #: src/qualcoder/reports.py:138
 msgid "Select files to view"
@@ -8192,7 +8678,7 @@ msgstr "Exportation de fichier texte"
 
 #: src/qualcoder/reports.py:482
 msgid "selected files"
-msgstr "Fichiers selectionnés"
+msgstr "fichiers sélectionnés"
 
 #: src/qualcoder/reports.py:523
 msgid "Report"
@@ -8411,517 +8897,3 @@ msgstr " commence avec : "
 #: src/qualcoder/GUI/special_functions.py:54
 msgid "Uncaught Exception"
 msgstr "Uncaught Exception"
-
-#~ msgid "Another language has been set in the config.ini file."
-#~ msgstr "Une autre langue a été sélectionnée dans le fichier config.ini"
-
-#~ msgid "They may not be recently updated"
-#~ msgstr "Elles n’ont peut-être pas été mis à jour récemment."
-
-#~ msgid ", Frequency: "
-#~ msgstr ", Effectif : "
-
-#~ msgid "Folder paths / represents backslash"
-#~ msgstr "Les chemins d’accès au dossier est représenté par un antislash (\\)"
-
-#~ msgid "Date time now: "
-#~ msgstr "Date et heure actuelles : "
-
-#, fuzzy
-#~ msgid "Type:"
-#~ msgstr "Type"
-
-#, fuzzy
-#~ msgid "Date:"
-#~ msgstr "Date : "
-
-#, fuzzy
-#~ msgid "Prompt:"
-#~ msgstr "Instruction :\n"
-
-#, fuzzy
-#~ msgid "AI"
-#~ msgstr "IA : "
-
-#, fuzzy
-#~ msgid "Attribute added: "
-#~ msgstr "Attribut supprimé : "
-
-#, fuzzy
-#~ msgid "Minimum:"
-#~ msgstr "Minimum : "
-
-#, fuzzy
-#~ msgid "Maximum:"
-#~ msgstr "Maximum : "
-
-#, fuzzy
-#~ msgid "File:"
-#~ msgstr "Fichier : "
-
-#, fuzzy
-#~ msgid "Characters:"
-#~ msgstr "Caractères : "
-
-#, fuzzy
-#~ msgid "Image:"
-#~ msgstr "Image : "
-
-#, fuzzy
-#~ msgid "AV media:"
-#~ msgstr "Média : "
-
-#, fuzzy
-#~ msgid "added to case."
-#~ msgstr "Fichier ajouté au cas"
-
-#, fuzzy
-#~ msgid "Codebook for"
-#~ msgstr "Mémos de la grille de codage"
-
-#, fuzzy
-#~ msgid "Category:"
-#~ msgstr "Catégorie : "
-
-#, fuzzy
-#~ msgid "Codings:"
-#~ msgstr "Codages : "
-
-#, fuzzy
-#~ msgid "From:"
-#~ msgstr "De : "
-
-#, fuzzy
-#~ msgid "Merged from category:"
-#~ msgstr "Mémo de catégorie : "
-
-#, fuzzy
-#~ msgid "Merger date:"
-#~ msgstr "Fusionner le code : "
-
-#, fuzzy
-#~ msgid "CODE:"
-#~ msgstr "CODE : "
-
-#, fuzzy
-#~ msgid "MEMO:"
-#~ msgstr "MÉMO : "
-
-#, fuzzy
-#~ msgid "Merged from code:"
-#~ msgstr "Fusionner le code : "
-
-#, fuzzy
-#~ msgid "Code renamed:"
-#~ msgstr "Code renommé : "
-
-#, fuzzy
-#~ msgid "Category renamed:"
-#~ msgstr "Catégorie renommée : "
-
-#, fuzzy
-#~ msgid "for:"
-#~ msgstr " pour : "
-
-#, fuzzy
-#~ msgid "No coded memo"
-#~ msgstr "Egalement des mémos codés"
-
-#, fuzzy
-#~ msgid "Co-occurring codes"
-#~ msgstr "Co-occurences de code"
-
-#, fuzzy
-#~ msgid "CODE MEMO"
-#~ msgstr "MÉMO DE CODE : "
-
-#, fuzzy
-#~ msgid "Scale:"
-#~ msgstr "Échelle : "
-
-#, fuzzy
-#~ msgid "Survey file:"
-#~ msgstr "Sélectionnez le fichier d'enquête"
-
-#, fuzzy
-#~ msgid "Rows:"
-#~ msgstr "Lignes : "
-
-#, fuzzy
-#~ msgid "About"
-#~ msgstr "À propos : "
-
-#, fuzzy
-#~ msgid "Acknowledgements"
-#~ msgstr "Segments codés"
-
-#, fuzzy
-#~ msgid "Project menu shortcuts"
-#~ msgstr "Importation du projet"
-
-#, fuzzy
-#~ msgid "Open Project menu"
-#~ msgstr "Mémo du projet"
-
-#, fuzzy
-#~ msgid "New project"
-#~ msgstr "Nouveau projet : "
-
-#, fuzzy
-#~ msgid "Manage files"
-#~ msgstr "Fichiers de données"
-
-#, fuzzy
-#~ msgid "Open project"
-#~ msgstr "Ouvrez d'abord un projet."
-
-#, fuzzy
-#~ msgid "Manage cases"
-#~ msgstr "Trop de cas"
-
-#, fuzzy
-#~ msgid "Open Coding menu"
-#~ msgstr "Ouvrir : "
-
-#, fuzzy
-#~ msgid "Close project"
-#~ msgstr "Fermer le projet : "
-
-#, fuzzy
-#~ msgid "Manage journals"
-#~ msgstr "Inclure le journal"
-
-#, fuzzy
-#~ msgid "Manage attributes"
-#~ msgstr "Cacher les attributs"
-
-#, fuzzy
-#~ msgid "Open Help menu"
-#~ msgstr "Mémo ouvert"
-
-#, fuzzy
-#~ msgid "Manage references"
-#~ msgstr "Éditer la référence"
-
-#, fuzzy
-#~ msgid "Code text"
-#~ msgstr "Textes codés"
-
-#, fuzzy
-#~ msgid "Code retrieval"
-#~ msgstr "Arbre des codes"
-
-#, fuzzy
-#~ msgid "Code image"
-#~ msgstr "Images codés"
-
-#, fuzzy
-#~ msgid "Code comparison"
-#~ msgstr "Paire de codes"
-
-#, fuzzy
-#~ msgid "Code audio/video"
-#~ msgstr "Audios / vidéos codés"
-
-#, fuzzy
-#~ msgid "Code comparison by file"
-#~ msgstr "Codes par fichier"
-
-#, fuzzy
-#~ msgid "Special functions"
-#~ msgstr "Sélection"
-
-#, fuzzy
-#~ msgid "Colour scheme"
-#~ msgstr "Couleur"
-
-#, fuzzy
-#~ msgid "File summary"
-#~ msgstr "Résumé du projet"
-
-#, fuzzy
-#~ msgid "Code summary"
-#~ msgstr "Résumé du projet"
-
-#, fuzzy
-#~ msgid "Open Graph"
-#~ msgstr "Sauvegarder le graphique"
-
-#, fuzzy
-#~ msgid "Charts"
-#~ msgstr "Caractères : "
-
-#, fuzzy
-#~ msgid "Database queries"
-#~ msgstr "Requêtes par défaut"
-
-#, fuzzy
-#~ msgid "Journals"
-#~ msgstr "Journaux : "
-
-#, fuzzy
-#~ msgid "References"
-#~ msgstr "Référence"
-
-#, fuzzy
-#~ msgid "Create case"
-#~ msgstr "Sélectionner un cas"
-
-#, fuzzy
-#~ msgid "Create journal"
-#~ msgstr "Nouveau journal"
-
-#, fuzzy
-#~ msgid "Import file"
-#~ msgstr "Importer un fichier relié"
-
-#, fuzzy
-#~ msgid "Import cases"
-#~ msgstr "Importation réussie."
-
-#, fuzzy
-#~ msgid "Unlink file"
-#~ msgstr "Importer un fichier relié"
-
-#, fuzzy
-#~ msgid "Link to file"
-#~ msgstr "Mauvais liens avec les dossiers"
-
-#, fuzzy
-#~ msgid "Case file manager"
-#~ msgstr "Filtre de cas"
-
-#, fuzzy
-#~ msgid "Export all"
-#~ msgstr "Exportation du chat"
-
-#, fuzzy
-#~ msgid "Create text file"
-#~ msgstr "Élément de texte libre"
-
-#, fuzzy
-#~ msgid "Add attribute"
-#~ msgstr "Ajout d'un attribut ("
-
-#, fuzzy
-#~ msgid "Delete journal"
-#~ msgstr "Journal de fichier"
-
-#, fuzzy
-#~ msgid "Import references"
-#~ msgstr "Importer les cooccurrences"
-
-#, fuzzy
-#~ msgid "Export attributes"
-#~ msgstr "Afficher les attributs"
-
-#, fuzzy
-#~ msgid "Delete reference"
-#~ msgstr "Supprimer cette référence."
-
-#, fuzzy
-#~ msgid "Export to linked file"
-#~ msgstr "Importer un fichier relié"
-
-#, fuzzy
-#~ msgid "Delete case"
-#~ msgstr "Sélectionner un cas"
-
-#, fuzzy
-#~ msgid "Export file"
-#~ msgstr "Exporter vers un fichier ODT"
-
-#, fuzzy
-#~ msgid "Link selected"
-#~ msgstr "Fichier sélectionné"
-
-#, fuzzy
-#~ msgid "Insert timestamp in format"
-#~ msgstr "Format d'horodatage"
-
-#, fuzzy
-#~ msgid "Code text key shortcuts"
-#~ msgstr "Coder le texte par nombre de caractères"
-
-#, fuzzy
-#~ msgid "Open file memo"
-#~ msgstr "Fichier ouvert"
-
-#, fuzzy
-#~ msgid "Filter files by attributes"
-#~ msgstr "Sélectionner des fichiers par attributs"
-
-#, fuzzy
-#~ msgid "Show selected code previous"
-#~ msgstr "Codeurs sélectionnés : "
-
-#, fuzzy
-#~ msgid "Show selected code next"
-#~ msgstr "Codeurs sélectionnés : "
-
-#, fuzzy
-#~ msgid "Show codes marked important"
-#~ msgstr "Afficher les codages marqués comme importants"
-
-#, fuzzy
-#~ msgid "Create bookmark - at clicked position"
-#~ msgstr "Décaler les codages après le clic de position"
-
-#, fuzzy
-#~ msgid "Memo code - at clicked position"
-#~ msgstr "Décaler les codages après le clic de position"
-
-#, fuzzy
-#~ msgid "New code - for selected text"
-#~ msgstr "Aucun codeur·euse sélectionné"
-
-#, fuzzy
-#~ msgid "assign in vivo code to selected text"
-#~ msgstr "Lier le segment au texte sélectionné"
-
-#, fuzzy
-#~ msgid "Code PDF key shortcuts"
-#~ msgstr "Code par caractères"
-
-#, fuzzy
-#~ msgid "Code image key shortcuts"
-#~ msgstr "Diagramme circulaire par zone d'image"
-
-#, fuzzy
-#~ msgid "Code audio/video key shortcuts"
-#~ msgstr "Code par segments audio/vidéo"
-
-#, fuzzy
-#~ msgid "Tag important"
-#~ msgstr "Marquer comme important"
-
-#, fuzzy
-#~ msgid "Cycle through overlapping codes at clicked position"
-#~ msgstr "Décaler les codages après le clic de position"
-
-#, fuzzy
-#~ msgid "Shows cursor position in text area"
-#~ msgstr "Afficher les fichiers contenant du texte"
-
-#, fuzzy
-#~ msgid "Run SQL query"
-#~ msgstr "Sauvegarder la requête"
-
-#, fuzzy
-#~ msgid "Attribute added to journals:"
-#~ msgstr "Attribut ajouté aux cas : "
-
-#, fuzzy
-#~ msgid "Journal exported to:"
-#~ msgstr "Exportation de journal"
-
-#, fuzzy
-#~ msgid "Renamed database file entry:"
-#~ msgstr "Entrée de fichier de base de données renommée : "
-
-#, fuzzy
-#~ msgid "Case linked:"
-#~ msgstr " relié"
-
-#, fuzzy
-#~ msgid "Attribute added to files:"
-#~ msgstr "Attribut ajouté aux cas : "
-
-#, fuzzy
-#~ msgid "error "
-#~ msgstr "Erreur"
-
-#, fuzzy
-#~ msgid "Media folder:"
-#~ msgstr "Rechercher des données"
-
-#, fuzzy
-#~ msgid "Position"
-#~ msgstr " Positions :"
-
-#, fuzzy
-#~ msgid "ANNOTATION"
-#~ msgstr "ANNOTÉ"
-
-#, fuzzy
-#~ msgid "Coding by: All coders"
-#~ msgstr "Codeur·euse : Tous les codeur·euses"
-
-#, fuzzy
-#~ msgid "Coding by: "
-#~ msgstr "Codages : "
-
-#, fuzzy
-#~ msgid "Attributes:"
-#~ msgstr "Attributs : "
-
-#, fuzzy
-#~ msgid " Files: "
-#~ msgstr "Fichiers : "
-
-#, fuzzy
-#~ msgid "Count:"
-#~ msgstr "Compte : "
-
-#, fuzzy
-#~ msgid "Percent of file:"
-#~ msgstr "Fichier de remplacement : "
-
-#, fuzzy
-#~ msgid "Code count totals"
-#~ msgstr "Analyse du code"
-
-#, fuzzy
-#~ msgid "Overlapping codes:"
-#~ msgstr "Montrer les codes se chevauchant"
-
-#, fuzzy
-#~ msgid "Delete coded section."
-#~ msgstr "Supprimer le texte codé"
-
-#, fuzzy
-#~ msgid "FILE MEMO:"
-#~ msgstr ""
-#~ " \n"
-#~ "ER : "
-
-#, fuzzy
-#~ msgid "CASE MEMO:"
-#~ msgstr "MÉMO DE CAS : "
-
-#, fuzzy
-#~ msgid "Project Opened: "
-#~ msgstr "Projet fusionné"
-
-#, fuzzy
-#~ msgid "Project path: "
-#~ msgstr "Importation du projet"
-
-#, fuzzy
-#~ msgid "Project date: "
-#~ msgstr "Mémo de projet : "
-
-#, fuzzy
-#~ msgid "Code categories: "
-#~ msgstr "Codes et catégories"
-
-#~ msgid ""
-#~ "Avoid selecting text combinations of unmarked text sections and coded/"
-#~ "annotated/case-assigned sections."
-#~ msgstr ""
-#~ "Évitez de combiner des sections de texte non marquées avec des sections "
-#~ "codées/annotées/cassées."
-
-#~ msgid "Positions may not correctly adjust."
-#~ msgstr "Les positions peuvent ne pas s'ajuster correctement."
-
-#~ msgid ""
-#~ "Do not code this text until you reload Coding - Code Text from the menu "
-#~ "bar."
-#~ msgstr ""
-#~ "Ne codez pas ce texte avant d'avoir rechargé Codage - Code de texte dans "
-#~ "la barre de menu."
-
-#, fuzzy
-#~ msgid "Codes by XXX"
-#~ msgstr "Codes par cas"
