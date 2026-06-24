@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-23 11:25+0200\n"
+"POT-Creation-Date: 2026-06-24 10:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -201,7 +201,7 @@ msgstr ""
 
 #: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:388
 #: src/qualcoder/view_image.py:402 src/qualcoder/view_av.py:451
-#: src/qualcoder/__main__.py:2621 src/qualcoder/code_text.py:1430
+#: src/qualcoder/__main__.py:2898 src/qualcoder/code_text.py:1430
 #: src/qualcoder/reports.py:403 src/qualcoder/reports.py:492
 msgid "Date: "
 msgstr ""
@@ -462,7 +462,7 @@ msgid ""
 "affect coding stripes display."
 msgstr ""
 
-#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3185
+#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3435
 #: src/qualcoder/code_text.py:5545 src/qualcoder/code_text.py:7771
 msgid "Information"
 msgstr ""
@@ -1464,7 +1464,7 @@ msgstr ""
 #: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
 #: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
 #: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
-#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:1995
+#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:2281
 #: src/qualcoder/report_exact_matches.py:540
 msgid "Coder"
 msgstr ""
@@ -1958,7 +1958,7 @@ msgid ""
 "be lost as well. Do you really want to cancel?"
 msgstr ""
 
-#: src/qualcoder/settings.py:780 src/qualcoder/__main__.py:1994
+#: src/qualcoder/settings.py:780 src/qualcoder/__main__.py:2280
 msgid "Settings"
 msgstr ""
 
@@ -3061,7 +3061,7 @@ msgstr ""
 msgid " imported."
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2608
+#: src/qualcoder/manage_files.py:2083 src/qualcoder/__main__.py:2885
 msgid " created."
 msgstr ""
 
@@ -3532,7 +3532,7 @@ msgid "Project export error "
 msgstr ""
 
 #: src/qualcoder/refi.py:2019 src/qualcoder/refi.py:2025
-#: src/qualcoder/__main__.py:2502 src/qualcoder/__main__.py:2522
+#: src/qualcoder/__main__.py:2779 src/qualcoder/__main__.py:2799
 msgid "Project"
 msgstr ""
 
@@ -3709,7 +3709,7 @@ msgstr ""
 msgid "Codes tree"
 msgstr ""
 
-#: src/qualcoder/code_color_scheme.py:339
+#: src/qualcoder/code_color_scheme.py:345
 msgid "Perspective: "
 msgstr ""
 
@@ -5074,6 +5074,217 @@ msgstr ""
 msgid "This will update the database schema. Then try merging again."
 msgstr ""
 
+#: src/qualcoder/information.py:440
+msgid ""
+"# Manage\n"
+"\n"
+"The Manage tab displays workspaces for organising cases, files, attributes, "
+"journals, and references.\n"
+"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among "
+"them.\n"
+"\n"
+"\n"
+"## [Manage Files](qualcoder://menu/files_and_cases/manage_files)\n"
+"\n"
+"- This menu lets you add and remove empirical data in your project.\n"
+"- You can import plain text and many other document types,\n"
+"including PDFs, images, audio, and video.\n"
+"- You may also import survey data.\n"
+"- Before importing text files, you may want to create pseudonyms to protect "
+"the privacy of people or organisations.\n"
+"- [Help: Import files](qualcoder://help/3.2.-Files/)\n"
+"\n"
+"\n"
+"## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)\n"
+"\n"
+"- You can use cases to group files together that are related to a topic, "
+"person, organisation, or any other empirical entity in your study. \n"
+"- This can be useful for organising your data and for running reports on "
+"specific groups of files.\n"
+"- [Help: Cases](qualcoder://help/3.3.-Cases/)\n"
+"\n"
+"\n"
+"## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)\n"
+"\n"
+"- Journals are used to record your thoughts when coding and analysing "
+"data. \n"
+"- The journal window opens separately from the main window so you can move "
+"between them easily.\n"
+"- [Help: Journals](qualcoder://help/5.2.-Journals/)\n"
+"\n"
+"\n"
+"## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)\n"
+"\n"
+"- Files, cases, and journals can have attributes (variables) that describe "
+"their characteristics. \n"
+"- They can be used to filter and organise data, and to run reports based on "
+"specific criteria. \n"
+"- Use this menu to create and manage such attributes. They can be attached "
+"to files, cases, and journals directly in the respective workspaces. \n"
+"- [Help: Attributes](qualcoder://help/3.4.-Attributes/)\n"
+"\n"
+"\n"
+"## [Manage References](qualcoder://menu/files_and_cases/manage_references)\n"
+"\n"
+"- Bibliographic references can be imported from NBIB and RIS files.\n"
+"- After that, references can be linked to files in the project.\n"
+"- [Help: Import References](qualcoder://help/6.1.-Imports-and-Exports/)\n"
+msgstr ""
+
+#: src/qualcoder/information.py:489
+msgid ""
+"# Coding\n"
+"\n"
+"The Coding tab displays workspaces for coding text, PDFs, images, audio, and "
+"video.\n"
+"Use the [Coding menu](qualcoder://menu/coding) to select an option to "
+"begin. \n"
+"Note that you can only open a particular coding workspace if that type of "
+"data is actually present in the current project. \n"
+"\n"
+"\n"
+"## [Code Text](qualcoder://menu/coding/codes)\n"
+"\n"
+"- Use this workspace to read textual data closely and assign codes to "
+"selected passages.\n"
+"- You can organise codes in a tree, add memos and annotations, create "
+"bookmarks, and mark especially useful segments as important.\n"
+"- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)\n"
+"\n"
+"\n"
+"## [Code Images](qualcoder://menu/coding/code_image)\n"
+"\n"
+"- In this workspace, you can select regions in photographs, diagrams, "
+"screenshots, or other visual material and assign codes to them.\n"
+"- Coded areas are displayed as coloured rectangles linked to your code "
+"system.\n"
+"- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)\n"
+"\n"
+"\n"
+"## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)\n"
+"\n"
+"- Use this workspace to transcribe and/or code time-based media such as "
+"interviews, focus groups, and field recordings.\n"
+"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-"
+"Video/)\n"
+"\n"
+"\n"
+"## [Code PDFs](qualcoder://menu/coding/code_pdf)\n"
+"\n"
+"- This workspace allows you to code text directly in PDF documents when you "
+"want to keep the original page layout in view.\n"
+"- This is useful for articles, reports, and other source material where page "
+"position and formatting matter.\n"
+"- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
+"\n"
+"\n"
+"## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)\n"
+"\n"
+"- This loads a variant of the text coding workspace that uses AI to explore "
+"your data and suggest segments for a selected code.\n"
+"- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
+"\n"
+"\n"
+"## [Code Organiser](qualcoder://menu/coding/code_organiser)\n"
+"\n"
+"- Use this workspace to reorganise your code system using a graphical, mind-"
+"map style interface.\n"
+"- You can move, merge, and rename codes and categories as your analytic "
+"structure becomes clearer.\n"
+"- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)\n"
+"\n"
+"\n"
+"## [Colour Scheme](qualcoder://menu/coding/colour_scheme)\n"
+"\n"
+"- This allows you to change the colour scheme of your codes and "
+"categories. \n"
+"- Special schemes for colour-blind users are available. \n"
+msgstr ""
+
+#: src/qualcoder/information.py:546
+msgid ""
+"# Reports tab\n"
+"\n"
+"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) "
+"and [Reports](qualcoder://menu/reports) menus.\n"
+"\n"
+"\n"
+"## [Analysis](qualcoder://menu/analysis)\n"
+"\n"
+"Use these tools when you want to explore coded segments and relationships in "
+"detail.\n"
+"\n"
+"[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
+"\n"
+"\n"
+"### Retrieval and segment-based analysis\n"
+"\n"
+"These tools help you inspect the actual coded material in your project.\n"
+"\n"
+"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible "
+"analysis tool. It gathers all segments for selected codes or categories and "
+"lets you narrow the results by file, case, attributes, or search text.\n"
+"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) "
+"generates a table with text segments and all associated codes.\n"
+"\n"
+"\n"
+"### Code relationships and overlaps\n"
+"\n"
+"Use these tools to examine how codes relate to one another. They only work "
+"with text files.\n"
+"\n"
+"- [Code relations](qualcoder://menu/analysis/code_relations) shows "
+"proximity, overlap, inclusion, and exact matches between selected codes.\n"
+"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses "
+"on where two codes overlap or directly touch.\n"
+"- [Code text exact matches](qualcoder://menu/analysis/"
+"code_text_exact_matches) lists passages where different codes were applied "
+"to exactly the same text.\n"
+"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map "
+"style view of linked project elements like codes, cases, files, etc. [Help: "
+"Graph](qualcoder://help/5.4.-Graph/)\n"
+"\n"
+"\n"
+"## [Reports](qualcoder://menu/reports)\n"
+"\n"
+"Use these tools when you want summaries, comparisons, counts, charts, or "
+"exports for reporting purposes.\n"
+"\n"
+"[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
+"\n"
+"\n"
+"### Inter-Coder Comparisons\n"
+"\n"
+"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and "
+"[Coding comparison by file](qualcoder://menu/reports/"
+"coding_comparison_by_file) are especially useful for collaborative work and "
+"inter-coder checking.\n"
+"\n"
+"\n"
+"### Summaries, frequencies, and charts\n"
+"\n"
+"These reports summarise patterns across the project rather than showing "
+"every coded segment in detail.\n"
+"\n"
+"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how "
+"often codes and categories have been used.\n"
+"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) "
+"gives a compact overview of where selected codes appear most often.\n"
+"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary]"
+"(qualcoder://menu/reports/code_summary) give focused overviews of one file "
+"or one code at a time.\n"
+"- [Charts](qualcoder://menu/reports/charts) visualises distributions and "
+"comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
+"\n"
+"\n"
+"### Advanced reporting\n"
+"\n"
+"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct "
+"access to the project database for custom analyses. This is most useful when "
+"the standard reports do not answer a specific research question in the exact "
+"form you need.\n"
+msgstr ""
+
 #: src/qualcoder/rqda.py:49
 msgid "Select RQDA file"
 msgstr ""
@@ -6273,7 +6484,7 @@ msgstr ""
 msgid "Project backup created: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1671
+#: src/qualcoder/__main__.py:1672
 msgid ""
 "Welcome\n"
 "\n"
@@ -6283,214 +6494,267 @@ msgid ""
 "\"Yes\" to start now."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1677
+#: src/qualcoder/__main__.py:1678
 msgid "AI Integration"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1996
+#: src/qualcoder/__main__.py:1749 src/qualcoder/__main__.py:1806
+#: src/qualcoder/__main__.py:1900
+msgid "Unsupported QualCoder link target: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1752
+msgid "Menu link has no target path."
+msgstr ""
+
+#: src/qualcoder/__main__.py:1759
+msgid "Menu not found: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1776
+msgid "Menu entry not found: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1781
+msgid "Action cannot contain subentries: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1809
+msgid "Action link has no target path."
+msgstr ""
+
+#: src/qualcoder/__main__.py:1817
+msgid "Action not found: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1819
+msgid "Action name is ambiguous: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1826
+msgid "Action link must end with a menu action."
+msgstr ""
+
+#: src/qualcoder/__main__.py:1866
+msgid "Cannot open link: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:1868
+msgid "Link error"
+msgstr ""
+
+#: src/qualcoder/__main__.py:1879
+msgid "Unsupported link scheme."
+msgstr ""
+
+#: src/qualcoder/__main__.py:1897
+msgid "Menu action is currently disabled."
+msgstr ""
+
+#: src/qualcoder/__main__.py:2282
 msgid "Font"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1997
+#: src/qualcoder/__main__.py:2283
 msgid "Tree font size"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1998
+#: src/qualcoder/__main__.py:2284
 msgid "Working directory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1999
+#: src/qualcoder/__main__.py:2285
 msgid "Show IDs"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2000
+#: src/qualcoder/__main__.py:2286
 msgid "Language"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2001
+#: src/qualcoder/__main__.py:2287
 msgid "Timestamp format"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2002
+#: src/qualcoder/__main__.py:2288
 msgid "Speaker name format"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2003
+#: src/qualcoder/__main__.py:2289
 msgid "Report text context characters: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2004
+#: src/qualcoder/__main__.py:2290
 msgid "Report text context style: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2005
+#: src/qualcoder/__main__.py:2291
 msgid "Style"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2006
+#: src/qualcoder/__main__.py:2292
 msgid "Backup on open"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2007
+#: src/qualcoder/__main__.py:2293
 msgid "Backup AV files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2009
+#: src/qualcoder/__main__.py:2295
 msgid "AI integration is enabled"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2011
+#: src/qualcoder/__main__.py:2297
 msgid "AI integration is disabled"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2014
+#: src/qualcoder/__main__.py:2300
 msgid "Folder paths / represents \\"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2247
+#: src/qualcoder/__main__.py:2533
 msgid "This project contains no text files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2248
+#: src/qualcoder/__main__.py:2534
 msgid "No text files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2261
+#: src/qualcoder/__main__.py:2547
 msgid "This project contains no pdf files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2262
+#: src/qualcoder/__main__.py:2548
 msgid "No pdf files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2277
+#: src/qualcoder/__main__.py:2563
 msgid "This project contains no image files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2278
+#: src/qualcoder/__main__.py:2564
 msgid "No image files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2286
+#: src/qualcoder/__main__.py:2572
 msgid "This project contains no audio/video files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2287
+#: src/qualcoder/__main__.py:2573
 msgid "No a/v files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2290
+#: src/qualcoder/__main__.py:2576
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2291
+#: src/qualcoder/__main__.py:2577
 msgid "Install VLC"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2300
+#: src/qualcoder/__main__.py:2586
 msgid "A/V Coding"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2387
+#: src/qualcoder/__main__.py:2664
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2389
+#: src/qualcoder/__main__.py:2666
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2390
+#: src/qualcoder/__main__.py:2667
 msgid "REFI-QDA import steps"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2394 src/qualcoder/__main__.py:2411
-#: src/qualcoder/__main__.py:2427
+#: src/qualcoder/__main__.py:2671 src/qualcoder/__main__.py:2688
+#: src/qualcoder/__main__.py:2704
 msgid "Project creation"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2394
+#: src/qualcoder/__main__.py:2671
 msgid "REFI-QDA Project not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2406
+#: src/qualcoder/__main__.py:2683
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Taguette.sqlite3 file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2407 src/qualcoder/__main__.py:2423
+#: src/qualcoder/__main__.py:2684 src/qualcoder/__main__.py:2700
 msgid "RQDA import steps"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2411 src/qualcoder/__main__.py:2427
+#: src/qualcoder/__main__.py:2688 src/qualcoder/__main__.py:2704
 msgid "Project not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2420
+#: src/qualcoder/__main__.py:2697
 msgid "IMPORTING RQDA PROJECT"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2422
+#: src/qualcoder/__main__.py:2699
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2440
+#: src/qualcoder/__main__.py:2717
 msgid "Are you sure you want to quit?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2498
+#: src/qualcoder/__main__.py:2775
 msgid "Enter project name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2502
+#: src/qualcoder/__main__.py:2779
 msgid "No project created."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2521
+#: src/qualcoder/__main__.py:2798
 msgid "Project creation error "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2522
+#: src/qualcoder/__main__.py:2799
 msgid " not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2608
+#: src/qualcoder/__main__.py:2885
 msgid "New project: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2609
+#: src/qualcoder/__main__.py:2886
 msgid "Opening: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2619
+#: src/qualcoder/__main__.py:2896
 msgid "New Project Created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2620
+#: src/qualcoder/__main__.py:2897
 msgid "DB Version:"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2622
+#: src/qualcoder/__main__.py:2899
 msgid "About: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2623
+#: src/qualcoder/__main__.py:2900
 msgid "Coder:"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2626
+#: src/qualcoder/__main__.py:2903
 msgid "Problem creating database "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2681
+#: src/qualcoder/__main__.py:2945
 msgid "Coder name changed to: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2704
+#: src/qualcoder/__main__.py:2954
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -6503,159 +6767,159 @@ msgid ""
 "AI.)"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2709
+#: src/qualcoder/__main__.py:2959
 msgid "Memo for project "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2716
+#: src/qualcoder/__main__.py:2966
 msgid "Project memo entered."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2740 src/qualcoder/special_functions.py:113
+#: src/qualcoder/__main__.py:2990 src/qualcoder/special_functions.py:113
 msgid "Open project directory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2762
+#: src/qualcoder/__main__.py:3012
 msgid "Cannot open file"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2787
+#: src/qualcoder/__main__.py:3037
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2790
+#: src/qualcoder/__main__.py:3040
 msgid "Coder name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2792
+#: src/qualcoder/__main__.py:3042
 msgid "Keep"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2793
+#: src/qualcoder/__main__.py:3043
 msgid "Switch"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2794
+#: src/qualcoder/__main__.py:3044
 msgid "Cancel"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2803
+#: src/qualcoder/__main__.py:3053
 msgid "Default coder name changed to: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2831 src/qualcoder/__main__.py:2860
-#: src/qualcoder/__main__.py:2880 src/qualcoder/__main__.py:2905
-#: src/qualcoder/__main__.py:2976 src/qualcoder/__main__.py:3000
-#: src/qualcoder/__main__.py:3008 src/qualcoder/__main__.py:3020
-#: src/qualcoder/__main__.py:3028 src/qualcoder/__main__.py:3036
-#: src/qualcoder/__main__.py:3045 src/qualcoder/__main__.py:3053
-#: src/qualcoder/__main__.py:3061 src/qualcoder/__main__.py:3071
-#: src/qualcoder/__main__.py:3079
+#: src/qualcoder/__main__.py:3081 src/qualcoder/__main__.py:3110
+#: src/qualcoder/__main__.py:3130 src/qualcoder/__main__.py:3155
+#: src/qualcoder/__main__.py:3226 src/qualcoder/__main__.py:3250
+#: src/qualcoder/__main__.py:3258 src/qualcoder/__main__.py:3270
+#: src/qualcoder/__main__.py:3278 src/qualcoder/__main__.py:3286
+#: src/qualcoder/__main__.py:3295 src/qualcoder/__main__.py:3303
+#: src/qualcoder/__main__.py:3311 src/qualcoder/__main__.py:3321
+#: src/qualcoder/__main__.py:3329
 msgid "Updating database to version"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3086
+#: src/qualcoder/__main__.py:3336
 msgid "Deleting code_text coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3093
+#: src/qualcoder/__main__.py:3343
 msgid "Deleting code_image coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3100
+#: src/qualcoder/__main__.py:3350
 msgid "Deleting code_av coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3150
+#: src/qualcoder/__main__.py:3400
 msgid "Repaired a cyclic code/category hierarchy."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3185
+#: src/qualcoder/__main__.py:3435
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3210
+#: src/qualcoder/__main__.py:3460
 msgid "Project summary"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3218
+#: src/qualcoder/__main__.py:3468
 msgid "Project memo: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3225 src/qualcoder/reports.py:405
+#: src/qualcoder/__main__.py:3475 src/qualcoder/reports.py:405
 #: src/qualcoder/reports.py:407 src/qualcoder/reports.py:493
 msgid "Files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3258
+#: src/qualcoder/__main__.py:3508
 msgid "Bad links to files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3292
+#: src/qualcoder/__main__.py:3528
 msgid "Closing project: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3358
+#: src/qualcoder/__main__.py:3594
 msgid "Deleting: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3367
+#: src/qualcoder/__main__.py:3603
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3369
+#: src/qualcoder/__main__.py:3605
 msgid "AI Setup Wizard"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3371
+#: src/qualcoder/__main__.py:3607
 msgid "AI: Setup Wizard"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3374
+#: src/qualcoder/__main__.py:3610
 msgid "AI: Setup Wizard finished"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3383
+#: src/qualcoder/__main__.py:3619
 msgid "Please enable the AI first and set it in Settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3384 src/qualcoder/__main__.py:3388
-#: src/qualcoder/__main__.py:3393 src/qualcoder/__main__.py:3418
+#: src/qualcoder/__main__.py:3620 src/qualcoder/__main__.py:3624
+#: src/qualcoder/__main__.py:3629 src/qualcoder/__main__.py:3654
 msgid "Rebuild AI Memory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3387
+#: src/qualcoder/__main__.py:3623
 msgid "The AI is busy or not set up correctly."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3391
+#: src/qualcoder/__main__.py:3627
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3409 src/qualcoder/__main__.py:3417
+#: src/qualcoder/__main__.py:3645 src/qualcoder/__main__.py:3653
 msgid "Please enable the AI first and set it up in Settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3410
+#: src/qualcoder/__main__.py:3646
 msgid "Ai Chat"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3430
+#: src/qualcoder/__main__.py:3666
 msgid "This version: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3437
+#: src/qualcoder/__main__.py:3673
 msgid "Newer release available: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3442
+#: src/qualcoder/__main__.py:3678
 msgid "Latest Release: "
 msgstr ""
 
