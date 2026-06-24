@@ -3196,9 +3196,13 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null)",
-                    ('v16', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
-                     0, self.app.settings['codername'], ""))
+        cur.execute(
+            "INSERT INTO project (databaseversion, date, memo, about, bookmarkfile, bookmarkpos, "
+            "codername, recently_used_codes, last_ai_chat_id, avbookmarkfile, avbookmarkmsec, "
+            "avbookmarktextpos) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+            ('v17', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '',
+             qualcoder_version, 0, 0, self.app.settings['codername'], "", None, None, None, None)
+        )
         self.app.conn.commit()
         try:
             # Get and display some project details
@@ -3632,7 +3636,6 @@ Click "Yes" to start now.')
         # Database version v15
         v15_updated = False
         for column_name, alter_sql in (
-                ("last_ai_chat_id", "ALTER TABLE project ADD last_ai_chat_id integer"),
                 ("avbookmarkfile", "ALTER TABLE project ADD avbookmarkfile integer"),
                 ("avbookmarkmsec", "ALTER TABLE project ADD avbookmarkmsec integer"),
                 ("avbookmarktextpos", "ALTER TABLE project ADD avbookmarktextpos integer")):
@@ -3653,6 +3656,19 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v16", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v16")
+        # Database version v17 - persist the last selected AI chat in the project table.
+        v17_updated = False
+        try:
+            cur.execute("select last_ai_chat_id from project")
+        except sqlite3.OperationalError:
+            cur.execute("ALTER TABLE project ADD last_ai_chat_id integer")
+            v17_updated = True
+        cur.execute("select databaseversion from project")
+        database_version = cur.fetchone()[0]
+        if v17_updated or database_version in ("v15", "v16"):
+            cur.execute('update project set databaseversion="v17", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v17")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
