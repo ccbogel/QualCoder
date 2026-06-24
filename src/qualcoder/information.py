@@ -22,13 +22,12 @@ https://qualcoder.org/
 """
 
 import html
-import re
-
 from markdown_it import MarkdownIt
 from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import logging
 import qtawesome as qta
+import re
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
@@ -64,7 +63,7 @@ def _qtawesome_icon_data_uri(icon_name, color, size=16, y_offset=0):
 
 
 def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_font_size, doc_font_family, heading_icon_name=None):
-    """Render placeholder tab Markdown to HTML, icluding link decoration, etc.
+    """Render placeholder tab Markdown to HTML, including link decoration, etc.
     """
 
     icon_size = round(doc_font_size * 2)
@@ -125,9 +124,14 @@ class DialogInformation(QtWidgets.QDialog):
          view_graph_original.ViewGraphOriginal.circular_graph.TextGraphicsItem
     """
 
-    def __init__(self, app, title, html=""):
+    def __init__(self, app, title, html_string=""):
         """Display information text in dialog.
-        If no html is given, fill with About html. """
+        If no html is given, fill with About html.
+        Args:
+            app: App object
+            title: String
+            html_string: html string for contents
+        """
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
@@ -138,19 +142,22 @@ class DialogInformation(QtWidgets.QDialog):
         self.text = ""
         self.information = ""
         self.setWindowTitle(title)
-        if html == "":
+        if html_string == "":
             qualcoder_tag = app.version.split("QualCoder ")[1]
             about_modifed = about.replace("QualCoderVersion", app.version)
             about_modifed = about_modifed.replace("QualCoderTag", qualcoder_tag)
             self.setHtml(about_modifed)
         else:
-            self.setHtml(html)
+            self.setHtml(html_string)
 
-    def setHtml(self, html):
+    def setHtml(self, html_string):
         """This method is used to populate the textEdit.
-        Usually called from a View_graph TextGraphicsItem via a context menu. """
+        Usually called from a View_graph TextGraphicsItem via a context menu.
+        Args:
+            html_string: string of html
+        """
 
-        self.text = html
+        self.text = html_string
         self.ui.textEdit.setHtml(self.text)
 
     def accept(self):
@@ -397,6 +404,8 @@ Ctrl 4 {_("Filter files by attributes")}<br />\
 Ctrl 9 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
 A {_("Annotate - for current selection")}<br />\
+B <br />\
+Shift B <br />\
 C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 G {_("Assign segment to currently selected code, and open memo for segment.")}<br />\
 I {_("Tag important")}<br />\
