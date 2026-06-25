@@ -1630,7 +1630,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         id_ = cur.fetchone()[0]
         item['id'] = id_
         ui = DialogEditTextFile(self.app, id_)
-        ui.ui.textEdit.setAcceptRichText(False)
         ui.exec()
         icon, metadata, err_ = self.get_icon_and_metadata(id_)
         item['icon'] = icon
