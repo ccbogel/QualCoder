@@ -4544,7 +4544,7 @@ N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avan
     <message>
         <location filename="../GUI/ui_main.py" line="397"/>
         <source>Colour scheme</source>
-        <translation>Schéma de couleurs</translation>
+        <translation>Palette de couleurs</translation>
     </message>
     <message>
         <location filename="../GUI/ui_main.py" line="398"/>
@@ -4604,7 +4604,7 @@ N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avan
     <message>
         <location filename="../GUI/ui_main.py" line="412"/>
         <source>Code organiser</source>
-        <translation>Organisateur du code</translation>
+        <translation type="unfinished">Organisateur des codes</translation>
     </message>
     <message>
         <location filename="../GUI/ui_main.py" line="413"/>
