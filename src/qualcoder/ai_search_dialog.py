@@ -39,6 +39,8 @@ from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+AI_SEARCH_SCOPE_DESCENDANT_LIMIT = 50
+AI_SEARCH_SCOPE_CHAR_LIMIT = 8000
 
 
 class DialogAiSearch(QtWidgets.QDialog):
@@ -718,6 +720,17 @@ class DialogAiSearch(QtWidgets.QDialog):
             res.extend(self._iter_code_items_from_tree(item.child(i)))
         return res
 
+    def _iter_descendant_tree_items(self, item: QtWidgets.QTreeWidgetItem) -> list:
+        """Return all descendant category/code items below item, excluding item itself."""
+
+        res = []
+        for i in range(item.childCount()):
+            child = item.child(i)
+            if self._tree_item_scope_type(child) in ('category', 'code'):
+                res.append(child)
+            res.extend(self._iter_descendant_tree_items(child))
+        return res
+
     def _selected_tree_items_without_selected_ancestors(self) -> list:
         """Return selected tree items, excluding items already covered by a selected ancestor."""
 
@@ -796,6 +809,71 @@ class DialogAiSearch(QtWidgets.QDialog):
                 lines.append(f"{idx}. {scope_type}: {path}")
                 lines.append(_("Memo: ") + memo)
         return "\n".join(lines).strip()
+
+    def _build_search_scope_context(self, item: QtWidgets.QTreeWidgetItem, include_memos: bool) -> str:
+        """Build the semantic search context for one selected code/category tree item."""
+
+        if item is None:
+            return ''
+        lines = []
+        root_type = self._tree_item_scope_type(item)
+        root_type_label = _("Category") if root_type == 'category' else _("Code")
+        root_path = self._tree_item_path(item)
+        root_memo = str(item.toolTip(2) if item.toolTip(2) is not None else '').strip()
+        notes = []
+        if include_memos and root_memo != '':
+            lines.append(f"{root_type_label}: {root_path}")
+            lines.append(_("Memo: ") + root_memo)
+
+        descendants = self._iter_descendant_tree_items(item)
+        descendant_total = len(descendants)
+        descendant_limited = descendants[:AI_SEARCH_SCOPE_DESCENDANT_LIMIT]
+        descendant_count_truncated = descendant_total > len(descendant_limited)
+        if len(descendant_limited) > 0:
+            lines.append(
+                _("Selected search scope includes {count} descendant categories/codes listed below.").format(
+                    count=len(descendant_limited)
+                )
+            )
+            for descendant in descendant_limited:
+                descendant_type = self._tree_item_scope_type(descendant)
+                descendant_type_label = _("Category") if descendant_type == 'category' else _("Code")
+                descendant_path = self._tree_item_path(descendant)
+                lines.append(f"- {descendant_type_label}: {descendant_path}")
+                if include_memos:
+                    descendant_memo = str(descendant.toolTip(2) if descendant.toolTip(2) is not None else '').strip()
+                    if descendant_memo != '':
+                        lines.append(_("Memo: ") + descendant_memo)
+            if descendant_count_truncated:
+                omitted = descendant_total - len(descendant_limited)
+                notes.append(
+                    _("Note: Only the first {limit} descendant categories/codes are included here; {omitted} additional items were omitted.").format(
+                        limit=AI_SEARCH_SCOPE_DESCENDANT_LIMIT,
+                        omitted=omitted,
+                    )
+                )
+
+        core_text = "\n".join(lines).strip()
+        notes_text = "\n\n".join([note for note in notes if str(note).strip() != ""]).strip()
+        if core_text == '' and notes_text == '':
+            return ''
+        combined_text = core_text
+        if notes_text != '':
+            combined_text = (combined_text + "\n\n" + notes_text).strip() if combined_text != '' else notes_text
+        if len(combined_text) <= AI_SEARCH_SCOPE_CHAR_LIMIT:
+            return combined_text
+
+        char_truncation_note = _(
+            "Note: Search context was truncated at {limit} characters; some descendant items or memos were omitted."
+        ).format(limit=AI_SEARCH_SCOPE_CHAR_LIMIT)
+        final_notes = [note for note in notes if str(note).strip() != ""]
+        final_notes.append(char_truncation_note)
+        final_notes_text = "\n\n".join(final_notes)
+        allowed_length = max(0, AI_SEARCH_SCOPE_CHAR_LIMIT - len(final_notes_text) - 2)
+        truncated_text = core_text[:allowed_length].rstrip()
+        if truncated_text == '':
+            return final_notes_text[:AI_SEARCH_SCOPE_CHAR_LIMIT].rstrip()
+        return truncated_text + "\n\n" + final_notes_text
            
     def ok(self):
         """Collect the infos needed for the ai based search and the filters applied 
@@ -834,10 +912,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                     self.selected_code_ids = self._get_codes_from_tree(item)
                     self.selected_code_scope = []
                     self.selected_code_name = self._tree_item_path(item)
-                    if include_memos:
-                        self.selected_code_memo = item.toolTip(2)
-                    else:
-                        self.selected_code_memo = ''
+                    self.selected_code_memo = self._build_search_scope_context(item, include_memos)
                 self.include_coded_segments = self.ui.checkBox_coded_segments.isChecked()
         else:  # free search selected
             self.selected_code_ids = None
