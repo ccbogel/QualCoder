@@ -3759,8 +3759,12 @@ class DialogAIChat(QtWidgets.QDialog):
             if memo != "":
                 lines.append(f"   Memo: {memo}")
             included_codes = list(raw_scope.get("included_codes", []) or [])
-            if scope_type == "category":
-                lines.append(f"   Includes {len(included_codes)} descendant code(s).")
+            should_describe_included_codes = scope_type == "category" or len(included_codes) > 1
+            if should_describe_included_codes:
+                if scope_type == "category":
+                    lines.append(f"   Includes {len(included_codes)} descendant code(s).")
+                else:
+                    lines.append(f"   Includes {len(included_codes)} code(s) in this selected code tree.")
                 for code_scope_item in included_codes[:max_codes_per_scope]:
                     if not isinstance(code_scope_item, dict):
                         continue
