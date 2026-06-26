@@ -1375,6 +1375,16 @@ class AiLLM():
                 name = self._short_change_label(self._lookup_code_name(int(op.get("cid", -1))))
             if name == "":
                 return ""
+            impact = op.get("impact", {})
+            counts = impact.get("counts", {}) if isinstance(impact, dict) else {}
+            scope = self._format_ai_change_scope(
+                codes=int(counts.get("codes", 0)),
+                codings=int(counts.get("total_codings", 0)),
+            )
+            if int(counts.get("codes", 0)) > 1:
+                if scope != "":
+                    return _("Moved code tree: ") + name + " (" + scope + ")"
+                return _("Moved code tree: ") + name
             return _("Moved code: ") + name
 
         if op_type == "move_coding_text":
@@ -1407,17 +1417,24 @@ class AiLLM():
         if op_type == "delete_code":
             name = self._short_change_label(op.get("name", ""))
             counts = self._snapshot_counts(op)
-            codings = (
-                int(counts.get("text_codings", 0)) +
-                int(counts.get("av_codings", 0)) +
-                int(counts.get("image_codings", 0))
+            scope = self._format_ai_change_scope(
+                codes=int(counts.get("codes", 0)),
+                codings=(
+                    int(counts.get("text_codings", 0)) +
+                    int(counts.get("av_codings", 0)) +
+                    int(counts.get("image_codings", 0))
+                ),
             )
             if name == "" and allow_db_lookup:
                 name = self._short_change_label(self._lookup_code_name(int(op.get("cid", -1))))
             if name == "":
                 return ""
-            if codings > 0:
-                return _("Deleted code: ") + name + " (" + str(codings) + " " + _("coding(s)") + ")"
+            if int(counts.get("codes", 0)) > 1:
+                if scope != "":
+                    return _("Deleted code tree: ") + name + " (" + scope + ")"
+                return _("Deleted code tree: ") + name
+            if scope != "":
+                return _("Deleted code: ") + name + " (" + scope + ")"
             return _("Deleted code: ") + name
 
         if op_type == "delete_coding_text":
@@ -1675,7 +1692,7 @@ class AiLLM():
         cid = int(op.get("cid", -1))
         if cid <= 0:
             return False, "invalid", None
-        cur.execute("SELECT cid, name, owner FROM code_name WHERE cid=?", (cid,))
+        cur.execute("SELECT cid, name, owner, catid, supercid FROM code_name WHERE cid=?", (cid,))
         row = cur.fetchone()
         if row is None:
             return False, "missing", None
@@ -1683,6 +1700,13 @@ class AiLLM():
         if expected_name != "" and row[1] != expected_name:
             return False, "changed", row
         if str(row[2]) != "AI Agent":
+            return False, "changed", row
+        expected_catid = op.get("catid", None)
+        expected_supercid = op.get("supercid", None)
+        if row[3] != expected_catid or row[4] != expected_supercid:
+            return False, "changed", row
+        cur.execute("SELECT count(*) FROM code_name WHERE supercid=?", (cid,))
+        if int((cur.fetchone() or [0])[0] or 0) > 0:
             return False, "changed", row
         return True, "ok", row
 
@@ -1902,12 +1926,13 @@ class AiLLM():
         cid = int(op.get("cid", -1))
         if cid <= 0:
             return False, "invalid", None
-        cur.execute("SELECT cid, catid FROM code_name WHERE cid=?", (cid,))
+        cur.execute("SELECT cid, catid, supercid FROM code_name WHERE cid=?", (cid,))
         row = cur.fetchone()
         if row is None:
             return False, "missing", None
         expected_catid = op.get("after", {}).get("catid", None)
-        if row[1] != expected_catid:
+        expected_supercid = op.get("after", {}).get("supercid", None)
+        if row[1] != expected_catid or row[2] != expected_supercid:
             return False, "changed", row
         return True, "ok", row
 
@@ -2315,7 +2340,7 @@ class AiLLM():
         if revert_moved_categories > 0:
             lines.append(str(revert_moved_categories) + _(" moved category tree(s) would be moved back to their previous parent."))
         if revert_moved_codes > 0:
-            lines.append(str(revert_moved_codes) + _(" moved code(s) would be moved back to their previous category."))
+            lines.append(str(revert_moved_codes) + _(" moved code(s) would be moved back to their previous parent."))
         if revert_moved_codings > 0:
             lines.append(str(revert_moved_codings) + _(" moved text coding(s) would be moved back to their previous code."))
         if skipped_changed > 0:
@@ -2703,8 +2728,12 @@ class AiLLM():
                             stats["removed_skipped"] += 1
                         continue
                     cur.execute(
-                        "UPDATE code_name SET catid=? WHERE cid=?",
-                        (op.get("before", {}).get("catid", None), int(row[0])),
+                        "UPDATE code_name SET catid=?, supercid=? WHERE cid=?",
+                        (
+                            op.get("before", {}).get("catid", None),
+                            op.get("before", {}).get("supercid", None),
+                            int(row[0]),
+                        ),
                     )
                     if cur.rowcount > 0:
                         stats["undone"] += 1

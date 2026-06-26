@@ -873,7 +873,8 @@ class AiMcpServer:
                 {
                     "name": "codes/create_code",
                     "description": (
-                        "Create a new code. Use catid to assign the code to a category, or null for top-level."
+                        "Create a new code. Use catid to assign the code to a category, "
+                        "supercid to nest it under another code, or null for top-level."
                     ),
                     "inputSchema": {
                         "type": "object",
@@ -881,6 +882,7 @@ class AiMcpServer:
                             "name": {"type": "string"},
                             "memo": {"type": "string"},
                             "catid": {"type": ["integer", "null"]},
+                            "supercid": {"type": ["integer", "null"]},
                             "color": {"type": "string"},
                         },
                         "required": ["name"],
@@ -922,8 +924,9 @@ class AiMcpServer:
                 {
                     "name": "codes/preview_delete_code",
                     "description": (
-                        "Preview the impact of deleting a code and all its codings. "
-                        "Returns affected coding counts, warnings, and a preview_token for execution."
+                        "Preview the impact of deleting a code subtree recursively, including descendant "
+                        "subcodes and all codings that use any code in the subtree. Returns affected "
+                        "subtree counts, warnings, and a preview_token for execution."
                     ),
                     "inputSchema": {
                         "type": "object",
@@ -979,7 +982,7 @@ class AiMcpServer:
                 {
                     "name": "codes/move_code",
                     "description": (
-                        "Move a code to another category or to top-level. "
+                        "Move a code subtree under another code, under a category, or to top-level. "
                         "Requires Full access."
                     ),
                     "inputSchema": {
@@ -987,6 +990,7 @@ class AiMcpServer:
                         "properties": {
                             "cid": {"type": "integer"},
                             "new_catid": {"type": ["integer", "null"]},
+                            "new_supercid": {"type": ["integer", "null"]},
                         },
                         "required": ["cid"],
                         "additionalProperties": False,
@@ -1011,7 +1015,8 @@ class AiMcpServer:
                 {
                     "name": "codes/delete_code",
                     "description": (
-                        "Delete a code and all related codings. "
+                        "Delete a code subtree recursively, including descendant subcodes and all codings "
+                        "that use any code in the subtree. "
                         "Requires Full access and a preview_token from codes/preview_delete_code."
                     ),
                     "inputSchema": {
@@ -1349,6 +1354,14 @@ class AiMcpServer:
             catid = self._to_int(catid_raw, -1)
             if catid <= 0:
                 raise ValueError("catid must be a positive integer or null.")
+        supercid_raw = arguments.get("supercid", None)
+        supercid = None
+        if supercid_raw is not None:
+            supercid = self._to_int(supercid_raw, -1)
+            if supercid <= 0:
+                raise ValueError("supercid must be a positive integer or null.")
+        if catid is not None and supercid is not None:
+            raise ValueError("Provide either catid or supercid, not both.")
         color = self._normalize_hex_color(arguments.get("color"))
         if color == "":
             color = "#8A8A8A"
@@ -1361,9 +1374,12 @@ class AiMcpServer:
                 row = cur.execute("SELECT catid FROM code_cat WHERE catid=?", (catid,)).fetchone()
                 if row is None:
                     raise ValueError(f"Category id {catid} not found.")
+            if supercid is not None and self._fetch_code_row_cur(cur, supercid) is None:
+                raise ValueError(f"Parent code id {supercid} not found.")
 
             existing = cur.execute(
-                "SELECT cid, owner, ifnull(memo,''), catid, color FROM code_name WHERE lower(name)=lower(?)",
+                "SELECT cid, owner, ifnull(memo,''), catid, supercid, color "
+                "FROM code_name WHERE lower(name)=lower(?)",
                 (name,),
             ).fetchone()
             if existing is not None:
@@ -1377,13 +1393,15 @@ class AiMcpServer:
                         "owner": existing[1],
                         "memo": existing[2],
                         "catid": existing[3],
-                        "color": existing[4],
+                        "supercid": existing[4],
+                        "color": existing[5],
                     },
                 }
 
             cur.execute(
-                "INSERT INTO code_name (name, memo, catid, owner, date, color) VALUES (?, ?, ?, ?, ?, ?)",
-                (name, memo, catid, self.AI_AGENT_OWNER, now, color),
+                "INSERT INTO code_name (name, memo, catid, owner, date, color, supercid) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (name, memo, catid, self.AI_AGENT_OWNER, now, color, supercid),
             )
             cid = int(cur.lastrowid)
             conn.commit()
@@ -1398,6 +1416,7 @@ class AiMcpServer:
                     "name": name,
                     "memo": memo,
                     "catid": catid,
+                    "supercid": supercid,
                     "color": color,
                     "owner": self.AI_AGENT_OWNER,
                     "created_at": now,
@@ -1412,6 +1431,7 @@ class AiMcpServer:
                     "name": name,
                     "memo": memo,
                     "catid": catid,
+                    "supercid": supercid,
                     "color": color,
                     "owner": self.AI_AGENT_OWNER,
                     "date": now,
@@ -1568,7 +1588,9 @@ class AiMcpServer:
             impact = self._build_code_impact(cur, code)
             signature = {"tool": "codes/delete_code", "cid": cid}
             preview_token = self._issue_preview_token("codes/delete_code", signature)
-            warnings = [_("Deleting this code also removes all codings that use it.")]
+            warnings = [
+                _("Deleting this code removes the full subcode tree, including descendant subcodes and all codings that use any code in the subtree.")
+            ]
             non_ai = int(impact["counts"].get("non_ai_codings", 0))
             if non_ai > 0:
                 warnings.append(
@@ -1583,6 +1605,9 @@ class AiMcpServer:
                 "code": self._code_ref(code),
                 "category": self._category_ref(
                     self._fetch_category_row_cur(cur, code.get("catid", None))
+                ),
+                "parent_code": self._code_ref(
+                    self._fetch_code_row_cur(cur, code.get("supercid", None))
                 ),
                 "impact": impact,
                 "warnings": warnings,
@@ -1765,6 +1790,14 @@ class AiMcpServer:
             new_catid = self._to_int(new_catid_raw, -1)
             if new_catid <= 0:
                 raise ValueError("new_catid must be a positive integer or null.")
+        new_supercid_raw = arguments.get("new_supercid", None)
+        new_supercid = None
+        if new_supercid_raw is not None:
+            new_supercid = self._to_int(new_supercid_raw, -1)
+            if new_supercid <= 0:
+                raise ValueError("new_supercid must be a positive integer or null.")
+        if new_catid is not None and new_supercid is not None:
+            raise ValueError("Provide either new_catid or new_supercid, not both.")
         conn = self._connect()
         try:
             cur = conn.cursor()
@@ -1773,27 +1806,37 @@ class AiMcpServer:
                 raise ValueError(f"Code id {cid} not found.")
             if new_catid is not None and self._fetch_category_row_cur(cur, new_catid) is None:
                 raise ValueError(f"Target category id {new_catid} not found.")
+            if new_supercid is not None:
+                parent_code = self._fetch_code_row_cur(cur, new_supercid)
+                if parent_code is None:
+                    raise ValueError(f"Target code id {new_supercid} not found.")
+                if self._code_is_descendant_cur(cur, new_supercid, cid):
+                    raise ValueError("A code cannot be moved into its own subcode tree.")
             old_catid = code.get("catid", None)
-            if old_catid == new_catid:
+            old_supercid = code.get("supercid", None)
+            if old_catid == new_catid and old_supercid == new_supercid:
                 return {
                     "tool": "codes/move_code",
                     "moved": False,
                     "reason": "unchanged",
                     "code": self._code_ref(code),
                 }
-            cur.execute("UPDATE code_name SET catid=? WHERE cid=?", (new_catid, cid))
+            cur.execute("UPDATE code_name SET catid=?, supercid=? WHERE cid=?", (new_catid, new_supercid, cid))
             conn.commit()
             if hasattr(self.app, "delete_backup"):
                 self.app.delete_backup = False
-            impact = self._build_code_impact(cur, code)
+            moved_code = dict(code)
+            moved_code["catid"] = new_catid
+            moved_code["supercid"] = new_supercid
+            impact = self._build_code_impact(cur, moved_code)
             self._record_ai_change(
                 change_set_id,
                 {
                     "type": "move_code",
                     "cid": cid,
                     "name": str(code.get("name", "")),
-                    "before": {"catid": old_catid},
-                    "after": {"catid": new_catid},
+                    "before": {"catid": old_catid, "supercid": old_supercid},
+                    "after": {"catid": new_catid, "supercid": new_supercid},
                     "impact": impact,
                 },
             )
@@ -1801,9 +1844,11 @@ class AiMcpServer:
             return {
                 "tool": "codes/move_code",
                 "moved": True,
-                "code": self._code_ref(code),
+                "code": self._code_ref(moved_code),
                 "old_catid": old_catid,
                 "new_catid": new_catid,
+                "old_supercid": old_supercid,
+                "new_supercid": new_supercid,
                 "impact": impact,
             }
         except Exception:
@@ -1878,8 +1923,17 @@ class AiMcpServer:
                 raise ValueError(f"Code id {cid} not found.")
             impact = self._build_code_impact(cur, code)
             snapshot = self._build_code_snapshot(cur, cid)
-            self._delete_codings_for_code_ids(cur, [cid])
-            cur.execute("DELETE FROM code_name WHERE cid=?", (cid,))
+            code_ids = [
+                int(item["cid"])
+                for item in snapshot.get("tables", {}).get("code_name", [])
+                if isinstance(item, dict) and self._to_int(item.get("cid"), -1) > 0
+            ]
+            self._delete_codings_for_code_ids(cur, code_ids)
+            if len(code_ids) > 0:
+                cur.execute(
+                    "DELETE FROM code_name WHERE cid IN (" + ",".join(["?"] * len(code_ids)) + ")",
+                    tuple(code_ids),
+                )
             conn.commit()
             if hasattr(self.app, "delete_backup"):
                 self.app.delete_backup = False
@@ -2556,6 +2610,8 @@ class AiMcpServer:
             "cid": code.get("cid", None),
             "name": str(code.get("name", "")),
             "owner": str(code.get("owner", "")),
+            "catid": code.get("catid", None),
+            "supercid": code.get("supercid", None),
         }
 
     def _case_ref(self, case: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -2606,7 +2662,8 @@ class AiMcpServer:
             return None
         return self._fetchone_dict_cur(
             cur,
-            "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date FROM code_name WHERE cid=?",
+            "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date, supercid "
+            "FROM code_name WHERE cid=?",
             (cid_i,),
         )
 
@@ -2790,18 +2847,74 @@ class AiMcpServer:
         category_ids = [int(item["catid"]) for item in subtree_categories]
         codes: List[Dict[str, Any]] = []
         if len(category_ids) > 0:
-            placeholders = ",".join(["?"] * len(category_ids))
-            codes = self._fetchall_dict_cur(
+            category_id_set = set(category_ids)
+            all_codes = self._fetchall_dict_cur(
                 cur,
-                "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date "
-                f"FROM code_name WHERE catid IN ({placeholders}) ORDER BY cid",
-                tuple(category_ids),
+                "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date, supercid "
+                "FROM code_name ORDER BY cid",
             )
+            by_supercid: Dict[Any, List[Dict[str, Any]]] = {}
+            queue: List[Dict[str, Any]] = []
+            for code in all_codes:
+                by_supercid.setdefault(code.get("supercid", None), []).append(code)
+                if self._to_int(code.get("catid"), -1) in category_id_set:
+                    queue.append(code)
+            seen_codes = set()
+            while len(queue) > 0:
+                code = queue.pop(0)
+                code_cid = self._to_int(code.get("cid"), -1)
+                if code_cid <= 0 or code_cid in seen_codes:
+                    continue
+                seen_codes.add(code_cid)
+                codes.append(code)
+                for child in by_supercid.get(code_cid, []):
+                    queue.append(child)
         return {
             "root_category": root_category,
             "categories": subtree_categories,
             "codes": codes,
         }
+
+    def _collect_code_subtree(self, cur: sqlite3.Cursor, root_cid: int) -> Dict[str, Any]:
+        codes = self._fetchall_dict_cur(
+            cur,
+            "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date, supercid "
+            "FROM code_name ORDER BY cid",
+        )
+        by_parent: Dict[Any, List[Dict[str, Any]]] = {}
+        root_code = None
+        for code in codes:
+            if int(code.get("cid", -1)) == root_cid:
+                root_code = code
+            by_parent.setdefault(code.get("supercid", None), []).append(code)
+        if root_code is None:
+            raise ValueError(f"Code id {root_cid} not found.")
+
+        subtree_codes: List[Dict[str, Any]] = []
+        queue: List[Dict[str, Any]] = [root_code]
+        seen = set()
+        while len(queue) > 0:
+            code = queue.pop(0)
+            cid = int(code.get("cid", -1))
+            if cid in seen or cid <= 0:
+                continue
+            seen.add(cid)
+            subtree_codes.append(code)
+            for child in by_parent.get(cid, []):
+                queue.append(child)
+        return {
+            "root_code": root_code,
+            "codes": subtree_codes,
+        }
+
+    def _code_is_descendant_cur(self, cur: sqlite3.Cursor, candidate_cid: int, ancestor_cid: int) -> bool:
+        if candidate_cid == ancestor_cid:
+            return True
+        subtree = self._collect_code_subtree(cur, ancestor_cid)
+        for code in subtree.get("codes", [])[1:]:
+            if int(code.get("cid", -1)) == candidate_cid:
+                return True
+        return False
 
     def _collect_table_rows_by_cids(self, cur: sqlite3.Cursor, table_name: str,
                                     cid_values: List[int]) -> List[Dict[str, Any]]:
@@ -2859,10 +2972,13 @@ class AiMcpServer:
 
     def _build_code_impact(self, cur: sqlite3.Cursor, code: Dict[str, Any]) -> Dict[str, Any]:
         cid = int(code.get("cid", -1))
-        coding_counts = self._count_codings_for_code_ids(cur, [cid] if cid > 0 else [])
+        subtree = self._collect_code_subtree(cur, cid) if cid > 0 else {"codes": []}
+        code_rows = subtree.get("codes", [])
+        code_ids = [int(item.get("cid", -1)) for item in code_rows if int(item.get("cid", -1)) > 0]
+        coding_counts = self._count_codings_for_code_ids(cur, code_ids)
         return {
             "counts": {
-                "codes": 1,
+                "codes": len(code_rows),
                 "text_codings": int(coding_counts.get("code_text", 0)),
                 "av_codings": int(coding_counts.get("code_av", 0)),
                 "image_codings": int(coding_counts.get("code_image", 0)),
@@ -2870,20 +2986,20 @@ class AiMcpServer:
                 "non_ai_codings": int(coding_counts.get("non_ai_codings", 0)),
             },
             "examples": {
-                "codes": [str(code.get("name", ""))],
+                "codes": [str(item.get("name", "")) for item in code_rows[:5]],
             },
         }
 
     def _build_code_snapshot(self, cur: sqlite3.Cursor, cid: int) -> Dict[str, Any]:
-        code = self._fetch_code_row_cur(cur, cid)
-        if code is None:
-            raise ValueError(f"Code id {cid} not found.")
+        subtree = self._collect_code_subtree(cur, cid)
+        codes = [dict(item) for item in subtree.get("codes", [])]
+        code_ids = [int(item.get("cid", -1)) for item in codes if int(item.get("cid", -1)) > 0]
         return {
             "tables": {
-                "code_name": [dict(code)],
-                "code_text": self._collect_table_rows_by_cids(cur, "code_text", [cid]),
-                "code_av": self._collect_table_rows_by_cids(cur, "code_av", [cid]),
-                "code_image": self._collect_table_rows_by_cids(cur, "code_image", [cid]),
+                "code_name": codes,
+                "code_text": self._collect_table_rows_by_cids(cur, "code_text", code_ids),
+                "code_av": self._collect_table_rows_by_cids(cur, "code_av", code_ids),
+                "code_image": self._collect_table_rows_by_cids(cur, "code_image", code_ids),
             }
         }
 
@@ -2957,7 +3073,7 @@ class AiMcpServer:
 
         codes = []
         for row in self._fetchall(
-            "SELECT cid, name, ifnull(memo,''), catid, color, owner "
+            "SELECT cid, name, ifnull(memo,''), catid, color, owner, supercid "
             "FROM code_name ORDER BY lower(name)"
         ):
             codes.append(
@@ -2968,6 +3084,7 @@ class AiMcpServer:
                     "catid": row[3],
                     "color": row[4],
                     "owner": row[5],
+                    "supercid": row[6],
                 }
             )
         speaker_prefix = "ðŸ“Œ "
@@ -2978,8 +3095,8 @@ class AiMcpServer:
                 speaker_categories.append({"catid": cat["catid"], "name": cat_name})
 
         structure_rules = {
-            "codes_are_leaves": True,
-            "codes_can_have_subcodes": False,
+            "codes_are_leaves": False,
+            "codes_can_have_subcodes": True,
             "categories_can_contain_codes": True,
             "categories_can_have_subcategories": True,
         }
