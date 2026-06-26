@@ -1551,13 +1551,14 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="245"/>
       <source>Code name filter</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodnamnsfilter</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="242"/>
       <source>Go to bookmark (Shift B)
 To set a bookmark press B</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Gå till bookmark (Shift B)
+För att ställa in en bokmärkespress B</translation>
     </message>
   </context>
   <context>
@@ -1756,7 +1757,7 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="247"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; Kodnamnsfilter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
   </context>
   <context>
@@ -1966,7 +1967,7 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="322"/>
       <source>Code name filter</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodnamnsfilter</translation>
     </message>
   </context>
   <context>
@@ -2343,7 +2344,7 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
       <source>Search for text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sök efter text</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="540"/>
@@ -2358,7 +2359,7 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="563"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; Kodnamnsfilter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
   </context>
   <context>
@@ -2406,7 +2407,7 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="85"/>
       <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Välj (✓) ditt kodnamn. Justera synligheten hos andra:</translation>
     </message>
   </context>
   <context>
@@ -2480,7 +2481,7 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
       <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="74"/>
       <source>Case sensitive</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fall känslig</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="73"/>
@@ -2497,7 +2498,8 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
       <source>When editing text: Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.
 Positions may not correctly adjust. Make  a backup copy of the project before editing text.
 </source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">När du redigerar text: Undvik att välja textkombinationer av omärkta textavsnitt och kodade/annoterade/falltilldelade sektioner.
+Positioner kan inte korrekt justera. Gör en säkerhetskopia av projektet innan du redigerar text.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="75"/>
@@ -2831,7 +2833,7 @@ Vid enkäter med många svar (t.ex. fler än 1 000) kan det ta längre tid, så 
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="51"/>
       <source>Automatic search through folders for the file</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Automatisk sökning genom mappar för filen</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="53"/>
@@ -2839,7 +2841,10 @@ Vid enkäter med många svar (t.ex. fler än 1 000) kan det ta längre tid, så 
 This is useful when you have a big change such as copying the project and external files to another computer.
 
 e.g. from C:/users/OldUser/Images to C:/usersNewUser/Images</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ändra filväg länk över alla filer.
+Detta är användbart när du har en stor förändring som att kopiera projektet och externa filer till en annan dator.
+
+från C:/users/OldUser/Images till C:/usersNewUser/Images</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="57"/>
@@ -3068,12 +3073,12 @@ Skiftlägeskänsligt, lägg till flera poster för varje: t.ex. Tom Jones  och T
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="94"/>
       <source>Show frequencies broken down by where they were coded</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Visa frekvenser bryts ned av var de kodades</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="95"/>
       <source>Breakdown by source (text / image / A/V)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Brytning efter källa (text / bild / A / V)</translation>
     </message>
   </context>
   <context>
@@ -3836,7 +3841,13 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language = 
 Then update it. For example: 
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Stäng och öppna programvaran för att språkförändringen ska ske.
+Språk uppdateras regelbundet (av människa och/eller AI) är: de, es, fr, ja, pt, sv, zh.
+Ytterligare språk kan läggas till om de är listade i src/qualcoder/i18n-mappen.
+För att göra denna uppdatering filen config.ini till ett annat språk som är tillgängligt.
+Hitta linjen börjar språket =
+Sedan uppdatera den. Till exempel:
+Langauge = den</translation>
     </message>
   </context>
   <context>
@@ -4083,33 +4094,35 @@ Röd understrykning = tilldelad kod eller kommentar</translation>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="201"/>
       <source>Ctrl + S start/pause
 Ctrl + P start/pause</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ctrl + S start/paus
+Ctrl + P start/paus</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="209"/>
       <source>Decrease play rate. Ctrl + Shift + &amp;lt; </source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Minska spelhastigheten. Ctrl + Skift + &amp;lt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="210"/>
       <source>Increase play rate. Ctrl + Shift + &amp;gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Öka spelhastigheten. Ctrl + Shift + &amp;gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="211"/>
       <source>Rewind 5 seconds Ctrl + R</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Rewind 5 sekunder Ctrl + R</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="212"/>
       <source>Rewind 30 seconds. Alt + Minus</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Rewind 30 sekunder. Alt + Minus</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="213"/>
       <source>Forward 30 seconds. Alt + Plus
 Forward 5 seconds. Press 5</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Framåt 30 sekunder. Alt + Plus
+Framåt 5 sekunder. Tryck 5</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="222"/>
@@ -4124,37 +4137,37 @@ Forward 5 seconds. Press 5</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="230"/>
       <source>Case sensitive</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fall känslig</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="221"/>
       <source>Search for text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sök efter text</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="226"/>
       <source>New speaker (Ctrl N)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ny talare (Ctrl N)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="227"/>
       <source>Insert timestamp (Ctrl T)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Infoga tidsstämpel (Ctrl T)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="228"/>
       <source>Remove speaker (Ctrl D)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ta bort högtalare (Ctrl D)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="231"/>
       <source>Set bookmark (Ctrl B)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ange bokmärke (Ctrl B)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="232"/>
       <source>Go to bookmark (Ctrl Shift B)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Gå till bookmark (Ctrl Shift B)</translation>
     </message>
   </context>
   <context>
@@ -4239,7 +4252,7 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="100"/>
       <source>&lt;Error Message&gt; </source>
-      <translation/>
+      <translation>&lt;Felmeddelande&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="101"/>
@@ -4657,7 +4670,7 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="361"/>
       <source>Code retrieval</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodhämtning</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="307"/>
@@ -4669,7 +4682,14 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;"&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Select an option from the Manage menu&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC "-/W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1"/&gt;&lt;meta charset="utf-8"/&gt;&lt;style type="text/css"&gt;
+p, li { vitrymd: pre-wrap; }
+hr { höjd: 1px; gränsbredd: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked:marker { content: "\2612"; }
+&lt;/stil&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-stil:normal;"&gt;
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; Välj ett alternativ från menyn Manage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="316"/>
@@ -4681,7 +4701,14 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;"&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Select an option from the coding menu&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC "-/W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1"/&gt;&lt;meta charset="utf-8"/&gt;&lt;style type="text/css"&gt;
+p, li { vitrymd: pre-wrap; }
+hr { höjd: 1px; gränsbredd: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked:marker { content: "\2612"; }
+&lt;/stil&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-stil:normal;"&gt;
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; Välj ett alternativ från kodningsmenyn&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="325"/>
@@ -4693,7 +4720,14 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;"&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Select an option from the Analysis or Reports menu&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC "-/W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1"/&gt;&lt;meta charset="utf-8"/&gt;&lt;style type="text/css"&gt;
+p, li { vitrymd: pre-wrap; }
+hr { höjd: 1px; gränsbredd: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked:marker { content: "\2612"; }
+&lt;/stil&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-stil:normal;"&gt;
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; Välj ett alternativ från menyn Analys eller rapporter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
   </context>
 </TS>
