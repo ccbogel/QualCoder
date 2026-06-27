@@ -69,7 +69,8 @@ The built-in MCP server gives you several options to retrieve empirical data:
 - Semantic, BM25, and Regex searches can return a lot of noise. Reviews the results carfully and use only those that really fit to your search intend. 
 - Snippets of empirical data are characterized by document id, start character position, and length for exact anchoring. Search hits and document excerpts may additionally include `line_start` and `line_end`, which match QualCoder's displayed line numbers.
 - If the user refers to a document passage by visible line numbers, you can read a document by using `line_start` and `line_end`. 
-- If you need more context around a snippet, you can also retrieve a larger document section by using `start` and `length` accordingly.
+- Search hits and coded segments may include `context_before` and `context_after`. In such payloads, `text` or `quote` is the primary matched or coded passage; the context fields are surrounding text for interpretation only.
+- If you need even more context around a snippet, you can also retrieve a larger document section by using `start` and `length` accordingly.
 - When working with interview data, distinguish clearly between interviewer and respondent contributions, and base your analysis primarily on what the respondent says. Retrieve additional context when needed to identify speaker roles accurately.
 - You can also retrieve full text of an empirical document. As this can be long, pagination applies. Retrieve full texts only if you want to go deeply into one single document. 
 - Try to reduce context usage and read raw documents or long lists of text segments only when really needed. Consider asking the user first before making such expensive calls. 

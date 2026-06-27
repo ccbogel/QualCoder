@@ -47,6 +47,8 @@ class AiMcpServer:
     max_regex_page_size = 100
     default_regex_context_chars = 120
     max_regex_context_chars = 1000
+    default_snippet_context_min_chars = 200
+    max_snippet_context_chars = 500
     max_regex_hits = 20000
     default_help_page_size = 5
     max_help_page_size = 20
@@ -3699,6 +3701,7 @@ class AiMcpServer:
                         ),
                     }
                     self._append_line_range_fields(hit_payload, source_fulltext, start_index, len(text))
+                    self._append_snippet_context_fields(hit_payload, source_fulltext, start_index, len(text))
                     hits.append(hit_payload)
                     if len(hits) >= page_size:
                         break
@@ -3875,6 +3878,7 @@ class AiMcpServer:
                 ),
             }
             self._append_line_range_fields(hit_payload, source_fulltext, hit.get("start"), hit.get("length"))
+            self._append_snippet_context_fields(hit_payload, source_fulltext, hit.get("start"), hit.get("length"))
             returned_hits.append(hit_payload)
 
         next_cursor = min(total_hits, cursor + len(returned_hits))
@@ -4030,25 +4034,26 @@ class AiMcpServer:
                     if current_match.start() != match_start or current_match.end() != (match_start + match_length):
                         continue
 
-                    context_text = fulltext[context_start:context_end]
-                    if context_text.strip() == "":
+                    match_text = fulltext[match_start:match_start + match_length]
+                    if match_text.strip() == "":
                         continue
 
                     hit_payload = {
                         "source_id": source_id,
                         "source_name": source_name,
-                        "start": context_start,
-                        "length": len(context_text),
+                        "start": match_start,
+                        "length": len(match_text),
                         "match_start": match_start,
                         "match_length": match_length,
-                        "text": context_text,
+                        "text": match_text,
                         "matching_cases": self._matching_cases_for_range(
                             match_start,
                             match_start + match_length,
                             case_memberships.get(source_id, []),
                         ),
                     }
-                    self._append_line_range_fields(hit_payload, fulltext, context_start, len(context_text))
+                    self._append_line_range_fields(hit_payload, fulltext, match_start, len(match_text))
+                    self._append_snippet_context_fields(hit_payload, fulltext, match_start, len(match_text))
                     hits.append(hit_payload)
                     if len(hits) >= page_size:
                         break
@@ -4788,6 +4793,98 @@ class AiMcpServer:
         payload["line_end"] = line_end
         return payload
 
+    def _find_context_start_boundary(self, fulltext: str, floor: int, ceiling: int) -> Optional[int]:
+        """Prefer paragraph or line starts within one backwards context search window."""
+
+        text = "" if fulltext is None else str(fulltext)
+        if text == "" or ceiling <= floor:
+            return None
+
+        paragraph_boundary = None
+        for match in re.finditer(r"(?:\r\n|\r|\n){2,}", text):
+            candidate = match.end()
+            if floor <= candidate <= ceiling:
+                paragraph_boundary = candidate
+        if paragraph_boundary is not None:
+            return paragraph_boundary
+
+        line_boundary = None
+        for match in re.finditer(r"\r\n|\r|\n", text):
+            candidate = match.end()
+            if floor <= candidate <= ceiling:
+                line_boundary = candidate
+        return line_boundary
+
+    def _find_context_end_boundary(self, fulltext: str, floor: int, ceiling: int) -> Optional[int]:
+        """Prefer paragraph or line ends within one forward context search window."""
+
+        text = "" if fulltext is None else str(fulltext)
+        if text == "" or ceiling <= floor:
+            return None
+
+        for match in re.finditer(r"(?:\r\n|\r|\n){2,}", text):
+            candidate = match.start()
+            if floor <= candidate <= ceiling:
+                return candidate
+
+        for match in re.finditer(r"\r\n|\r|\n", text):
+            candidate = match.start()
+            if floor <= candidate <= ceiling:
+                return candidate
+        return None
+
+    def _snippet_context_fields(self, fulltext: str, start: Any, length: Any) -> Dict[str, str]:
+        """Return surrounding snippet context with natural boundaries where possible."""
+
+        text = "" if fulltext is None else str(fulltext)
+        if text == "":
+            return {"context_before": "", "context_after": ""}
+
+        start_i = self._to_int(start, -1)
+        length_i = self._to_int(length, -1)
+        if start_i < 0 or length_i < 0:
+            return {"context_before": "", "context_after": ""}
+
+        text_len = len(text)
+        if text_len <= 0:
+            return {"context_before": "", "context_after": ""}
+
+        snippet_start = max(0, min(start_i, text_len))
+        snippet_end = max(snippet_start, min(text_len, snippet_start + length_i))
+        if snippet_start >= text_len:
+            return {"context_before": "", "context_after": ""}
+
+        min_chars = max(0, int(self.default_snippet_context_min_chars))
+        max_chars = max(min_chars, int(self.max_snippet_context_chars))
+
+        before_floor = max(0, snippet_start - max_chars)
+        before_ceiling = max(0, snippet_start - min_chars)
+        before_start = before_floor if before_ceiling <= before_floor else before_ceiling
+        preferred_before_start = self._find_context_start_boundary(text, before_floor, before_ceiling)
+        if preferred_before_start is not None:
+            before_start = preferred_before_start
+
+        after_floor = min(text_len, snippet_end + min_chars)
+        after_ceiling = min(text_len, snippet_end + max_chars)
+        after_end = after_ceiling if after_floor >= after_ceiling else after_floor
+        preferred_after_end = self._find_context_end_boundary(text, after_floor, after_ceiling)
+        if preferred_after_end is not None:
+            after_end = preferred_after_end
+
+        before_start = max(0, min(before_start, snippet_start))
+        after_end = max(snippet_end, min(after_end, text_len))
+        return {
+            "context_before": text[before_start:snippet_start],
+            "context_after": text[snippet_end:after_end],
+        }
+
+    def _append_snippet_context_fields(self, payload: Dict[str, Any], fulltext: str,
+                                       start: Any, length: Any) -> Dict[str, Any]:
+        """Attach context_before and context_after to one payload."""
+
+        payload.update(self._snippet_context_fields(fulltext, start, length))
+        return payload
+
     def _fetch_excluded_coding_ranges(self, exclude_cids: List[int], file_ids: List[int]) -> Dict[int, List[Tuple[int, int]]]:
         """Fetch coded text ranges grouped by source id for exclusion filtering."""
 
@@ -4990,6 +5087,12 @@ class AiMcpServer:
                 ),
             }
             self._append_line_range_fields(
+                segment_payload,
+                source_fulltext,
+                row[4],
+                self._to_int(row[5], 0) - self._to_int(row[4], 0),
+            )
+            self._append_snippet_context_fields(
                 segment_payload,
                 source_fulltext,
                 row[4],
