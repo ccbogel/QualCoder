@@ -589,6 +589,7 @@ if __name__ == "__main__":
             update_translation_placeholders(lang)
         elif mode == "--compile":
             recompile_translation(lang)
+            zip_language_files(lang)
         elif mode == "--status":
             analyze_translation_status(lang)
         elif mode == "--zip":
