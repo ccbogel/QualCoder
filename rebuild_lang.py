@@ -391,6 +391,9 @@ def analyze_translation_status(language: str | None = None) -> str:
         "ro": "Română",
         "sv": "Svenska",
         "zh": "中文",
+        "eu": "Euskara",
+        "eo": "Esperanto",
+        "fa": "فارسی"
         # Add new language here
     }
 
