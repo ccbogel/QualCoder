@@ -1,0 +1,4737 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="ht" sourcelanguage="en_US">
+<context>
+    <name>DialogAddAttribute</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_attribute.py" line="41"/>
+        <source>Add Attribute</source>
+        <translation>Ajoute yon atribi</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_attribute.py" line="42"/>
+        <source>Attribute name:</source>
+        <translation>Ajoute yon atribi :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_attribute.py" line="43"/>
+        <source>Character</source>
+        <translation>Caractère</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_attribute.py" line="44"/>
+        <source>Numeric</source>
+        <translation>Numérique</translation>
+    </message>
+</context>
+<context>
+    <name>DialogCharts</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="288"/>
+        <source>Charts</source>
+        <translation>Grafik</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="289"/>
+        <source>Charts displayed in the default web browser</source>
+        <translation>Graphiques affichés dans le navigateur web par défaut</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="290"/>
+        <source>Pie charts</source>
+        <translation>Diagrammes circulaires</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="291"/>
+        <source>Bar charts</source>
+        <translation>Graphiques à barres</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="292"/>
+        <source>Sunburst and treemap charts</source>
+        <translation>Diagramme radial hiérarchique et Treemap</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="294"/>
+        <source>Select coder</source>
+        <translation>Sélectionner un codeur·euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="296"/>
+        <source>Select file</source>
+        <translation>Sélectionnez un fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="298"/>
+        <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
+Codings from the entire text file are used for the calculations.</source>
+        <translation>Si des parties d&apos;un fichier texte sont attribuées à un cas, la fréquence des codes et le nombre total de caractères du texte peuvent être incorrects.
+Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="300"/>
+        <source>Select case</source>
+        <translation>Sélectionner un cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="301"/>
+        <source>Select attributes</source>
+        <translation>Sélectionner les attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="302"/>
+        <source>Filter out values below:</source>
+        <translation>Filtrez les valeurs ci-dessous :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="303"/>
+        <source>Enter number for filter cut off</source>
+        <translation>Entrez le numéro de la coupure du filtre</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="304"/>
+        <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Filtres de données&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="305"/>
+        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Graphiques de codage&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="310"/>
+        <source>Select category</source>
+        <translation>Sélectionnez une catégorie</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="311"/>
+        <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Graphes d&apos;attributs&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="312"/>
+        <source>Numeric attributes</source>
+        <translation>Attributs numériques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="313"/>
+        <source>Character attributes</source>
+        <translation>Attributs de caractère</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="314"/>
+        <source>File</source>
+        <translation>Fichye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="315"/>
+        <source>Case</source>
+        <translation>Ka</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="316"/>
+        <source>Export HTML file</source>
+        <translation>Exporter le fichier HTML</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="317"/>
+        <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Cartes thermiques&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="318"/>
+        <source>Word cloud</source>
+        <translation>Nuage de mots</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="322"/>
+        <source>Width</source>
+        <translation>Lajè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="323"/>
+        <source>Height</source>
+        <translation>Wotè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="324"/>
+        <source>Max words</source>
+        <translation>Nombre maximal de mots</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="326"/>
+        <source>Reverse colour range</source>
+        <translation>Gamme de couleurs inversées</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="327"/>
+        <source>Reverse range</source>
+        <translation>Gamme inversée</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="328"/>
+        <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
+        <translation>Nombre de mots joints dans la phrase. Mots vides s&apos;applique à la sélection d&apos;un seul mot.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="329"/>
+        <source>n-grams</source>
+        <translation>n-grams</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="330"/>
+        <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
+        <translation>1=un mot, 3=une phrase de 3 mots, 4=une phrase de 4 mots</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="331"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cela permet d&apos;élargir la palette de couleurs de la carte thermique en cas de différences de comptage extrêmes..&lt;/p&gt;&lt;p&gt; 0 représente aucune limite.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="332"/>
+        <source>Upper count limiter</source>
+        <translation>Limiteur de nombre maximal</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="321"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Créer un nuage de mots&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="336"/>
+        <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
+        <translation>&lt;b&gt; Graphique à barres cumulé&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="337"/>
+        <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+This is temporary and must be selected each time the Charts screen is opened.
+
+The file must be plain text with one word per line.
+Each word is excluded in the n-grams=1 Word cloud.</source>
+        <translation>La sélection d&apos;un fichier texte ici remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder. 
+Cette modification est temporaire et doit être sélectionnée à chaque ouverture de l&apos;écran Graphiques.
+
+Le fichier doit être au format texte brut, avec un mot par ligne.
+Chaque mot est exclu du nuage de mots n-grams=1.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="342"/>
+        <source>Stop words</source>
+        <translation>Mots vides</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="343"/>
+        <source>Select stopwords list by language</source>
+        <translation>Sélectionner la liste des mots vides par langue</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="306"/>
+        <source>Right-click for text filter</source>
+        <translation>Clic-droit pour filtrer le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="307"/>
+        <source>If portions of a text file are assigned to a case,
+the code frequency and total text characters may be incorrect.
+Codings from the entire text file are used for the calculations.</source>
+        <translation>Si une partie du texte est attribuée à un cas,
+les statistiques de code et de caractères peuvent être erronées.
+Les calculs se font à partir du texte complet.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="319"/>
+        <source>Background</source>
+        <translation>Arrière-plan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="320"/>
+        <source>Foreground</source>
+        <translation>Premye plan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="333"/>
+        <source>Image width</source>
+        <translation>Lajè imaj</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="334"/>
+        <source>Image height</source>
+        <translation>Wotè imaj</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="335"/>
+        <source>Maximum words</source>
+        <translation>Nombre maximal de mots</translation>
+    </message>
+</context>
+<context>
+    <name>DialogGraph</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="130"/>
+        <source>Graph Visualisation</source>
+        <translation>Visualisation des graphiques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="131"/>
+        <source>Export image</source>
+        <translation>Exportation de l&apos;image</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="133"/>
+        <source>Reveal hidden items</source>
+        <translation>Révéler les objets cachés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="132"/>
+        <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
+        <translation>Cliquez sur la zone du graphique et appuyez sur + ou W pour effectuer un zoom avant. Appuyez sur - ou Q pour effectuer un zoom avant ou un zoom arrière.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="134"/>
+        <source>Save graph</source>
+        <translation>Sauvegarder le graphique</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="135"/>
+        <source>Load graph
+Right-click for options</source>
+        <translation>Charger le graphique
+Clic droit pour les options</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="137"/>
+        <source>Delete graph</source>
+        <translation>Supprimer le graphique</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="138"/>
+        <source>Add free text item</source>
+        <translation>Ajouter un élément de texte libre</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="139"/>
+        <source>Add case items</source>
+        <translation>Ajouter des éléments de cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="140"/>
+        <source>Add file items</source>
+        <translation>Ajouter des éléments de fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="141"/>
+        <source>Add connecting line</source>
+        <translation>Ajouter une ligne de connexion</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="142"/>
+        <source>Select code branch</source>
+        <translation>Sélectionnez la branche du code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="143"/>
+        <source>Clear</source>
+        <translation>Vide</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="144"/>
+        <source>Changing to another report will lose unsaved graph.</source>
+        <translation>Le passage à un autre rapport entraîne la perte des graphiques non sauvegardés.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="145"/>
+        <source>Show coded segments of text files</source>
+        <translation>Afficher les segments codés des fichiers texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="146"/>
+        <source>Show coding memos of coded segments</source>
+        <translation>Montrer les mémos de codage des segments codés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="147"/>
+        <source>Show coded areas of image files</source>
+        <translation>Afficher les zones codées des fichiers image</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="148"/>
+        <source>Show coded av segments</source>
+        <translation>Afficher les segments codés av</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="149"/>
+        <source>Export Pdf image</source>
+        <translation>Exporter l&apos;image au format PDF</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="150"/>
+        <source>Export to Draw.io</source>
+        <translation>Exporter vers Draw.io</translation>
+    </message>
+</context>
+<context>
+    <name>DialogMatchingTextSegments</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="109"/>
+        <source>Report matching text segments</source>
+        <translation>Rapport sur les segments de texte correspondants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="110"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur·euse. Vide pour tous.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="111"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="112"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rapport sur les segments de texte de correspondance exacte&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="113"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur·euse. Vide pour tous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
+        <source>Coder</source>
+        <translation>Kodè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="117"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le texte codé doit contenir le texte saisi ci-dessus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="118"/>
+        <source>Include text</source>
+        <translation>Inclure le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="119"/>
+        <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
+        <translation>Sélectionner le(s) fichier(s), le codeur·euse, 2 codes ou plus. Possibilité d&apos;exclure des résultats en excluant un code (clic droit sur le code).</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="120"/>
+        <source>Unchecked - all selected codes must match exactly.
+Checked - any selected codes must match exactly.</source>
+        <translation>Non coché - tous les codes sélectionnés doivent correspondre exactement.
+Coché - tous les codes sélectionnés doivent correspondre exactement.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="122"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le texte codé exact correspondant à plusieurs codes est regroupé sur une seule ligne.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="123"/>
+        <source>One line results</source>
+        <translation>Résultats en une ligne</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
+        <source>Export Excel file</source>
+        <translation>Exporter un fichier Excel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="116"/>
+        <source>Run</source>
+        <translation>Egzekite</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="124"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File attributes filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtre sur les attributs des fichiers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>DialogOrganiser</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="62"/>
+        <source>Graph Visualisation</source>
+        <translation>Visualisation des graphiques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="63"/>
+        <source>Export image</source>
+        <translation>Exportation de l&apos;image</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="64"/>
+        <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
+        <translation>Cliquez sur la zone du graphique et appuyez sur + ou W pour effectuer un zoom avant. Appuyez sur - ou Q pour effectuer un zoom avant ou un zoom arrière.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="65"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Créer une catégorie&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="66"/>
+        <source>Select code branch</source>
+        <translation>Sélectionnez la branche du code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="67"/>
+        <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
+        <translation>Organisateur de codes. Cliquez avec le bouton droit de la souris sur les codes et les catégories pour les lier et les fusionner. Ajouter de nouvelles catégories. Restructurer l&apos;arborescence des codes.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="68"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Appliquer la structure modifiée.&lt;/p&gt;&lt;p&gt;Attention : cette action est irréversible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="69"/>
+        <source>Apply</source>
+        <translation>Aplike</translation>
+    </message>
+</context>
+<context>
+    <name>DialogReferenceEditor</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_reference_editor.py" line="36"/>
+        <source>Reference Editor</source>
+        <translation>Éditeur de référence</translation>
+    </message>
+</context>
+<context>
+    <name>DialogSaveQuery</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_save_query.py" line="52"/>
+        <source>Save Query</source>
+        <translation>Sauvegarder la requête</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_save_query.py" line="53"/>
+        <source>Query name:</source>
+        <translation>Nom de la requête :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_save_query.py" line="54"/>
+        <source>Query Group</source>
+        <translation>Groupe de recherche</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_save_query.py" line="55"/>
+        <source>Description</source>
+        <translation>Deskripsyon</translation>
+    </message>
+</context>
+<context>
+    <name>DialogSegmentCodings</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="94"/>
+        <source>Report Segment Codings</source>
+        <translation>Codages des segments du rapport</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="95"/>
+        <source>Text limiter:</source>
+        <translation>Délimitateur de texte :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="96"/>
+        <source>Run report</source>
+        <translation>Executer le rapport</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="97"/>
+        <source>Coder:</source>
+        <translation>Kodè :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="98"/>
+        <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
+        <translation>Codes par segments de texte tableau. 1 = code présent, 0 = non codé.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="99"/>
+        <source>Export to Excel</source>
+        <translation>Exporter vers Excel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="100"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Selectionner les fichiers par attributs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="101"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichiers. Clic-droit pour sélectionner les options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="102"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cas. Clic-droit pour sélectionner les options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="103"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Clic-droit pour sélectionner les options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_AiPrompts</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="195"/>
+        <source>AI Prompts Library</source>
+        <translation>Bibliothèque des instructions IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="196"/>
+        <source>Analytic Prompts:</source>
+        <translation>Instructions à l&apos;analyse de l&apos;IA :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="197"/>
+        <source>New</source>
+        <translation>Nouvo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="198"/>
+        <source>Duplicate</source>
+        <translation>Kopye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="199"/>
+        <source>Copy prompt to clipboard</source>
+        <translation>Copier l’instruction dans le presse-papiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="204"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="201"/>
+        <source>Paste prompt from clipboard</source>
+        <translation>Coller l&apos;instruction à partir du presse-papiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="203"/>
+        <source>Delete prompt</source>
+        <translation>Supprimer l&apos;instruction</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="205"/>
+        <source>Prompt Name:</source>
+        <translation>Nom de l&apos;instruction :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="206"/>
+        <source>(Uneditable system prompt)</source>
+        <translation>(Instruction non éditable)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="207"/>
+        <source>Scope:</source>
+        <translation>Champ d&apos;application :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="208"/>
+        <source>system</source>
+        <translation>système</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="209"/>
+        <source>user</source>
+        <translation>itilizatè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="210"/>
+        <source>project</source>
+        <translation>pwojè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="211"/>
+        <source>Type:</source>
+        <translation>Tip :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="212"/>
+        <source>Prompt description:</source>
+        <translation>Description de l’instruction IA :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="213"/>
+        <source>Prompt text (this will be send to the AI):</source>
+        <translation>Texte de l’instruction (il sera envoyé à l&apos;IA) :</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_AiSearch</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="208"/>
+        <source>AI search</source>
+        <translation>Rechèch IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="209"/>
+        <source>1) What do you want to search for?</source>
+        <translation>1) Que voulez-vous rechercher ?</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="210"/>
+        <source>Please select a code or category</source>
+        <translation>Veuillez sélectionner un code ou une catégorie</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="211"/>
+        <source>Send not only the name but also the memo associated with a code to the AI?</source>
+        <translation>Envoyer à l&apos;IA non seulement le nom mais aussi le mémo associé à un code ?</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="212"/>
+        <source>Send memo to AI</source>
+        <translation>Envoyer un mémo à l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="213"/>
+        <source>If deselected (default), the AI searches for new material only. Segments already coded with this code are excluded from the results.</source>
+        <translation>Si cette option est désélectionnée (par défaut), l&apos;IA ne recherche que les nouveaux matériaux. Les segments déjà codés avec ce code sont exclus des résultats.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="214"/>
+        <source>Include coded segments</source>
+        <translation>Inclure des segments codés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="217"/>
+        <source>Code search</source>
+        <translation>Recherche de code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="218"/>
+        <source>Topic or phenomenon to search for:</source>
+        <translation>Sujet ou phénomène à rechercher :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="219"/>
+        <source>Enter a good descriptive name for what you are looking for.</source>
+        <translation>Saisissez un nom descriptif approprié pour ce que vous recherchez.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="220"/>
+        <source>Description:</source>
+        <translation>Deskripsyon :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="221"/>
+        <source>Give a short description so that the AI can better understand what you are looking for</source>
+        <translation>Donnez une brève description afin que l&apos;IA puisse mieux comprendre ce que vous recherchez</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="222"/>
+        <source>Free search</source>
+        <translation>Rechèch lib</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="223"/>
+        <source>2) How to analyze the data?</source>
+        <translation>2) Comment analyser les données ?</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="224"/>
+        <source>Analytic Prompt:</source>
+        <translation>Instruction analytique :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="225"/>
+        <source>Edit prompt or create your own (advanced option)</source>
+        <translation>Modifier l’instruction ou créer la vôtre (option avancée)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="226"/>
+        <source> Edit </source>
+        <translation> Modifye </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="227"/>
+        <source>3) Filter the data?</source>
+        <translation>3) Filtrer les données ?</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="228"/>
+        <source>Filter with the help of attributes</source>
+        <translation>Filtrer à l&apos;aide d&apos;attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="229"/>
+        <source>Select Attributes</source>
+        <translation>Sélection d&apos;attribut</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="215"/>
+        <source>TextLabel</source>
+        <translation>Étiquette de texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="216"/>
+        <source>Select coders</source>
+        <translation>Sélectionner un⋅e codeur⋅euse</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_CodeRelations</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="148"/>
+        <source>Code relations</source>
+        <translation>Relations de code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="149"/>
+        <source>Relations between codes in text files.</source>
+        <translation>Relations entre les codes dans les fichiers texte.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="150"/>
+        <source>Export file</source>
+        <translation>Exporter le fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="151"/>
+        <source>Calculate</source>
+        <translation>Kalkile</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="152"/>
+        <source>This coder</source>
+        <translation>Ce codeur·euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="153"/>
+        <source>All coders</source>
+        <translation>Tous les codeur·euses</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="172"/>
+        <source>Codes:</source>
+        <translation>Kòd :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="154"/>
+        <source>Select text files.</source>
+        <translation>Sélectionnez les fichiers texte.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="156"/>
+        <source>All</source>
+        <translation>Tout</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="157"/>
+        <source>Overlap</source>
+        <translation>Chevauchement</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="158"/>
+        <source>Inclusion</source>
+        <translation>Inclusion</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="159"/>
+        <source>Exact</source>
+        <translation>Egzak</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="160"/>
+        <source>Proximity</source>
+        <translation>Proximité</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="161"/>
+        <source>Overlap Inclusion</source>
+        <translation>Chevauchement. Inclusion</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="162"/>
+        <source>Overlap Inclusion Exact</source>
+        <translation>Chevauchement Inclusion Exact</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="163"/>
+        <source>Relationship</source>
+        <translation>Relasyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="164"/>
+        <source>Boxplots of distance between code pairs.</source>
+        <translation>Boîtes à moustaches représentant la distance entre les paires de codes.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="173"/>
+        <source>Summary statistics</source>
+        <translation>Résumé des statistiques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="165"/>
+        <source>Search Results for:</source>
+        <translation>Résultats de recherche pour :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="166"/>
+        <source>Search results for text</source>
+        <translation>Résultats de la recherche pour le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="167"/>
+        <source>Search for next occurence in results</source>
+        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="155"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relationship types&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Types de relations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="170"/>
+        <source>E</source>
+        <translation>E</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="168"/>
+        <source>Export Excel report of exact text coding matches for all  files.
+Ordered by file name and code name.</source>
+        <translation>Exportation d&apos;un rapport Excel des correspondances exactes de codage de texte pour tous les fichiers.
+Classement par nom de fichier et nom de code.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="171"/>
+        <source>Select text files by attributes</source>
+        <translation>Sélection de fichiers texte par attributs</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_Comparisons</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="98"/>
+        <source>Code Counts by file or case</source>
+        <translation>Nombre de codes par fichier ou par dossier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="99"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Afficher les codes qui se chevauchent.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="100"/>
+        <source>Code counts table</source>
+        <translation>Tableau des occurrences des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="101"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exporter le fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="102"/>
+        <source>Hide blank lines</source>
+        <translation>Masquer les lignes vides</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="103"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner les fichiers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="104"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner les categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="105"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Selectionner les codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="106"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Selectionner l’attribut&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="107"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner les cas&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_Coocurrence</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="105"/>
+        <source>Code Co-occurence</source>
+        <translation>Cooccurrence des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="106"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Afficher les codes qui se chevauchent.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="107"/>
+        <source>Code co-occurence</source>
+        <translation>Cooccurrence des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="109"/>
+        <source>Hide blank lines</source>
+        <translation>Masquer les lignes vides</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="108"/>
+        <source>Export to file</source>
+        <translation>Exporter dans un fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="110"/>
+        <source>Select files</source>
+        <translation>Sélectionner les fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="111"/>
+        <source>Select categories</source>
+        <translation>Sélectionner les catégories</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="112"/>
+        <source>Select codes</source>
+        <translation>Sélectionner les codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="113"/>
+        <source>Select files by attributes</source>
+        <translation>Sélectionner des fichiers par attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="114"/>
+        <source>Export to Gephi. GraphML format</source>
+        <translation>Exporter au format GraphML Gephi</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="115"/>
+        <source>Export Co-occurence Graph Image
+Right-click for format options</source>
+        <translation>Exporter l&apos;image du graphique de cooccurrence
+Clic-droit pour  les options de formatage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="117"/>
+        <source>Export Cluster Graph Image
+Right-click for format options
+</source>
+        <translation>Exporter l&apos;image du graphe de cluster
+Clic-droit pour  les options de formatage
+</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_Import</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="90"/>
+        <source>Import</source>
+        <translation>Enpòte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="91"/>
+        <source>Survey Import Options</source>
+        <translation>Options d&apos;importation d&apos;enquête</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="94"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le délimiteur doit être un seul caractère.&lt;/p&gt;&lt;p&gt;tapez &apos;ta&apos; pour &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="95"/>
+        <source>Delimiter:</source>
+        <translation>Délimiteur:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="96"/>
+        <source>Quote format:</source>
+        <translation>Format de citation :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="97"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;AUCUNE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="98"/>
+        <source>NONE</source>
+        <translation>OKENN</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="101"/>
+        <source>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text).</source>
+        <translation>Les modifications apportées à la ligne supérieure remplaceront les modifications apportées par l&apos;utilisateur aux noms et types de champs ci-dessous. Clic-droit sur un en-tête de colonne ci-dessous pour changer le nom de la colonne ou pour passer de Caractère (attribut) à Qualitatif (crée un fichier texte à partir du texte).</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="92"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="93"/>
+        <source>,</source>
+        <translation>,</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="99"/>
+        <source>MINIMAL</source>
+        <translation>MINIMAL</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="100"/>
+        <source>ALL</source>
+        <translation>TOUT</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="102"/>
+        <source>Press OK to import.</source>
+        <translation>Appuyez sur OK pour importer.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="103"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked: All the rows of a qualitative column will be collated into one text file.&lt;/p&gt;&lt;p&gt;If unchecked: Each qualitative answer will be an individual text file within the database.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché : Toutes les lignes d&apos;une colonne qualitative seront rassemblées dans un seul fichier texte.&lt;/p&gt;&lt;p&gt;Si la case n&apos;est pas cochée : Chaque réponse qualitative sera un fichier texte individuel dans la base de données.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="104"/>
+        <source>One file per qualitative column</source>
+        <translation>Un fichier par colonne qualitative</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_Import_twitter</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="53"/>
+        <source>Twitter data import</source>
+        <translation>Importation de données Twitter</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="54"/>
+        <source>Import twitter data file</source>
+        <translation>Importer un fichier de données Twitter</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="55"/>
+        <source>Use the R statistics package to get the twitter data and create a csv file. Then import the csv file.</source>
+        <translation>Utilisez le package statistique R pour obtenir les données Twitter et créer un fichier CSV. Importez ensuite le fichier CSV.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="56"/>
+        <source>Select file</source>
+        <translation>Sélectionnez un fichier</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_QueryDetails</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_queryDetails.py" line="41"/>
+        <source>Query Details</source>
+        <translation>Détails de la requête</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_queryDetails.py" line="42"/>
+        <source>Query Name</source>
+        <translation>Nom de la requête</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_queryDetails.py" line="43"/>
+        <source>Query Description</source>
+        <translation>Description de la requête</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_StartAndEndMarks</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_start_and_end_marks.py" line="61"/>
+        <source>Define start and end marks for auto assigning</source>
+        <translation>Définir les marqueurs de début et de fin pour l&apos;attribution automatique</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_start_and_end_marks.py" line="64"/>
+        <source>Start mark</source>
+        <translation>Marque de départ</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_start_and_end_marks.py" line="65"/>
+        <source>End mark</source>
+        <translation>Marque de fin</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_start_and_end_marks.py" line="66"/>
+        <source>File(s):</source>
+        <translation>Fichye :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_start_and_end_marks.py" line="63"/>
+        <source>.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_start_and_end_marks.py" line="62"/>
+        <source>Define the start and end text marks.</source>
+        <translation>Définissez les marques de début et de fin de texte.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_add_item</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_add_item.py" line="40"/>
+        <source>Add Code</source>
+        <translation>Ajoute yon kòd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_add_item.py" line="41"/>
+        <source>Enter text below:</source>
+        <translation>Entrez le texte ci-dessous :</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_ai_chat</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="146"/>
+        <source>AI Chat</source>
+        <translation>Chat sur l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="147"/>
+        <source>Create a new chat</source>
+        <translation>Créer un nouveau chat</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="148"/>
+        <source>New</source>
+        <translation>Nouvo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="149"/>
+        <source>Delete the selected chat</source>
+        <translation>Supprimer le chat sélectionné</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="150"/>
+        <source>Delete</source>
+        <translation>Efase</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="151"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="152"/>
+        <source>Enter your question here and press Enter to continue the chat</source>
+        <translation>Saisissez votre question ici et appuyez sur la touche Entrée pour poursuivre la discussion</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_assignAttribute</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_assign_attribute.py" line="45"/>
+        <source>Assign attribute</source>
+        <translation>Assigner un attribut</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_assign_attribute.py" line="46"/>
+        <source>Cases</source>
+        <translation>Ka</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_assign_attribute.py" line="47"/>
+        <source>Files</source>
+        <translation>Fichye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_assign_attribute.py" line="48"/>
+        <source>Assign attribute to:</source>
+        <translation>Assigner un attribut à :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_assign_attribute.py" line="49"/>
+        <source>Journals</source>
+        <translation>Jounal</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_case_file_manager</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="82"/>
+        <source>Case file manager</source>
+        <translation>Gestionnaire des fichiers de cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="83"/>
+        <source>Actions</source>
+        <translation>Aksyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="84"/>
+        <source>Auto assign file text to case</source>
+        <translation>Affecter automatique un fichier texte vers un cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="85"/>
+        <source>Add selected files to case</source>
+        <translation>Ajouter les fichiers vers le cas sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="86"/>
+        <source>Remove selected files from case</source>
+        <translation>Enlever les dossiers vers un cas sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="88"/>
+        <source>Can assign text in a file to this case. Right click to mark selected text in a file to assign to this case.</source>
+        <translation>Attribuer du texte dans un fichier vers ce cas. Clic-droit pour surligner le texte sélectionné dans un fichier à affecter à ce cas.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="89"/>
+        <source>Case:</source>
+        <translation>Ka :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="91"/>
+        <source>File:</source>
+        <translation>Fichye :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="92"/>
+        <source>Files linked: </source>
+        <translation>Fichiers reliés : </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="90"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click the file row to view image, audio, or video&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double-cliquez sur la ligne du fichier pour afficher l&apos;image, le son ou la vidéo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="87"/>
+        <source>Hide assigned files</source>
+        <translation>Cacher les fichiers assignés</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_cases</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="104"/>
+        <source>Cases</source>
+        <translation>Ka</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="114"/>
+        <source>Cases: </source>
+        <translation>Ka : </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="106"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ajouter un cas&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="107"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Supprimer le cas&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="109"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ajouter un attribut&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="108"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Importer des cas&lt;/p&gt;&lt;p&gt;Importer à partir d&apos;un fichier csv ou xlsx.&lt;/p&gt;&lt;p&gt;Le fichier doit avoir une ligne d&apos;en-tête et la première colonne doit contenir les noms de cas ou les identifiants uniques. Les colonnes suivantes sont des attributs pour chaque cas.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="110"/>
+        <source>.</source>
+        <translation>.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="111"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gestionnaire du dossier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="112"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exporter les attributs sous forme de fichier csv&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="113"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="105"/>
+        <source>Double click case name to change the name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</source>
+        <translation>Double-cliquez sur le nom du cas pour le modifier. Cliquez sur Mémo pour éditer un mémo pour le cas. Cliquez sur Fichiers pour lier des fichiers et des textes de fichiers au cas.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_av</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="212"/>
+        <source>Code Audio Video</source>
+        <translation>Code Audio / Vidéo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="246"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Retranscription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clic gauche sur le curseur et faites-le glisser vers la gauche ou la droite pour modifier la position de la vidéo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="217"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsqu&apos;un segment audio ou vidéo est créé, choisissez un code dans l&apos;arborescence des codes, cliquez dessus avec le bouton droit de la souris et assignez le segment au code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="218"/>
+        <source>Segment:</source>
+        <translation>Segman :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
+        <source>Coder:</source>
+        <translation>Kodè :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="223"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     augmente la vitesse de lecture jusqu&apos;à 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Diminue la vitesse de lecture jusqu&apos;à 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="227"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Diminuer la vitesse de lecture&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="228"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Rembobinez 5 secondes. Alt + R</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="214"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Volim</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
+        <source>1.0x</source>
+        <translation>1.0x</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="237"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier avec le dernier codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="238"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="239"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mémo de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="222"/>
+        <source>Scroll transcript while playing.</source>
+        <translation>Faire défiler la retranscription pendant la lecture.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="230"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="231"/>
+        <source>Show codings flagged important</source>
+        <translation>Afficher les codages marqués comme importants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="240"/>
+        <source>Show files with selected file attributes</source>
+        <translation>Afficher les fichiers avec les attributs de fichier sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="221"/>
+        <source>Cannot code text when play transcript box is checked.</source>
+        <translation>Impossible de coder le texte lorsque la case jouer la retranscription est cochée.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="213"/>
+        <source>Ctrl P or Ctrl D Play/Pause</source>
+        <translation>Ctrl P ou Ctrl D Lecture/Pause</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="229"/>
+        <source>Rewind 5 seconds. Ctrl + R</source>
+        <translation>Revenir en arrière de 5 secondes. Ctrl + R</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Changer de piste, si plusieurs sont disponibles.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Revenir en arrière de 30 secondes. Alt + Moins&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="233"/>
+        <source>S</source>
+        <translation>S</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="215"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Appuyez sur le bouton Start segment pour commencer à coder le segment audio/vidéo. Appuyez sur le bouton Fin du segment pour terminer le segment codé.&lt;/p&gt;&lt;p&gt;Raccourci clavier : Ctrl S&lt;/p&gt;&lt;p&gt;Raccourci clavier : G - Ouvrir un mémo et appliquer un segment au code sélectionné.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="226"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Avancer de 30 secondes. Alt + Plus
+Appui sur la touche 5 - Avance de 5 secondes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="232"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bouton pour sélectionner un segment. &lt;/p&gt;&lt;p&gt;Un menu d&apos;options s&apos;ouvre alors.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="234"/>
+        <source>Find code</source>
+        <translation>Jwenn kòd la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="235"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Capture d&apos;écran&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="236"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Image de projet à partir d&apos;une capture d&apos;écran&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="216"/>
+        <source>Start segment</source>
+        <translation>Segment de départ</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="241"/>
+        <source>Clear file filter</source>
+        <translation>Effacer le filtre des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="244"/>
+        <source>Clear code filter</source>
+        <translation>Effacer le filtre des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="245"/>
+        <source>Code name filter</source>
+        <translation>Filtrer par nom de code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="242"/>
+        <source>Go to bookmark (Shift B)
+To set a bookmark press B</source>
+        <translation>Aller au signet (Maj + B)
+Pour créer un signet, appuyez sur B</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_colors</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="95"/>
+        <source>Code colour scheme</source>
+        <translation>Schéma de couleurs du code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="96"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette zone codée&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="97"/>
+        <source>Codes colour scheme. Select colours in order. Select codes. Apply.</source>
+        <translation>Codes de couleurs. Sélectionner les couleurs dans l&apos;ordre. Sélectionner les codes. Appliquer.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="98"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo all changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annuler toutes les modifications.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="102"/>
+        <source>Clear selection</source>
+        <translation>Effacer la sélection</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="100"/>
+        <source>Apply colours to codes</source>
+        <translation>Appliquer des couleurs aux codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="101"/>
+        <source>Perspective: normal vision</source>
+        <translation>Perspective : vision normale</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_colours.py" line="103"/>
+        <source>Change perspective</source>
+        <translation>Changer de perspective</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_context_image</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_context_image.py" line="58"/>
+        <source>View Image</source>
+        <translation>Visualiser l&apos;image</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_image</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="219"/>
+        <source>View Image</source>
+        <translation>Visualiser l&apos;image</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
+        <source>Coder:</source>
+        <translation>Kodè :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="243"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mémo de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="221"/>
+        <source>Coded area:</source>
+        <translation>Zòn kode :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="222"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette zone codée&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="241"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier avec le dernier codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="242"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="223"/>
+        <source>Show codings flagged important</source>
+        <translation>Afficher les codages marqués comme importants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="244"/>
+        <source>Show files using selected file attributes</source>
+        <translation>Afficher les fichiers utilisant les attributs de fichiers sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="220"/>
+        <source>Image details</source>
+        <translation>Détails de l&apos;image</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="224"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exporter l&apos;image en tant que fichier html.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="225"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Afficher les légendes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="226"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom avant W ou +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="227"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom arrière. Q ou -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="228"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tourner dans le sens inverse des aiguilles d&apos;une montre&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="229"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotation dans le sens des aiguilles d&apos;une montre&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="230"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Précédent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="231"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="232"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="233"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dernière page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="234"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Aller à la page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="235"/>
+        <source>Set default colour for new codes</source>
+        <translation>Définir la couleur par défaut pour les nouveaux codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="236"/>
+        <source>PDF controls</source>
+        <translation>Kontwòl PDF</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="237"/>
+        <source>Find code</source>
+        <translation>Jwenn kòd la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
+        <source>Coder visibility</source>
+        <translation>Visibilité du codeur⋅euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="240"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="245"/>
+        <source>Clear file filter</source>
+        <translation>Effacer le filtre des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="246"/>
+        <source>Clear code filter</source>
+        <translation>Effacer le filtre des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="247"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_pdf</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="279"/>
+        <source>Code Text</source>
+        <translation>Kòd tèks la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="309"/>
+        <source>Coder:</source>
+        <translation>Kodè :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="280"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
+&lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Recherche de texte.&lt;/p&gt;&lt;p&gt;cocher &lt;span style=&quot;font-weight:600;&quot;&gt;Sensible à la casse&lt;/span&gt; pour une recherche sensible à la casse&lt;/p&gt;&lt;p&gt;cocher &lt;span style=&quot;font-weight:600;&quot;&gt;Tous les fichiers&lt;/span&gt; pour une recherche sur tous les fichiers&lt;/p&gt;
+&lt;p&gt;Clic droit pour modifier les options de recherche&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="282"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Recherche sensible à la casse&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="283"/>
+        <source>0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="302"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Précédent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="303"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="286"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Recherche textuelle. Sensible à la casse&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="287"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="288"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="289"/>
+        <source>Images</source>
+        <translation>Imaj</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="290"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Useful if font colours are harder to see&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilisable si les couleurs des polices sont plus difficiles à voir&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="291"/>
+        <source>Black Text</source>
+        <translation>Tèks nwa</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="292"/>
+        <source>Text</source>
+        <translation>Tèks</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="293"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pdf font size adjustment&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ajustement de la taille des polices PDF&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="294"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="295"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PDF object information&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Informations sur l&apos;objet PDF&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="296"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exporter l&apos;image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="312"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier avec le dernier codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="313"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Aller au marque-page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="314"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="315"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mémo de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="316"/>
+        <source>Show files with file attributes</source>
+        <translation>Afficher les fichiers avec leurs attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="318"/>
+        <source>Show codings flagged important</source>
+        <translation>Afficher les codages marqués comme importants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="319"/>
+        <source>Right click below to create new codes and categories</source>
+        <translation>Clic droit ci-dessous pour créer de nouveaux codes et catégories</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
+        <source>-1</source>
+        <translation>-1</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
+        <source>-2</source>
+        <translation>-2</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
+        <source>-3</source>
+        <translation>-3</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
+        <source>-4</source>
+        <translation>-4</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dernière page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="305"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Aller à la page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="306"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in (Shift Plus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Zoom avant (Shift Plus)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="307"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom Out (Ctrl Minus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Zoom arrière (Ctrl Minus)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="308"/>
+        <source>Set default colour for new codes</source>
+        <translation>Définir la couleur par défaut pour les nouveaux codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="320"/>
+        <source>Find code</source>
+        <translation>Jwenn kòd la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="310"/>
+        <source>Coder visibility</source>
+        <translation>Visibilité du codeur⋅euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="311"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="317"/>
+        <source>Clear file filter</source>
+        <translation>Effacer le filtre des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="321"/>
+        <source>Clear code filter</source>
+        <translation>Effacer le filtre des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="322"/>
+        <source>Code name filter</source>
+        <translation>Filtrer par nom de code</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_summary</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_summary.py" line="67"/>
+        <source>Code summary</source>
+        <translation>Rezime kòd yo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_summary.py" line="71"/>
+        <source>Code summary report</source>
+        <translation>Rapport des résumés des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_summary.py" line="68"/>
+        <source>Search for next occurence in results</source>
+        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_summary.py" line="69"/>
+        <source>Search results for text</source>
+        <translation>Résultats de la recherche pour le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_summary.py" line="70"/>
+        <source>Search:</source>
+        <translation>Rechèch :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_summary.py" line="72"/>
+        <source>Select stopwords list by language</source>
+        <translation>Sélectionner la liste des mots vides par langue</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_code_text</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="486"/>
+        <source>Code Text</source>
+        <translation>Kòd tèks la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="534"/>
+        <source>Coder:</source>
+        <translation>Kodè:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="560"/>
+        <source>Right click below to create new codes and categories</source>
+        <translation>Clic droit ci-dessous pour créer de nouveaux codes et catégories</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="543"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Taille de la police du texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="492"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Rechercher tous les fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="494"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Avan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="495"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="496"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Recherche de texte. Tous les fichiers texte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="542"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Recherche de texte. Sensible à la casse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="501"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Effacer tous les codes de ce codeur·euse de ce fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="502"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Annotation de la sélection</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="500"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annuler l’auto-codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="546"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Fichye pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="544"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Fichier avec le dernier codage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="545"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Aller au marque-page</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="552"/>
+        <source>Click here to define the options for the AI based search</source>
+        <translation>Cliquez ici pour définir les options de la recherche basée sur l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="547"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>;Mémo de fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="503"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Mémo pour cette section codée</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="493"/>
+        <source>0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="505"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Autocodage à l&apos;aide de marques de début et de fin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="506"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="548"/>
+        <source>Show files with file attributes</source>
+        <translation>Afficher les fichiers avec leurs attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="559"/>
+        <source>Show codings flagged important</source>
+        <translation>Afficher les codages marqués comme importants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="489"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
+&lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Recherchez le texte. Sensible à la casse, Tous les fichiers. Cliquez avec le bouton droit de la souris pour modifier les options de recherche automatique</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="507"/>
+        <source>Show memos</source>
+        <translation>Montrer les mémos</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="508"/>
+        <source>Show annotations</source>
+        <translation>Montrer les annotations</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="564"/>
+        <source>Code rule with examples</source>
+        <translation>Règle du code avec exemples</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="565"/>
+        <source>Current journal</source>
+        <translation>Jounal aktyèl</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="566"/>
+        <source>Project memo</source>
+        <translation>Memo pwojè a</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="567"/>
+        <source>.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="538"/>
+        <source>Exit Edit text </source>
+        <translation>Quitter Editer le texte </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="509"/>
+        <source>Edit text 
+Click on a position, without selecting text, to type, delete, or paste text. 
+Select text that is not underlined and delete or paste over. 
+Avoid selecting text to delete or paste over if the selected text is underlined:
+(coded - red, annotated - yellow, case-assigned - green)
+As all assigned positions may be incorrect. </source>
+        <translation>Modifier le texte 
+Cliquez sur une position, sans sélectionner de texte, pour taper, supprimer ou coller du texte. 
+Sélectionnez du texte qui n&apos;est pas souligné et supprimez ou collez par-dessus. 
+Évitez de sélectionner du texte pour le supprimer ou le coller si le texte sélectionné est souligné :
+(codé - rouge, annoté - jaune, attribué à un cas - vert)
+car toutes les positions assignées peuvent être incorrectes. </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="516"/>
+        <source>Export</source>
+        <translation>Ekspòte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
+        <source>html</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="504"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
+        <source>txt</source>
+        <translation>txt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="523"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Après avoir édité le texte:&lt;/p&gt;&lt;p&gt;Revoir le texte édité pour confirmer que les positions des codes sont correctes. Appuyez sur le bouton pour annuler le texte édité, si les positions des codes sont incorrectes. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="550"/>
+        <source>Documents</source>
+        <translation>Dokiman</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="551"/>
+        <source>Select a document</source>
+        <translation>Sélectionner un document</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
+        <source>&lt;Start AI Search&gt;</source>
+        <translation>&lt;Démarrer la recherche d&apos;IA&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
+        <source>AI Assistance</source>
+        <translation>Assistance IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="555"/>
+        <source>Use the AI to find data</source>
+        <translation>Utiliser l&apos;IA pour trouver des données</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="525"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Afficher le volet latéral</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="524"/>
+        <source>Set default colour for new codes</source>
+        <translation>Définir la couleur par défaut pour les nouveaux codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="556"/>
+        <source>Show all codings</source>
+        <translation>Afficher tous les codages</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="557"/>
+        <source>Show previous coding of selected code</source>
+        <translation>Afficher le codage précédent du code sélectionné</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="558"/>
+        <source>Show next coding of selected code.</source>
+        <translation>Affiche le codage suivant du code sélectionné.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="561"/>
+        <source>Find code</source>
+        <translation>Jwenn kòd la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="526"/>
+        <source>Apply REGEX to autocoding for exact text and sentences buttons.
+https://www.datacamp.com/cheat-sheet/regular-expresso</source>
+        <translation>Appliquer REGEX à l&apos;autocodage pour les boutons de texte et de phrases exactes.
+https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
+        <source>REGEX</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
+        <source>Mark speakers.
+Limited to names up to 63 characters long. 
+The name must be at the start of a new line.
+Formatted like below for name detection.
+&quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
+        <translation>Surligner les intervenant⋅es.
+Limité à des noms de 63 caractères maximum. 
+Le nom doit être au début d&apos;une nouvelle ligne.
+Formaté comme ci-dessous pour la détection du nom.
+« Nom : », « {Nom} » ou « [Nom] »</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="487"/>
+        <source>Auto code with exact text.
+Right click for options: all, first, last, within another code.</source>
+        <translation>Code automatique avec texte exact.
+Clic-droit pour afficher les options : tout, premier, dernier, dans un autre code.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="498"/>
+        <source>Text fragment to auto code sentences.
+Right click for options: all (default), first, code within code.</source>
+        <translation>Fragment de texte vers phrase d’autocodage.
+Clic-droit pour les options : tous (par défaut), premier, code dans le code.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="535"/>
+        <source>Coder visibility</source>
+        <translation>Visibilité du codeur⋅euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="536"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="537"/>
+        <source>Select document font and size</source>
+        <translation>Choisissez la police et la taille du texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="517"/>
+        <source>odt highlight</source>
+        <translation>surlignage odt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="518"/>
+        <source>odt comment</source>
+        <translation>commentaire odt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
+        <source>odt report</source>
+        <translation>rapport odt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
+        <source>codebook</source>
+        <translation>grille de codage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="549"/>
+        <source>Clear file filter</source>
+        <translation>Effacer le filtre des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="562"/>
+        <source>Clear code filter</source>
+        <translation>Effacer le filtre des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
+        <source>Search for text</source>
+        <translation>Recherche de texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="540"/>
+        <source>Next</source>
+        <translation>Pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="541"/>
+        <source>Previous</source>
+        <translation>Avan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="563"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtrer par nom de code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_coders</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="84"/>
+        <source>Coders</source>
+        <translation>Kodè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="86"/>
+        <source>Add a new coder name</source>
+        <translation>Ajouter un nouveau nom de codeur⋅euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="87"/>
+        <source>New</source>
+        <translation>Nouvo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="89"/>
+        <source>Rename</source>
+        <translation>Chanje non</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="90"/>
+        <source>Warning: There is no undo. Make a project backup first.</source>
+        <translation>Attention: Ce n&apos;est pas réversible. Faites une sauvegarde avant.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="91"/>
+        <source>Merge</source>
+        <translation>Fizyone</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="88"/>
+        <source>Rename the selected coder. Note that this will affect the entire project.</source>
+        <translation>Renommez le codeur⋅euse sélectionné. Notez que cela affecte l’entièreté du projet.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="92"/>
+        <source>(Go to Project &gt; Settings for more options)</source>
+        <translation>(Allez dans Projet &gt; Configuration pour plus d’options)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="85"/>
+        <source>Choose (✓) your coder name. Adjust visibility of others:</source>
+        <translation>Choisissez votre nom de codeur⋅euse. Ajustez la visibilité aux autres :</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_colour_selector</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="95"/>
+        <source>Colour selector</source>
+        <translation>Sélecteur de couleur</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="96"/>
+        <source>* Used</source>
+        <translation>* Utilisé</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="97"/>
+        <source>Color vision</source>
+        <translation>Vision des couleurs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="98"/>
+        <source>Normal</source>
+        <translation>Nòmal</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="99"/>
+        <source>Red weak</source>
+        <translation>Protanomalie</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="100"/>
+        <source>Red blind</source>
+        <translation>Protanopie</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="101"/>
+        <source>Green weak</source>
+        <translation>Deutéranomalie</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_colour_selector.py" line="102"/>
+        <source>Green blind</source>
+        <translation>Deutéranopie</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_confirmDelete</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_confirm_delete.py" line="34"/>
+        <source>Confirm Delete</source>
+        <translation>Confirmer la suppression</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_confirm_delete.py" line="35"/>
+        <source>.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_edit_text</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="70"/>
+        <source>Memo</source>
+        <translation>Memo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="71"/>
+        <source>Clear</source>
+        <translation>Efase</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="74"/>
+        <source>Case sensitive</source>
+        <translation>Sensible à la casse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="73"/>
+        <source>Previous</source>
+        <translation>Avan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="76"/>
+        <source>Next</source>
+        <translation>Pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="77"/>
+        <source>When editing text: Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.
+Positions may not correctly adjust. Make  a backup copy of the project before editing text.
+</source>
+        <translation>Lors de la modification du texte : évitez de sélectionner des combinaisons de texte comprenant à la fois des sections non marquées et des sections codées, annotées ou associées à un dossier.
+Le positionnement risque de ne pas s&apos;ajuster correctement. Effectuez une copie de sauvegarde du projet avant de modifier le texte.
+</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="75"/>
+        <source>Search for text.</source>
+        <translation>Recherchez le texte.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_file_summary</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_file_summary.py" line="67"/>
+        <source>File summary</source>
+        <translation>Résumé des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_file_summary.py" line="71"/>
+        <source>File summary report</source>
+        <translation>Rapport du résumé du fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_file_summary.py" line="69"/>
+        <source>Search results for text</source>
+        <translation>Résultats de la recherche pour le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_file_summary.py" line="70"/>
+        <source>Search for next occurence in results</source>
+        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_file_summary.py" line="68"/>
+        <source>Search:</source>
+        <translation>Chèche :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_file_summary.py" line="72"/>
+        <source>Select stopwords list by language</source>
+        <translation>Sélectionner la liste des mots vides par langue</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_information</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_information.py" line="34"/>
+        <source>Information</source>
+        <translation>Enfòmasyon</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_journals</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="125"/>
+        <source>Journals</source>
+        <translation>Jounal</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="142"/>
+        <source>Name</source>
+        <translation>Non</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="146"/>
+        <source>Coder</source>
+        <translation>Kodè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="129"/>
+        <source>Journal:</source>
+        <translation>Jounal :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="130"/>
+        <source>Journals: </source>
+        <translation>Jounal : </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="131"/>
+        <source>Export all journals as single text file.</source>
+        <translation>Exporter tous les journaux dans un seul fichier texte.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="134"/>
+        <source>0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="135"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All journals&lt;/span&gt; for searching all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rechercher du texte.&lt;/p&gt;&lt;p&gt;Cochez &lt;span style=&quot; font-weight:600;&quot;&gt;Tous les journaux&lt;/span&gt; pour rechercher dans tous les journaux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="138"/>
+        <source>Search all journals</source>
+        <translation>Rechercher dans tous les journaux</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="139"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="148"/>
+        <source>jid</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="132"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex).&lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="144"/>
+        <source>Modified</source>
+        <translation>Modifye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="126"/>
+        <source>Create</source>
+        <translation>Kreye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="127"/>
+        <source>Export</source>
+        <translation>Ekspòte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="128"/>
+        <source>Delete</source>
+        <translation>Efase</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="133"/>
+        <source>Next</source>
+        <translation>Pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="137"/>
+        <source>Previous</source>
+        <translation>Avan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="140"/>
+        <source>Add Attribute</source>
+        <translation>Ajoute yon atribi</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_manage_attributes</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_attributes.py" line="47"/>
+        <source>Attributes</source>
+        <translation>Atribi</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_attributes.py" line="48"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Ajoute</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_attributes.py" line="49"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Efase</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_manage_files</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="133"/>
+        <source>Files</source>
+        <translation>Fichye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="134"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Wè fichye a</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="135"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Créer un fichier texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="139"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Sélectionner les fichiers à supprimer</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="140"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Importer le fichier dans le dossier du projet</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="141"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Ajoute yon atribi</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="142"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Exporter le fichier du dossier du projet sous forme de fichier lié</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="143"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Importer le fichier lié dans le dossier du projet</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="146"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Exporter les attributs sous forme de fichier csv</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="147"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="136"/>
+        <source>Export selected file.
+Text files (from any source) are exported from the text stored in the database as .txt files.
+(You can open the project folder and copy/paste the orignal text file if preferred.)</source>
+        <translation>Exporter le fichier sélectionné.
+Les fichiers texte (de n&apos;importe quelle source) sont exportés à partir du texte stocké dans la base de données sous forme de fichiers .txt.
+(Vous pouvez ouvrir le dossier du projet et copier/coller le fichier texte original si vous préférez.)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="144"/>
+        <source>Export file from project folder as a linked file.
+Cannot export text transcription file associated with an audio or video as a linked file.</source>
+        <translation>Exportation d&apos;un fichier du dossier de projet en tant que fichier lié.
+Impossible d&apos;exporter le fichier de retranscription de texte associé à un fichier audio ou vidéo en tant que fichier lié.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="148"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Annuler le renommage d&apos;un fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="149"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Renommer en bloc les entrées du fichier de noms de bases de données.&lt;/p&gt;&lt;p&gt;Ne renommer que les lignes visibles du fichier. Il est possible de n&apos;afficher que certaines lignes en utilisant la sélection d&apos;attributs ou en affichant/masquant les valeurs comme...&lt;/p&gt;&lt;p&gt;Renommer en tant que : Préfixe choisi par l&apos;utilisateur et suffixe numéroté _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="150"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save table display settings. &lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Sauvegarder les paramètres d&apos;affichage du tableau. 
+(Lignes et colonnes cachées et taille des colonnes)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="151"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Charger les paramètres d&apos;affichage du tableau sauvegardés.
+(Lignes et colonnes cachées et taille des colonnes)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="152"/>
+        <source>Delete saved table display settings. </source>
+        <translation>Supprimer les paramètres d&apos;affichage enregistrés pour les tableaux. </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="153"/>
+        <source>Pseudonymisation (data de-identification)
+Before importing text files, create a list of names or phrases to be replaced.
+Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
+Pseudonym replacements are case sensitive. 
+So separate entries would be needed for Tom and TOM.
+
+Does not work with PDF files. Instead extract the plain text and only import the plain text of the PDF.
+
+The pseudonyms are stored in the qda data folder as pseudonyms.json
+After all text files are imported, remove this file from the project folder and store it securely.
+</source>
+        <translation>Pseudonymisation (désidentification des données)
+Avant d&apos;importer des fichiers texte, créez une liste des noms ou expressions à remplacer.
+S&apos;applique aux fichiers suivants : docx, epub, htm, html, md, rtf, odt, txt, importations d&apos;enquêtes de colonnes qualitatives.
+Les remplacements de pseudonymes sont sensibles à la casse. 
+Il faudrait donc des entrées distinctes pour Tom et TOM.
+
+Ne fonctionne pas avec les fichiers PDF. Extrayez plutôt le texte brut et importez uniquement le texte brut du PDF.
+
+Les pseudonymes sont stockés dans le dossier de données qda sous le nom pseudonyms.json.
+Une fois tous les fichiers texte importés, supprimez ce fichier du dossier du projet et conservez-le en lieu sûr.
+</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="164"/>
+        <source>Select a text transcription to mark the speakers.
+The speaker name must be at the start of a new line and less than 64 characters long.
+Formatted like below for name detection.
+&quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
+        <translation>Sélectionnez une retranscription de texte pour surligner les intervenant⋅es.
+Le nom de l’interlocuteur doit figurer au début d&apos;une nouvelle ligne et comporter moins de 64 caractères.
+Formaté comme ci-dessous pour la détection du nom.
+« Nom : », « {Nom} » ou « [Nom] »</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="168"/>
+        <source>Import survey
+
+For csv and tsv files, please avoid using the following in the column names:  , ; |
+
+Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
+        <translation>Enquête d&apos;importation
+
+Pour les fichiers CSV et TSV, veuillez éviter d&apos;utiliser les caractères suivants dans les noms de colonnes :  , ; |
+
+Pour les enquêtes comportant un grand nombre d&apos;entrées (par exemple, plus de 1 000), veuillez patienter, car l&apos;importation sera lente.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_manage_links</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="48"/>
+        <source>Manage file links</source>
+        <translation>Gérer les liens entre les fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="50"/>
+        <source>Click on the file name to browse to the correct file location.</source>
+        <translation>Cliquez sur le nom du fichier pour naviguer jusqu&apos;à l&apos;emplacement correct du fichier.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="49"/>
+        <source>Manage bad links to files</source>
+        <translation>Gérer les mauvais liens vers les fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="52"/>
+        <source>Search folders</source>
+        <translation>Recherche de dossiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="51"/>
+        <source>Automatic search through folders for the file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="53"/>
+        <source>Change file path link across all the files.
+This is useful when you have a big change such as copying the project and external files to another computer.
+
+e.g. from C:/users/OldUser/Images to C:/usersNewUser/Images</source>
+        <translation>Modifiez les liens vers les chemins d&apos;accès dans tous les fichiers.
+Cette opération s&apos;avère utile en cas de changement important, comme la copie du projet et des fichiers externes vers un autre ordinateur.
+
+Par exemple, de C:/users/OldUser/Images vers C:/usersNewUser/Images</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="57"/>
+        <source>Bulk change</source>
+        <translation>Modification groupée</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_manage_references</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="90"/>
+        <source>Reference manager</source>
+        <translation>Gestionnaire de référence</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="91"/>
+        <source>Assign selected file(s) to selected reference. Press L or Link button below.</source>
+        <translation>Attribuer le(s) fichier(s) sélectionné(s) à la référence sélectionnée. Appuyez sur le bouton L ou Link ci-dessous.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="92"/>
+        <source>Hide assigned files</source>
+        <translation>Cacher les fichiers assignés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="93"/>
+        <source>Hide assigned references</source>
+        <translation>Cacher les références assignées</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="94"/>
+        <source>Delete selected reference</source>
+        <translation>Supprimer la référence sélectionnée</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="95"/>
+        <source>Link selected files to selected reference</source>
+        <translation>Lier les fichiers sélectionnés à la référence sélectionnée</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="96"/>
+        <source>Unlink selected files from references</source>
+        <translation>Dissocier les fichiers sélectionnés des références</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="97"/>
+        <source>Delete all references that are not assigned to files</source>
+        <translation>Supprimer toutes les références qui ne sont pas affectées à des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="99"/>
+        <source>Import references. RIS or NBIB (PubMed) format.</source>
+        <translation>Importer des références au format RIS ou NBIB (PubMed).</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="100"/>
+        <source>Automatically link references to unassigned file names.
+Word matching uses words from reference title.
+Strong matches with 70% or more matching words are linked.
+Linking may be incorrect.
+Review after applying the function.</source>
+        <translation>Liez automatiquement les références aux noms de fichiers non attribués.
+La correspondance des mots utilise les mots du titre de référence.
+Les correspondances fortes avec 70 % ou plus de mots correspondants sont liées.
+La liaison peut être incorrecte.
+Vérifiez après avoir appliqué la fonction.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_manage_references.py" line="98"/>
+        <source>Edit reference</source>
+        <translation>Modifier la référence</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_memo</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="43"/>
+        <source>Memo</source>
+        <translation>Memo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="44"/>
+        <source>Clear</source>
+        <translation>Vide</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_move_resize_rect</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="69"/>
+        <source>Move and Resize</source>
+        <translation>Déplacement et redimensionnement</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="70"/>
+        <source>Move horizontally</source>
+        <translation>Déplacement horizontal</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="71"/>
+        <source>Move vertically</source>
+        <translation>Déplacement vertical</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="72"/>
+        <source>Resize horizontally</source>
+        <translation>Redimensionner horizontalement</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="73"/>
+        <source>Resize vertically</source>
+        <translation>Redimensionner verticalement</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="77"/>
+        <source>pixels</source>
+        <translation>pixels</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_move_resize_rectangle.py" line="78"/>
+        <source>Enter the amount of change required. e.g. 10 for 10 pixels or -10 for a reduction of 10 pixels.</source>
+        <translation>Saisissez la quantité de changement requise. Par exemple, 10 pour 10 pixels ou -10 pour une réduction de 10 pixels.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_pseudonyms</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="63"/>
+        <source>Pseudonyms</source>
+        <translation>Pseudonymes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="64"/>
+        <source>Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.
+Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</source>
+        <translation>Pseudonymes. Dépersonnalisation des données appliquée lors de l&apos;importation des fichiers. Ne s&apos;applique pas aux importations PDF.
+Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, Tom Jones  et TOM JONES</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="66"/>
+        <source>Original</source>
+        <translation>Orijinal</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="67"/>
+        <source>Pseudonym</source>
+        <translation>Pseudonyme</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="68"/>
+        <source>Add to pseudonyms</source>
+        <translation>Ajouter aux pseudonymes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="69"/>
+        <source>Click on a row to delete entry.</source>
+        <translation>Cliquez sur une ligne pour supprimer l&apos;entrée.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_refi_export_line_endings</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_refi_export_endings.py" line="41"/>
+        <source>Settings</source>
+        <translation>Paramèt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_refi_export_endings.py" line="42"/>
+        <source>No change to line endings</source>
+        <translation>Pas de modification des fins de lignes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_refi_export_endings.py" line="43"/>
+        <source>Add line ending character for MAXQDA importation</source>
+        <translation>Ajouter un caractère de fin de ligne pour l&apos;importation MAXQDA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_refi_export_endings.py" line="44"/>
+        <source>REFI-QDA project export. Plain text representation may need adjustment of line endings so that codes do not shift on import into other software.</source>
+        <translation>Export du projet REFI-QDA. La représentation en texte clair peut nécessiter un ajustement des fins de ligne afin que les codes ne se décalent pas à l&apos;importation dans d&apos;autres logiciels.</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_reportCodeFrequencies</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="85"/>
+        <source>Code frequencies</source>
+        <translation>Effectifs des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="87"/>
+        <source>Export text file</source>
+        <translation>Exporter un fichier texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="86"/>
+        <source>Code and category frequencies: overall and by coder</source>
+        <translation>Effectifs des codes et des catégories: globale et par codeur·euse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="90"/>
+        <source>Select files</source>
+        <translation>Sélectionner les fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="91"/>
+        <source>Alphabetic ascending</source>
+        <translation>Alphabétique ascendant</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="92"/>
+        <source>Totals descending</source>
+        <translation>Totaux décroissants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="89"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Sélectionner les fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="88"/>
+        <source>Export Excel</source>
+        <translation>Exporter un fichier Excel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="93"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File Attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Attributs du fichier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="94"/>
+        <source>Show frequencies broken down by where they were coded</source>
+        <translation>Afficher les fréquences ventilées selon le lieu où elles ont été saisies</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_code_frequencies.py" line="95"/>
+        <source>Breakdown by source (text / image / A/V)</source>
+        <translation>Répartition par source (texte / image / audio/vidéo)</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_reportCodings</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="179"/>
+        <source>Coder:</source>
+        <translation>Kodè:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="176"/>
+        <source>Reports</source>
+        <translation>Rapò</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="177"/>
+        <source>Text limiter:</source>
+        <translation>Délimitateur de texte :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="208"/>
+        <source>Export:</source>
+        <translation>Ekspòte :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="181"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Ekspòte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="182"/>
+        <source>html</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="183"/>
+        <source>txt</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="184"/>
+        <source>odt</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="186"/>
+        <source>csv</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="188"/>
+        <source>Coding report</source>
+        <translation>Rapport de codage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="190"/>
+        <source>Filter results for those marked Important</source>
+        <translation>Filtrer les résultats pour ceux marqués comme importants</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="191"/>
+        <source>Important</source>
+        <translation>Enpòtan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="193"/>
+        <source>Memo reporting options</source>
+        <translation>Options de rapport pour mémo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="189"/>
+        <source>File and case matrix options</source>
+        <translation>Options de matrice de fichiers et de cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="194"/>
+        <source>Display summary statistics</source>
+        <translation>Afficher le résumé des statistiques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="195"/>
+        <source>Statistics</source>
+        <translation>Estatistik</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="196"/>
+        <source>Transpose matrix</source>
+        <translation>Transposer la matrice</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="199"/>
+        <source>Text context</source>
+        <translation>Contexte textuel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="200"/>
+        <source>Search results for text</source>
+        <translation>Résultats de la recherche pour le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="202"/>
+        <source>Search for next occurence in results</source>
+        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="197"/>
+        <source>Surround coded text with pre-text and post-text.
+Change Settings for number of characters and display style.</source>
+        <translation>Entourez le texte codé de pré-texte et de post-texte.
+Modifiez les paramètres du nombre de caractères et du style d&apos;affichage.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="201"/>
+        <source>Search:</source>
+        <translation>Chèche :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="203"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code names sort order.&lt;/p&gt;&lt;p&gt;Set this before running results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ordre de tri des noms de code. &lt;/p&gt;&lt;p&gt;Définissez ce paramètre avant d&apos;exécuter les résultats.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="204"/>
+        <source>A - z</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="205"/>
+        <source>Z - a</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="206"/>
+        <source>10 - 1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="207"/>
+        <source>1 - 10</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="185"/>
+        <source>xlsx</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="178"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Rapport d&apos;exécution</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="180"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributs. &lt;/p&gt;&lt;p&gt;La sélection d&apos;un attribut a priorité sur les dossiers ou les cas sélectionnés dans les listes de gauche.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="209"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file  or case variables in columns for CSV or XLSX export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Fichier d&apos;exportation ou variables de cas dans les colonnes pour l&apos;exportation CSV ou XLSX</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="210"/>
+        <source>Variables CSV / XLSX</source>
+        <translation>Variables CSV / XLSX</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="211"/>
+        <source>Export matrix</source>
+        <translation>Matrice d&apos;exportation</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="212"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Montrer les références</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="213"/>
+        <source>References</source>
+        <translation>Referans</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="187"/>
+        <source>iramuteq</source>
+        <translation>IRaMuTeQ</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_reportCompareCoderFile</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="96"/>
+        <source>Reports</source>
+        <translation>Rapò</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
+        <source>Coders:</source>
+        <translation>kodè:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="99"/>
+        <source>To compare coding.
+Select two coders, one file, one code.</source>
+        <translation>Pour comparer les codages.
+Sélectionnez deux codeur·euses, un fichier, un code.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="101"/>
+        <source>Coder comparisons by file</source>
+        <translation>Comparaisons de codeur·euses par dossier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="103"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Sélection claire</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="102"/>
+        <source>Coders selected</source>
+        <translation>Codeurs sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="104"/>
+        <source>Export ODT file</source>
+        <translation>Exporter en fichier ODT</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="98"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Comparaison de parcours</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="106"/>
+        <source>Statistics explanation</source>
+        <translation>Explication des statistiques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="105"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison.&lt;/p&gt;&lt;p&gt;Select 2 coders, 1 file, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exécuter la comparaison.&lt;/p&gt;&lt;p&gt;Sélectionnez 2 codeur·euses, 1 fichier, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_reportComparisons</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="79"/>
+        <source>Coder Comparisons</source>
+        <translation>Comparaison des codeur·euses</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="82"/>
+        <source>Coders:</source>
+        <translation>Kodè:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="86"/>
+        <source>Coders selected:</source>
+        <translation>Codeurs sélectionnés:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="80"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Exporter un fichier Excel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="81"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Exécuter la comparaison</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="84"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Effacer la sélection</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="85"/>
+        <source>Coder comparisons - text files</source>
+        <translation>Comparaisons de codeur·euses - fichiers texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="87"/>
+        <source>Statistics help</source>
+        <translation>Aide aux statistiques</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="83"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Sélectionner deux codeur·euses</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_report_attribute_parameters</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="81"/>
+        <source>Attribute selection parameters</source>
+        <translation>Paramètres de sélection d&apos;attribut</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="96"/>
+        <source>Attribute</source>
+        <translation>Atribi</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="98"/>
+        <source>Source</source>
+        <translation>Sous</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="100"/>
+        <source>Type</source>
+        <translation>Tip</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="104"/>
+        <source>Value list</source>
+        <translation>Lis valè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="102"/>
+        <source>Operator</source>
+        <translation>Operatè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="83"/>
+        <source>Select parameters for the attributes. 
+between requires 2 values separated by ; e.g. 1;100
+ in and not in require 1 or more values separated by ;
+Wildcards for &apos;like&apos; are % and _</source>
+        <translation>Sélectionnez les paramètres pour les attributs. 
+entre requiert 2 valeurs séparées par ;, par exemple 1;100
+ in et not in nécessitent 1 ou plusieurs valeurs séparées par ;
+Les caractères génériques pour&apos;like&apos; are % and _</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="88"/>
+        <source>Clear attribute selections</source>
+        <translation>Effacer les sélections d&apos;attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="89"/>
+        <source>Clear</source>
+        <translation>Vide</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="92"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean Or&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Booléen ou. Pour toutes les sélections de paramètres</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="93"/>
+        <source>or</source>
+        <translation>ou</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="90"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean And&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Booléen Et. Pour toutes les sélections de paramètres</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="91"/>
+        <source>and</source>
+        <translation>et</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="82"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load filter settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Paramètres du filtre de chargement</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="87"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save filter settings.&lt;/p&gt;&lt;p&gt;Do not use apostrophe or comma in any values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sauvegarder les paramètres du filtre.&lt;/p&gt;&lt;p&gt;Ne pas utiliser d&apos;apostrophe ou de virgule dans les valeurs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="94"/>
+        <source>Delete saved filter settings</source>
+        <translation>Supprimer les paramètres de filtre enregistrés</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_selectitems</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_select_items.py" line="38"/>
+        <source>Select Items</source>
+        <translation>Sélectionnez les éléments</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_settings</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="530"/>
+        <source>Settings</source>
+        <translation>Paramèt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
+        <source>General font and size</source>
+        <translation>Police générale et taille</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
+        <source>Show IDs</source>
+        <translation>Afficher les IDs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="532"/>
+        <source>Default project directory</source>
+        <translation>Répertoire de projet par défaut</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
+        <source>Language</source>
+        <translation>Lang</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="531"/>
+        <source>Backup project folder every time project is opened</source>
+        <translation>Sauvegarder le dossier de sauvegarde à chaque ouverture du projet</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
+        <source>Time format</source>
+        <translation>Format de l&apos;horodatage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
+        <source>Speaker format</source>
+        <translation>Format de l&apos;intervenant</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Afficher les numéros d&apos;identification des dossiers, des cas, des codes, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Utilisé lors de la saisie de la position temporelle dans la retranscription</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Utilisé lors de la saisie du nom de l&apos;intervenant⋅e dans la retranscription</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="546"/>
+        <source>/</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
+        <source>Font size for documents</source>
+        <translation>Taille de la police pour les documents</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
+        <source>Reports with text context</source>
+        <translation>Rapports avec contexte textuel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="545"/>
+        <source>Current coder: </source>
+        <translation>Kodè aktyèl : </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
+        <source>Set this name as the current coder.
+</source>
+        <translation>Définir ce nom comme le codeur·euse actuel.
+</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
+        <source>Very large text documents. Load text chunks by number of characters.</source>
+        <translation>Documents textuels très volumineux. Chargement des morceaux de texte par nombre de caractères.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
+        <source>Code text chunk size</source>
+        <translation>Taille des morceaux de texte du code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
+        <source>50000</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="583"/>
+        <source>30000</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
+        <source>Font size for codes tree</source>
+        <translation>Taille de la police pour l&apos;arbre des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="533"/>
+        <source>Backup video and audio files. Uncheck to speed up backups.
+Not recommended unless you have many large files slowing the backup.</source>
+        <translation>Sauvegarde des fichiers vidéo et audio. Décochez cette case pour accélérer les sauvegardes.
+Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la sauvegarde.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="535"/>
+        <source>Backups</source>
+        <translation>Sauvegardes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
+        <source>Style</source>
+        <translation>Stil</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
+        <source>Characters before and after</source>
+        <translation>Caractères avant et après</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="560"/>
+        <source>Text context, coded text style</source>
+        <translation>Contexte du texte, style de texte codé</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
+        <source>AI Integration</source>
+        <translation>Intégration de l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
+        <source>enable AI integration</source>
+        <translation>permettre l&apos;intégration de l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
+        <source>Description:</source>
+        <translation>Deskripsyon:</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
+        <source>Get Access:</source>
+        <translation>Accéder :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
+        <source>API key</source>
+        <translation>Clé API</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
+        <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
+        <translation>Vous pouvez utiliser la note de projet (dans le menu : Projet &gt; Note de projet) pour transmettre à l&apos;IA des informations générales sur votre recherche, notamment les objectifs, la méthodologie et les données. Cela aidera l&apos;IA à générer des réponses plus précises et plus pertinentes. Désélectionnez cette option si vous utilisez la note de projet à d&apos;autres fins.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
+        <source>Send project memo to AI</source>
+        <translation>Envoyer la note de projet à l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
+        <source>Temperature:</source>
+        <translation>Tanperati :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
+        <source>Advanced option. Only change when you know whatr you are doing.</source>
+        <translation>Option avancée. Ne modifiez que si vous savez ce que vous faites.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+        <source>   Top_p:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="536"/>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="537"/>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="538"/>
+        <source>2</source>
+        <translation>2</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="539"/>
+        <source>3</source>
+        <translation>3</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="540"/>
+        <source>4</source>
+        <translation>4</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
+        <source>5</source>
+        <translation>5</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
+        <source>8</source>
+        <translation>8</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="574"/>
+        <source>10</source>
+        <translation>10</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
+        <source>12</source>
+        <translation>12</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
+        <source>14</source>
+        <translation>14</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
+        <source>16</source>
+        <translation>16</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
+        <source>18</source>
+        <translation>18</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="579"/>
+        <source>100</source>
+        <translation>100</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="580"/>
+        <source>200</source>
+        <translation>200</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
+        <source>300</source>
+        <translation>300</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+        <source>Language for AI conversations: </source>
+        <translation>Langage pour les conversations sur l&apos;IA : </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
+        <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
+        <translation>Si cette option est sélectionnée, les conversations se dérouleront dans la même langue que le reste de l&apos;interface utilisateur. Vous pouvez sélectionner cette langue en haut de cette fenêtre.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
+        <source>same as UI</source>
+        <translation>Identique à l&apos;IU</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
+        <source>Enter the name of your language here</source>
+        <translation>Saisissez ici le nom de votre langue</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
+        <source>1.0</source>
+        <translation>1.0</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
+        <source>Advanced AI Options...</source>
+        <translation>Options avancées de l&apos;IA...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
+        <source>Large Model:</source>
+        <translation>Grand modèle :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
+        <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
+        <translation>Sélectionnez un modèle d&apos;IA disponible (qui peut être le même que le grand modèle). Le modèle rapide est utilisé pour les tâches simples uniquement.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
+        <source>&lt;select available model&gt;</source>
+        <translation>&lt;sélectionner le modèle disponible&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
+        <source>   Fast Model:</source>
+        <translation>   Modèle rapide :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+        <source>context window:</source>
+        <translation>fenêtre contextuelle :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
+        <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
+        <translation>Sélectionnez un modèle d&apos;IA disponible. Le grand modèle est utilisé pour la plupart des fonctions d&apos;IA de QualCoder.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
+        <source>AI Profile:</source>
+        <translation>Profil de l&apos;IA :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
+        <source>Edit Name</source>
+        <translation>Éditer le nom</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
+        <source>New AI Profile...</source>
+        <translation>Nouveau profil IA...</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
+        <source>General Parameters:</source>
+        <translation>Paramètres généraux :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
+        <source>API Base URL:</source>
+        <translation>URL de base de l&apos;API :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
+        <source>AI Models:</source>
+        <translation>Modèles d&apos;IA :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
+        <source>Reasoning:</source>
+        <translation>Raisonnement :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="544"/>
+        <source>Change</source>
+        <translation>Modifikasyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
+        <source>Close and open the software for the change in language to occur.
+Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
+Additional languages can be added if they are listed in the src/qualcoder/i18n folder. 
+To do this update the config.ini  file to another language that is available. 
+Find the line begining language = 
+Then update it. For example: 
+langauge = it</source>
+        <translation>Fermez puis rouvrez le logiciel pour que le changement de langue prenne effet.
+Les langues régulièrement mises à jour (par des humains et/ou par l&apos;IA) sont : de, es, fr, ja, pt, sv, zh.
+D’autres langues peuvent être ajoutées si elles sont incluses dans le dossier&#xa0;src/qualcoder/i18n. 
+Pour ce faire, modifiez le fichier config.ini  en indiquant une autre langue disponible. 
+Recherchez la ligne commençant par language = 
+Ensuite, modifiez-la. Par exemple : 
+language = it</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_speakers</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="53"/>
+        <source>Mark Speakers</source>
+        <translation>Surligner l’interlocuteur</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="54"/>
+        <source>The following speaker names were detected in the document. 
+Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
+        <translation>Les noms des intervenant⋅es suivants ont été détectés dans le document. 
+Sélectionnez (✓) ceux que vous souhaitez surligner. En cliquant sur OK, vous créez un code pour chaque intervenant⋅es sélectionné⋅e dans la catégorie « 📌 intervenant⋅e » et attribuez tous les segments de texte correspondants. Double-cliquez pour modifier le nom « coder comme » dans le tableau. Pour fusionner deux intervenant⋅es (par exemple pour corriger une faute de frappe), renommez le « code comme » dans une entrée afin qu&apos;il corresponde exactement à l&apos;autre.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="56"/>
+        <source>Doubleclick a &quot;coded as&quot; name to edit</source>
+        <translation>Double-cliquez sur un nom « codé comme » pour le modifier</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_special_functions</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="110"/>
+        <source>Special Functions</source>
+        <translation>Fonctions spéciales</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="126"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of characters to extend (positive numbers)&lt;/p&gt;&lt;p&gt;or reduce (negative numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Nombre de caractères à étendre (nombres positifs)
+ou à réduire (nombres négatifs)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="124"/>
+        <source>Change text code start positions ALL codes ALL files for current owner.</source>
+        <translation>Modifier les positions de début des codes de texte TOUS les codes TOUS les fichiers pour le propriétaire actuel.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="123"/>
+        <source>Change text code end positions ALL codes ALL files for current owner.</source>
+        <translation>Modifier les positions de fin de code de texte TOUS les codes TOUS les fichiers pour le propriétaire actuel.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="111"/>
+        <source>Backup project before running these functions.</source>
+        <translation>Sauvegarder le projet avant d&apos;exécuter ces fonctions.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="112"/>
+        <source>Dynamic update text content</source>
+        <translation>Mise à jour dynamique du contenu du texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="128"/>
+        <source>Run</source>
+        <translation>Egzekite</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="115"/>
+        <source>Select text file to update</source>
+        <translation>Sélectionnez le fichier texte à mettre à jour</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="117"/>
+        <source>Select replacement text file</source>
+        <translation>Sélectionnez le fichier texte de remplacement</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="118"/>
+        <source>Merge project into this project</source>
+        <translation>Fusionner le projet dans ce projet</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="120"/>
+        <source>Select project to merge</source>
+        <translation>Sélectionnez le projet à fusionner</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="122"/>
+        <source>Change text positions</source>
+        <translation>Modifier la position du texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="113"/>
+        <source>Run update text content</source>
+        <translation>Exécuter la mise à jour du contenu textuel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="119"/>
+        <source>Run merge projects</source>
+        <translation>Exécuter des projets de fusion</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_special_functions.py" line="121"/>
+        <source>Select project to merge into this project</source>
+        <translation>Sélectionnez le projet à fusionner dans ce projet</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_sql</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="81"/>
+        <source>SQL_statements</source>
+        <translation>déclarations SQL</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="87"/>
+        <source>tab</source>
+        <translation>tab</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="82"/>
+        <source>SQL reports</source>
+        <translation>Rapports SQL</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="83"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Egzekite</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="86"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter for export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Délimiteur pour l&apos;exportation</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="88"/>
+        <source>,</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="89"/>
+        <source>;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="90"/>
+        <source>|</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="91"/>
+        <source>All fields quoted with quotation marks.</source>
+        <translation>Tous les champs sont indiqués entre guillemets.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="92"/>
+        <source>Quote</source>
+        <translation>Sitasyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="84"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Exporter vers Excel</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="85"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to CSV file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Exporter un fichier csv</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_view_av</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="199"/>
+        <source>View Audio Video</source>
+        <translation>Visualiser audio / vidéo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="218"/>
+        <source>Transcription:</source>
+        <translation>Retranscription :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="204"/>
+        <source>Audio:</source>
+        <translation>Odyo :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="205"/>
+        <source>Scroll transcript while playing. (Transcript is read only)</source>
+        <translation>Faites défiler la retranscription pendant la lecture. (La retranscription ne peut pas être codée)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="219"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ajouter un nom d&apos;intervenant·e aux raccourcis. Dans la zone de saisie, appuyez sur Ctrl + N&lt;/p&gt;&lt;p&gt;Insérer un·e intervenant·e dans la transcription. Dans la zone de saisie, appuyez sur Ctrl + 1 à Ctrl + 8 pour insérer le nom de l&apos;intervenant·e correspondant·e.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="220"/>
+        <source>Speakers:</source>
+        <translation>Interlocuteurs :</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="206"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; augmenter la vitesse de lecture, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; réduire la vitesse de lecture, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="203"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Avancer de 30 secondes. Alt + Plus</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="207"/>
+        <source>1.0x</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="208"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Tan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="200"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Faites un clic gauche sur le bouton du curseur et faites-le glisser vers la gauche ou la droite pour modifier la position de l&apos;audio/vidéo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="215"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="225"/>
+        <source>0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="216"/>
+        <source>green underline = Assigned to case.
+red underline = Assigned to code or annotation</source>
+        <translation>souligné en vert = assigné au cas.
+souligné en rouge = Affecté au code ou à l&apos;annotation</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="223"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="201"/>
+        <source>Ctrl + S start/pause
+Ctrl + P start/pause</source>
+        <translation>Ctrl + S start/pause
+Ctrl + P start/pause</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="209"/>
+        <source>Decrease play rate. Ctrl + Shift + &amp;lt; </source>
+        <translation>Ralentir.  Ctrl + Shift + &amp;lt; </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="210"/>
+        <source>Increase play rate. Ctrl + Shift + &amp;gt;</source>
+        <translation>Accélérer. . Ctrl + Shift + &amp;gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="211"/>
+        <source>Rewind 5 seconds Ctrl + R</source>
+        <translation>Reculer 5 secondes Ctrl + R</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="212"/>
+        <source>Rewind 30 seconds. Alt + Minus</source>
+        <translation>Reculer 30 30 secondes. Alt + Moins</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="213"/>
+        <source>Forward 30 seconds. Alt + Plus
+Forward 5 seconds. Press 5</source>
+        <translation>Avancer 30 secondes. Alt + Plus
+Avancer 5 secondse. Presser 5</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="222"/>
+        <source>Next</source>
+        <translation>Pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="224"/>
+        <source>Previous</source>
+        <translation>Avan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="230"/>
+        <source>Case sensitive</source>
+        <translation>Sensible à la casse</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="221"/>
+        <source>Search for text</source>
+        <translation>Recherche de texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="226"/>
+        <source>New speaker (Ctrl N)</source>
+        <translation>Nouveau⋅elle intervenant⋅e (Ctrl N)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="227"/>
+        <source>Insert timestamp (Ctrl T)</source>
+        <translation>Insérer un horodatage (Ctrl T)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="228"/>
+        <source>Remove speaker (Ctrl D)</source>
+        <translation>Enlever intervenant⋅e (Ctrl D)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="231"/>
+        <source>Set bookmark (Ctrl B)</source>
+        <translation>Ajouter en favori (Ctrl B)</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="232"/>
+        <source>Go to bookmark (Ctrl Shift B)</source>
+        <translation>Aller au favori (Ctrl Maj B)</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_view_image</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_image.py" line="50"/>
+        <source>View Image</source>
+        <translation>Wè imaj la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_image.py" line="51"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Memo</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_view_text</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="73"/>
+        <source>View and Edit Text</source>
+        <translation>Afficher et modifier le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="74"/>
+        <source>Clear all text</source>
+        <translation>Effacer tout le texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="75"/>
+        <source>Clear</source>
+        <translation>Efase</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="76"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Pwochen</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="77"/>
+        <source>Search for text.</source>
+        <translation>Recherchez le texte.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="78"/>
+        <source>0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="80"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Avan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="81"/>
+        <source>Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).
+Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.
+Do not code this text until you reload Coding - Code Text from the menu bar.</source>
+        <translation>Évitez de sélectionner des sections de texte avec une combinaison de non souligné (non codé / annoté / cas-assigné) et souligné (codé, annoté, cas-assigné).
+Les positions des codes / annotations / cas-assignés sous-jacents peuvent ne pas s&apos;ajuster correctement si le texte est écrasé ou supprimé.
+Ne codez pas ce texte tant que vous n&apos;avez pas rechargé Codage - Coder le texte à partir de la barre de menu.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="84"/>
+        <source>Do not select sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned). Positions of the underlying codes / annotations / case-assigned may not correctly adjust if selected text is typed over or deleted.
+Do not code this text until you reload Coding - Code Text from the menu bar.</source>
+        <translation>Ne sélectionnez pas de passages de texte contenant à la fois du texte non codé et du texte codé. Cela peut entrainer des problèmes d’alignement des codes sous-jacents.
+N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avant de relancer la fonction depuis la barre de menu.</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="79"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » sert de caractère générique ; par exemple, « .ears » correspondra à « bears » et à « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou plusieurs occurrences de ce caractère, par exemple « bears? » correspondra à « bear » et « bears » &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. » correspondra au point, « \? » correspondra au point d’interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>ErrorDlg</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="99"/>
+        <source>Uncaught exception</source>
+        <translation>Uncaught exception</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="100"/>
+        <source>&lt;Error Message&gt; </source>
+        <translation>&lt;Error Message&gt; </translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="101"/>
+        <source>Error traceback (most recent call last):</source>
+        <translation>Error traceback (most recent call last):</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="102"/>
+        <source>&lt;traceback&gt;</source>
+        <translation>&lt;traceback&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="335"/>
+        <source>Project</source>
+        <translation>Pwojè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="340"/>
+        <source>Coding</source>
+        <translation>Kodaj</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="342"/>
+        <source>Help</source>
+        <translation>Èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="345"/>
+        <source>Create New Project</source>
+        <translation>Créer un nouveau projet</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="346"/>
+        <source>Open Project</source>
+        <translation>Louvri yon pwojè</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="347"/>
+        <source>Close Project</source>
+        <translation>Fèmen pwojè a</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="406"/>
+        <source>Project Memo</source>
+        <translation>Memo pwojè a</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
+        <source>Settings</source>
+        <translation>Paramèt</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="350"/>
+        <source>Exit</source>
+        <translation>Kite</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="353"/>
+        <source>File categories</source>
+        <translation>Catégories de fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="355"/>
+        <source>Code text</source>
+        <translation>Kòd tèks la</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="356"/>
+        <source>Categories</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="357"/>
+        <source>Codebook</source>
+        <translation>Grille de codage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
+        <source>Assign Attributes</source>
+        <translation>Attribuer des attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="359"/>
+        <source>Manage Attributes</source>
+        <translation>Gérer les attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="360"/>
+        <source>Import Attributes</source>
+        <translation>Importer des attributs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="362"/>
+        <source>Coding summary</source>
+        <translation>Rezime kodaj</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="364"/>
+        <source>Contents</source>
+        <translation>Manyèl èd</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="365"/>
+        <source>About</source>
+        <translation>Konsènan</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="399"/>
+        <source>Import survey</source>
+        <translation>Importer une enquête</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="368"/>
+        <source>Frequency table</source>
+        <translation>Tableau des effectifs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="369"/>
+        <source>Coding comparison</source>
+        <translation>Comparaison de codage</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="370"/>
+        <source>Text mining</source>
+        <translation>Exploration de texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="371"/>
+        <source>Graph</source>
+        <translation>Graphe</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
+        <source>Code image</source>
+        <translation>Code d&apos;image</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="374"/>
+        <source>Code frequencies</source>
+        <translation>Effectifs des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="375"/>
+        <source>Coding Matrix</source>
+        <translation>Coder une matrice</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
+        <source>Code audio/video</source>
+        <translation>Code audio/vidéo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="341"/>
+        <source>Reports</source>
+        <translation>Rapò</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="378"/>
+        <source>REFI-QDA Project export</source>
+        <translation>Exportation de projet REFI-QDA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="379"/>
+        <source>REFI-QDA Codebook export</source>
+        <translation>Export de la grille de codage REFI-QDA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="380"/>
+        <source>REFI-QDA Codebook import</source>
+        <translation>Importation une grille de codage REFI QDA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="381"/>
+        <source>REFI-QDA Project import</source>
+        <translation>Importer un projet REFI QDA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="382"/>
+        <source>RQDA Project import</source>
+        <translation>Importer un projet RQDA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="336"/>
+        <source>Open Recent Project</source>
+        <translation>Ouvrir un projet récent</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="337"/>
+        <source>Export</source>
+        <translation>Ekspòte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="338"/>
+        <source>Import</source>
+        <translation>Enpòte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="383"/>
+        <source>Project summary</source>
+        <translation>Rezime pwojè a</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="384"/>
+        <source>None</source>
+        <translation>Okenn</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="385"/>
+        <source>Code relations</source>
+        <translation>Relations de code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="386"/>
+        <source>Export coded text as html</source>
+        <translation>Exporter le texte codé comme du HTML</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="305"/>
+        <source>QualCoder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="339"/>
+        <source>Manage</source>
+        <translation>Jesyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="306"/>
+        <source>Action Log</source>
+        <translation>Journal des actions</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="388"/>
+        <source>Special functions</source>
+        <translation>Fonctions spéciales</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="389"/>
+        <source>File summary</source>
+        <translation>Sommaire des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
+        <source>Code summary</source>
+        <translation>Rezime kòd yo</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
+        <source>Coding comparison by file</source>
+        <translation>Comparaison du codage par dossier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="392"/>
+        <source>Code by case</source>
+        <translation>Code par cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="393"/>
+        <source>Charts</source>
+        <translation>Grafik</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="372"/>
+        <source>Export codebook as ODT file</source>
+        <translation>Exporter la grille de codage comme fichier ODT</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="394"/>
+        <source>Export codebook with memos as ODT file</source>
+        <translation>Exporter la grille de codage avec les mémos comme fichier ODT</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="395"/>
+        <source>Import references RIS format</source>
+        <translation>Importation de références au format RIS</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="363"/>
+        <source>Database queries</source>
+        <translation>Requêtes de base de données</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="397"/>
+        <source>Colour scheme</source>
+        <translation>Schéma de couleurs</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="398"/>
+        <source>Import plain text codes list</source>
+        <translation>Importer une grille de codage en texte brut</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="401"/>
+        <source>Import twitter data</source>
+        <translation>Importer des données Twitter</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="407"/>
+        <source>AI Chat</source>
+        <translation>Chat IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="343"/>
+        <source>AI</source>
+        <translation>IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="402"/>
+        <source>Code pdf</source>
+        <translation>Code pdf</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="403"/>
+        <source>Code text exact matches</source>
+        <translation>Correspondance exacte du texte du code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="404"/>
+        <source>Setup Wizard</source>
+        <translation>Konfigirasyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="405"/>
+        <source>Rebuild Internal Memory</source>
+        <translation>Reconstruction de la mémoire interne</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
+        <source>AI Assisted Coding</source>
+        <translation>Codage assisté par l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="410"/>
+        <source>AI related Settings</source>
+        <translation>Paramètres liés à l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="411"/>
+        <source>Prompt library</source>
+        <translation>Bibliothèque des instructions</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="412"/>
+        <source>Code organiser</source>
+        <translation>Organisateur du code</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="413"/>
+        <source>Codes by text segments</source>
+        <translation>Codes par segments de texte</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="414"/>
+        <source>AI assisted coding</source>
+        <translation>Codage assisté par l&apos;IA</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="415"/>
+        <source>Code co-occurrence</source>
+        <translation>Cooccurrence des codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="416"/>
+        <source>Code counts by file/case</source>
+        <translation>Occurrences des codes par fichier/cas</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="417"/>
+        <source>Taguette import</source>
+        <translation>Importer depuis Taguette</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="344"/>
+        <source>Analysis</source>
+        <translation>Analiz</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="351"/>
+        <source>Files</source>
+        <translation>Fichye</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="352"/>
+        <source>Cases</source>
+        <translation>Ka</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="354"/>
+        <source>Journals</source>
+        <translation>Journaux de bord</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="367"/>
+        <source>Attributes</source>
+        <translation>Atribi</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="387"/>
+        <source>Bad links to files</source>
+        <translation>Liens incorrects vers des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="396"/>
+        <source>References</source>
+        <translation>Sitasyon</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="400"/>
+        <source>Key Shortcuts</source>
+        <translation>Raccourcis clavier</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="361"/>
+        <source>Code retrieval</source>
+        <translation>Recherche de codes</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="307"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select an option from the Manage menu&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sélectionnez une option dans le menu Gestion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="316"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select an option from the coding menu&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sélectionnez une option dans le menu Codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/qualcoder/GUI/ui_main.py" line="325"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select an option from the Analysis or Reports menu&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sélectionnez une option dans le menu Analyse ou Rapports&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+</TS>
