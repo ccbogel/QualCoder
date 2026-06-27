@@ -2178,6 +2178,18 @@ class DialogAIChat(QtWidgets.QDialog):
         self.history_update_message_list()
         self.update_chat_window()
 
+    def _flush_user_message_before_ai_start(self, chat_idx: Optional[int] = None) -> None:
+        """Render a freshly added user message before starting AI work."""
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx != self.current_chat_idx or chat_idx < 0:
+            return
+        self.update_chat_window()
+        self.ui.ai_output.repaint()
+        self.ui.scrollArea_ai_output.viewport().repaint()
+        QtWidgets.QApplication.processEvents()
+
     def _chat_scope_active(self, chat_idx=None) -> bool:
         if chat_idx is None:
             chat_idx = self.current_chat_idx
@@ -6456,6 +6468,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             if chat_idx == self.current_chat_idx:
                 self.history_add_message(msg_type, self.app.settings['codername'], msg_content, chat_idx)
                 self._queue_agent_chat_metadata_generation(chat_idx, msg_content)
+                self._flush_user_message_before_ai_start(chat_idx)
                 messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
                 self.current_streaming_run_id = ''
