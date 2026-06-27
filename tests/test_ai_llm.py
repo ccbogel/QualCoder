@@ -1,9 +1,10 @@
-import httpx
 import sqlite3
 import threading
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import patch
+
+import httpx
 
 from qualcoder.ai_llm import AiLLM
 

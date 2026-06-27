@@ -1,6 +1,7 @@
-import httpx
 from types import SimpleNamespace
 from unittest import TestCase, skipIf
+
+import httpx
 
 try:
     from qualcoder.ai_chat import DialogAIChat

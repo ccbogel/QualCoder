@@ -880,12 +880,12 @@ class DialogCodeText(QtWidgets.QWidget):
             current_branch["prompts"].append((relative_path, prompt))
 
         def populate_branch(parent_menu, branch) -> None:
-            for relative_path, prompt in branch["prompts"]:
-                action = parent_menu.addAction(self._text_analysis_prompt_menu_leaf(relative_path))
-                action.setToolTip(prompt.description)
+            for branch_relative_path, prompt_record in branch["prompts"]:
+                action = parent_menu.addAction(self._text_analysis_prompt_menu_leaf(branch_relative_path))
+                action.setToolTip(prompt_record.description)
                 action.setIcon(self._text_analysis_prompt_file_icon(parent_menu))
                 action.setProperty('submenu', 'ai_text_analysis')
-                action.setData(prompt)
+                action.setData(prompt_record)
             for folder_name, child_branch in branch["folders"].items():
                 submenu = parent_menu.addMenu(folder_name)
                 submenu.setToolTipsVisible(True)

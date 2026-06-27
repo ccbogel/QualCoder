@@ -242,21 +242,24 @@ class AiAgentPromptsCatalog:
         resolved: set[str] = set()
         visiting: set[str] = set()
 
-        def visit(prompt: AgentPromptRecord) -> None:
-            key = self._conflict_key(prompt.name)
+        def visit(prompt_record: AgentPromptRecord) -> None:
+            key = self._conflict_key(prompt_record.name)
             if key == "" or key in resolved:
                 return
             if key in visiting:
-                logger.warning("Detected cyclic AI prompt reference involving '/%s'", prompt.name)
+                logger.warning("Detected cyclic AI prompt reference involving '/%s'", prompt_record.name)
                 return
 
             visiting.add(key)
-            for nested_prompt in self.extract_prompt_references(prompt.content, include_internal=include_internal):
-                visit(nested_prompt)
+            for nested_prompt_record in self.extract_prompt_references(
+                prompt_record.content,
+                include_internal=include_internal,
+            ):
+                visit(nested_prompt_record)
             visiting.remove(key)
 
             resolved.add(key)
-            ordered.append(prompt)
+            ordered.append(prompt_record)
 
         for prompt in prompts:
             visit(prompt)

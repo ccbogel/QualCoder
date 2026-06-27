@@ -1,10 +1,11 @@
-from unittest import TestCase
-from qualcoder.__main__ import App
 import datetime
 import os
 import shutil
 import sqlite3
 import tempfile
+from unittest import TestCase
+
+from qualcoder.__main__ import App
 
 """ Useful insights from:
 https: // stackoverflow.com / questions / 32527861 / python - unit - test - that - uses - an - external - data - file / 32528173

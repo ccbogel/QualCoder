@@ -20,42 +20,41 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+from datetime import datetime
+import html as html_lib
+import json
+import logging
+import math
+import os
+import re
+import sqlite3
+import threading
+import time
+import traceback
+import unicodedata
+from typing import List, Dict, Any, Optional, Tuple
+from urllib.parse import urlencode, quote, unquote, urlparse, parse_qs, urlunparse
+import webbrowser
+
+from langchain_core.documents.base import Document
+from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+from markdown_it import MarkdownIt
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt, QEvent, QObject, pyqtSignal
 from PyQt6.QtGui import QCursor, QGuiApplication, QAction, QPalette, QShortcut, QKeySequence, QStandardItemModel, QStandardItem
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
-from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.ai import AIMessage
-from langchain_core.messages.system import SystemMessage
-from langchain_core.documents.base import Document
-from markdown_it import MarkdownIt
-
-from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime
-import json
-import html as html_lib
-import logging
-import math
-import traceback
-import os
-import sqlite3
-import webbrowser
-import re
-import threading
-import time
-import unicodedata
-from urllib.parse import urlencode, quote, unquote, urlparse, parse_qs, urlunparse
-
-from .ai_search_dialog import DialogAiSearch
-from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
-from .helpers import Message
-from .confirm_delete import DialogConfirmDelete
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
 from .ai_llm import extract_ai_memo, ai_quote_search, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
+from .ai_search_dialog import DialogAiSearch
+from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
+from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
+from .helpers import Message
 from .html_parser import html_to_text
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -1399,11 +1398,11 @@ class DialogAIChat(QtWidgets.QDialog):
                 label_pattern = re.compile("|".join(re.escape(label) for label in known_labels))
 
                 def replace_prompt_label(match: re.Match) -> str:
-                    label = match.group(0)
+                    matched_label = match.group(0)
                     placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
                     replacements[placeholder] = self._prompt_reference_html_span(
-                        label,
-                        records_by_label.get(label.casefold()),
+                        matched_label,
+                        records_by_label.get(matched_label.casefold()),
                         style_role=style_role,
                     )
                     return placeholder
@@ -2376,8 +2375,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 template_context[normalized_key] = str(value if value is not None else "")
 
         def replace_placeholder(match: re.Match) -> str:
-            key = match.group(1)
-            return template_context.get(key, match.group(0))
+            placeholder_key = match.group(1)
+            return template_context.get(placeholder_key, match.group(0))
 
         return re.sub(r"\{\{([A-Z0-9_]+)\}\}", replace_placeholder, content)
 
@@ -2863,9 +2862,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 return
             existing_values: List[int] = []
             seen_existing: set[int] = set()
-            for raw in list(query.get(key, []) or []):
+            for raw_value in list(query.get(key, []) or []):
                 try:
-                    value = int(raw)
+                    value = int(raw_value)
                 except Exception:
                     continue
                 if value <= 0 or value in seen_existing:
@@ -2977,21 +2976,21 @@ class DialogAIChat(QtWidgets.QDialog):
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-            request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
-            display_params = dict(request_params)
+            prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
+            prepared_display_params = dict(prepared_request_params)
             if method_name == "resources/read":
-                raw_uri = str(request_params.get("uri", "")).strip()
+                raw_uri = str(prepared_request_params.get("uri", "")).strip()
                 if raw_uri != "":
                     constrained_uri = self._constrain_search_uri_to_material_scope(
                         raw_uri,
                         file_ids,
                         selected_case_ids,
                     )
-                    request_params["uri"] = constrained_uri
-                    display_params["uri"] = constrained_uri
+                    prepared_request_params["uri"] = constrained_uri
+                    prepared_display_params["uri"] = constrained_uri
             if method_name == "tools/call" and ai_change_set_id != "":
-                request_params["_ai_change_set_id"] = ai_change_set_id
-            return request_params, display_params
+                prepared_request_params["_ai_change_set_id"] = ai_change_set_id
+            return prepared_request_params, prepared_display_params
 
         def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
             call_content = json.dumps(
@@ -3926,21 +3925,21 @@ class DialogAIChat(QtWidgets.QDialog):
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-            request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
-            display_params = dict(request_params)
+            prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
+            prepared_display_params = dict(prepared_request_params)
             if method_name == "resources/read":
-                raw_uri = str(request_params.get("uri", "")).strip()
+                raw_uri = str(prepared_request_params.get("uri", "")).strip()
                 if raw_uri != "":
                     constrained_uri = self._constrain_search_uri_to_material_scope(
                         raw_uri,
                         file_ids,
                         selected_case_ids,
                     )
-                    request_params["uri"] = constrained_uri
-                    display_params["uri"] = constrained_uri
+                    prepared_request_params["uri"] = constrained_uri
+                    prepared_display_params["uri"] = constrained_uri
             if method_name == "tools/call" and ai_change_set_id != "":
-                request_params["_ai_change_set_id"] = ai_change_set_id
-            return request_params, display_params
+                prepared_request_params["_ai_change_set_id"] = ai_change_set_id
+            return prepared_request_params, prepared_display_params
 
         def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
             call_content = json.dumps(
@@ -4764,11 +4763,11 @@ data collected. This information will accompany every prompt sent to the AI, res
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-            request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
-            display_params = dict(request_params)
+            prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
+            prepared_display_params = dict(prepared_request_params)
             if method_name == "tools/call" and ai_change_set_id != "":
-                request_params["_ai_change_set_id"] = ai_change_set_id
-            return request_params, display_params
+                prepared_request_params["_ai_change_set_id"] = ai_change_set_id
+            return prepared_request_params, prepared_display_params
 
         def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
             call_content = json.dumps(
@@ -5533,8 +5532,8 @@ data collected. This information will accompany every prompt sent to the AI, res
         ref_pattern = r'\{REF:\s*(.+?)\s*\}'
 
         def replace_ref(match):
-            quote = self._strip_ref_quotes(match.group(1))
-            return self._resolve_ref_quote_to_anchor(quote, candidates)
+            ref_quote = self._strip_ref_quotes(match.group(1))
+            return self._resolve_ref_quote_to_anchor(ref_quote, candidates)
 
         return re.sub(ref_pattern, replace_ref, res)
 
@@ -7529,8 +7528,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                         continue
                     source_id = self._safe_int(seg.get("fid", None), -1)
                     start = self._safe_int(seg.get("pos0", None), -1)
-                    quote = str(seg.get("quote", ""))
-                    if source_id <= 0 or start < 0 or quote.strip() == "":
+                    segment_quote = str(seg.get("quote", ""))
+                    if source_id <= 0 or start < 0 or segment_quote.strip() == "":
                         continue
                     source_name = str(seg.get("source_name", "")).strip()
                     if source_name == "":
@@ -7540,8 +7539,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                             "source_id": source_id,
                             "source_name": source_name,
                             "start": start,
-                            "length": len(quote),
-                            "text": quote,
+                            "length": len(segment_quote),
+                            "text": segment_quote,
                         }
                     )
                 continue
@@ -7662,10 +7661,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                 candidates.append(item)
         return candidates
 
-    def _resolve_ref_quote_to_anchor(self, quote: str, candidates: List[Dict[str, Any]]) -> str:
+    def _resolve_ref_quote_to_anchor(self, quoted_text: str, candidates: List[Dict[str, Any]]) -> str:
         """Resolve one exact/fuzzy quote to a quote: anchor."""
 
-        quote_text = str(quote if quote is not None else "").strip()
+        quote_text = str(quoted_text if quoted_text is not None else "").strip()
         if quote_text == "":
             return _('(unknown reference)')
 
@@ -7785,11 +7784,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             stop_reason = ""
             methodology_gate = self._empty_methodology_gate()
             def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-                request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
-                display_params = dict(request_params)
+                prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
+                prepared_display_params = dict(prepared_request_params)
                 if method_name == "tools/call" and ai_change_set_id != "":
-                    request_params["_ai_change_set_id"] = ai_change_set_id
-                return request_params, display_params
+                    prepared_request_params["_ai_change_set_id"] = ai_change_set_id
+                return prepared_request_params, prepared_display_params
 
             def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
                 call_content = json.dumps(
@@ -7824,13 +7823,13 @@ data collected. This information will accompany every prompt sent to the AI, res
                     ensure_ascii=False,
                 )
                 if tool_messages_streamed:
-                    progress_payload = {
+                    instruct_progress_payload = {
                         "chat_idx": chat_idx,
                         "msg_type": "single_instruct",
                         "msg_author": "ai_agent",
                         "msg_content": payload,
                     }
-                    signals.progress.emit(json.dumps(progress_payload, ensure_ascii=False))
+                    signals.progress.emit(json.dumps(instruct_progress_payload, ensure_ascii=False))
                 else:
                     tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
 

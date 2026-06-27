@@ -20,45 +20,46 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-import os
-import logging
-from logging.handlers import RotatingFileHandler
-import traceback
-from dataclasses import dataclass, field
-from datetime import datetime
-import threading
-import time
-import uuid
-from PyQt6 import QtWidgets
-from PyQt6 import QtCore
-from PyQt6 import QtGui
-import qtawesome as qta
-import httpx
-
-from openai import OpenAI, BadRequestError
-from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
-from langchain_openai import ChatOpenAI, AzureChatOpenAI
-from langchain_core.globals import set_llm_cache  # Unused
-from langchain_community.cache import InMemoryCache  # Unused
-from langchain_core.callbacks.base import BaseCallbackHandler
-from langchain_core.runnables.config import RunnableConfig
-from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.ai import AIMessage  # Unused
-from langchain_core.messages.system import SystemMessage
-from langchain_core.documents.base import Document  # Unused
-from .ai_async_worker import Worker
-from .ai_vectorstore import AiVectorstore
-from .helpers import Message
-from .select_items import DialogSelectItems
-from .confirm_delete import DialogConfirmDelete
-from .error_dlg import qt_exception_hook
-from .html_parser import html_to_text
-import json_repair
 import asyncio
 import configparser
-from Bio.Align import PairwiseAligner
-from pydantic import ValidationError
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
+import os
 import re
+import threading
+import time
+import traceback
+import uuid
+
+from Bio.Align import PairwiseAligner
+import httpx
+from langchain_core.callbacks.base import BaseCallbackHandler
+from langchain_community.cache import InMemoryCache  # Unused
+from langchain_core.documents.base import Document  # Unused
+from langchain_core.globals import set_llm_cache  # Unused
+from langchain_core.messages.ai import AIMessage  # Unused
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_core.runnables.config import RunnableConfig
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
+import json_repair
+from openai import OpenAI, BadRequestError
+from pydantic import ValidationError
+from PyQt6 import QtCore
+from PyQt6 import QtGui
+from PyQt6 import QtWidgets
+import qtawesome as qta
+
+from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
+from .ai_async_worker import Worker
+from .ai_vectorstore import AiVectorstore
+from .confirm_delete import DialogConfirmDelete
+from .error_dlg import qt_exception_hook
+from .helpers import Message
+from .html_parser import html_to_text
+from .select_items import DialogSelectItems
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -3557,11 +3558,11 @@ class AiLLM():
         # This way, frequent and relevant chunks should be sorted to the top
         # (see: "Reciprocal Rank Fusion" (https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf))
 
-        def chunk_unique_str(chunk):
+        def chunk_unique_str(chunk_item):
             # helper
-            chunk_str = str(chunk.metadata['id']) + ", "
-            chunk_str += str(chunk.metadata['start_index']) + ", "
-            return chunk_str
+            chunk_key = str(chunk_item.metadata['id']) + ", "
+            chunk_key += str(chunk_item.metadata['start_index']) + ", "
+            return chunk_key
             
         # Flatten the lists and count the frequency of each chunk
         chunk_count_list = {}  # contains the chunk count
