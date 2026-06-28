@@ -3103,7 +3103,7 @@ class AiMcpServer:
                     "supercid": row[6],
                 }
             )
-        speaker_prefix = "ðŸ“Œ "
+        speaker_prefix = "\U0001F4CC "
         speaker_categories = []
         for cat in categories:
             cat_name = str(cat.get("name", ""))
