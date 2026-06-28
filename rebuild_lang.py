@@ -391,6 +391,9 @@ def analyze_translation_status(language: str | None = None) -> str:
         "ro": "Română",
         "sv": "Svenska",
         "zh": "中文",
+        "eu": "Euskara",
+        "eo": "Esperanto",
+        "fa": "فارسی"
         # Add new language here
     }
 
@@ -586,6 +589,7 @@ if __name__ == "__main__":
             update_translation_placeholders(lang)
         elif mode == "--compile":
             recompile_translation(lang)
+            zip_language_files(lang)
         elif mode == "--status":
             analyze_translation_status(lang)
         elif mode == "--zip":
