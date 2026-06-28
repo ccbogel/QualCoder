@@ -4,8 +4,10 @@ import sqlite3
 import tempfile
 from types import SimpleNamespace
 from unittest import TestCase
+from unittest.mock import patch
 
 from qualcoder.ai_mcp_server import AiMcpServer
+from qualcoder.color_selector import color_matcher, colors
 
 
 class TestAiMcpServer(TestCase):
@@ -32,7 +34,7 @@ class TestAiMcpServer(TestCase):
         )
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text, "
-            "date text, color text, unique(name))"
+            "date text, color text, supercid integer, unique(name))"
         )
         cur.execute(
             "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer, seltext text, pos0 integer, "
@@ -83,12 +85,12 @@ class TestAiMcpServer(TestCase):
             (3, "cat child", "default", "2026-02-13", "child memo", 1),
         )
         cur.execute(
-            "INSERT INTO code_name (cid, name, memo, catid, owner, date, color) VALUES (?,?,?,?,?,?,?)",
-            (1, "code one", "code memo", 1, "default", "2026-02-13", "#AAAAAA"),
+            "INSERT INTO code_name (cid, name, memo, catid, owner, date, color, supercid) VALUES (?,?,?,?,?,?,?,?)",
+            (1, "code one", "code memo", 1, "default", "2026-02-13", "#AAAAAA", None),
         )
         cur.execute(
-            "INSERT INTO code_name (cid, name, memo, catid, owner, date, color) VALUES (?,?,?,?,?,?,?)",
-            (2, "code child", "child code memo", 3, "default", "2026-02-13", "#BBBBBB"),
+            "INSERT INTO code_name (cid, name, memo, catid, owner, date, color, supercid) VALUES (?,?,?,?,?,?,?,?)",
+            (2, "code child", "child code memo", 3, "default", "2026-02-13", "#BBBBBB", None),
         )
         cur.execute(
             "INSERT INTO journal (jid, name, jentry, date, owner) VALUES (?,?,?,?,?)",
@@ -197,7 +199,26 @@ class TestAiMcpServer(TestCase):
         payload = res["result"]["structuredContent"]
         self.assertTrue(payload["created"])
         self.assertEqual("AI Agent", payload["code"]["owner"])
-        self.assertEqual("#ABCDEF", payload["code"]["color"])
+        self.assertEqual(color_matcher("#ABCDEF"), payload["code"]["color"])
+
+    def test_tool_create_code_without_color_uses_qualcoder_palette(self):
+        selected_color = colors[7]
+        req = {
+            "jsonrpc": "2.0",
+            "id": 320,
+            "method": "tools/call",
+            "params": {
+                "name": "codes/create_code",
+                "arguments": {"name": "code ai no color", "memo": "m", "catid": 1},
+                "_ai_change_set_id": "run-2b",
+            },
+        }
+        with patch("qualcoder.ai_mcp_server.random.choice", return_value=selected_color):
+            res = self.server.handle_request(req)
+        self.assertIn("result", res)
+        payload = res["result"]["structuredContent"]
+        self.assertTrue(payload["created"])
+        self.assertEqual(selected_color, payload["code"]["color"])
 
     def test_tool_create_text_coding(self):
         req = {

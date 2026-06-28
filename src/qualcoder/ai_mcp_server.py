@@ -24,6 +24,7 @@ from mcp.server.lowlevel import Server
 from mcp.server.lowlevel.server import ReadResourceContents
 
 from .ai_help_index import AiHelpIndex
+from .color_selector import color_matcher, colors
 
 
 class AiMcpServer:
@@ -876,7 +877,9 @@ class AiMcpServer:
                     "name": "codes/create_code",
                     "description": (
                         "Create a new code. Use catid to assign the code to a category, "
-                        "supercid to nest it under another code, or null for top-level."
+                        "supercid to nest it under another code, or null for top-level. "
+                        "If color is omitted, a QualCoder palette color is chosen automatically. "
+                        "If color is provided, it is matched to the nearest QualCoder palette color."
                     ),
                     "inputSchema": {
                         "type": "object",
@@ -885,7 +888,10 @@ class AiMcpServer:
                             "memo": {"type": "string"},
                             "catid": {"type": ["integer", "null"]},
                             "supercid": {"type": ["integer", "null"]},
-                            "color": {"type": "string"},
+                            "color": {
+                                "type": "string",
+                                "description": "Optional #RRGGBB color. Stored as the nearest QualCoder palette color.",
+                            },
                         },
                         "required": ["name"],
                         "additionalProperties": False,
@@ -1364,9 +1370,7 @@ class AiMcpServer:
                 raise ValueError("supercid must be a positive integer or null.")
         if catid is not None and supercid is not None:
             raise ValueError("Provide either catid or supercid, not both.")
-        color = self._normalize_hex_color(arguments.get("color"))
-        if color == "":
-            color = "#8A8A8A"
+        color = self._new_code_palette_color(arguments.get("color"))
 
         conn = self._connect()
         try:
@@ -3036,6 +3040,16 @@ class AiMcpServer:
         if re.fullmatch(r"#[0-9A-Fa-f]{6}", text) is None:
             return ""
         return text.upper()
+
+    def _new_code_palette_color(self, requested_color: Any) -> str:
+        """Return a QualCoder palette color for a newly created code."""
+
+        normalized_color = self._normalize_hex_color(requested_color)
+        if normalized_color != "":
+            return color_matcher(normalized_color)
+        if len(colors) == 0:
+            return "#D8D8D8"
+        return str(random.choice(colors))
 
     def _quote_search(self, quote: str, fulltext: str) -> Tuple[int, int]:
         """Find quote boundaries, preferring ai_llm.ai_quote_search with graceful fallback."""
