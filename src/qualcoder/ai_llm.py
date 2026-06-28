@@ -511,8 +511,39 @@ class AiLLM():
             log_dir = os.path.expanduser('~')
         return os.path.join(log_dir, 'ai.log')
 
+    def _is_ai_extended_logging_enabled(self) -> bool:
+        """Return whether verbose AI request logging is enabled in config.ini."""
+
+        value = self.app.settings.get('ai_extended_logging', 'False')
+        if isinstance(value, bool):
+            return value
+        return str(value).strip().lower() == 'true'
+
+    def _close_ai_log_handler(self):
+        """Detach and close the dedicated AI log handler, if any."""
+
+        if self.ai_log_logger is None:
+            self.ai_log_logger = logging.getLogger('qualcoder.ai_log')
+            self.ai_log_logger.setLevel(logging.INFO)
+            self.ai_log_logger.propagate = False
+        for stale_handler in list(self.ai_log_logger.handlers):
+            try:
+                self.ai_log_logger.removeHandler(stale_handler)
+            except Exception:
+                pass
+            try:
+                stale_handler.close()
+            except Exception:
+                pass
+        self.ai_log_handler = None
+        self.ai_log_path = ''
+
     def _ensure_ai_log_logger(self):
         """Set up or refresh the dedicated rotating AI logger."""
+
+        if not self._is_ai_extended_logging_enabled():
+            self._close_ai_log_handler()
+            return False
 
         if self.ai_log_logger is None:
             self.ai_log_logger = logging.getLogger('qualcoder.ai_log')
@@ -557,6 +588,7 @@ class AiLLM():
         self.ai_log_logger.addHandler(handler)
         self.ai_log_handler = handler
         self.ai_log_path = desired_path
+        return True
 
     def _next_ai_log_id(self) -> int:
         self.ai_log_seq += 1
@@ -605,7 +637,8 @@ class AiLLM():
                 return '<unprintable>'
 
     def _write_ai_log(self, text: str):
-        self._ensure_ai_log_logger()
+        if not self._ensure_ai_log_logger():
+            return
         self.ai_log_logger.info(text)
 
     def log_llm_request(self, llm, messages, context: str = '') -> int:

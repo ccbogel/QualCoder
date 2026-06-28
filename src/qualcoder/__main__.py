@@ -964,7 +964,7 @@ class App(object):
                 'stylesheet', 'backup_num', 'codetext_chunksize',
                 'report_text_context_characters', 'report_text_context_style',
                 'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
-                'ai_permissions', 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
+                'ai_permissions', 'ai_extended_logging', 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -996,6 +996,8 @@ class App(object):
                     settings_data[key] = '0'
                 if key == 'ai_permissions':
                     settings_data[key] = 1
+                if key == 'ai_extended_logging':
+                    settings_data[key] = 'False'
                 if key == 'ai_chat_sidebar':
                     settings_data[key] = 'False'
                 if key == 'ai_chat_sidebar_width':
@@ -1352,6 +1354,7 @@ class App(object):
             'ai_first_startup': 'True',
             'ai_model_index': -1,
             'ai_permissions': 1,
+            'ai_extended_logging': 'False',
             'ai_chat_sidebar': 'False',
             'ai_chat_sidebar_width': 320,
             'ai_chat_splitter_output_bottom': 80
