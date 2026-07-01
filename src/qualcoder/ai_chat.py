@@ -2103,7 +2103,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return False
         clean_name = str(new_name).strip()
         if clean_name == '':
-            Message(self.app, _('AI Chat'), _('Please enter a chat title.'), icon='warning').exec()
+            Message(self.app, _('AI Agent'), _('Please enter a chat title.'), icon='warning').exec()
             return False
         chat = self.chat_list[row]
         chat_id = chat[0]
@@ -5727,16 +5727,16 @@ data collected. This information will accompany every prompt sent to the AI, res
         menu.setToolTipsVisible(True)
 
         # Add actions
-        action_general_chat = menu.addAction(_('New AI Agent Chat'))
+        action_general_chat = menu.addAction(_('New AI Agent Session'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Analyze your data together with an AI Agent.'))        
-        action_topic_exploration = menu.addAction(_('New topic exploration chat'))
+        action_topic_exploration = menu.addAction(_('New topic exploration'))
         action_topic_exploration.setIcon(self.app.ai.topic_exploration_icon())
         action_topic_exploration.setToolTip(_('Explore a free-search topic together with the AI agent.'))
-        action_text_analysis = menu.addAction(_('New text analysis chat'))
+        action_text_analysis = menu.addAction(_('New text analysis'))
         action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
         action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
-        action_codings_analysis = menu.addAction(_('New code analysis chat'))
+        action_codings_analysis = menu.addAction(_('New code analysis'))
         action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
         action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI agent.'))
 
@@ -8762,17 +8762,17 @@ data collected. This information will accompany every prompt sent to the AI, res
             path_segments = [segment for segment in url.path().split('/') if segment]
             if path_segments[:1] == ['pages'] or path_segments[:1] == ['search']:
                 msg = _('This help link is only for internal AI help lookup, not for opening a help page.')
-                Message(self.app, _('AI Chat'), msg, icon='warning').exec()
+                Message(self.app, _('AI Agent'), msg, icon='warning').exec()
                 return True
             if path_segments[:1] == ['page']:
                 if len(path_segments) != 2:
                     msg = _('Invalid help reference.')
-                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
+                    Message(self.app, _('AI Agent'), msg, icon='critical').exec()
                     return True
                 slug = unquote(path_segments[1]).strip().strip('/')
                 if slug == '':
                     msg = _('Invalid help reference.')
-                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
+                    Message(self.app, _('AI Agent'), msg, icon='critical').exec()
                     return True
                 url = QtCore.QUrl(f"qualcoder://help/{quote(slug, safe='-._~')}")
 
@@ -8799,7 +8799,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     self._open_text_reference(int(coding[0]), int(coding[1]), int(coding[2]))
                 else:
                     msg = _('Invalid source reference.')
-                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
+                    Message(self.app, _('AI Agent'), msg, icon='critical').exec()
             elif link.startswith('chunk:'):
                 try:
                     chunk_id = link[len('chunk:'):]
@@ -8816,7 +8816,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     source_id = None  # TODO source_id not used
                     msg = _('Invalid source reference.')
-                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()  
+                    Message(self.app, _('AI Agent'), msg, icon='critical').exec()  
             elif link.startswith('quote:'):
                     quote_id = link[len('quote:'):]
                     source_id, start, length = quote_id.split('_')

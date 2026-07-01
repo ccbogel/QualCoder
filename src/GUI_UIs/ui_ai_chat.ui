@@ -16,9 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">
-   <string>AI Chat</string>
-  </property>
+   <property name="windowTitle">
+    <string>AI Agent</string>
+   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>6</number>
@@ -212,7 +212,7 @@
       <item row="0" column="2">
        <widget class="QToolButton" name="toolButton_close_sidebar">
         <property name="toolTip">
-         <string>Enlarge AI Chat</string>
+         <string>Enlarge AI Agent</string>
         </property>
         <property name="text">
          <string/>
@@ -222,7 +222,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>AI Chat</string>
+         <string>AI Agent</string>
         </property>
        </widget>
       </item>

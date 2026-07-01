@@ -215,7 +215,7 @@ class Ui_Dialog_ai_chat(object):
 
     def retranslateUi(self, Dialog_ai_chat):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_ai_chat.setWindowTitle(_translate("Dialog_ai_chat", "AI Chat"))
+        Dialog_ai_chat.setWindowTitle(_translate("Dialog_ai_chat", "AI Agent"))
         self.pushButton_delete.setToolTip(_translate("Dialog_ai_chat", "Delete the selected chat"))
         self.pushButton_delete.setText(_translate("Dialog_ai_chat", "Delete"))
         self.pushButton_undo.setToolTip(_translate("Dialog_ai_chat", "Selectively undo AI induced changes"))
@@ -229,7 +229,7 @@ class Ui_Dialog_ai_chat(object):
         self.comboBox_ai_permissions.setItemText(0, _translate("Dialog_ai_chat", "Read-only"))
         self.comboBox_ai_permissions.setItemText(1, _translate("Dialog_ai_chat", "Sandboxed"))
         self.comboBox_ai_permissions.setItemText(2, _translate("Dialog_ai_chat", "Full access"))
-        self.toolButton_close_sidebar.setToolTip(_translate("Dialog_ai_chat", "Enlarge AI Chat"))
-        self.label.setText(_translate("Dialog_ai_chat", "AI Chat"))
+        self.toolButton_close_sidebar.setToolTip(_translate("Dialog_ai_chat", "Enlarge AI Agent"))
+        self.label.setText(_translate("Dialog_ai_chat", "AI Agent"))
         self.toolButton_edit_title.setText(_translate("Dialog_ai_chat", "..."))
         self.plainTextEdit_question.setToolTip(_translate("Dialog_ai_chat", "Enter your question here and press Enter to continue the chat"))

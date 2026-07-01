@@ -2151,9 +2151,9 @@ Click "Yes" to start now.')
         self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
         self.ui.actionAI_Edit_Project_Memo.triggered.connect(self.project_memo)
         self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
-        self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
-        self.ui.actionAI_Chat_Sidebar.setCheckable(True)
-        self.ui.actionAI_Chat_Sidebar.toggled.connect(self.toggle_ai_chat_sidebar)
+        self.ui.actionAI_Agent.triggered.connect(self.ai_go_chat)
+        self.ui.actionAI_Agent_Sidebar.setCheckable(True)
+        self.ui.actionAI_Agent_Sidebar.toggled.connect(self.toggle_ai_chat_sidebar)
         self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
         self.ui.tabWidget.currentChanged.connect(self.remember_last_non_ai_chat_tab)
         # Help menu
@@ -2705,7 +2705,7 @@ Click "Yes" to start now.')
     def _setup_ai_chat_tab_sidebar_button(self):
         """Add a small button in the AI chat tab to move the chat into sidebar view."""
 
-        tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_chat)
+        tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
         if tab_index < 0:
             return
         tab_bar = self.ui.tabWidget.tabBar()
@@ -2713,7 +2713,7 @@ Click "Yes" to start now.')
         button.setAutoRaise(True)
         button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        button.setToolTip(_('Move AI Chat to sidebar view'))
+        button.setToolTip(_('Move AI Agent to sidebar view'))
         button.setFixedSize(22, 22)
         icon_color = tab_bar.tabTextColor(tab_index)
         if not icon_color.isValid():
@@ -2735,9 +2735,9 @@ Click "Yes" to start now.')
 
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('Ai Chat'), msg).exec()
+            Message(self.app, _('AI Agent'), msg).exec()
             return
-        self.ui.actionAI_Chat_Sidebar.setChecked(True)
+        self.ui.actionAI_Agent_Sidebar.setChecked(True)
 
     def _ensure_widget_layout(self, widget):
         """Ensure a widget has a layout so child widgets can be hosted in it."""
@@ -2810,6 +2810,12 @@ Click "Yes" to start now.')
         finally:
             self.ai_sidebar_splitter_is_restoring = False
 
+    def _sync_ai_chat_sidebar_action(self):
+        """Keep the AI sidebar menu action aligned with the active sidebar mode."""
+
+        with QtCore.QSignalBlocker(self.ui.actionAI_Agent_Sidebar):
+            self.ui.actionAI_Agent_Sidebar.setChecked(bool(self.ai_chat_sidebar_mode))
+
     def _restore_ai_splitters_after_show(self):
         """Re-apply saved splitter positions once window geometry is finalized."""
 
@@ -2820,13 +2826,13 @@ Click "Yes" to start now.')
             QtCore.QTimer.singleShot(30, self._apply_ai_sidebar_splitter_sizes)
 
     def remember_last_non_ai_chat_tab(self, index):
-        """Store the most recent visible main tab other than AI Chat."""
+        """Store the most recent visible main tab other than AI Agent."""
 
         widget = self.ui.tabWidget.widget(index)
-        if widget == self.ui.tab_ai_chat and self.ai_chat_window is not None:
+        if widget == self.ui.tab_ai_agent and self.ai_chat_window is not None:
             self.ai_chat_window.schedule_ai_output_splitter_restore()
             return
-        if widget is None or widget == self.ui.tab_ai_chat:
+        if widget is None or widget == self.ui.tab_ai_agent:
             return
         if not self.ui.tabWidget.isTabVisible(index):
             return
@@ -2839,7 +2845,7 @@ Click "Yes" to start now.')
         current_index = self.ui.tabWidget.indexOf(current_widget)
         if (
             current_widget is not None
-            and current_widget != self.ui.tab_ai_chat
+            and current_widget != self.ui.tab_ai_agent
             and current_index >= 0
             and self.ui.tabWidget.isTabVisible(current_index)
         ):
@@ -2852,6 +2858,7 @@ Click "Yes" to start now.')
         """Switch AI chat between main tab view and sidebar view."""
 
         if self.ai_chat_window is None:
+            self._sync_ai_chat_sidebar_action()
             return
         sidebar_target_tab = None
         if bool(enabled):
@@ -2870,10 +2877,10 @@ Click "Yes" to start now.')
         if enabled:
             self._move_ai_chat_to_host(self._ai_chat_sidebar_host_widget())
         else:
-            self._move_ai_chat_to_host(self.ui.tab_ai_chat)
+            self._move_ai_chat_to_host(self.ui.tab_ai_agent)
 
         self.ai_chat_window.set_sidebar_mode(enabled)
-        ai_tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_chat)
+        ai_tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
         self.ui.tabWidget.setTabVisible(ai_tab_index, not enabled)
         self.ui.sidebar.setVisible(enabled)
 
@@ -2893,8 +2900,7 @@ Click "Yes" to start now.')
         QtCore.QTimer.singleShot(30, restore_ai_output_anchor)
         QtCore.QTimer.singleShot(90, restore_ai_output_anchor)
 
-        with QtCore.QSignalBlocker(self.ui.actionAI_Chat_Sidebar):
-            self.ui.actionAI_Chat_Sidebar.setChecked(enabled)
+        self._sync_ai_chat_sidebar_action()
 
         if persist:
             if enabled:
@@ -2906,14 +2912,17 @@ Click "Yes" to start now.')
         """Handle menu toggle for AI chat sidebar mode."""
 
         self.set_ai_chat_sidebar_mode(checked)
-        if not checked:
-            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat)
+        if bool(self.ai_chat_sidebar_mode) != bool(checked):
+            self._sync_ai_chat_sidebar_action()
+            return
+        if not self.ai_chat_sidebar_mode:
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
 
     def close_ai_chat_sidebar(self):
         """Return AI chat from sidebar back into the main AI tab."""
 
         self.set_ai_chat_sidebar_mode(False)
-        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
 
     def on_main_splitter_moved(self, pos, index):  # pos/index are Qt callback args
         """Track current AI sidebar width while user drags splitter."""
@@ -3988,16 +3997,16 @@ Click "Yes" to start now.')
         ).exec()
 
     def ai_go_chat(self):
-        """ Action triggered by AI Chat menu item."""
+        """Action triggered by AI Agent menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('Ai Chat'), msg).exec()
+            Message(self.app, _('AI Agent'), msg).exec()
             return
         if self.ai_chat_sidebar_mode:
             self.set_ai_chat_sidebar_mode(True, persist=False)
         else:
             self.set_ai_chat_sidebar_mode(False, persist=False)
-            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat)
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
 
     def ai_go_search(self):
         """ Action triggered by AI Search and Coding menu item."""

@@ -34,7 +34,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_action_log">
         <attribute name="title">
@@ -130,9 +130,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_ai_chat">
+       <widget class="QWidget" name="tab_ai_agent">
         <attribute name="title">
-         <string>AI Chat</string>
+         <string>AI Agent</string>
         </attribute>
        </widget>
       </widget>
@@ -302,8 +302,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionAI_Edit_Project_Memo"/>
     <addaction name="actionAI_Prompts"/>
     <addaction name="separator"/>
-    <addaction name="actionAI_Chat"/>
-    <addaction name="actionAI_Chat_Sidebar"/>
+    <addaction name="actionAI_Agent"/>
+    <addaction name="actionAI_Agent_Sidebar"/>
     <addaction name="actionAI_Search_and_Coding"/>
    </widget>
    <widget class="QMenu" name="menuAnalysis">
@@ -627,7 +627,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Setup Wizard</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Rebuild_internal_memory">
@@ -640,9 +640,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Project Memo</string>
    </property>
   </action>
-  <action name="actionAI_Chat">
+  <action name="actionAI_Agent">
    <property name="text">
-    <string>AI Chat</string>
+    <string>AI Agent</string>
    </property>
   </action>
   <action name="actionAI_Search_and_Coding">
@@ -658,7 +658,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>AI related Settings</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Prompts">
@@ -696,9 +696,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Taguette import</string>
    </property>
   </action>
-  <action name="actionAI_Chat_Sidebar">
+  <action name="actionAI_Agent_Sidebar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>AI Chat Sidebar</string>
+    <string>Sidebar Mode</string>
    </property>
   </action>
  </widget>
