@@ -18,6 +18,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
+https://qualcoder-org.github.io
 """
 
 import sqlite3
@@ -161,7 +162,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_screensshot.setEnabled(False)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
-
 
         # The buttons under the files list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
@@ -4077,7 +4077,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.load_segments()
 
-    # --- handles experimental
+    # --- handles
     def display_handles_for_code(self, position):
         """ Display interactive drag handles to resize a code's boundaries. """
 
@@ -4208,36 +4208,6 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         self.scene_height = height
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    '''def set_width(self, width):
-        """ Resize scene width. Not currently used. """
-
-        self.sceneWidth = width
-        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
-
-    def set_height(self, height):
-        """ Resize scene height. Not currently used. """
-
-        self.sceneHeight = height
-        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
-
-    def get_width(self):
-        """ Return scene width. Not currently used. """
-
-        return self.scene_width
-
-    def get_height(self):
-        """ Return scene height. Not currently used. """
-
-        return self.scene_height
-
-    def mouseMoveEvent(self, mouseEvent):
-        super(GraphicsScene, self).mousePressEvent(mouseEvent)
-
-        for i in self.scene.items():
-            if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
-                self.load_segments()
-        self.update()'''
-
     def mousePressEvent(self, event):
         """ I have implemented this, as the Segment context menu does not work when right-clicked
         once the QualCoder code is packaged by pyinstaller. (It does work outside of this).
@@ -4287,7 +4257,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.scene_to_x = 0
         self.scene_from_y = 0
         self.scene_to_y = 8
-
         self.app = app
         self.segment = segment
         self.scaler = scaler
@@ -4307,6 +4276,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                  {'name': 'Play segment'},
                  {'name': 'Edit start position'},
                  {'name': 'Edit end position'},
+                 {'name': 'Change code to selected code'},
+                 {'name': 'Add selected code to segment'},
                  {'name': 'Export segment'}]
         if self.code_av_dialog.ui.plainTextEdit.toPlainText() != "" and seltext != "":
             items.append({'name': 'Link segment to selected text'})
@@ -4346,6 +4317,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if action['name'] == 'Remove important mark':
             self.set_coded_importance(False)
             return
+        if action['name'] == 'Change code to selected code':
+            self.replace_code()
+            return
+        if action['name'] == 'Add selected code to segment':
+            self.add_code()
+            return
 
     def contextMenuEvent(self, event):
         """
@@ -4353,8 +4330,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         I was not able to mapToGlobal position so, the menu maps to scene position plus
         the Dialog screen position.
         Makes use of current segment: self.segment
-
-        Menu now does not work when packed with pyinstaller.
+        ThisMenu now does not work when packed with pyinstaller. So alternative menu method above.
         """
 
         seltext = self.code_av_dialog.ui.plainTextEdit.textCursor().selectedText()
@@ -4365,6 +4341,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_play = menu.addAction(_('Play segment'))
         action_edit_start = menu.addAction(_('Edit segment start position'))
         action_edit_end = menu.addAction(_('Edit segment end position'))
+        action_change_code = menu.addAction(_('Change code to selected code'))
+        action_add_code = menu.addAction(_('Add selected code to segment'))
         action_export = None
         try:
             result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True).stdout
@@ -4409,6 +4387,69 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             return
         if action == action_export:
             self.export_segment()
+            return
+        if action == action_add_code:
+            self.add_code()
+            return
+        if action== action_change_code:
+            self.replace_code()
+            return
+
+    def add_code(self):
+        """ Add another code to the segment. """
+        selected = self.code_av_dialog.ui.treeWidget.currentItem()
+        if selected is None:
+            Message(self.app, _("No selection"), _("No code selected in tree")).exec()
+            return
+        item = selected.text(1)
+        if 'catid' in item:
+            Message(self.app, _("No selection"), _("No code selected in tree")).exec()
+            return
+        cid = int(item.split(":")[1])
+
+        ''' TODO
+        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
+        cid = int(selected.text(1).split(':')[1])
+        values = [self.file_['id'], self.segment['start_msecs'],
+                  self.segment['end_msecs'], cid, self.segment['memo'],
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                  self.app.settings['codername']]
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        self.app.conn.commit()
+        self.code_av_dialog.load_segments()
+        self.app.delete_backup = False
+        self.code_av_dialog.fill_code_counts_in_tree()'''
+
+        Message(self.app, "Add Code TODO", selected.text(0)).exec()
+
+    def replace_code(self):
+        """ Replace code with another code. """
+        selected = self.code_av_dialog.ui.treeWidget.currentItem()
+        if selected is None:
+            Message(self.app, _("No selection"), _("No code selected in tree")).exec()
+            return
+        item = selected.text(1)
+        if 'catid' in item:
+            Message(self.app, _("No selection"), _("No code selected in tree")).exec()
+            return
+        cid = int(item.split(":")[1])
+
+        ''' TODO
+        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
+        cid = int(selected.text(1).split(':')[1])
+        values = [self.file_['id'], self.segment['start_msecs'],
+                  self.segment['end_msecs'], cid, self.segment['memo'],
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                  self.app.settings['codername']]
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        self.app.conn.commit()
+        self.code_av_dialog.load_segments()
+        self.app.delete_backup = False
+        self.code_av_dialog.fill_code_counts_in_tree()'''
+
+        Message(self.app, "Replace Code TODO", selected.text(0)).exec()
 
     def export_segment(self):
         """ Export segment as audio/video file.
@@ -4447,11 +4488,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                     f"{e_}\n{self.app.project_path}{self.code_av_dialog.file_['mediapath']}",
                     "warning").exec()
             return
-        ffmpeg_command = 'ffmpeg -i "' + mediapath + '" -ss '
-        ffmpeg_command += str(self.segment['pos0'] / 1000)
-        ffmpeg_command += ' -to '
-        ffmpeg_command += str(self.segment['pos1'] / 1000)
-        ffmpeg_command += ' -c copy "' + filepath + '"'
+        ffmpeg_command = f'ffmpeg -i "{mediapath}" -ss {self.segment["pos0"] / 1000}'
+        ffmpeg_command += f' -to {self.segment["pos1"] / 1000}'
+        ffmpeg_command += f' -c copy "{filepath}"'
         print(f"FFMPEG COMMAND\n {ffmpeg_command}")
         try:
             subprocess.run(ffmpeg_command, timeout=15, shell=True)

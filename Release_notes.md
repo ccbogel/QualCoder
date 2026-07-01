@@ -50,6 +50,8 @@ For install from source code, download the zip file below and use the instructio
 
 # Changes in this release
 
+Core languages will be English, German, French, Spanish. this is due to having regular human review and updates. Additional languages are located in the Other Languages folder. These may not be human reviewed, and may not be updated recently.
+
 ## Data structure change
 
 One major requested change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
@@ -58,6 +60,8 @@ One major requested change is to allow codes to have sub-codes. This makes it po
 ## Menus and tabs
 
 A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. 
+
+The manage, Coding and Reports tabs have placeholder information that explains in more detail what each of these tabs is used for.
 
 ## Journals
 
@@ -75,7 +79,7 @@ When in the file name column pressing delete will delete the file(s).
 
 ## All coding screens
 
-Added sub-menus for Modify (Code or ecategoert selected), Filter, Sort.
+Added sub-menus for Modify (Code or categories selected), Filter, Sort.
 
 Added a code namestext filter under neathte codes tree.
 
