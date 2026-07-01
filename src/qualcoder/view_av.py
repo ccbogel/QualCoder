@@ -4406,22 +4406,15 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             Message(self.app, _("No selection"), _("No code selected in tree")).exec()
             return
         cid = int(item.split(":")[1])
-
-        ''' TODO
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
-        cid = int(selected.text(1).split(':')[1])
-        values = [self.file_['id'], self.segment['start_msecs'],
-                  self.segment['end_msecs'], cid, self.segment['memo'],
-                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                  self.app.settings['codername']]
+        values = [self.segment['id'], self.segment['pos0'], self.segment['pos1'], cid, "",
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
         self.code_av_dialog.load_segments()
         self.app.delete_backup = False
-        self.code_av_dialog.fill_code_counts_in_tree()'''
-
-        Message(self.app, "Add Code TODO", selected.text(0)).exec()
+        self.code_av_dialog.fill_code_counts_in_tree()
 
     def replace_code(self):
         """ Replace code with another code. """
@@ -4433,23 +4426,15 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if 'catid' in item:
             Message(self.app, _("No selection"), _("No code selected in tree")).exec()
             return
-        cid = int(item.split(":")[1])
-
-        ''' TODO
-        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
-        cid = int(selected.text(1).split(':')[1])
-        values = [self.file_['id'], self.segment['start_msecs'],
-                  self.segment['end_msecs'], cid, self.segment['memo'],
-                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                  self.app.settings['codername']]
+        sql = "update code_av set cid=?, date=? where avid=?"
+        values = [int(item.split(":")[1]), datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                  self.segment['avid']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
         self.code_av_dialog.load_segments()
         self.app.delete_backup = False
-        self.code_av_dialog.fill_code_counts_in_tree()'''
-
-        Message(self.app, "Replace Code TODO", selected.text(0)).exec()
+        self.code_av_dialog.fill_code_counts_in_tree()
 
     def export_segment(self):
         """ Export segment as audio/video file.
