@@ -667,7 +667,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_text_text = ''
         self.ai_text_start_pos = -1
         self._chat_ai_profile_snapshots: Dict[int, str] = {}
-        self._pending_restore_chat_id: Optional[int] = None
         self.ai_output_autoscroll = True
         self._chat_window_refresh_pending = False
         self._chat_window_refresh_timer = QtCore.QTimer(self)
@@ -1668,15 +1667,12 @@ class DialogAIChat(QtWidgets.QDialog):
             cursor.execute("ALTER TABLE chats ADD COLUMN compaction_frontier_msg_id INTEGER DEFAULT 0")
         self.chat_history_conn.commit()
         self.current_chat_idx = -1
-        self._pending_restore_chat_id = self._get_project_last_ai_chat_id()
         self.fill_chat_list()
         self._update_undo_button_state()
     
     def close(self):
         self.ai_output_splitter_save_timer.stop()
         self.persist_ai_output_splitter_setting()
-        self._store_project_last_ai_chat_id()
-        self._pending_restore_chat_id = None
         if self.chat_history_conn is not None:
             self.chat_history_conn.close()
             
@@ -1853,43 +1849,6 @@ class DialogAIChat(QtWidgets.QDialog):
 
         self.main_window.close_ai_chat_sidebar()
 
-    def _get_project_last_ai_chat_id(self) -> Optional[int]:
-        """Load the last selected AI chat id stored in the project database."""
-
-        if getattr(self.app, "conn", None) is None:
-            return None
-        try:
-            cursor = self.app.conn.cursor()
-            cursor.execute("SELECT last_ai_chat_id FROM project")
-            row = cursor.fetchone()
-        except sqlite3.OperationalError:
-            return None
-        if row is None or row[0] is None:
-            return None
-        try:
-            return int(row[0])
-        except (TypeError, ValueError):
-            return None
-
-    def _store_project_last_ai_chat_id(self, chat_id: Optional[int] = None) -> None:
-        """Persist the currently selected AI chat id in the project database."""
-
-        if getattr(self.app, "conn", None) is None:
-            return
-        if chat_id is None:
-            if 0 <= self.current_chat_idx < len(self.chat_list):
-                chat_id = self.chat_list[self.current_chat_idx][0]
-            else:
-                chat_id = None
-        try:
-            cursor = self.app.conn.cursor()
-            cursor.execute("UPDATE project SET last_ai_chat_id = ?", (chat_id,))
-            self.app.conn.commit()
-        except sqlite3.OperationalError:
-            pass
-        except Exception as e_:
-            logger.debug(f"Could not persist last AI chat id: {e_}")
-
     def combo_chat_selection_changed(self, index):
         """Select the current chat when chosen via sidebar combo box."""
 
@@ -2003,12 +1962,6 @@ class DialogAIChat(QtWidgets.QDialog):
     def fill_chat_list(self):
         self.chat_list_model.clear()
         self.get_chat_list()
-        restore_chat_id = self._pending_restore_chat_id
-        self._pending_restore_chat_id = None
-        if self.current_chat_idx < 0 and restore_chat_id is not None:
-            restored_idx = self.find_chat_idx(restore_chat_id)
-            if restored_idx is not None:
-                self.current_chat_idx = restored_idx
         if self.current_chat_idx < 0 and len(self.chat_list) > 0:
             self.current_chat_idx = 0
         for i in range(len(self.chat_list)):
@@ -5594,7 +5547,6 @@ data collected. This information will accompany every prompt sent to the AI, res
         if self._cancel_chat_scope(self.current_chat_idx, ask=True):
             # AI generation is either finished or canceled, we can change to another chat
             self.current_chat_idx = current_row
-            self._store_project_last_ai_chat_id()
             self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
             self.history_update_message_list()
             self.update_chat_window(scroll_to_bottom=False)
