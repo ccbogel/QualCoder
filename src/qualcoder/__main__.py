@@ -138,7 +138,7 @@ BUILTIN_LANGUAGE_LABELS = [
 
 class ProjectEventBus(QtCore.QObject):
     """Application-wide event bus for project database changes.
-    This is used to notify other dialogs (e.g. reports) of changes to the project database,
+    This is used to notify other dialogs (e.g. reports) of changes to the project database, 
     so they can update their UI (e.g the code tree)."""
 
     project_data_changed = QtCore.pyqtSignal(list, object)
@@ -182,7 +182,7 @@ class App(object):
     # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
     ai_embedding_function = None
     project_events = None
-
+    
     def __init__(self):
         self.conn = None
         self.project_path = ""
@@ -481,7 +481,7 @@ class App(object):
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
-
+        
     def get_project_memo(self) -> str:
         # Might be called from a different thread (ai asynch operations), so have to create a new database connection
         conn = sqlite3.connect(os.path.join(self.project_path, 'data.qda'))
@@ -593,7 +593,7 @@ class App(object):
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
-
+    
     def get_text_fulltext(self, id_, start_pos=None, length=None) -> str:
         """Extracts text from the database in the document with the given id_.
 
@@ -633,10 +633,10 @@ class App(object):
         cumulative_length = 0
         start_line_number = 0
         end_line_number = 0
-
+        
         # Iterate through each line and find the line numbers
         for i, line in enumerate(lines):
-            cumulative_length += len(line) + 1  # +1 for the newline character
+            cumulative_length += len(line) + 1  # +1 for the newline character          
             # Determine if the start position falls within this line
             if start_line_number == 0 and cumulative_length > quote_start:
                 start_line_number = i + 1  # Line numbers are usually 1-indexed
@@ -644,7 +644,7 @@ class App(object):
             if end_line_number == 0 and cumulative_length > quote_end:
                 end_line_number = i + 1  # Line numbers are usually 1-indexed
                 break  # We can break early since both start and end line numbers are found
-
+                
         return start_line_number, end_line_number
 
     def get_pdf_filenames(self, ids:list[int]|None = None):
@@ -790,7 +790,7 @@ class App(object):
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
-
+    
     def check_bad_file_links(self, id_:int|None=None):
         """ Check all linked files are present.
         Will not state a bad link to an internally created text file.
@@ -848,9 +848,9 @@ class App(object):
             config[model_section]['reasoning_effort'] = model['reasoning_effort']
             config[model_section]['api_base'] = model['api_base']
             config[model_section]['api_key'] = model['api_key']
-
+        
         with open(self.configpath, 'w', encoding='utf-8') as configfile:
-            config.write(configfile)
+            config.write(configfile)            
 
     def _load_config_ini(self):
         """ load config settings, and convert some to Integer or Boolean. """
@@ -887,7 +887,7 @@ class App(object):
                 result['showids'] = True
         if 'report_text_context_characters' in default:
             result['report_text_context_characters'] = default.getint('report_text_context_characters')
-
+        
         # load AI model list
         ai_models = []
         for section in config.sections():
@@ -991,7 +991,7 @@ class App(object):
                 if key == 'ai_enable':
                     settings_data[key] = 'False'
                 if key == 'ai_first_startup':
-                    settings_data[key] = 'True'
+                    settings_data[key] = 'True' 
                 if key == 'ai_model_index':
                     settings_data[key] = '0'
                 if key == 'ai_permissions':
@@ -1009,7 +1009,7 @@ class App(object):
         if ai_permissions not in (0, 1, 2):
             settings_data['ai_permissions'] = 1
             settings_updated = True
-
+                    
         # Check AI models
         if len(ai_models) == 0:  # No models loaded, create default
             ai_models = get_default_ai_models()
@@ -1018,7 +1018,7 @@ class App(object):
         if settings_updated or len(settings_data) > dict_len:
             self.write_config_ini(settings_data, ai_models)
         return settings_data, ai_models
-
+    
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
@@ -1200,7 +1200,7 @@ class App(object):
         style = "\n".join(style_lines)'''
         # print("\nSTYLE\n", style)
         return style
-
+    
     def highlight_color(self):
         """ Get the default highlight color, depending on the current style
         """
@@ -1434,9 +1434,9 @@ class App(object):
         for row in cur.fetchall():
             result.append(dict(zip(keys, row)))
         return result
-
+    
     def get_last_project_coder(self) -> str:
-        """Returns the last coder name stored in the project table or
+        """Returns the last coder name stored in the project table or 
         an empty string if nothing is found there (old dab version 1-4)"""
         if self.conn is None:
             return ""
@@ -1445,29 +1445,29 @@ class App(object):
             cur.execute("SELECT codername FROM project")
             res = cur.fetchone()
             if res is not None and res[0] is not None:
-                return res[0]
+                return res[0]                   
         except sqlite3.OperationalError:  # db vers. 1-4 did not have codername in project table
             return ""
-
+        
     def update_coder_names(self):
         """
-        Collects names from the 'owner' field in all tables, and updates the
+        Collects names from the 'owner' field in all tables, and updates the 
         table 'coder_names' accordingly. The table will be created if not present.
-
-        The function also creates views that filter out invisible coders for the
-        following tables:
-        code_image --> code_image_visible
-        code_text  --> code_text_visible
-        code_av    --> code_av_visible
+        
+        The function also creates views that filter out invisible coders for the 
+        following tables: 
+        code_image --> code_image_visible 
+        code_text  --> code_text_visible 
+        code_av    --> code_av_visible 
         annotation --> annotation_visible
         """
         if self.conn is None:
             return
         system_coder_names = [speaker_coder_name]  # in the future, we could add '🤖 AI' to the list, and more...
-
+        
         cur = self.conn.cursor()
         initial_changes = self.conn.total_changes
-
+        
         try:
             # create table 'coder_names' if not already present
             sql = """
@@ -1475,7 +1475,7 @@ class App(object):
                     name TEXT UNIQUE NOT NULL,
                     visibility INTEGER NOT NULL DEFAULT 1 CHECK (visibility IN (0, 1))
                 );
-            """
+            """        
             cur.execute(sql)
 
             # Collect used coder names from all tables and add them to 'coder_names'.
@@ -1501,23 +1501,23 @@ class App(object):
 
             # Ensure current coder is added and visible
             sql = """
-                INSERT INTO coder_names (name, visibility)
-                VALUES (?, 1)
-                ON CONFLICT(name)
+                INSERT INTO coder_names (name, visibility) 
+                VALUES (?, 1) 
+                ON CONFLICT(name) 
                 DO UPDATE SET visibility = 1
                 WHERE coder_names.visibility <> 1
             """
             cur.execute(sql, (self.settings['codername'],))
-
+            
             # Ensure last coder from project is added
             last_project_coder = self.get_last_project_coder()
             if last_project_coder != "":
-                cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (last_project_coder, ))
-
+                cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (last_project_coder, ))                    
+            
             # Ensure system coder names are added
             for name in system_coder_names:
                 cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (name, ))
-
+            
             # create views
             cur.execute("""
                 CREATE VIEW IF NOT EXISTS code_image_visible AS
@@ -1571,7 +1571,7 @@ class App(object):
             print(err)
             self.conn.rollback()
             raise
-
+    
     def get_coder_names_in_project(self, only_visible=False):
         """ Get all coder names from all tables and from the config.ini file
         Design flaw is that current codername is not stored in a specific table in Database Versions 1 to 4.
@@ -1581,7 +1581,7 @@ class App(object):
         Returns:
             List of String coder names
         """
-
+        
         if self.conn is None:
             return [self.settings['codername']]
 
@@ -1598,9 +1598,9 @@ class App(object):
             for r in res:
                 coder_names.append(r[0])
         except sqlite3.OperationalError:
-            pass
+            pass        
         return coder_names
-
+         
     def save_backup(self, suffix:str=""):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
@@ -1663,7 +1663,7 @@ class App(object):
         # Delete backup path - delete the backup if no changes occurred in the project during the session
         self.delete_backup_path_name = backup
         return msg, backup
-
+        
     def help_wiki(self, page_path:str):
         """ Open website doc help page in https://qualcoder.org.
         Assumes English pages are present as a default.
@@ -1679,7 +1679,7 @@ class App(object):
             if err.code == 404:
                 lang = "en"
         webbrowser.open(f"https://qualcoder.org/doc/{lang}/{page_path}")
-
+       
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -1739,7 +1739,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_ui()
         self.ui.tabWidget.setCurrentIndex(0)
         self.show()
-        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents() 
         QtCore.QTimer.singleShot(0, self._restore_ai_splitters_after_show)
         # Setup AI
         try:
@@ -1764,11 +1764,11 @@ Click "Yes" to start now.')
                 while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
                     reply = msg_box.exec()
                     if reply == QtWidgets.QMessageBox.StandardButton.Help:
-                        self.app.help_wiki("2.3.-AI-Setup")
+                        self.app.help_wiki("2.3.-AI-Setup")                
                 if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                     self.ai_setup_wizard()  # (will also init the llm)
             else:
-                self.app.ai.init_llm(self)
+                self.app.ai.init_llm(self)      
             self.app.settings['ai_first_startup'] = 'False'
             self.app.write_config_ini(self.app.settings, self.app.ai_models)
         except Exception as err:
@@ -2172,7 +2172,7 @@ Click "Yes" to start now.')
         self.ui.sidebar.setMinimumWidth(0)
         self.ui.splitter.splitterMoved.connect(self.on_main_splitter_moved)
         self.settings_report()
-
+        
         self.ui.tabWidget.setCurrentIndex(0)
         self.last_non_ai_chat_tab = self.ui.tab_action_log
         self.ai_chat()
@@ -2189,7 +2189,7 @@ Click "Yes" to start now.')
         except Exception as e_:
             logger.log(e_)
         self._setup_ai_chat_tab_sidebar_button()
-
+        
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
         Add up to five recent projects to the menu. """
@@ -2504,7 +2504,7 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(menu_shortcuts_display)
         self.ui.textEdit.append(coding_shortcuts_display)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
-
+        
     def action_log_scroll_bottom(self):
         """Scrolls the action log to the very bottom, malking new entries visible."""
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
@@ -2598,7 +2598,7 @@ Click "Yes" to start now.')
 
     def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files.
+        text in imported text files. 
         Args:
             task: "documents": The default, shows the tab with the text documents
                   "ai_search": Shows the tab "AI Search"
@@ -2623,7 +2623,7 @@ Click "Yes" to start now.')
                 ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
                 if doc_id is not None:
                     ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
-                    ui.mark_speakers()
+                    ui.mark_speakers()                               
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
@@ -3248,7 +3248,7 @@ Click "Yes" to start now.')
         Language, Backup options.
         As this dialog affects all others if the coder name changes, on exit of the dialog,
         all other opened dialogs are destroyed.
-
+        
         section = 'AI' moves to the AI settings at the bottom of the dialog
         enable_ai = if True, the AI will be enabled in settings
         """
@@ -3264,12 +3264,12 @@ Click "Yes" to start now.')
         self.setStyleSheet(font)
         self.update_placeholder_tab_styles()
         self.ai_chat_window.init_styles()
-
+        
         if self.app.settings['ai_enable'] == 'True':
             self.app.ai.init_llm(self, rebuild_vectorstore=False)
-        else:
+        else:  
             self.app.ai.close()
-
+            
         # Change in coder names: Close all opened dialogs as coder names needs to change everywhere
         if ui.coder_names_changes:
             if current_coder != self.app.settings['codername']:
@@ -3280,7 +3280,7 @@ Click "Yes" to start now.')
     def project_memo(self):
         """ Give the entire project a memo. """
         memo = self.app.get_project_memo()
-        # If the memo is empty, add a template that defines all the necessary information for the AI
+        # If the memo is empty, add a template that defines all the necessary information for the AI  
         if memo is None or memo == '':
             memo = _('**Research topic, questions and objectives:** \n\n'
                      '**Methodology:** \n\n'
@@ -3373,17 +3373,17 @@ Click "Yes" to start now.')
             keep_button = msg_box.addButton(_('Keep'), QtWidgets.QMessageBox.ButtonRole.YesRole)
             switch_button = msg_box.addButton(_('Switch'), QtWidgets.QMessageBox.ButtonRole.NoRole)
             cancel_button = msg_box.addButton(_('Cancel'), QtWidgets.QMessageBox.ButtonRole.RejectRole)
-            msg_box.setDefaultButton(keep_button)
+            msg_box.setDefaultButton(keep_button) 
             msg_box.exec()
             res = msg_box.clickedButton()
             if res == keep_button:
-                pass
+                pass                
             elif res == switch_button:
                 self.app.settings['codername'] = last_project_coder
                 self.app.write_config_ini(self.app.settings, self.app.ai_models)
-                self.ui.textEdit.append(_("Default coder name changed to: ") + last_project_coder)
+                self.ui.textEdit.append(_("Default coder name changed to: ") + last_project_coder)                
             else:  # Cancel or closed
-                self.close_project()
+                self.close_project()                
                 return
 
         # Display some project details
@@ -3731,12 +3731,12 @@ Click "Yes" to start now.')
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()
-
+        
         # Update coder_names table and current coder in project
         self.app.update_coder_names()
         cur.execute('update project set codername=?', [self.app.settings['codername']])
         self.app.conn.commit()
-
+        
         # Fix missing folders within QualCoder project. Otherwise, will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
@@ -3840,7 +3840,7 @@ Click "Yes" to start now.')
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
-        self.ui.textEdit.append("<br />")
+        self.ui.textEdit.append("< br/>")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
@@ -3860,7 +3860,7 @@ Click "Yes" to start now.')
         # AI
         self.ai_chat_window.close()
         self.app.ai.close()
-
+        
         if self.app.conn is not None:
             try:
                 self.app.conn.commit()
@@ -3931,13 +3931,13 @@ Click "Yes" to start now.')
         if self.app.settings['ai_enable'] == 'True':
             msg = _('The AI is setup and enabled, so there is nothing to do here. '
                     'Go to AI > settings to change the current model or other settings.')
-            Message(self.app, _('AI Setup Wizard'), msg).exec()
+            Message(self.app, _('AI Setup Wizard'), msg).exec() 
             return
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
         self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
-
+        
     def ai_settings(self):
         """ Action triggered by AI Settings menu item."""
         self.change_settings(section='AI')
@@ -3946,13 +3946,13 @@ Click "Yes" to start now.')
         """ Action triggered by AI Rebuild Internal Memory menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it in Settings.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec()
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
             return
         if not self.app.ai.is_ready():
             msg = _('The AI is busy or not set up correctly.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec()
-            return
-
+            return 
+        
         msg = _('This will re-read all of your empirical documents, which may take some time. Do you want to continue?')
         mb = QtWidgets.QMessageBox(self)
         mb.setWindowTitle(_('Rebuild AI Memory'))
@@ -3960,10 +3960,10 @@ Click "Yes" to start now.')
         mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok |
                             QtWidgets.QMessageBox.StandardButton.Abort)
         mb.setStyleSheet(f'* {{font-size: {self.app.settings["fontsize"]}pt}}')
-        if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok:
+        if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
             self.ui.tabWidget.setCurrentIndex(0)  # Show action log
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
-
+    
     def ai_prompts(self, initial_prompt_name: str = "", initial_prompt_scope: str = ""):
         """ Action triggered by AI Prompts menu item."""
         DialogAiEditPrompts(
@@ -3988,7 +3988,7 @@ Click "Yes" to start now.')
         """ Action triggered by AI Search and Coding menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec()
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
             return
         self.text_coding(task='ai_search')
 
