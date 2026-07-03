@@ -56,6 +56,7 @@ from .error_dlg import qt_exception_hook
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .html_parser import html_to_text
+from .information import ai_agent_tab_info, render_tab_info_markdown
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -597,6 +598,7 @@ class DialogAIChat(QtWidgets.QDialog):
         # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_scroll_to_bottom)
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.plainTextEdit_question.viewport().installEventFilter(self)
+        self.ui.widget_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         self.ui.progressBar_ai.setMaximum(100)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
@@ -672,6 +674,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self._chat_window_refresh_timer = QtCore.QTimer(self)
         self._chat_window_refresh_timer.setSingleShot(True)
         self._chat_window_refresh_timer.timeout.connect(self._flush_chat_window_refresh)
+        self._new_chat_popup_menu = None
         self.setMinimumWidth(0)
         self.ui.widget_chat.setMinimumWidth(0)
         self.ui.scrollArea_ai_output.setMinimumWidth(0)
@@ -988,6 +991,12 @@ class DialogAIChat(QtWidgets.QDialog):
         if not self.ui.plainTextEdit_question.isEnabled():
             return
         self.ui.plainTextEdit_question.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _show_start_new_chat_message(self) -> None:
+        """Tell the user how to enable the question box when no chat is active."""
+
+        msg = _('Start a new AI Agent session first with the "New" button on the left.')
+        Message(self.app, _('AI Agent'), msg, icon='warning').exec()
 
     def _discard_inline_prompt_completion(self) -> bool:
         """Remove the transient inline completion suffix if it is still present."""
@@ -1866,6 +1875,154 @@ class DialogAIChat(QtWidgets.QDialog):
         if self.current_chat_idx >= len(self.chat_list):
             self.current_chat_idx = len(self.chat_list) - 1    
 
+    @staticmethod
+    def _new_chat_menu_target_specs() -> tuple[tuple[str, str, str], ...]:
+        """Return target ids, labels, and tooltips for the New menu entries."""
+
+        return (
+            (
+                'new_general_chat',
+                _('New AI Agent Session'),
+                _('Analyze your data together with an AI Agent.'),
+            ),
+            (
+                'new_topic_exploration',
+                _('New topic exploration'),
+                _('Explore a free-search topic together with the AI agent.'),
+            ),
+            (
+                'new_text_analysis',
+                _('New text analysis'),
+                _('Analyse a piece of text from your empirical data together with the AI.'),
+            ),
+            (
+                'new_code_analysis',
+                _('New code analysis'),
+                _('Analyze the data collected under a certain code together with the AI agent.'),
+            ),
+        )
+
+    def _new_chat_menu_icon(self, target: str) -> QtGui.QIcon:
+        """Return the icon for one New-menu target."""
+
+        if target == 'new_general_chat':
+            return self.app.ai.general_chat_icon()
+        if target == 'new_topic_exploration':
+            return self.app.ai.topic_exploration_icon()
+        if target == 'new_text_analysis':
+            return self.app.ai.text_analysis_icon()
+        if target == 'new_code_analysis':
+            return self.app.ai.code_analysis_icon()
+        return QtGui.QIcon()
+
+    def _create_new_chat_menu(self) -> tuple[QtWidgets.QMenu, dict[str, QtGui.QAction]]:
+        """Build the New-session popup menu and return its actions by target id."""
+
+        menu = QtWidgets.QMenu(self)
+        menu.setStyleSheet(self.font)
+        menu.setToolTipsVisible(True)
+        action_map: dict[str, QtGui.QAction] = {}
+        for target, label, tooltip in self._new_chat_menu_target_specs():
+            action = menu.addAction(label)
+            action.setIcon(self._new_chat_menu_icon(target))
+            action.setToolTip(tooltip)
+            action.setData(target)
+            action_map[target] = action
+        return menu, action_map
+
+    def _new_chat_menu_global_pos(self) -> QtCore.QPoint:
+        """Return the popup position for the New-session menu."""
+
+        button_rect = self.ui.pushButton_new_analysis.rect()
+        bottom_left_point = button_rect.bottomLeft()
+        return self.ui.pushButton_new_analysis.mapToGlobal(bottom_left_point)
+
+    def _trigger_new_chat_menu_target(self, target: str) -> bool:
+        """Execute one New-session target by its link/menu id."""
+
+        if target == 'new_text_analysis':
+            self.new_text_analysis()
+            return True
+        if target == 'new_code_analysis':
+            self.new_code_analysis()
+            return True
+        if target == 'new_topic_exploration':
+            self.new_topic_exploration()
+            return True
+        if target == 'new_general_chat':
+            self.new_general_chat('', '')
+            return True
+        return False
+
+    def _popup_new_chat_menu(self, highlight_target: Optional[str] = None) -> None:
+        """Show the New-session menu below the button and optionally highlight one entry."""
+
+        if self._new_chat_popup_menu is not None:
+            self._new_chat_popup_menu.close()
+        menu, action_map = self._create_new_chat_menu()
+        if highlight_target is not None and highlight_target not in action_map:
+            raise ValueError(_('Unknown AI Agent New-menu target: ') + highlight_target)
+        self._new_chat_popup_menu = menu
+
+        def cleanup_popup() -> None:
+            if self._new_chat_popup_menu is menu:
+                self._new_chat_popup_menu = None
+            menu.deleteLater()
+
+        menu.aboutToHide.connect(cleanup_popup)
+        menu.popup(self._new_chat_menu_global_pos())
+        if highlight_target is not None:
+            menu.setActiveAction(action_map[highlight_target])
+
+    def _show_ai_agent_link_error(self, link: str, details: str) -> None:
+        """Show a visible warning when one AI-tab placeholder link cannot be handled."""
+
+        msg = _('Cannot open link: ') + link + "\n\n" + details
+        logger.warning(msg)
+        Message(self.app, _('AI Agent'), msg, icon='warning').exec()
+
+    def _dispatch_ai_agent_tab_link(self, link: str) -> bool:
+        """Handle AI-tab-local qualcoder://ai_agent_tab/... links."""
+
+        url = QtCore.QUrl(link)
+        if not url.isValid() or url.scheme().casefold() != 'qualcoder':
+            return False
+        if url.host().casefold() != 'ai_agent_tab':
+            return False
+
+        link_path = [segment for segment in url.path().split('/') if segment]
+        try:
+            if len(link_path) == 1 and link_path[0] == 'new':
+                self._popup_new_chat_menu()
+                return True
+            if len(link_path) == 1 and link_path[0] == 'permissions':
+                self.ui.comboBox_ai_permissions.showPopup()
+                self.ui.comboBox_ai_permissions.setFocus(Qt.FocusReason.OtherFocusReason)
+                return True
+            if len(link_path) == 2 and link_path[0] == 'new':
+                self._popup_new_chat_menu(link_path[1])
+                return True
+            raise ValueError(_('Unsupported AI Agent tab link target.'))
+        except ValueError as err:
+            self._show_ai_agent_link_error(link, str(err))
+            return True
+
+    def _render_ai_agent_placeholder_html(self) -> str:
+        """Render the AI Agent startup placeholder with current theme colors."""
+
+        text_color = self.ui.ai_output.palette().color(QPalette.ColorRole.Text).name()
+        doc_font_size = self.app.settings["docfontsize"]
+        doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
+        return render_tab_info_markdown(
+            ai_agent_tab_info(),
+            self.app.highlight_color(),
+            text_color,
+            doc_font_size,
+            doc_font_family,
+            heading_icon_name="mdi6.message-processing-outline",
+            link_text_color=text_color,
+        )
+
     def _is_agent_chat_type(self, analysis_type: str) -> bool:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
         return normalized in ('general chat', 'agent chat', 'topic_exploration', 'code_analysis', 'text_analysis')
@@ -1962,8 +2119,6 @@ class DialogAIChat(QtWidgets.QDialog):
     def fill_chat_list(self):
         self.chat_list_model.clear()
         self.get_chat_list()
-        if self.current_chat_idx < 0 and len(self.chat_list) > 0:
-            self.current_chat_idx = 0
         for i in range(len(self.chat_list)):
             chat = self.chat_list[i]
             id_, name, analysis_type, summary, date, analysis_prompt = chat
@@ -5257,6 +5412,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.is_updating_chat_window = True
             try:
                 html_parts = []
+                self.ui.ai_output.setAlignment(
+                    QtCore.Qt.AlignmentFlag.AlignBottom
+                    | QtCore.Qt.AlignmentFlag.AlignLeading
+                    | QtCore.Qt.AlignmentFlag.AlignLeft
+                )
                 self.ui.plainTextEdit_question.setEnabled(True)
                 self.ui.pushButton_question.setEnabled(True)
                 chat = self.chat_list[self.current_chat_idx]
@@ -5430,9 +5590,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     self.ui.plainTextEdit_question.setFocus()
                 self.is_updating_chat_window = False
         else:
-            self.ui.ai_output.setText('')
+            self.ui.ai_output.setAlignment(
+                QtCore.Qt.AlignmentFlag.AlignTop
+                | QtCore.Qt.AlignmentFlag.AlignLeading
+                | QtCore.Qt.AlignmentFlag.AlignLeft
+            )
+            self.ui.ai_output.setText(self._render_ai_agent_placeholder_html())
             self.ui.plainTextEdit_question.setEnabled(False)
             self.ui.pushButton_question.setEnabled(False)
+            self.ui.scrollArea_ai_output.verticalScrollBar().setValue(0)
             if hasattr(self, "_prompt_reference_highlighter"):
                 self._prompt_reference_highlighter.rehighlight()
             
@@ -5673,42 +5839,12 @@ data collected. This information will accompany every prompt sent to the AI, res
     """
 
     def button_new_clicked(self):
-        # Create QMenu
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet(self.font)
-        menu.setToolTipsVisible(True)
-
-        # Add actions
-        action_general_chat = menu.addAction(_('New AI Agent Session'))
-        action_general_chat.setIcon(self.app.ai.general_chat_icon())
-        action_general_chat.setToolTip(_('Analyze your data together with an AI Agent.'))        
-        action_topic_exploration = menu.addAction(_('New topic exploration'))
-        action_topic_exploration.setIcon(self.app.ai.topic_exploration_icon())
-        action_topic_exploration.setToolTip(_('Explore a free-search topic together with the AI agent.'))
-        action_text_analysis = menu.addAction(_('New text analysis'))
-        action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
-        action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
-        action_codings_analysis = menu.addAction(_('New code analysis'))
-        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
-        action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI agent.'))
-
-        # Obtain the bottom-left point of the button in global coordinates
-        button_rect = self.ui.pushButton_new_analysis.rect()  # Get the button's rect
-        bottom_left_point = button_rect.bottomLeft()  # Bottom-left point
-        global_bottom_left_point = self.ui.pushButton_new_analysis.mapToGlobal(bottom_left_point)  # Map to global
-
-        # Execute the menu at the calculated position
-        action = menu.exec(global_bottom_left_point)
-
-        # Check which action was selected and do something
-        if action == action_text_analysis:
-            self.new_text_analysis()
-        elif action == action_codings_analysis:
-            self.new_code_analysis()
-        elif action == action_topic_exploration:
-            self.new_topic_exploration()
-        elif action == action_general_chat:
-            self.new_general_chat('', '')
+        menu, _ = self._create_new_chat_menu()
+        action = menu.exec(self._new_chat_menu_global_pos())
+        if action is None:
+            return
+        target = str(action.data() if action.data() is not None else '').strip()
+        self._trigger_new_chat_menu_target(target)
 
     def ai_output_scroll_to_bottom(self, minVal=None, maxVal=None):  # toDO minVal, maxVal unused
         #self._ai_output_scroll_to_bottom()
@@ -8512,6 +8648,17 @@ data collected. This information will accompany every prompt sent to the AI, res
     def eventFilter(self, source, event):
         editor = self.ui.plainTextEdit_question
         editor_viewport = editor.viewport()
+        question_widget = self.ui.widget_question
+
+        if source is question_widget and event.type() == QEvent.Type.MouseButtonPress:
+            if self.current_chat_idx < 0:
+                try:
+                    click_pos = event.position().toPoint()
+                except Exception:
+                    click_pos = None
+                if click_pos is not None and editor.geometry().contains(click_pos):
+                    self._show_start_new_chat_message()
+                    return True
 
         if source in (editor, editor_viewport) and event.type() == QEvent.Type.ContextMenu:
             context_pos = event.pos()
@@ -8774,6 +8921,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_id, start, length = quote_id.split('_')
                     end = int(start) + int(length)
                     self._open_text_reference(int(source_id), int(start), end)
+            elif self._dispatch_ai_agent_tab_link(link):
+                return
             elif self._dispatch_qualcoder_link(link):
                 return
             elif link.startswith('action:topic_chat_analyze_more'):

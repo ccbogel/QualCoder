@@ -37,6 +37,7 @@ tab_info_markdown_renderer = MarkdownIt("commonmark")
 help_link_pattern = re.compile(r'(<a href="qualcoder://help/[^"]*">)', re.IGNORECASE)
 menu_link_pattern = re.compile(r'(<a href="qualcoder://menu/[^"]*">)', re.IGNORECASE)
 action_link_pattern = re.compile(r'(<a href="qualcoder://action/[^"]*">)', re.IGNORECASE)
+ai_agent_tab_link_pattern = re.compile(r'(<a href="qualcoder://ai_agent_tab/[^"]*">)', re.IGNORECASE)
 first_h1_pattern = re.compile(r"<h1>(.*?)</h1>", re.IGNORECASE | re.DOTALL)
 
 
@@ -62,7 +63,14 @@ def _qtawesome_icon_data_uri(icon_name, color, size=16, y_offset=0):
     return f"data:image/png;base64,{encoded}"
 
 
-def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_font_size, doc_font_family, heading_icon_name=None):
+def render_tab_info_markdown(
+        markdown_text,
+        highlight_color,
+        text_color,
+        doc_font_size,
+        doc_font_family,
+        heading_icon_name=None,
+        link_text_color=None):
     """Render placeholder tab Markdown to HTML, including link decoration, etc.
     """
 
@@ -86,6 +94,7 @@ def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_fon
     rendered_html = help_link_pattern.sub(rf"\1{help_icon_html}", rendered_html)
     rendered_html = menu_link_pattern.sub(rf"\1{menu_icon_html}", rendered_html)
     rendered_html = action_link_pattern.sub(rf"\1{action_icon_html}", rendered_html)
+    rendered_html = ai_agent_tab_link_pattern.sub(rf"\1{menu_icon_html}", rendered_html)
     if heading_icon_name:
         heading_size = max(64, icon_size * 4)
         heading_offset = max(4, round(heading_size * 0.28))
@@ -102,6 +111,10 @@ def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_fon
         )
         rendered_html = first_h1_pattern.sub(rf"<h1>{heading_icon_html}\1</h1>", rendered_html, count=1)
     safe_font_family = html.escape(doc_font_family, quote=True)
+    safe_link_text_color = html.escape(
+        str(link_text_color if link_text_color is not None else highlight_color),
+        quote=True,
+    )
     return (
         "<style>"
         f"body {{ font-family: \"{safe_font_family}\"; font-size: {doc_font_size}pt; line-height: 1.35; margin: 0; color: {text_color}; }}"
@@ -109,6 +122,7 @@ def render_tab_info_markdown(markdown_text, highlight_color, text_color, doc_fon
         f"h1 {{ font-size: {doc_font_size + 6}pt; margin: 2em -0.5em 0.5em 0; }}"
         f"h2 {{ font-size: {doc_font_size + 4}pt; font-weight: normal; margin: 1.5em 0 0.5em 0; }}"
         f"h3 {{ font-size: {doc_font_size + 2}pt; font-weight: normal; font-style: italic; margin: 0.8em 0 0.3em 0; }}"
+        f'a, a:visited {{ color: {safe_link_text_color}; text-decoration: underline; }}'
         "</style>"
         + f'<div style="margin-left: 20px; margin-right: 20px;">{rendered_html}</div>'
     )
@@ -598,5 +612,47 @@ These reports summarise patterns across the project rather than showing every co
 ### Advanced reporting
 
 - [Database queries](qualcoder://menu/reports/sql_statements) gives direct access to the project database for custom analyses. This is most useful when the standard reports do not answer a specific research question in the exact form you need.
+""")
+
+
+def ai_agent_tab_info():
+    """Return translated Markdown for the AI Agent tab placeholder."""
+
+    return _("""# AI Agent
+
+Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to do
+almost anything in QualCoder:
+explore your empirical data, get suggestions for coding, obtain feedback on your codes or memos,
+and generate reports. To begin, use the ["New" button](qualcoder://ai_agent_tab/new) at the bottom
+left and choose one of the options described below.
+
+## [New AI Agent Session](qualcoder://ai_agent_tab/new/new_general_chat)
+
+- The default starting point for an open-ended analysis or any other task.
+- You can also ask for help about using QualCoder.
+
+
+## [New topic exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)
+
+- Search and explore a topic or question across the whole corpus of project data.
+- Clicking this option will open a dialog to enter your topic and select which data you want to include in the analysis.
+
+
+## [New text analysis](qualcoder://ai_agent_tab/new/new_text_analysis)
+
+- Analyse a selected text passage from your empirical material in detail.
+- This will switch to the text coding workspace and let you select a passage for analysis.
+
+
+## [New code analysis](qualcoder://ai_agent_tab/new/new_code_analysis)
+
+- Discuss your codings with the AI Agent, compare different codes, generate subcodes, or create reports.
+- This will also open a dialog to select your code(s) and the data you want to include in the analysis.
+
+
+## Other options
+- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what the AI Agent can
+do in your project.
+- You must [set up](qualcoder://menu/ai/ai_configuration) AI access before you can use the agent ([Help: AI setup](qualcoder://help/2.3.-AI-Setup/)).
 """)
 
