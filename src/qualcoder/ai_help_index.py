@@ -7,6 +7,27 @@ The English Markdown manual from the QualCoder website repository is treated as
 the canonical source. Pages are synced into a local SQLite FTS5 index under
 ``~/.qualcoder/help`` and can then be queried quickly by the internal MCP
 server.
+
+---
+
+This file is part of QualCoder.
+
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
+
+Author: Kai Dröge (kaixxx)
+https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
+https://qualcoder.org/
 """
 
 from __future__ import annotations

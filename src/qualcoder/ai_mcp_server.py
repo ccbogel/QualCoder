@@ -6,6 +6,27 @@ Internal MCP server for QualCoder.
 This module uses the official MCP Python SDK (low-level server) and exposes
 an in-process JSON-RPC bridge (`handle_request`) so the current chat flow can
 call it without transport setup.
+
+---
+
+This file is part of QualCoder.
+
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
+
+Author: Kai Dröge (kaixxx)
+https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
+https://qualcoder.org/
 """
 
 import asyncio
