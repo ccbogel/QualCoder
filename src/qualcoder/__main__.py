@@ -3269,6 +3269,7 @@ Click "Yes" to start now.')
             self.app.ai.init_llm(self, rebuild_vectorstore=False)
         else:  
             self.app.ai.close()
+        self.ai_chat_window.refresh_placeholder_if_visible()
             
         # Change in coder names: Close all opened dialogs as coder names needs to change everywhere
         if ui.coder_names_changes:
@@ -3936,6 +3937,7 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
         self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
+        self.ai_chat_window.refresh_placeholder_if_visible()
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
         
     def ai_settings(self):

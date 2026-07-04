@@ -1562,6 +1562,13 @@ class DialogAIChat(QtWidgets.QDialog):
         """)
         self.update_chat_window()
 
+    def refresh_placeholder_if_visible(self) -> None:
+        """Re-render the startup placeholder when no chat is selected and the widget is visible."""
+
+        if self.current_chat_idx >= 0 or not self.isVisible():
+            return
+        self.update_chat_window(scroll_to_bottom=False)
+
     def setup_ai_permissions_combobox(self):
         """Replace the Designer combobox with a prefixed, non-editable combobox."""
 
@@ -2013,8 +2020,9 @@ class DialogAIChat(QtWidgets.QDialog):
         text_color = self.ui.ai_output.palette().color(QPalette.ColorRole.Text).name()
         doc_font_size = self.app.settings["docfontsize"]
         doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
+        ai_enabled = self.app.settings.get("ai_enable", "False") == "True"
         return render_tab_info_markdown(
-            ai_agent_tab_info(),
+            ai_agent_tab_info(ai_enabled=ai_enabled),
             self.app.highlight_color(),
             text_color,
             doc_font_size,

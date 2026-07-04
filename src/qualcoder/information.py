@@ -615,16 +615,18 @@ These reports summarise patterns across the project rather than showing every co
 """)
 
 
-def ai_agent_tab_info():
+def ai_agent_tab_info(ai_enabled: bool = True):
     """Return translated Markdown for the AI Agent tab placeholder."""
 
-    return _("""# AI Agent
+    markdown_text = _("""# AI Agent
 
 Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to do
 almost anything in QualCoder:
 explore your empirical data, get suggestions for coding, obtain feedback on your codes or memos,
 and generate reports. To begin, use the ["New" button](qualcoder://ai_agent_tab/new) at the bottom
 left and choose one of the options described below.
+
+{{AI_WARNING_BLOCK}}
 
 ## [New AI Agent Session](qualcoder://ai_agent_tab/new/new_general_chat)
 
@@ -647,12 +649,28 @@ left and choose one of the options described below.
 ## [New code analysis](qualcoder://ai_agent_tab/new/new_code_analysis)
 
 - Discuss your codings with the AI Agent, compare different codes, generate subcodes, or create reports.
-- This will also open a dialog to select your code(s) and the data you want to include in the analysis.
+- This will also open a dialog to select the code(s) and data you want to include in the analysis.
 
 
 ## Other options
 - The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what the AI Agent can
 do in your project.
-- You must [set up](qualcoder://menu/ai/ai_configuration) AI access before you can use the agent ([Help: AI setup](qualcoder://help/2.3.-AI-Setup/)).
+- Open the [AI menu](qualcoder://menu/ai) for more options, for example to edit predefined prompts in the
+[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted coding](qualcoder://menu/ai/ai_search_and_coding).
+- You must [set up AI access](qualcoder://menu/ai/ai_setup_wizard) before you can use the agent ([Help: AI setup](qualcoder://help/2.3.-AI-Setup/)).
 """)
+
+    warning_block = ""
+    if not ai_enabled:
+        warning_block = _("""
+<br />
+
+**Note: The AI Agent is currently not available because AI setup has not been completed yet.**
+
+- Start the [AI Setup Wizard](qualcoder://action/ai/ai_setup_wizard)
+
+- [Help: AI setup](qualcoder://help/2.3.-AI-Setup/)
+
+""")
+    return markdown_text.replace("{{AI_WARNING_BLOCK}}", warning_block, 1)
 
