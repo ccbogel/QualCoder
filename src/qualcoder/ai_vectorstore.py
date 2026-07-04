@@ -235,6 +235,7 @@ class AiVectorstore:
     parent_text_edit = None
     ready = False
     import_workers_count = 0
+    vectorstore_workers_count = 0
     model_name = "intfloat/multilingual-e5-large"
     cache_folder = os.path.join(os.path.expanduser('~'), '.cache', 'torch', 'sentence_transformers')
     model_folder = os.path.join(cache_folder, model_name.replace("/", "_"))
@@ -880,10 +881,13 @@ class AiVectorstore:
             self.parent_text_edit.append(_('AI: Finished loading (no project open).'))
             self.app.ai._status = ''
         else:
+            self.app.ai._status = ''
             self.open_db(rebuild)
 
     def open_db(self, rebuild=False):
         worker = Worker(self._open_db, rebuild)
+        self.vectorstore_workers_count += 1
+        worker.signals.finished.connect(self._finish_vectorstore_worker)
         worker.signals.error.connect(ai_exception_handler)
         worker.signals.progress.connect(self.open_progress)
         self.threadpool.start(worker)
@@ -896,12 +900,17 @@ class AiVectorstore:
         self.parent_text_edit.append(msg)
 
     def finished_import(self):
+        self._finish_vectorstore_worker()
         self.import_workers_count -= 1
         if self.import_workers_count <= 0:
             self.import_workers_count = 0
             msg = _("AI: Checked all documents, memory is up to date.")
             self.parent_text_edit.append(msg)
             logger.debug(msg)
+
+    def _finish_vectorstore_worker(self):
+        if self.vectorstore_workers_count > 0:
+            self.vectorstore_workers_count -= 1
 
     def _query_embedding(self, query: str) -> np.ndarray:
         vector = self.app.ai_embedding_function.embed_query(query)
@@ -1047,6 +1056,7 @@ class AiVectorstore:
         worker.signals.progress.connect(self.progress_import)
         worker.signals.error.connect(ai_exception_handler)
         self.import_workers_count += 1
+        self.vectorstore_workers_count += 1
         self.threadpool.start(worker)
 
     def _update_vectorstore(self, signals=None):
@@ -1065,6 +1075,8 @@ class AiVectorstore:
 
     def update_vectorstore(self):
         worker = Worker(self._update_vectorstore)
+        self.vectorstore_workers_count += 1
+        worker.signals.finished.connect(self._finish_vectorstore_worker)
         worker.signals.error.connect(ai_exception_handler)
         self.threadpool.start(worker)
 
@@ -1102,13 +1114,14 @@ class AiVectorstore:
         self.threadpool.clear()
         self.threadpool.waitForDone(5000)
         self.import_workers_count = 0
+        self.vectorstore_workers_count = 0
         self._faiss_index = None
         self._chunk_ids_by_pos = []
         self.faiss_db = None
         self._is_closing = False
 
     def ai_worker_running(self):
-        return self.import_workers_count
+        return self.vectorstore_workers_count
 
     def is_open(self) -> bool:
         return self.faiss_db is not None and self._is_closing is False

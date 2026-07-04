@@ -3936,9 +3936,18 @@ Click "Yes" to start now.')
             return
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
-        self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
+        self.app.ai.init_llm(self, rebuild_vectorstore=False, enable_ai=True)
         self.ai_chat_window.refresh_placeholder_if_visible()
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
+        if self.app.settings['ai_enable'] == 'True':
+            ai_status = self.app.ai.get_status()
+            if ai_status == 'reading data':
+                msg = _('The AI setup is complete. The AI is now reading your project data in the background.')
+            elif ai_status == 'ready':
+                msg = _('The AI setup is complete and the AI is ready to use.')
+            else:
+                msg = _('The AI setup is complete.')
+            Message(self.app, _('AI Setup Wizard'), msg).exec()
         
     def ai_settings(self):
         """ Action triggered by AI Settings menu item."""
