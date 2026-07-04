@@ -620,24 +620,24 @@ def ai_agent_tab_info(ai_enabled: bool = True):
 
     markdown_text = _("""# AI Agent
 
-Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to do
-almost anything in QualCoder:
-explore your empirical data, get suggestions for coding, obtain feedback on your codes or memos,
-and generate reports. To begin, use the ["New" button](qualcoder://ai_agent_tab/new) at the bottom
-left and choose one of the options described below.
+Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to
+explore your empirical text data, get suggestions for coding, obtain feedback on your codes or memos,
+and generate summaries and reports. To begin, use the ["New" button](qualcoder://ai_agent_tab/new) at 
+the bottom left and choose one of the options described below.
 
 {{AI_WARNING_BLOCK}}
 
 ## [New AI Agent Session](qualcoder://ai_agent_tab/new/new_general_chat)
 
-- The default starting point for an open-ended analysis or any other task.
-- You can also ask for help about using QualCoder.
+- Initiate a new chat with the AI Agent.
+- This is the default starting point for an open-ended analysis or any other task.
+- You can also ask for help using QualCoder.
 
 
 ## [New topic exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)
 
 - Search and explore a topic or question across the whole corpus of project data.
-- Clicking this option will open a dialog to enter your topic and select which data you want to include in the analysis.
+- This option opens a dialog where you define the topic and select which data to include in the analysis.
 
 
 ## [New text analysis](qualcoder://ai_agent_tab/new/new_text_analysis)
@@ -653,11 +653,10 @@ left and choose one of the options described below.
 
 
 ## Other options
-- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what the AI Agent can
-do in your project.
+- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what 
+the AI Agent is allowed to do in your project.
 - Open the [AI menu](qualcoder://menu/ai) for more options, for example to edit predefined prompts in the
 [prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted coding](qualcoder://menu/ai/ai_search_and_coding).
-- You must [set up AI access](qualcoder://menu/ai/ai_setup_wizard) before you can use the agent ([Help: AI setup](qualcoder://help/2.3.-AI-Setup/)).
 """)
 
     warning_block = ""

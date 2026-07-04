@@ -590,6 +590,7 @@ class DialogAIChat(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
+        self._new_chat_popup_menu = None
         self.setup_chat_selector_widget()
         self.setup_ai_permissions_combobox()
         self.ui.comboBox_ai_permissions.currentIndexChanged.connect(self.ai_permissions_changed)
@@ -674,7 +675,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self._chat_window_refresh_timer = QtCore.QTimer(self)
         self._chat_window_refresh_timer.setSingleShot(True)
         self._chat_window_refresh_timer.timeout.connect(self._flush_chat_window_refresh)
-        self._new_chat_popup_menu = None
         self.setMinimumWidth(0)
         self.ui.widget_chat.setMinimumWidth(0)
         self.ui.scrollArea_ai_output.setMinimumWidth(0)
@@ -1970,6 +1970,8 @@ class DialogAIChat(QtWidgets.QDialog):
         if highlight_target is not None and highlight_target not in action_map:
             raise ValueError(_('Unknown AI Agent New-menu target: ') + highlight_target)
         self._new_chat_popup_menu = menu
+        menu.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        menu.installEventFilter(self)
 
         def cleanup_popup() -> None:
             if self._new_chat_popup_menu is menu:
@@ -1980,6 +1982,10 @@ class DialogAIChat(QtWidgets.QDialog):
         menu.popup(self._new_chat_menu_global_pos())
         if highlight_target is not None:
             menu.setActiveAction(action_map[highlight_target])
+        elif len(action_map) > 0:
+            menu.setActiveAction(next(iter(action_map.values())))
+        menu.activateWindow()
+        menu.setFocus(Qt.FocusReason.PopupFocusReason)
 
     def _show_ai_agent_link_error(self, link: str, details: str) -> None:
         """Show a visible warning when one AI-tab placeholder link cannot be handled."""
@@ -8657,6 +8663,20 @@ data collected. This information will accompany every prompt sent to the AI, res
         editor = self.ui.plainTextEdit_question
         editor_viewport = editor.viewport()
         question_widget = self.ui.widget_question
+        popup_menu = getattr(self, "_new_chat_popup_menu", None)
+
+        if source is popup_menu and event.type() == QEvent.Type.KeyPress:
+            if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space):
+                active_action = popup_menu.activeAction() if popup_menu is not None else None
+                if active_action is None:
+                    return True
+                target = str(active_action.data() if active_action.data() is not None else '').strip()
+                popup_menu.close()
+                QtCore.QTimer.singleShot(0, lambda t=target: self._trigger_new_chat_menu_target(t))
+                return True
+            if event.key() == Qt.Key.Key_Escape and popup_menu is not None:
+                popup_menu.close()
+                return True
 
         if source is question_widget and event.type() == QEvent.Type.MouseButtonPress:
             if self.current_chat_idx < 0:
