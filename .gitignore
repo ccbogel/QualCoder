@@ -28,4 +28,3 @@ tmp*.*
 AGENTS.md
 windows_run_from_conda_*.bat
 *.code-workspace
-/tests
