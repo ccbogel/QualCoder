@@ -3380,7 +3380,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if planner_action != "call_mcp":
                 planned_calls = []
             if len(planned_calls) == 0 and stop_reason == "":
-                stop_reason = "enough_information"
+                stop_reason = "final_answer"
 
             reflection_system_prompt = self._build_mcp_combined_system_prompt(
                 self._mcp_reflection_system_prompt()
@@ -3461,26 +3461,25 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "reflection_timeout"
                     break
 
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 short_reflection_note = self._short_reflection_next_step_note(
                     reflection_summary,
                     reflection_next_step_note,
@@ -3491,9 +3490,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     planned_calls = []
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -3506,9 +3505,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
+                if reflection_action == "final_answer":
                     planned_calls = revised_calls
-                    stop_reason = "enough_information"
+                    stop_reason = "final_answer"
                     break
 
                 if continue_deferred_calls and len(deferred_calls) > 0:
@@ -4255,26 +4254,25 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "reflection_timeout"
                     break
 
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 short_reflection_note = self._short_reflection_next_step_note(
                     reflection_summary,
                     reflection_next_step_note,
@@ -4284,9 +4282,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 if self._is_methodology_gate_blocking(reflection_methodology_gate):
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -4299,8 +4297,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
-                    stop_reason = "enough_information"
+                if reflection_action == "final_answer":
+                    stop_reason = "final_answer"
                     break
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(revised_calls, max_calls_per_round)
@@ -5016,26 +5014,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                     stop_reason = "reflection_timeout"
                     break
 
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 short_reflection_note = self._short_reflection_next_step_note(
                     reflection_summary,
                     reflection_next_step_note,
@@ -5045,9 +5042,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                 if self._is_methodology_gate_blocking(reflection_methodology_gate):
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -5060,8 +5057,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
-                    stop_reason = "enough_information"
+                if reflection_action == "final_answer":
+                    stop_reason = "final_answer"
                     break
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(revised_calls, max_calls_per_round)
@@ -6751,7 +6748,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         methodology_note = self._methodology_gate_prompt_block(methodology_gate)
         if methodology_note != "":
             prompt_parts.append(methodology_note)
-        if stop_reason_text not in ("", "enough_information") and not stop_reason_text.startswith("methodology_"):
+        if stop_reason_text not in ("", "final_answer") and not stop_reason_text.startswith("methodology_"):
             prompt_parts.append(
                 "The available project evidence may still be incomplete. "
                 "State the uncertainty clearly and mention what additional project material would help."
@@ -7041,7 +7038,10 @@ data collected. This information will accompany every prompt sent to the AI, res
         return {
             "type": "object",
             "properties": {
-                "enough_information": {"type": "boolean"},
+                "action": {
+                    "type": "string",
+                    "enum": ["call_mcp", "final_answer", "ask_user"],
+                },
                 "reflection_summary": {"type": "string"},
                 "next_step_note": {"type": "string"},
                 "methodology_decision": {
@@ -7058,7 +7058,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "answer_brief": {"type": "string"},
             },
             "required": [
-                "enough_information",
+                "action",
                 "reflection_summary",
                 "next_step_note",
                 "methodology_decision",
@@ -7070,6 +7070,52 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "proposed_next_calls",
                 "revised_calls",
                 "answer_brief",
+            ],
+            "allOf": [
+                {
+                    "if": {"properties": {"action": {"const": "call_mcp"}}},
+                    "then": {
+                        "anyOf": [
+                            {"properties": {"revised_calls": {"type": "array", "items": call_schema, "minItems": 1}}},
+                            {"properties": {"continue_deferred_calls": {"const": True}}},
+                        ],
+                        "properties": {
+                            "methodology_decision": {
+                                "enum": ["allow", "allow_with_caveat"],
+                            },
+                            "user_decision_required": {"const": False},
+                            "decision_question": {"const": ""},
+                            "decision_context": {"const": ""},
+                        },
+                    },
+                },
+                {
+                    "if": {"properties": {"action": {"const": "final_answer"}}},
+                    "then": {
+                        "properties": {
+                            "user_decision_required": {"const": False},
+                            "decision_question": {"const": ""},
+                            "decision_context": {"const": ""},
+                            "continue_deferred_calls": {"const": False},
+                            "proposed_next_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                            "revised_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                        },
+                    },
+                },
+                {
+                    "if": {"properties": {"action": {"const": "ask_user"}}},
+                    "then": {
+                        "properties": {
+                            "methodology_decision": {
+                                "enum": ["allow", "allow_with_caveat"],
+                            },
+                            "continue_deferred_calls": {"const": False},
+                            "user_decision_required": {"const": True},
+                            "decision_question": {"type": "string", "minLength": 1},
+                            "revised_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                        },
+                    },
+                },
             ],
             "additionalProperties": False,
         }
@@ -7484,6 +7530,81 @@ data collected. This information will accompany every prompt sent to the AI, res
         if str(planner_action).strip().lower() != "call_mcp":
             return False
         return len(planned_calls) == 0
+
+    def _parse_mcp_reflection_response(self, reflection_data: Any, allowed_methods: set[str],
+                                       max_queued_calls: int, max_calls_per_round: int) -> Dict[str, Any]:
+        """Normalize one reflection JSON payload into controller state."""
+
+        data = reflection_data if isinstance(reflection_data, dict) else {}
+        reflection_summary = str(data.get("reflection_summary", "")).strip()
+        next_step_note = str(data.get("next_step_note", "")).strip()
+        answer_brief = str(data.get("answer_brief", "")).strip()
+        methodology_gate = self._extract_methodology_gate(data)
+        user_decision_required = self._json_bool(data.get("user_decision_required", False), False)
+        decision_question = self._normalize_progress_note(data.get("decision_question", ""), max_length=600)
+        decision_context = self._normalize_progress_note(data.get("decision_context", ""), max_length=600)
+        if user_decision_required and decision_question == "":
+            decision_question = self._normalize_progress_note(
+                next_step_note if next_step_note != "" else reflection_summary,
+                max_length=600,
+            )
+        action = str(data.get("action", "")).strip().lower()
+        if action not in ("call_mcp", "final_answer", "ask_user"):
+            if user_decision_required:
+                action = "ask_user"
+            elif self._is_methodology_gate_blocking(methodology_gate):
+                action = "final_answer"
+            elif self._json_bool(data.get("enough_information", False), False):
+                action = "final_answer"
+            else:
+                action = "call_mcp"
+
+        continue_deferred_calls = self._json_bool(data.get("continue_deferred_calls", False), False)
+        revised_calls = self._normalize_mcp_calls(
+            data.get("revised_calls", []), allowed_methods, max_queued_calls
+        )
+        proposed_next_calls = self._normalize_mcp_calls(
+            data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
+        )
+
+        if self._is_methodology_gate_blocking(methodology_gate):
+            action = "final_answer"
+            continue_deferred_calls = False
+            revised_calls = []
+            proposed_next_calls = []
+            user_decision_required = False
+            decision_question = ""
+            decision_context = ""
+        elif action == "ask_user":
+            continue_deferred_calls = False
+            revised_calls = []
+        elif action == "final_answer":
+            if len(revised_calls) > 0 or continue_deferred_calls:
+                action = "call_mcp"
+            else:
+                continue_deferred_calls = False
+                proposed_next_calls = []
+                user_decision_required = False
+                decision_question = ""
+                decision_context = ""
+        elif action == "call_mcp":
+            user_decision_required = False
+            decision_question = ""
+            decision_context = ""
+
+        return {
+            "action": action,
+            "reflection_summary": reflection_summary,
+            "next_step_note": next_step_note,
+            "answer_brief": answer_brief,
+            "methodology_gate": methodology_gate,
+            "continue_deferred_calls": continue_deferred_calls,
+            "user_decision_required": user_decision_required,
+            "decision_question": decision_question,
+            "decision_context": decision_context,
+            "revised_calls": revised_calls,
+            "proposed_next_calls": proposed_next_calls,
+        }
 
     def _mcp_call_key(self, method: str, params: Dict[str, Any]) -> str:
         try:
@@ -8153,7 +8274,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             if planner_action != "call_mcp":
                 planned_calls = []
             if len(planned_calls) == 0 and stop_reason == "":
-                stop_reason = "enough_information"
+                stop_reason = "final_answer"
 
             for reflection_round in range(max_reflection_rounds) if len(planned_calls) > 0 else []:
                 if self.app.ai.is_current_run_canceled():
@@ -8226,26 +8347,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                     planned_calls = []
                     stop_reason = "reflection_timeout"
                     break
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 if continue_deferred_calls and len(deferred_calls) > 0:
                     revised_calls = self._merge_mcp_call_lists(revised_calls, deferred_calls, max_queued_calls)
                 short_reflection_note = self._short_reflection_next_step_note(
@@ -8258,9 +8378,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                     planned_calls = []
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -8274,9 +8394,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
+                if reflection_action == "final_answer":
                     planned_calls = revised_calls
-                    stop_reason = "enough_information"
+                    stop_reason = "final_answer"
                     break
 
                 if len(revised_calls) == 0:
