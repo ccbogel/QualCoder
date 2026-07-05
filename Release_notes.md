@@ -1,3 +1,5 @@
+We have jumped from version 3.8.2 to 4.0 as there are quite a few changes in this release.
+
 # Installation
 
 QualCoder is released under the LGPL v3 license
@@ -59,6 +61,13 @@ Core languages will be English, German, French, Spanish. this is due to having r
 ## Data structure change
 
 One major requested change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
+
+## Artificial Inteligence changes
+
+Agentic restructure of AI features. Turns the AI chat into an agent that can not only talk, but also do things in QualCoder.
+* Read-only gives the AI agent read access to the complete code tree, all the memos and codings, as well as the empirical data through a diverse set of search tools (text only).
+ Sandboxed allows for limited write-access: The agent can create new codes and codings, but it cannot change or delete existing ones. 
+* Full access gives additional write access to existing codes, codings, attributes, and cases - with precautions: Destructive operation must be confirmed by the user.
 
 
 ## Menus and tabs
