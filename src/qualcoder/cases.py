@@ -121,6 +121,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.splitter.setSizes([1, 0])
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def keyPressEvent(self, event):
         """ Used to activate buttons.
@@ -177,6 +179,43 @@ class DialogCases(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, False)
                 return True
         return False
+
+    def _on_project_data_changed(self, tables, source):
+        """Refresh the dialog when relevant project tables change elsewhere."""
+
+        if source is self or not isinstance(tables, list):
+            return
+        changed_tables = set(tables)
+        if not changed_tables.intersection({"cases", "case_text", "attribute", "attribute_type", "source"}):
+            return
+
+        selected_caseid = None
+        if isinstance(self.selected_case, dict):
+            try:
+                selected_caseid = int(self.selected_case.get("caseid", -1))
+            except Exception:
+                selected_caseid = None
+
+        self.load_cases_data()
+        self.fill_table()
+
+        if selected_caseid is None:
+            self.ui.textBrowser.clear()
+            return
+
+        for row, case_item in enumerate(self.cases):
+            try:
+                caseid = int(case_item.get("caseid", -1))
+            except Exception:
+                continue
+            if caseid != selected_caseid:
+                continue
+            self.ui.tableWidget.setCurrentCell(row, self.NAME_COLUMN)
+            self.selected_case = case_item
+            self.view_case_files()
+            return
+        self.selected_case = None
+        self.ui.textBrowser.clear()
 
     def insert_nonexisting_attribute_placeholders(self):
         """ Check attribute placeholder is present in attribute table.

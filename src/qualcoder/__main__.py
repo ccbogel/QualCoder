@@ -86,7 +86,7 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
-from qualcoder.ai_prompts import DialogAiEditPrompts
+from qualcoder.ai_prompt_library import DialogAiEditPrompts
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
 from qualcoder.speakers import speaker_coder_name
 
@@ -878,6 +878,8 @@ class App(object):
             result['backup_num'] = default.getint('backup_num')
         if 'codetext_chunksize' in default:
             result['codetext_chunksize'] = default.getint('codetext_chunksize')
+        if 'ai_permissions' in default:
+            result['ai_permissions'] = default.getint('ai_permissions')
         if 'showids' in default:
             if default['showids'] == "False":
                 result['showids'] = False
@@ -923,6 +925,7 @@ class App(object):
         """
 
         dict_len = len(settings_data)
+        settings_updated = False
         keys = ['mainwindow_geometry',
                 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
@@ -960,11 +963,13 @@ class App(object):
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize',
                 'report_text_context_characters', 'report_text_context_style',
-                'ai_enable', 'ai_first_startup', 'ai_model_index'
+                'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
+                'ai_permissions', 'ai_extended_logging', 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
                 ]
         for key in keys:
             if key not in settings_data:
                 settings_data[key] = 0
+                settings_updated = True
                 if key == "mainwindow_geometry":
                     settings_data[key] = ""
                 if key == "timestampformat":
@@ -989,13 +994,28 @@ class App(object):
                     settings_data[key] = 'True' 
                 if key == 'ai_model_index':
                     settings_data[key] = '0'
+                if key == 'ai_permissions':
+                    settings_data[key] = 1
+                if key == 'ai_extended_logging':
+                    settings_data[key] = 'False'
+                if key == 'ai_chat_sidebar':
+                    settings_data[key] = 'False'
+                if key == 'ai_chat_sidebar_width':
+                    settings_data[key] = 320
+                if key == 'ai_chat_splitter_output_bottom':
+                    settings_data[key] = 80
+
+        ai_permissions = settings_data.get('ai_permissions', 1)
+        if ai_permissions not in (0, 1, 2):
+            settings_data['ai_permissions'] = 1
+            settings_updated = True
                     
         # Check AI models
         if len(ai_models) == 0:  # No models loaded, create default
             ai_models = get_default_ai_models()
 
         # Write out new ini file, if needed
-        if len(settings_data) > dict_len:
+        if settings_updated or len(settings_data) > dict_len:
             self.write_config_ini(settings_data, ai_models)
         return settings_data, ai_models
     
@@ -1131,8 +1151,8 @@ class App(object):
                               f"QFileDialog QAbstractItemView {{font-size: {settings.get('fontsize')}")
         style = style.replace("QTreeWidget {font-size: 12",
                               f"QTreeWidget {{font-size: {settings.get('treefontsize')}")
-        # Set the color for links (used in AI chat window and Settings dialog). The system default might be hard to read, especially in light themes. 
-        palette = QtGui.QPalette()
+        # Keep the active application palette and only override link colors.
+        palette = QtWidgets.QApplication.instance().palette()
         palette.setColor(QtGui.QPalette.ColorRole.Link, QtGui.QColor(self.highlight_color()))
         palette.setColor(QtGui.QPalette.ColorRole.LinkVisited, QtGui.QColor(self.highlight_color()))
         QtWidgets.QApplication.instance().setPalette(palette)
@@ -1140,9 +1160,10 @@ class App(object):
             return style_dark
         style_rainbow = style_dark
         if self.settings['stylesheet'] == 'original':
-            # This background may work with white or black icon colours
+            # Force dark button foregrounds so qtawesome icons remain readable on the light button background.
             style = style.replace("QPushButton {border-style: outset; ",
-                                  "QPushButton {border-style: outset; background-color: #dddddd;")
+                                  "QPushButton {border-style: outset; background-color: #dddddd; color: #202020; ")
+            style += "\nQToolButton {color: #202020;}"
         if self.settings['stylesheet'] == 'rainbow':
             style_rainbow += "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, " \
                              "stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, " \
@@ -1201,6 +1222,26 @@ class App(object):
             palette = QtWidgets.QApplication.instance().palette()
             return palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
         return '#f89407'  # Default
+
+    def qtawesome_icon_color(self):
+        """Get the default qtawesome icon color for the current QualCoder style."""
+        stylesheet = self.settings['stylesheet']
+        if stylesheet in ('dark', 'rainbow'):
+            return QtGui.QColor('#eeeeee')
+        if stylesheet == 'native':
+            palette = QtWidgets.QApplication.instance().palette()
+            return palette.color(QtGui.QPalette.ColorRole.Text)
+        return QtGui.QColor('#202020')
+
+    def qtawesome_icon_color_disabled(self):
+        """Get the default disabled qtawesome icon color for the current QualCoder style."""
+        stylesheet = self.settings['stylesheet']
+        if stylesheet in ('dark', 'rainbow'):
+            return QtGui.QColor('#707070')
+        if stylesheet == 'native':
+            palette = QtWidgets.QApplication.instance().palette()
+            return palette.color(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text)
+        return QtGui.QColor('#7a7a7a')
 
     def load_settings(self):
         result, ai_models = self._load_config_ini()
@@ -1311,7 +1352,12 @@ class App(object):
             'codetext_chunksize': 50000,
             'ai_enable': 'False',
             'ai_first_startup': 'True',
-            'ai_model_index': -1
+            'ai_model_index': -1,
+            'ai_permissions': 1,
+            'ai_extended_logging': 'False',
+            'ai_chat_sidebar': 'False',
+            'ai_chat_sidebar_width': 320,
+            'ai_chat_splitter_output_bottom': 80
         }
 
     def get_file_texts(self, file_ids:list[int]|None = None):
@@ -1574,20 +1620,44 @@ class App(object):
         if result and suffix == "":
             return f"Backup exists already with this name: {backup}", backup
         msg = ""
+        backup_ignore_patterns = (
+            'search.sqlite',
+            'search.sqlite-*',
+            '*.sqlite-shm',
+            '*.sqlite-wal',
+            '*.sqlite-journal',
+        )
         if self.settings['backup_av_files'] == 'True':
             try:
-                shutil.copytree(self.project_path, backup)
+                shutil.copytree(self.project_path, backup, ignore=shutil.ignore_patterns(*backup_ignore_patterns))
             except FileExistsError as err:
                 msg = _("There is already a backup with this name")
                 print(f"{err}\nmsg")
                 logger.warning(_(msg) + f"\n{err}")
+            except shutil.Error as err:
+                msg = _("Project backup could not be fully created.") + " " + str(err)
+                logger.warning(msg)
         else:
-            shutil.copytree(self.project_path, backup,
-                            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg',
-                                                          '*.wmv', '*.MP3',
-                                                          '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
-            # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
-            msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
+            try:
+                shutil.copytree(
+                    self.project_path,
+                    backup,
+                    ignore=shutil.ignore_patterns(
+                        *backup_ignore_patterns,
+                        '*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv',
+                        '*.MP3', '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'
+                    )
+                )
+                # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
+                msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
+            except FileExistsError as err:
+                msg = _("There is already a backup with this name")
+                logger.warning(_(msg) + f"\n{err}")
+            except shutil.Error as err:
+                msg = _("Project backup could not be fully created.") + " " + str(err)
+                logger.warning(msg)
+        if not os.path.exists(backup):
+            return msg, backup
         # self.ui.textEdit.append(_("Project backup created: ") + backup)
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
@@ -1632,6 +1702,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.force_quit = force_quit
         self.journal_display = None
         self.ai_chat_window = None
+        self.ai_chat_sidebar_mode = False
+        self.ai_chat_tab_sidebar_button = None
+        self.last_non_ai_chat_tab = None
+
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
             # Make 'Fusion' the standard native style on Windows https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
             # The default 'Windows' style seems partially broken at the moment, in combination with the native dark mode.
@@ -1639,6 +1713,10 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QApplication.instance().setStyle("Fusion")
 
         QtWidgets.QMainWindow.__init__(self)
+        self.ai_sidebar_splitter_save_timer = QtCore.QTimer(self)
+        self.ai_sidebar_splitter_save_timer.setSingleShot(True)
+        self.ai_sidebar_splitter_save_timer.timeout.connect(self.persist_ai_sidebar_splitter_setting)
+        self.ai_sidebar_splitter_is_restoring = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.init_placeholder_tab_layouts()
@@ -1662,6 +1740,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.setCurrentIndex(0)
         self.show()
         QtWidgets.QApplication.processEvents() 
+        QtCore.QTimer.singleShot(0, self._restore_ai_splitters_after_show)
         # Setup AI
         try:
             global AiLLM
@@ -2072,8 +2151,11 @@ Click "Yes" to start now.')
         self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
         self.ui.actionAI_Edit_Project_Memo.triggered.connect(self.project_memo)
         self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
-        self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
+        self.ui.actionAI_Agent.triggered.connect(self.ai_go_chat)
+        self.ui.actionAI_Agent_Sidebar.setCheckable(True)
+        self.ui.actionAI_Agent_Sidebar.toggled.connect(self.toggle_ai_chat_sidebar)
         self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
+        self.ui.tabWidget.currentChanged.connect(self.remember_last_non_ai_chat_tab)
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
@@ -2085,9 +2167,14 @@ Click "Yes" to start now.')
         # Ensure the action_log always scrolls to the very bottom once new log entries are added:
         self.ui.textEdit.verticalScrollBar().rangeChanged.connect(self.action_log_scroll_bottom)
         self.ui.textEdit.setReadOnly(True)
+        self.ui.splitter.setChildrenCollapsible(False)
+        self.ui.splitter.setCollapsible(1, False)
+        self.ui.sidebar.setMinimumWidth(0)
+        self.ui.splitter.splitterMoved.connect(self.on_main_splitter_moved)
         self.settings_report()
         
         self.ui.tabWidget.setCurrentIndex(0)
+        self.last_non_ai_chat_tab = self.ui.tab_action_log
         self.ai_chat()
 
         self.refresh_placeholder_tab_content()
@@ -2101,6 +2188,7 @@ Click "Yes" to start now.')
             self.ui.tabWidget.setTabIcon(4, qta.icon('mdi6.message-processing-outline', color=self.app.highlight_color()))  # Ai Chat
         except Exception as e_:
             logger.log(e_)
+        self._setup_ai_chat_tab_sidebar_button()
         
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
@@ -2290,11 +2378,18 @@ Click "Yes" to start now.')
         msg += _("Report text context style: ") + f"{self.app.settings['report_text_context_style']}<br />"
         msg += _("Style") + f": {self.app.settings['stylesheet']}<br />"
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}<br />"
-        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}</p>"
+        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}<br />"
         if self.app.settings['ai_enable'] == 'True':
             msg += _("AI integration is enabled") + "<br />"
         else:
             msg += _("AI integration is disabled") + "<br />"
+        ai_permissions = self.app.settings.get('ai_permissions', 1)
+        ai_permissions_labels = {
+            0: 'Read-only',
+            1: 'Sandboxed',
+            2: 'Full access'
+        }
+        msg += _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}</p>"
         self.ui.textEdit.append(msg)
         if platform.system() == "Windows":
             self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
@@ -2601,10 +2696,242 @@ Click "Yes" to start now.')
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
     def ai_chat(self):
-        """ Add AI chat to tab. """
+        """Initialize AI chat and place it in tab or sidebar based on settings."""
 
         self.ai_chat_window = DialogAIChat(self.app, self.ui.textEdit, self)
-        self.tab_layout_helper(self.ui.tab_ai_chat, self.ai_chat_window)
+        sidebar_mode = self.app.settings.get('ai_chat_sidebar', 'False') == 'True'
+        self.set_ai_chat_sidebar_mode(sidebar_mode, persist=False)
+
+    def _setup_ai_chat_tab_sidebar_button(self):
+        """Add a small button in the AI chat tab to move the chat into sidebar view."""
+
+        tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
+        if tab_index < 0:
+            return
+        tab_bar = self.ui.tabWidget.tabBar()
+        button = QtWidgets.QToolButton(tab_bar)
+        button.setAutoRaise(True)
+        button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        button.setToolTip(_('Move AI Agent to sidebar view'))
+        button.setFixedSize(22, 22)
+        icon_color = tab_bar.tabTextColor(tab_index)
+        if not icon_color.isValid():
+            icon_color = tab_bar.palette().color(QtGui.QPalette.ColorRole.WindowText)
+        try:
+            button.setIcon(qta.icon('mdi6.arrow-right-bold-outline', color=icon_color))
+            button.setIconSize(QtCore.QSize(16, 16))
+        except Exception:
+            button.setText(">")
+        button.clicked.connect(self.open_ai_chat_sidebar_from_tab_button)
+
+        self.ai_chat_tab_sidebar_button = button
+        tab_bar.setTabButton(
+            tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, button
+        )
+
+    def open_ai_chat_sidebar_from_tab_button(self):
+        """Switch AI chat to sidebar mode from the tab button."""
+
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up in Settings.')
+            Message(self.app, _('AI Agent'), msg).exec()
+            return
+        self.ui.actionAI_Agent_Sidebar.setChecked(True)
+
+    def _ensure_widget_layout(self, widget):
+        """Ensure a widget has a layout so child widgets can be hosted in it."""
+
+        layout = widget.layout()
+        if layout is None:
+            layout = QtWidgets.QVBoxLayout()
+            layout.setContentsMargins(0, 0, 0, 0)
+            widget.setLayout(layout)
+        return layout
+
+    def _ai_chat_sidebar_host_widget(self):
+        """Return the widget that should host AI chat in sidebar mode."""
+
+        return self.ui.sidebar_frame
+
+    def _move_ai_chat_to_host(self, host_widget):
+        """Reparent the AI chat widget without closing or recreating it."""
+
+        if self.ai_chat_window is None:
+            return
+        current_parent = self.ai_chat_window.parentWidget()
+        if current_parent is not None:
+            current_layout = current_parent.layout()
+            if current_layout is not None:
+                current_layout.removeWidget(self.ai_chat_window)
+        target_layout = self._ensure_widget_layout(host_widget)
+        if target_layout.indexOf(self.ai_chat_window) == -1:
+            target_layout.addWidget(self.ai_chat_window)
+        self.ai_chat_window.setParent(host_widget)
+        self.ai_chat_window.show()
+
+    def _get_saved_ai_sidebar_width(self, fallback_total=1000):
+        """Return configured sidebar width without imposing artificial minima."""
+
+        try:
+            width = int(self.app.settings.get('ai_chat_sidebar_width', 320))
+        except (TypeError, ValueError):
+            width = 320
+        total = max(2, int(fallback_total))
+        return max(1, min(width, total - 1))
+
+    def _remember_ai_sidebar_width(self):
+        """Read current splitter sidebar width and keep it in settings (in-memory)."""
+
+        if self.ui.sidebar.isVisible():
+            sizes = self.ui.splitter.sizes()
+            if len(sizes) >= 2 and sizes[1] > 0:
+                self.app.settings['ai_chat_sidebar_width'] = int(sizes[1])
+
+    def persist_ai_sidebar_splitter_setting(self):
+        """Write the AI sidebar splitter width to config.ini after drag operations settle."""
+
+        try:
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        except Exception as e_:
+            logger.debug(f"Could not persist ai sidebar splitter setting: {e_}")
+
+    def _apply_ai_sidebar_splitter_sizes(self):
+        """Apply main/sidebar splitter sizes from the stored sidebar width."""
+
+        sizes = self.ui.splitter.sizes()
+        total = sum(sizes) if sum(sizes) > 0 else 1000
+        sidebar_width = self._get_saved_ai_sidebar_width(fallback_total=total)
+        main_width = max(1, total - sidebar_width)
+        self.ai_sidebar_splitter_is_restoring = True
+        try:
+            with QtCore.QSignalBlocker(self.ui.splitter):
+                self.ui.splitter.setSizes([main_width, sidebar_width])
+        finally:
+            self.ai_sidebar_splitter_is_restoring = False
+
+    def _sync_ai_chat_sidebar_action(self):
+        """Keep the AI sidebar menu action aligned with the active sidebar mode."""
+
+        with QtCore.QSignalBlocker(self.ui.actionAI_Agent_Sidebar):
+            self.ui.actionAI_Agent_Sidebar.setChecked(bool(self.ai_chat_sidebar_mode))
+
+    def _restore_ai_splitters_after_show(self):
+        """Re-apply saved splitter positions once window geometry is finalized."""
+
+        if self.ai_chat_window is not None:
+            self.ai_chat_window.schedule_ai_output_splitter_restore()
+        if self.ai_chat_sidebar_mode:
+            self._apply_ai_sidebar_splitter_sizes()
+            QtCore.QTimer.singleShot(30, self._apply_ai_sidebar_splitter_sizes)
+
+    def remember_last_non_ai_chat_tab(self, index):
+        """Store the most recent visible main tab other than AI Agent."""
+
+        widget = self.ui.tabWidget.widget(index)
+        if widget == self.ui.tab_ai_agent and self.ai_chat_window is not None:
+            self.ai_chat_window.schedule_ai_output_splitter_restore()
+            return
+        if widget is None or widget == self.ui.tab_ai_agent:
+            return
+        if not self.ui.tabWidget.isTabVisible(index):
+            return
+        self.last_non_ai_chat_tab = widget
+
+    def get_tab_after_ai_chat_sidebar_switch(self):
+        """Choose which main tab to show when AI chat moves into the sidebar."""
+
+        current_widget = self.ui.tabWidget.currentWidget()
+        current_index = self.ui.tabWidget.indexOf(current_widget)
+        if (
+            current_widget is not None
+            and current_widget != self.ui.tab_ai_agent
+            and current_index >= 0
+            and self.ui.tabWidget.isTabVisible(current_index)
+        ):
+            return current_widget
+        if self.last_non_ai_chat_tab is not None:
+            return self.last_non_ai_chat_tab
+        return self.ui.tab_action_log
+
+    def set_ai_chat_sidebar_mode(self, enabled, persist=True, target_tab=None):
+        """Switch AI chat between main tab view and sidebar view."""
+
+        if self.ai_chat_window is None:
+            self._sync_ai_chat_sidebar_action()
+            return
+        sidebar_target_tab = None
+        if bool(enabled):
+            sidebar_target_tab = target_tab if target_tab is not None else self.get_tab_after_ai_chat_sidebar_switch()
+        ai_output_anchor = self.ai_chat_window.capture_ai_output_top_anchor()
+
+        def restore_ai_output_anchor():
+            if self.ai_chat_window is not None:
+                self.ai_chat_window.restore_ai_output_top_anchor(ai_output_anchor)
+
+        if self.ai_chat_sidebar_mode and not bool(enabled):
+            self._remember_ai_sidebar_width()
+        enabled = bool(enabled)
+        self.ai_chat_sidebar_mode = enabled
+
+        if enabled:
+            self._move_ai_chat_to_host(self._ai_chat_sidebar_host_widget())
+        else:
+            self._move_ai_chat_to_host(self.ui.tab_ai_agent)
+
+        self.ai_chat_window.set_sidebar_mode(enabled)
+        ai_tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
+        self.ui.tabWidget.setTabVisible(ai_tab_index, not enabled)
+        self.ui.sidebar.setVisible(enabled)
+
+        if enabled:
+            self.ui.sidebar.setMinimumWidth(0)
+            self.ai_chat_window.setMinimumWidth(0)
+            self.ui.tabWidget.setCurrentWidget(sidebar_target_tab)
+            self._apply_ai_sidebar_splitter_sizes()
+            QtCore.QTimer.singleShot(0, self._apply_ai_sidebar_splitter_sizes)
+            QtCore.QTimer.singleShot(30, self._apply_ai_sidebar_splitter_sizes)
+        else:
+            sizes = self.ui.splitter.sizes()
+            total = sum(sizes) if sum(sizes) > 0 else 1000
+            self.ui.splitter.setSizes([total, 0])
+        restore_ai_output_anchor()
+        QtCore.QTimer.singleShot(0, restore_ai_output_anchor)
+        QtCore.QTimer.singleShot(30, restore_ai_output_anchor)
+        QtCore.QTimer.singleShot(90, restore_ai_output_anchor)
+
+        self._sync_ai_chat_sidebar_action()
+
+        if persist:
+            if enabled:
+                self._remember_ai_sidebar_width()
+            self.app.settings['ai_chat_sidebar'] = 'True' if enabled else 'False'
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+
+    def toggle_ai_chat_sidebar(self, checked):
+        """Handle menu toggle for AI chat sidebar mode."""
+
+        self.set_ai_chat_sidebar_mode(checked)
+        if bool(self.ai_chat_sidebar_mode) != bool(checked):
+            self._sync_ai_chat_sidebar_action()
+            return
+        if not self.ai_chat_sidebar_mode:
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+
+    def close_ai_chat_sidebar(self):
+        """Return AI chat from sidebar back into the main AI tab."""
+
+        self.set_ai_chat_sidebar_mode(False)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+
+    def on_main_splitter_moved(self, pos, index):  # pos/index are Qt callback args
+        """Track current AI sidebar width while user drags splitter."""
+
+        if getattr(self, 'ai_sidebar_splitter_is_restoring', False):
+            return
+        if self.ai_chat_sidebar_mode:
+            self._remember_ai_sidebar_width()
+            self.ai_sidebar_splitter_save_timer.start(400)
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
@@ -2721,6 +3048,10 @@ Click "Yes" to start now.')
             if reply != QtWidgets.QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
+
+        if self.ai_chat_sidebar_mode:
+            self._remember_ai_sidebar_width()
+        self.ai_sidebar_splitter_save_timer.stop()
 
         self.close_project()
 
@@ -2938,6 +3269,7 @@ Click "Yes" to start now.')
             self.app.ai.init_llm(self, rebuild_vectorstore=False)
         else:  
             self.app.ai.close()
+        self.ai_chat_window.refresh_placeholder_if_visible()
             
         # Change in coder names: Close all opened dialogs as coder names needs to change everywhere
         if ui.coder_names_changes:
@@ -3327,7 +3659,6 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v16", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v16")
-
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)
@@ -3407,10 +3738,6 @@ Click "Yes" to start now.')
         cur.execute('update project set codername=?', [self.app.settings['codername']])
         self.app.conn.commit()
         
-        # AI: init llm and update vectorstore
-        self.app.ai.init_llm(self)
-        self.ai_chat_window.init_ai_chat(self.app)
-        
         # Fix missing folders within QualCoder project. Otherwise, will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
@@ -3438,6 +3765,9 @@ Click "Yes" to start now.')
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             msg, backup_name = self.app.save_backup()
             self.ui.textEdit.append(msg)
+        # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
+        self.app.ai.init_llm(self)
+        self.ai_chat_window.init_ai_chat(self.app)
         msg = f"<p>{_('Project Opened: ')}{self.app.project_name}</p>"
         self.ui.textEdit.append(msg)
         self.project_summary_report()
@@ -3606,8 +3936,18 @@ Click "Yes" to start now.')
             return
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
-        self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
+        self.app.ai.init_llm(self, rebuild_vectorstore=False, enable_ai=True)
+        self.ai_chat_window.refresh_placeholder_if_visible()
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
+        if self.app.settings['ai_enable'] == 'True':
+            ai_status = self.app.ai.get_status()
+            if ai_status == 'reading data':
+                msg = _('The AI setup is complete. The AI is now reading your project data in the background.')
+            elif ai_status == 'ready':
+                msg = _('The AI setup is complete and the AI is ready to use.')
+            else:
+                msg = _('The AI setup is complete.')
+            Message(self.app, _('AI Setup Wizard'), msg).exec()
         
     def ai_settings(self):
         """ Action triggered by AI Settings menu item."""
@@ -3635,17 +3975,25 @@ Click "Yes" to start now.')
             self.ui.tabWidget.setCurrentIndex(0)  # Show action log
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
     
-    def ai_prompts(self):
+    def ai_prompts(self, initial_prompt_name: str = "", initial_prompt_scope: str = ""):
         """ Action triggered by AI Prompts menu item."""
-        DialogAiEditPrompts(self.app).exec()
+        DialogAiEditPrompts(
+            self.app,
+            initial_prompt_name=initial_prompt_name,
+            initial_prompt_scope=initial_prompt_scope,
+        ).exec()
 
     def ai_go_chat(self):
-        """ Action triggered by AI Chat menu item."""
+        """Action triggered by AI Agent menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('Ai Chat'), msg).exec() 
+            Message(self.app, _('AI Agent'), msg).exec()
             return
-        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
+        if self.ai_chat_sidebar_mode:
+            self.set_ai_chat_sidebar_mode(True, persist=False)
+        else:
+            self.set_ai_chat_sidebar_mode(False, persist=False)
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
 
     def ai_go_search(self):
         """ Action triggered by AI Search and Coding menu item."""
@@ -3700,6 +4048,11 @@ def gui():
     install_droid_sans_mono()
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
+    qta.reset_cache()
+    qta.set_defaults(
+        color=qual_app.qtawesome_icon_color,
+        color_disabled=qual_app.qtawesome_icon_color_disabled
+    )
     if sys.platform != 'darwin':
         qualcoder32_icon = b'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CiAgICB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIKICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIKICAgIHhtbG5zOnBsdXM9Imh0dHA6Ly9ucy51c2VwbHVzLm9yZy9sZGYveG1wLzEuMC8iCiAgICB4bWxuczpHSU1QPSJodHRwOi8vd3d3LmdpbXAub3JnL3htcC8iCiAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIKICAgIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIKICAgIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIgogICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZWU1YjRlNWUtNGU1MS02NzRkLTk1ZDItNTIwMzA3YWQ0MWFhIgogICB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOmJjMTRjZDA2LTQzYzItNDBhOS1iOGExLWY3NjZjMGI0NzVkMSIKICAgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmE1ZTMzYzY4LTAyNGEtNzk0MS05N2VmLWZhN2NjODExODdlOSIKICAgR0lNUDpBUEk9IjIuMCIKICAgR0lNUDpQbGF0Zm9ybT0iTGludXgiCiAgIEdJTVA6VGltZVN0YW1wPSIxNjM2MTUzNzY5NTY3OTIyIgogICBHSU1QOlZlcnNpb249IjIuMTAuMTgiCiAgIGRjOkZvcm1hdD0iaW1hZ2UvcG5nIgogICBleGlmOlBpeGVsWERpbWVuc2lvbj0iNTEyIgogICBleGlmOlBpeGVsWURpbWVuc2lvbj0iNTEyIgogICBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIgogICB0aWZmOk9yaWVudGF0aW9uPSIxIgogICB0aWZmOlJlc29sdXRpb25Vbml0PSIyIgogICB0aWZmOlhSZXNvbHV0aW9uPSI3MjAwMDAvMTAwMDAiCiAgIHRpZmY6WVJlc29sdXRpb249IjcyMDAwMC8xMDAwMCIKICAgeG1wOkNyZWF0ZURhdGU9IjIwMjEtMTEtMDVUMTE6MzU6NDkrMDE6MDAiCiAgIHhtcDpDcmVhdG9yVG9vbD0iR0lNUCAyLjEwIgogICB4bXA6TWV0YWRhdGFEYXRlPSIyMDIxLTExLTA1VDEyOjM0OjMxKzAxOjAwIgogICB4bXA6TW9kaWZ5RGF0ZT0iMjAyMS0xMS0wNVQxMjozNDozMSswMTowMCI+CiAgIDxpcHRjRXh0OkxvY2F0aW9uQ3JlYXRlZD4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OkxvY2F0aW9uQ3JlYXRlZD4KICAgPGlwdGNFeHQ6TG9jYXRpb25TaG93bj4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OkxvY2F0aW9uU2hvd24+CiAgIDxpcHRjRXh0OkFydHdvcmtPck9iamVjdD4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OkFydHdvcmtPck9iamVjdD4KICAgPGlwdGNFeHQ6UmVnaXN0cnlJZD4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OlJlZ2lzdHJ5SWQ+CiAgIDx4bXBNTTpIaXN0b3J5PgogICAgPHJkZjpTZXE+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249ImNyZWF0ZWQiCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YTVlMzNjNjgtMDI0YS03OTQxLTk3ZWYtZmE3Y2M4MTE4N2U5IgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIgogICAgICBzdEV2dDp3aGVuPSIyMDIxLTExLTA1VDExOjM1OjQ5KzAxOjAwIi8+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIKICAgICAgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBpbWFnZS9wbmcgdG8gYXBwbGljYXRpb24vdm5kLmFkb2JlLnBob3Rvc2hvcCIvPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJzYXZlZCIKICAgICAgc3RFdnQ6Y2hhbmdlZD0iLyIKICAgICAgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NTJhODhhNi1iYWVjLTgzNDktODZjNy0xMWM0NWVmY2IyNDEiCiAgICAgIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiCiAgICAgIHN0RXZ0OndoZW49IjIwMjEtMTEtMDVUMTI6MjQ6MTMrMDE6MDAiLz4KICAgICA8cmRmOmxpCiAgICAgIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiCiAgICAgIHN0RXZ0OmNoYW5nZWQ9Ii8iCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDU3OGM4ZTMtYjllNC03ZjRiLWEyOGMtYWExNmYzOGJmZjA5IgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIgogICAgICBzdEV2dDp3aGVuPSIyMDIxLTExLTA1VDEyOjM0OjMxKzAxOjAwIi8+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIKICAgICAgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIgogICAgICBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJzYXZlZCIKICAgICAgc3RFdnQ6Y2hhbmdlZD0iLyIKICAgICAgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo1ZGM3ZDg0Ny1kNGRhLTk1NGUtYTQ0NC00NzhmOGVhZjY3MDEiCiAgICAgIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiCiAgICAgIHN0RXZ0OndoZW49IjIwMjEtMTEtMDVUMTI6MzQ6MzErMDE6MDAiLz4KICAgICA8cmRmOmxpCiAgICAgIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiCiAgICAgIHN0RXZ0OmNoYW5nZWQ9Ii8iCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YzJlMmQyMmEtZWUyNy00MTEzLTg0OTQtYTRhZDYzMjhkOTBmIgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJHaW1wIDIuMTAgKExpbnV4KSIKICAgICAgc3RFdnQ6d2hlbj0iKzExOjAwIi8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICAgPHhtcE1NOkRlcml2ZWRGcm9tCiAgICBzdFJlZjpkb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6N2YxMDM5N2ItZTBmZi05NzRlLThkMjktY2VmZDU3MGFiNDFiIgogICAgc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDowNTc4YzhlMy1iOWU0LTdmNGItYTI4Yy1hYTE2ZjM4YmZmMDkiCiAgICBzdFJlZjpvcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6YTVlMzNjNjgtMDI0YS03OTQxLTk3ZWYtZmE3Y2M4MTE4N2U5Ii8+CiAgIDxwbHVzOkltYWdlU3VwcGxpZXI+CiAgICA8cmRmOlNlcS8+CiAgIDwvcGx1czpJbWFnZVN1cHBsaWVyPgogICA8cGx1czpJbWFnZUNyZWF0b3I+CiAgICA8cmRmOlNlcS8+CiAgIDwvcGx1czpJbWFnZUNyZWF0b3I+CiAgIDxwbHVzOkNvcHlyaWdodE93bmVyPgogICAgPHJkZjpTZXEvPgogICA8L3BsdXM6Q29weXJpZ2h0T3duZXI+CiAgIDxwbHVzOkxpY2Vuc29yPgogICAgPHJkZjpTZXEvPgogICA8L3BsdXM6TGljZW5zb3I+CiAgPC9yZGY6RGVzY3JpcHRpb24+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9InciPz7mcyShAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QsFFwkdYf6D1wAAA2NJREFUSMftVl9IU1EYP7fd1VX8y8r/yMAtcoWDwGES5EAoTGeUkFGSrD0k+rKRCQ7qRV+ESkEMQXQPqSAo+K8xZuGQ8s9Q9CpqugkhUyduNtfm5p07PUyOh+t0+iC9+OM83Hu+7/f9zvnu+b5zCQghOE9cAueMC4H/L0AGnTWZTLOzszMzM16vFwDA5XLFYnFGRoZAICAIwu/bt61s2pY3HSvbft8+ACCKHxubdvXa9UQuxWWFIljH1GQyNTQ0NDY2BhVWKBQvH7/wfLV71z1HrZwoMu2ZKE164xLJCS4wODiYn58fctfK269z+Hc5RPD0Rt6MkbzJoSLD2AJ9fX2FhYXILzMzUy6XJycnEwSxtrbW0dFhMBiQtUL86lFOQVx2EhnG9fv8mxNr7mUnsoYLI7PVuVciKAAAgBBCCBcXF/FVaDSa3d1diGFvb0+r1eI+BoMBd9iYt+jLewaedATG6KdvgXkAIfT5fAqFAjF7enrgMZicnERuEonE7XbjVve2C9ewTP8+EJibm0M0lUrl9/vh8Whvb0fOQ0NDLKt1wYIERmp1BwLNzc2IMzU1BU+E3W5HzlVVVTAUAIRQLpcjjtPpDMnB8xnSmQQAtLa2IoLD4TAajVarlWEYiqIEAkF6ejpFUfjnjY+PR882m43H452hklNSUlgzEomkpqZGKpWSJIlWfVhHBBGiaiCExcXFIYtLrVbv7OwEdi2TyU6fIgAhbGpqQgSRSFRXV9fV1dXZ2alSqXCNkpKS9fX1hYUFNFNZWXkqgenpacSprq7GzVtbW/X19Xi6SktL0ater2eF+2Ox//wwFBhTmh8HAgzD4Fnq7e1l0fr7+48mLSsri1VoXpdnWD2A6mBl5NeBAIRwfn4eJ7e0tLhcLpys0+lYAuPj47iDc9NheDeIon9/2+fzMhDCw2bX3d1dVFSE+Hw+X6lU8vl8DodjsVja2trGxsZwgfLyctmDgoSkhPC/lx3Ltg3t6mHfjiTv1OZGJ8Wy2zWroZ4SXx5+jqGiDw9+NFfyXhqbygtyZcpksqWlpYqKiuNilZWVDQ8Pn3CsE/NS733MQ9GD3GgBmM1mmqZpmvZ4PPiVKRQKAQAMw9A0bRydMC+ZV/Xm5/efxgkSeKL4hFvJEXFRIa7Mi9+WC4Gz4x8imSOgwBMa1AAAAABJRU5ErkJggg=='
         pm = QtGui.QPixmap()

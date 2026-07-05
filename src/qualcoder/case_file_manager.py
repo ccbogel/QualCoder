@@ -206,7 +206,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         text_len = 0
         if file_[2] is not None:
-            text_len = len(file_[2]) - 1
+            text_len = len(file_[2])
         link = {'caseid': self.case['caseid'], 'fid': file_[0], 'pos0': 0,
                 'pos1': text_len, 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}

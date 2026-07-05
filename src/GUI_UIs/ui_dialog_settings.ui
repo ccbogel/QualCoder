@@ -375,10 +375,10 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="toolTip">
                 <string>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
-Additional languages can be added if they are listed in the src/qualcoder/i18n folder. 
-To do this update the config.ini  file to another language that is available. 
-Find the line begining language = 
-Then update it. For example: 
+Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
+To do this update the config.ini  file to another language that is available.
+Find the line begining language =
+Then update it. For example:
 langauge = it</string>
                </property>
               </widget>
@@ -847,6 +847,44 @@ langauge = it</string>
                <property name="checkable">
                 <bool>true</bool>
                </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Permissions:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QComboBox" name="comboBox_ai_permissions">
+               <property name="toolTip">
+                <string>Define what the AI agent is allowed to do in your project:
+- Read-only: The AI agent cannot make any changes.
+- Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
+- Full access: The AI agent can change everything, but will usually ask for confirmation first.</string>
+               </property>
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Read-only</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Sandboxed</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Full access</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item row="0" column="0">

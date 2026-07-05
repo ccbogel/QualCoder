@@ -33,6 +33,8 @@ sentence-transformers
 Bio
 PyYAML 
 json_repair
+mcp>=1.0.0
+markdown-it-py
 pyinstaller<=6.15 
 # The bootloader in the most recent version of pyinstaller is often falsely detected as malware
 # by anti virus software, so, it's safer to use a version that has been released a few months ago.

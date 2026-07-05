@@ -45,8 +45,9 @@ from odf import text as odf_text, office as odf_office, dc as odf_dc, style as o
 from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .add_item_name import DialogAddItemName
+from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
+from .ai_prompt_library import DialogAiEditPrompts
 from .ai_search_dialog import DialogAiSearch
-from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect, colour_ranges, colors, TextColor, show_codes_of_colour_range
@@ -828,6 +829,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_include_coded_segments = None
         self.ai_search_found = False
         self.ai_search_analysis_counter = 0
+        self.ai_search_session_id = 0
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
@@ -842,6 +844,84 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
         self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
+
+    @staticmethod
+    def _text_analysis_prompt_menu_leaf(relative_path: str) -> str:
+        """Return the leaf label for one text-analysis prompt menu item."""
+
+        normalized = str(relative_path if relative_path is not None else "").replace("\\", "/").strip("/")
+        if normalized == "":
+            return ""
+        return normalized.rsplit("/", 1)[-1]
+
+    def _text_analysis_prompt_folder_icon(self):
+        """Return the same folder icon used by the prompt library."""
+
+        return qta.icon("mdi.folder-outline", color=self.app.highlight_color())
+
+    def _text_analysis_prompt_file_icon(self, menu):
+        """Return the same prompt file icon used by the prompt library."""
+
+        text_color = menu.palette().color(QtGui.QPalette.ColorRole.Text).name()
+        return qta.icon("mdi6.script-text-outline", color=text_color)
+
+    def _populate_text_analysis_prompt_menu(self, menu, prompts_catalog, prompt_records) -> None:
+        """Populate one prompt menu, mirroring the prompt library folder structure."""
+
+        menu_tree = {"prompts": [], "folders": {}}
+        for prompt in prompt_records:
+            relative_path = prompts_catalog.prompt_name_within_type(prompt.name)
+            parts = [part for part in relative_path.split("/") if part != ""]
+            if len(parts) == 0:
+                continue
+            current_branch = menu_tree
+            for part in parts[:-1]:
+                current_branch = current_branch["folders"].setdefault(part, {"prompts": [], "folders": {}})
+            current_branch["prompts"].append((relative_path, prompt))
+
+        def populate_branch(parent_menu, branch) -> None:
+            for branch_relative_path, prompt_record in branch["prompts"]:
+                action = parent_menu.addAction(self._text_analysis_prompt_menu_leaf(branch_relative_path))
+                action.setToolTip(prompt_record.description)
+                action.setIcon(self._text_analysis_prompt_file_icon(parent_menu))
+                action.setProperty('submenu', 'ai_text_analysis')
+                action.setData(prompt_record)
+            for folder_name, child_branch in branch["folders"].items():
+                submenu = parent_menu.addMenu(folder_name)
+                submenu.setToolTipsVisible(True)
+                submenu.setIcon(self._text_analysis_prompt_folder_icon())
+                populate_branch(submenu, child_branch)
+
+        populate_branch(menu, menu_tree)
+
+    def _ai_search_scope_id(self):
+        return id(self)
+
+    def _ai_search_scope_active(self) -> bool:
+        ai = getattr(self.app, 'ai', None)
+        if ai is None or not hasattr(ai, 'has_active_runs'):
+            return False
+        try:
+            return bool(ai.has_active_runs('ai_search', self._ai_search_scope_id()))
+        except Exception:
+            return False
+
+    def _ai_search_scope_status(self) -> str:
+        ai = getattr(self.app, 'ai', None)
+        if ai is None or not hasattr(ai, 'get_scope_status'):
+            return 'idle'
+        try:
+            return str(ai.get_scope_status('ai_search', self._ai_search_scope_id())).strip() or 'idle'
+        except Exception:
+            return 'idle'
+
+    def _cancel_ai_search_scope(self, wait_ms: int = 5000) -> bool:
+        ai = getattr(self.app, 'ai', None)
+        if ai is None:
+            return True
+        if hasattr(ai, 'cancel_scope'):
+            return bool(ai.cancel_scope('ai_search', self._ai_search_scope_id(), wait_ms=wait_ms))
+        return bool(ai.cancel(ask=False))
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -2327,13 +2407,11 @@ class DialogCodeText(QtWidgets.QWidget):
             submenu_ai_text_analysis.setToolTipsVisible(True)
             if self.app.ai is not None and self.app.ai.is_ready():
                 submenu_ai_text_analysis.setEnabled(True)
-                prompts_list = PromptsList(self.app, 'text_analysis')
-                for prompt in prompts_list.prompts:
-                    ac = submenu_ai_text_analysis.addAction(prompt.name_and_scope())
-                    ac.setToolTip(prompt.description)
-                    ac.setProperty('submenu', 'ai_text_analysis')
-                    ac.setData(prompt)
-                submenu_ai_text_analysis.addSeparator()
+                prompts_catalog = AiAgentPromptsCatalog(self.app)
+                prompt_records = prompts_catalog.list_visible_prompt_variants(prompt_type='text_analysis')
+                self._populate_text_analysis_prompt_menu(submenu_ai_text_analysis, prompts_catalog, prompt_records)
+                if len(prompt_records) > 0:
+                    submenu_ai_text_analysis.addSeparator()
                 ac = submenu_ai_text_analysis.addAction(_('Edit text analysis prompts'))
                 ac.setProperty('submenu', 'ai_text_analysis_prompts')
             else:
@@ -2414,8 +2492,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                                           action.data())
             return
         if action.property('submenu') == 'ai_text_analysis_prompts':
-            ui = DialogAiEditPrompts(self.app, 'text_analysis')
-            ui.exec()
+            DialogAiEditPrompts(self.app, 'text_analysis').exec()
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
@@ -6061,7 +6138,7 @@ class DialogCodeText(QtWidgets.QWidget):
             ai_search_result = self.get_overlapping_ai_search_result()
             if ai_search_result is not None:
                 memo = _("AI interpretation: ") + ai_search_result["interpretation"]
-                memo += _("\n\nAI search prompt: ") + self.ai_search_prompt.name_and_scope()
+                memo += _("\n\nAI search prompt: ") + prompt_name_and_scope(self.ai_search_prompt)
                 memo += _("\nAI model: ") + self.ai_search_ai_model
 
                 msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'
@@ -7508,20 +7585,29 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.plainTextEdit.setPlainText(_('Searching for related data, please wait...'))
 
             # Phase 1: find similar chunks of data from the vectorstore
-            self.app.ai.ai_async_is_canceled = False
+            self.ai_search_session_id += 1
+            current_session_id = int(self.ai_search_session_id)
             self.ai_search_chunks_pos = 0
-            self.app.ai.retrieve_similar_data(self.ai_search_prepare_analysis,
-                                              self.ai_search_code_name, self.ai_search_code_memo,
-                                              self.ai_search_file_ids)
+            self.app.ai.retrieve_similar_data(
+                lambda chunks, session_id=current_session_id: self.ai_search_prepare_analysis(chunks, session_id),
+                self.ai_search_code_name,
+                self.ai_search_code_memo,
+                self.ai_search_file_ids,
+                scope_type='ai_search',
+                scope_id=self._ai_search_scope_id(),
+                group_id=f'ai-search-{self._ai_search_scope_id()}-{current_session_id}',
+            )
 
-    def ai_search_prepare_analysis(self, chunks):
+    def ai_search_prepare_analysis(self, chunks, session_id=None):
         """ Prepare and start the second step of the AI search. 
         
         This will clean up the list of data found in the first stage of the search and then 
         start step 2, the deeper analysis with the choosen search prompt.
         """
 
-        if self.app.ai.ai_async_is_canceled:
+        if session_id is not None and int(session_id) != int(self.ai_search_session_id):
+            return
+        if self._ai_search_scope_status() == 'canceled':
             self.ai_search_running = False
             self.ui.plainTextEdit.setPlainText('')
             return
@@ -7581,9 +7667,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_chunks_pos = 0  # position of the next chunk to be analyzed
         self.ai_search_analysis_counter = 0  # counter to stop analyzing after ai_search_analysis_max_count
         self.ai_search_found = False  # Becomes True if any new data has been found
-        self.ai_search_analyze_next_chunk()
+        self.ai_search_analyze_next_chunk(session_id=session_id)
 
-    def ai_search_analyze_next_chunk(self):
+    def ai_search_analyze_next_chunk(self, session_id=None):
         """Step 2 of the AI search: 
         Selects the next chunk of data found in step 1 of the search and analyzes it closer, 
         using the selected search prompt.
@@ -7598,11 +7684,17 @@ class DialogCodeText(QtWidgets.QWidget):
             if self.ai_search_analysis_counter < ai_search_analysis_max_count:
                 # ai_search_analysis_max_count not reached
                 self.ai_search_running = True
-                self.app.ai.search_analyze_chunk(self.ai_search_analyze_next_chunk_callback,
-                                                 self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
-                                                 self.ai_search_code_name,
-                                                 self.ai_search_code_memo,
-                                                 self.ai_search_prompt)
+                current_session_id = int(self.ai_search_session_id if session_id is None else session_id)
+                self.app.ai.search_analyze_chunk(
+                    lambda doc, session_id=current_session_id: self.ai_search_analyze_next_chunk_callback(doc, session_id),
+                    self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
+                    self.ai_search_code_name,
+                    self.ai_search_code_memo,
+                    self.ai_search_prompt,
+                    scope_type='ai_search',
+                    scope_id=self._ai_search_scope_id(),
+                    group_id=f'ai-search-{self._ai_search_scope_id()}-{current_session_id}',
+                )
             else:  # ai_search_analysis_max_count reached
                 self.ai_search_running = False
                 if len(self.ai_search_results) == 0:  # nothing found
@@ -7624,12 +7716,14 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.ai_search_update_listview_action()
 
-    def ai_search_analyze_next_chunk_callback(self, doc):
+    def ai_search_analyze_next_chunk_callback(self, doc, session_id=None):
         """Callback for ai_search_analyze_next_chunk: 
         If the AI has finished analyzing the chunk of data, this callback function collects the results, 
         updates the UI and starts the analysis of the next chunk. 
         """
 
+        if session_id is not None and int(session_id) != int(self.ai_search_session_id):
+            return
         if not self.ai_search_running:  # Search has been cancelled
             return
         if doc is not None:
@@ -7649,8 +7743,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # analyze next
         self.ai_search_chunks_pos += 1
         self.ai_search_analysis_counter += 1
-        if not self.app.ai.ai_async_is_canceled:
-            self.ai_search_analyze_next_chunk()
+        if self._ai_search_scope_status() != 'canceled':
+            self.ai_search_analyze_next_chunk(session_id=session_id)
         else:
             self.ai_search_running = False
 
@@ -7689,8 +7783,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_listview_action_label.setText('')
             self.ai_search_listview_action_label.setToolTip('')
             self.ai_search_listview_action_label.setVisible(False)
-            if self.app.ai.ai_async_is_errored:
+            if self._ai_search_scope_status() == 'errored':
                 action_item.setText(_('(search aborted due to an error)'))
+            elif self._ai_search_scope_status() == 'canceled':
+                action_item.setText('(search canceled)')
             else:
                 action_item.setText(_('(search finished)'))
 
@@ -7714,7 +7810,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok)
                 ret = msg_box.exec()
                 if ret == QtWidgets.QMessageBox.StandardButton.Ok:
-                    self.app.ai.ai_async_is_canceled = True
+                    self._cancel_ai_search_scope(wait_ms=5000)
                     self.ai_search_running = False
                     self.ai_search_update_listview_action()
             else:  # 'find more' item or "finished search"
@@ -7774,15 +7870,24 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
                     # Set text cursor position
-                    text_cursor = self.ui.plainTextEdit.textCursor()
-                    text_cursor.setPosition(sel_start)
-                    endpos = sel_end
-                    if endpos < 0:
+                    doc_len = len(self.ui.plainTextEdit.toPlainText())
+                    start = max(0, int(sel_start))
+                    endpos = int(sel_end)
+                    if endpos <= start:
+                        endpos = start + 1
+                    if doc_len > 0:
+                        if start >= doc_len:
+                            start = doc_len - 1
+                        endpos = min(max(start + 1, endpos), doc_len)
+                    else:
+                        start = 0
                         endpos = 0
+                    text_cursor = self.ui.plainTextEdit.textCursor()
+                    text_cursor.setPosition(start)
                     text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
                     self.ui.plainTextEdit.setTextCursor(text_cursor)
                     self.ui.plainTextEdit.setFocus()
-                    QtCore.QTimer.singleShot(20, self.scroll_text_into_view)  # scroll into view after window is updated
+                    QtCore.QTimer.singleShot(0, self.scroll_text_into_view)  # scroll into view after window is updated
                 except Exception as e:
                     logger.debug(str(e))
                 break
@@ -7813,7 +7918,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def ai_search_update_spinner(self):
         """ Updating the ai_progressBar and the text spinner in the list view to indicate to the user that 
         an AI search is running in the background. """
-        if self.app.ai.ai_async_is_finished or self.app.ai.ai_async_is_errored or self.app.ai.ai_async_is_canceled:
+        if self._ai_search_scope_status() in ('finished', 'errored', 'canceled', 'idle'):
             self.ai_search_running = False
         if self.ai_search_running:
             self.ui.ai_progressBar.setVisible(True)

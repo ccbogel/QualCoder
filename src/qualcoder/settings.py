@@ -245,6 +245,21 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.widget_ai.setStyleSheet('')
 
+        self.load_ai_permissions()
+
+    def load_ai_permissions(self):
+        ai_permissions = self.settings.get('ai_permissions', 1)
+        if ai_permissions not in (0, 1, 2):
+            ai_permissions = 1
+            self.settings['ai_permissions'] = ai_permissions
+        self.ui.comboBox_ai_permissions.setCurrentIndex(ai_permissions)
+
+    def current_ai_permissions(self):
+        index = self.ui.comboBox_ai_permissions.currentIndex()
+        if index not in (0, 1, 2):
+            return 1
+        return index
+
     def get_selected_language_code(self):
         """Return the currently selected language code, excluding the action item."""
 
@@ -735,6 +750,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['ai_enable'] = 'False'
         ai_model_index = self.ui.comboBox_ai_profile.currentIndex() 
         self.settings['ai_model_index'] = ai_model_index
+        self.settings['ai_permissions'] = self.current_ai_permissions()
         if self.settings['ai_enable'] == 'True' and ai_model_index < 0:
             msg = _('Please select an AI profile or disable the AI altogether.')
             Message(self.app, _('AI profile'), msg).exec()
