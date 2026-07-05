@@ -25,10 +25,6 @@ Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applicatio
 
 import sys
 import traceback  # TODO unused
-try:
-    import pydevd  # for debugging
-except ModuleNotFoundError:
-    pass
 from typing import Any  # TODO unused
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot  # TODO QThreadPool not used
 from PyQt6 import sip
@@ -98,11 +94,6 @@ class Worker(QRunnable):
     @pyqtSlot()
     def run(self):
         """ Initialise the runner function with passed args, kwargs. """
-
-        try:
-            pydevd.settrace(suspend=False)  # enable debugger
-        except (NameError, ConnectionRefusedError):
-            pass 
 
         # Retrieve args/kwargs here; and fire processing using them
         try:

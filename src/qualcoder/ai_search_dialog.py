@@ -28,7 +28,8 @@ import os
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
-from .ai_prompts import PromptsList, DialogAiEditPrompts
+from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
+from .ai_prompt_library import DialogAiEditPrompts
 from .color_selector import TextColor
 from .report_attributes import DialogSelectAttributeParameters
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
@@ -38,6 +39,8 @@ from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+AI_SEARCH_SCOPE_DESCENDANT_LIMIT = 50
+AI_SEARCH_SCOPE_CHAR_LIMIT = 8000
 
 
 class DialogAiSearch(QtWidgets.QDialog):
@@ -50,9 +53,122 @@ class DialogAiSearch(QtWidgets.QDialog):
     selected_code_name = ''
     selected_code_ids = -1
     selected_code_memo = ''
+    selected_code_scope = []
     include_coded_segments = False
     selected_file_ids = []
+    selected_case_ids = []
+    selected_case_names = []
+    selected_filter_info = {}
     current_prompt = None
+    prompt_records = []
+
+    def _default_prompt_record(self):
+        """Return the legacy-default prompt for this dialog context when available."""
+
+        default_names = {
+            "search": "search/focused-search",
+            "code_analysis": "code-analysis/code-summary",
+            "topic_exploration": "topic-exploration/topic-summary",
+        }
+        default_name = default_names.get(self.context, "")
+        if default_name == "":
+            return self.prompt_records[0] if len(self.prompt_records) > 0 else None
+        prompt = self.prompts_catalog.find_prompt_variant(
+            default_name,
+            "system",
+            prompt_type=self.context,
+            include_internal=(self.context == "search"),
+            apply_init=False,
+        )
+        if prompt is not None:
+            return prompt
+        return self.prompt_records[0] if len(self.prompt_records) > 0 else None
+
+    def _context_setting_keys(self, suffix: str) -> list[str]:
+        keys = [f'ai_dlg_{self.context}_{suffix}']
+        if self.context == 'topic_exploration':
+            keys.append(f'ai_dlg_topic_analysis_{suffix}')
+        return keys
+
+    def _get_context_setting(self, suffix: str, default=None):
+        for key in self._context_setting_keys(suffix):
+            if key in self.app.settings:
+                return self.app.settings[key]
+        return default
+
+    def _set_context_setting(self, suffix: str, value) -> None:
+        self.app.settings[f'ai_dlg_{self.context}_{suffix}'] = value
+
+    def _prompt_display_name_and_scope(self, prompt: AgentPromptRecord) -> str:
+        """Return the prompt label for this dialog context."""
+
+        prompt_label = prompt_name_and_scope(prompt)
+        prefixes = {
+            "code_analysis": "code-analysis/",
+            "topic_exploration": "topic-exploration/",
+        }
+        prefix = prefixes.get(self.context, "")
+        if prefix != "" and prompt_label.startswith(prefix):
+            return prompt_label[len(prefix):]
+        return prompt_label
+
+    def _prompt_name_from_editor_selection(self, editor) -> tuple[str, str]:
+        """Return catalog prompt name and scope from the prompt library selection."""
+
+        selected_prompt = getattr(editor, "selected_prompt", None)
+        if selected_prompt is None:
+            return "", ""
+        prompt_path = str(selected_prompt.path() if hasattr(selected_prompt, "path") else "").strip("/")
+        prompt_type = str(getattr(selected_prompt, "prompt_type", "") or self.context).strip()
+        prompt_scope = str(getattr(selected_prompt, "scope", "") or "").strip()
+        if prompt_path == "" or prompt_type == "":
+            return "", prompt_scope
+        prompt_folder = self.prompts_catalog.prompt_folder_for_type(prompt_type)
+        if prompt_folder == "":
+            return prompt_path, prompt_scope
+        return f"{prompt_folder}/{prompt_path}", prompt_scope
+
+    def _load_prompt_records(self, preferred_name: str = "", preferred_scope: str = "") -> bool:
+        """Reload available prompts and select the preferred or default prompt."""
+
+        self.prompt_records = self.prompts_catalog.list_prompt_variants(
+            prompt_type=self.context,
+            include_internal=(self.context == "search"),
+            apply_init=False,
+        )
+        if len(self.prompt_records) == 0:
+            self.current_prompt = None
+            return False
+
+        selected_prompt = None
+        if preferred_name != "":
+            selected_prompt = self.prompts_catalog.find_prompt_variant(
+                preferred_name,
+                preferred_scope,
+                prompt_type=self.context,
+                include_internal=(self.context == "search"),
+                apply_init=False,
+            )
+        if selected_prompt is None:
+            selected_prompt = self._default_prompt_record()
+        self.current_prompt = selected_prompt
+        return self.current_prompt is not None
+
+    def _refresh_prompt_combo(self) -> None:
+        """Refresh the prompt combo box from current prompt records."""
+
+        blocked = self.ui.comboBox_prompts.blockSignals(True)
+        try:
+            self.ui.comboBox_prompts.clear()
+            for prompt in self.prompt_records:
+                self.ui.comboBox_prompts.addItem(self._prompt_display_name_and_scope(prompt))
+                item_idx = self.ui.comboBox_prompts.count() - 1
+                self.ui.comboBox_prompts.setItemData(item_idx, prompt.description, Qt.ItemDataRole.ToolTipRole)
+            if self.current_prompt is not None:
+                self.ui.comboBox_prompts.setCurrentText(self._prompt_display_name_and_scope(self.current_prompt))
+                self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
+        finally:
+            self.ui.comboBox_prompts.blockSignals(blocked)
 
     def __init__(self, app_, context, selected_id=-1, selected_is_code=True, tree_sort_option="all asc"):
         """Initializes the dialog
@@ -62,7 +178,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             context: the calling context, can be:
                 'search': called from 'Code Text > AI Search', 
                 'code_analysis': called from 'AI Chat > New Code Chat', 
-                'topic_analysis': called from 'AI Chat > New Topic Chat'.
+                'topic_exploration': called from 'AI Chat > New Topic Exploration Chat'.
             selected_id (int): the id of the selected item in the codes and categories tree. -1 if no item is selected.
             selected_is_code (bool): True if the selected item is a code, False if it is a category
         """
@@ -73,6 +189,8 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.case_ids = ""
         self.files = []
         self.cases = []
+        self.selected_code_scope = []
+        self.coder_selection_is_custom = False
         self.tree_sort_option = tree_sort_option
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_AiSearch()
@@ -87,15 +205,15 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.widget_coder.setVisible(False)
         elif context == 'code_analysis':
             self.setWindowTitle('AI Code Analysis')
-            self.ui.label_what.setText(_('1) Which code do you want to analyze?'))
+            self.ui.label_what.setText(_('1) Which codes or categories do you want to analyze?'))
             self.ui.tabWidget.setCurrentIndex(0)
             self.ui.tabWidget.setTabVisible(0, True)  # code search
             self.ui.tabWidget.setTabVisible(1, False)  # free search
             self.ui.checkBox_coded_segments.setVisible(False) 
             self.ui.widget_coder.setVisible(True)
-        elif context == 'topic_analysis':
-            self.setWindowTitle('AI Topic Analysis')
-            self.ui.label_what.setText(_('1) Which topic do you want to analyze?'))
+        elif context == 'topic_exploration':
+            self.setWindowTitle('AI Topic Exploration')
+            self.ui.label_what.setText(_('1) Which topic do you want to explore?'))
             self.ui.tabWidget.setCurrentIndex(1)
             self.ui.tabWidget.setTabVisible(0, False)  # code search
             self.ui.tabWidget.setTabVisible(1, True)  # free search
@@ -122,35 +240,45 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
+        if context == 'code_analysis':
+            self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
+        else:
+            self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
         init_persistent_tree_header(self.ui.treeWidget, self.app, 'ai_search_tree_widths')
         if self.ui.tabWidget.isTabVisible(0):  # code
             self.fill_tree(selected_id, selected_is_code) 
         # prompts
-        self.prompts_list = PromptsList(app_, context)
+        self.prompts_catalog = AiAgentPromptsCatalog(app_)
+        if not self._load_prompt_records():
+            msg = _('No prompts available for this analysis type.')
+            Message(self.app, _('AI prompts'), msg, "warning").exec()
+            self.reject()
+            return
         # load last settings
-        last_prompt_name = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_name', self.prompts_list.prompts[0].name)
-        last_prompt_scope = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_scope', self.prompts_list.prompts[0].scope)
-        self.current_prompt = self.prompts_list.find_prompt(last_prompt_name, last_prompt_scope, self.context)
+        default_prompt = self._default_prompt_record()
+        last_prompt_name = self._get_context_setting('last_prompt_name', default_prompt.name)
+        last_prompt_scope = self._get_context_setting('last_prompt_scope', default_prompt.scope)
+        self.current_prompt = self.prompts_catalog.find_prompt_variant(
+            last_prompt_name,
+            last_prompt_scope,
+            prompt_type=self.context,
+            include_internal=(self.context == "search"),
+            apply_init=False,
+        )
         if self.current_prompt is None:
-            self.current_prompt = self.prompts_list.prompts[0]
+            self.current_prompt = default_prompt
             msg = _('The last used prompt') + \
                 f' "{last_prompt_name} ({last_prompt_scope})" ' + \
                 _('could not be found. The prompt will be reset to the default.')
             Message(self.app, _('No codes'), msg, "warning").exec()
-        for prompt in self.prompts_list.prompts:
-            self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
-            item_idx = self.ui.comboBox_prompts.count() - 1
-            self.ui.comboBox_prompts.setItemData(item_idx, prompt.description, Qt.ItemDataRole.ToolTipRole)
-        self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
-        self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
+        self._refresh_prompt_combo()
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
         if context == 'search':
-            self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
-        self.ui.lineEdit_free_topic.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_topic', ''))
-        self.ui.textEdit_free_description.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_description', '').replace('\\n', '\n'))        
-        self.ui.checkBox_send_memos.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_send_memos', 'True') == 'True'))
-        self.ui.checkBox_coded_segments.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_coded_segments', 'False') == 'True'))
+            self.ui.tabWidget.setCurrentIndex(int(self._get_context_setting('last_tab_index', 0)))
+        self.ui.lineEdit_free_topic.setText(self._get_context_setting('free_topic', ''))
+        self.ui.textEdit_free_description.setText(self._get_context_setting('free_description', '').replace('\\n', '\n'))        
+        self.ui.checkBox_send_memos.setChecked((self._get_context_setting('send_memos', 'True') == 'True'))
+        self.ui.checkBox_coded_segments.setChecked((self._get_context_setting('coded_segments', 'False') == 'True'))
         # buttons
         self.ui.pushButton_change_prompt.clicked.connect(self.change_prompt)
         self.ui.buttonBox.accepted.connect(self.ok)
@@ -168,12 +296,12 @@ class DialogAiSearch(QtWidgets.QDialog):
     def showEvent(self, event):
         super().showEvent(event)
         # restore position splitter_code_tree:
-        splitter_pos = int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_code_tree', 500))
+        splitter_pos = int(self._get_context_setting('last_splitter_code_tree', 500))
         splitter_width = self.ui.splitter_code_tree.size().width()
         splitter_handle = self.ui.splitter_code_tree.handleWidth()
         self.ui.splitter_code_tree.setSizes([splitter_pos, splitter_width - splitter_pos - splitter_handle])
         # restore position splitter_case_files:
-        splitter_pos = int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_case_files', 220))
+        splitter_pos = int(self._get_context_setting('last_splitter_case_files', 220))
         splitter_height = self.ui.splitter_case_files.size().height()
         splitter_handle = self.ui.splitter_case_files.handleWidth()
         self.ui.splitter_case_files.setSizes([splitter_pos, splitter_height - splitter_pos - splitter_handle])
@@ -408,30 +536,34 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.coder_names = []
         for coder_name in selection:
             self.coder_names.append(coder_name['name'])
+        self.coder_selection_is_custom = True
         coder_names_str = ', '.join(self.coder_names)
         self.ui.label_coder.setText(_('Coders: ') + coder_names_str)
         self.fill_code_counts_in_tree()
             
     def on_prompt_selected(self, index):
         """ This function will be called whenever the user selects a new item in the combobox. """
-        self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
+        del index
+        if 0 <= self.ui.comboBox_prompts.currentIndex() < len(self.prompt_records):
+            self.current_prompt = self.prompt_records[self.ui.comboBox_prompts.currentIndex()]
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
             
     def change_prompt(self):
         """ Select and edit the prompt for the search. """
-        ui = DialogAiEditPrompts(self.app, self.context)
-        if ui.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            # Update prompts list and display current prompt:
-            self.prompts_list.read_prompts(self.context)
-            self.ui.comboBox_prompts.clear()
-            for prompt in self.prompts_list.prompts:
-                self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
-            if ui.selected_prompt is not None:
-                self.current_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
-            if self.current_prompt is None:
-                self.current_prompt = self.prompts_list.prompts[0]  # default
-            self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
-            self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
+        initial_name = str(getattr(self.current_prompt, "name", "") or "")
+        initial_scope = str(getattr(self.current_prompt, "scope", "") or "")
+        ui = DialogAiEditPrompts(self.app, self.context, initial_name, initial_scope)
+        if not ui.exec():
+            return
+        selected_name, selected_scope = self._prompt_name_from_editor_selection(ui)
+        if selected_name == "":
+            selected_name = initial_name
+            selected_scope = initial_scope
+        if not self._load_prompt_records(selected_name, selected_scope):
+            msg = _('No prompts available for this analysis type.')
+            Message(self.app, _('AI prompts'), msg, "warning").exec()
+            return
+        self._refresh_prompt_combo()
 
     def select_attributes(self):
         """ Select files based on attribute selections.
@@ -540,6 +672,208 @@ class DialogAiSearch(QtWidgets.QDialog):
             child = item.child(i)
             res.extend(self._get_codes_from_tree(child))
         return res
+
+    def _tree_item_full_name(self, item: QtWidgets.QTreeWidgetItem) -> str:
+        """Return the unabridged code/category name stored in the tree item."""
+
+        full_name = str(item.toolTip(0) if item.toolTip(0) is not None else '').strip()
+        if full_name != '':
+            return full_name
+        return str(item.text(0) if item.text(0) is not None else '').strip()
+
+    def _tree_item_path(self, item: QtWidgets.QTreeWidgetItem) -> str:
+        """Return the full tree path for a code or category item."""
+
+        path = [self._tree_item_full_name(item)]
+        parent = item.parent()
+        while parent is not None and not isinstance(parent, QtWidgets.QTreeWidget):
+            path.insert(0, self._tree_item_full_name(parent))
+            parent = parent.parent()
+        return " > ".join([part for part in path if part != ""])
+
+    def _tree_item_scope_type(self, item: QtWidgets.QTreeWidgetItem) -> str:
+        """Return the tree item scope type: code, category, or unknown."""
+
+        item_id = str(item.text(1) if item.text(1) is not None else '')
+        if item_id.startswith('cid:'):
+            return 'code'
+        if item_id.startswith('catid:'):
+            return 'category'
+        return 'unknown'
+
+    def _tree_item_numeric_id(self, item: QtWidgets.QTreeWidgetItem) -> int:
+        """Return the numeric id stored in the tree item id column."""
+
+        item_id = str(item.text(1) if item.text(1) is not None else '')
+        try:
+            return int(item_id.split(':', 1)[1])
+        except Exception:
+            return -1
+
+    def _iter_code_items_from_tree(self, item: QtWidgets.QTreeWidgetItem) -> list:
+        """Return all code items below item, including item if it is a code."""
+
+        res = []
+        if self._tree_item_scope_type(item) == 'code':
+            res.append(item)
+        for i in range(item.childCount()):
+            res.extend(self._iter_code_items_from_tree(item.child(i)))
+        return res
+
+    def _iter_descendant_tree_items(self, item: QtWidgets.QTreeWidgetItem) -> list:
+        """Return all descendant category/code items below item, excluding item itself."""
+
+        res = []
+        for i in range(item.childCount()):
+            child = item.child(i)
+            if self._tree_item_scope_type(child) in ('category', 'code'):
+                res.append(child)
+            res.extend(self._iter_descendant_tree_items(child))
+        return res
+
+    def _selected_tree_items_without_selected_ancestors(self) -> list:
+        """Return selected tree items, excluding items already covered by a selected ancestor."""
+
+        selected = list(self.ui.treeWidget.selectedItems())
+        selected_ids = {id(item) for item in selected}
+        result = []
+        for item in selected:
+            parent = item.parent()
+            covered_by_parent = False
+            while parent is not None and not isinstance(parent, QtWidgets.QTreeWidget):
+                if id(parent) in selected_ids:
+                    covered_by_parent = True
+                    break
+                parent = parent.parent()
+            if not covered_by_parent:
+                result.append(item)
+        return result
+
+    def _code_scope_from_tree_item(self, item: QtWidgets.QTreeWidgetItem, include_memos: bool) -> dict:
+        """Build a structured code-analysis scope entry for one selected item."""
+
+        code_items = self._iter_code_items_from_tree(item)
+        included_codes = []
+        code_ids = []
+        for code_item in code_items:
+            code_id = self._tree_item_numeric_id(code_item)
+            if code_id < 0 or code_id in code_ids:
+                continue
+            code_ids.append(code_id)
+            code_scope = {
+                "id": code_id,
+                "path": self._tree_item_path(code_item),
+                "name": self._tree_item_full_name(code_item),
+            }
+            if include_memos:
+                code_scope["memo"] = str(code_item.toolTip(2) if code_item.toolTip(2) is not None else '').strip()
+            included_codes.append(code_scope)
+        scope = {
+            "type": self._tree_item_scope_type(item),
+            "id": self._tree_item_numeric_id(item),
+            "path": self._tree_item_path(item),
+            "name": self._tree_item_full_name(item),
+            "code_ids": code_ids,
+            "included_codes": included_codes,
+        }
+        if include_memos:
+            scope["memo"] = str(item.toolTip(2) if item.toolTip(2) is not None else '').strip()
+        return scope
+
+    def _format_selected_code_name(self, code_scope: list) -> str:
+        """Build a compact display name for the selected code-analysis scope."""
+
+        if len(code_scope) == 0:
+            return ''
+        paths = [str(scope.get("path", "")).strip() for scope in code_scope if str(scope.get("path", "")).strip() != ""]
+        if len(paths) == 1:
+            return paths[0]
+        preview = "; ".join(paths[:3])
+        if len(paths) > 3:
+            preview += "; ..."
+        return preview
+
+    def _format_selected_code_memos(self, code_scope: list) -> str:
+        """Build a compact memo text for the selected top-level code-analysis scope."""
+
+        lines = []
+        for idx, scope in enumerate(code_scope, start=1):
+            memo = str(scope.get("memo", "")).strip()
+            if memo == "":
+                continue
+            scope_type = _("Category") if scope.get("type") == "category" else _("Code")
+            path = str(scope.get("path", "")).strip()
+            if len(code_scope) == 1:
+                lines.append(memo)
+            else:
+                lines.append(f"{idx}. {scope_type}: {path}")
+                lines.append(_("Memo: ") + memo)
+        return "\n".join(lines).strip()
+
+    def _build_search_scope_context(self, item: QtWidgets.QTreeWidgetItem, include_memos: bool) -> str:
+        """Build the semantic search context for one selected code/category tree item."""
+
+        if item is None:
+            return ''
+        lines = []
+        root_type = self._tree_item_scope_type(item)
+        root_type_label = _("Category") if root_type == 'category' else _("Code")
+        root_path = self._tree_item_path(item)
+        root_memo = str(item.toolTip(2) if item.toolTip(2) is not None else '').strip()
+        notes = []
+        if include_memos and root_memo != '':
+            lines.append(f"{root_type_label}: {root_path}")
+            lines.append(_("Memo: ") + root_memo)
+
+        descendants = self._iter_descendant_tree_items(item)
+        descendant_total = len(descendants)
+        descendant_limited = descendants[:AI_SEARCH_SCOPE_DESCENDANT_LIMIT]
+        descendant_count_truncated = descendant_total > len(descendant_limited)
+        if len(descendant_limited) > 0:
+            lines.append(
+                _("Selected search scope includes {count} descendant categories/codes listed below.").format(
+                    count=len(descendant_limited)
+                )
+            )
+            for descendant in descendant_limited:
+                descendant_type = self._tree_item_scope_type(descendant)
+                descendant_type_label = _("Category") if descendant_type == 'category' else _("Code")
+                descendant_path = self._tree_item_path(descendant)
+                lines.append(f"- {descendant_type_label}: {descendant_path}")
+                if include_memos:
+                    descendant_memo = str(descendant.toolTip(2) if descendant.toolTip(2) is not None else '').strip()
+                    if descendant_memo != '':
+                        lines.append(_("Memo: ") + descendant_memo)
+            if descendant_count_truncated:
+                omitted = descendant_total - len(descendant_limited)
+                notes.append(
+                    _("Note: Only the first {limit} descendant categories/codes are included here; {omitted} additional items were omitted.").format(
+                        limit=AI_SEARCH_SCOPE_DESCENDANT_LIMIT,
+                        omitted=omitted,
+                    )
+                )
+
+        core_text = "\n".join(lines).strip()
+        notes_text = "\n\n".join([note for note in notes if str(note).strip() != ""]).strip()
+        if core_text == '' and notes_text == '':
+            return ''
+        combined_text = core_text
+        if notes_text != '':
+            combined_text = (combined_text + "\n\n" + notes_text).strip() if combined_text != '' else notes_text
+        if len(combined_text) <= AI_SEARCH_SCOPE_CHAR_LIMIT:
+            return combined_text
+
+        char_truncation_note = _(
+            "Note: Search context was truncated at {limit} characters; some descendant items or memos were omitted."
+        ).format(limit=AI_SEARCH_SCOPE_CHAR_LIMIT)
+        final_notes = [note for note in notes if str(note).strip() != ""]
+        final_notes.append(char_truncation_note)
+        final_notes_text = "\n\n".join(final_notes)
+        allowed_length = max(0, AI_SEARCH_SCOPE_CHAR_LIMIT - len(final_notes_text) - 2)
+        truncated_text = core_text[:allowed_length].rstrip()
+        if truncated_text == '':
+            return final_notes_text[:AI_SEARCH_SCOPE_CHAR_LIMIT].rstrip()
+        return truncated_text + "\n\n" + final_notes_text
            
     def ok(self):
         """Collect the infos needed for the ai based search and the filters applied 
@@ -557,20 +891,32 @@ class DialogAiSearch(QtWidgets.QDialog):
                 Message(self.app, _('No codes'), msg, "warning").exec()
                 return
             else:
-                item = self.ui.treeWidget.selectedItems()[0]
-                self.selected_code_ids = self._get_codes_from_tree(item)
-                self.selected_code_name = item.text(0)
-                if self.ui.checkBox_send_memos.isChecked():
-                    self.selected_code_memo = item.toolTip(2)
+                include_memos = self.ui.checkBox_send_memos.isChecked()
+                if self.context == 'code_analysis':
+                    selected_items = self._selected_tree_items_without_selected_ancestors()
+                    self.selected_code_scope = [
+                        self._code_scope_from_tree_item(item, include_memos) for item in selected_items
+                    ]
+                    self.selected_code_ids = []
+                    for scope in self.selected_code_scope:
+                        for code_id in list(scope.get("code_ids", []) or []):
+                            if code_id not in self.selected_code_ids:
+                                self.selected_code_ids.append(code_id)
+                    self.selected_code_name = self._format_selected_code_name(self.selected_code_scope)
+                    if include_memos:
+                        self.selected_code_memo = self._format_selected_code_memos(self.selected_code_scope)
+                    else:
+                        self.selected_code_memo = ''
                 else:
-                    self.selected_code_memo = ''
+                    item = self.ui.treeWidget.selectedItems()[0]
+                    self.selected_code_ids = self._get_codes_from_tree(item)
+                    self.selected_code_scope = []
+                    self.selected_code_name = self._tree_item_path(item)
+                    self.selected_code_memo = self._build_search_scope_context(item, include_memos)
                 self.include_coded_segments = self.ui.checkBox_coded_segments.isChecked()
-                item = item.parent()
-                while item is not None and not isinstance(item, QtWidgets.QTreeWidget):
-                    self.selected_code_name = f'{item.text(0)} > {self.selected_code_name}'
-                    item = item.parent()               
         else:  # free search selected
             self.selected_code_ids = None
+            self.selected_code_scope = []
             self.selected_code_name = self.ui.lineEdit_free_topic.text()
             if self.selected_code_name == '':
                 msg = _('Please enter text in the "topic" field.')
@@ -580,6 +926,9 @@ class DialogAiSearch(QtWidgets.QDialog):
         
         # File selection
         self.selected_file_ids = []
+        self.selected_case_ids = []
+        self.selected_case_names = []
+        self.selected_filter_info = {}
         if self.ui.listWidget_files.item(0).isSelected():  # first item selected = add all files
             for i in range(self.ui.listWidget_files.count()):
                 id_ = self.ui.listWidget_files.item(i).data(Qt.ItemDataRole.UserRole)
@@ -591,8 +940,11 @@ class DialogAiSearch(QtWidgets.QDialog):
                 if id_ > -1:
                     self.selected_file_ids.append(id_)
         
+        no_file_filter = self.ui.listWidget_files.item(0).isSelected()
+
         # case filter
-        if not self.ui.listWidget_cases.item(0).isSelected(): 
+        no_case_filter = self.ui.listWidget_cases.item(0).isSelected()
+        if not no_case_filter: 
             # Only apply case filter if the first item (<no case filter>)  
             # is not selected.
             # The case filter will delete all files from self.selected_file_ids that 
@@ -602,6 +954,8 @@ class DialogAiSearch(QtWidgets.QDialog):
                 id_ = item.data(Qt.ItemDataRole.UserRole)
                 if id_ > -1:
                     selected_cases.append(id_)
+                    self.selected_case_ids.append(id_)
+                    self.selected_case_names.append(item.text())
             if len(selected_cases) > 0:
                 selected_cases_str = "(" + ", ".join(map(str, selected_cases)) + ")"
                 files_cases_sql = str('select distinct case_text.fid from case_text '
@@ -621,27 +975,40 @@ class DialogAiSearch(QtWidgets.QDialog):
         if len(self.attribute_file_ids) > 0:
             self.selected_file_ids = [x for x in self.selected_file_ids if x in self.attribute_file_ids]
 
+        self.selected_filter_info = {
+            "no_file_filter": no_file_filter,
+            "no_case_filter": no_case_filter,
+            "has_attribute_filter": (len(self.attribute_file_ids) > 0),
+            "selected_case_ids": list(self.selected_case_ids),
+            "selected_case_names": list(self.selected_case_names),
+            "custom_coder_filter": bool(self.coder_selection_is_custom),
+        }
+
         if len(self.selected_file_ids) == 0:
             msg = _('After combining all filters, there are not files left for the search. Please check your settings.')
             Message(self.app, _('No files'), msg, "warning").exec()
             return
         
         # Save the settings for the next search
-        self.app.settings[f'ai_dlg_{self.context}_last_prompt_name'] = self.current_prompt.name
-        self.app.settings[f'ai_dlg_{self.context}_last_prompt_scope'] = self.current_prompt.scope
+        self._set_context_setting('last_prompt_name', self.current_prompt.name)
+        self._set_context_setting('last_prompt_scope', self.current_prompt.scope)
         if self.context == 'search':
-            self.app.settings[f'ai_dlg_{self.context}_last_tab_index'] = self.ui.tabWidget.currentIndex()
-        self.app.settings[f'ai_dlg_{self.context}_free_topic'] = self.ui.lineEdit_free_topic.text()
-        self.app.settings[f'ai_dlg_{self.context}_free_description'] = self.ui.textEdit_free_description.toPlainText().replace('\n', '\\n')
-        self.app.settings[f'ai_dlg_{self.context}_last_splitter_code_tree'] = self.ui.splitter_code_tree.sizes()[0]
-        self.app.settings[f'ai_dlg_{self.context}_last_splitter_case_files'] = self.ui.splitter_case_files.sizes()[0]
-        self.app.settings[f'ai_dlg_{self.context}_send_memos'] = 'True' if self.ui.checkBox_send_memos.isChecked() else 'False'
-        self.app.settings[f'ai_dlg_{self.context}_coded_segments'] = 'True' if self.ui.checkBox_coded_segments.isChecked() else 'False'
+            self._set_context_setting('last_tab_index', self.ui.tabWidget.currentIndex())
+        self._set_context_setting('free_topic', self.ui.lineEdit_free_topic.text())
+        self._set_context_setting('free_description', self.ui.textEdit_free_description.toPlainText().replace('\n', '\\n'))
+        self._set_context_setting('last_splitter_code_tree', self.ui.splitter_code_tree.sizes()[0])
+        self._set_context_setting('last_splitter_case_files', self.ui.splitter_case_files.sizes()[0])
+        self._set_context_setting('send_memos', 'True' if self.ui.checkBox_send_memos.isChecked() else 'False')
+        self._set_context_setting('coded_segments', 'True' if self.ui.checkBox_coded_segments.isChecked() else 'False')
         self.accept()
         
     def cancel(self):
         self.selected_code_name = ''
         self.selected_code_memo = ''
+        self.selected_code_scope = []
         self.selected_file_ids = []
+        self.selected_case_ids = []
+        self.selected_case_names = []
+        self.selected_filter_info = {}
         self.reject()
 

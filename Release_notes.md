@@ -1,3 +1,5 @@
+We have jumped from version 3.8.2 to 4.0 as there are quite a few changes in this release.
+
 # Installation
 
 QualCoder is released under the LGPL v3 license
@@ -5,6 +7,8 @@ QualCoder is released under the LGPL v3 license
 ## Windows
 
 Attached to the end of release page you will find two options:
+
+Executables will be aviable when a release is made.
 
 QualCoder_4_0_Win_setup.exe: a Windows installer, will set up QualCoder like any normal app, with entries in the start menu, etc.
 QualCoder_4_0_Win_Portable.exe: A portable binary. Double-click to run and wait for 15 seconds.
@@ -16,6 +20,8 @@ The executable files are large downloads. Occasionally you might get a CRDOWNLOA
 ## MacOS
 
 Attached to the end of release page you will find two options:
+
+Executables will be aviaable when a release is made.
 
 QualCoder_4_0_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
 We are not able to compile a binary for Intel based Macs right now due to incompatibilities in the libraries we use.
@@ -34,9 +40,9 @@ From now on, QualCoder should start without issues.
 
 ## Linux Ubuntu, Lubuntu, Mint, ZorinOS, Debian, Arch
 
-This binary should work on the above recent releases of Linux distros, e.g. Linux Mint 22.3, Ubuntu 24.04 etc.
+This binary should work on the above recent releases of Linux distros, e.g. Linux Mint 22.3, Ubuntu 24.04 etc. Make the file executable after downloading by right-click -> Properties -> check the executable box. Then double-click to run.
 
-QualCoder_4_0_ubuntu executable
+QualCoder_4_0_ubuntu executable  (Will be avaible when a release is made).
 
 The binary file may work in other distros also. You need to make it executable, via the GUI or using the terminal.
 
@@ -55,6 +61,13 @@ Core languages will be English, German, French, Spanish. this is due to having r
 ## Data structure change
 
 One major requested change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
+
+## Artificial Inteligence changes
+
+Agentic restructure of AI features. Turns the AI chat into an agent that can not only talk, but also do things in QualCoder.
+* Read-only gives the AI agent read access to the complete code tree, all the memos and codings, as well as the empirical data through a diverse set of search tools (text only).
+*  Sandboxed allows for limited write-access: The agent can create new codes and codings, but it cannot change or delete existing ones. 
+* Full access gives additional write access to existing codes, codings, attributes, and cases - with precautions: Destructive operation must be confirmed by the user.
 
 
 ## Menus and tabs
