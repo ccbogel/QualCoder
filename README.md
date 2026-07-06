@@ -58,6 +58,8 @@ cd Downloads\QualCoder-master
 
 `run_from_source_Windows.bat`
 
+If you get errors using a bat file, then run the below commands instead.
+
 6. Install the virtual environment and required python modules. 
 
 The `py` command uses the most recent installed version of Python. The `py` command does not work on all Windows OS, you may instead replace `py` with `python3`. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.12`. See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
