@@ -80,11 +80,6 @@ cd src
 python -m qualcoder
 ```
 
-If you are using python version 3.13 and get a dll error regarding the torch module when trying to run QualCoder. Install this torch version:
-
-```
-pip install torch==2.8.0
-```
 
 8. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
