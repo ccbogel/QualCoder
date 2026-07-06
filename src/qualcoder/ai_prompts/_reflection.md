@@ -21,6 +21,8 @@ Rules:
 - If the user explicitly requested write actions, include revised_calls that execute the remaining write actions whenever this is possible.
 - If a delete action still needs user confirmation after preview, set `action="ask_user"`, set user_decision_required=true, and place the execute tool with the preview_token into proposed_next_calls.
 - Do not stop with explanations only if executable actions are still pending.
+- If the previous MCP result reports `invalid_params` or says a required field is missing, do not repeat the same MCP call unchanged. Correct the call structure first.
+- If the previous MCP result reports `permissions_denied`, do not retry unless permissions have changed. Explain the limitation or ask the user.
 - If the task was about collecting information and you now have enough evidence for a final answer, set `action="final_answer"` and `revised_calls=[]`.
 - If more information or actions are still needed, set `action="call_mcp"` and propose only the necessary revised_calls.
 - If `action="call_mcp"`, return at least one executable next step through revised_calls, or explicitly continue deferred_calls.

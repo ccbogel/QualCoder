@@ -3397,6 +3397,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
                 executed_any_call = False
+                round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -3408,21 +3409,21 @@ class DialogAIChat(QtWidgets.QDialog):
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
-                    executed_any_call = True
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
+                        total_tool_calls += 1
+                        executed_any_call = True
                     append_tool_exchange(method, display_params, response)
+                    failure_summary = self._summarize_mcp_failure(method, display_params, response)
+                    if failure_summary is not None:
+                        round_failures.append(failure_summary)
                 if stop_reason == "max_total_tool_calls_reached":
                     break
 
@@ -3433,6 +3434,8 @@ class DialogAIChat(QtWidgets.QDialog):
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls, ensure_ascii=False)
                     )
+                if len(round_failures) > 0:
+                    current_reflection_prompt += self._mcp_failure_feedback_block(round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -4044,6 +4047,7 @@ class DialogAIChat(QtWidgets.QDialog):
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
+        previous_round_failures: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
@@ -4226,6 +4230,8 @@ class DialogAIChat(QtWidgets.QDialog):
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls_for_next_round, ensure_ascii=False)
                     )
+                if len(previous_round_failures) > 0:
+                    current_reflection_prompt += self._mcp_failure_feedback_block(previous_round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -4317,6 +4323,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "no_more_valid_calls"
                     break
 
+                current_round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -4328,20 +4335,21 @@ class DialogAIChat(QtWidgets.QDialog):
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
+                        total_tool_calls += 1
                     append_tool_exchange(method, display_params, response)
+                    failure_summary = self._summarize_mcp_failure(method, display_params, response)
+                    if failure_summary is not None:
+                        current_round_failures.append(failure_summary)
+                previous_round_failures = current_round_failures
                 if stop_reason == "max_total_tool_calls_reached":
                     break
             else:
@@ -4881,6 +4889,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
+        previous_round_failures: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
@@ -4986,6 +4995,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls_for_next_round, ensure_ascii=False)
                     )
+                if len(previous_round_failures) > 0:
+                    current_reflection_prompt += self._mcp_failure_feedback_block(previous_round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -5077,6 +5088,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     stop_reason = "no_more_valid_calls"
                     break
 
+                current_round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -5088,20 +5100,21 @@ data collected. This information will accompany every prompt sent to the AI, res
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
+                        total_tool_calls += 1
                     append_tool_exchange(method, display_params, response)
+                    failure_summary = self._summarize_mcp_failure(method, display_params, response)
+                    if failure_summary is not None:
+                        current_round_failures.append(failure_summary)
+                previous_round_failures = current_round_failures
                 if stop_reason == "max_total_tool_calls_reached":
                     break
             else:
@@ -6766,6 +6779,165 @@ data collected. This information will accompany every prompt sent to the AI, res
         response = self.ai_mcp_server.handle_request(request)
         return request, response
 
+    def _mcp_local_error_response(self, code: int, message: str, data: Any = None) -> Dict[str, Any]:
+        """Build one local MCP-shaped error response."""
+
+        error_payload: Dict[str, Any] = {
+            "code": int(code),
+            "message": str(message if message is not None else "").strip(),
+        }
+        if data is not None:
+            error_payload["data"] = data
+        return {
+            "jsonrpc": "2.0",
+            "id": self.ai_mcp_server.new_request_id(),
+            "error": error_payload,
+        }
+
+    def _validate_mcp_call_params(self, method_name: str, params: Any) -> str:
+        """Validate essential MCP request params before dispatch."""
+
+        if not isinstance(params, dict):
+            return "MCP params must be an object."
+
+        method = str(method_name if method_name is not None else "").strip()
+        if method == "resources/read":
+            uri = str(params.get("uri", "")).strip()
+            if uri == "":
+                return "Missing required `uri` for resources/read."
+            return ""
+
+        if method == "tools/call":
+            name = str(params.get("name", "")).strip()
+            if name == "":
+                return "Missing required `name` for tools/call."
+            arguments = params.get("arguments", {})
+            if arguments is not None and not isinstance(arguments, dict):
+                return "Tool arguments must be an object."
+            return ""
+
+        return ""
+
+    def _summarize_mcp_failure(self, method_name: str, method_params: Dict[str, Any],
+                               rpc_response: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Return one compact failure summary for model feedback, or None on success."""
+
+        if not isinstance(rpc_response, dict):
+            return {
+                "method": str(method_name).strip(),
+                "error_class": "invalid_response",
+                "message": _("Invalid MCP response."),
+                "retry_advice": "revise_or_explain",
+            }
+
+        method = str(method_name if method_name is not None else "").strip()
+        if method == "tools/call":
+            tool_name = str(method_params.get("name", "")).strip()
+        else:
+            tool_name = ""
+
+        error_payload = rpc_response.get("error", None)
+        if isinstance(error_payload, dict):
+            code = error_payload.get("code", "")
+            message = str(error_payload.get("message", "")).strip() or _("Unknown MCP error.")
+            data = error_payload.get("data", None)
+            error_class = "rpc_error"
+            retry_advice = "revise_or_explain"
+            if code == -32602:
+                error_class = "invalid_params"
+                retry_advice = "do_not_retry_unchanged"
+            elif code == -32601:
+                error_class = "method_not_found"
+                retry_advice = "do_not_retry_unchanged"
+            elif code == -32000:
+                error_class = "runtime_error"
+                retry_advice = "retry_only_if_state_changed"
+            summary: Dict[str, Any] = {
+                "method": method,
+                "error_class": error_class,
+                "message": message,
+                "retry_advice": retry_advice,
+            }
+            if tool_name != "":
+                summary["tool"] = tool_name
+            if data not in (None, ""):
+                summary["details"] = data
+            return summary
+
+        result_payload = rpc_response.get("result", None)
+        if method == "tools/call" and isinstance(result_payload, dict) and bool(result_payload.get("isError", False)):
+            structured = result_payload.get("structuredContent", {})
+            if not isinstance(structured, dict):
+                structured = {}
+            tool_error = structured.get("error", {})
+            if not isinstance(tool_error, dict):
+                tool_error = {}
+            tool_code = str(tool_error.get("code", "")).strip()
+            message = str(tool_error.get("message", "")).strip() or _("Tool execution failed.")
+            error_class = "tool_error"
+            retry_advice = "revise_or_explain"
+            if tool_code == "ai_permissions_denied":
+                error_class = "permissions_denied"
+                retry_advice = "do_not_retry_until_permissions_change"
+            summary = {
+                "method": method,
+                "error_class": error_class,
+                "message": message,
+                "retry_advice": retry_advice,
+            }
+            if tool_name != "":
+                summary["tool"] = tool_name
+            if tool_code != "":
+                summary["details"] = {"code": tool_code}
+            return summary
+
+        return None
+
+    def _mcp_failure_feedback_block(self, failures: List[Dict[str, Any]]) -> str:
+        """Build an explicit reflection prompt block for recent MCP failures."""
+
+        compact_failures: List[Dict[str, Any]] = []
+        for item in failures:
+            if not isinstance(item, dict) or len(item) == 0:
+                continue
+            compact_item: Dict[str, Any] = {}
+            for key in ("method", "tool", "error_class", "message", "retry_advice", "details"):
+                if key in item and item.get(key) not in (None, "", []):
+                    compact_item[key] = item.get(key)
+            if len(compact_item) > 0:
+                compact_failures.append(compact_item)
+        if len(compact_failures) == 0:
+            return ""
+
+        return (
+            "\nRecent MCP execution failures (diagnostic facts, not user-facing text):\n"
+            + json.dumps(compact_failures, ensure_ascii=False)
+            + "\nRules for these failures:\n"
+            + "- If retry_advice is do_not_retry_unchanged, do not repeat the same MCP call unchanged.\n"
+            + "- For invalid_params, correct the call structure before trying again.\n"
+            + "- For permissions_denied, do not retry unless permissions change; explain the limitation or ask the user.\n"
+            + "- If you cannot correct the failure inside the allowed MCP methods, choose ask_user or final_answer."
+        )
+
+    def _execute_validated_mcp_call(self, method_name: str, raw_params: Dict[str, Any], allowed_methods: set[str],
+                                    prepare_request, signals, chat_idx: int) -> Tuple[Dict[str, Any], Dict[str, Any], bool]:
+        """Validate one MCP call locally, then dispatch it or return a structured local error."""
+
+        method = str(method_name if method_name is not None else "").strip()
+        params = dict(raw_params) if isinstance(raw_params, dict) else {}
+        if method not in allowed_methods:
+            return params, self._mcp_local_error_response(-32601, "Method not found", method), False
+
+        validation_error = self._validate_mcp_call_params(method, params)
+        if validation_error != "":
+            return params, self._mcp_local_error_response(-32602, "Invalid params", validation_error), False
+
+        request_params, display_params = prepare_request(method, params)
+        status_text = self.ai_mcp_server.describe_status_event(method, request_params)
+        self._emit_mcp_status(signals, chat_idx, status_text)
+        _request, response = self._run_mcp_request(method, request_params)
+        return display_params, response, True
+
     def _compact_mcp_result_content(self, method_name: str, method_params: Dict[str, Any],
                                     rpc_response: Dict[str, Any]) -> str:
         """Return a compact MCP result payload for conversation history."""
@@ -8283,6 +8455,7 @@ data collected. This information will accompany every prompt sent to the AI, res
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
                 executed_any_call = False
+                round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -8294,20 +8467,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                    else:
-                        request_params, display_params = _prepare_mcp_request(method, params)
-                        status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                        self._emit_mcp_status(signals, chat_idx, status_text)
-                        _request, response = self._run_mcp_request(method, request_params)
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
                         total_tool_calls += 1
                         executed_any_call = True
                     append_tool_exchange(method, display_params if method in allowed_methods else params, response)
+                    failure_summary = self._summarize_mcp_failure(
+                        method,
+                        display_params if method in allowed_methods else params,
+                        response,
+                    )
+                    if failure_summary is not None:
+                        round_failures.append(failure_summary)
 
                 reflection_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_reflection_system_prompt())
                 reflection_prompt = "Reflect on sufficiency of the collected evidence and return JSON now."
@@ -8319,6 +8497,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls, ensure_ascii=False)
                     )
+                if len(round_failures) > 0:
+                    reflection_prompt += self._mcp_failure_feedback_block(round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
