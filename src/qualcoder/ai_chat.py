@@ -2426,6 +2426,7 @@ class DialogAIChat(QtWidgets.QDialog):
             f'The current conversation language is "{current_language}". '
             "Ask exactly one short opening question equivalent to "
             '"How can I help you with QualCoder?" in that language. '
+            'Use a direct, informal form of address.'
             "Do not add anything else."
         )
 
