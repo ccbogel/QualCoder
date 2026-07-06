@@ -2380,21 +2380,81 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_output_autoscroll = True
         self.chat_list_selection_changed()
 
-    def new_general_chat(self, name='', summary=''):
+    def _can_start_general_chat(self) -> bool:
+        """Return whether a general AI chat session can be started now."""
+
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
-            return
+            return False
         if self.app.settings['ai_enable'] != 'True':
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
-            return
+            return False
+        return True
+
+    def _start_general_chat_session(self, name='', summary='') -> Optional[int]:
+        """Create one base AI agent session and return its chat index."""
 
         self.new_chat(str(name if name is not None else ''), 'agent chat', summary, '')
         system_prompt = self._general_chat_base_system_prompt()
         self.ai_text_doc_id = None
-        self.process_message('system', system_prompt)    
-        self.update_chat_window()  
+        self.process_message('system', system_prompt)
+        self.update_chat_window()
+        return self.current_chat_idx
+
+    def new_general_chat(self, name='', summary=''):
+        """Start one plain AI agent chat without extra bootstrap prompts."""
+
+        if not self._can_start_general_chat():
+            return
+        self._start_general_chat_session(name, summary)
+
+    def _support_chat_prompt_name(self) -> str:
+        """Return the internal prompt name for Help-menu support sessions."""
+
+        return "_help"
+
+    def _support_chat_opening_instruction(self) -> str:
+        """Return the one-shot instruction that triggers the opening support question."""
+
+        current_language = str(self.app.ai.get_curr_language()).strip()
+        if current_language == "":
+            current_language = "English"
+        return (
+            "This is a QualCoder support conversation started from the Help menu. "
+            f'The current conversation language is "{current_language}". '
+            "Ask exactly one short opening question equivalent to "
+            '"How can I help you with QualCoder?" in that language. '
+            "Do not add anything else."
+        )
+
+    def new_help_support_chat(self):
+        """Start one Help-menu AI support session with support-specific bootstrap context."""
+
+        if not self._can_start_general_chat():
+            return
+        if self.app.ai.is_busy():
+            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
+            Message(self.app, _('AI busy'), msg, "warning").exec()
+            return
+        if not self.app.ai.is_ready():
+            msg = _('The AI not yet fully loaded. Please wait and retry.')
+            Message(self.app, _('AI not ready'), msg, "warning").exec()
+            return
+
+        support_prompt = self.agent_prompts_catalog.get_internal_prompt(self._support_chat_prompt_name())
+        if support_prompt is None:
+            msg = _('The internal AI support prompt "_help.md" could not be found.')
+            Message(self.app, _('AI Agent'), msg, "warning").exec()
+            return
+
+        chat_idx = self._start_general_chat_session('', '')
+        if chat_idx is None or chat_idx < 0:
+            return
+
+        self._persist_agent_prompt_record(chat_idx, support_prompt, activation_source='bootstrap')
+        self.process_message('instruct', self._support_chat_opening_instruction(), chat_idx)
 
     def _agent_base_prompt_name(self) -> str:
         return "_agent"
@@ -2589,17 +2649,31 @@ class DialogAIChat(QtWidgets.QDialog):
             if self.agent_prompts_catalog.prompt_type_from_name(prompt.name) != "search"
         ]
 
-    def _build_turn_prompt_message(self, prompt: AgentPromptRecord) -> str:
-        """Format one loaded explicit prompt as persistent supplemental instructions."""
+    def _build_persistent_agent_prompt_message(self, prompt: AgentPromptRecord, activation_source: str = 'user') -> str:
+        """Format one persistent prompt message for replay in future agent turns."""
 
-        header = (
-            f'The user explicitly activated the prompt "/{prompt.name}" in this conversation. '
-            "Treat the following text as supplemental instructions for the rest of this conversation."
-        )
+        prompt_label = '/' + str(prompt.name if prompt.name is not None else '').strip('/')
+        if activation_source == 'bootstrap':
+            header = (
+                f'QualCoder activated the internal prompt "{prompt_label}" for this conversation. '
+                "Treat the following text as supplemental instructions for the rest of this conversation."
+            )
+        else:
+            header = (
+                f'The user explicitly activated the prompt "{prompt_label}" in this conversation. '
+                "Treat the following text as supplemental instructions for the rest of this conversation."
+            )
         content = str(prompt.content if prompt.content is not None else "").strip()
+        if prompt.is_internal:
+            content = self._render_agent_prompt_content(content)
         if content == "":
             content = _("(empty prompt)")
         return header + "\n\n" + content
+
+    def _build_turn_prompt_message(self, prompt: AgentPromptRecord) -> str:
+        """Format one user-loaded prompt as persistent supplemental instructions."""
+
+        return self._build_persistent_agent_prompt_message(prompt, activation_source='user')
 
     def _persist_explicit_agent_prompts(self, chat_idx: int, user_message: str) -> List[AgentPromptRecord]:
         """Persist newly activated explicit prompts so they remain active in later turns."""
@@ -2633,7 +2707,8 @@ class DialogAIChat(QtWidgets.QDialog):
             loaded_prompts.append(prompt)
         return loaded_prompts
 
-    def _persist_agent_prompt_record(self, chat_idx: int, prompt: AgentPromptRecord) -> None:
+    def _persist_agent_prompt_record(self, chat_idx: int, prompt: AgentPromptRecord,
+                                     activation_source: str = 'user') -> None:
         """Persist one selected prompt as active chat context for future agent turns."""
 
         if prompt is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
@@ -2641,7 +2716,7 @@ class DialogAIChat(QtWidgets.QDialog):
         prompt_name = str(prompt.name if prompt.name is not None else '').strip()
         if prompt_name == '':
             return
-        prompt_message = self._build_turn_prompt_message(prompt)
+        prompt_message = self._build_persistent_agent_prompt_message(prompt, activation_source=activation_source)
         latest_prompt_content: Optional[str] = None
         for msg in reversed(self.chat_msg_list):
             if len(msg) < 5 or str(msg[2]) != 'prompt':
@@ -9188,7 +9263,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if url.host().casefold() == 'help':
             path_segments = [segment for segment in url.path().split('/') if segment]
             if path_segments[:1] == ['pages'] or path_segments[:1] == ['search']:
-                msg = _('This help link is only for internal AI help lookup, not for opening a help page.')
+                msg = _('Invalid help reference.')
                 Message(self.app, _('AI Agent'), msg, icon='warning').exec()
                 return True
             if path_segments[:1] == ['page']:

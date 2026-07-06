@@ -288,6 +288,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <string>Help</string>
     </property>
     <addaction name="actionContents"/>
+    <addaction name="actionAsk_the_AI_Agent"/>
     <addaction name="actionAbout"/>
     <addaction name="actionSpecial_functions"/>
     <addaction name="actionMenu_Key_Shortcuts"/>
@@ -702,6 +703,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
    <property name="text">
     <string>Sidebar Mode</string>
+   </property>
+  </action>
+  <action name="actionAsk_the_AI_Agent">
+   <property name="text">
+    <string>Ask the AI Agent</string>
    </property>
   </action>
  </widget>

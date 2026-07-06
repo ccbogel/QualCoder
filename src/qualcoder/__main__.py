@@ -2159,6 +2159,7 @@ Click "Yes" to start now.')
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
+        self.ui.actionAsk_the_AI_Agent.triggered.connect(self.ai_go_help_support)
         self.ui.actionAbout.setShortcut('Alt+Y')
         self.ui.actionAbout.triggered.connect(self.about)
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
@@ -3994,6 +3995,20 @@ Click "Yes" to start now.')
         else:
             self.set_ai_chat_sidebar_mode(False, persist=False)
             self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+
+    def ai_go_help_support(self):
+        """Action triggered by Help > Ask the AI Agent."""
+
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up in Settings.')
+            Message(self.app, _('AI Agent'), msg).exec()
+            return
+        if self.ai_chat_sidebar_mode:
+            self.set_ai_chat_sidebar_mode(True, persist=False)
+        else:
+            self.set_ai_chat_sidebar_mode(False, persist=False)
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+        self.ai_chat_window.new_help_support_chat()
 
     def ai_go_search(self):
         """ Action triggered by AI Search and Coding menu item."""
