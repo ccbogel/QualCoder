@@ -51,6 +51,7 @@ from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_organiser import CodeOrganiser
+from qualcoder.code_organiser_assist import CodeOrganiserAssist
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
@@ -2118,6 +2119,7 @@ Click "Yes" to start now.')
         self.ui.actionColour_scheme.setShortcut('Alt+E')
         self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
         self.ui.actionCode_organiser.triggered.connect(self.code_organiser)
+        self.ui.actionCode_organiser_assist.triggered.connect(self.code_organiser_assist)
         # Analysis menu
         self.ui.actionCoding_reports.setShortcut('Alt+K')
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -2278,6 +2280,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_pdf.setEnabled(False)
         self.ui.actionColour_scheme.setEnabled(False)
         self.ui.actionCode_organiser.setEnabled(False)
+        self.ui.actionCode_organiser_assist.setEnabled(False)
         # Analysis menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCode_co_occurrence.setEnabled(False)
@@ -2326,6 +2329,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_pdf.setEnabled(True)
         self.ui.actionColour_scheme.setEnabled(True)
         self.ui.actionCode_organiser.setEnabled(True)
+        self.ui.actionCode_organiser_assist.setEnabled(True)
         # Analysis menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCode_co_occurrence.setEnabled(True)
@@ -2691,6 +2695,14 @@ Click "Yes" to start now.')
         """ Organise codes structure. """
 
         ui = CodeOrganiser(self.app, self.ui.textEdit)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_reports, None)
+        self.tab_layout_helper(self.ui.tab_coding, ui)
+
+    def code_organiser_assist(self):
+        """ Manually organise the codes system with selection lists. """
+
+        ui = CodeOrganiserAssist(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, None)
         self.tab_layout_helper(self.ui.tab_coding, ui)
