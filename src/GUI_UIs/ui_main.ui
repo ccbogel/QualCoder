@@ -267,6 +267,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <addaction name="actionCode_pdf"/>
     <addaction name="actionAI_assisted_coding"/>
     <addaction name="actionCode_organiser"/>
+    <addaction name="actionCode_organiser_assist"/>
     <addaction name="actionColour_scheme"/>
    </widget>
    <widget class="QMenu" name="menuReports">
@@ -669,6 +670,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <action name="actionCode_organiser">
    <property name="text">
     <string>Code organiser</string>
+   </property>
+  </action>
+  <action name="actionCode_organiser_assist">
+   <property name="text">
+    <string>Code organiser assist</string>
    </property>
   </action>
   <action name="actionText_segments_by_codes">
