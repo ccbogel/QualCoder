@@ -627,9 +627,8 @@ the bottom left and choose one of the options described below.
 
 {{AI_WARNING_BLOCK}}
 
-## [New AI Agent Session](qualcoder://ai_agent_tab/new/new_general_chat)
+## [New Chat with the AI Agent](qualcoder://ai_agent_tab/new/new_general_chat)
 
-- Initiate a new chat with the AI Agent.
 - This is the default starting point for an open-ended analysis or any other task.
 - You can also ask for help using QualCoder.
 

@@ -995,7 +995,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _show_start_new_chat_message(self) -> None:
         """Tell the user how to enable the question box when no chat is active."""
 
-        msg = _('Start a new AI Agent session first with the "New" button on the left.')
+        msg = _('Start a new chat with the AI Agent first with the "New" button on the left.')
         Message(self.app, _('AI Agent'), msg, icon='warning').exec()
 
     def _discard_inline_prompt_completion(self) -> bool:
@@ -1889,7 +1889,7 @@ class DialogAIChat(QtWidgets.QDialog):
         return (
             (
                 'new_general_chat',
-                _('New AI Agent Session'),
+                _('New Chat with the AI Agent'),
                 _('Analyze your data together with an AI Agent.'),
             ),
             (
@@ -2488,7 +2488,7 @@ class DialogAIChat(QtWidgets.QDialog):
         new_label = self._ai_permissions_label_for_value(new_value)
         if old_label == new_label:
             return
-        content = _('System event: AI Permissions changed from "{old}" to "{new}".').format(
+        content = 'System event: AI Permissions changed from "{old}" to "{new}".'.format(
             old=old_label,
             new=new_label,
         )
@@ -2528,13 +2528,13 @@ class DialogAIChat(QtWidgets.QDialog):
         """Persist one hidden event stating that the previous assistant turn was canceled."""
 
         if partial_response:
-            content = _(
+            content = (
                 'System event: The previous assistant turn was canceled by the user before completion. '
                 'If a partial assistant response is present in the conversation, treat it as unfinished unless '
                 'the user asks you to continue it.'
             )
         else:
-            content = _(
+            content = (
                 'System event: The previous assistant turn was canceled by the user before completion and did not finish.'
             )
         self._log_agent_env_update(content, chat_idx)
@@ -6136,7 +6136,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         compacted: Dict[str, Any] = {
             "action": "mcp_result_compacted",
             "method": method,
-            "note": _(
+            "note": (
                 "Older read/list result omitted from the active context to save space. "
                 "Re-read if needed; current project data may differ."
             ),
