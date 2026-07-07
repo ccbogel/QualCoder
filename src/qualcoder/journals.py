@@ -965,6 +965,9 @@ class DialogJournals(QtWidgets.QDialog):
                 logger.warning(_("Could not insert attribute: "), file_attr_name, str(e))
         self.app.conn.commit()
 
+        if self.app.settings['ai_enable'] == 'True' and getattr(self.app, 'ai', None) is not None:
+            self.app.ai.sources_vectorstore.import_document(new_source_id, source_name, journal_text)
+
         msg = _("Journal converted to source document: ") + source_name
         self.parent_text_edit.append(msg)
         Message(self.app, _("Journal converted to source document"), msg, "information").exec()
