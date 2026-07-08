@@ -3532,7 +3532,13 @@ class DialogCodePdf(QtWidgets.QWidget):
             item.setPos(text_box['left'], text_box['top'])
             '''print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
             font = QtGui.QFont(t['fontname'], t['fontsize']) '''
-            adjustment = int(self.ui.comboBox_fontsize.currentText())
+            # Canonical values of comboBox_fontsize, in the same order as the .ui items.
+            # Read by index: the label goes through the translation function and may be
+            # localized or corrupt (eo: '0' -> '0 0 0 0' crashed int(); fa: '-2' -> '2'
+            # silently inverted the adjustment).  # <- L
+            adjustment_values = (0, -1, -2, -3, -4)  # <- L
+            adj_index = self.ui.comboBox_fontsize.currentIndex()  # <- L
+            adjustment = adjustment_values[adj_index] if 0 <= adj_index < len(adjustment_values) else 0  # <- L
             font_size = text_box['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
             if font_size < 4:
                 font_size = 4

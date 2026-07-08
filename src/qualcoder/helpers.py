@@ -49,7 +49,7 @@ import platform
 from random import randint
 import sqlite3
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets, sip  # <- L sip: detect deleted C++ objects in deferred callbacks
 
 from .color_selector import TextColor, colors
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
@@ -220,8 +220,16 @@ class PersistentTreeWidthEventFilter(QtCore.QObject):
 
 
 def _apply_pending_tree_widths(tree_widget):
-    """Apply deferred default widths if the tree is ready for sizing."""
+    """Apply deferred default widths if the tree is ready for sizing.
 
+    Called via QTimer.singleShot(0, ...), so the tree widget may have been
+    destroyed (dialog closed or rebuilt, e.g. after a font size change) between
+    queueing and execution. In that case the Python wrapper still exists but the
+    C++ object is gone, and any method call raises RuntimeError.  # <- L
+    """
+
+    if tree_widget is None or sip.isdeleted(tree_widget):  # <- L widget destroyed before the deferred call ran
+        return
     if not getattr(tree_widget, "_qc_tree_widths_pending_restore", False):
         return
     _apply_default_tree_widths(
@@ -1191,7 +1199,11 @@ class NumberBar(QtWidgets.QFrame):
         magic_number = 0.00947327480831203467051894654962
         new_pos = round(self.text_edit.verticalScrollBar().value() * (1 + new_digits * magic_number))
         if new_pos > 0:
-            QtCore.QTimer.singleShot(100, lambda: self.text_edit.verticalScrollBar().setValue(new_pos))
+            def _restore_scroll():  # <- L guard: the editor may close within the 100 ms delay
+                if sip.isdeleted(self.text_edit):
+                    return
+                self.text_edit.verticalScrollBar().setValue(new_pos)
+            QtCore.QTimer.singleShot(100, _restore_scroll)
         
     def showEvent(self, event):
         """Adjusts the width based on the current font size"""

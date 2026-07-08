@@ -1853,22 +1853,22 @@ Pentru a seta un semn de carte apăsaţi B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
       <source>-1</source>
-      <translation type="unfinished">- 1</translation>
+      <translation type="unfinished"></translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
       <source>-2</source>
-      <translation type="unfinished">- 2</translation>
+      <translation type="unfinished"></translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
       <source>-3</source>
-      <translation type="unfinished">- 3</translation>
+      <translation type="unfinished"></translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
       <source>-4</source>
-      <translation type="unfinished">- 4</translation>
+      <translation type="unfinished"></translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>

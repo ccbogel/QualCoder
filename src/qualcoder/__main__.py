@@ -1613,8 +1613,8 @@ class App(object):
         """
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
-        # backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
-        backup = os.path.join(self.settings['directory'], f"{self.project_name[:-4]}_BKUP_{nowdate}{suffix}.qda")
+        backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
+        # USED IN 3.8 - 3.8.2 CAUSED CONFUSION backup = os.path.join(self.settings['directory'], f"{self.project_name[:-4]}_BKUP_{nowdate}{suffix}.qda")
         # Do not try and create another backup with same date and hour, unless suffix present
         result = os.path.exists(backup)
         if result and suffix == "":
@@ -1648,7 +1648,6 @@ class App(object):
                         '*.MP3', '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'
                     )
                 )
-                # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
                 msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
             except FileExistsError as err:
                 msg = _("There is already a backup with this name")
@@ -1658,7 +1657,6 @@ class App(object):
                 logger.warning(msg)
         if not os.path.exists(backup):
             return msg, backup
-        # self.ui.textEdit.append(_("Project backup created: ") + backup)
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
         self.delete_backup_path_name = backup
