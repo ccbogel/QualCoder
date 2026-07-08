@@ -995,7 +995,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _show_start_new_chat_message(self) -> None:
         """Tell the user how to enable the question box when no chat is active."""
 
-        msg = _('Start a new AI Agent session first with the "New" button on the left.')
+        msg = _('Start a new chat with the AI Agent first with the "New" button on the left.')
         Message(self.app, _('AI Agent'), msg, icon='warning').exec()
 
     def _discard_inline_prompt_completion(self) -> bool:
@@ -1889,7 +1889,7 @@ class DialogAIChat(QtWidgets.QDialog):
         return (
             (
                 'new_general_chat',
-                _('New AI Agent Session'),
+                _('New Chat with the AI Agent'),
                 _('Analyze your data together with an AI Agent.'),
             ),
             (
@@ -2380,21 +2380,82 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_output_autoscroll = True
         self.chat_list_selection_changed()
 
-    def new_general_chat(self, name='', summary=''):
+    def _can_start_general_chat(self) -> bool:
+        """Return whether a general AI chat session can be started now."""
+
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
-            return
+            return False
         if self.app.settings['ai_enable'] != 'True':
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
-            return
+            return False
+        return True
+
+    def _start_general_chat_session(self, name='', summary='') -> Optional[int]:
+        """Create one base AI agent session and return its chat index."""
 
         self.new_chat(str(name if name is not None else ''), 'agent chat', summary, '')
         system_prompt = self._general_chat_base_system_prompt()
         self.ai_text_doc_id = None
-        self.process_message('system', system_prompt)    
-        self.update_chat_window()  
+        self.process_message('system', system_prompt)
+        self.update_chat_window()
+        return self.current_chat_idx
+
+    def new_general_chat(self, name='', summary=''):
+        """Start one plain AI agent chat without extra bootstrap prompts."""
+
+        if not self._can_start_general_chat():
+            return
+        self._start_general_chat_session(name, summary)
+
+    def _support_chat_prompt_name(self) -> str:
+        """Return the internal prompt name for Help-menu support sessions."""
+
+        return "_help"
+
+    def _support_chat_opening_instruction(self) -> str:
+        """Return the one-shot instruction that triggers the opening support question."""
+
+        current_language = str(self.app.ai.get_curr_language()).strip()
+        if current_language == "":
+            current_language = "English"
+        return (
+            "This is a QualCoder support conversation started from the Help menu. "
+            f'The current conversation language is "{current_language}". '
+            "Ask exactly one short opening question equivalent to "
+            '"How can I help you with QualCoder?" in that language. '
+            'Use a direct, informal form of address.'
+            "Do not add anything else."
+        )
+
+    def new_help_support_chat(self):
+        """Start one Help-menu AI support session with support-specific bootstrap context."""
+
+        if not self._can_start_general_chat():
+            return
+        if self.app.ai.is_busy():
+            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
+            Message(self.app, _('AI busy'), msg, "warning").exec()
+            return
+        if not self.app.ai.is_ready():
+            msg = _('The AI not yet fully loaded. Please wait and retry.')
+            Message(self.app, _('AI not ready'), msg, "warning").exec()
+            return
+
+        support_prompt = self.agent_prompts_catalog.get_internal_prompt(self._support_chat_prompt_name())
+        if support_prompt is None:
+            msg = _('The internal AI support prompt "_help.md" could not be found.')
+            Message(self.app, _('AI Agent'), msg, "warning").exec()
+            return
+
+        chat_idx = self._start_general_chat_session('', '')
+        if chat_idx is None or chat_idx < 0:
+            return
+
+        self._persist_agent_prompt_record(chat_idx, support_prompt, activation_source='bootstrap')
+        self.process_message('instruct', self._support_chat_opening_instruction(), chat_idx)
 
     def _agent_base_prompt_name(self) -> str:
         return "_agent"
@@ -2427,7 +2488,7 @@ class DialogAIChat(QtWidgets.QDialog):
         new_label = self._ai_permissions_label_for_value(new_value)
         if old_label == new_label:
             return
-        content = _('System event: AI Permissions changed from "{old}" to "{new}".').format(
+        content = 'System event: AI Permissions changed from "{old}" to "{new}".'.format(
             old=old_label,
             new=new_label,
         )
@@ -2467,13 +2528,13 @@ class DialogAIChat(QtWidgets.QDialog):
         """Persist one hidden event stating that the previous assistant turn was canceled."""
 
         if partial_response:
-            content = _(
+            content = (
                 'System event: The previous assistant turn was canceled by the user before completion. '
                 'If a partial assistant response is present in the conversation, treat it as unfinished unless '
                 'the user asks you to continue it.'
             )
         else:
-            content = _(
+            content = (
                 'System event: The previous assistant turn was canceled by the user before completion and did not finish.'
             )
         self._log_agent_env_update(content, chat_idx)
@@ -2589,17 +2650,31 @@ class DialogAIChat(QtWidgets.QDialog):
             if self.agent_prompts_catalog.prompt_type_from_name(prompt.name) != "search"
         ]
 
-    def _build_turn_prompt_message(self, prompt: AgentPromptRecord) -> str:
-        """Format one loaded explicit prompt as persistent supplemental instructions."""
+    def _build_persistent_agent_prompt_message(self, prompt: AgentPromptRecord, activation_source: str = 'user') -> str:
+        """Format one persistent prompt message for replay in future agent turns."""
 
-        header = (
-            f'The user explicitly activated the prompt "/{prompt.name}" in this conversation. '
-            "Treat the following text as supplemental instructions for the rest of this conversation."
-        )
+        prompt_label = '/' + str(prompt.name if prompt.name is not None else '').strip('/')
+        if activation_source == 'bootstrap':
+            header = (
+                f'QualCoder activated the internal prompt "{prompt_label}" for this conversation. '
+                "Treat the following text as supplemental instructions for the rest of this conversation."
+            )
+        else:
+            header = (
+                f'The user explicitly activated the prompt "{prompt_label}" in this conversation. '
+                "Treat the following text as supplemental instructions for the rest of this conversation."
+            )
         content = str(prompt.content if prompt.content is not None else "").strip()
+        if prompt.is_internal:
+            content = self._render_agent_prompt_content(content)
         if content == "":
             content = _("(empty prompt)")
         return header + "\n\n" + content
+
+    def _build_turn_prompt_message(self, prompt: AgentPromptRecord) -> str:
+        """Format one user-loaded prompt as persistent supplemental instructions."""
+
+        return self._build_persistent_agent_prompt_message(prompt, activation_source='user')
 
     def _persist_explicit_agent_prompts(self, chat_idx: int, user_message: str) -> List[AgentPromptRecord]:
         """Persist newly activated explicit prompts so they remain active in later turns."""
@@ -2633,7 +2708,8 @@ class DialogAIChat(QtWidgets.QDialog):
             loaded_prompts.append(prompt)
         return loaded_prompts
 
-    def _persist_agent_prompt_record(self, chat_idx: int, prompt: AgentPromptRecord) -> None:
+    def _persist_agent_prompt_record(self, chat_idx: int, prompt: AgentPromptRecord,
+                                     activation_source: str = 'user') -> None:
         """Persist one selected prompt as active chat context for future agent turns."""
 
         if prompt is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
@@ -2641,7 +2717,7 @@ class DialogAIChat(QtWidgets.QDialog):
         prompt_name = str(prompt.name if prompt.name is not None else '').strip()
         if prompt_name == '':
             return
-        prompt_message = self._build_turn_prompt_message(prompt)
+        prompt_message = self._build_persistent_agent_prompt_message(prompt, activation_source=activation_source)
         latest_prompt_content: Optional[str] = None
         for msg in reversed(self.chat_msg_list):
             if len(msg) < 5 or str(msg[2]) != 'prompt':
@@ -3380,7 +3456,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if planner_action != "call_mcp":
                 planned_calls = []
             if len(planned_calls) == 0 and stop_reason == "":
-                stop_reason = "enough_information"
+                stop_reason = "final_answer"
 
             reflection_system_prompt = self._build_mcp_combined_system_prompt(
                 self._mcp_reflection_system_prompt()
@@ -3397,6 +3473,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
                 executed_any_call = False
+                round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -3408,21 +3485,21 @@ class DialogAIChat(QtWidgets.QDialog):
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
-                    executed_any_call = True
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
+                        total_tool_calls += 1
+                        executed_any_call = True
                     append_tool_exchange(method, display_params, response)
+                    failure_summary = self._summarize_mcp_failure(method, display_params, response)
+                    if failure_summary is not None:
+                        round_failures.append(failure_summary)
                 if stop_reason == "max_total_tool_calls_reached":
                     break
 
@@ -3433,6 +3510,8 @@ class DialogAIChat(QtWidgets.QDialog):
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls, ensure_ascii=False)
                     )
+                if len(round_failures) > 0:
+                    current_reflection_prompt += self._mcp_failure_feedback_block(round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -3461,26 +3540,25 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "reflection_timeout"
                     break
 
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 short_reflection_note = self._short_reflection_next_step_note(
                     reflection_summary,
                     reflection_next_step_note,
@@ -3491,9 +3569,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     planned_calls = []
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -3506,9 +3584,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
+                if reflection_action == "final_answer":
                     planned_calls = revised_calls
-                    stop_reason = "enough_information"
+                    stop_reason = "final_answer"
                     break
 
                 if continue_deferred_calls and len(deferred_calls) > 0:
@@ -4045,6 +4123,7 @@ class DialogAIChat(QtWidgets.QDialog):
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
+        previous_round_failures: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
@@ -4227,6 +4306,8 @@ class DialogAIChat(QtWidgets.QDialog):
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls_for_next_round, ensure_ascii=False)
                     )
+                if len(previous_round_failures) > 0:
+                    current_reflection_prompt += self._mcp_failure_feedback_block(previous_round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -4255,26 +4336,25 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "reflection_timeout"
                     break
 
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 short_reflection_note = self._short_reflection_next_step_note(
                     reflection_summary,
                     reflection_next_step_note,
@@ -4284,9 +4364,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 if self._is_methodology_gate_blocking(reflection_methodology_gate):
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -4299,8 +4379,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
-                    stop_reason = "enough_information"
+                if reflection_action == "final_answer":
+                    stop_reason = "final_answer"
                     break
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(revised_calls, max_calls_per_round)
@@ -4319,6 +4399,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "no_more_valid_calls"
                     break
 
+                current_round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -4330,20 +4411,21 @@ class DialogAIChat(QtWidgets.QDialog):
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
+                        total_tool_calls += 1
                     append_tool_exchange(method, display_params, response)
+                    failure_summary = self._summarize_mcp_failure(method, display_params, response)
+                    if failure_summary is not None:
+                        current_round_failures.append(failure_summary)
+                previous_round_failures = current_round_failures
                 if stop_reason == "max_total_tool_calls_reached":
                     break
             else:
@@ -4883,6 +4965,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
         deferred_calls_for_next_round: List[Dict[str, Any]] = []
+        previous_round_failures: List[Dict[str, Any]] = []
 
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
@@ -4988,6 +5071,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls_for_next_round, ensure_ascii=False)
                     )
+                if len(previous_round_failures) > 0:
+                    current_reflection_prompt += self._mcp_failure_feedback_block(previous_round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -5016,26 +5101,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                     stop_reason = "reflection_timeout"
                     break
 
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 short_reflection_note = self._short_reflection_next_step_note(
                     reflection_summary,
                     reflection_next_step_note,
@@ -5045,9 +5129,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                 if self._is_methodology_gate_blocking(reflection_methodology_gate):
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -5060,8 +5144,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
-                    stop_reason = "enough_information"
+                if reflection_action == "final_answer":
+                    stop_reason = "final_answer"
                     break
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(revised_calls, max_calls_per_round)
@@ -5080,6 +5164,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     stop_reason = "no_more_valid_calls"
                     break
 
+                current_round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -5091,20 +5176,21 @@ data collected. This information will accompany every prompt sent to the AI, res
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
+                        total_tool_calls += 1
                     append_tool_exchange(method, display_params, response)
+                    failure_summary = self._summarize_mcp_failure(method, display_params, response)
+                    if failure_summary is not None:
+                        current_round_failures.append(failure_summary)
+                previous_round_failures = current_round_failures
                 if stop_reason == "max_total_tool_calls_reached":
                     break
             else:
@@ -6050,7 +6136,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         compacted: Dict[str, Any] = {
             "action": "mcp_result_compacted",
             "method": method,
-            "note": _(
+            "note": (
                 "Older read/list result omitted from the active context to save space. "
                 "Re-read if needed; current project data may differ."
             ),
@@ -6751,7 +6837,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         methodology_note = self._methodology_gate_prompt_block(methodology_gate)
         if methodology_note != "":
             prompt_parts.append(methodology_note)
-        if stop_reason_text not in ("", "enough_information") and not stop_reason_text.startswith("methodology_"):
+        if stop_reason_text not in ("", "final_answer") and not stop_reason_text.startswith("methodology_"):
             prompt_parts.append(
                 "The available project evidence may still be incomplete. "
                 "State the uncertainty clearly and mention what additional project material would help."
@@ -6768,6 +6854,165 @@ data collected. This information will accompany every prompt sent to the AI, res
         }
         response = self.ai_mcp_server.handle_request(request)
         return request, response
+
+    def _mcp_local_error_response(self, code: int, message: str, data: Any = None) -> Dict[str, Any]:
+        """Build one local MCP-shaped error response."""
+
+        error_payload: Dict[str, Any] = {
+            "code": int(code),
+            "message": str(message if message is not None else "").strip(),
+        }
+        if data is not None:
+            error_payload["data"] = data
+        return {
+            "jsonrpc": "2.0",
+            "id": self.ai_mcp_server.new_request_id(),
+            "error": error_payload,
+        }
+
+    def _validate_mcp_call_params(self, method_name: str, params: Any) -> str:
+        """Validate essential MCP request params before dispatch."""
+
+        if not isinstance(params, dict):
+            return "MCP params must be an object."
+
+        method = str(method_name if method_name is not None else "").strip()
+        if method == "resources/read":
+            uri = str(params.get("uri", "")).strip()
+            if uri == "":
+                return "Missing required `uri` for resources/read."
+            return ""
+
+        if method == "tools/call":
+            name = str(params.get("name", "")).strip()
+            if name == "":
+                return "Missing required `name` for tools/call."
+            arguments = params.get("arguments", {})
+            if arguments is not None and not isinstance(arguments, dict):
+                return "Tool arguments must be an object."
+            return ""
+
+        return ""
+
+    def _summarize_mcp_failure(self, method_name: str, method_params: Dict[str, Any],
+                               rpc_response: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Return one compact failure summary for model feedback, or None on success."""
+
+        if not isinstance(rpc_response, dict):
+            return {
+                "method": str(method_name).strip(),
+                "error_class": "invalid_response",
+                "message": _("Invalid MCP response."),
+                "retry_advice": "revise_or_explain",
+            }
+
+        method = str(method_name if method_name is not None else "").strip()
+        if method == "tools/call":
+            tool_name = str(method_params.get("name", "")).strip()
+        else:
+            tool_name = ""
+
+        error_payload = rpc_response.get("error", None)
+        if isinstance(error_payload, dict):
+            code = error_payload.get("code", "")
+            message = str(error_payload.get("message", "")).strip() or _("Unknown MCP error.")
+            data = error_payload.get("data", None)
+            error_class = "rpc_error"
+            retry_advice = "revise_or_explain"
+            if code == -32602:
+                error_class = "invalid_params"
+                retry_advice = "do_not_retry_unchanged"
+            elif code == -32601:
+                error_class = "method_not_found"
+                retry_advice = "do_not_retry_unchanged"
+            elif code == -32000:
+                error_class = "runtime_error"
+                retry_advice = "retry_only_if_state_changed"
+            summary: Dict[str, Any] = {
+                "method": method,
+                "error_class": error_class,
+                "message": message,
+                "retry_advice": retry_advice,
+            }
+            if tool_name != "":
+                summary["tool"] = tool_name
+            if data not in (None, ""):
+                summary["details"] = data
+            return summary
+
+        result_payload = rpc_response.get("result", None)
+        if method == "tools/call" and isinstance(result_payload, dict) and bool(result_payload.get("isError", False)):
+            structured = result_payload.get("structuredContent", {})
+            if not isinstance(structured, dict):
+                structured = {}
+            tool_error = structured.get("error", {})
+            if not isinstance(tool_error, dict):
+                tool_error = {}
+            tool_code = str(tool_error.get("code", "")).strip()
+            message = str(tool_error.get("message", "")).strip() or _("Tool execution failed.")
+            error_class = "tool_error"
+            retry_advice = "revise_or_explain"
+            if tool_code == "ai_permissions_denied":
+                error_class = "permissions_denied"
+                retry_advice = "do_not_retry_until_permissions_change"
+            summary = {
+                "method": method,
+                "error_class": error_class,
+                "message": message,
+                "retry_advice": retry_advice,
+            }
+            if tool_name != "":
+                summary["tool"] = tool_name
+            if tool_code != "":
+                summary["details"] = {"code": tool_code}
+            return summary
+
+        return None
+
+    def _mcp_failure_feedback_block(self, failures: List[Dict[str, Any]]) -> str:
+        """Build an explicit reflection prompt block for recent MCP failures."""
+
+        compact_failures: List[Dict[str, Any]] = []
+        for item in failures:
+            if not isinstance(item, dict) or len(item) == 0:
+                continue
+            compact_item: Dict[str, Any] = {}
+            for key in ("method", "tool", "error_class", "message", "retry_advice", "details"):
+                if key in item and item.get(key) not in (None, "", []):
+                    compact_item[key] = item.get(key)
+            if len(compact_item) > 0:
+                compact_failures.append(compact_item)
+        if len(compact_failures) == 0:
+            return ""
+
+        return (
+            "\nRecent MCP execution failures (diagnostic facts, not user-facing text):\n"
+            + json.dumps(compact_failures, ensure_ascii=False)
+            + "\nRules for these failures:\n"
+            + "- If retry_advice is do_not_retry_unchanged, do not repeat the same MCP call unchanged.\n"
+            + "- For invalid_params, correct the call structure before trying again.\n"
+            + "- For permissions_denied, do not retry unless permissions change; explain the limitation or ask the user.\n"
+            + "- If you cannot correct the failure inside the allowed MCP methods, choose ask_user or final_answer."
+        )
+
+    def _execute_validated_mcp_call(self, method_name: str, raw_params: Dict[str, Any], allowed_methods: set[str],
+                                    prepare_request, signals, chat_idx: int) -> Tuple[Dict[str, Any], Dict[str, Any], bool]:
+        """Validate one MCP call locally, then dispatch it or return a structured local error."""
+
+        method = str(method_name if method_name is not None else "").strip()
+        params = dict(raw_params) if isinstance(raw_params, dict) else {}
+        if method not in allowed_methods:
+            return params, self._mcp_local_error_response(-32601, "Method not found", method), False
+
+        validation_error = self._validate_mcp_call_params(method, params)
+        if validation_error != "":
+            return params, self._mcp_local_error_response(-32602, "Invalid params", validation_error), False
+
+        request_params, display_params = prepare_request(method, params)
+        status_text = self.ai_mcp_server.describe_status_event(method, request_params)
+        self._emit_mcp_status(signals, chat_idx, status_text)
+        _request, response = self._run_mcp_request(method, request_params)
+        return display_params, response, True
 
     def _compact_mcp_result_content(self, method_name: str, method_params: Dict[str, Any],
                                     rpc_response: Dict[str, Any]) -> str:
@@ -7041,7 +7286,10 @@ data collected. This information will accompany every prompt sent to the AI, res
         return {
             "type": "object",
             "properties": {
-                "enough_information": {"type": "boolean"},
+                "action": {
+                    "type": "string",
+                    "enum": ["call_mcp", "final_answer", "ask_user"],
+                },
                 "reflection_summary": {"type": "string"},
                 "next_step_note": {"type": "string"},
                 "methodology_decision": {
@@ -7058,7 +7306,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "answer_brief": {"type": "string"},
             },
             "required": [
-                "enough_information",
+                "action",
                 "reflection_summary",
                 "next_step_note",
                 "methodology_decision",
@@ -7070,6 +7318,52 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "proposed_next_calls",
                 "revised_calls",
                 "answer_brief",
+            ],
+            "allOf": [
+                {
+                    "if": {"properties": {"action": {"const": "call_mcp"}}},
+                    "then": {
+                        "anyOf": [
+                            {"properties": {"revised_calls": {"type": "array", "items": call_schema, "minItems": 1}}},
+                            {"properties": {"continue_deferred_calls": {"const": True}}},
+                        ],
+                        "properties": {
+                            "methodology_decision": {
+                                "enum": ["allow", "allow_with_caveat"],
+                            },
+                            "user_decision_required": {"const": False},
+                            "decision_question": {"const": ""},
+                            "decision_context": {"const": ""},
+                        },
+                    },
+                },
+                {
+                    "if": {"properties": {"action": {"const": "final_answer"}}},
+                    "then": {
+                        "properties": {
+                            "user_decision_required": {"const": False},
+                            "decision_question": {"const": ""},
+                            "decision_context": {"const": ""},
+                            "continue_deferred_calls": {"const": False},
+                            "proposed_next_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                            "revised_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                        },
+                    },
+                },
+                {
+                    "if": {"properties": {"action": {"const": "ask_user"}}},
+                    "then": {
+                        "properties": {
+                            "methodology_decision": {
+                                "enum": ["allow", "allow_with_caveat"],
+                            },
+                            "continue_deferred_calls": {"const": False},
+                            "user_decision_required": {"const": True},
+                            "decision_question": {"type": "string", "minLength": 1},
+                            "revised_calls": {"type": "array", "items": call_schema, "maxItems": 0},
+                        },
+                    },
+                },
             ],
             "additionalProperties": False,
         }
@@ -7484,6 +7778,81 @@ data collected. This information will accompany every prompt sent to the AI, res
         if str(planner_action).strip().lower() != "call_mcp":
             return False
         return len(planned_calls) == 0
+
+    def _parse_mcp_reflection_response(self, reflection_data: Any, allowed_methods: set[str],
+                                       max_queued_calls: int, max_calls_per_round: int) -> Dict[str, Any]:
+        """Normalize one reflection JSON payload into controller state."""
+
+        data = reflection_data if isinstance(reflection_data, dict) else {}
+        reflection_summary = str(data.get("reflection_summary", "")).strip()
+        next_step_note = str(data.get("next_step_note", "")).strip()
+        answer_brief = str(data.get("answer_brief", "")).strip()
+        methodology_gate = self._extract_methodology_gate(data)
+        user_decision_required = self._json_bool(data.get("user_decision_required", False), False)
+        decision_question = self._normalize_progress_note(data.get("decision_question", ""), max_length=600)
+        decision_context = self._normalize_progress_note(data.get("decision_context", ""), max_length=600)
+        if user_decision_required and decision_question == "":
+            decision_question = self._normalize_progress_note(
+                next_step_note if next_step_note != "" else reflection_summary,
+                max_length=600,
+            )
+        action = str(data.get("action", "")).strip().lower()
+        if action not in ("call_mcp", "final_answer", "ask_user"):
+            if user_decision_required:
+                action = "ask_user"
+            elif self._is_methodology_gate_blocking(methodology_gate):
+                action = "final_answer"
+            elif self._json_bool(data.get("enough_information", False), False):
+                action = "final_answer"
+            else:
+                action = "call_mcp"
+
+        continue_deferred_calls = self._json_bool(data.get("continue_deferred_calls", False), False)
+        revised_calls = self._normalize_mcp_calls(
+            data.get("revised_calls", []), allowed_methods, max_queued_calls
+        )
+        proposed_next_calls = self._normalize_mcp_calls(
+            data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
+        )
+
+        if self._is_methodology_gate_blocking(methodology_gate):
+            action = "final_answer"
+            continue_deferred_calls = False
+            revised_calls = []
+            proposed_next_calls = []
+            user_decision_required = False
+            decision_question = ""
+            decision_context = ""
+        elif action == "ask_user":
+            continue_deferred_calls = False
+            revised_calls = []
+        elif action == "final_answer":
+            if len(revised_calls) > 0 or continue_deferred_calls:
+                action = "call_mcp"
+            else:
+                continue_deferred_calls = False
+                proposed_next_calls = []
+                user_decision_required = False
+                decision_question = ""
+                decision_context = ""
+        elif action == "call_mcp":
+            user_decision_required = False
+            decision_question = ""
+            decision_context = ""
+
+        return {
+            "action": action,
+            "reflection_summary": reflection_summary,
+            "next_step_note": next_step_note,
+            "answer_brief": answer_brief,
+            "methodology_gate": methodology_gate,
+            "continue_deferred_calls": continue_deferred_calls,
+            "user_decision_required": user_decision_required,
+            "decision_question": decision_question,
+            "decision_context": decision_context,
+            "revised_calls": revised_calls,
+            "proposed_next_calls": proposed_next_calls,
+        }
 
     def _mcp_call_key(self, method: str, params: Dict[str, Any]) -> str:
         try:
@@ -8153,7 +8522,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             if planner_action != "call_mcp":
                 planned_calls = []
             if len(planned_calls) == 0 and stop_reason == "":
-                stop_reason = "enough_information"
+                stop_reason = "final_answer"
 
             for reflection_round in range(max_reflection_rounds) if len(planned_calls) > 0 else []:
                 if self.app.ai.is_current_run_canceled():
@@ -8162,6 +8531,7 @@ data collected. This information will accompany every prompt sent to the AI, res
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
                 executed_any_call = False
+                round_failures: List[Dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -8173,20 +8543,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                     params = call.get("params", {})
                     if not isinstance(params, dict):
                         params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                    else:
-                        request_params, display_params = _prepare_mcp_request(method, params)
-                        status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                        self._emit_mcp_status(signals, chat_idx, status_text)
-                        _request, response = self._run_mcp_request(method, request_params)
+                    display_params, response, executed_remotely = self._execute_validated_mcp_call(
+                        method,
+                        params,
+                        allowed_methods,
+                        _prepare_mcp_request,
+                        signals,
+                        chat_idx,
+                    )
+                    if executed_remotely:
                         total_tool_calls += 1
                         executed_any_call = True
                     append_tool_exchange(method, display_params if method in allowed_methods else params, response)
+                    failure_summary = self._summarize_mcp_failure(
+                        method,
+                        display_params if method in allowed_methods else params,
+                        response,
+                    )
+                    if failure_summary is not None:
+                        round_failures.append(failure_summary)
 
                 reflection_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_reflection_system_prompt())
                 reflection_prompt = "Reflect on sufficiency of the collected evidence and return JSON now."
@@ -8198,6 +8573,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls, ensure_ascii=False)
                     )
+                if len(round_failures) > 0:
+                    reflection_prompt += self._mcp_failure_feedback_block(round_failures)
                 append_single_instruct_log(
                     "reflection",
                     "user",
@@ -8226,26 +8603,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                     planned_calls = []
                     stop_reason = "reflection_timeout"
                     break
-                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                reflection_state = self._parse_mcp_reflection_response(
+                    reflection_data,
+                    allowed_methods,
+                    max_queued_calls,
+                    max_calls_per_round,
+                )
+                reflection_summary = reflection_state["reflection_summary"]
                 if reflection_summary != "":
                     latest_reflection_summary = reflection_summary
-                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                reflection_brief = reflection_state["answer_brief"]
                 if reflection_brief != "":
                     final_hint = reflection_brief
-                reflection_methodology_gate = self._extract_methodology_gate(reflection_data)
+                reflection_methodology_gate = reflection_state["methodology_gate"]
                 methodology_gate = self._merge_methodology_gate(methodology_gate, reflection_methodology_gate)
-                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
-                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
-                continue_deferred_calls = self._json_bool(
-                    reflection_data.get("continue_deferred_calls", False),
-                    False
-                )
-                revised_calls = self._normalize_mcp_calls(
-                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
-                )
-                proposed_next_calls = self._normalize_mcp_calls(
-                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
-                )
+                reflection_action = reflection_state["action"]
+                reflection_next_step_note = reflection_state["next_step_note"]
+                continue_deferred_calls = reflection_state["continue_deferred_calls"]
+                revised_calls = reflection_state["revised_calls"]
+                proposed_next_calls = reflection_state["proposed_next_calls"]
                 if continue_deferred_calls and len(deferred_calls) > 0:
                     revised_calls = self._merge_mcp_call_lists(revised_calls, deferred_calls, max_queued_calls)
                 short_reflection_note = self._short_reflection_next_step_note(
@@ -8258,9 +8634,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                     planned_calls = []
                     stop_reason = "methodology_" + reflection_methodology_gate["decision"]
                     break
-                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
-                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
-                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                user_decision_required = reflection_state["user_decision_required"]
+                decision_question = reflection_state["decision_question"]
+                decision_context = reflection_state["decision_context"]
                 if user_decision_required and decision_question == "":
                     decision_question = short_reflection_note
                 if user_decision_required and decision_question != "":
@@ -8274,9 +8650,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                     result["direct_ai_message"] = decision_question
                     stop_reason = "awaiting_user_decision"
                     break
-                if enough_information:
+                if reflection_action == "final_answer":
                     planned_calls = revised_calls
-                    stop_reason = "enough_information"
+                    stop_reason = "final_answer"
                     break
 
                 if len(revised_calls) == 0:
@@ -8888,7 +9264,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if url.host().casefold() == 'help':
             path_segments = [segment for segment in url.path().split('/') if segment]
             if path_segments[:1] == ['pages'] or path_segments[:1] == ['search']:
-                msg = _('This help link is only for internal AI help lookup, not for opening a help page.')
+                msg = _('Invalid help reference.')
                 Message(self.app, _('AI Agent'), msg, icon='warning').exec()
                 return True
             if path_segments[:1] == ['page']:

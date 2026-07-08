@@ -3391,17 +3391,23 @@ class AiLLM():
             self._clear_current_run_context()
                         
     def get_curr_language(self):
-        """Determine the current language of the UI and/or the project. 
-        Used to instruct the AI answering in the correct language. 
-        """ 
-        if self.app.settings.get('ai_language_ui', 'True') == 'True':
-            # get ui language
-            lang_long = {"de": "Deutsch", "en": "English", "es": "Español", "fr": "Français", "it": "Italiano", "pt": "Português"}
-            lang = lang_long[self.app.settings['language']] 
-            if lang is None:
+        """Determine the current language of the UI and/or the project.
+        Used to instruct the AI answering in the correct language.
+        """
+        if self.app.settings.get('ai_language_ui', 'True') != 'True':
+            lang = str(self.app.settings.get('ai_language', 'English')).strip()
+            if lang == '':
                 lang = 'English'
-        else:
-            lang = self.app.settings.get('ai_language', 'English')
+            return lang
+        lang_code = str(self.app.settings.get('language', 'en')).strip()
+        if lang_code == '':
+            return 'English'
+        locale = QtCore.QLocale(lang_code)
+        lang = str(locale.nativeLanguageName()).strip()
+        if lang == '':
+            lang = str(QtCore.QLocale.languageToString(locale.language())).strip()
+        if lang in ('', 'C', 'Default'):
+            lang = 'English'
         return lang
     
     def _get_response_format_json_schema(self, schema_name: str, schema: dict):

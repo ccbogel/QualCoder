@@ -844,6 +844,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
         self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
+        self.update_ai_menu_options()
 
     @staticmethod
     def _text_analysis_prompt_menu_leaf(relative_path: str) -> str:
@@ -893,6 +894,16 @@ class DialogCodeText(QtWidgets.QWidget):
                 populate_branch(submenu, child_branch)
 
         populate_branch(menu, menu_tree)
+
+    def _ai_menu_options_enabled(self) -> bool:
+        """Return whether AI-specific text-coding actions should be enabled."""
+
+        return self.app.settings.get('ai_enable', 'False') == 'True'
+
+    def update_ai_menu_options(self):
+        """Refresh AI-specific controls inside the text-coding workspace."""
+
+        self.ui.pushButton_ai_search.setEnabled(self._ai_menu_options_enabled())
 
     def _ai_search_scope_id(self):
         return id(self)
@@ -2405,7 +2416,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected_text != "":
             submenu_ai_text_analysis = menu.addMenu(_("AI Text Analysis"))
             submenu_ai_text_analysis.setToolTipsVisible(True)
-            if self.app.ai is not None and self.app.ai.is_ready():
+            if self._ai_menu_options_enabled():
                 submenu_ai_text_analysis.setEnabled(True)
                 prompts_catalog = AiAgentPromptsCatalog(self.app)
                 prompt_records = prompts_catalog.list_visible_prompt_variants(prompt_type='text_analysis')
