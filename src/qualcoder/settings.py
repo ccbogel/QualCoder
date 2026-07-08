@@ -26,6 +26,7 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 import qtawesome as qta
 import copy
 import re
+import unicodedata  # <- L normalize localized numerals when reading numeric combos
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .coder_names import DialogCoderNames
@@ -61,6 +62,74 @@ Notes
 - The zip package will be unpacked automatically when that language is used.
 - If a language exists both here and inside QualCoder, the newer file is used.
 """
+
+
+# Canonical values of the numeric combos in Settings, in the SAME order as the items defined in the .ui. The logic uses these values by INDEX, so
+# the translated label (e.g. '۱۰', '十' or even a corrupt label) is presentation only and never alters the stored value.
+FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  # <- L
+BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  # <- L
+CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  # <- L
+CHUNK_SIZES = [50000, 30000]                # comboBox_text_chunk_size  # <- L
+
+
+def _combo_value(combobox, values, default):  # <- L
+    """
+    Return the canonical value of the selected item, by index.
+
+    The combo's visible text goes through the translation function and may be localized
+    (fa: '50،000'; zh: '十') or corrupt (eo: '12 12 12 12'), so the text is NEVER parsed:
+    the item index identifies the value. As a safety net (invalid index), the text is
+    interpreted with _combo_int bounded to the range of 'values' and, ultimately,
+    'default' (the previous valid value) is returned.
+    """
+    idx = combobox.currentIndex()
+    if 0 <= idx < len(values):
+        return values[idx]
+    return _combo_int(combobox.currentText(), default=default,
+                      minimum=min(values), maximum=max(values))
+
+
+def _set_combo_by_value(combobox, values, value):  # <- L
+    """
+    Select in the combo the item whose canonical value matches, by index.
+
+    Replaces findText(str(value)): with translated or corrupt labels, findText cannot
+    match the text and the dialog always showed the first item instead of the user's
+    stored selection. By index, the selection is always honoured.
+    """
+    try:
+        combobox.setCurrentIndex(values.index(value))
+    except ValueError:
+        combobox.setCurrentIndex(0)
+
+
+def _combo_int(text, default=0, minimum=None, maximum=None):  # <- L
+    """
+    Convert a numeric combo's text to int, tolerating localization and guarding
+    against corrupt translations. Safety net for _combo_value.
+
+    Covers two real problems seen in the translation files:
+    1) Localized numerals: some translations (e.g. fa) use non-ASCII digits or
+       thousands separators (Arabic comma U+060C), so 'currentText()' returns
+       '50،000' and int() fails. We keep only the decimal digits, mapped to ASCII.
+    2) Duplicated or exorbitant numerals: other translations (e.g. eo) duplicate the
+       literal ('12' -> '12 12 12 12'), which would yield 12121212 and break the UI
+       (giant fonts). If 'minimum'/'maximum' are given and the value is out of range,
+       a warning is logged and 'default' (the previous valid value) is returned
+       instead of applying the corrupt number.
+    """
+    
+    digits = ''.join(
+        str(unicodedata.decimal(ch)) for ch in text
+        if unicodedata.decimal(ch, None) is not None
+    )
+    value = int(digits) if digits else default
+    if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
+        logger.warning(
+            "Numeric combo value out of range after translation: %r -> %s "
+            "(allowed %s..%s). Falling back to %s.", text, value, minimum, maximum, default)  # <- L
+        return default
+    return value
 
 
 class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
@@ -121,28 +190,12 @@ class DialogSettings(QtWidgets.QDialog):
         for index, snf in enumerate(speakernameformats):
             if snf == self.settings['speakernameformat']:
                 self.ui.comboBox_speaker.setCurrentIndex(index)
-        index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_fontsize.setCurrentIndex(index)
-        index = self.ui.comboBox_codetreefontsize.findText(str(self.settings['treefontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_codetreefontsize.setCurrentIndex(index)
 
-        index = self.ui.comboBox_docfontsize.findText(str(self.settings['docfontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_docfontsize.setCurrentIndex(index)
-
-        index = self.ui.comboBox_text_chunk_size.findText(str(self.settings['codetext_chunksize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_text_chunk_size.setCurrentIndex(index)
+        # Selection by canonical value (index), immune to translated or corrupt labels.
+        _set_combo_by_value(self.ui.comboBox_fontsize, FONT_SIZES, self.settings['fontsize'])
+        _set_combo_by_value(self.ui.comboBox_codetreefontsize, FONT_SIZES, self.settings['treefontsize'])
+        _set_combo_by_value(self.ui.comboBox_docfontsize, FONT_SIZES, self.settings['docfontsize'])
+        _set_combo_by_value(self.ui.comboBox_text_chunk_size, CHUNK_SIZES, self.settings['codetext_chunksize'])
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
         if self.settings['showids'] == 'True':
             self.ui.checkBox.setChecked(True)
@@ -163,11 +216,7 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
 
-        index = self.ui.comboBox_backups.findText(str(self.settings['backup_num']),
-                                                      QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_backups.setCurrentIndex(index)
+        _set_combo_by_value(self.ui.comboBox_backups, BACKUP_COUNTS, self.settings['backup_num'])  # <- L
 
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
@@ -178,11 +227,8 @@ class DialogSettings(QtWidgets.QDialog):
             if text_style == self.settings['report_text_context_style']:
                 self.ui.comboBox_text_style.setCurrentIndex(index)
 
-        index = self.ui.comboBox_surrounding_chars.findText(str(self.settings['report_text_context_characters']),
-                                                      QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_surrounding_chars.setCurrentIndex(index)
+        _set_combo_by_value(self.ui.comboBox_surrounding_chars, CONTEXT_CHARS,
+                            self.settings['report_text_context_characters'])  # <- L
         msg = _("Default folder for storing automatic backups and for file outputs.")
         self.ui.pushButton_choose_directory.setToolTip(msg)
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
@@ -711,9 +757,14 @@ class DialogSettings(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute('update project set codername=?', [self.settings['codername']])
         self.settings['font'] = self.ui.fontComboBox.currentText()
-        self.settings['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
-        self.settings['treefontsize'] = int(self.ui.comboBox_codetreefontsize.currentText())
-        self.settings['docfontsize'] = int(self.ui.comboBox_docfontsize.currentText())
+
+        # Read by index: the translated (or corrupt) label never alters the value <- L
+        self.settings['fontsize'] = _combo_value(self.ui.comboBox_fontsize, FONT_SIZES,
+                                                 self.app.settings['fontsize'])
+        self.settings['treefontsize'] = _combo_value(self.ui.comboBox_codetreefontsize, FONT_SIZES,
+                                                     self.app.settings['treefontsize'])  
+        self.settings['docfontsize'] = _combo_value(self.ui.comboBox_docfontsize, FONT_SIZES,
+                                                    self.app.settings['docfontsize'])  # <- L
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
             self.settings['showids'] = 'True'
@@ -728,7 +779,8 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['language'] != selected_language:
             restart_qualcoder = True
         self.settings['language'] = selected_language
-        self.settings['codetext_chunksize'] = int(self.ui.comboBox_text_chunk_size.currentText())
+        self.settings['codetext_chunksize'] = _combo_value(self.ui.comboBox_text_chunk_size, CHUNK_SIZES,
+                                                           self.app.settings['codetext_chunksize'])  # <- L
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
         if self.ui.checkBox_auto_backup.isChecked():
@@ -739,8 +791,11 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['backup_av_files'] = 'True'
         else:
             self.settings['backup_av_files'] = 'False'
-        self.settings['backup_num'] = int(self.ui.comboBox_backups.currentText())
-        self.settings['report_text_context_characters'] = int(self.ui.comboBox_surrounding_chars.currentText())
+        self.settings['backup_num'] = _combo_value(self.ui.comboBox_backups, BACKUP_COUNTS,
+                                                   self.app.settings['backup_num'])  # <- L
+        self.settings['report_text_context_characters'] = _combo_value(
+            self.ui.comboBox_surrounding_chars, CONTEXT_CHARS,
+            self.app.settings['report_text_context_characters'])  # <- L
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
         # AI settings
