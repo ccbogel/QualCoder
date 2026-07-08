@@ -27,10 +27,8 @@ import re
 import logging
 # from spellchecker import SpellChecker
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-import webbrowser
-import shutil  # for file copy operations in convert_to_source <- L
-from odf.opendocument import OpenDocumentText  # For ODT export <- L
-from odf.text import P as OdfParagraph  # For ODT export <- L
+from odf.opendocument import OpenDocumentText  # For ODT export
+from odf.text import P as OdfParagraph  # For ODT export
 from .add_item_name import DialogAddItemName
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
@@ -51,31 +49,18 @@ ATTRIBUTE_START_COLUMN = 4
 class DialogJournals(QtWidgets.QDialog):
     """  View, create, export, rename and delete journals. """
 
-    journals = []
-    header_labels = []
-    jid = None  # journal database jid
-    app = None
-    parent_text_edit = None
     textDialog = None
-    # variables for searching through journal(s)
-    search_indices = []  # A list of tuples of (journal name, match.start, match length)
-    search_index = 0
-    text_changed_flag = False
-    rows_hidden = False
-    qtimer = None
-    timer_msecs = 1500
-
-    # Timer to reduce overly sensitive key events
-    keypress_timer = 0
 
     def __init__(self, app, parent_text_edit, parent=None):
 
         super(DialogJournals, self).__init__(parent)  # overrride accept method
         self.app = app
         self.parent_text_edit = parent_text_edit
+        self.jid = None  # journal database jid
+        self.timer_msecs = 1500
         self.qtimer = QtCore.QTimer()
         self.qtimer.timeout.connect(self.update_database_text)
-        self.keypress_timer = datetime.datetime.now()
+        self.keypress_timer = datetime.datetime.now()  # Timer to reduce overly sensitive key events
         self.text_changed_flag = False
         self.rows_hidden = False
         QtWidgets.QDialog.__init__(self)
@@ -97,9 +82,11 @@ class DialogJournals(QtWidgets.QDialog):
             pass
         self.journals = []
         self.current_jid = None
-        self.search_indices = []
+        self.search_indices = []  # A list of tuples of (journal name, match.start, match length)
         self.search_index = 0
         self.attribute_labels_ordered = []
+        self.header_labels = []
+        self.header_value_type = []  # variable value type of header column
         self.load_journals()
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
@@ -597,7 +584,6 @@ class DialogJournals(QtWidgets.QDialog):
                     (self.journals[self.ui.tableWidget.currentRow()]['jentry'], now_date, self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
-        # TODO update the visual table entry for the date
 
     def text_changed(self):
         """ Used in combination with timer to update database entry. """
