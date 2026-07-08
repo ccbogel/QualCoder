@@ -291,11 +291,11 @@ class DialogSpeakers(QtWidgets.QDialog):
         # El orden pone Name: primero, luego los formatos con simbolo y al final Custom.
         # Order puts Name: first, then the symbol formats, and Custom last.
         self._identifiers: List[Tuple[str, str]] = [
-            ('name',    'Name :'),
-            ('hash',    '# Name :'),
-            ('at',      '@ Name :'),
-            ('bracket', '[ Name ]'),
-            ('brace',   '{ Name }'),
+            ('name',    'Name:'),
+            ('hash',    '#Name:'),
+            ('at',      '@Name:'),
+            ('bracket', '[Name]'),
+            ('brace',   '{Name}'),
             ('custom',  _('Custom (regex)')),
         ]
         combo = self.ui.comboBox_identifier
