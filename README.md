@@ -58,31 +58,28 @@ cd Downloads\QualCoder-master
 
 `run_from_source_Windows.bat`
 
+If you get errors using a bat file, then run the below commands instead.
+
 6. Install the virtual environment and required python modules. 
 
-The `py` command uses the most recent installed version of Python. The `py` command does not work on all Windows OS, you may instead replace `py` with `python3`. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.12`. See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
-The install may take up to 10 minutes. On some Windows systems you may need to replace the _py_ command with _python_ or _python3_ below: 
+
+The install may take up to 10 minutes. On some Windows systems you may need to replace the _python_ command with _py_ or _python3_ below: 
 
 ```bash
-py -m venv env
+python -m venv env
 env\Scripts\activate
-py -m pip install --upgrade pip
-py -m pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 7. Start QualCoder. by moving to the the inner src folder first:
 
 ```bash
 cd src
-py -m qualcoder
+python -m qualcoder
 ```
 
-If you are using python version 3.13 and get a dll error regarding the torch module when trying to run QualCoder. Install this torch version:
-
-```
-pip install torch==2.8.0
-```
 
 8. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
@@ -94,7 +91,7 @@ The command prompt will then remove the  *(env)* wording.
 
 If you are not using a virtual environment, as long as you are in the same drive letter, eg C:
 
-`py -m qualcoder`
+`python -m qualcoder`
 
 If you are using a virtual environment:
 
@@ -103,7 +100,7 @@ If you are using a virtual environment:
 ```
 env\Scripts\activate
 cd src
-py -m qualcoder
+python -m qualcoder
 ```
 
 ## MacOS
