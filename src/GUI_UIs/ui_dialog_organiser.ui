@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>190</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -98,9 +98,9 @@
      <widget class="QLabel" name="label_loaded_graph">
       <property name="geometry">
        <rect>
-        <x>260</x>
+        <x>420</x>
         <y>1</y>
-        <width>721</width>
+        <width>561</width>
         <height>46</height>
        </rect>
       </property>
@@ -114,7 +114,7 @@
      <widget class="QPushButton" name="pushButton_apply">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>250</x>
         <y>3</y>
         <width>91</width>
         <height>28</height>
@@ -125,6 +125,38 @@
       </property>
       <property name="text">
        <string>Apply</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_create_code">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add code</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_import_codebook">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Import and edit codebook</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
@@ -147,6 +179,8 @@
  <tabstops>
   <tabstop>pushButton_selectbranch</tabstop>
   <tabstop>pushButton_create_category</tabstop>
+  <tabstop>pushButton_create_code</tabstop>
+  <tabstop>pushButton_import_codebook</tabstop>
   <tabstop>pushButton_export</tabstop>
   <tabstop>graphicsView</tabstop>
  </tabstops>
