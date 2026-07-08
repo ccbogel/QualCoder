@@ -627,31 +627,31 @@ the bottom left and choose one of the options described below.
 
 {{AI_WARNING_BLOCK}}
 
-## [New Chat with the AI Agent](qualcoder://ai_agent_tab/new/new_general_chat)
+## [Chat with the AI Agent](qualcoder://ai_agent_tab/new/new_general_chat)
 
 - This is the default starting point for an open-ended analysis or any other task.
 - You can also ask for help using QualCoder.
 
 
-## [New topic exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)
+## [AI Topic Exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)
 
 - Search and explore a topic or question across the whole corpus of project data.
 - This option opens a dialog where you define the topic and select which data to include in the analysis.
 
 
-## [New text analysis](qualcoder://ai_agent_tab/new/new_text_analysis)
+## [AI Text Analysis](qualcoder://ai_agent_tab/new/new_text_analysis)
 
 - Analyse a selected text passage from your empirical material in detail.
 - This will switch to the text coding workspace and let you select a passage for analysis.
 
 
-## [New code analysis](qualcoder://ai_agent_tab/new/new_code_analysis)
+## [AI Code Analysis](qualcoder://ai_agent_tab/new/new_code_analysis)
 
 - Discuss your codings with the AI Agent, compare different codes, generate subcodes, or create reports.
 - This will also open a dialog to select the code(s) and data you want to include in the analysis.
 
 
-## Other options
+## Other Options
 - The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what 
 the AI Agent is allowed to do in your project.
 - Open the [AI menu](qualcoder://menu/ai) for more options, for example to edit predefined prompts in the
