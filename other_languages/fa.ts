@@ -1853,22 +1853,22 @@ To set a bookmark press B</source>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
         <source>-1</source>
-        <translation type="unfinished">1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
         <source>-2</source>
-        <translation type="unfinished">2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
         <source>-3</source>
-        <translation type="unfinished">3</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
         <source>-4</source>
-        <translation type="unfinished">4</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
@@ -3501,7 +3501,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="537"/>
         <source>1</source>
-        <translation type="unfinished">1 1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="538"/>
@@ -3639,17 +3639,17 @@ langauge = آن</translation>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
         <source>300</source>
-        <translation type="unfinished">۳۰۰</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
         <source>50000</source>
-        <translation type="unfinished">50،000</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="583"/>
         <source>30000</source>
-        <translation type="unfinished">30،000</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
