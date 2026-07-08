@@ -1848,7 +1848,7 @@ Por meti libromarkan gazetaron B</translation>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
 <source>0</source>
-<translation type="unfinished">0 0 0 0</translation>
+<translation type="unfinished"></translation>
 </message>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
@@ -1858,17 +1858,17 @@ Por meti libromarkan gazetaron B</translation>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
 <source>-2</source>
-<translation type="unfinished">2</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
 <source>-3</source>
-<translation type="unfinished">3</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
 <source>-4</source>
-<translation type="unfinished">4</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
@@ -3496,22 +3496,22 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="536"/>
 <source>0</source>
-<translation type="unfinished">0 0 0 0</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="537"/>
 <source>1</source>
-<translation type="unfinished">1 1 1 1</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="538"/>
 <source>2</source>
-<translation type="unfinished">2 2</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="539"/>
 <source>3</source>
-<translation type="unfinished">3 3 3 3</translation>
+<translation type="unfinished"></translation>
 </message>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="540"/>
@@ -3521,7 +3521,7 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
 <source>5</source>
-<translation type="unfinished">5 5 5</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
@@ -3599,7 +3599,7 @@ Langauge = ĝi</translation>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
 <source>8</source>
-<translation type="unfinished">8 8</translation>
+<translation type="unfinished"></translation>
 </message>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="574"/>
@@ -3609,7 +3609,7 @@ Langauge = ĝi</translation>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
 <source>12</source>
-<translation type="unfinished">12 12 12 12</translation>
+<translation type="unfinished"></translation>
 </message>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
@@ -3619,27 +3619,27 @@ Langauge = ĝi</translation>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
 <source>16</source>
-<translation type="unfinished">16 16</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
 <source>18</source>
-<translation type="unfinished">18 18 18 18</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="579"/>
 <source>100</source>
-<translation type="unfinished">100 100</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="580"/>
 <source>200</source>
-<translation type="unfinished">200 200 200 200</translation>
+<translation type="unfinished"></translation>
 </message>
 <message type="unfinished">
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
 <source>300</source>
-<translation type="unfinished">300 300 300</translation>
+<translation type="unfinished"></translation>
 </message>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
