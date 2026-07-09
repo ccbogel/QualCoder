@@ -67,6 +67,26 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
+def get_default_user_directory():
+    """Return a usable default directory for project dialogs and exports."""
+
+    documents_dir = QtCore.QStandardPaths.writableLocation(
+        QtCore.QStandardPaths.StandardLocation.DocumentsLocation
+    )
+    if documents_dir and os.path.isdir(documents_dir):
+        return documents_dir
+
+    home_dir = QtCore.QDir.homePath()
+    if home_dir and os.path.isdir(home_dir):
+        return home_dir
+
+    expanded_home = os.path.expanduser("~")
+    if expanded_home and os.path.isdir(expanded_home):
+        return expanded_home
+
+    return os.getcwd()
+
+
 def msecs_to_mins_and_secs(msecs):
     """ Convert milliseconds to minutes and seconds.
     msecs is an integer. Minutes and seconds output is a string."""
