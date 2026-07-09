@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-07 20:22+0200\n"
-"PO-Revision-Date: 2026-07-07 20:22+0200\n"
+"PO-Revision-Date: 2026-07-09 13:31+0200\n"
 "Last-Translator: maninthemiddle01\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de\n"
@@ -6160,7 +6160,7 @@ msgstr "Anzeige gelöscht"
 
 #: src\qualcoder\manage_files.py:467
 msgid "View"
-msgstr "Siehe"
+msgstr "Ansehen"
 
 #: src\qualcoder\manage_files.py:474
 msgid "Pdf pages to images"
