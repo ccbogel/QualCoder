@@ -56,7 +56,7 @@ from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import Message, ImportPlainTextCodes
+from qualcoder.helpers import get_default_user_directory, Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.information import manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
@@ -1275,7 +1275,7 @@ class App(object):
             'fontsize': 12,
             'docfontsize': 12,
             'treefontsize': 12,
-            'directory': os.path.join(os.path.expanduser('~'), "Documents"),
+            'directory': get_default_user_directory(),
             'showids': False,
             'language': self.get_initial_language_code(),
             'backup_on_open': True,
@@ -2038,6 +2038,7 @@ Click "Yes" to start now.')
                 doc_font_size,
                 doc_font_family,
                 heading_icon_name=heading_icon_name,
+                link_text_color=text_color,
             )
         )
 
@@ -2157,6 +2158,7 @@ Click "Yes" to start now.')
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
+        self.ui.actionAsk_the_AI_Agent.triggered.connect(self.ai_go_help_support)
         self.ui.actionAbout.setShortcut('Alt+Y')
         self.ui.actionAbout.triggered.connect(self.about)
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
@@ -2187,6 +2189,7 @@ Click "Yes" to start now.')
         except Exception as e_:
             logger.log(e_)
         self._setup_ai_chat_tab_sidebar_button()
+        self.update_ai_menu_options()
         
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
@@ -2295,6 +2298,7 @@ Click "Yes" to start now.')
         self.ui.actionCharts.setEnabled(False)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(False)
+        self.update_ai_menu_options()
 
     def show_menu_options(self):
         """ Project opened, show most menu options.
@@ -2343,6 +2347,30 @@ Click "Yes" to start now.')
         self.ui.actionCharts.setEnabled(True)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
+        self.update_ai_menu_options()
+
+    def update_ai_menu_options(self):
+        """Refresh all AI-related menu and widget enablement from current app state."""
+
+        project_open = str(getattr(self.app, 'project_name', '')).strip() != ''
+        ai_enabled = self.app.settings.get('ai_enable', 'False') == 'True'
+        ai_actions_enabled = project_open and ai_enabled
+
+        self.ui.actionAI_Edit_Project_Memo.setEnabled(project_open)
+        self.ui.actionAI_Rebuild_internal_memory.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_Agent.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_Agent_Sidebar.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_Search_and_Coding.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_assisted_coding.setEnabled(ai_actions_enabled)
+        self.ui.actionAsk_the_AI_Agent.setEnabled(ai_actions_enabled)
+
+        if self.ai_chat_tab_sidebar_button is not None:
+            self.ai_chat_tab_sidebar_button.setEnabled(ai_actions_enabled)
+
+        for widget in self.findChildren(QtWidgets.QWidget):
+            updater = getattr(widget, "update_ai_menu_options", None)
+            if callable(updater):
+                updater()
 
     def keyPressEvent(self, event):
         """ Used to open top level menus. """
@@ -3098,7 +3126,7 @@ Click "Yes" to start now.')
         previous_app = self.app
         self.app = App()
         if self.app.settings['directory'] == "":
-            self.app.settings['directory'] = os.path.join(os.path.expanduser('~'), "Documents")
+            self.app.settings['directory'] = get_default_user_directory()
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         project_path, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'])
@@ -3267,6 +3295,7 @@ Click "Yes" to start now.')
             self.app.ai.init_llm(self, rebuild_vectorstore=False)
         else:  
             self.app.ai.close()
+        self.update_ai_menu_options()
         self.ai_chat_window.refresh_placeholder_if_visible()
             
         # Change in coder names: Close all opened dialogs as coder names needs to change everywhere
@@ -3315,7 +3344,7 @@ Click "Yes" to start now.')
         default_directory = self.app.settings['directory']
         if path_ == "" or path_ is False:
             if default_directory == "":
-                default_directory = os.path.join(os.path.expanduser('~'), "Documents")
+                default_directory = get_default_user_directory()
             path_ = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                                _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
@@ -3935,6 +3964,7 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
         self.app.ai.init_llm(self, rebuild_vectorstore=False, enable_ai=True)
+        self.update_ai_menu_options()
         self.ai_chat_window.refresh_placeholder_if_visible()
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
         if self.app.settings['ai_enable'] == 'True':
@@ -3992,6 +4022,20 @@ Click "Yes" to start now.')
         else:
             self.set_ai_chat_sidebar_mode(False, persist=False)
             self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+
+    def ai_go_help_support(self):
+        """Action triggered by Help > Ask the AI Agent."""
+
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up in Settings.')
+            Message(self.app, _('AI Agent'), msg).exec()
+            return
+        if self.ai_chat_sidebar_mode:
+            self.set_ai_chat_sidebar_mode(True, persist=False)
+        else:
+            self.set_ai_chat_sidebar_mode(False, persist=False)
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+        self.ai_chat_window.new_help_support_chat()
 
     def ai_go_search(self):
         """ Action triggered by AI Search and Coding menu item."""

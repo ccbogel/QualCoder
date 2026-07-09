@@ -1961,6 +1961,14 @@ class DialogAIChat(QtWidgets.QDialog):
             return True
         return False
 
+    def _trigger_new_chat_menu_action(self, action: QtGui.QAction) -> None:
+        """Dispatch one clicked New-session menu action after the popup closes."""
+
+        target = str(action.data() if action is not None and action.data() is not None else '').strip()
+        if target == '':
+            return
+        QtCore.QTimer.singleShot(0, lambda t=target: self._trigger_new_chat_menu_target(t))
+
     def _popup_new_chat_menu(self, highlight_target: Optional[str] = None) -> None:
         """Show the New-session menu below the button and optionally highlight one entry."""
 
@@ -1972,6 +1980,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self._new_chat_popup_menu = menu
         menu.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         menu.installEventFilter(self)
+        menu.triggered.connect(self._trigger_new_chat_menu_action)
 
         def cleanup_popup() -> None:
             if self._new_chat_popup_menu is menu:
@@ -5939,12 +5948,9 @@ data collected. This information will accompany every prompt sent to the AI, res
     """
 
     def button_new_clicked(self):
-        menu, _ = self._create_new_chat_menu()
-        action = menu.exec(self._new_chat_menu_global_pos())
-        if action is None:
-            return
-        target = str(action.data() if action.data() is not None else '').strip()
-        self._trigger_new_chat_menu_target(target)
+        """Open the shared New-session popup used by button and placeholder links."""
+
+        self._popup_new_chat_menu()
 
     def ai_output_scroll_to_bottom(self, minVal=None, maxVal=None):  # toDO minVal, maxVal unused
         #self._ai_output_scroll_to_bottom()

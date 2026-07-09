@@ -30,7 +30,7 @@ import unicodedata  # <- L normalize localized numerals when reading numeric com
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .coder_names import DialogCoderNames
-from .helpers import Message
+from .helpers import get_default_user_directory, Message
 from .ai_llm import get_available_models, add_new_ai_model
 
 home = os.path.expanduser('~')
@@ -219,7 +219,7 @@ class DialogSettings(QtWidgets.QDialog):
         _set_combo_by_value(self.ui.comboBox_backups, BACKUP_COUNTS, self.settings['backup_num'])
 
         if self.settings['directory'] == "":
-            self.settings['directory'] = os.path.join(os.path.expanduser("~"), "Documents")
+            self.settings['directory'] = get_default_user_directory()
         self.ui.label_directory.setText(self.settings['directory'])
         text_styles = [_('Bold'), _('Italic'), _('Bigger')]
         self.ui.comboBox_text_style.addItems(text_styles)
