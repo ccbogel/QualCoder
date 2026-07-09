@@ -3182,10 +3182,10 @@ class AiLLM():
             return self._status  # 'starting' and 'closing' are set by the corresponding procedures
         elif self.app.settings['ai_enable'] != 'True':
             return 'disabled'
+        elif self.sources_vectorstore is not None and self.sources_vectorstore.ai_worker_running():
+            return 'reading data'
         elif self.sources_vectorstore is None or not self.sources_vectorstore.is_open():
             return 'no data'
-        elif self.sources_vectorstore.ai_worker_running():
-            return 'reading data'
         elif self._large_llm_factory is None or self._fast_llm_factory is None or \
                 self._large_llm_params is None or self._fast_llm_params is None:
             return 'closed'
