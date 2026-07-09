@@ -2038,6 +2038,7 @@ Click "Yes" to start now.')
                 doc_font_size,
                 doc_font_family,
                 heading_icon_name=heading_icon_name,
+                link_text_color=text_color,
             )
         )
 
