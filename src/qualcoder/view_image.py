@@ -380,6 +380,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if len(bad_link_sql) > 0:
             bad_link_sql = f' and id not in ({bad_link_sql[1:]}) '
 
+        selection_model = self.ui.listWidget.selectionModel()
+        selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
         self.ui.listWidget.clear()
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath, risid from source where "  # Missing parentheses <- L
@@ -435,38 +437,68 @@ class DialogCodeImage(QtWidgets.QDialog):
             item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
         self.clear_file()
+        del selection_blocker
 
-    def get_files_from_attributes(self):
+    def get_files_from_attributes(self, refresh_only: bool = False):
         """ Select files based on attribute selections.
         Attribute results are a dictionary of:
         first item is a Boolean AND or OR list item
         Followed by each attribute list item
+
+        Args:
+            refresh_only: Recompute an already active attribute filter without reopening
+                the selection dialog.
         """
+
+        if refresh_only and len(self.attributes) <= 1:
+            return
 
         # Clear ui
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
         ui = DialogSelectAttributeParameters(self.app)
-        ui.fill_parameters(self.attributes)
+        previous_attributes = deepcopy(self.attributes)
+        ui.fill_parameters(deepcopy(self.attributes))
         temp_attributes = deepcopy(self.attributes)
-        self.attributes = []
-        ok = ui.exec()
-        if not ok:
-            self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
-            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
-            if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
-            return
+        if refresh_only:
+            ui.make_parameter_list()
+            ui.get_results_case_ids()
+            ui.get_results_file_ids()
+            ui.get_results_message()
+        else:
+            self.attributes = []
+            ok = ui.exec()
+            if not ok:
+                self.attributes = temp_attributes
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
+                self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+                if self.attributes:
+                    self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
+                return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
+            if refresh_only and len(previous_attributes) > 1:
+                self.clear_file_filter()
+                return
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
-            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            if not refresh_only:
+                Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
+                self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+                return
+            selection_model = self.ui.listWidget.selectionModel()
+            selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
             self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
-            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
+            self.ui.listWidget.clear()
+            self.files = []
+            self.clear_file()
+            self.ui.pushButton_clear_filter_file.setVisible(True)
+            self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
+            del selection_blocker
             return
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
@@ -949,7 +981,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if len(self.files) == 0:
             return
-        item_name = self.ui.listWidget.currentItem().text()
+        current_item = self.ui.listWidget.currentItem()
+        if current_item is None:
+            return
+        item_name = current_item.text()
         for f in self.files:
             if f['name'] == item_name:
                 self.file_ = f
@@ -1121,6 +1156,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        if ("attribute" in tables or "attribute_type" in tables) and len(self.attributes) > 1:
+            self.get_files_from_attributes(refresh_only=True)
 
         code_tree_changed = "code_cat" in tables or "code_name" in tables
         refresh_areas = "code_image" in tables or ("code_name" in tables and bool(self.code_areas))

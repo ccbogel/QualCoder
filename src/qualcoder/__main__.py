@@ -143,6 +143,13 @@ class ProjectEventBus(QtCore.QObject):
 
     project_data_changed = QtCore.pyqtSignal(list, object)
 
+    def __init__(self, parent=None):
+        """Queue project change notifications until the next event-loop turn."""
+
+        super().__init__(parent)
+        self._pending_table_changes = []
+        self._dispatch_scheduled = False
+
     def emit_table_changes(self, tables: list[str] | None, source=None):
         """Emit one project-change event for changed database tables.
 
@@ -157,7 +164,21 @@ class ProjectEventBus(QtCore.QObject):
             return
         if len(tables) == 0:
             return
-        self.project_data_changed.emit(tables, source)
+        self._pending_table_changes.append((list(tables), source))
+        if self._dispatch_scheduled:
+            return
+        self._dispatch_scheduled = True
+        QtCore.QTimer.singleShot(0, self._dispatch_pending_table_changes)
+
+    @QtCore.pyqtSlot()
+    def _dispatch_pending_table_changes(self):
+        """Emit pending project-change events after the current UI callback returns."""
+
+        self._dispatch_scheduled = False
+        pending = self._pending_table_changes
+        self._pending_table_changes = []
+        for tables, source in pending:
+            self.project_data_changed.emit(tables, source)
 
 
 class App(object):

@@ -217,6 +217,12 @@ class DialogCases(QtWidgets.QDialog):
         self.selected_case = None
         self.ui.textBrowser.clear()
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def insert_nonexisting_attribute_placeholders(self):
         """ Check attribute placeholder is present in attribute table.
         An error in earlier qualcoder versions did not fill these placeholders.
@@ -420,6 +426,7 @@ class DialogCases(QtWidgets.QDialog):
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
             cur.execute(sql, (name, "", id_[0], 'case', now_date, self.app.settings['codername']))
         self.app.conn.commit()
+        self._emit_project_table_changes(["attribute_type", "attribute"])
         self.load_cases_data()
         self.fill_table()
         self.parent_text_edit.append(_("Attribute added to cases: ") + f"{name}, {_('type:')} {value_type}")
@@ -515,6 +522,7 @@ class DialogCases(QtWidgets.QDialog):
                         cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
+        self._emit_project_table_changes(["cases", "attribute_type", "attribute"])
         self.load_cases_data()
         self.fill_table()
         msg = _("Cases and attributes imported from: ") + filepath
@@ -591,6 +599,7 @@ class DialogCases(QtWidgets.QDialog):
                         cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
+        self._emit_project_table_changes(["cases", "attribute_type", "attribute"])
         self.load_cases_data()
         self.fill_table()
         msg = _("Cases and attributes imported from: ") + filepath
@@ -717,6 +726,7 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute("update attribute set value=?, date=?, owner=? where id=? and name=? and attr_type='case'",
                         (value, now_date, self.app.settings['codername'], self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
+            self._emit_project_table_changes(["attribute"])
 
         # Update self.cases[attributes]
         # Add list of attribute values to files, order matches header columns
