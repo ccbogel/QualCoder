@@ -24,7 +24,8 @@ https://qualcoder-org.github.io
 import sqlite3
 from copy import copy, deepcopy
 import datetime
-import difflib
+# import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
+import diff_match_patch
 import logging
 import os
 import platform
@@ -3597,64 +3598,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    '''def change_text_code_pos(self, location, start_or_end):
-        """ Change code start or end character position in text.
-        param:
-            location: integer
-            start_or_end: 'start' or 'end' """
-
-        if self.file_ is None:
-            return
-        code_list = []
-        for item in self.code_text:
-            if item['pos0'] <= location <= item['pos1'] and item['owner'] == \
-                    self.app.settings['codername']:
-                code_list.append(item)
-        if not code_list:
-            return
-        code_to_edit = None
-        if len(code_list) == 1:
-            code_to_edit = code_list[0]
-        # multiple codes to select from
-        if len(code_list) > 1:
-            ui = DialogSelectItems(self.app, code_list, _("Select code to unmark"), "single")
-            ok = ui.exec()
-            if not ok:
-                return
-            code_to_edit = ui.get_selected()
-        if code_to_edit is None:
-            return
-        txt_len = len(self.ui.plainTextEdit.toPlainText())
-        changed_start = 0
-        changed_end = 0
-        if start_or_end == "start":
-            max_ = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
-            min_ = -1 * code_to_edit['pos0']
-            changed_start, ok = QtWidgets.QInputDialog.getInt(self, _("Change start position"), _(
-                "Change start character position.\nPositive or negative number:"), 0, min_, max_, 1)
-            if not ok:
-                return
-        if start_or_end == "end":
-            max_ = txt_len - code_to_edit['pos1']
-            min_ = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
-            changed_end, ok = QtWidgets.QInputDialog.getInt(self, _("Change end position"), _(
-                "Change end character position.\nPositive or negative number:"), 0, min_, max_, 1)
-            if not ok:
-                return
-        if changed_start == 0 and changed_end == 0:
-            return
-        # Update database, reload code_text and highlights
-        new_pos0 = code_to_edit['pos0'] + changed_start
-        new_pos1 = code_to_edit['pos1'] + changed_end
-        cur = self.app.conn.cursor()
-        sql = "update code_text set pos0=?, pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-        cur.execute(sql,
-                    (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'],
-                     code_to_edit['pos1'], self.app.settings['codername']))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        self.get_coded_text_update_eventfilter_tooltips()'''
-
     def play_text(self, avid):
         """ Play the audio/video for this coded text selection that is mapped to an a/v segment. """
 
@@ -4716,7 +4659,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.abs_path = self.file_['mediapath'][6:]
         self.is_paused = True
         # Variables used for editing the transcribed text file
-        self.transcription = None
+        self.transcription = None # Will be a tuple of id, fulltext
         self.codetext = []
         self.annotations = []
         self.casetext = []
@@ -4765,9 +4708,6 @@ class DialogViewAV(QtWidgets.QDialog):
         if self.transcription is not None:
             self.ui.textEdit.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
-            # Commented out as auto-filling speaker names annoys users
-            # self.get_speaker_names_from_bracketed_text()
-            # self.add_speaker_names_to_label()
         if self.transcription is None:
             # Check if an existing matching text entry name is present, despite no linkage to av source
             name = file_['name'] + ".txt"
@@ -4882,7 +4822,6 @@ class DialogViewAV(QtWidgets.QDialog):
         if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
         # Create a vlc instance
-        # Fix an Ubuntu error but, makes no difference self.instance = vlc.Instance("--no-xlib")
         # Fedora 39 NameError: no function 'libvlc_new'
         try:
             self.instance = vlc.Instance()
@@ -4890,7 +4829,6 @@ class DialogViewAV(QtWidgets.QDialog):
             logger.error(f"{name_err}")
             msg = f"{name_err}"
             Message(self.app, _("QualCoder will crash") + " " * 20, msg).exec()
-        # Ubuntu 22.04 hide - self.ddialog.hide() as vlc is not inside dialog
         # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
@@ -4962,6 +4900,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
 
+        self.ui.textEdit.textChanged.connect(self.update_positions)
+        self.textchanged_timer = QtCore.QTimer(self)
+        self.textchanged_timer.setInterval(100)
+        self.textchanged_timer.timeout.connect(self.update_database_text)
+
     def get_waveform(self):
         """ Create waveform image in the audio folder. Apply image to label_waveform.
         If a video file has multiple tracks only the first one is used for this method.
@@ -5017,21 +4960,21 @@ class DialogViewAV(QtWidgets.QDialog):
         self.codetext = []
         for r in res:
             self.codetext.append({'ctid': r[0], 'cid': r[1], 'pos0': r[2], 'pos1': r[3], 'seltext': r[4],
-                                  'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
+                                  'owner': r[5], 'newpos0': r[2], 'newpos1': r[3]})
         sql = "select anid, pos0, pos1 from annotation where fid=?"
         cur.execute(sql, [self.transcription[0]])
         res = cur.fetchall()
         self.annotations = []
         for r in res:
             self.annotations.append({'anid': r[0], 'pos0': r[1], 'pos1': r[2],
-                                     'npos0': r[1], 'npos1': r[2]})
+                                     'newpos0': r[1], 'newpos1': r[2]})
         sql = "select id, pos0, pos1 from case_text where fid=?"
         cur.execute(sql, [self.transcription[0]])
         res = cur.fetchall()
         self.casetext = []
         for r in res:
             self.casetext.append({'id': r[0], 'pos0': r[1], 'pos1': r[2],
-                                  'npos0': r[1], 'npos1': r[2]})
+                                  'newpos0': r[1], 'newpos1': r[2]})
         self.no_codes_annotes_cases = True
         if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
             self.no_codes_annotes_cases = False
@@ -5563,27 +5506,6 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.stop()
         self.ui.horizontalSlider.blockSignals(False)
 
-    def closeEvent(self, event):
-        """ Stop the vlc player on close.
-        Record the dialog and video dialog0 size and positions. """
-
-        self.update_sizes()
-        self.ddialog.close()
-        self.stop()
-        cur = self.app.conn.cursor()
-        if self.transcription is not None:
-            txt = self.ui.textEdit.toPlainText()
-            # self.transcription[0] is file id, [1] is the original text
-            if txt != self.transcription[1]:
-                date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                cur.execute("update source set fulltext=?, date=? where id=?", [txt, date, self.transcription[0]])
-                self.app.conn.commit()
-                # update transcript in vectorstore
-                if self.app.settings['ai_enable'] == 'True': 
-                    name = self.transcription[2]
-                    self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, txt)
-        self.app.delete_backup = False
-
     def update_sizes(self):
         """ Called by play/pause and close event """
 
@@ -5678,189 +5600,254 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
-    # Text edit editing and formatting functions
+    def closeEvent(self, event):
+        """ Stop the vlc player and timers on close.
+        Record the dialog and video dialog0 size and positions. """
+
+        self.update_sizes()
+        self.ddialog.close()
+        self.stop()
+        self.textchanged_timer.stop()
+        self.timer.stop()
+
+        current_text = self.ui.textEdit.toPlainText()
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("update source set fulltext=? where id=?", (current_text, self.transcription[0]))
+            for item in self.code_deletions:
+                cur.execute(item)
+            self.code_deletions = []
+            self.update_codings()
+            self.update_annotations()
+            self.update_casetext()
+            self.app.conn.commit()  # Commit all changes in one go to prevent database inconsistencies
+        except Exception as e_:
+            print(e_)
+            self.app.conn.rollback()
+            raise
+
+        # TODO move to update_database_text
+        cur = self.app.conn.cursor()
+        if self.transcription is not None:
+            txt = self.ui.textEdit.toPlainText()
+            # self.transcription[0] is file id, [1] is the original text
+            if txt != self.transcription[1]:
+                date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                cur.execute("update source set fulltext=?, date=? where id=?", [txt, date, self.transcription[0]])
+                self.update_codings()
+                self.update_annotations()
+                self.update_casetext()
+                self.app.conn.commit()
+                # update transcript in vectorstore
+                if self.app.settings['ai_enable'] == 'True':
+                    name = self.transcription[2]
+                    self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, txt)
+        self.app.delete_backup = False
+
+    def update_database_text(self):
+        """  """
+
+        print("TODO")
+
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
         via adding or deleting.
+        Called by text changed in textEdit.
 
-        Output: adding an e at pos 4:
-        ---
+        uses diff-match-patch module much faster than difflib with large text files that are
+        annotated, coded, cased.
+        consider diff_match_patch 20x faster
 
-        +++
+        diff_match_patch.diff_main() Output:
+        Adding X at pos 0
+            [(1, 'X'), (0, "I rea...")]
+        Adding X at pos 4
+            [(0, 'I re'), (1, 'X'), (0, "ally...")]
+        Adding X at end of file
+            [(0, "...appy to pay €200."), (1, 'X')]
+        Removing 'really'
+            [(0, 'I '), (-1, 'really'), (0, " like ...")]
 
-        @@ -4,0 +5 @@
-
-        +e
         """
+        self.has_changed = True  # mark contents as beeing changed
 
-        # No need to update positions (unless entire file is a case)
         if self.no_codes_annotes_cases:
             return
-        # cursor = self.ui.textEdit.textCursor()
         self.text = self.ui.textEdit.toPlainText()
-        # print("cursor", cursor.position())
-        # for d in difflib.unified_diff(self.prev_text, self.text):
-        # n is how many context lines to show
-        d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
-        if len(d) < 4:
-            return
-        char = d[3]
-        position = d[2][4:]  # Removes prefix @@ -
-        position = position[:-4]  # Removes suffix space@@\n
-        previous = position.split(" ")[0]
-        pre_start = int(previous.split(",")[0])
-        pre_chars = None
-        try:
-            pre_chars = previous.split(",")[1]
-        except IndexError:
-            pass
-        post = position.split(" ")[1]
-        post_start = int(post.split(",")[0])
-        post_chars = None
-        try:
-            post_chars = post.split(",")[1]
-        except IndexError:
-            pass
-        # print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
-        """
-        Replacing 'way' with 'the' start position 13
-        -w  previous 13 3  post 13 3
-
-        Replacing 's' with 'T'  (highlight s and replace with T
-        -s  previous 4 None  post 4 None
-        """
-        # No additions or deletions
-        if pre_start == post_start and pre_chars == post_chars:
-            self.highlight()
-            self.prev_text = copy(self.text)
-            return
-        """
-        Adding 'X' at inserted position 5, note: None as no number is provided from difflib
-        +X  previous 4 0  post 5 None
-
-        Adding 'qda' at inserted position 5 (After 'This')
-        +q  previous 4 0  post 5 3
-
-        Removing 'X' from position 5, note None
-        -X  previous 5 None  post 4 0
-
-        Removing 'the' from position 13
-        -t  previous 13 3  post 12 0
-        """
-        if pre_chars is None:
-            pre_chars = 1
-        pre_chars = -1 * int(pre_chars)  # String if not None
-        if post_chars is None:
-            post_chars = 1
-        post_chars = int(post_chars)  # String if not None
-        # print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        diff = diff_match_patch.diff_match_patch()
+        diff_list = diff.diff_main(self.prev_text, self.text)
+        # print(diff_list)
+        extending = True
+        preceding_pos = 0
+        chars_len = 0
+        pre_chars_len = 0
+        post_chars_len = 0
+        if len(diff_list) == 2 and diff_list[0][0] == 1:
+            # print("Add at start")
+            chars_len = len(diff_list[0][1])
+            pre_chars_len = 0
+            preceding_pos = 0
+        if len(diff_list) == 2 and diff_list[0][0] == -1:
+            # print("Remove from start")
+            extending = False
+            chars_len = len(diff_list[0][1])
+            pre_chars_len = 0
+            preceding_pos = 0
+            post_chars_len = len(diff_list[1][1])
+        if len(diff_list) == 2 and diff_list[1][0] == 1:
+            # print("Add at end")
+            chars_len = len(diff_list[1][1])
+            pre_chars_len = len(diff_list[0][1])
+            preceding_pos = pre_chars_len - 1
+        if len(diff_list) == 2 and diff_list[1][0] == -1:
+            # print("Remove from end")
+            extending = False
+            chars_len = len(diff_list[1][1])
+            post_chars_len = 0
+            pre_chars_len = len(diff_list[0][1])
+            preceding_pos = pre_chars_len - 1
+        if len(diff_list) == 3 and diff_list[1][0] == 1:
+            # print("Add in middle")
+            chars_len = len(diff_list[1][1])
+            pre_chars_len = len(diff_list[0][1])
+            preceding_pos = pre_chars_len - 1
+        if len(diff_list) == 3 and diff_list[1][0] == -1:
+            # print("Delete from middle")
+            extending = False
+            chars_len = len(diff_list[1][1])
+            pre_chars_len = len(diff_list[0][1])
+            preceding_pos = pre_chars_len - 1
+            post_chars_len = len(diff_list[2][1])
         # Adding characters
-        if char[0] == "+":
+        if extending:
             for c in self.codetext:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
+                    'newpos0'] >= preceding_pos - pre_chars_len:
+                    c['newpos0'] += chars_len
+                    c['newpos1'] += chars_len
                     changed = True
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
+                if not changed and c['newpos0'] is not None and c['newpos0'] < preceding_pos < c['newpos1']:
+                    c['newpos1'] += chars_len
             for c in self.annotations:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
+                    'newpos0'] >= preceding_pos - pre_chars_len:
+                    c['newpos0'] += chars_len
+                    c['newpos1'] += chars_len
                     changed = True
-                if not changed and c['npos0'] < pre_start < c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
+                    c['newpos1'] += chars_len
             for c in self.casetext:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
+                    'newpos0'] >= preceding_pos - pre_chars_len:
+                    c['newpos0'] += chars_len
+                    c['newpos1'] += chars_len
                     changed = True
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
+                    c['newpos1'] += chars_len
             self.highlight()
             self.prev_text = copy(self.text)
             return
-
         # Removing characters
-        if char[0] == "-":
+        if not extending:
             for c in self.codetext:
                 changed = False
-                # print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
+                    'newpos0'] >= preceding_pos - pre_chars_len:
+                    c['newpos0'] -= chars_len
+                    c['newpos1'] -= chars_len
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
-                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and \
-                        c['npos1'] < pre_start + -1 * pre_chars + post_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and not changed and c['newpos0'] >= preceding_pos and \
+                        c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
+                    c['newpos0'] -= chars_len
+                    c['newpos1'] -= chars_len
                     changed = True
-                    self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
-                    c['npos0'] = None
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
-                    if c['npos1'] < c['npos0']:
-                        self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
-                        c['npos0'] = None
+                    self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
+                    c['newpos0'] = None
+                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos <= c['newpos1']:
+                    c['newpos1'] -= chars_len
+                    if c['newpos1'] < c['newpos0']:
+                        self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
+                        c['newpos0'] = None
             for c in self.annotations:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
+                    'newpos0'] >= preceding_pos - pre_chars_len:
+                    c['newpos0'] -= chars_len
+                    c['newpos1'] -= chars_len
                     changed = True
                     # Remove, as entire text is being removed (e.g. copy replace)
-                    # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                    # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                    if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and \
-                            c['npos1'] < pre_start + -1 * pre_chars + post_chars:
-                        c['npos0'] += pre_chars + post_chars
-                        c['npos1'] += pre_chars + post_chars
+                    if not changed and c['newpos0'] >= preceding_pos and c[
+                        'newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
+                        c['newpos0'] -= chars_len
+                        c['newpos1'] -= chars_len
                         changed = True
-                        self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
-                        c['npos0'] = None
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
-                    if c['npos1'] < c['npos0']:
-                        self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
-                        c['npos0'] = None
+                        self.code_deletions.append(f"delete from annotations where anid={c['anid']}")
+                        c['newpos0'] = None
+                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos <= c['newpos1']:
+                    c['newpos1'] -= chars_len
+                    if c['newpos1'] < c['newpos0']:
+                        self.code_deletions.append(f"delete from annotation where anid={c['anid']}")
+                        c['newpos0'] = None
             for c in self.casetext:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
+                    'newpos0'] >= preceding_pos - pre_chars_len:
+                    c['newpos0'] -= chars_len
+                    c['newpos1'] -= chars_len
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
-                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and \
-                        c['npos1'] < pre_start + -1 * pre_chars + post_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and not changed and c['newpos0'] >= preceding_pos and \
+                        c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
+                    c['newpos0'] -= chars_len
+                    c['newpos1'] -= chars_len
                     changed = True
-                    self.code_deletions.append("delete from case_text where id=" + str(c['id']))
-                    c['npos0'] = None
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
-                    if c['npos1'] < c['npos0']:
-                        self.code_deletions.append("delete from case_text where id=" + str(c['id']))
-                        c['npos0'] = None
+                    self.code_deletions.append(f"delete from case_text where id={c['id']}")
+                    c['newpos0'] = None
+                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos <= c['newpos1']:
+                    c['newpos1'] -= chars_len
+                    if c['newpos1'] < c['newpos0']:
+                        self.code_deletions.append(f"delete from case_text where id={c['id']}")
+                        c['newpos0'] = None
         self.highlight()
         self.prev_text = copy(self.text)
+
+    def update_casetext(self):
+        """ Update linked case text positions. """
+
+        sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
-        cur.execute("update source set fulltext=? where id=?", (self.text, self.transcription[0]))
-        self.app.conn.commit()
-        for item in self.code_deletions:
-            cur.execute(item)
-        self.code_deletions = []
-        self.update_codings()
-        self.update_annotations()
-        self.update_casetext()
+        for c in self.casetext:
+            if c['newpos0'] is not None:
+                cur.execute(sql, [c['newpos0'], c['newpos1'], c['id'], c['newpos0'], c['newpos1']])
+            if c['newpos1'] >= len(self.text):
+                cur.execute("delete from case_text where id=?", [c['id']])
+
+    def update_annotations(self):
+        """ Update annotation positions. """
+
+        sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
+        cur = self.app.conn.cursor()
+        for a in self.annotations:
+            if a['newpos0'] is not None:
+                cur.execute(sql, [a['newpos0'], a['newpos1'], a['anid'], a['newpos0'], a['newpos1']])
+            if a['newpos1'] >= len(self.text):
+                cur.execute("delete from annotation where anid=?", [a['anid']])
+
+    def update_codings(self):
+        """ Update coding positions and seltext. """
+
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+        for c in self.codetext:
+            if c['newpos0'] is not None:
+                seltext = self.text[c['newpos0']:c['newpos1']]
+                cur.execute(sql, [c['newpos0'], c['newpos1'], seltext, c['ctid']])
+            if c['newpos1'] >= len(self.text):
+                cur.execute("delete from code_text where ctid=?", [c['ctid']])
 
     def highlight(self):
         """ Add coding and annotation highlights. """
@@ -5873,23 +5860,23 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.textEdit.blockSignals(True)
         cursor = self.ui.textEdit.textCursor()
         for item in self.casetext:
-            if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            if item['newpos0'] is not None:
+                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.green)
                 cursor.setCharFormat(format_)
         for item in self.annotations:
-            if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            if item['newpos0'] is not None:
+                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.yellow)
                 cursor.setCharFormat(format_)
         for item in self.codetext:
-            if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            if item['newpos0'] is not None:
+                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
@@ -5909,39 +5896,4 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
 
-    def update_casetext(self):
-        """ Update linked case text positions. """
 
-        sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
-        cur = self.app.conn.cursor()
-        for c in self.casetext:
-            if c['npos0'] is not None:
-                cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
-            if c['npos1'] >= len(self.text):
-                cur.execute("delete from case_text where id=?", [c['id']])
-        self.app.conn.commit()
-
-    def update_annotations(self):
-        """ Update annotation positions. """
-
-        sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
-        cur = self.app.conn.cursor()
-        for a in self.annotations:
-            if a['npos0'] is not None:
-                cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
-            if a['npos1'] >= len(self.text):
-                cur.execute("delete from annotation where anid=?", [a['anid']])
-        self.app.conn.commit()
-
-    def update_codings(self):
-        """ Update coding positions and seltext. """
-
-        cur = self.app.conn.cursor()
-        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
-        for c in self.codetext:
-            if c['npos0'] is not None:
-                seltext = self.text[c['npos0']:c['npos1']]
-                cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
-            if c['npos1'] >= len(self.text):
-                cur.execute("delete from code_text where ctid=?", [c['ctid']])
-        self.app.conn.commit()
