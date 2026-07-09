@@ -66,13 +66,13 @@ Notes
 
 # Canonical values of the numeric combos in Settings, in the SAME order as the items defined in the .ui. The logic uses these values by INDEX, so
 # the translated label (e.g. '۱۰', '十' or even a corrupt label) is presentation only and never alters the stored value.
-FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  # <- L
-BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  # <- L
-CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  # <- L
-CHUNK_SIZES = [50000, 30000]                # comboBox_text_chunk_size  # <- L
+FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  
+BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  
+CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
+CHUNK_SIZES = [50000, 30000]                # comboBox_text_chunk_size  
 
 
-def _combo_value(combobox, values, default):  # <- L
+def _combo_value(combobox, values, default):  
     """
     Return the canonical value of the selected item, by index.
 
@@ -89,7 +89,7 @@ def _combo_value(combobox, values, default):  # <- L
                       minimum=min(values), maximum=max(values))
 
 
-def _set_combo_by_value(combobox, values, value):  # <- L
+def _set_combo_by_value(combobox, values, value):  
     """
     Select in the combo the item whose canonical value matches, by index.
 
@@ -216,10 +216,10 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
 
-        _set_combo_by_value(self.ui.comboBox_backups, BACKUP_COUNTS, self.settings['backup_num'])  # <- L
+        _set_combo_by_value(self.ui.comboBox_backups, BACKUP_COUNTS, self.settings['backup_num'])
 
         if self.settings['directory'] == "":
-            self.settings['directory'] = os.path.expanduser("~")
+            self.settings['directory'] = os.path.join(os.path.expanduser("~"), "Documents")
         self.ui.label_directory.setText(self.settings['directory'])
         text_styles = [_('Bold'), _('Italic'), _('Bigger')]
         self.ui.comboBox_text_style.addItems(text_styles)
@@ -228,7 +228,7 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ui.comboBox_text_style.setCurrentIndex(index)
 
         _set_combo_by_value(self.ui.comboBox_surrounding_chars, CONTEXT_CHARS,
-                            self.settings['report_text_context_characters'])  # <- L
+                            self.settings['report_text_context_characters'])
         msg = _("Default folder for storing automatic backups and for file outputs.")
         self.ui.pushButton_choose_directory.setToolTip(msg)
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
@@ -418,12 +418,19 @@ class DialogSettings(QtWidgets.QDialog):
             logger.error(err)
             Message(self.app, _("Add more languages..."), str(err), "warning").exec()
             return
-
         opened = QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(user_i18n_dir))
         if not opened:
             Message(self.app, _("Add more languages..."),
                     _("Could not open the user translation folder.") + "\n" + user_i18n_dir,
                     "warning").exec()
+        msg = _("Download additional language files from here:") + "\n"
+        msg += "https://github.com/ccbogel/QualCoder/tree/master/other_languages/\n"
+        msg += _("Put either the zip file or the .qm and .mo files into the folder") + " .qualcoder/i18n\n"
+        msg += "For example: sv.zip, or both the sv.mo and sv.qm files." + "\n"
+        msg += _("Then select that language in the dropdown box.") + "\n"
+        msg += _("Additional languages may not be the most current translations, and they may contain inaccurate translations.")  + "\n"
+        msg += _("Read the README.txt file in the i18n folder for more information.")
+        Message(self.app, _("Add more languages"), msg, "information").exec()
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -758,13 +765,13 @@ class DialogSettings(QtWidgets.QDialog):
                 cur.execute('update project set codername=?', [self.settings['codername']])
         self.settings['font'] = self.ui.fontComboBox.currentText()
 
-        # Read by index: the translated (or corrupt) label never alters the value <- L
+        # Read by index: the translated (or corrupt) label never alters the value
         self.settings['fontsize'] = _combo_value(self.ui.comboBox_fontsize, FONT_SIZES,
                                                  self.app.settings['fontsize'])
         self.settings['treefontsize'] = _combo_value(self.ui.comboBox_codetreefontsize, FONT_SIZES,
                                                      self.app.settings['treefontsize'])  
         self.settings['docfontsize'] = _combo_value(self.ui.comboBox_docfontsize, FONT_SIZES,
-                                                    self.app.settings['docfontsize'])  # <- L
+                                                    self.app.settings['docfontsize']) 
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
             self.settings['showids'] = 'True'
