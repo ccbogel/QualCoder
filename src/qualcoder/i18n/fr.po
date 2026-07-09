@@ -6,14 +6,14 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-09 10:11+0200\n"
-"PO-Revision-Date: 2026-07-09 11:01+0200\n"
+"PO-Revision-Date: 2026-07-09 11:10+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
 #: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1141
@@ -6868,8 +6868,8 @@ msgstr "Description de l’instruction : "
 msgid ""
 "Start a new chat with the AI Agent first with the \"New\" button on the left."
 msgstr ""
-"Commencez par lancer une nouvelle conversation avec l'agent IA en cliquant "
-"sur le bouton « Nouveau » situé à gauche."
+"Commencez par lancer une nouvelle session avec l'agent IA en cliquant sur le "
+"bouton « Nouveau » situé à gauche."
 
 #: src/qualcoder/ai_chat.py:999 src/qualcoder/ai_chat.py:1995
 #: src/qualcoder/ai_chat.py:2228 src/qualcoder/ai_chat.py:2450
@@ -6886,7 +6886,7 @@ msgstr "Autorisations IA :"
 
 #: src/qualcoder/ai_chat.py:1892
 msgid "New Chat with the AI Agent"
-msgstr "Nouvelle conversation avec l’Agent IA"
+msgstr "Nouvelle session avec l’agent IA"
 
 #: src/qualcoder/ai_chat.py:1893
 msgid "Analyze your data together with an AI Agent."
@@ -7181,8 +7181,8 @@ msgstr ""
 "Seuls {loaded} des {total} segments codés ({coverage:.1f} %) ont pu être "
 "chargés avant que la limite de caractères ne soit atteinte. Veuillez "
 "restreindre la portée par code, fichiers, cas, attributs ou codeur⋅euses. Si "
-"vous souhaitez tout de même continuer, envoyez un message de suivi tel que « "
-"Analyser quand même »."
+"vous souhaitez tout de même continuer, envoyez un message de suivi tel que "
+"« Analyser quand même »."
 
 #: src/qualcoder/ai_chat.py:4507
 msgid "Error during MCP-based code analysis bootstrap: "
@@ -7426,7 +7426,7 @@ msgstr "(référence inconnue)"
 
 #: src/qualcoder/ai_chat.py:8788
 msgid "Error during MCP-based AI agent chat: "
-msgstr "Erreur lors d'une conversation avec un agent IA basé sur le MCP : "
+msgstr "Erreur lors d'une session avec un agent IA basé sur le MCP : "
 
 #: src/qualcoder/ai_chat.py:8798
 msgid "Error: Invalid result from MCP AI agent chat worker."
@@ -7454,7 +7454,7 @@ msgstr ""
 #: src/qualcoder/ai_chat.py:8955 src/qualcoder/ai_chat.py:8961
 msgid "Chat has been canceled by the user. The partial response was kept."
 msgstr ""
-"La conversation a été annulée par l'utilisateur. La réponse partielle a été "
+"La session a été annulée par l'utilisateur. La réponse partielle a été "
 "conservée."
 
 #: src/qualcoder/ai_chat.py:8967
@@ -7777,8 +7777,8 @@ msgstr ""
 #, python-brace-format
 msgid "Warning: {count} affected coding(s) are not owned by 'AI Agent'."
 msgstr ""
-"Avertissement : les {count} codes concernés n'appartiennent pas à « AI Agent "
-"»."
+"Avertissement : les {count} codes concernés n'appartiennent pas à « AI "
+"Agent »."
 
 #: src/qualcoder/ai_mcp_server.py:1619
 msgid ""
