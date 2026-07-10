@@ -615,6 +615,8 @@ class AiLLM():
         self._fast_llm_factory = None
         self._large_reasoning_effort = ''
         self._fast_reasoning_effort = ''
+        self._unsupported_llm_params_lock = threading.RLock()
+        self._unsupported_llm_params_by_key = {}
 
     def _ai_log_target_path(self) -> str:
         """Return the file path for the dedicated AI communication log."""
@@ -721,6 +723,117 @@ class AiLLM():
         if 0 <= model_idx < len(self.app.ai_models):
             return str(self.app.ai_models[model_idx].get('name', '')).strip()
         return 'unknown'
+
+    def _llm_provider_name(self, factory) -> str:
+        return 'azure' if factory is AzureChatOpenAI else 'openai'
+
+    def _llm_setup_for_kind(self, model_kind: str):
+        normalized_kind = 'fast' if str(model_kind).strip().lower() == 'fast' else 'large'
+        if normalized_kind == 'fast':
+            return normalized_kind, self._fast_llm_params, self._fast_llm_factory
+        return normalized_kind, self._large_llm_params, self._large_llm_factory
+
+    def _llm_profile_key(self, factory, base_params: dict | None) -> tuple[str, str, str]:
+        if base_params is None:
+            return self._llm_provider_name(factory), '', ''
+        model_name = str(
+            base_params.get('model', '') or
+            base_params.get('azure_deployment', '') or
+            base_params.get('deployment_name', '')
+        ).strip().lower()
+        endpoint = str(
+            base_params.get('openai_api_base', '') or
+            base_params.get('azure_endpoint', '')
+        ).strip().lower()
+        return self._llm_provider_name(factory), endpoint, model_name
+
+    def _filtered_llm_base_params(self, factory, base_params: dict | None) -> dict:
+        if base_params is None:
+            return {}
+        filtered_params = dict(base_params)
+        key = self._llm_profile_key(factory, base_params)
+        with self._unsupported_llm_params_lock:
+            unsupported_params = set(self._unsupported_llm_params_by_key.get(key, set()))
+        for param_name in unsupported_params:
+            filtered_params.pop(param_name, None)
+        return filtered_params
+
+    def _remember_unsupported_llm_param(self, factory, base_params: dict | None, param_name: str) -> bool:
+        normalized_name = str(param_name).strip()
+        if normalized_name == '' or base_params is None:
+            return False
+        key = self._llm_profile_key(factory, base_params)
+        with self._unsupported_llm_params_lock:
+            known_params = set(self._unsupported_llm_params_by_key.get(key, set()))
+            was_new = normalized_name not in known_params
+            known_params.add(normalized_name)
+            self._unsupported_llm_params_by_key[key] = known_params
+        return was_new
+
+    def _close_http_client(self, client) -> None:
+        if client is None:
+            return
+        try:
+            client.close()
+        except Exception:
+            pass
+
+    def _build_llm_for_run(self, factory, base_params: dict | None, model_kind: str, purpose: str):
+        timeout_obj = self._run_timeout(model_kind, purpose)
+        http_client = httpx.Client(timeout=timeout_obj)
+        llm_params = self._filtered_llm_base_params(factory, base_params)
+        llm_params['timeout'] = timeout_obj
+        llm_params['http_client'] = http_client
+        llm = factory(**llm_params)
+        return llm, http_client
+
+    def _unsupported_param_from_message(self, message_text: str) -> str:
+        text = str(message_text).strip()
+        if text == '':
+            return ''
+        patterns = (
+            r"Unsupported parameter:\s*['\"]([^'\"]+)['\"]",
+            r"Parameter\s+['\"]([^'\"]+)['\"]\s+is\s+not\s+supported",
+            r"['\"]([^'\"]+)['\"]\s+is\s+not\s+supported\s+with\s+this\s+model",
+        )
+        for pattern in patterns:
+            match = re.search(pattern, text, flags=re.IGNORECASE)
+            if match is not None:
+                return str(match.group(1)).strip()
+        return ''
+
+    def _unsupported_param_from_error(self, err: BaseException) -> str:
+        for item in self._exception_chain(err):
+            if not isinstance(item, BadRequestError):
+                continue
+            param_name = str(getattr(item, 'param', '')).strip()
+            if param_name != '':
+                return param_name
+            body = getattr(item, 'body', None)
+            if isinstance(body, dict):
+                error_payload = body.get('error', body)
+                if isinstance(error_payload, dict):
+                    param_name = str(error_payload.get('param', '')).strip()
+                    if param_name != '':
+                        return param_name
+                    message_text = self._safe_to_text(error_payload.get('message', ''))
+                    param_name = self._unsupported_param_from_message(message_text)
+                    if param_name != '':
+                        return param_name
+            param_name = self._unsupported_param_from_message(self._safe_to_text(item))
+            if param_name != '':
+                return param_name
+        return ''
+
+    def log_llm_retry(self, req_id: int, llm, param_name: str, source: str, context: str = ''):
+        """Log one automatic retry triggered by an unsupported parameter error."""
+
+        model_name = self._llm_name_for_log(llm)
+        line = f'[#{req_id}] RETRY model="{model_name}"'
+        if context.strip() != '':
+            line += f' context="{context.strip()}"'
+        line += f' unsupported_parameter="{str(param_name).strip()}" source="{str(source).strip()}"'
+        self._write_ai_log(line)
 
     def _message_role_and_text_for_log(self, msg) -> tuple[str, str]:
         if isinstance(msg, SystemMessage):
@@ -901,21 +1014,78 @@ class AiLLM():
             pool=pool_timeout,
         )
 
+    def _rebuild_run_context_without_param(self, run_context: AiRunContext, param_name: str) -> bool:
+        normalized_kind, base_params, factory = self._llm_setup_for_kind(run_context.model_kind)
+        normalized_name = str(param_name).strip()
+        if base_params is None or factory is None or normalized_name == '':
+            return False
+        if normalized_name not in base_params:
+            return False
+        self._remember_unsupported_llm_param(factory, base_params, normalized_name)
+        old_client = getattr(run_context, 'http_client', None)
+        llm, http_client = self._build_llm_for_run(
+            factory,
+            base_params,
+            normalized_kind,
+            str(getattr(run_context, 'purpose', '')).strip(),
+        )
+        run_context.llm = llm
+        run_context.http_client = http_client
+        run_context.provider = self._llm_provider_name(factory)
+        self._close_http_client(old_client)
+        return True
+
+    def _retry_after_unsupported_parameter_error(self, run_context: AiRunContext, invoke_kwargs: dict | None,
+                                                 err: BaseException, attempted_params: set[str],
+                                                 req_id: int, context: str = '') -> tuple[bool, dict | None]:
+        param_name = self._unsupported_param_from_error(err)
+        if param_name == '' or param_name in attempted_params:
+            return False, invoke_kwargs
+
+        if invoke_kwargs is not None and param_name in invoke_kwargs:
+            retry_kwargs = dict(invoke_kwargs)
+            retry_kwargs.pop(param_name, None)
+            attempted_params.add(param_name)
+            self.log_llm_retry(req_id, run_context.llm, param_name, source='invoke', context=context)
+            return True, retry_kwargs
+
+        if not self._rebuild_run_context_without_param(run_context, param_name):
+            return False, invoke_kwargs
+
+        attempted_params.add(param_name)
+        self.log_llm_retry(req_id, run_context.llm, param_name, source='model', context=context)
+        return True, invoke_kwargs
+
+    def _invoke_with_unsupported_parameter_retry(self, run_context: AiRunContext, messages,
+                                                 invoke_kwargs: dict | None, req_id: int,
+                                                 context: str = ''):
+        current_kwargs = {} if invoke_kwargs is None else dict(invoke_kwargs)
+        attempted_params = set()
+        while True:
+            self._raise_if_run_canceled(run_context)
+            try:
+                return run_context.llm.invoke(messages, **current_kwargs)
+            except Exception as err:
+                retried, current_kwargs = self._retry_after_unsupported_parameter_error(
+                    run_context,
+                    current_kwargs,
+                    err,
+                    attempted_params,
+                    req_id,
+                    context=context,
+                )
+                if retried:
+                    continue
+                raise
+
     def _create_run_context(self, model_kind: str = 'large', purpose: str = '',
                             scope_type: str = '', scope_id=None, group_id: str = '',
                             parent_run_id: str = '', cancel_result=None) -> AiRunContext:
-        normalized_kind = 'fast' if str(model_kind).strip().lower() == 'fast' else 'large'
-        base_params = self._fast_llm_params if normalized_kind == 'fast' else self._large_llm_params
-        factory = self._fast_llm_factory if normalized_kind == 'fast' else self._large_llm_factory
+        normalized_kind, base_params, factory = self._llm_setup_for_kind(model_kind)
         if base_params is None or factory is None:
             raise RuntimeError('AI model configuration is not initialized.')
 
-        timeout_obj = self._run_timeout(normalized_kind, purpose)
-        http_client = httpx.Client(timeout=timeout_obj)
-        llm_params = dict(base_params)
-        llm_params['timeout'] = timeout_obj
-        llm_params['http_client'] = http_client
-        llm = factory(**llm_params)
+        llm, http_client = self._build_llm_for_run(factory, base_params, normalized_kind, purpose)
 
         return AiRunContext(
             run_id=self._next_run_id(),
@@ -928,7 +1098,7 @@ class AiLLM():
             cancel_result=cancel_result,
             http_client=http_client,
             llm=llm,
-            provider=('azure' if factory is AzureChatOpenAI else 'openai'),
+            provider=self._llm_provider_name(factory),
         )
 
     def _register_run_context(self, run_context: AiRunContext):
@@ -1168,13 +1338,21 @@ class AiLLM():
                 invoke_kwargs['response_format'] = response_format
             if config is not None:
                 invoke_kwargs['config'] = config
-            res = active_llm.invoke(messages, **invoke_kwargs)
+            res = self._invoke_with_unsupported_parameter_retry(
+                current_context,
+                messages,
+                invoke_kwargs,
+                req_id,
+                context=context,
+            )
+            active_llm = current_context.llm
             self._raise_if_run_canceled(current_context)
         except Exception as err:
             if isinstance(err, AICancelled):
                 raise
             if current_context.cancel_event.is_set():
                 raise AICancelled(current_context.run_id)
+            active_llm = current_context.llm
             if str(current_context.model_kind).strip().lower() == 'fast':
                 self.log_llm_error(req_id, active_llm, err, context=f'{context}_fast_primary_error')
             try:
@@ -1235,7 +1413,14 @@ class AiLLM():
             fallback_context = self._create_run_context(model_kind='large', purpose='invoke')
             fallback_llm = fallback_context.llm
             fallback_req_id = self.log_llm_request(fallback_llm, messages, context=fallback_context_label)
-            res = fallback_llm.invoke(messages, **invoke_kwargs)
+            res = self._invoke_with_unsupported_parameter_retry(
+                fallback_context,
+                messages,
+                invoke_kwargs,
+                fallback_req_id,
+                context=fallback_context_label,
+            )
+            fallback_llm = fallback_context.llm
             self._raise_if_run_canceled(current_context)
             self.log_llm_response(fallback_req_id, fallback_llm, getattr(res, 'content', ''), context=fallback_context_label)
             return res
@@ -3263,6 +3448,8 @@ class AiLLM():
             self._latest_run_by_scope.clear()
             self._last_status_by_scope.clear()
             self._last_streaming_output_by_run.clear()
+        with self._unsupported_llm_params_lock:
+            self._unsupported_llm_params_by_key.clear()
         self._status = ''
         
     def cancel(self, ask: bool) -> bool:
@@ -3384,53 +3571,69 @@ class AiLLM():
         self._set_current_run_context(run_context)
         self._update_run_status(run_context.run_id, 'running')
         run_context.streaming_output = ''
-        active_llm = run_context.llm
-        req_id = self.log_llm_request(active_llm, messages, context='run_stream')
+        req_id = self.log_llm_request(run_context.llm, messages, context='run_stream')
         stream_iter = None
+        attempted_params = set()
         try:
-            self._raise_if_run_canceled(run_context)
-            stream_iter = active_llm.stream(messages)
-            run_context.stream_iter = stream_iter
-            for chunk in stream_iter:
-                if run_context.cancel_event.is_set():
-                    break  # cancel the streaming
-                else:
-                    chunk_text = str(getattr(chunk, 'content', ''))
-                    run_context.streaming_output += chunk_text
-                    if signals is not None:
-                        if signals.streaming is not None:
-                            signals.streaming.emit(chunk_text)
-                        if signals.progress is not None:
-                            self.run_progress_count += len(chunk_text)
-                            signals.progress.emit(str(self.run_progress_count))
-            if run_context.cancel_event.is_set():
-                self._update_run_status(run_context.run_id, 'canceled')
-        except Exception as err:
-            if run_context.cancel_event.is_set():
-                self._update_run_status(run_context.run_id, 'canceled')
-                res = run_context.streaming_output
-                self.clear_streaming_output(run_context.run_id)
-                return res
-            self._update_run_status(run_context.run_id, 'errored', self._safe_to_text(err))
-            self.log_llm_error(req_id, active_llm, err, context='run_stream')
-            # Some providers emit malformed trailing streaming events after content is already complete.
-            # Prefer returning the accumulated text instead of failing the whole turn.
-            if run_context.streaming_output != '' and self._allow_partial_stream_result_after_error(err):
-                res = run_context.streaming_output
-                self.clear_streaming_output(run_context.run_id)
-                if not run_context.cancel_event.is_set():
-                    self.log_llm_response(req_id, active_llm, res, context='run_stream_partial')
-                return res
-            raise
+            while True:
+                active_llm = run_context.llm
+                try:
+                    self._raise_if_run_canceled(run_context)
+                    stream_iter = active_llm.stream(messages)
+                    run_context.stream_iter = stream_iter
+                    for chunk in stream_iter:
+                        if run_context.cancel_event.is_set():
+                            break  # cancel the streaming
+                        chunk_text = str(getattr(chunk, 'content', ''))
+                        run_context.streaming_output += chunk_text
+                        if signals is not None:
+                            if signals.streaming is not None:
+                                signals.streaming.emit(chunk_text)
+                            if signals.progress is not None:
+                                self.run_progress_count += len(chunk_text)
+                                signals.progress.emit(str(self.run_progress_count))
+                    if run_context.cancel_event.is_set():
+                        self._update_run_status(run_context.run_id, 'canceled')
+                    break
+                except Exception as err:
+                    if run_context.cancel_event.is_set():
+                        self._update_run_status(run_context.run_id, 'canceled')
+                        res = run_context.streaming_output
+                        self.clear_streaming_output(run_context.run_id)
+                        return res
+                    if run_context.streaming_output == '':
+                        retried, _ = self._retry_after_unsupported_parameter_error(
+                            run_context,
+                            None,
+                            err,
+                            attempted_params,
+                            req_id,
+                            context='run_stream',
+                        )
+                        if retried:
+                            continue
+                    self._update_run_status(run_context.run_id, 'errored', self._safe_to_text(err))
+                    self.log_llm_error(req_id, run_context.llm, err, context='run_stream')
+                    # Some providers emit malformed trailing streaming events after content is already complete.
+                    # Prefer returning the accumulated text instead of failing the whole turn.
+                    if run_context.streaming_output != '' and self._allow_partial_stream_result_after_error(err):
+                        res = run_context.streaming_output
+                        self.clear_streaming_output(run_context.run_id)
+                        if not run_context.cancel_event.is_set():
+                            self.log_llm_response(req_id, run_context.llm, res, context='run_stream_partial')
+                        return res
+                    raise
+                finally:
+                    if stream_iter is not None and not run_context.cancel_event.is_set():
+                        close_fn = getattr(stream_iter, "close", None)
+                        if callable(close_fn):
+                            try:
+                                close_fn()
+                            except Exception as close_err:
+                                self.log_llm_error(req_id, active_llm, close_err, context='run_stream_close')
+                    run_context.stream_iter = None
+                    stream_iter = None
         finally:
-            if stream_iter is not None and not run_context.cancel_event.is_set():
-                close_fn = getattr(stream_iter, "close", None)
-                if callable(close_fn):
-                    try:
-                        close_fn()
-                    except Exception as close_err:
-                        self.log_llm_error(req_id, active_llm, close_err, context='run_stream_close')
-            run_context.stream_iter = None
             terminal_status = 'canceled' if run_context.cancel_event.is_set() else (
                 'errored' if run_context.error_text != '' else 'finished'
             )
@@ -3439,7 +3642,7 @@ class AiLLM():
         res = run_context.streaming_output
         self.clear_streaming_output(run_context.run_id)
         if not run_context.cancel_event.is_set():
-            self.log_llm_response(req_id, active_llm, res, context='run_stream')
+            self.log_llm_response(req_id, run_context.llm, res, context='run_stream')
         return res
 
     def start_query(self, func, result_callback, *args, progress_callback=None,
