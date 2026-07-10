@@ -1495,16 +1495,19 @@ class DialogCodeText(QtWidgets.QWidget):
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
 
-    def get_files(self, ids=None, sort="name asc"):
+    def get_files(self, ids=None, sort="name asc", preserve_current_file: bool = False):
         """ Get files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
          Args:
             ids : list, fill with ids to limit file selection.
             sort : String Sort options, name asc, name, desc, case asc, case desc
+            preserve_current_file: Reload the currently displayed file after rebuilding
+                the list when it is still present in the filtered result set.
          """
 
         if ids is None:
             ids = []
+        preserved_file = deepcopy(self.file_) if preserve_current_file and self.file_ is not None else None
         selection_model = self.ui.listWidget.selectionModel()
         selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
         self.ui.listWidget.clear()
@@ -1567,9 +1570,21 @@ class DialogCodeText(QtWidgets.QWidget):
             item = QtWidgets.QListWidgetItem(file_['name'])
             item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
-        self.file_ = None
-        self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
-        self.ui.plainTextEdit.setPlainText("")
+        restored = False
+        if preserved_file is not None:
+            for file_ in self.files:
+                if file_['id'] != preserved_file['id']:
+                    continue
+                for key in ("start", "end", "start_line"):
+                    if key in preserved_file:
+                        file_[key] = preserved_file[key]
+                self.load_file(file_)
+                restored = True
+                break
+        if not restored:
+            self.file_ = None
+            self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
+            self.ui.plainTextEdit.setPlainText("")
         del selection_blocker
 
     def update_file_tooltip(self):
@@ -1643,7 +1658,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 return
             self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
-            self.get_files()
+            self.get_files(preserve_current_file=True)
             return
         if not ui.result_file_ids:
             if not refresh_only:
@@ -1666,7 +1681,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
-        self.get_files(ui.result_file_ids)
+        self.get_files(ui.result_file_ids, preserve_current_file=True)
         self.ui.pushButton_clear_filter_file.setVisible(True)
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
 
