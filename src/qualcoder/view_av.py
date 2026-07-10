@@ -46,7 +46,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from .helpers import msecs_to_hours_mins_secs, Message, ToolTipEventFilter, CodeResizeHandle, \
-    init_persistent_tree_header, restore_persistent_tree_widths
+    init_persistent_tree_header, restore_persistent_tree_widths, ExportDirectoryPathDialog
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -4692,10 +4692,10 @@ class DialogViewAV(QtWidgets.QDialog):
             _("Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 (select speaker) Ctrl+D (delete speaker)"))
         tt = _("It is best to edit text before ANY coding has been applied.")
         tt += "\n" + _(
-            "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
+            "Avoid selecting sections of text with a combination of not underlined (not coded) and underlined (coded).")
         tt += "\n" + _(
-            "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
-        tt += "\n" + _("Text changes are automatically saved every 20 seconds.")
+            "Positions of the underlying codes / annotations / case-assigned may be incorrect if text is typed over or deleted.")
+        tt += "\n" + _("Auto-save: Text changes are automatically saved every 20 seconds.")
         self.ui.label_note.setToolTip(tt)
         self.ui.label_transcription.setToolTip(tt)
         self.ui.textEdit.installEventFilter(self)
@@ -5002,8 +5002,15 @@ class DialogViewAV(QtWidgets.QDialog):
             time.sleep(0.5)
             screen = QtWidgets.QApplication.primaryScreen()
             screenshot = screen.grabWindow(self.ddialog.winId())
-            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().astimezone().strftime(
-                "%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
+            filename = f'Frame_{datetime.datetime.now().astimezone().strftime("%Y%m%d_%H_%M_%S")}.jpg'
+            exp_directory = ExportDirectoryPathDialog(self.app, filename)
+            filepath = exp_directory.filepath
+            if filepath is None:
+                return
+            #TODO only black image saved
+            screenshot.save(filepath, 'jpg')
+            Message(self.app, _("Frame saved"), filepath).exec()
+            return
         if action == action_resize:
             w = self.ddialog.size().width()
             h = self.ddialog.size().height()
