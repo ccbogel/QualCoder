@@ -5000,16 +5000,14 @@ class DialogViewAV(QtWidgets.QDialog):
         action = menu.exec(self.ddialog.mapToGlobal(position))
         if action == action_screenshot:
             time.sleep(0.5)
-            screen = QtWidgets.QApplication.primaryScreen()
-            screenshot = screen.grabWindow(self.ddialog.winId())
             filename = f'Frame_{datetime.datetime.now().astimezone().strftime("%Y%m%d_%H_%M_%S")}.jpg'
             exp_directory = ExportDirectoryPathDialog(self.app, filename)
             filepath = exp_directory.filepath
             if filepath is None:
                 return
-            #TODO only black image saved
-            screenshot.save(filepath, 'jpg')
-            Message(self.app, _("Frame saved"), filepath).exec()
+            image = self.mediaplayer.video_take_snapshot(0, filepath, 0, 0)
+            if image == 0:
+                Message(self.app, _("Frame saved"), filepath).exec()
             return
         if action == action_resize:
             w = self.ddialog.size().width()
