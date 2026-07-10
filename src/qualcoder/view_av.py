@@ -4690,11 +4690,14 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_note.setText(
             _("Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 (select speaker) Ctrl+D (delete speaker)"))
-        tt = _(
+        tt = _("It is best to edit text before ANY coding has been applied.")
+        tt += "\n" + _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
-        tt += _(
+        tt += "\n" + _(
             "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
+        tt += "\n" + _("Text changes are automatically saved every 20 seconds.")
         self.ui.label_note.setToolTip(tt)
+        self.ui.label_transcription.setToolTip(tt)
         self.ui.textEdit.installEventFilter(self)
         self.installEventFilter(self)  # for rewind, play/stop, etc
         if platform.system() in ("Windows", "Darwin"):
@@ -4741,6 +4744,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.text = self.transcription[1]
         self.ui.textEdit.setPlainText(self.text)
         self.prev_text = copy(self.text)
+        self.text_has_changed = False
         self.highlight()
 
         self.ui.label_time_3.setPixmap(qta.icon('mdi6.clock-outline').pixmap(22, 22))
@@ -4902,7 +4906,8 @@ class DialogViewAV(QtWidgets.QDialog):
 
         self.ui.textEdit.textChanged.connect(self.update_positions)
         self.textchanged_timer = QtCore.QTimer(self)
-        self.textchanged_timer.setInterval(100)
+        self.textchanged_timer.setInterval(20000)  # 20 seconds
+        self.textchanged_timer.start()
         self.textchanged_timer.timeout.connect(self.update_database_text)
 
     def get_waveform(self):
@@ -5609,45 +5614,41 @@ class DialogViewAV(QtWidgets.QDialog):
         self.stop()
         self.textchanged_timer.stop()
         self.timer.stop()
+        self.update_database_text()
+        
+    def update_database_text(self):
+        """ Called every 10 seconds via textchanged_timer """
 
+        if not self.text_has_changed:
+            return
+        self.text_has_changed = False
         current_text = self.ui.textEdit.toPlainText()
         try:
             cur = self.app.conn.cursor()
-            cur.execute("update source set fulltext=? where id=?", (current_text, self.transcription[0]))
+            # self.transcription[0] is file id, [1] is the original text
+            date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("update source set fulltext=?, date=? where id=?", [current_text, date, self.transcription[0]])
             for item in self.code_deletions:
                 cur.execute(item)
             self.code_deletions = []
             self.update_codings()
+            self.codetext = []
             self.update_annotations()
+            self.annotations = []
             self.update_casetext()
+            self.casetext = []
             self.app.conn.commit()  # Commit all changes in one go to prevent database inconsistencies
+            # Update transcript in vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                name = self.transcription[2]
+                self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, current_text)
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()
             raise
-
-        # TODO move to update_database_text
-        cur = self.app.conn.cursor()
-        if self.transcription is not None:
-            txt = self.ui.textEdit.toPlainText()
-            # self.transcription[0] is file id, [1] is the original text
-            if txt != self.transcription[1]:
-                date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                cur.execute("update source set fulltext=?, date=? where id=?", [txt, date, self.transcription[0]])
-                self.update_codings()
-                self.update_annotations()
-                self.update_casetext()
-                self.app.conn.commit()
-                # update transcript in vectorstore
-                if self.app.settings['ai_enable'] == 'True':
-                    name = self.transcription[2]
-                    self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, txt)
+        self.text = current_text
+        self.prev_text = copy(self.text)
         self.app.delete_backup = False
-
-    def update_database_text(self):
-        """  """
-
-        print("TODO")
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
@@ -5669,7 +5670,7 @@ class DialogViewAV(QtWidgets.QDialog):
             [(0, 'I '), (-1, 'really'), (0, " like ...")]
 
         """
-        self.has_changed = True  # mark contents as beeing changed
+        self.text_has_changed = True
 
         if self.no_codes_annotes_cases:
             return
@@ -5832,7 +5833,7 @@ class DialogViewAV(QtWidgets.QDialog):
         sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for a in self.annotations:
-            if a['newpos0'] is not None:
+            if a['newpos0'] is not None and a['newpos0'] >= 0:
                 cur.execute(sql, [a['newpos0'], a['newpos1'], a['anid'], a['newpos0'], a['newpos1']])
             if a['newpos1'] >= len(self.text):
                 cur.execute("delete from annotation where anid=?", [a['anid']])
@@ -5843,7 +5844,7 @@ class DialogViewAV(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
         for c in self.codetext:
-            if c['newpos0'] is not None:
+            if c['newpos0'] is not None and c['newpos0'] >= 0:
                 seltext = self.text[c['newpos0']:c['newpos1']]
                 cur.execute(sql, [c['newpos0'], c['newpos1'], seltext, c['ctid']])
             if c['newpos1'] >= len(self.text):
@@ -5871,7 +5872,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
-                format_.setUnderlineColor(QtCore.Qt.GlobalColor.yellow)
+                format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
         for item in self.codetext:
             if item['newpos0'] is not None:
