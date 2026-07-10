@@ -79,24 +79,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.code_selection_mode = "all"
         self.selected_category_ids = []
         self.files = self.app.get_text_filenames()
-        # Get attributes
-        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
         self.attributes = []
-        keys = 'true_name', 'valuetype', 'caseOrFile', 'min', 'max'
-        for row in cur.fetchall():
-            self.attributes.append(dict(zip(keys, row)))
-        for attribute in self.attributes:
-            attribute['name'] = f"{attribute['true_name']} [{attribute['caseOrFile']}]"
-            if attribute['valuetype'] == 'numeric':
-                sql = "select cast(value as real) from attribute where name=? and attr_type=? and value is not null order by cast(value as real) asc"
-                cur.execute(sql, [attribute['true_name'], attribute['caseOrFile']])
-                res = cur.fetchall()
-                range = [r[0] for r in res]
-                if range:
-                    attribute['min'] = range[0]
-                    attribute['max'] = range[-1]
+        self._load_attributes()
 
         self.data = []
         self.max_count = 0
@@ -141,6 +125,28 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         fresh_code_map = {code["cid"]: code for code in fresh_codes}
         self.codes = [fresh_code_map[cid] for cid in previous_selected_ids if cid in fresh_code_map]
 
+    def _load_attributes(self):
+        """Load the cached attribute metadata used for selection."""
+
+        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        attributes = []
+        keys = 'true_name', 'valuetype', 'caseOrFile', 'min', 'max'
+        for row in cur.fetchall():
+            attributes.append(dict(zip(keys, row)))
+        for attribute in attributes:
+            attribute['name'] = f"{attribute['true_name']} [{attribute['caseOrFile']}]"
+            if attribute['valuetype'] == 'numeric':
+                sql = "select cast(value as real) from attribute where name=? and attr_type=? and value is not null order by cast(value as real) asc"
+                cur.execute(sql, [attribute['true_name'], attribute['caseOrFile']])
+                result = cur.fetchall()
+                value_range = [r[0] for r in result]
+                if value_range:
+                    attribute['min'] = value_range[0]
+                    attribute['max'] = value_range[-1]
+        self.attributes = attributes
+
     def _on_project_data_changed(self, tables, source):
         """Handle project change events from other dialogs.
 
@@ -152,6 +158,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        if "attribute" in tables or "attribute_type" in tables:
+            self._load_attributes()
         watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
         if watched_tables.isdisjoint(tables):
             return

@@ -171,6 +171,55 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
         self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
         self.load_file_data()
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
+    def _current_source_id(self):
+        """Return the currently focused source id, if any."""
+
+        row = self.ui.tableWidget.currentRow()
+        if row < 0:
+            return None
+        item = self.ui.tableWidget.item(row, self.ID_COLUMN)
+        if item is None:
+            return None
+        try:
+            return int(item.text())
+        except (TypeError, ValueError):
+            return None
+
+    def _restore_current_source(self, source_id):
+        """Restore the current table selection for one source id when possible."""
+
+        if source_id is None:
+            return
+        for row, source_item in enumerate(self.source):
+            if int(source_item.get("id", -1)) == int(source_id):
+                self.ui.tableWidget.setCurrentCell(row, self.NAME_COLUMN)
+                return
+
+    def _reload_after_attribute_change(self):
+        """Reload file data after an external attribute update."""
+
+        current_source_id = self._current_source_id()
+        self.load_file_data()
+        self._restore_current_source(current_source_id)
+
+    def _on_project_data_changed(self, tables, source):
+        """Refresh the file table when attributes change elsewhere."""
+
+        if source is self or not isinstance(tables, list):
+            return
+        changed_tables = set(tables)
+        if not changed_tables.intersection({"attribute", "attribute_type"}):
+            return
+        self._reload_after_attribute_change()
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -1409,6 +1458,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             logger.debug(str(e_))
             self.app.conn.rollback()  # Revert all changes
             raise
+        self._emit_project_table_changes(["attribute_type", "attribute"])
         self.load_file_data()
         self.fill_table()
         self.parent_text_edit.append(f'{_("Attribute added to files:")} {name}, {_("type")}: {value_type}')
@@ -1482,6 +1532,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
                         (value, self.source[x]['id'], attribute_name))
             self.app.conn.commit()
+            self._emit_project_table_changes(["attribute"])
 
             # Update self.source[attributes]
             # Add list of attribute values to files, order matches header columns
@@ -1845,6 +1896,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += f"\n{key} - {value}"
 
         self.app.conn.commit()
+        changed_tables = {"source"}
+        if attr_cols:
+            changed_tables.update({"attribute_type", "attribute"})
+        if case_cols:
+            changed_tables.update({"cases", "case_text"})
+        if autocode_enabled:
+            changed_tables.update({"code_name", "code_text"})
+        self._emit_project_table_changes(sorted(changed_tables))
         msg += f"\n{count} " + _("rows imported.")
         self.app.delete_backup = False
         self.update_files_in_dialogs()

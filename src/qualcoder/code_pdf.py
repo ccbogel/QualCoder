@@ -367,16 +367,21 @@ class DialogCodePdf(QtWidgets.QWidget):
             except ValueError:
                 pass
 
-    def get_files(self, ids=None, sort:str = "name asc"):
+    def get_files(self, ids=None, sort:str = "name asc", preserve_current_file: bool = False):
         """ Get pdf files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
          args:
          ids: list, fill with ids to limit file selection.
          sort : String Sort options, name asc, name, desc, case asc, case desc
+         preserve_current_file: Reload the currently displayed file after rebuilding
+             the list when it is still present in the filtered result set.
          """
 
         if ids is None:
             ids = []
+        preserved_file = deepcopy(self.file_) if preserve_current_file and self.file_ is not None else None
+        selection_model = self.ui.listWidget.selectionModel()
+        selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
         self.ui.listWidget.clear()
         self.files = self.app.get_pdf_filenames(ids)
         # Fill additional details about each file in the memo
@@ -433,9 +438,22 @@ class DialogCodePdf(QtWidgets.QWidget):
             item = QtWidgets.QListWidgetItem(file_['name'])
             item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
-        self.file_ = None
-        self.code_text = []  # Must be empty, before clearing textEdit, as next calls cursorChanged
-        self.ui.plainTextEdit.setPlainText("")
+        restored = False
+        if preserved_file is not None:
+            for file_ in self.files:
+                if file_['id'] != preserved_file['id']:
+                    continue
+                for key in ("start", "end", "start_line"):
+                    if key in preserved_file:
+                        file_[key] = preserved_file[key]
+                self.load_file(file_)
+                restored = True
+                break
+        if not restored:
+            self.file_ = None
+            self.code_text = []  # Must be empty, before clearing textEdit, as next calls cursorChanged
+            self.ui.plainTextEdit.setPlainText("")
+        del selection_blocker
 
     def update_file_tooltip(self):
         """ Create tooltip for file containing characters, codings and from: to: if partially loaded.
@@ -465,41 +483,72 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         items[0].setToolTip(tt)
 
-    def get_files_from_attributes(self):
+    def get_files_from_attributes(self, refresh_only: bool = False):
         """ Select files based on attribute selections.
         Attribute results are a dictionary of:
         first item is a Boolean AND or OR list item
         Followed by each attribute list item
+
+        Args:
+            refresh_only: Recompute an already active attribute filter without reopening
+                the selection dialog.
         """
+
+        if refresh_only and len(self.attributes) <= 1:
+            return
 
         # Clear ui
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
         ui = DialogSelectAttributeParameters(self.app)
-        ui.fill_parameters(self.attributes)
+        previous_attributes = deepcopy(self.attributes)
+        ui.fill_parameters(deepcopy(self.attributes))
         temp_attributes = deepcopy(self.attributes)
-        self.attributes = []
-        ok = ui.exec()
-        if not ok:
-            self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
-            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
-            if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
-            return
+        if refresh_only:
+            ui.make_parameter_list()
+            ui.get_results_case_ids()
+            ui.get_results_file_ids()
+            ui.get_results_message()
+        else:
+            self.attributes = []
+            ok = ui.exec()
+            if not ok:
+                self.attributes = temp_attributes
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
+                self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+                if self.attributes:
+                    self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
+                return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
+            if refresh_only and len(previous_attributes) > 1:
+                self.clear_file_filter()
+                return
             self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
-            self.get_files()
+            self.get_files(preserve_current_file=True)
             return
         if not ui.result_file_ids:
-            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
-            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if not refresh_only:
+                Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
+                self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+                return
+            selection_model = self.ui.listWidget.selectionModel()
+            selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
+            self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
+            self.ui.listWidget.clear()
+            self.files = []
+            self.file_ = None
+            self.code_text = []
+            self.ui.plainTextEdit.setPlainText("")
+            self.ui.pushButton_clear_filter_file.setVisible(True)
+            self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
+            del selection_blocker
             return
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
-        self.get_files(ui.result_file_ids)
+        self.get_files(ui.result_file_ids, preserve_current_file=True)
         self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter file <- L
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
 
@@ -2769,6 +2818,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        if ("attribute" in tables or "attribute_type" in tables) and len(self.attributes) > 1:
+            self.get_files_from_attributes(refresh_only=True)
 
         code_tree_changed = "code_cat" in tables or "code_name" in tables
         refresh_current_text = "code_text" in tables or ("code_name" in tables and bool(self.code_text))
@@ -3287,6 +3338,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ File selection changed. """
 
         row = self.ui.listWidget.currentRow()
+        if row < 0 or row >= len(self.files):
+            return
         self.load_file(self.files[row])
 
     def load_file(self, file_):

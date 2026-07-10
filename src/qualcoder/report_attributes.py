@@ -242,6 +242,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
 
         if not attribute_list:
             return
+        self.ui.tableWidget.blockSignals(True)
         first_attr = attribute_list.pop(0)
         radio_bool = first_attr[0]
         if radio_bool == "BOOLEAN_OR":
@@ -260,6 +261,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     val_text = val_text.replace("'", "")
                     self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).setText(val_text)
                     self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText(a[3])
+        self.ui.tableWidget.blockSignals(False)
 
     def make_parameter_list(self):
         """ Make a parameter list where operator and value are entered.

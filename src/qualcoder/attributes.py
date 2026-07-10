@@ -85,6 +85,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         for row in result:
             self.attributes.append(dict(zip(keys, row)))
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def count_selected_items(self):
         """ Update label with the count of selected items. """
 
@@ -144,6 +150,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
             cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.app.settings['codername']))
         self.app.conn.commit()
+        self._emit_project_table_changes(["attribute_type", "attribute"])
         self.fill_table_widget()
         self.parent_textEdit.append(f"{_('Attribute added: ')}{item['name']} -> {_(case_or_file)}")
 
@@ -170,6 +177,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
                     cur.execute("delete from attribute where name = ?", (name,))
                     cur.execute("delete from attribute_type where name = ?", (name,))
         self.app.conn.commit()
+        self._emit_project_table_changes(["attribute_type", "attribute"])
         self.attributes = []
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
@@ -196,6 +204,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update attribute_type set memo=? where name=?", (memo, self.attributes[x]['name']))
                 self.app.conn.commit()
+                self._emit_project_table_changes(["attribute_type"])
             if memo == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
@@ -224,6 +233,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             print(attr_name)
             cur.execute('update attribute_type set valuetype="character" where name=?', [attr_name])
             self.app.conn.commit()
+            self._emit_project_table_changes(["attribute_type"])
             self.get_attributes()
             self.fill_table_widget()
 
@@ -247,6 +257,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
                 cur.execute("update attribute_type set name=? where name=?", (new_name, self.attributes[x]['name']))
                 cur.execute("update attribute set name=? where name=?", (new_name, self.attributes[x]['name']))
                 self.app.conn.commit()
+                self._emit_project_table_changes(["attribute_type", "attribute"])
                 self.parent_textEdit.append(
                     _("Attribute renamed from: ") + self.attributes[x]['name'] + _(" to ") + new_name)
                 self.attributes[x]['name'] = new_name

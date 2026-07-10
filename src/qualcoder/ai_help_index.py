@@ -517,7 +517,10 @@ class AiHelpIndex:
             tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9._:/+-]*", query)
             if len(tokens) == 0:
                 continue
-            token_clause = " AND ".join(f'"{token.replace("\"", "\"\"")}"' for token in tokens[:10])
+            token_clause = " AND ".join(
+                '"' + token.replace('"', '""') + '"'
+                for token in tokens[:10]
+            )
             if token_clause != "":
                 clauses.append("(" + token_clause + ")")
         if len(clauses) == 0:

@@ -95,12 +95,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_coders.addItems(coders)
 
         self.attributes = []
-        cur.execute("select name, ifnull(memo,''), caseOrFile, valuetype from attribute_type")
-        result = cur.fetchall()
-        self.attributes = []
-        keys = 'name', 'memo', 'caseOrFile', 'valuetype'
-        for row in result:
-            self.attributes.append(dict(zip(keys, row)))
+        self._load_attributes()
         self.fill_combobox_attributes()
         self.ui.radioButton_file.clicked.connect(self.fill_combobox_attributes)
         self.ui.radioButton_case.clicked.connect(self.fill_combobox_attributes)
@@ -199,6 +194,47 @@ class ViewCharts(QDialog):
         if index == -1:
             index = 0
         self.ui.comboBox_stopwords.setCurrentIndex(index)
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+
+    def _load_attributes(self):
+        """Load the cached attribute definitions used by the chart controls."""
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, ifnull(memo,''), caseOrFile, valuetype from attribute_type")
+        result = cur.fetchall()
+        self.attributes = []
+        keys = 'name', 'memo', 'caseOrFile', 'valuetype'
+        for row in result:
+            self.attributes.append(dict(zip(keys, row)))
+
+    def _refresh_attribute_controls(self):
+        """Refresh cached attribute controls without re-rendering charts."""
+
+        selected_char = self.ui.comboBox_char_attributes.currentText()
+        selected_num = self.ui.comboBox_num_attributes.currentText()
+        self._load_attributes()
+        self.fill_combobox_attributes()
+        self.ui.comboBox_char_attributes.blockSignals(True)
+        self.ui.comboBox_num_attributes.blockSignals(True)
+        char_index = self.ui.comboBox_char_attributes.findText(selected_char)
+        if char_index >= 0:
+            self.ui.comboBox_char_attributes.setCurrentIndex(char_index)
+        num_index = self.ui.comboBox_num_attributes.findText(selected_num)
+        if num_index >= 0:
+            self.ui.comboBox_num_attributes.setCurrentIndex(num_index)
+        self.ui.comboBox_char_attributes.blockSignals(False)
+        self.ui.comboBox_num_attributes.blockSignals(False)
+
+    def _on_project_data_changed(self, tables, source):
+        """Refresh chart attribute options when attribute metadata changes elsewhere."""
+
+        if source is self or not isinstance(tables, list):
+            return
+        changed_tables = set(tables)
+        if not changed_tables.intersection({"attribute", "attribute_type"}):
+            return
+        self._refresh_attribute_controls()
 
     def fill_files_combobox(self, text=""):
         files_combobox_list = [""]
@@ -1750,6 +1786,11 @@ class ViewCharts(QDialog):
         self.ui.comboBox_num_attributes.addItems(list_num)
         self.ui.comboBox_num_attributes.blockSignals(False)
         self.ui.comboBox_char_attributes.blockSignals(False)
+
+        if self.ui.comboBox_char_attributes.currentIndex() == -1 and len(list_char) > 0:
+            self.ui.comboBox_char_attributes.setCurrentIndex(0)
+        if self.ui.comboBox_num_attributes.currentIndex() == -1 and len(list_num) > 0:
+            self.ui.comboBox_num_attributes.setCurrentIndex(0)
 
     def character_attribute_charts(self):
         """ Character attributes are displayed as counts via bar charts. """
