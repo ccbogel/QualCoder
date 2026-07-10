@@ -933,7 +933,7 @@ class App(object):
                 current_ai_model_index = int(result.get('ai_model_index', -1))
             except ValueError:
                 current_ai_model_index = 0
-            ai_models, result['ai_model_index'] = update_ai_models(ai_models, current_ai_model_index)
+            ai_models, result['ai_model_index'] = update_ai_models(ai_models, current_ai_model_index, result)
         return result, ai_models
 
     def check_and_add_additional_settings(self, settings_data, ai_models):
@@ -985,7 +985,8 @@ class App(object):
                 'stylesheet', 'backup_num', 'codetext_chunksize',
                 'report_text_context_characters', 'report_text_context_style',
                 'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
-                'ai_permissions', 'ai_extended_logging', 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
+                'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
+                'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -1019,6 +1020,8 @@ class App(object):
                     settings_data[key] = 1
                 if key == 'ai_extended_logging':
                     settings_data[key] = 'False'
+                if key == 'ai_model_upgrade_offers_seen':
+                    settings_data[key] = ''
                 if key == 'ai_chat_sidebar':
                     settings_data[key] = 'False'
                 if key == 'ai_chat_sidebar_width':
@@ -1376,6 +1379,7 @@ class App(object):
             'ai_model_index': -1,
             'ai_permissions': 1,
             'ai_extended_logging': 'False',
+            'ai_model_upgrade_offers_seen': '',
             'ai_chat_sidebar': 'False',
             'ai_chat_sidebar_width': 320,
             'ai_chat_splitter_output_bottom': 80

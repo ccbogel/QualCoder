@@ -147,28 +147,28 @@ def get_available_models(app, api_base: str, api_key: str) -> list:
 
 def get_default_ai_models():
     ini_string = """
-[ai_model_OpenAI GPT5.2 reasoning]
+[ai_model_OpenAI GPT5.5 reasoning]
 desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.2
-large_model_context_window = 1000000
-fast_model = gpt-5-mini
-fast_model_context_window = 128000
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.4-mini
+fast_model_context_window = 400000
 reasoning_effort = medium
 api_base = 
 api_key = 
 
-[ai_model_OpenAI GPT5.2 no reasoning]
+[ai_model_OpenAI GPT5.5 no reasoning]
 desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.2
-large_model_context_window = 1000000
-fast_model = gpt-5-mini
-fast_model_context_window = 128000
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.4-mini
+fast_model_context_window = 400000
 reasoning_effort = low
 api_base = 
 api_key = 
@@ -330,12 +330,105 @@ def add_new_ai_model(current_models: list, new_name: str) -> tuple[list, int]:
     current_models.append(new_model)
     return current_models, len(current_models) - 1
 
-def update_ai_models(current_models: list, current_model_index: int) -> tuple[list, int]:
+def get_ai_profile_group_key(model: dict) -> str:
+    """Return the group key for an AI profile based on the first word of its name."""
+
+    name = str(model.get('name', '')).strip()
+    if name == '':
+        return ''
+    return re.split(r'\s+', name, maxsplit=1)[0].lower()
+
+
+def _find_first_ai_group_index(models: list, group_key: str) -> int:
+    """Return the first list index that belongs to the requested profile group."""
+
+    if group_key == '':
+        return -1
+    for idx, model in enumerate(models):
+        if get_ai_profile_group_key(model) == group_key:
+            return idx
+    return -1
+
+
+def _find_ai_model_index_by_name(models: list, model_name: str) -> int:
+    """Return the list index for a named AI profile, or -1 if it is not found."""
+
+    for idx, model in enumerate(models):
+        if str(model.get('name', '')).strip() == model_name:
+            return idx
+    return -1
+
+
+def _parse_seen_ai_model_upgrade_offers(settings: dict | None) -> set[str]:
+    """Return the set of one-time model-upgrade prompts that were already shown."""
+
+    if settings is None:
+        return set()
+    raw_value = str(settings.get('ai_model_upgrade_offers_seen', '')).strip()
+    if raw_value == '':
+        return set()
+    return {item for item in raw_value.split('||') if item != ''}
+
+
+def _store_seen_ai_model_upgrade_offers(settings: dict | None, seen_offers: set[str]) -> None:
+    """Persist the set of one-time model-upgrade prompts in the settings dictionary."""
+
+    if settings is None:
+        return
+    settings['ai_model_upgrade_offers_seen'] = '||'.join(sorted(seen_offers))
+
+
+def _offer_ai_profile_upgrade(current_models: list, current_model_name: str,
+                              suggested_model_name: str, settings: dict | None) -> int:
+    """Offer a one-time switch from the current profile to a newly added provider profile."""
+
+    current_index = _find_ai_model_index_by_name(current_models, current_model_name)
+    suggested_index = _find_ai_model_index_by_name(current_models, suggested_model_name)
+    if current_index < 0 or suggested_index < 0 or current_index == suggested_index:
+        return current_index
+
+    current_model = current_models[current_index]
+    suggested_model = current_models[suggested_index]
+    seen_offers = _parse_seen_ai_model_upgrade_offers(settings)
+    offer_key = str(suggested_model.get('name', '')).strip()
+    if offer_key == '' or offer_key in seen_offers:
+        return current_index
+
+    msg = _(
+        'A newer default AI profile is now available for this provider.\n\n'
+        'Current profile: {current}\n'
+        'New profile: {new}\n\n'
+        'Do you want to switch to the new profile now?\n'
+        'Your existing API-key will be copied to the new profile for convenience.'
+    ).format(
+        current=str(current_model.get('name', '')).strip(),
+        new=str(suggested_model.get('name', '')).strip(),
+    )
+    msg_box = QtWidgets.QMessageBox()
+    msg_box.setWindowTitle(_('AI Setup'))
+    msg_box.setText(msg)
+    switch_button = msg_box.addButton(_('Switch to new profile'), QtWidgets.QMessageBox.ButtonRole.YesRole)
+    keep_button = msg_box.addButton(_('Keep current profile'), QtWidgets.QMessageBox.ButtonRole.NoRole)
+    msg_box.setDefaultButton(keep_button)
+    msg_box.exec()
+
+    seen_offers.add(offer_key)
+    _store_seen_ai_model_upgrade_offers(settings, seen_offers)
+
+    if msg_box.clickedButton() == switch_button:
+        suggested_model['api_key'] = current_model.get('api_key', '')
+        return suggested_index
+    return current_index
+
+
+def update_ai_models(current_models: list, current_model_index: int,
+                     settings: dict | None = None) -> tuple[list, int]:
     """Update the AI model definitions, and add new models from the default set
 
     Args:
         current_models (list): the current list from config.ini
         current_model_index (int): the index of the currently selected model
+        settings (dict | None): config settings used for one-time upgrade prompts
 
     Returns:
         tuple[list, int]: updated list and current model index 
@@ -343,21 +436,37 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
     if current_model_index < 0 or current_model_index > (len(current_models) - 1):
         current_model_index = 0
 
-    # add new models from the default model list
+    current_model_name = str(current_models[current_model_index].get('name', '')).strip()
+    current_group_key = get_ai_profile_group_key(current_models[current_model_index])
+
+    # add new models from the default model list, keeping provider groups together
     default_models = get_default_ai_models()
     current_models_names = {model['name'] for model in current_models}
+    missing_models_by_group = {}
+    missing_group_order = []
     for model in default_models:
-        if not model['name'] in current_models_names:
-            if model['name'] == 'OpenAI GPT5.1 reasoning': # insert this at the top, because it is the current default model
-                current_models.insert(0, model)
-                if current_model_index >= 0:
-                    current_model_index += 1
-            elif model['name'] == 'OpenAI GPT5.1 no reasoning' and len(current_models) > 1: # insert this at the second position
-                current_models.insert(1, model)
-                if current_model_index >= 1:
-                    current_model_index += 1        
-            else:
-                current_models.append(model)
+        if model['name'] not in current_models_names:
+            group_key = get_ai_profile_group_key(model)
+            if group_key not in missing_models_by_group:
+                missing_models_by_group[group_key] = []
+                missing_group_order.append(group_key)
+            missing_models_by_group[group_key].append(model)
+            current_models_names.add(model['name'])
+
+    newest_inserted_by_group = {}
+    for group_key in missing_group_order:
+        group_models = missing_models_by_group.get(group_key, [])
+        if len(group_models) == 0:
+            continue
+        insertion_index = _find_first_ai_group_index(current_models, group_key)
+        if insertion_index < 0:
+            insertion_index = len(current_models)
+        for offset, model in enumerate(group_models):
+            insert_at = insertion_index + offset
+            current_models.insert(insert_at, model)
+            if current_model_index >= insert_at:
+                current_model_index += 1
+        newest_inserted_by_group[group_key] = str(group_models[0].get('name', '')).strip()
                 
     # Blablador: update config (api base, model alias)
     curr_model = current_models[current_model_index]
@@ -396,6 +505,12 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
         # Correct an error in the QualCoder 3.8 release, where reasoning effort was set to medium for GPT-4.1:            
         if model['large_model'].lower().find('gpt-4.1') > -1: 
             model['reasoning_effort'] = 'default'
+
+    suggested_model_name = newest_inserted_by_group.get(current_group_key, '')
+    if current_model_name != '' and suggested_model_name != '':
+        current_model_index = _offer_ai_profile_upgrade(
+            current_models, current_model_name, suggested_model_name, settings
+        )
     
     return current_models, current_model_index
 
