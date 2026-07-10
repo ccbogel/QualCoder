@@ -380,7 +380,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             image = self.mediaplayer.video_take_snapshot(0, filepath, 1280, 720)
             if image == 0:
                 Message(self.app, _("Frame saved"), filepath).exec()
-            self.parent_textEdit.append(_("Screenshot saved: ") + filepath)
+                self.parent_textEdit.append(_("Screenshot saved: ") + filepath)
+            else:
+                Message(self.app, _("Screenshot"), _("Not saved")).exec()
         if action == action_resize:
             w = self.ddialog.size().width()
             h = self.ddialog.size().height()
@@ -2306,7 +2308,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         image = self.mediaplayer.video_take_snapshot(0, filepath, 1280, 720)
         if image == 0:
             Message(self.app, _("Frame saved"), filepath).exec()
-        self.parent_textEdit.append(_("Screenshot saved: ") + filepath)
+            self.parent_textEdit.append(_("Screenshot saved: ") + filepath)
+        else:
+            Message(self.app, _("Screenshot"), _("Not saved")).exec()
 
     def import_screenshot_into_project(self):
 
@@ -5056,6 +5060,8 @@ class DialogViewAV(QtWidgets.QDialog):
             image = self.mediaplayer.video_take_snapshot(0, filepath, 1280, 720)
             if image == 0:
                 Message(self.app, _("Frame saved"), filepath).exec()
+            else:
+                Message(self.app, _("Screenshot"), _("Not saved")).exec()
         if action == action_resize:
             w = self.ddialog.size().width()
             h = self.ddialog.size().height()
