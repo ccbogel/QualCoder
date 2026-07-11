@@ -206,6 +206,13 @@ def renew_chatgpt_oauth(timeout: float = 300.0) -> tuple[bool, str]:
     return get_chatgpt_oauth_status()
 
 
+def _chatgpt_oauth_reauth_message() -> str:
+    """Return a user-facing re-authentication instruction."""
+
+    return _('ChatGPT authentication expired or could not be renewed. '
+             'Open the settings dialog and click "Renew" to authenticate again.')
+
+
 def get_available_models(app, api_base: str, api_key: str) -> list:
     """Queries the API and returns a list of all AI models available from this provider."""
     if is_chatgpt_oauth_api_base(api_base):
@@ -999,6 +1006,18 @@ class AiLLM():
                 return repr(value)
             except Exception:
                 return '<unprintable>'
+
+    def _chatgpt_oauth_user_error(self, err: BaseException) -> str:
+        """Return a friendly ChatGPT OAuth re-auth message, if applicable."""
+
+        for item in self._exception_chain(err):
+            if isinstance(item, _ChatGPTOAuthRefreshError):
+                return _chatgpt_oauth_reauth_message()
+            if isinstance(item, FileNotFoundError):
+                item_text = self._safe_to_text(item)
+                if 'ChatGPT OAuth token' in item_text or 'login_chatgpt()' in item_text:
+                    return _chatgpt_oauth_reauth_message()
+        return ''
 
     def _write_ai_log(self, text: str):
         if not self._ensure_ai_log_logger():
@@ -3680,9 +3699,15 @@ class AiLLM():
         try:
             if exception_type is AICancelled or isinstance(value, AICancelled):
                 return
-            value_text = html_to_text(self._safe_to_text(value))
-            msg = _('AI Error:\n')
-            msg += exception_type.__name__ + ': ' + str(value_text)
+            auth_message = ''
+            if isinstance(value, BaseException):
+                auth_message = self._chatgpt_oauth_user_error(value)
+            if auth_message != '':
+                msg = _('AI Error:\n') + auth_message
+            else:
+                value_text = html_to_text(self._safe_to_text(value))
+                msg = _('AI Error:\n')
+                msg += exception_type.__name__ + ': ' + str(value_text)
             tb = '\n'.join(traceback.format_tb(tb_obj))
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
             # Trigger message box show
@@ -3707,14 +3732,21 @@ class AiLLM():
         """
         self.run_progress_msg = ''
         self.run_progress_count = -1
-        run_context = self._create_run_context(
-            model_kind=model_kind,
-            purpose='stream',
-            scope_type=scope_type,
-            scope_id=scope_id,
-            group_id=group_id,
-            parent_run_id=parent_run_id,
-        )
+        try:
+            run_context = self._create_run_context(
+                model_kind=model_kind,
+                purpose='stream',
+                scope_type=scope_type,
+                scope_id=scope_id,
+                group_id=group_id,
+                parent_run_id=parent_run_id,
+            )
+        except Exception as err:
+            auth_message = self._chatgpt_oauth_user_error(err)
+            if auth_message != '':
+                Message.warning(self.app, _('Authentication'), auth_message)
+                return ''
+            raise
         run_context.worker_type = 'stream'
         self._register_run_context(run_context)
         worker = Worker(self._run_stream_worker, run_context=run_context, messages=messages)
@@ -3821,15 +3853,22 @@ class AiLLM():
         """
         self.run_progress_msg = ''
         self.run_progress_count = -1
-        run_context = self._create_run_context(
-            model_kind=model_kind,
-            purpose='query',
-            scope_type=scope_type,
-            scope_id=scope_id,
-            group_id=group_id,
-            parent_run_id=parent_run_id,
-            cancel_result=cancel_result,
-        )
+        try:
+            run_context = self._create_run_context(
+                model_kind=model_kind,
+                purpose='query',
+                scope_type=scope_type,
+                scope_id=scope_id,
+                group_id=group_id,
+                parent_run_id=parent_run_id,
+                cancel_result=cancel_result,
+            )
+        except Exception as err:
+            auth_message = self._chatgpt_oauth_user_error(err)
+            if auth_message != '':
+                Message.warning(self.app, _('Authentication'), auth_message)
+                return ''
+            raise
         run_context.worker_type = 'query'
         self._register_run_context(run_context)
         worker = Worker(
