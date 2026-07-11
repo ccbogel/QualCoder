@@ -49,11 +49,10 @@ ATTRIBUTE_START_COLUMN = 4
 class DialogJournals(QtWidgets.QDialog):
     """  View, create, export, rename and delete journals. """
 
-    textDialog = None
 
     def __init__(self, app, parent_text_edit, parent=None):
 
-        super(DialogJournals, self).__init__(parent)  # overrride accept method
+        super(DialogJournals, self).__init__(parent)
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.jid = None  # journal database jid
