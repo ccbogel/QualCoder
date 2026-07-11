@@ -216,6 +216,7 @@ class App(object):
         self.confighome = os.path.join(self.userhome, '.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
+        self.pending_ai_model_upgrade_offer = None
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
         self.version = qualcoder_version
@@ -933,7 +934,9 @@ class App(object):
                 current_ai_model_index = int(result.get('ai_model_index', -1))
             except ValueError:
                 current_ai_model_index = 0
-            ai_models, result['ai_model_index'] = update_ai_models(ai_models, current_ai_model_index, result)
+            ai_models, result['ai_model_index'], self.pending_ai_model_upgrade_offer = update_ai_models(
+                ai_models, current_ai_model_index, result
+            )
         return result, ai_models
 
     def check_and_add_additional_settings(self, settings_data, ai_models):
@@ -1719,6 +1722,63 @@ class MainWindow(QtWidgets.QMainWindow):
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     recent_projects = []  # a list of recent projects for the qmenu
 
+    @staticmethod
+    def _find_ai_model_index_by_name(ai_models: list, model_name: str) -> int:
+        """Return the index of a named AI profile, or -1 if it is not present."""
+
+        target_name = str(model_name).strip()
+        for idx, model in enumerate(ai_models):
+            if str(model.get('name', '')).strip() == target_name:
+                return idx
+        return -1
+
+    def _show_pending_ai_model_upgrade_offer(self) -> None:
+        """Show one deferred AI-profile upgrade offer after the main window is visible."""
+
+        offer = getattr(self.app, 'pending_ai_model_upgrade_offer', None)
+        if not isinstance(offer, dict) or len(offer) == 0:
+            return
+
+        current_model_name = str(offer.get('current_model_name', '')).strip()
+        suggested_model_name = str(offer.get('suggested_model_name', '')).strip()
+        current_index = self._find_ai_model_index_by_name(self.app.ai_models, current_model_name)
+        suggested_index = self._find_ai_model_index_by_name(self.app.ai_models, suggested_model_name)
+        if current_index < 0 or suggested_index < 0 or current_index == suggested_index:
+            self.app.pending_ai_model_upgrade_offer = None
+            return
+
+        seen_value = str(self.app.settings.get('ai_model_upgrade_offers_seen', '')).strip()
+        seen_offers = {item for item in seen_value.split('||') if item != ''}
+        if suggested_model_name in seen_offers:
+            self.app.pending_ai_model_upgrade_offer = None
+            return
+
+        current_model = self.app.ai_models[current_index]
+        suggested_model = self.app.ai_models[suggested_index]
+        msg = _(
+            'A newer default AI profile is now available for this provider.\n\n'
+            'Current profile: {current}\n'
+            'New profile: {new}\n\n'
+            'Do you want to switch to the new profile now?\n'
+            'Your existing API-key (if available) will be copied to the new profile for convenience.'
+        ).format(
+            current=str(current_model.get('name', '')).strip(),
+            new=str(suggested_model.get('name', '')).strip(),
+        )
+        msg_box = Message(self.app, _('AI Setup'), msg, 'Information')
+        switch_button = msg_box.addButton(_('Switch to new profile'), QtWidgets.QMessageBox.ButtonRole.YesRole)
+        keep_button = msg_box.addButton(_('Keep current profile'), QtWidgets.QMessageBox.ButtonRole.NoRole)
+        msg_box.setDefaultButton(keep_button)
+        msg_box.exec()
+
+        seen_offers.add(suggested_model_name)
+        self.app.settings['ai_model_upgrade_offers_seen'] = '||'.join(sorted(seen_offers))
+        if msg_box.clickedButton() == switch_button:
+            suggested_model['api_key'] = current_model.get('api_key', '')
+            self.app.settings['ai_model_index'] = suggested_index
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        self.app.pending_ai_model_upgrade_offer = None
+
     def __init__(self, app, force_quit=False):
         """ Set up user interface from ui_main.py file. """
         self.app = app
@@ -1764,6 +1824,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
         QtWidgets.QApplication.processEvents() 
         QtCore.QTimer.singleShot(0, self._restore_ai_splitters_after_show)
+        self._show_pending_ai_model_upgrade_offer()
         # Setup AI
         try:
             global AiLLM
@@ -4106,7 +4167,8 @@ def gui():
     app = QtWidgets.QApplication(sys.argv)
     app._qc_installed_translators = []
     qual_app = App()
-    settings, ai_models = qual_app.load_settings()
+    settings = qual_app.settings
+    ai_models = qual_app.ai_models
     project_path = qual_app.get_most_recent_projectpath()
     # Noto Sans - for general application
     install_noto_sans()

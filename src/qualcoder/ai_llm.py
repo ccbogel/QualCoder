@@ -204,27 +204,40 @@ reasoning_effort = default
 api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
 api_key = 
 
-[ai_model_Anthropic Claude Sonnet 4.5]
+[ai_model_Anthropic Claude Opus 4.8]
 desc = Claude is a family of high quality models from Anthropic.
 	You need an API-key from Anthropic and credits in your account.
 	Anthropic will charge a small amount for every use.
 access_info_url = https://console.anthropic.com/settings/keys
-large_model = claude-sonnet-4-5
-large_model_context_window = 200000
-fast_model = claude-sonnet-4-5
-fast_model_context_window = 200000
+large_model = claude-opus-4-8
+large_model_context_window = 1000000
+fast_model = claude-sonnet-5
+fast_model_context_window = 1000000
 reasoning_effort = medium
 api_base = https://api.anthropic.com/v1/
 api_key = 
 
-[ai_model_Google Gemini]
+[ai_model_Anthropic Claude Sonnet 5]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-sonnet-5
+large_model_context_window = 1000000
+fast_model = claude-sonnet-5
+fast_model_context_window = 1000000
+reasoning_effort = medium
+api_base = https://api.anthropic.com/v1/
+api_key = 
+
+[ai_model_Google Gemini 3.5 Flash]
 desc = Google offers several free and paid models on their servers.
 	Select one in the Advanced AI options below.
 	You need an API-key from Google.
 access_info_url = https://ai.google.dev/gemini-api/docs
-large_model = gemini-2.5-flash
+large_model = gemini-3.5-flash
 large_model_context_window = 1000000
-fast_model = gemini-2.5-flash
+fast_model = gemini-3.1-flash-lite
 fast_model_context_window = 1000000
 reasoning_effort = default
 api_base = https://generativelanguage.googleapis.com/v1beta/openai/
@@ -378,51 +391,29 @@ def _store_seen_ai_model_upgrade_offers(settings: dict | None, seen_offers: set[
     settings['ai_model_upgrade_offers_seen'] = '||'.join(sorted(seen_offers))
 
 
-def _offer_ai_profile_upgrade(current_models: list, current_model_name: str,
-                              suggested_model_name: str, settings: dict | None) -> int:
-    """Offer a one-time switch from the current profile to a newly added provider profile."""
+def _queue_ai_profile_upgrade_offer(current_models: list, current_model_name: str,
+                                    suggested_model_name: str,
+                                    settings: dict | None) -> dict | None:
+    """Prepare one deferred upgrade offer for a newly added provider profile."""
 
     current_index = _find_ai_model_index_by_name(current_models, current_model_name)
     suggested_index = _find_ai_model_index_by_name(current_models, suggested_model_name)
     if current_index < 0 or suggested_index < 0 or current_index == suggested_index:
-        return current_index
+        return None
 
-    current_model = current_models[current_index]
-    suggested_model = current_models[suggested_index]
     seen_offers = _parse_seen_ai_model_upgrade_offers(settings)
-    offer_key = str(suggested_model.get('name', '')).strip()
+    offer_key = str(suggested_model_name).strip()
     if offer_key == '' or offer_key in seen_offers:
-        return current_index
+        return None
 
-    msg = _(
-        'A newer default AI profile is now available for this provider.\n\n'
-        'Current profile: {current}\n'
-        'New profile: {new}\n\n'
-        'Do you want to switch to the new profile now?\n'
-        'Your existing API-key will be copied to the new profile for convenience.'
-    ).format(
-        current=str(current_model.get('name', '')).strip(),
-        new=str(suggested_model.get('name', '')).strip(),
-    )
-    msg_box = QtWidgets.QMessageBox()
-    msg_box.setWindowTitle(_('AI Setup'))
-    msg_box.setText(msg)
-    switch_button = msg_box.addButton(_('Switch to new profile'), QtWidgets.QMessageBox.ButtonRole.YesRole)
-    keep_button = msg_box.addButton(_('Keep current profile'), QtWidgets.QMessageBox.ButtonRole.NoRole)
-    msg_box.setDefaultButton(keep_button)
-    msg_box.exec()
-
-    seen_offers.add(offer_key)
-    _store_seen_ai_model_upgrade_offers(settings, seen_offers)
-
-    if msg_box.clickedButton() == switch_button:
-        suggested_model['api_key'] = current_model.get('api_key', '')
-        return suggested_index
-    return current_index
+    return {
+        'current_model_name': str(current_model_name).strip(),
+        'suggested_model_name': offer_key,
+    }
 
 
 def update_ai_models(current_models: list, current_model_index: int,
-                     settings: dict | None = None) -> tuple[list, int]:
+                     settings: dict | None = None) -> tuple[list, int, dict | None]:
     """Update the AI model definitions, and add new models from the default set
 
     Args:
@@ -431,7 +422,7 @@ def update_ai_models(current_models: list, current_model_index: int,
         settings (dict | None): config settings used for one-time upgrade prompts
 
     Returns:
-        tuple[list, int]: updated list and current model index 
+        tuple[list, int, dict | None]: updated list, current model index, queued upgrade offer
     """
     if current_model_index < 0 or current_model_index > (len(current_models) - 1):
         current_model_index = 0
@@ -506,13 +497,14 @@ def update_ai_models(current_models: list, current_model_index: int,
         if model['large_model'].lower().find('gpt-4.1') > -1: 
             model['reasoning_effort'] = 'default'
 
+    pending_upgrade_offer = None
     suggested_model_name = newest_inserted_by_group.get(current_group_key, '')
     if current_model_name != '' and suggested_model_name != '':
-        current_model_index = _offer_ai_profile_upgrade(
+        pending_upgrade_offer = _queue_ai_profile_upgrade_offer(
             current_models, current_model_name, suggested_model_name, settings
         )
     
-    return current_models, current_model_index
+    return current_models, current_model_index, pending_upgrade_offer
 
 def strip_think_blocks(text: str) -> str:
     """
