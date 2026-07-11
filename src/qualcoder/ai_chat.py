@@ -48,7 +48,7 @@ from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
-from .ai_llm import extract_ai_memo, ai_quote_search, strip_think_blocks, AICancelled
+from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
 from .ai_search_dialog import DialogAiSearch
 from .confirm_delete import DialogConfirmDelete
@@ -7395,7 +7395,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             model_kind=model_kind,
             run_context=run_context,
         )
-        raw = strip_think_blocks(str(llm_response.content)).strip()
+        raw = strip_think_blocks(llm_content_to_text(getattr(llm_response, 'content', ''))).strip()
         raw = self._extract_first_json_object(raw)
         if raw == "":
             return {}
@@ -7664,7 +7664,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 fallback_without_response_format=False,
                 model_kind='large',
             )
-            return strip_think_blocks(str(repaired.content if repaired is not None else '')).strip()
+            return strip_think_blocks(llm_content_to_text(getattr(repaired, 'content', ''))).strip()
         except Exception as err:
             logger.warning("Final answer repair failed: %s", err)
             return ''

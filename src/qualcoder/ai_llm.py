@@ -44,6 +44,12 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from langchain_core.runnables.config import RunnableConfig
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
+from langchain_openai.chat_models.codex import _ChatOpenAICodex
+from langchain_openai.chatgpt_oauth import (
+    _ChatGPTOAuthRefreshError,
+    _FileChatGPTOAuthTokenProvider,
+    login_chatgpt,
+)
 import json_repair
 from openai import OpenAI, BadRequestError
 from pydantic import ValidationError
@@ -66,6 +72,9 @@ max_memo_length = 1500  # Maximum length of the memo send to the AI
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+CHATGPT_OAUTH_API_BASE = 'ChatGPT_OAuth'
+NO_API_KEY_NEEDED = '<no API key needed>'
 
 
 class AICancelled(Exception):
@@ -124,9 +133,83 @@ def extract_ai_memo(memo: str) -> str:
         return memo[0:mark]
     else:
         return memo
-    
+
+
+def is_chatgpt_oauth_api_base(api_base: str) -> bool:
+    """Return whether the api_base marker selects ChatGPT OAuth auth."""
+
+    return str(api_base).strip() == CHATGPT_OAUTH_API_BASE
+
+
+def is_chatgpt_oauth_profile(model: dict | None) -> bool:
+    """Return whether the AI profile uses ChatGPT OAuth authentication."""
+
+    if model is None:
+        return False
+    return is_chatgpt_oauth_api_base(model.get('api_base', ''))
+
+
+def ensure_chatgpt_oauth_profile_defaults(model: dict | None) -> None:
+    """Normalize a ChatGPT OAuth profile in-place."""
+
+    if not is_chatgpt_oauth_profile(model):
+        return
+    model['api_key'] = NO_API_KEY_NEEDED
+
+
+def _chatgpt_oauth_provider(timeout: float = 5.0) -> _FileChatGPTOAuthTokenProvider:
+    """Return the default ChatGPT OAuth token provider."""
+
+    return _FileChatGPTOAuthTokenProvider(timeout=timeout)
+
+
+def _format_chatgpt_oauth_token_status(token) -> str:
+    """Format one human-readable ChatGPT OAuth status line."""
+
+    details = []
+    plan_type = str(getattr(token, 'plan_type', '')).strip()
+    if plan_type != '':
+        details.append(plan_type)
+    expires_at = getattr(token, 'expires_at', None)
+    if expires_at is not None:
+        try:
+            expires_text = expires_at.astimezone().strftime('%Y-%m-%d %H:%M')
+        except Exception:
+            expires_text = str(expires_at)
+        details.append(_('expires ') + expires_text)
+    if len(details) == 0:
+        return _('Authenticated')
+    return _('Authenticated') + ' (' + ', '.join(details) + ')'
+
+
+def get_chatgpt_oauth_status(timeout: float = 5.0) -> tuple[bool, str]:
+    """Return current ChatGPT OAuth status for the default token store."""
+
+    try:
+        token = _chatgpt_oauth_provider(timeout=timeout).get_token()
+        return True, _format_chatgpt_oauth_token_status(token)
+    except FileNotFoundError:
+        return False, _('Not authenticated')
+    except _ChatGPTOAuthRefreshError:
+        return False, _('Authentication expired. Please renew it.')
+    except Exception as err:
+        return False, _('Authentication error') + ': ' + str(err)
+
+
+def renew_chatgpt_oauth(timeout: float = 300.0) -> tuple[bool, str]:
+    """Start or renew ChatGPT OAuth authentication."""
+
+    try:
+        login_chatgpt(timeout=timeout)
+    except Exception as err:
+        return False, _('Authentication error') + ': ' + str(err)
+    return get_chatgpt_oauth_status()
+
+
 def get_available_models(app, api_base: str, api_key: str) -> list:
     """Queries the API and returns a list of all AI models available from this provider."""
+    if is_chatgpt_oauth_api_base(api_base):
+        return []
     msg = None
     if app is not None:
         msg = Message(app, _('AI Models'), _('Loading list of available AI models...'))
@@ -172,6 +255,20 @@ fast_model_context_window = 400000
 reasoning_effort = low
 api_base = 
 api_key = 
+
+[ai_model_OpenAI ChatGPT Login]
+desc = Lets you use your ChatGPT Plus, Pro, or Team account with QualCoder.
+	No API key is needed, so no extra cost. Use the authentication controls 
+    in the settings dialog. Note that this is experimental, availability 
+    may vary. 
+access_info_url = https://chatgpt.com/
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.5
+fast_model_context_window = 272000
+reasoning_effort = medium
+api_base = ChatGPT_OAuth
+api_key = <no API key needed>
 
 [ai_model_Blablador]
 desc = Free and open source models, excellent privacy, but not as powerful 
@@ -520,6 +617,38 @@ def strip_think_blocks(text: str) -> str:
 
     return text.strip()
 
+
+def llm_content_to_text(content) -> str:
+    """Convert LLM content payloads into plain text.
+
+    LangChain providers usually return a string in `AIMessage.content`, but
+    Responses-API based models can return a list of content blocks instead.
+    This helper flattens the common text-bearing block shapes that QualCoder
+    needs for logging and JSON parsing.
+    """
+
+    if content is None:
+        return ''
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            text = llm_content_to_text(item)
+            if text != '':
+                parts.append(text)
+        return "\n".join(parts)
+    if isinstance(content, dict):
+        for key in ('text', 'output_text'):
+            value = content.get(key, None)
+            if isinstance(value, str):
+                return value
+        value = content.get('content', None)
+        if value is not None:
+            return llm_content_to_text(value)
+        return ''
+    return str(content)
+
 def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
     """Searches the quote in the original text using the Smith-Waterman algorithm.
     This also tolerates gaps up to complete sentences in the cited text or other 
@@ -717,7 +846,11 @@ class AiLLM():
         return 'unknown'
 
     def _llm_provider_name(self, factory) -> str:
-        return 'azure' if factory is AzureChatOpenAI else 'openai'
+        if factory is AzureChatOpenAI:
+            return 'azure'
+        if factory is _ChatOpenAICodex:
+            return 'chatgpt_oauth'
+        return 'openai'
 
     def _llm_setup_for_kind(self, model_kind: str):
         normalized_kind = 'fast' if str(model_kind).strip().lower() == 'fast' else 'large'
@@ -785,6 +918,7 @@ class AiLLM():
             return ''
         patterns = (
             r"Unsupported parameter:\s*['\"]([^'\"]+)['\"]",
+            r"Unsupported parameter:\s*([A-Za-z0-9_.-]+)",
             r"Parameter\s+['\"]([^'\"]+)['\"]\s+is\s+not\s+supported",
             r"['\"]([^'\"]+)['\"]\s+is\s+not\s+supported\s+with\s+this\s+model",
         )
@@ -796,8 +930,6 @@ class AiLLM():
 
     def _unsupported_param_from_error(self, err: BaseException) -> str:
         for item in self._exception_chain(err):
-            if not isinstance(item, BadRequestError):
-                continue
             param_name = str(getattr(item, 'param', '')).strip()
             if param_name != '':
                 return param_name
@@ -808,10 +940,22 @@ class AiLLM():
                     param_name = str(error_payload.get('param', '')).strip()
                     if param_name != '':
                         return param_name
-                    message_text = self._safe_to_text(error_payload.get('message', ''))
-                    param_name = self._unsupported_param_from_message(message_text)
-                    if param_name != '':
-                        return param_name
+                    for key in ('message', 'detail'):
+                        message_text = self._safe_to_text(error_payload.get(key, ''))
+                        param_name = self._unsupported_param_from_message(message_text)
+                        if param_name != '':
+                            return param_name
+            elif body is not None:
+                param_name = self._unsupported_param_from_message(self._safe_to_text(body))
+                if param_name != '':
+                    return param_name
+            for attr_name in ('message', 'detail'):
+                attr_value = getattr(item, attr_name, None)
+                if attr_value is None:
+                    continue
+                param_name = self._unsupported_param_from_message(self._safe_to_text(attr_value))
+                if param_name != '':
+                    return param_name
             param_name = self._unsupported_param_from_message(self._safe_to_text(item))
             if param_name != '':
                 return param_name
@@ -895,7 +1039,8 @@ class AiLLM():
         if context.strip() != '':
             header += f' context="{context.strip()}"'
         lines = [header, 'assistant:']
-        for line in self._safe_to_text(response_text if response_text is not None else '').splitlines():
+        response_body = llm_content_to_text(response_text)
+        for line in self._safe_to_text(response_body).splitlines():
             lines.append('  ' + line)
         if len(lines) == 2:
             lines.append('  ')
@@ -1368,7 +1513,14 @@ class AiLLM():
                 fallback_kwargs = {}
                 if config is not None:
                     fallback_kwargs['config'] = config
-                res = active_llm.invoke(messages, **fallback_kwargs)
+                res = self._invoke_with_unsupported_parameter_retry(
+                    current_context,
+                    messages,
+                    fallback_kwargs,
+                    req_id,
+                    context=context,
+                )
+                active_llm = current_context.llm
                 self._raise_if_run_canceled(current_context)
             except Exception as err2:
                 if isinstance(err2, AICancelled):
@@ -3320,13 +3472,16 @@ class AiLLM():
                 self.large_llm_context_window = int(curr_model['large_model_context_window'])
                 fast_model = curr_model['fast_model']
                 self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
+                ensure_chatgpt_oauth_profile_defaults(curr_model)
                 api_base = curr_model['api_base']
                 api_key = curr_model['api_key']
-                if api_key == '':
+                is_chatgpt_oauth = is_chatgpt_oauth_api_base(api_base)
+                if api_key == '' and not is_chatgpt_oauth:
                     msg = _('Please enter an API-key for the AI in the following dialog.')
                     Message(self.app, _('AI API-key'), msg).exec()
                     main_window.change_settings(section='AI', enable_ai=True)
                     curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+                    ensure_chatgpt_oauth_profile_defaults(curr_model)
                     if curr_model['api_key'] == '':
                         # still no API-key, disable AI:
                         self.app.settings['ai_enable'] = 'False'
@@ -3373,6 +3528,16 @@ class AiLLM():
                     }        
                     fast_llm_params = large_llm_params.copy()
                     fast_llm_params['model'] = fast_model
+                elif is_chatgpt_oauth:
+                    is_azure = False
+                    large_llm_params = {
+                        'model': large_model,
+                        'cache': False,
+                        'temperature': temp,
+                        'timeout': timeout,
+                    }
+                    fast_llm_params = large_llm_params.copy()
+                    fast_llm_params['model'] = fast_model
                 else: # OpenAI or compatible API
                     is_azure = False
                     large_llm_params = {
@@ -3401,8 +3566,15 @@ class AiLLM():
 
                 self._large_llm_params = dict(large_llm_params)
                 self._fast_llm_params = dict(fast_llm_params)
-                self._large_llm_factory = AzureChatOpenAI if is_azure else ChatOpenAI
-                self._fast_llm_factory = AzureChatOpenAI if is_azure else ChatOpenAI
+                if is_azure:
+                    self._large_llm_factory = AzureChatOpenAI
+                    self._fast_llm_factory = AzureChatOpenAI
+                elif is_chatgpt_oauth:
+                    self._large_llm_factory = _ChatOpenAICodex
+                    self._fast_llm_factory = _ChatOpenAICodex
+                else:
+                    self._large_llm_factory = ChatOpenAI
+                    self._fast_llm_factory = ChatOpenAI
                 self._large_reasoning_effort = str(curr_model.get('reasoning_effort', '')).strip().lower()
                 self._fast_reasoning_effort = ''
                 
@@ -3576,7 +3748,7 @@ class AiLLM():
                     for chunk in stream_iter:
                         if run_context.cancel_event.is_set():
                             break  # cancel the streaming
-                        chunk_text = str(getattr(chunk, 'content', ''))
+                        chunk_text = llm_content_to_text(getattr(chunk, 'content', ''))
                         run_context.streaming_output += chunk_text
                         if signals is not None:
                             if signals.streaming is not None:
@@ -3828,8 +4000,9 @@ class AiLLM():
             )
         except AICancelled:
             return []
-        logger.debug(str(res.content))
-        res.content = strip_think_blocks(res.content)
+        response_text = llm_content_to_text(getattr(res, 'content', ''))
+        logger.debug(response_text)
+        res.content = strip_think_blocks(response_text)
         code_descriptions = list(json_repair.loads(str(res.content))['descriptions'])
         code_descriptions.insert(0, code_name) # insert the original as well
         return code_descriptions
@@ -4039,7 +4212,8 @@ class AiLLM():
             )
         except AICancelled:
             return None
-        res.content = strip_think_blocks(res.content)
+        response_text = llm_content_to_text(getattr(res, 'content', ''))
+        res.content = strip_think_blocks(response_text)
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer
