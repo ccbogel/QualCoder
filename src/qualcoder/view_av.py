@@ -370,12 +370,19 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_resize = menu.addAction(_("Resize"))
         action = menu.exec(self.ddialog.mapToGlobal(position))
         if action == action_screenshot:
-            time.sleep(0.5)
-            screen = QtWidgets.QApplication.primaryScreen()
-            screenshot = screen.grabWindow(self.ddialog.winId())
-            frame_name = f'Frame_{datetime.datetime.now().astimezone().strftime("%Y%m%d_%H_%M_%S")}.jpg'
-            save_path = os.path.join(self.app.settings['directory'], frame_name)
-            screenshot.save(save_path, 'jpg')
+            filename = f'Frame_{datetime.datetime.now().astimezone().strftime("%Y%m%d_%H_%M_%S")}.jpg'
+            hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
+            image_name = f"{self.file_['name']}_{hms}.png"
+            exp_directory = ExportDirectoryPathDialog(self.app, image_name)
+            filepath = exp_directory.filepath
+            if filepath is None:
+                return
+            image = self.mediaplayer.video_take_snapshot(0, filepath, 1280, 720)
+            if image == 0:
+                Message(self.app, _("Frame saved"), filepath).exec()
+                self.parent_textEdit.append(_("Screenshot saved: ") + filepath)
+            else:
+                Message(self.app, _("Screenshot"), _("Not saved")).exec()
         if action == action_resize:
             w = self.ddialog.size().width()
             h = self.ddialog.size().height()
@@ -2291,12 +2298,19 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.plainTextEdit.setTextCursor(cursor)
 
     def save_screenshot(self):
+        filename = f'Frame_{datetime.datetime.now().astimezone().strftime("%Y%m%d_%H_%M_%S")}.jpg'
         hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
         image_name = f"{self.file_['name']}_{hms}.png"
-        filename = os.path.join(self.app.settings['directory'], image_name)
-        self.mediaplayer.video_take_snapshot(0, filename, 1280, 720)
-        Message(self.app, _("Screenshot saved"), filename).exec()
-        self.parent_textEdit.append(_("Screenshot saved: ") + filename)
+        exp_directory = ExportDirectoryPathDialog(self.app, image_name)
+        filepath = exp_directory.filepath
+        if filepath is None:
+            return
+        image = self.mediaplayer.video_take_snapshot(0, filepath, 1280, 720)
+        if image == 0:
+            Message(self.app, _("Frame saved"), filepath).exec()
+            self.parent_textEdit.append(_("Screenshot saved: ") + filepath)
+        else:
+            Message(self.app, _("Screenshot"), _("Not saved")).exec()
 
     def import_screenshot_into_project(self):
 
@@ -5036,16 +5050,18 @@ class DialogViewAV(QtWidgets.QDialog):
 
         action = menu.exec(self.ddialog.mapToGlobal(position))
         if action == action_screenshot:
-            time.sleep(0.5)
             filename = f'Frame_{datetime.datetime.now().astimezone().strftime("%Y%m%d_%H_%M_%S")}.jpg'
-            exp_directory = ExportDirectoryPathDialog(self.app, filename)
+            hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
+            image_name = f"{self.file_['name']}_{hms}.png"
+            exp_directory = ExportDirectoryPathDialog(self.app, image_name)
             filepath = exp_directory.filepath
             if filepath is None:
                 return
-            image = self.mediaplayer.video_take_snapshot(0, filepath, 0, 0)
+            image = self.mediaplayer.video_take_snapshot(0, filepath, 1280, 720)
             if image == 0:
                 Message(self.app, _("Frame saved"), filepath).exec()
-            return
+            else:
+                Message(self.app, _("Screenshot"), _("Not saved")).exec()
         if action == action_resize:
             w = self.ddialog.size().width()
             h = self.ddialog.size().height()
@@ -5938,5 +5954,3 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
-
-
