@@ -263,11 +263,10 @@ reasoning_effort = low
 api_base = 
 api_key = 
 
-[ai_model_OpenAI ChatGPT Login]
+[ai_model_OpenAI_ChatGPT_Login GPT5.5]
 desc = Lets you use your ChatGPT Plus, Pro, or Team account with QualCoder.
-	No API key is needed, so no extra cost. Use the authentication controls 
-    in the settings dialog. Note that this is experimental, availability 
-    may vary. 
+	No API key, no extra cost. Use the "Renew" button to authenticate your account.
+    Note that this is experimental, availability may vary. 
 access_info_url = https://chatgpt.com/
 large_model = gpt-5.5
 large_model_context_window = 272000
@@ -456,6 +455,15 @@ def get_ai_profile_group_key(model: dict) -> str:
     return re.split(r'\s+', name, maxsplit=1)[0].lower()
 
 
+def _get_ai_profile_insertion_anchor_key(model: dict) -> str:
+    """Return the fallback provider group after which a profile should be inserted."""
+
+    group_key = get_ai_profile_group_key(model)
+    if group_key.startswith('openai_chatgpt_login'):
+        return 'openai'
+    return group_key
+
+
 def _find_first_ai_group_index(models: list, group_key: str) -> int:
     """Return the first list index that belongs to the requested profile group."""
 
@@ -465,6 +473,18 @@ def _find_first_ai_group_index(models: list, group_key: str) -> int:
         if get_ai_profile_group_key(model) == group_key:
             return idx
     return -1
+
+
+def _find_last_ai_group_index(models: list, group_key: str) -> int:
+    """Return the last list index that belongs to the requested profile group."""
+
+    if group_key == '':
+        return -1
+    last_match = -1
+    for idx, model in enumerate(models):
+        if get_ai_profile_group_key(model) == group_key:
+            last_match = idx
+    return last_match
 
 
 def _find_ai_model_index_by_name(models: list, model_name: str) -> int:
@@ -553,7 +573,16 @@ def update_ai_models(current_models: list, current_model_index: int,
         group_models = missing_models_by_group.get(group_key, [])
         if len(group_models) == 0:
             continue
-        insertion_index = _find_first_ai_group_index(current_models, group_key)
+        first_group_index = _find_first_ai_group_index(current_models, group_key)
+        if first_group_index > -1:
+            insertion_index = first_group_index
+        else:
+            anchor_group_key = _get_ai_profile_insertion_anchor_key(group_models[0])
+            if anchor_group_key == group_key:
+                insertion_index = -1
+            else:
+                last_anchor_index = _find_last_ai_group_index(current_models, anchor_group_key)
+                insertion_index = -1 if last_anchor_index < 0 else last_anchor_index + 1
         if insertion_index < 0:
             insertion_index = len(current_models)
         for offset, model in enumerate(group_models):

@@ -916,8 +916,11 @@ langauge = it</string>
              </item>
              <item row="6" column="4">
               <widget class="QPushButton" name="pushButton_renew_auth">
+               <property name="toolTip">
+                <string>Click to open the ChatGPT sign-in page in your default browser. Use it to authorize QualCoder to access AI models through this account.</string>
+               </property>
                <property name="text">
-                <string>Renew</string>
+                <string>Authenticate...</string>
                </property>
               </widget>
              </item>
