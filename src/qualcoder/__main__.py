@@ -45,14 +45,18 @@ from copy import copy
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
 
+from qualcoder.ai_chat import DialogAIChat
+from qualcoder.ai_prompt_library import DialogAiEditPrompts
+from qualcoder.ai_llm import get_default_ai_models, update_ai_models
 from qualcoder.error_dlg import qt_exception_hook
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
-from qualcoder.codebook import Codebook
+from qualcoder.code_av import DialogCodeAV
 from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_organiser import CodeOrganiser
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
+from qualcoder.codebook import Codebook
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
@@ -77,18 +81,14 @@ from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
-from qualcoder.ai_chat import DialogAIChat
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
+from qualcoder.speakers import speaker_coder_name
 from qualcoder.special_functions import DialogSpecialFunctions
 from qualcoder.taguette_import import TaguetteImport
-from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
-from qualcoder.ai_prompt_library import DialogAiEditPrompts
-from qualcoder.ai_llm import get_default_ai_models, update_ai_models
-from qualcoder.speakers import speaker_coder_name
 
 # Check if VLC installed, for warning message for code_av
 vlc = None
