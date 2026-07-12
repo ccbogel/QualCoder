@@ -1793,20 +1793,51 @@ class DialogCodePdf(QtWidgets.QWidget):
             selected : QTreeWidgetItem
          """
 
-        cid = int(selected.text(1)[4:])
-        cur = self.app.conn.cursor()
-        cur.execute("select name, catid from code_cat order by name")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        items_list = [{'name': " ", 'catid': -1, 'cid': -1}]  # Default blank item
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            can_append = True
+            item = iterator.value()
+            depth = 0
+            current = item
+            # Get depth and if circular reference present
+            while current.parent() is not None:
+                if current.text(1) == selected.text(1):
+                    can_append = False
+                current = current.parent()
+                depth += 1
+            prefix = ""
+            if depth > 0:
+                prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
+            name = prefix + item.text(0)
+            cid = -1
+            catid = -1
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+            else:
+                catid = int(item.text(1)[6:])
+                name += " " + _("[CATEGORY]")
+            # Check the same item is not the same selected item
+            if item.text(1) == selected.text(1) and item.text(2) == selected.text(2):
+                can_append = False
+            memo = item.toolTip(2)
+            if can_append:
+                items_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo})
+            iterator += 1
+        ui = DialogSelectItems(self.app, items_list, _("Select blank or category or code"), "single")
         ok = ui.exec()
         if not ok:
             return
-        category = ui.get_selected()
-        # Moving to a category (or to blank) removes any sub-code nesting. <- L
-        cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], cid])
+        destination = ui.get_selected()
+        # print(destination)
+        selected_cid = int(selected.text(1)[4:])
+        cur = self.app.conn.cursor()
+        if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
+            cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
+        elif destination['cid'] > 0:  # Move under another code
+            cur.execute("update code_name set catid=null, supercid=? where cid=?", [destination['cid'], selected_cid])
+        else:  # Move under a category
+            cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], selected_cid])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories(["code_name"])
 

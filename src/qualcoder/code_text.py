@@ -3261,7 +3261,6 @@ class DialogCodeText(QtWidgets.QWidget):
         #print(destination)
         selected_cid = int(selected.text(1)[4:])
         cur = self.app.conn.cursor()
-        # TODO CHECK THIS
         if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
             cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
         elif destination['cid'] > 0:  # Move under another code
