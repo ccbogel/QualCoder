@@ -3784,12 +3784,12 @@ Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="631"/>
         <source>Language for AI conversations: </source>
-        <translation type="unfinished">Langage pour les session sur l&apos;IA : </translation>
+        <translation>Langage pour les session IA : </translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="628"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
-        <translation type="unfinished">Si cette option est sélectionnée, les sessions se dérouleront dans la même langue que le reste de l&apos;interface utilisateur. Vous pouvez sélectionner cette langue en haut de cette fenêtre.</translation>
+        <translation>Si cette option est sélectionnée, les sessions s&apos;afficheront dans la même langue que le reste de l&apos;interface utilisateur. Vous pouvez sélectionner cette langue en haut de cette fenêtre.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="629"/>
