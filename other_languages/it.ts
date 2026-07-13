@@ -498,12 +498,12 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
       <source>Add code</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Aggiungi codice</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
       <source>Import and edit codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Importa e modifica il codice di codifica</translation>
     </message>
   </context>
   <context>
@@ -1245,12 +1245,12 @@ Se non è selezionata: Ogni risposta qualitativa sarà un file di testo individu
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Agente IA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
       <source>Selectively undo AI induced changes</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Annulla in modo selettivo le modifiche apportate dall'IA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
@@ -1258,27 +1258,30 @@ Se non è selezionata: Ogni risposta qualitativa sarà un file di testo individu
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Definisci cosa è consentito fare all’agente IA nel tuo progetto:
+- Solo lettura: l’agente IA non può apportare alcuna modifica.
+- In modalità sandbox (impostazione predefinita): l’agente IA non può modificare i tuoi codici e le tue note, ma può crearne di propri.
+- Accesso completo: l’agente IA può modificare qualsiasi cosa, ma di solito chiederà prima conferma.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sola lettura</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">In ambiente sandbox</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Accesso completo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
       <source>Enlarge AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ingrandisci l'agente IA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
@@ -1492,7 +1495,7 @@ Ctrl Shift &lt;    Decrease play rate to minimum 0.1</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
-      <translation/>
+      <translation>Una volta</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="237"/>
@@ -3274,12 +3277,12 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="204"/>
       <source>A - z</source>
-      <translation/>
+      <translation>A - Z</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="205"/>
       <source>Z - a</source>
-      <translation/>
+      <translation>Da - a</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="206"/>
@@ -3294,7 +3297,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="185"/>
       <source>xlsx</source>
-      <translation/>
+      <translation>Excel 2007</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="178"/>
@@ -3634,12 +3637,12 @@ Non utilizzare l'apostrofo o la virgola in nessun valore.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
       <source>50000</source>
-      <translation/>
+      <translation>50.000</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
       <source>30000</source>
-      <translation/>
+      <translation>30.000</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="567"/>
@@ -3912,12 +3915,18 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language =
 Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Chiudere e riaprire il software affinché la modifica della lingua abbia effetto.
+Le lingue aggiornate regolarmente (da persone e/o dall'intelligenza artificiale) sono: de, es, fr, ja, pt, sv, zh.
+È possibile aggiungere altre lingue se sono elencate nella cartella src/qualcoder/i18n.
+Per farlo, aggiorna il file config.ini indicando un'altra lingua disponibile.
+Trova la riga che inizia con language =
+Quindi modificala. Ad esempio:
+language = it</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
       <source>Permissions:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Autorizzazioni:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
@@ -3925,22 +3934,25 @@ langauge = it</source>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Definisci cosa è consentito fare all’agente IA nel tuo progetto:
+- Solo lettura: l’agente IA non può apportare alcuna modifica.
+- In modalità sandbox (impostazione predefinita): l’agente IA non può modificare i tuoi codici e le tue note, ma può crearne di propri.
+- Accesso completo: l’agente IA può modificare qualsiasi cosa, ma di solito chiederà prima conferma.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sola lettura</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">In ambiente sandbox</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Accesso completo</translation>
     </message>
   </context>
   <context>
@@ -3953,27 +3965,27 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
       <source>Identifier:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Identificativo:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Come viene indicato ogni oratore all'inizio di una riga: Nome: , #Nome: , @Nome: , [Nome] , {Nome} , oppure un formato personalizzato. L'opzione "Rilevamento automatico" seleziona il formato con il maggior numero di turni.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Espressione regolare personalizzata. Deve contenere un gruppo di cattura per il nome dell'oratore. Esempio: ^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Espressione regolare con un gruppo, ad esempio ^\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Scegli i file di testo da analizzare per individuare i parlanti. È possibile selezionare i parlanti in più file contemporaneamente.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
@@ -3988,32 +4000,32 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Numero di parlanti e di turni rilevati con l'identificatore e i file attuali.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fai doppio clic su una cella "codice come" per rinominare un oratore. Assegna lo stesso "codice come" a due righe per unirle, ad esempio per correggere un errore di battitura.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Seleziona i relatori da contrassegnare. Cliccando su OK, viene generato un codice per ciascuno di essi nella categoria “📌 Relatori” e vengono contrassegnati i loro interventi.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Codifica l'intero turno, compresa l'etichetta dell'oratore. Deseleziona questa opzione per codificare solo il testo della risposta, senza il nome.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
       <source>Include speaker name</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Includi il nome del relatore</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
       <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fai doppio clic sul nome di un "codice come" per modificarlo</translation>
     </message>
   </context>
   <context>
@@ -4209,7 +4221,7 @@ Ctrl  Shift &lt; diminuire il tasso di gioco, minimo 0.1</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
-      <translation/>
+      <translation>Una volta</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="200"/>
@@ -4244,7 +4256,8 @@ www.rexegg.com/regex-quickstart.html</translation>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="201"/>
       <source>Ctrl + S start/pause
 Ctrl + P start/pause</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ctrl + S avvia/metti in pausa
+Ctrl + P avvia/metti in pausa</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="209"/>
@@ -4311,7 +4324,7 @@ Avanti 5 secondi. Stampa 5</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="231"/>
       <source>Set bookmark (Ctrl B)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Aggiungi ai preferiti (Ctrl+B)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="232"/>
@@ -4878,17 +4891,17 @@ li.checked:marker { contenuto: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Agente IA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
       <source>Sidebar Mode</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Modalità barra laterale</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
       <source>Ask the AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Chiedi all'agente IA</translation>
     </message>
   </context>
 </TS>

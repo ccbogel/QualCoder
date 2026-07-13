@@ -1,17 +1,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-13 07:50+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Justin\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-07-13 11:27+0200\n"
+"PO-Revision-Date: 2026-07-13 11:21+0200\n"
+"Last-Translator: Auto-translated via DeepL (EN -> PT)\n"
+"Language-Team: PT <LL@li.org>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: DeepL + Custom Script\n"
 
 #: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
 #: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1151
@@ -1241,8 +1241,9 @@ msgid "Memo for file: "
 msgstr "Memo para arquivo:"
 
 #: src/qualcoder/code_pdf.py:3363 src/qualcoder/code_text.py:2752
+#, fuzzy
 msgid "Memo:"
-msgstr "Memo:"
+msgstr "Memo"
 
 #: src/qualcoder/code_pdf.py:3411 src/qualcoder/code_text.py:5866
 #, fuzzy
@@ -2205,7 +2206,7 @@ msgstr "Categorias de código:"
 #: src/qualcoder/ai_llm.py:2360
 #, fuzzy
 msgid " code(s)"
-msgstr "Sem códigos"
+msgstr "nome de código"
 
 #: src/qualcoder/ai_llm.py:2362
 #, fuzzy
@@ -3425,7 +3426,7 @@ msgstr "Atributo renomeado de:"
 #: src/qualcoder/attributes.py:262 src/qualcoder/code_text.py:5609
 #: src/qualcoder/code_text.py:5665
 msgid " to "
-msgstr ""
+msgstr "para"
 
 #: src/qualcoder/attributes.py:275
 msgid "Assigned to"
@@ -4090,7 +4091,7 @@ msgstr "Selecione pelo menos uma coluna de texto qualitativo para analisar."
 #: src/qualcoder/manage_files.py:1894
 #, fuzzy
 msgid "Attributes "
-msgstr "Atributos"
+msgstr "Atributos:"
 
 #: src/qualcoder/manage_files.py:1908
 #, fuzzy
@@ -4595,7 +4596,7 @@ msgstr ""
 #: src/qualcoder/code_organiser.py:1435
 #, fuzzy
 msgid "Category "
-msgstr "Categoria"
+msgstr "Categoria:"
 
 #: src/qualcoder/code_organiser.py:1443
 #, fuzzy
@@ -4792,10 +4793,12 @@ msgid "Not saved"
 msgstr "Nada salvo"
 
 #: src/qualcoder/code_av.py:387 src/qualcoder/view_av.py:445
+#, fuzzy
 msgid "Width:"
 msgstr "Largura:"
 
 #: src/qualcoder/code_av.py:390 src/qualcoder/view_av.py:448
+#, fuzzy
 msgid "Height:"
 msgstr "Altura:"
 
@@ -4847,6 +4850,7 @@ msgid "Screenshot imports: "
 msgstr "Screenshot Importada:"
 
 #: src/qualcoder/code_av.py:2717
+#, fuzzy
 msgid "Segment:"
 msgstr "Segmento:"
 
@@ -5681,6 +5685,7 @@ msgstr "Total:"
 #: src/qualcoder/report_compare_coder_file.py:589
 #: src/qualcoder/view_graph.py:1359 src/qualcoder/view_graph.py:1564
 #: src/qualcoder/view_graph.py:2402
+#, fuzzy
 msgid "msecs"
 msgstr "msegs"
 
@@ -5723,6 +5728,7 @@ msgstr "Contagem de interseções:"
 
 #: src/qualcoder/report_compare_coder_file.py:727
 #: src/qualcoder/report_compare_coder_file.py:737
+#, fuzzy
 msgid "pixels"
 msgstr "pixels"
 
@@ -5905,7 +5911,7 @@ msgstr "Usando"
 
 #: src/qualcoder/case_file_manager.py:623 src/qualcoder/code_text.py:6488
 msgid " and "
-msgstr ""
+msgstr "e"
 
 #: src/qualcoder/case_file_manager.py:623
 #, fuzzy
@@ -6392,6 +6398,7 @@ msgid "width:"
 msgstr "largura:"
 
 #: src/qualcoder/view_graph.py:1548 src/qualcoder/view_graph.py:2382
+#, fuzzy
 msgid "height:"
 msgstr "altura:"
 
@@ -8216,7 +8223,7 @@ msgstr "Encontrado"
 #: src/qualcoder/text_file_replacement.py:134
 #: src/qualcoder/text_file_replacement.py:161
 msgid " of "
-msgstr ""
+msgstr "de"
 
 #: src/qualcoder/text_file_replacement.py:144
 #: src/qualcoder/text_file_replacement.py:171
@@ -8573,6 +8580,7 @@ msgstr "Arquivo:"
 #: src/qualcoder/code_in_all_files.py:256
 #: src/qualcoder/code_in_all_files.py:688 src/qualcoder/code_text.py:4679
 #: src/qualcoder/code_text.py:4749
+#, fuzzy
 msgid "Code:"
 msgstr "Código:"
 
@@ -8768,6 +8776,7 @@ msgstr "Item do arquivo"
 
 #: src/qualcoder/view_charts.py:250 src/qualcoder/view_charts.py:271
 #: src/qualcoder/view_charts.py:292
+#, fuzzy
 msgid "Text:"
 msgstr "Texto:"
 
@@ -9421,6 +9430,7 @@ msgid "About: "
 msgstr "Sobre:"
 
 #: src/qualcoder/__main__.py:3278
+#, fuzzy
 msgid "Coder:"
 msgstr "Codificador:"
 
@@ -9893,7 +9903,7 @@ msgstr "Arquivos exportados"
 #: src/qualcoder/cases.py:400
 #, fuzzy
 msgid "Cases: "
-msgstr "Casos:"
+msgstr "Caso:"
 
 #: src/qualcoder/cases.py:432
 #, fuzzy
@@ -9909,6 +9919,7 @@ msgid "Select cases file"
 msgstr "Selecione o arquivo de casos"
 
 #: src/qualcoder/cases.py:512 src/qualcoder/cases.py:589
+#, fuzzy
 msgid "attribute:"
 msgstr "atributo:"
 
@@ -11414,14 +11425,8 @@ msgstr "Exceção não detectada:"
 #~ msgstr ""
 #~ "Vectorstore: A importação do documento falhou, faiss_db não está presente."
 
-#~ msgid "to"
-#~ msgstr "para"
-
 #~ msgid "Branch has been selected"
 #~ msgstr "O ramo foi selecionado"
-
-#~ msgid "and"
-#~ msgstr "e"
 
 #~ msgid ""
 #~ "No coded text found. Please select another code or category, or refine "
@@ -11443,17 +11448,11 @@ msgstr "Exceção não detectada:"
 #~ msgid "Topic"
 #~ msgstr "Tópico"
 
-#~ msgid "AI:"
-#~ msgstr "IA:"
-
 #~ msgid "New topic analysis chat"
 #~ msgstr "Novo chat de análise de tópicos"
 
 #~ msgid "Ask the AI anything, not related to your data."
 #~ msgstr "Pergunte à IA qualquer coisa, não relacionada com os seus dados."
-
-#~ msgid "of"
-#~ msgstr "de"
 
 #~ msgid "Names of prompts must be unique within its type and scope."
 #~ msgstr "Os nomes dos prompts devem ser únicos dentro do seu tipo e âmbito."

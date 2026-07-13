@@ -165,7 +165,7 @@ Codings از کل فایل متن برای محاسبات استفاده می ش
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="320"/>
       <source>Foreground</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">زمینهٔ پیش</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="321"/>
@@ -205,7 +205,7 @@ Codings از کل فایل متن برای محاسبات استفاده می ش
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="329"/>
       <source>n-grams</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ان-گرام‌ها</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="330"/>
@@ -291,7 +291,7 @@ Each word is excluded in the n-grams=1 Word cloud.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="134"/>
       <source>Save graph</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ذخیره نمودار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="135"/>
@@ -401,7 +401,7 @@ Right-click for options</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
       <source>Coder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کد‌نویس</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
@@ -496,12 +496,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
       <source>Add code</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کد اضافه کنید</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
       <source>Import and edit codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">وارد و ویرایش کتاب کد</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_save_query.py" line="52"/>
       <source>Save Query</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ذخیره پرس‌وجو</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_save_query.py" line="53"/>
@@ -716,7 +716,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="215"/>
       <source>TextLabel</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">برچسب متن</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="216"/>
@@ -761,7 +761,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="224"/>
       <source>Analytic Prompt:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">پرامپت تحلیلی:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="225"/>
@@ -809,7 +809,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="151"/>
       <source>Calculate</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">محاسبه کن</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="152"/>
@@ -839,12 +839,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="157"/>
       <source>Overlap</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">همپوشانی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="158"/>
       <source>Inclusion</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">شمولیت</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="159"/>
@@ -859,7 +859,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="161"/>
       <source>Overlap Inclusion</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">پوشش هم‌پوشانی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="162"/>
@@ -901,7 +901,7 @@ Ordered by file name and code name.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="170"/>
       <source>E</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">و</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="171"/>
@@ -939,7 +939,7 @@ Ordered by file name and code name.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="101"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;خروجی به فایل&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_comparison_table.py" line="102"/>
@@ -1060,7 +1060,7 @@ Right-click for format options
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="93"/>
       <source>,</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">،</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="94"/>
@@ -1240,12 +1240,12 @@ Right-click for format options
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">عامل هوش مصنوعی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
       <source>Selectively undo AI induced changes</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">به‌طور گزینشی لغو تغییرات ناشی از هوش مصنوعی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
@@ -1253,27 +1253,30 @@ Right-click for format options
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">تعریف کنید که عامل هوش مصنوعی در پروژه شما مجاز به انجام چه کارهایی است:
+- فقط خواندنی: عامل هوش مصنوعی نمی‌تواند هیچ تغییری ایجاد کند.
+- محصور (پیش‌فرض): عامل هوش مصنوعی نمی‌تواند تغییراتی در کدها و یادداشت‌های شما ایجاد کند، اما می‌تواند موارد جدید ایجاد کند.
+- دسترسی کامل: عامل هوش مصنوعی می‌تواند همه چیز را تغییر دهد، اما معمولاً ابتدا برای تأیید درخواست می‌کند.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">فقط خواندنی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">در محیط ایزوله</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">دسترسی کامل</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
       <source>Enlarge AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">بزرگ‌نمایی ایجنت هوش مصنوعی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
@@ -1440,7 +1443,7 @@ Right-click for format options
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="214"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">حجم</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="215"/>
@@ -1490,7 +1493,7 @@ Right-click for format options
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">یک بار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
@@ -1545,7 +1548,7 @@ Right-click for format options
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="235"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">اسکرین‌شات</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="236"/>
@@ -1597,7 +1600,7 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="246"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;متن رونویسی‌شده&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
@@ -1726,7 +1729,7 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="232"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;صفحات&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="233"/>
@@ -1809,7 +1812,7 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="279"/>
       <source>Code Text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">متن کد</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="280"/>
@@ -1881,42 +1884,42 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="294"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;صفحات&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="295"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PDF object information&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">اطلاعات شیء PDF</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="296"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;صادرات تصویر&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
       <source>0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">صفر</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
       <source>-1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">منفی یک</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
       <source>-2</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">منفی دو</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
       <source>-3</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">-۳</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
       <source>-4</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">-۴</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
@@ -1931,12 +1934,12 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="306"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in (Shift Plus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;زوم بزرگنمایی (Shift Plus)&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="307"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom Out (Ctrl Minus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;دور کردن (Ctrl منهای)&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="308"/>
@@ -2052,7 +2055,7 @@ To set a bookmark press B</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="486"/>
       <source>Code Text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">متن کد</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="487"/>
@@ -2183,7 +2186,7 @@ As all assigned positions may be incorrect. </source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="518"/>
       <source>odt comment</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">نظر odt</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
@@ -2193,12 +2196,12 @@ As all assigned positions may be incorrect. </source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
       <source>txt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">متن</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
       <source>html</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">اچ‌تی‌ام‌ال</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
@@ -2333,7 +2336,7 @@ Formatted like below for name detection.
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
       <source>&lt;Start AI Search&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;شروع جستجوی هوش مصنوعی&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
@@ -2411,7 +2414,7 @@ Formatted like below for name detection.
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="84"/>
       <source>Coders</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کدنویسان</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="85"/>
@@ -2436,7 +2439,7 @@ Formatted like below for name detection.
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="89"/>
       <source>Rename</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">نام‌گذاری مجدد</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="90"/>
@@ -2446,7 +2449,7 @@ Formatted like below for name detection.
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="91"/>
       <source>Merge</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کار می‌کند</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="92"/>
@@ -2515,7 +2518,7 @@ Formatted like below for name detection.
     <message>
       <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="70"/>
       <source>Memo</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">حافظه</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_edit_text.py" line="71"/>
@@ -2682,12 +2685,12 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="146"/>
       <source>Coder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کد‌نویس</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="148"/>
       <source>jid</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">برداشتن</translation>
     </message>
   </context>
   <context>
@@ -2705,7 +2708,7 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_attributes.py" line="49"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">حذف</translation>
     </message>
   </context>
   <context>
@@ -2718,7 +2721,7 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="134"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;مشاهده فایل&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="135"/>
@@ -2965,7 +2968,7 @@ Review after applying the function.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="43"/>
       <source>Memo</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">حافظه</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="44"/>
@@ -3016,7 +3019,7 @@ Review after applying the function.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="63"/>
       <source>Pseudonyms</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">نام‌های مستعار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="64"/>
@@ -3157,32 +3160,32 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="181"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;صادرات&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="182"/>
       <source>html</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">اچ‌تی‌ام‌ال</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="183"/>
       <source>txt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">متن</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="184"/>
       <source>odt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">قالب متن قابل انتقال</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="185"/>
       <source>xlsx</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">اکسل ۲۰۱۶</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="186"/>
       <source>csv</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">سی‌اس‌وی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="187"/>
@@ -3264,7 +3267,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="204"/>
       <source>A - z</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">الف – ی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="205"/>
@@ -3274,12 +3277,12 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="206"/>
       <source>10 - 1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ده - یک</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="207"/>
       <source>1 - 10</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">۱ - ۱۰</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="208"/>
@@ -3377,7 +3380,7 @@ Select two coders, one file, one code.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="80"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;صادرات اکسل&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="81"/>
@@ -3544,32 +3547,32 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
       <source>0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">صفر</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
       <source>1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">یک</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
       <source>2</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">دو</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
       <source>3</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">سه</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
       <source>4</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">چهار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="552"/>
       <source>5</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">پنج</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
@@ -3630,57 +3633,57 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
       <source>8</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">هشت</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
       <source>10</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ده</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
       <source>12</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">دوازده</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
       <source>14</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">چهارده</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
       <source>16</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">شانزده</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
       <source>18</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">هجده</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
       <source>100</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">صد</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
       <source>200</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">دویست</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
       <source>300</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">سیصد</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
       <source>50000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">پنجاه هزار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
       <source>30000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">سی هزار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
@@ -3725,7 +3728,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="603"/>
       <source>Show IDs</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">نمایش شناسه‌ها</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="604"/>
@@ -3740,7 +3743,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
       <source>API key</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کلید API</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
@@ -3780,7 +3783,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
       <source>1.0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">یک.۰</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
@@ -3886,12 +3889,18 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language =
 Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">برای اعمال تغییر زبان، نرم‌افزار را ببندید و باز کنید.
+زبان‌هایی که به طور منظم (توسط انسان و/یا هوش مصنوعی) به‌روزرسانی می‌شوند عبارتند از: de, es, fr, ja, pt, sv, zh.
+زبان‌های اضافی در صورتی که در پوشه src/qualcoder/i18n فهرست شده باشند، قابل افزودن هستند.
+برای این کار، فایل config.ini را برای زبان دیگری که در دسترس است، به‌روزرسانی کنید.
+خطی را که با language = شروع می‌شود پیدا کنید.
+سپس آن را به‌روزرسانی کنید. برای مثال:
+langauge = it</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
       <source>Permissions:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">مجوزها:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
@@ -3899,22 +3908,25 @@ langauge = it</source>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">تعریف کنید که عامل هوش مصنوعی در پروژه شما مجاز به انجام چه کارهایی است:
+- فقط خواندنی: عامل هوش مصنوعی نمی‌تواند هیچ تغییری ایجاد کند.
+- محصور (پیش‌فرض): عامل هوش مصنوعی نمی‌تواند در کدها و یادداشت‌های شما تغییری ایجاد کند، اما می‌تواند موارد جدید ایجاد کند.
+- دسترسی کامل: عامل هوش مصنوعی می‌تواند همه چیز را تغییر دهد، اما معمولاً ابتدا برای تأیید درخواست می‌کند.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">فقط خواندنی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">در محیط ایزوله</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">دسترسی کامل</translation>
     </message>
   </context>
   <context>
@@ -3927,67 +3939,67 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
       <source>Identifier:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">شناسگر:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">نحوهٔ علامت‌گذاری هر گوینده در ابتدای یک خط: Name: , #Name: , @Name: , [Name] , {Name} یا الگوی سفارشی. تشخیص خودکار قالبی را انتخاب می‌کند که بیشترین تعداد استفاده را دارد.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">بیان‌گر منظم سفارشی. باید شامل یک گروه برداشت برای نام گوینده باشد. مثال: ^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">بی‌قاعده با یک گروه، مثلاً ^\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">انتخاب کنید کدام فایل‌های متنی را برای اسکن سخنرانان بررسی کنید.  می‌توانید سخنرانان را در چندین فایل به‌طور هم‌زمان علامت‌گذاری کنید.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
       <source>Select files</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">انتخاب فایل‌ها</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="89"/>
       <source>Help</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کمک</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">تعداد سخنرانان و نوبت‌های شناسایی‌شده با شناسه‌ی فعلی و فایل‌ها.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">برای تغییر نام یک سخنران، روی سلول «کد به‌عنوان» دوبار کلیک کنید. برای ادغام دو سطر، به هر دو یک «کد به‌عنوان» یکسان بدهید، برای مثال برای اصلاح یک اشتباه تایپی.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">سخنرانان را تیک بزنید تا علامت‌گذاری شوند. OK برای هر یک از آن‌ها در دسته‌بندی «📌 سخنرانان» کد ایجاد می‌کند و نوبت‌هایشان را کدگذاری می‌کند.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کل دور را همراه با برچسب گوینده کد کنید. تیک را بردارید تا فقط متن پاسخ را بدون نام کد کنید.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
       <source>Include speaker name</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">نام سخنران را درج کنید</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
       <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">برای ویرایش، روی نام «code as» دوبار کلیک کنید.</translation>
     </message>
   </context>
   <context>
@@ -4083,17 +4095,17 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="83"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">اجرا</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="84"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;خروجی به اکسل&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="85"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to CSV file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;خروجی به فایل CSV&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="86"/>
@@ -4103,12 +4115,12 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="87"/>
       <source>tab</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">از دست دادن</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="88"/>
       <source>,</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">،</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="89"/>
@@ -4153,7 +4165,7 @@ Ctrl + P Start/pause</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="203"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">حجم</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="204"/>
@@ -4173,7 +4185,7 @@ Ctrl + P Start/pause</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">یک بار</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="208"/>
@@ -4300,7 +4312,7 @@ red underline = Assigned to code or annotation</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_image.py" line="51"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">یادداشت</translation>
     </message>
   </context>
   <context>
@@ -4308,7 +4320,7 @@ red underline = Assigned to code or annotation</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="73"/>
       <source>View and Edit Text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">مشاهده و ویرایش متن</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="74"/>
@@ -4382,7 +4394,7 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="102"/>
       <source>&lt;traceback&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ردیابی خطا</translation>
     </message>
   </context>
   <context>
@@ -4390,12 +4402,12 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="338"/>
       <source>QualCoder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کوال‌کودر</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="339"/>
       <source>Action Log</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">گزارش اقدام</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="340"/>
@@ -4443,7 +4455,7 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
       <source>Coding</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کدنویسی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
@@ -4497,7 +4509,7 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
       <source>AI</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">هوش مصنوعی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="377"/>
@@ -4557,7 +4569,7 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="388"/>
       <source>Code text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">متن کد</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="389"/>
@@ -4567,7 +4579,7 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
       <source>Codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">کتابچهٔ رمزگذاری</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
@@ -4657,7 +4669,7 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
       <source>Coding Matrix</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ماتریس کدنویسی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
@@ -4677,12 +4689,12 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="413"/>
       <source>REFI-QDA Codebook import</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">وارد کردن کتاب کد REFI-QDA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="414"/>
       <source>REFI-QDA Project import</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">واردات پروژه REFI-QDA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="415"/>
@@ -4847,17 +4859,17 @@ li.checked::marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">عامل هوش مصنوعی</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
       <source>Sidebar Mode</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">حالت نوار کناری</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
       <source>Ask the AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">از نماینده هوش مصنوعی بپرسید</translation>
     </message>
   </context>
 </TS>

@@ -496,12 +496,12 @@ Egiaztatuta - hautatutako kodeak bat etorri behar dute.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
       <source>Add code</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Gehitu kodea</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
       <source>Import and edit codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kode-liburua inportatu eta editatu</translation>
     </message>
   </context>
   <context>
@@ -638,7 +638,7 @@ Egiaztatuta - hautatutako kodeak bat etorri behar dute.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="206"/>
       <source>(Uneditable system prompt)</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">(Ezin da editatu sistemaren mezua)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="207"/>
@@ -716,7 +716,7 @@ Egiaztatuta - hautatutako kodeak bat etorri behar dute.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="215"/>
       <source>TextLabel</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Testu etiketa</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="216"/>
@@ -901,7 +901,7 @@ Fitxategi-izenaren eta kode-izenaren arabera ordenatua.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="170"/>
       <source>E</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Eta</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="171"/>
@@ -1090,7 +1090,7 @@ Egin klik eskuineko botoiaz formatu-aukerentzat</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="99"/>
       <source>MINIMAL</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Gutxienekoa</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="100"/>
@@ -1240,12 +1240,12 @@ Egin klik eskuineko botoiaz formatu-aukerentzat</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AI agentea</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
       <source>Selectively undo AI induced changes</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AIk eragindako aldaketak hautaz baliogabetu</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
@@ -1253,27 +1253,30 @@ Egin klik eskuineko botoiaz formatu-aukerentzat</translation>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Definitu zure proiektuan AI agenteak zer egin dezakeen:
+- Irakurri bakarrik: AI agenteak ezin ditu inolako aldaketarik egin.
+- Sandbox moduan (lehenetsita): AI agenteak ezin ditu zure kode eta oharretan aldaketarik egin, baina bereak sor ditzake.
+- Sarbide osoa: AI agenteak dena alda dezake, baina normalean lehenik baieztapena eskatu ohi du.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Irakurri bakarrik</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Mugatuta</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sarbide osoa</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
       <source>Enlarge AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Handitu AI agentea</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
@@ -1490,7 +1493,7 @@ Egin klik eskuineko botoiaz formatu-aukerentzat</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">behin</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
@@ -1711,7 +1714,7 @@ Laster-marka bat ezartzeko, sakatu B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="229"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Biratu eskuineko norabidean</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="230"/>
@@ -1736,7 +1739,7 @@ Laster-marka bat ezartzeko, sakatu B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="234"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Joan orrialdera</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="235"/>
@@ -1826,7 +1829,7 @@ Laster-marka bat ezartzeko, sakatu B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="283"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero / zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="302"/>
@@ -1896,27 +1899,27 @@ Laster-marka bat ezartzeko, sakatu B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
       <source>0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
       <source>-1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">negatiboa</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
       <source>-2</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">bi minus</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
       <source>-3</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">-hiru</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
       <source>-4</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">lau gutxiago</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
@@ -1926,12 +1929,12 @@ Laster-marka bat ezartzeko, sakatu B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="305"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Joan orrira</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="306"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in (Shift Plus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Zoom handitu (Shift +)</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="307"/>
@@ -2081,7 +2084,7 @@ Egin klik eskuineko botoiaz aukeren alde: lehena, azkena, beste kode baten barru
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="493"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero / zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="494"/>
@@ -2183,7 +2186,7 @@ Emandako posizio guztiak okerrak izan daitezke.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="518"/>
       <source>odt comment</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">odt iruzkin</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
@@ -2198,7 +2201,7 @@ Emandako posizio guztiak okerrak izan daitezke.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
       <source>html</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Html</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
@@ -2230,7 +2233,7 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
       <source>REGEX</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Erregular adierazpenak</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
@@ -2642,7 +2645,7 @@ Posizioak ezin dira zuzen egokitu. Egin proiektuaren babeskopia testua editatu a
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="134"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero / zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="135"/>
@@ -2687,7 +2690,7 @@ Posizioak ezin dira zuzen egokitu. Egin proiektuaren babeskopia testua editatu a
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="148"/>
       <source>jid</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hartzeko</translation>
     </message>
   </context>
   <context>
@@ -3016,7 +3019,7 @@ Berrikusi funtzioa aplikatu ondoren.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="63"/>
       <source>Pseudonyms</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Izengoitiak</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="64"/>
@@ -3033,7 +3036,7 @@ maiuskulak eta minuskulak bereizten dira.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="67"/>
       <source>Pseudonym</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ezizena</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="68"/>
@@ -3162,7 +3165,7 @@ maiuskulak eta minuskulak bereizten dira.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="182"/>
       <source>html</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Html</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="183"/>
@@ -3172,22 +3175,22 @@ maiuskulak eta minuskulak bereizten dira.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="184"/>
       <source>odt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">eguneko ordutegi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="185"/>
       <source>xlsx</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Excel 2007</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="186"/>
       <source>csv</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">komaz bereizitako balioak</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="187"/>
       <source>iramuteq</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Iramuteq</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="188"/>
@@ -3274,12 +3277,12 @@ Aldatu ezarpenak karaktere kopuruarentzat eta bistaratzeko estiloarentzat.</tran
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="206"/>
       <source>10 - 1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hamar bat</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="207"/>
       <source>1 - 10</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Batetik hamarrera</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="208"/>
@@ -3372,7 +3375,7 @@ Hautatu bi kodetzaile, fitxategi bat, kode bat.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="79"/>
       <source>Coder Comparisons</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodegileen konparaketak</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="80"/>
@@ -3544,32 +3547,32 @@ Ez da gomendatzen babeskopia moteltzen duten fitxategi handi asko ez badituzu.</
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
       <source>0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
       <source>1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">bat</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
       <source>2</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">bi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
       <source>3</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hiru</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
       <source>4</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">lau</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="552"/>
       <source>5</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">bost</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
@@ -3630,57 +3633,57 @@ Ez da gomendatzen babeskopia moteltzen duten fitxategi handi asko ez badituzu.</
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
       <source>8</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zortzi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
       <source>10</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hamar</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
       <source>12</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hamabi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
       <source>14</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hamalau</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
       <source>16</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hamasei</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
       <source>18</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hamazortzi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
       <source>100</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ehun</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
       <source>200</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dohain</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
       <source>300</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hirurehun</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
       <source>50000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">berrogeita hamar mila</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
       <source>30000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">hiru hamar mila</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
@@ -3780,7 +3783,7 @@ Ez da gomendatzen babeskopia moteltzen duten fitxategi handi asko ez badituzu.</
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
       <source>1.0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">bat.zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
@@ -3886,12 +3889,18 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language =
 Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Itxi eta ireki softwarea hizkuntza-aldaketa gertatzeko.
+Hizkuntzak, giza eta/edo adimen artifizial bidez erregularki eguneratzen direnak, hauek dira: de, es, fr, ja, pt, sv, zh.
+Src/qualcoder/i18n karpeta horretan agertzen badira, hizkuntza osagarriak gehitu daitezke.
+Horretarako, eguneratu config.ini fitxategia eskuragarri dagoen beste hizkuntza batera.
+Bilatu language = hasten den lerroa.
+Ondoren, eguneratu. Adibidez:
+language = it</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
       <source>Permissions:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Baimenak:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
@@ -3899,22 +3908,25 @@ langauge = it</source>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Definitu zure proiektuan AI agenteak zer egin dezakeen:
+- Irakurri bakarrik: AI agenteak ezin ditu inolako aldaketarik egin.
+- Sandbox moduan (lehenetsita): AI agenteak ezin ditu zure kode eta oharretan aldaketarik egin, baina bereak sor ditzake.
+- Sarbide osoa: AI agenteak dena alda dezake, baina normalean lehenik baieztapena eskatu ohi du.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Irakurri bakarrik</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Mugatuta</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sarbide osoa</translation>
     </message>
   </context>
   <context>
@@ -3922,72 +3934,72 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="82"/>
       <source>Mark Speakers</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Marka bozgorailuak</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
       <source>Identifier:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Identifikatzailea:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Nola markatzen den hiztun bakoitza lerro baten hasieran: Name: , #Name: , @Name: , [Name] , {Name} edo eredu pertsonalizatua. Auto-detect-ek hautatzen du erabilien formatua.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Espresio erregular pertsonalizatua. Hiztunaren izena harrapatzeko talde bakarra izan behar du. Adibidea: ^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">talde bakarreko regex-a, adibidez ^\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Aukeratu zein testu-fitxategi eskaneatu hiztunak aurkitzeko.  Hiztunak hainbat fitxategitan aldi berean markatu ditzakezu.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
       <source>Select files</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Hautatu fitxategiak</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="89"/>
       <source>Help</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Laguntza</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Egungo identifikatzailearekin eta fitxategiekin detektatutako hiztunen kopurua eta txandak.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Egin klik bikoitza "code as" zelula batean hiztun baten izena aldatzeko. Bi ilareri eman "code as" bera elkartzeko, adibidez akats tipografiko bat zuzentzeko.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Markatzeko hizlariak hautatu. OK-k "📌 Hizlariak" kategorian bakoitzarentzako kode bat sortzen du eta haien txandak kodetzen ditu.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sartu bira osoa, hiztunaren etiketa barne. Desmarkatu erantzun-testua bakarrik kodetzeko, izenik gabe.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
       <source>Include speaker name</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Hizlariren izena sartu</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
       <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Bikoiztu klikatu "code as" izenean editatzeko</translation>
     </message>
   </context>
   <context>
@@ -4173,7 +4185,7 @@ Ktrl + P hasiera/pause</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">behin</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="208"/>
@@ -4257,7 +4269,7 @@ gorria azpimarra = kodeari edo ohartzeari esleitua</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="225"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero / zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="226"/>
@@ -4333,7 +4345,7 @@ gorria azpimarra = kodeari edo ohartzeari esleitua</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="78"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">zero / zero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="79"/>
@@ -4382,7 +4394,7 @@ Ez kodetu testu hau Coding-a birkargatu arte - Menu-barrako testu-kodea.</transl
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="102"/>
       <source>&lt;traceback&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Errastaketa</translation>
     </message>
   </context>
   <context>
@@ -4443,7 +4455,7 @@ li.checked:marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
       <source>Coding</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodetzea</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
@@ -4497,7 +4509,7 @@ li.checked:marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
       <source>AI</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Adimen artifiziala</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="377"/>
@@ -4567,7 +4579,7 @@ li.checked:marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
       <source>Codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kode-liburua</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
@@ -4657,7 +4669,7 @@ li.checked:marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
       <source>Coding Matrix</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodetze Matrizea</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
@@ -4847,17 +4859,17 @@ li.checked:marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AI agentea</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
       <source>Sidebar Mode</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Alboko barrako modua</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
       <source>Ask the AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Adimen Artifizialeko Agenteari galdetu</translation>
     </message>
   </context>
 </TS>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="eo_001" sourcelanguage="en">
   <context>
     <name>DialogAddAttribute</name>
     <message>
@@ -175,7 +175,7 @@ Codings de la tuta teksta dosiero estas uzata por la kalkuloj.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="322"/>
       <source>Width</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Larĝo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="323"/>
@@ -215,7 +215,7 @@ Codings de la tuta teksta dosiero estas uzata por la kalkuloj.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="331"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Tio estas permesi pli larĝan disvastiĝon de varmomapoj kiam ekzistas ekstremaj kalkulodiferencoj.&lt;/p&gt;0 reprezentas neniun limon.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Tio estas permesi pli larĝan disvastiĝon de varmomapoj kiam ekzistas ekstremaj kalkulodiferencoj.&lt;/p&gt;0 reprezentas neniun limon.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="332"/>
@@ -401,7 +401,7 @@ Rajto-klako por opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
       <source>Coder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programisto</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
@@ -438,7 +438,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="122"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Matching preciza kodigita teksto por multoblaj kodoj estas komparitaj en unu linion.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Matching preciza kodigita teksto por multoblaj kodoj estas komparitaj en unu linion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="123"/>
@@ -491,17 +491,17 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
       <source>Apply</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Apliki</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
       <source>Add code</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Aldonu kodon</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
       <source>Import and edit codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Enporti kaj redakti kodlibron</translation>
     </message>
   </context>
   <context>
@@ -527,7 +527,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_save_query.py" line="54"/>
       <source>Query Group</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Demanda Grupo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_save_query.py" line="55"/>
@@ -555,7 +555,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="97"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodisto:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="98"/>
@@ -593,12 +593,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="195"/>
       <source>AI Prompts Library</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Biblioteko de AI-instigoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="196"/>
       <source>Analytic Prompts:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Analizaj demandoj:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="197"/>
@@ -643,7 +643,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="207"/>
       <source>Scope:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Amplekso:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_edit_prompts.py" line="208"/>
@@ -761,7 +761,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="224"/>
       <source>Analytic Prompt:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Analiza instrukcio:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="225"/>
@@ -771,7 +771,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="226"/>
       <source> Edit </source>
-      <translation type="unfinished">Edit Edit Edit</translation>
+      <translation type="unfinished"> Edit </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_search.py" line="227"/>
@@ -854,7 +854,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="160"/>
       <source>Proximity</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Proksimeco</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="161"/>
@@ -901,7 +901,7 @@ Ordonite per dosiernomo kaj kodnomo.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="170"/>
       <source>E</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kaj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="171"/>
@@ -1037,7 +1037,8 @@ Dekstra-klako por formataj opcioj</translation>
 Right-click for format options
 </source>
       <translation type="unfinished">Eksporto Cluster Graph Image
-Dekstra-klako por formataj opcioj</translation>
+Dekstra-klako por formataj opcioj
+</translation>
     </message>
   </context>
   <context>
@@ -1090,7 +1091,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="99"/>
       <source>MINIMAL</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">MINIMUMA</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="100"/>
@@ -1110,7 +1111,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="103"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked: All the rows of a qualitative column will be collated into one text file.&lt;/p&gt;&lt;p&gt;If unchecked: Each qualitative answer will be an individual text file within the database.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Se kontrolite: Ĉiuj vicoj de kvalita kolono estos komparitaj en unu tekstdosieron.&lt;/p&gt;&lt;p&gt; Se neĉerpita: Ĉiu kvalita respondo estos individua tekstodosiero ene de la datumbazo.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Se kontrolite: Ĉiuj vicoj de kvalita kolono estos komparitaj en unu tekstdosieron.&lt;/p&gt;&lt;p&gt; Se neĉerpita: Ĉiu kvalita respondo estos individua tekstodosiero ene de la datumbazo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="104"/>
@@ -1225,7 +1226,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="220"/>
       <source>Delete</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Forigi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="222"/>
@@ -1240,12 +1241,12 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Artifika inteligenteca agento</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
       <source>Selectively undo AI induced changes</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Selekteme nuligi de AI induktitajn ŝanĝojn</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
@@ -1253,27 +1254,30 @@ Dekstra-klako por formataj opcioj</translation>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Difinu, kion la IA-agento rajtas fari en via projekto:
+- Nur-legado: La IA-agento ne povas fari iujn ajn ŝanĝojn.
+- Izolita (normale): La IA-agento ne povas fari ŝanĝojn al viaj kodoj kaj memuaroj, sed ĝi povas krei siajn proprajn.
+- Plena aliro: La AI-agento povas ŝanĝi ĉion, sed kutime unue petos konfirmon.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Nur-legado</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sandkestigita</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Plena aliro</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
       <source>Enlarge AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Pligrandigi AI-agenton</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
@@ -1364,7 +1368,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_case_file_manager.py" line="92"/>
       <source>Files linked: </source>
-      <translation type="unfinished">Dosieroj interligitaj:</translation>
+      <translation type="unfinished">Dosieroj interligitaj: </translation>
     </message>
   </context>
   <context>
@@ -1392,7 +1396,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="108"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Importaj kazoj&lt;/p&gt;Import de csv aŭ xlsx dosiero. La dosiero havendaĵo pli kapon kaj la unua kolono havendaĵo la unikajn kaznomojn aŭ identigilojn. Postaj kolonoj estas atributoj por ĉiu kazo.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Importaj kazoj&lt;/p&gt;Import de csv aŭ xlsx dosiero. La dosiero havendaĵo pli kapon kaj la unua kolono havendaĵo la unikajn kaznomojn aŭ identigilojn. Postaj kolonoj estas atributoj por ĉiu kazo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="109"/>
@@ -1422,7 +1426,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_cases.py" line="114"/>
       <source>Cases: </source>
-      <translation type="unfinished">Kazoj:</translation>
+      <translation type="unfinished">Kazoj: </translation>
     </message>
   </context>
   <context>
@@ -1445,7 +1449,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="215"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Gazetaro la Komenca segmentbutono por komenci kodigi la aŭdio-/vidbendan segmenton. Premigu la End-segmenton por fini la kodigitan segmenton.&lt;/p&gt;Key mallongigo: Ctrl S&lt;/p&gt;Key mallongigo: G - Malferma noto kaj apliki segmenton al nuntempe elektita kodo.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Gazetaro la Komenca segmentbutono por komenci kodigi la aŭdio-/vidbendan segmenton. Premigu la End-segmenton por fini la kodigitan segmenton.&lt;/p&gt;Key mallongigo: Ctrl S&lt;/p&gt;Key mallongigo: G - Malferma noto kaj apliki segmenton al nuntempe elektita kodo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="216"/>
@@ -1455,7 +1459,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="217"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Kiam segmento de aŭdio aŭ vidbendo estas farita, elektas kodon de la kodoj arbo, dekstra klako sur la kodo kaj asignas la segmenton al la kodo.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Kiam segmento de aŭdio aŭ vidbendo estas farita, elektas kodon de la kodoj arbo, dekstra klako sur la kodo kaj asignas la segmenton al la kodo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="218"/>
@@ -1465,7 +1469,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodisto:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
@@ -1490,7 +1494,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
       <source>1.0x</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Unufoje</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
@@ -1530,7 +1534,7 @@ Dekstra-klako por formataj opcioj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="232"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Button selekti segmenton.&lt;/p&gt;Tiam menuo de opcioj malfermiĝos.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Button selekti segmenton.&lt;/p&gt;Tiam menuo de opcioj malfermiĝos.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="233"/>
@@ -1602,7 +1606,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Maldekstra klako sur la glitilbutono kaj tiriĝo foriris aŭ rekte por ŝanĝi videpozicion.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Maldekstra klako sur la glitilbutono kaj tiriĝo foriris aŭ rekte por ŝanĝi videpozicion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
   </context>
   <context>
@@ -1756,7 +1760,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodisto:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
@@ -1809,7 +1813,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="279"/>
       <source>Code Text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Koda teksto</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="280"/>
@@ -1826,7 +1830,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="283"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nul / nul</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="302"/>
@@ -1896,17 +1900,17 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
       <source>0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nulo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
       <source>-1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">-unu</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
       <source>-2</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">mal-du</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
@@ -1916,7 +1920,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
       <source>-4</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">-kvar</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
@@ -1946,7 +1950,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="309"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodisto:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="310"/>
@@ -2052,7 +2056,7 @@ Por meti libromarkan gazetaron B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="486"/>
       <source>Code Text</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Koda teksto</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="487"/>
@@ -2081,7 +2085,7 @@ Dekstra klako por opcioj: ĉio, unue, laste, ene de alia kodo.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="493"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nul / nul</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="494"/>
@@ -2168,7 +2172,7 @@ Klaku sur pozicio, sen selektado de teksto, por tajpi, forigi, aŭ pastotekston.
 Elekti tekston kiu ne estas underlined kaj forigi aŭ paston inte.
 Eviti selekti tekston por forigi aŭ paston super se la elektita teksto estas substrekita:
 (kodite - ruĝa, komentita - flava, kaz-asignita - verda)
-Ĉar ĉiuj asignitaj pozicioj povas esti malĝustaj.</translation>
+Ĉar ĉiuj asignitaj pozicioj povas esti malĝustaj. </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="516"/>
@@ -2248,7 +2252,7 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="534"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodisto:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="535"/>
@@ -2268,7 +2272,7 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="538"/>
       <source>Exit Edit text </source>
-      <translation type="unfinished">Exit Edit teksto</translation>
+      <translation type="unfinished">Exit Edit teksto </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
@@ -2333,7 +2337,7 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
       <source>&lt;Start AI Search&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;Komencu AI-serĉon&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
@@ -2411,7 +2415,7 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="84"/>
       <source>Coders</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programistoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="85"/>
@@ -2446,7 +2450,7 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="91"/>
       <source>Merge</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ĝi funkcias</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_coder_names.py" line="92"/>
@@ -2502,7 +2506,7 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_confirm_delete.py" line="34"/>
       <source>Confirm Delete</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Konfirmi forigon</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_confirm_delete.py" line="35"/>
@@ -2548,7 +2552,8 @@ Suba maldekstra butono [戻る] estas por [送信] por [Sendi].
 Positions may not correctly adjust. Make  a backup copy of the project before editing text.
 </source>
       <translation type="unfinished">Se redaktante tekston: Evitu selekti tekstkombinaĵojn de nemarkitaj tekstsekcioj kaj koditaj/etiked-asignitaj sekcioj.
-Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redaktado de teksto.</translation>
+Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redaktado de teksto.
+</translation>
     </message>
   </context>
   <context>
@@ -2612,7 +2617,7 @@ Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redakt
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="128"/>
       <source>Delete</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Forigi</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="129"/>
@@ -2622,7 +2627,7 @@ Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redakt
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="130"/>
       <source>Journals: </source>
-      <translation type="unfinished">Ĵurnaloj:</translation>
+      <translation type="unfinished">Ĵurnaloj: </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="131"/>
@@ -2632,7 +2637,7 @@ Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redakt
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="132"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;Search uzas Regex funkciojn.&lt;/p&gt;&lt;p&gt;A dot '.' estas utiligita kiel sovaĝa karto, ekz. '. '.ears' ludos "bears" kaj "jaroj" ... &lt;/p&gt;A "gepatro" ludos unu aŭ neniun fojon tiun karakteron, ekz. "aroj?" &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span stilo=" fon-koloro: transgepatro;'&lt;/span&gt;\. ludos la dot simbolon, '\'?" matĉos la demandomarko. '\n' matĉos la linio finanta simbolon.&lt;/p&gt; Regex tromptuko:&lt;a href 'htp: //wreggx.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » sert de caractère générique ; par exemple, « .ears » correspondra à « bears » et à « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère ; par exemple, « bears? » correspondra à « bear » et à « bears » &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;« &lt;/span&gt;\. » correspondra au point, « \? » correspondra au point d’interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="133"/>
@@ -2642,7 +2647,7 @@ Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redakt
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="134"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nul / nul</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="135"/>
@@ -2682,12 +2687,12 @@ Pozicioj ne povas ĝuste adapti. Faru rezervokopion de la projekto antaŭ redakt
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="146"/>
       <source>Coder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programisto</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="148"/>
       <source>jid</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">preni</translation>
     </message>
   </context>
   <context>
@@ -2799,7 +2804,7 @@ Ne povas eksporti tekstan transskribdosieron asociitan kun aŭdio aŭ vidbendo k
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="152"/>
       <source>Delete saved table display settings. </source>
-      <translation type="unfinished">Delete savis tablon ekranvalorojn.</translation>
+      <translation type="unfinished">Delete savis tablon ekranvalorojn. </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="153"/>
@@ -2814,16 +2819,7 @@ Does not work with PDF files. Instead extract the plain text and only import the
 The pseudonyms are stored in the qda data folder as pseudonyms.json
 After all text files are imported, remove this file from the project folder and store it securely.
 </source>
-      <translation type="unfinished">Pseudonymization (datenoj de-identigo)
-Antaŭ importado de tekstdosieroj, krei liston de nomoj aŭ frazoj por esti anstataŭigita.
-Applies al tiuj dosieroj: doĉ, epub, htm, html, md, rtf, odt, txt, enketimportado de kvalitaj kolonoj.
-Pseudonym-anstataŭaĵoj estas kazo sentema.
-Tiel apartaj kontribuoj estus necesaj por Tom kaj TOM.
-
-Ne funkcias per PDF-dosieroj. Anstataŭe eltiras la simplan tekston kaj nur importas la simplan tekston de la PDF.
-
-La pseŭdonimoj estas stokitaj en la qda datenfalinto kiel pseŭdonimoj.json
-Post kiam ĉiuj tekstdosieroj estas importitaj, forigas tiun dosieron de la projektofalinto kaj stokas ĝin defendeble.</translation>
+      <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;Serĉo uzas Regex-funkciojn. Punkto '.' estas uzata kiel ĝenerala karto, ekzemple '.ears' kongruos kun 'bears' kaj 'years'. Punkto '.' post karaktero kongruas unu aŭ neniun fojon tiun karakteron, ekz. 'bears?' kongruos kun 'bear' kaj 'bears' &lt;span style=" background-color:transparent;"&gt;Asterisko '*' post karaktero kongruas nul aŭ pli da fojoj. &lt;/span&gt;'\. kongruos kun la punkto-simbolo, '\?' kongruos kun la demandosigno. '\n' kongruos kun la linifina simbolo. Regex-rapidgvidilo: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="164"/>
@@ -3016,7 +3012,7 @@ Post aplikado de la funkcio.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="63"/>
       <source>Pseudonyms</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Pseudonimoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="64"/>
@@ -3033,7 +3029,7 @@ Case sentema, aldonas multoblajn kontribuojn por ĉiu: ekz. Tom Jones kaj TOM JO
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="67"/>
       <source>Pseudonym</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kromnomo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_pseudonyms.py" line="68"/>
@@ -3051,7 +3047,7 @@ Case sentema, aldonas multoblajn kontribuojn por ĉiu: ekz. Tom Jones kaj TOM JO
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_refi_export_endings.py" line="41"/>
       <source>Settings</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Agordoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_refi_export_endings.py" line="42"/>
@@ -3147,12 +3143,12 @@ Case sentema, aldonas multoblajn kontribuojn por ĉiu: ekz. Tom Jones kaj TOM JO
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="179"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodisto:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="180"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;Atributoj.&lt;/p&gt;&lt;p&gt;Altributo selektado superregis dosierojn aŭ kazojn selektitajn en la maldekstramana-flankaj listoj.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;Atributoj.&lt;/p&gt;&lt;p&gt;Altributo selektado superregis dosierojn aŭ kazojn selektitajn en la maldekstramana-flankaj listoj.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="181"/>
@@ -3172,22 +3168,22 @@ Case sentema, aldonas multoblajn kontribuojn por ĉiu: ekz. Tom Jones kaj TOM JO
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="184"/>
       <source>odt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Origina dokumento</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="185"/>
       <source>xlsx</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Excel 2016</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="186"/>
       <source>csv</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">komata-valora dosiero</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="187"/>
       <source>iramuteq</source>
-      <translation type="unfinished">→ Eventoj:</translation>
+      <translation type="unfinished">iramuteq</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="188"/>
@@ -3259,7 +3255,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="203"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code names sort order.&lt;/p&gt;&lt;p&gt;Set this before running results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Kodo nomas speconrdo.&lt;/p&gt;Set tio antaŭ prizorgado de rezultoj.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Kodo nomas speconrdo.&lt;/p&gt;Set tio antaŭ prizorgado de rezultoj.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="204"/>
@@ -3274,7 +3270,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="206"/>
       <source>10 - 1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dek - unu</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="207"/>
@@ -3322,7 +3318,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
       <source>Coders:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programistoj:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="98"/>
@@ -3372,7 +3368,7 @@ Elekti du kodigilojn, unu dosieron, unu kodon.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="79"/>
       <source>Coder Comparisons</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodaj komparoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="80"/>
@@ -3387,7 +3383,7 @@ Elekti du kodigilojn, unu dosieron, unu kodon.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="82"/>
       <source>Coders:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programistoj:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="83"/>
@@ -3441,7 +3437,7 @@ Sovaĝaj kartoj por "kiel" estas% kaj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="87"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save filter settings.&lt;/p&gt;&lt;p&gt;Do not use apostrophe or comma in any values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Save-filtrilvaloroj.&lt;/p&gt; Ne uzu apostrofo aŭ komo en iuj valoroj.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Save-filtrilvaloroj.&lt;/p&gt; Ne uzu apostrofo aŭ komo en iuj valoroj.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="88"/>
@@ -3496,7 +3492,7 @@ Sovaĝaj kartoj por "kiel" estas% kaj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="102"/>
       <source>Operator</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Funkciigisto</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_attribute_parameters.py" line="104"/>
@@ -3517,7 +3513,7 @@ Sovaĝaj kartoj por "kiel" estas% kaj</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
       <source>Settings</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Agordoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
@@ -3539,43 +3535,44 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="546"/>
       <source>Backups</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sekurkopioj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
       <source>0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nulo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
       <source>1</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">unu</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
       <source>2</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">du</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
       <source>3</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">tri</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
       <source>4</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">kvar</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="552"/>
       <source>5</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">kvin</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
       <source>Set this name as the current coder.
 </source>
-      <translation type="unfinished">Tiu nomo estas la nuna kodo.</translation>
+      <translation type="unfinished">Tiu nomo estas la nuna kodo.
+</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
@@ -3585,7 +3582,7 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
       <source>Current coder: </source>
-      <translation type="unfinished">Nuna kodigilo:</translation>
+      <translation type="unfinished">Nuna kodigilo: </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
@@ -3630,57 +3627,57 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
       <source>8</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ok</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
       <source>10</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dek</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
       <source>12</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dek du</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
       <source>14</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dek kvar</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
       <source>16</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dek ses</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
       <source>18</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">dek ok</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
       <source>100</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">cent</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
       <source>200</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">ducent</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
       <source>300</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">tricent</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
       <source>50000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">kvindek mil</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
       <source>30000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">tridekmil</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
@@ -3720,7 +3717,7 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Montri la identigajn nombrojn por dosieroj, kazoj, kodoj, ktp.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Montri la identigajn nombrojn por dosieroj, kazoj, kodoj, ktp.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="603"/>
@@ -3780,7 +3777,7 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
       <source>1.0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">unu nula</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
@@ -3815,7 +3812,7 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
       <source>Language for AI conversations: </source>
-      <translation type="unfinished">Lingvo por konversacio:</translation>
+      <translation type="unfinished">Lingvo por konversacio: </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
@@ -3830,12 +3827,12 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="634"/>
       <source>API Base URL:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">API-baza URL:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="635"/>
       <source>   Top_p:</source>
-      <translation type="unfinished">Top p:</translation>
+      <translation type="unfinished">   Top p:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
@@ -3850,7 +3847,7 @@ Ne rekomendite se vi havas multajn grandajn dosierojn malrapidigante la rezervon
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
       <source>   Fast Model:</source>
-      <translation type="unfinished">Rapida Modelo:</translation>
+      <translation type="unfinished">   Rapida Modelo:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
@@ -3886,12 +3883,18 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language =
 Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fermu kaj malfermu la programaron por ke la lingvoŝanĝo efektiviĝu.
+Regule ĝisdatigitaj lingvoj (de homo kaj/aŭ IA) estas: de, es, fr, ja, pt, sv, zh.
+Pliaj lingvoj povas esti aldonitaj se ili estas listigitaj en la dosierujo src/qualcoder/i18n.
+Por fari tion, ĝisdatigu la dosieron config.ini al alia disponebla lingvo.
+Trovu la linion komencantan per language =
+Poste ĝisdatigu ĝin. Ekzemple:
+language = it</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
       <source>Permissions:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Permesoj:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
@@ -3899,22 +3902,25 @@ langauge = it</source>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Difinu, kion la IA-agento rajtas fari en via projekto:
+- Nur-legado: La IA-agento ne povas fari iujn ajn ŝanĝojn.
+- Izolita (normale): La IA-agento ne povas fari ŝanĝojn al viaj kodoj kaj memoraĵoj, sed ĝi povas krei siajn proprajn.
+- Plena aliro: La AI-agento povas ŝanĝi ĉion, sed kutime unue petos konfirmon.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Nur-legenda</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sandkestigita</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Plena aliro</translation>
     </message>
   </context>
   <context>
@@ -3927,67 +3933,67 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
       <source>Identifier:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Identigu:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kiel ĉiu parolanto estas markita ĉe la komenco de linio: Nomo: , #Nomo: , @Nomo: , [Nomo] , {Nomo} aŭ propra ŝablono. Aŭtomata detekto elektas la formaton kun la plej multaj uzoj.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Personigita regula esprimo. Ĝi devas enhavi unu kaptogrupon por la nomo de la parolanto. Ekzemplo: ^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">regex kun unu grupo, ekz. ^\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Elektu, kiujn tekstdosierojn skani por parolantoj. Vi povas marki parolantojn en pluraj dosieroj samtempe.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
       <source>Select files</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Elekti dosierojn</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="89"/>
       <source>Help</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Helpu</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Nombro de parolantoj kaj vortturnoj detektitaj kun la nuna identigilo kaj dosieroj.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Duoble alklaku ĉelon "kodo kiel" por renomi parolanton. Donu al du vicoj la saman "kodo kiel" por kunfandi ilin, ekzemple por korekti tajperon.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Marku la parolantojn. OK kreas kodon por ĉiu el ili en la kategorio "📌 Parolantoj" kaj kodas iliajn turnojn.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodu la tutan turnon inkluzive de la etikedon de la parolanto. Malmarku por kodi nur la respondotekston, sen la nomo.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
       <source>Include speaker name</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Inkluzivu la nomon de la parolanto</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
       <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Duoble alklaku nomon "kodo kiel" por redakti</translation>
     </message>
   </context>
   <context>
@@ -4128,7 +4134,7 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="92"/>
       <source>Quote</source>
-      <translation type="unfinished">Vidu ankaŭ:</translation>
+      <translation type="unfinished">Vidu ankaŭ</translation>
     </message>
   </context>
   <context>
@@ -4141,7 +4147,7 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="200"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Maldekstra klako sur la glitilbutono kaj tiriĝo foriris aŭ rekte por ŝanĝi aŭdion/vidbendpozicion.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Maldekstra klako sur la glitilbutono kaj tiriĝo foriris aŭ rekte por ŝanĝi aŭdion/vidbendpozicion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="201"/>
@@ -4173,7 +4179,7 @@ Ctrl + P komenco/pause</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="207"/>
       <source>1.0x</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Unufoje</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="208"/>
@@ -4183,7 +4189,7 @@ Ctrl + P komenco/pause</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="209"/>
       <source>Decrease play rate. Ctrl + Shift + &amp;lt; </source>
-      <translation type="unfinished">Malkresko de ludo. Ctrl + Shift + &amp;lt;</translation>
+      <translation type="unfinished">Malkresko de ludo. Ctrl + Shift + &amp;lt; </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="210"/>
@@ -4227,7 +4233,7 @@ Ruĝa sublinio = Subskribita al kodo aŭ komentado</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="219"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Aldonu parollingvan nomon al mallongigoj. En la teksta enirkesto premi ctrl + n&lt;/p&gt;&lt;p&gt; Insert parolanto en transskribon. En la teksta enirkesto trl + 1 ĝis ctrl + 8 por la parolantoj nomas.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;&lt;p&gt; Aldonu parollingvan nomon al mallongigoj. En la teksta enirkesto premi ctrl + n&lt;/p&gt;&lt;p&gt; Insert parolanto en transskribon. En la teksta enirkesto trl + 1 ĝis ctrl + 8 por la parolantoj nomas.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="220"/>
@@ -4247,7 +4253,7 @@ Ruĝa sublinio = Subskribita al kodo aŭ komentado</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="223"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;Search uzas Regex funkciojn.&lt;/p&gt;&lt;p&gt;A dot '.' estas utiligita kiel sovaĝa karto, ekz. '. '.ears' ludos "bears" kaj "jaroj" ... &lt;/p&gt;A "gepatro" ludos unu aŭ neniun fojon tiun karakteron, ekz. "aroj?" &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span stilo=" fon-koloro: transgepatro;'&lt;/span&gt;\. ludos la dot simbolon, '\'?" matĉos la demandomarko. '\n' matĉos la linio finanta simbolon.&lt;/p&gt; Regex tromptuko:&lt;a href 'htp: //wreggx.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;Serĉo uzas Regex-funkciojn. Punkto '.' estas uzata kiel ĝenerala karto, ekzemple '.ears' kongruos kun 'bears' kaj 'years'. Punkto '.' post karaktero kongruas unu aŭ neniun fojon tiun karakteron, ekz. 'bears?' kongruos kun 'bear' kaj 'bears' &lt;span style=" background-color:transparent;"&gt;Asterisko '*' post karaktero kongruas nul aŭ pli da fojoj. &lt;/span&gt;'\. kongruos kun la punkto-simbolo, '\?' kongruos kun la demandosigno. '\n' kongruos kun la linifina simbolo. Regex-rapidgvidilo: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="224"/>
@@ -4257,7 +4263,7 @@ Ruĝa sublinio = Subskribita al kodo aŭ komentado</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="225"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nul / nul</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_av.py" line="226"/>
@@ -4333,12 +4339,12 @@ Ruĝa sublinio = Subskribita al kodo aŭ komentado</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="78"/>
       <source>0 / 0</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">nul / nul</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="79"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;p&gt;Search uzas Regex funkciojn.&lt;/p&gt;&lt;p&gt;A dot '.' estas utiligita kiel sovaĝa karto, ekz. '. '.ears' ludos "bears" kaj "jaroj" ... &lt;/p&gt;A "gepatro" ludos unu aŭ neniun fojon tiun karakteron, ekz. "aroj?" &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span stilo=" fon-koloro: transgepatro;'&lt;/span&gt;\. ludos la dot simbolon, '\'?" matĉos la demandomarko. '\n' matĉos la linio finanta simbolon.&lt;/p&gt; Regex tromptuko:&lt;a href 'htp: //wreggx.</translation>
+      <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;Serĉo uzas Regex-funkciojn. Punkto '.' estas uzata kiel ĝenerala karto, ekzemple '.ears' kongruos kun 'bears' kaj 'years'. Punkto '.' post karaktero kongruas unu aŭ neniun fojon tiun karakteron, ekz. 'bears?' kongruos kun 'bear' kaj 'bears' &lt;span style=" background-color:transparent;"&gt;Asterisko '*' post karaktero kongruas nul aŭ pli da fojoj. &lt;/span&gt;'\. kongruos kun la punkto-simbolo, '\?' kongruos kun la demandosigno. '\n' kongruos kun la linifina simbolo. Regex-rapidgvidilo: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_view_text.py" line="80"/>
@@ -4372,7 +4378,7 @@ Ne kodigu tiun tekston ĝis vi reŝargas Coding - Code Text de la menuodrinkejo.
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="100"/>
       <source>&lt;Error Message&gt; </source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;Erarmesaĝo&gt; </translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="101"/>
@@ -4382,7 +4388,7 @@ Ne kodigu tiun tekston ĝis vi reŝargas Coding - Code Text de la menuodrinkejo.
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="102"/>
       <source>&lt;traceback&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Spurigo</translation>
     </message>
   </context>
   <context>
@@ -4443,7 +4449,7 @@ Li.checked:marker { enhavo: "\2612";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
       <source>Coding</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodado</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
@@ -4497,7 +4503,7 @@ Li.checked:marker { enhavo: "\2612";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
       <source>AI</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Artificiala Inteligenteco</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="377"/>
@@ -4527,12 +4533,12 @@ Li.checked:marker { enhavo: "\2612";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="442"/>
       <source>Settings</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Agordoj</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="383"/>
       <source>Exit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Eksiri</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="384"/>
@@ -4567,7 +4573,7 @@ Li.checked:marker { enhavo: "\2612";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
       <source>Codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodlibro</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
@@ -4657,7 +4663,7 @@ Li.checked:marker { enhavo: "\2612";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
       <source>Coding Matrix</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodiga Matrico</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
@@ -4847,17 +4853,17 @@ Li.checked:marker { enhavo: "\2612";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Artifaktinteligenta agento</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
       <source>Sidebar Mode</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Flankobara reĝimo</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
       <source>Ask the AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Demandu la AI-agenton</translation>
     </message>
   </context>
 </TS>

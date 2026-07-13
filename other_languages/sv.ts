@@ -496,12 +496,12 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
       <source>Add code</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Lägg till kod</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
       <source>Import and edit codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Importera och redigera kodbok</translation>
     </message>
   </context>
   <context>
@@ -1240,12 +1240,12 @@ Högerklicka för formatalternativ</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AI-agent</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
       <source>Selectively undo AI induced changes</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ångra AI-orsakade ändringar selektivt</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
@@ -1253,27 +1253,30 @@ Högerklicka för formatalternativ</translation>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ange vad AI-agenten får göra i ditt projekt:
+- Skrivskyddad: AI-agenten kan inte göra några ändringar.
+- Sandbox (standard): AI-agenten kan inte göra ändringar i dina koder och anteckningar, men kan skapa egna.
+- Full åtkomst: AI-agenten kan ändra allt, men kommer vanligtvis att be om bekräftelse först.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Skrivskyddad</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">I sandlåda</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fullständig åtkomst</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
       <source>Enlarge AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Förstora AI-agenten</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
@@ -2315,7 +2318,7 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
       <source>REGEX</source>
-      <translation/>
+      <translation>Reguljära uttryck</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
@@ -2897,7 +2900,7 @@ från C:/users/OldUser/Images till C:/usersNewUser/Images</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="57"/>
       <source>Bulk change</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Massändring</translation>
     </message>
   </context>
   <context>
@@ -3863,7 +3866,7 @@ Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopia
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="634"/>
       <source>API Base URL:</source>
-      <translation/>
+      <translation>API:s bas-URL:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
@@ -3889,12 +3892,18 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language =
 Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Stäng och öppna programmet för att språkändringen ska träda i kraft.
+Språk som uppdateras regelbundet (av människor och/eller AI) är: de, es, fr, ja, pt, sv, zh.
+Ytterligare språk kan läggas till om de finns listade i mappen src/qualcoder/i18n.
+För att göra detta uppdaterar du filen config.ini till ett annat tillgängligt språk.
+Leta reda på raden som börjar med language =
+Uppdatera sedan den. Till exempel:
+language = it</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
       <source>Permissions:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Behörigheter:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
@@ -3902,22 +3911,25 @@ langauge = it</source>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ange vad AI-agenten får göra i ditt projekt:
+- Skrivskyddad: AI-agenten kan inte göra några ändringar.
+- Sandbox (standard): AI-agenten kan inte göra ändringar i dina koder och anteckningar, men kan skapa egna.
+- Full åtkomst: AI-agenten kan ändra allt, men kommer vanligtvis att be om bekräftelse först.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Skrivskyddad</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">I en sandlåda</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fullständig åtkomst</translation>
     </message>
   </context>
   <context>
@@ -3930,27 +3942,27 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
       <source>Identifier:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Identifiering:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Hur varje talare markeras i början av en rad: Namn: , #Namn: , @Namn: , [Namn] , {Namn} eller ett anpassat mönster. Funktionen för automatisk identifiering väljer det format som förekommer oftast.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Anpassat reguljärt uttryck. Det måste innehålla en fångstgrupp för talarens namn. Exempel: ^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Reguljärt uttryck med en grupp, t.ex. ^\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Välj vilka textfiler som ska genomsökas efter talare. Du kan markera talare i flera filer samtidigt.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
@@ -3965,32 +3977,32 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Antal talare och talomgångar som har identifierats med den aktuella identifieraren och filerna.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Dubbelklicka på en ”kod som”-cell för att byta namn på en talare. Ange samma ”kod som” för två rader för att slå ihop dem, till exempel för att rätta till ett stavfel.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Markera talarna genom att kryssa i rutorna. När du klickar på OK skapas en kod för var och en i kategorin ”📌 Talare” och deras inlägg kodas.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Kodifiera hela turen, inklusive talarens namn. Avmarkera rutan för att endast kodifiera svarstexten, utan namnet.</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
       <source>Include speaker name</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Ange talarens namn</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
       <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Dubbelklicka på ett ”code as”-namn för att redigera det</translation>
     </message>
   </context>
   <context>
@@ -4850,17 +4862,17 @@ li.checked:marker { content: "\2612"; }
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AI-agent</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
       <source>Sidebar Mode</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Sidopanelsläge</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
       <source>Ask the AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Fråga AI-agenten</translation>
     </message>
   </context>
 </TS>

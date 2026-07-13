@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/qualcoder/GUI/ui_attribute.py" line="41"/>
       <source>Add Attribute</source>
-      <translation/>
+      <translation>属性を追加</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_attribute.py" line="42"/>
@@ -496,12 +496,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
       <source>Add code</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">コードを追加</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
       <source>Import and edit codebook</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">コードブックのインポートと編集</translation>
     </message>
   </context>
   <context>
@@ -1240,12 +1240,12 @@ Right-click for format options
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AIエージェント</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
       <source>Selectively undo AI induced changes</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AIによる変更を選択的に元に戻す</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
@@ -1253,27 +1253,30 @@ Right-click for format options
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">プロジェクト内でAIエージェントに許可される動作を定義します：
+- 読み取り専用：AIエージェントは一切の変更を行うことができません。
+- サンドボックス（デフォルト）：AIエージェントはコードやメモに変更を加えることはできませんが、独自のコードやメモを作成することは可能です。
+- フルアクセス：AIエージェントはすべてを変更できますが、通常はまず確認を求めます。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">読み取り専用</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">サンドボックス化された</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">すべてのコンテンツへのアクセス</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
       <source>Enlarge AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AIエージェントを拡大</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
@@ -3261,7 +3264,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="204"/>
       <source>A - z</source>
-      <translation/>
+      <translation>A - Z</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="205"/>
@@ -3276,7 +3279,7 @@ Change Settings for number of characters and display style.</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="207"/>
       <source>1 - 10</source>
-      <translation/>
+      <translation>1 ～ 10</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="208"/>
@@ -3892,12 +3895,18 @@ To do this update the config.ini  file to another language that is available.
 Find the line begining language =
 Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">言語の変更を反映させるには、ソフトウェアを一度閉じてから再度開いてください。
+定期的に（人間および／またはAIによって）更新される言語は、de、es、fr、ja、pt、sv、zhです。
+src/qualcoder/i18n フォルダにリストされている言語であれば、追加することができます。
+これを行うには、config.ini ファイルを利用可能な別の言語に更新してください。
+「language =」で始まる行を探してください。
+その後、その行を更新してください。例：
+language = it</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
       <source>Permissions:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">権限：</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
@@ -3905,22 +3914,25 @@ langauge = it</source>
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
 - Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">プロジェクト内でAIエージェントに許可される動作を定義してください：
+- 読み取り専用：AIエージェントは一切の変更を行うことができません。
+- サンドボックス（デフォルト）：AIエージェントはコードやメモに変更を加えることはできませんが、独自のコードやメモを作成することは可能です。
+- フルアクセス：AIエージェントはすべてを変更できますが、通常はまず確認を求めます。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
       <source>Read-only</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">読み取り専用</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
       <source>Sandboxed</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">サンドボックス化された</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
       <source>Full access</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">すべてのコンテンツへのアクセス</translation>
     </message>
   </context>
   <context>
@@ -3933,27 +3945,27 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
       <source>Identifier:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">識別子：</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">各スピーカーが、行の先頭でどのように表記されるか：Name: 、#Name: 、@Name: 、[Name] 、{Name} 、またはカスタムパターン。自動検出では、最も多くのターン数がある形式が選択されます。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">カスタム正規表現。話者名を表すキャプチャグループを1つ含んでいる必要があります。例：^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">1つのグループを持つ正規表現。例：^\s*(.+?):</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">スピーカーを検索するテキストファイルを選択してください。複数のファイルにまたがるスピーカーを一度に選択することができます。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
@@ -3968,32 +3980,32 @@ langauge = it</source>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">現在の識別子とファイルで検出された話者数および発言回数。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">「コードとして」のセルをダブルクリックして、話者の名前を変更します。たとえば、タイプミスを修正する場合など、2つの行に同じ「コードとして」を設定することで、それらを統合できます。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">マークしたいスピーカーにチェックを入れます。「OK」をクリックすると、「📌 スピーカー」カテゴリ内の各スピーカーにコードが割り当てられ、発言順がコード化されます。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">発言者のラベルを含めて、そのターン全体をコード化します。名前を除いて応答テキストのみをコード化するには、このチェックを外してください。</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
       <source>Include speaker name</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">発表者の氏名を記載する</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
       <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">「コード名」をダブルクリックして編集します</translation>
     </message>
   </context>
   <context>
@@ -4854,17 +4866,17 @@ e.unchecked::marker { コンテンツ: "\2610";
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
       <source>AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AIエージェント</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
       <source>Sidebar Mode</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">サイドバーモード</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
       <source>Ask the AI Agent</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">AIエージェントに質問する</translation>
     </message>
   </context>
 </TS>
