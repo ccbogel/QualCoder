@@ -45,6 +45,7 @@ from mcp.server.lowlevel import Server
 from mcp.server.lowlevel.server import ReadResourceContents
 
 from .ai_help_index import AiHelpIndex
+from .ai_memo import extract_ai_memo, merge_public_memo
 from .color_selector import color_matcher, colors
 
 
@@ -93,8 +94,9 @@ class AiMcpServer:
         "cases/link_text_to_case",
     )
     FULL_ACCESS_WRITE_TOOL_NAMES = (
-        "codes/rename_category",
-        "codes/rename_code",
+        "codes/update_category",
+        "codes/update_code",
+        "codes/update_text_coding",
         "codes/move_category",
         "codes/move_code",
         "codes/delete_category",
@@ -106,6 +108,7 @@ class AiMcpServer:
         "cases/update_attributes",
         "cases/unlink_text_from_case",
         "documents/create_attribute",
+        "documents/update_document",
         "documents/update_attributes",
     )
     PREVIEW_TOOL_NAMES = (
@@ -176,16 +179,50 @@ class AiMcpServer:
         }
         return labels.get(self._current_ai_permissions(), "Sandboxed")
 
+    def _memo_public_text(self, memo: Any) -> str:
+        """Return the memo text that may be shown to the AI."""
+
+        return extract_ai_memo("" if memo is None else str(memo))
+
+    def _memo_update_text(self, memo: Any) -> str:
+        """Normalize one AI-provided memo update to public text only."""
+
+        return self._memo_public_text(memo)
+
+    def _merge_public_memo(self, existing_memo: Any, memo: Any) -> str:
+        """Replace only the AI-visible memo text and preserve any private suffix."""
+
+        return merge_public_memo(
+            "" if existing_memo is None else str(existing_memo),
+            self._memo_update_text(memo),
+        )
+
+    def _sanitize_memo_payload(self, value: Any) -> Any:
+        """Recursively strip private memo suffixes from payloads sent to the AI."""
+
+        if isinstance(value, dict):
+            sanitized: Dict[str, Any] = {}
+            for key, item in value.items():
+                if key == "memo":
+                    sanitized[key] = self._memo_public_text(item)
+                else:
+                    sanitized[key] = self._sanitize_memo_payload(item)
+            return sanitized
+        if isinstance(value, list):
+            return [self._sanitize_memo_payload(item) for item in value]
+        return value
+
     def _tool_result_payload(self, payload: Dict[str, Any], is_error: bool = False) -> Dict[str, Any]:
         """Wrap structured tool content in an MCP tool result."""
 
+        sanitized_payload = self._sanitize_memo_payload(payload)
         return {
             "isError": is_error,
-            "structuredContent": payload,
+            "structuredContent": sanitized_payload,
             "content": [
                 {
                     "type": "text",
-                    "text": self._tool_result_summary_text(payload, is_error),
+                    "text": self._tool_result_summary_text(sanitized_payload, is_error),
                 }
             ],
         }
@@ -423,22 +460,25 @@ class AiMcpServer:
                 if tool_name == "codes/move_code":
                     return _('Moving code "{name}"...').format(name=str(code_name))
                 return _('Deleting code "{name}"...').format(name=str(code_name))
-            if tool_name == "codes/rename_category":
+            if tool_name == "codes/update_category":
                 catid = self._to_int(tool_args.get("catid"), -1)
                 if catid <= 0:
-                    return _('Renaming category "error: missing category id"...')
+                    return _('Updating category "error: missing category id"...')
                 category_name = self._fetch_category_name(catid)
                 if category_name is None or str(category_name).strip() == "":
                     category_name = _("Category") + f" #{catid}"
-                return _('Renaming category "{name}"...').format(name=str(category_name))
-            if tool_name == "codes/rename_code":
+                return _('Updating category "{name}"...').format(name=str(category_name))
+            if tool_name == "codes/update_code":
                 cid = self._to_int(tool_args.get("cid"), -1)
                 if cid <= 0:
-                    return _('Renaming code "error: missing code id"...')
+                    return _('Updating code "error: missing code id"...')
                 code_name = self._fetch_code_name(cid)
                 if code_name is None or str(code_name).strip() == "":
                     code_name = _("Code") + f" #{cid}"
-                return _('Renaming code "{name}"...').format(name=str(code_name))
+                return _('Updating code "{name}"...').format(name=str(code_name))
+            if tool_name == "codes/update_text_coding":
+                ctid = self._to_int(tool_args.get("ctid"), -1)
+                return _('Updating text coding #{ctid}...').format(ctid=ctid if ctid > 0 else "?")
             if tool_name == "codes/move_text_coding":
                 ctid = self._to_int(tool_args.get("ctid"), -1)
                 return _('Moving text coding #{ctid}...').format(ctid=ctid if ctid > 0 else "?")
@@ -456,6 +496,12 @@ class AiMcpServer:
                 if case_name is None or str(case_name).strip() == "":
                     case_name = _("Case") + (f" #{caseid}" if caseid > 0 else "")
                 return _('Updating case "{name}"...').format(name=str(case_name))
+            if tool_name == "documents/update_document":
+                fid = self._to_int(tool_args.get("fid"), -1)
+                file_name = self._fetch_source_name(fid) if fid > 0 else None
+                if file_name is None or str(file_name).strip() == "":
+                    file_name = _("Document") + (f" #{fid}" if fid > 0 else "")
+                return _('Updating document "{name}"...').format(name=str(file_name))
             if tool_name == "cases/link_text_to_case":
                 caseid = self._to_int(tool_args.get("caseid"), -1)
                 fid = self._to_int(tool_args.get("fid"), -1)
@@ -664,7 +710,7 @@ class AiMcpServer:
                     uriTemplate="qualcoder://codes/segments/{cid}",
                     name="Coded text segments by code id",
                     description=(
-                        "Read coded text segments for a code id. Optional query params: strategy "
+                        "Read coded text segments for a code id, including coding memo. Optional query params: strategy "
                         "(diverse_by_document|recent_first|sequential), max_segments, max_chars, cursor, "
                         "file_ids, case_ids, owner. "
                         "If owner is set, the server reads from code_text instead of code_text_visible."
@@ -726,7 +772,13 @@ class AiMcpServer:
             uri_str = str(uri)
             base_uri, window = self._parse_read_window(uri_str)
             payload = self._read_resource_payload(base_uri, window)
-            return [ReadResourceContents(content=json.dumps(payload, ensure_ascii=False), mime_type="application/json")]
+            sanitized_payload = self._sanitize_memo_payload(payload)
+            return [
+                ReadResourceContents(
+                    content=json.dumps(sanitized_payload, ensure_ascii=False),
+                    mime_type="application/json",
+                )
+            ]
 
         @self._sdk_server.list_tools()
         async def _list_tools(_: types.ListToolsRequest) -> types.ListToolsResult:
@@ -967,28 +1019,30 @@ class AiMcpServer:
                     },
                 },
                 {
-                    "name": "codes/rename_category",
-                    "description": "Rename an existing category. Requires Full access.",
+                    "name": "codes/update_category",
+                    "description": "Rename an existing category and/or update its memo. Requires Full access.",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
                             "catid": {"type": "integer"},
-                            "new_name": {"type": "string"},
+                            "name": {"type": "string"},
+                            "memo": {"type": "string"},
                         },
-                        "required": ["catid", "new_name"],
+                        "required": ["catid"],
                         "additionalProperties": False,
                     },
                 },
                 {
-                    "name": "codes/rename_code",
-                    "description": "Rename an existing code. Requires Full access.",
+                    "name": "codes/update_code",
+                    "description": "Rename an existing code and/or update its memo. Requires Full access.",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
                             "cid": {"type": "integer"},
-                            "new_name": {"type": "string"},
+                            "name": {"type": "string"},
+                            "memo": {"type": "string"},
                         },
-                        "required": ["cid", "new_name"],
+                        "required": ["cid"],
                         "additionalProperties": False,
                     },
                 },
@@ -1055,6 +1109,19 @@ class AiMcpServer:
                             "preview_token": {"type": "string"},
                         },
                         "required": ["cid", "preview_token"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "codes/update_text_coding",
+                    "description": "Update the memo for one text coding. Requires Full access.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "ctid": {"type": "integer"},
+                            "memo": {"type": "string"},
+                        },
+                        "required": ["ctid", "memo"],
                         "additionalProperties": False,
                     },
                 },
@@ -1205,6 +1272,19 @@ class AiMcpServer:
                     },
                 },
                 {
+                    "name": "documents/update_document",
+                    "description": "Update the memo of a text document. Requires Full access.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "fid": {"type": "integer"},
+                            "memo": {"type": "string"},
+                        },
+                        "required": ["fid", "memo"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
                     "name": "documents/update_attributes",
                     "description": (
                         "Update values for one or more existing attributes on a text document. "
@@ -1256,10 +1336,12 @@ class AiMcpServer:
             payload = self._tool_preview_delete_category(arguments)
         elif tool_name == "codes/preview_delete_code":
             payload = self._tool_preview_delete_code(arguments)
-        elif tool_name == "codes/rename_category":
-            payload = self._tool_rename_category(arguments, change_set_id)
-        elif tool_name == "codes/rename_code":
-            payload = self._tool_rename_code(arguments, change_set_id)
+        elif tool_name == "codes/update_category":
+            payload = self._tool_update_category(arguments, change_set_id)
+        elif tool_name == "codes/update_code":
+            payload = self._tool_update_code(arguments, change_set_id)
+        elif tool_name == "codes/update_text_coding":
+            payload = self._tool_update_text_coding(arguments, change_set_id)
         elif tool_name == "codes/move_category":
             payload = self._tool_move_category(arguments, change_set_id)
         elif tool_name == "codes/move_code":
@@ -1286,6 +1368,8 @@ class AiMcpServer:
             payload = self._tool_unlink_text_from_case(arguments, change_set_id)
         elif tool_name == "documents/create_attribute":
             payload = self._tool_create_attribute("file", arguments, change_set_id)
+        elif tool_name == "documents/update_document":
+            payload = self._tool_update_document(arguments, change_set_id)
         elif tool_name == "documents/update_attributes":
             payload = self._tool_update_attributes("file", arguments, change_set_id)
         else:
@@ -1297,7 +1381,7 @@ class AiMcpServer:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
         if name == "":
             raise ValueError("Category name must not be empty.")
-        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        memo = self._memo_update_text(arguments.get("memo", ""))
         supercatid_raw = arguments.get("supercatid", None)
         supercatid = None
         if supercatid_raw is not None:
@@ -1376,7 +1460,7 @@ class AiMcpServer:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
         if name == "":
             raise ValueError("Code name must not be empty.")
-        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        memo = self._memo_update_text(arguments.get("memo", ""))
         catid_raw = arguments.get("catid", None)
         catid = None
         if catid_raw is not None:
@@ -1474,7 +1558,7 @@ class AiMcpServer:
         cid = self._to_int(arguments.get("cid"), -1)
         fid = self._to_int(arguments.get("fid"), -1)
         quote = str(arguments.get("quote", "") if arguments.get("quote", "") is not None else "").strip()
-        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        memo = self._memo_update_text(arguments.get("memo", ""))
 
         if cid <= 0:
             raise ValueError("cid must be a positive integer.")
@@ -1561,6 +1645,7 @@ class AiMcpServer:
                     "pos0": pos0,
                     "pos1": pos1,
                     "quote": seltext,
+                    "memo": memo,
                     "owner": self.AI_AGENT_OWNER,
                     "date": now,
                 },
@@ -1642,13 +1727,14 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_rename_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
         catid = self._to_int(arguments.get("catid"), -1)
-        new_name = " ".join(str(arguments.get("new_name", "")).split()).strip()
         if catid <= 0:
             raise ValueError("catid must be a positive integer.")
-        if new_name == "":
-            raise ValueError("new_name must not be empty.")
+        has_name = "name" in arguments
+        has_memo = "memo" in arguments
+        if not has_name and not has_memo:
+            raise ValueError("Provide at least one field to update: name or memo.")
 
         conn = self._connect()
         try:
@@ -1656,39 +1742,58 @@ class AiMcpServer:
             category = self._fetch_category_row_cur(cur, catid)
             if category is None:
                 raise ValueError(f"Category id {catid} not found.")
+
             old_name = str(category.get("name", ""))
-            if old_name == new_name:
+            old_memo = str(category.get("memo", ""))
+            new_name = old_name if not has_name else " ".join(str(arguments.get("name", "")).split()).strip()
+            new_memo = old_memo if not has_memo else self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            if new_name == "":
+                raise ValueError("name must not be empty.")
+            if new_name.casefold() != old_name.casefold():
+                existing = cur.execute(
+                    "SELECT catid FROM code_cat WHERE lower(name)=lower(?) AND catid != ?",
+                    (new_name, catid),
+                ).fetchone()
+                if existing is not None:
+                    raise ValueError(f'Another category already uses the name "{new_name}".')
+            if new_name == old_name and new_memo == old_memo:
                 return {
-                    "tool": "codes/rename_category",
-                    "renamed": False,
-                    "reason": "unchanged",
+                    "tool": "codes/update_category",
+                    "updated": False,
+                    "reason": "no_changes",
                     "category": self._category_ref(category),
                 }
-            existing = cur.execute(
-                "SELECT catid FROM code_cat WHERE lower(name)=lower(?) AND catid != ?",
-                (new_name, catid),
-            ).fetchone()
-            if existing is not None:
-                raise ValueError(f'Another category already uses the name "{new_name}".')
 
-            cur.execute("UPDATE code_cat SET name=? WHERE catid=?", (new_name, catid))
+            cur.execute("UPDATE code_cat SET name=?, memo=? WHERE catid=?", (new_name, new_memo, catid))
             conn.commit()
             if hasattr(self.app, "delete_backup"):
                 self.app.delete_backup = False
             self._record_ai_change(
                 change_set_id,
                 {
-                    "type": "rename_category",
+                    "type": "update_category",
                     "catid": catid,
-                    "old_name": old_name,
-                    "new_name": new_name,
+                    "before": {
+                        "name": old_name,
+                        "memo": old_memo,
+                        "owner": str(category.get("owner", "")),
+                    },
+                    "after": {
+                        "name": new_name,
+                        "memo": new_memo,
+                        "owner": str(category.get("owner", "")),
+                    },
                 },
             )
             self._emit_project_table_changes(["code_cat"])
             return {
-                "tool": "codes/rename_category",
-                "renamed": True,
-                "category": {"catid": catid, "old_name": old_name, "new_name": new_name},
+                "tool": "codes/update_category",
+                "updated": True,
+                "category": {
+                    "catid": catid,
+                    "name": new_name,
+                    "memo": new_memo,
+                },
             }
         except Exception:
             conn.rollback()
@@ -1696,13 +1801,14 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_rename_code(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_code(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
         cid = self._to_int(arguments.get("cid"), -1)
-        new_name = " ".join(str(arguments.get("new_name", "")).split()).strip()
         if cid <= 0:
             raise ValueError("cid must be a positive integer.")
-        if new_name == "":
-            raise ValueError("new_name must not be empty.")
+        has_name = "name" in arguments
+        has_memo = "memo" in arguments
+        if not has_name and not has_memo:
+            raise ValueError("Provide at least one field to update: name or memo.")
 
         conn = self._connect()
         try:
@@ -1710,39 +1816,126 @@ class AiMcpServer:
             code = self._fetch_code_row_cur(cur, cid)
             if code is None:
                 raise ValueError(f"Code id {cid} not found.")
+
             old_name = str(code.get("name", ""))
-            if old_name == new_name:
+            old_memo = str(code.get("memo", ""))
+            new_name = old_name if not has_name else " ".join(str(arguments.get("name", "")).split()).strip()
+            new_memo = old_memo if not has_memo else self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            if new_name == "":
+                raise ValueError("name must not be empty.")
+            if new_name.casefold() != old_name.casefold():
+                existing = cur.execute(
+                    "SELECT cid FROM code_name WHERE lower(name)=lower(?) AND cid != ?",
+                    (new_name, cid),
+                ).fetchone()
+                if existing is not None:
+                    raise ValueError(f'Another code already uses the name "{new_name}".')
+            if new_name == old_name and new_memo == old_memo:
                 return {
-                    "tool": "codes/rename_code",
-                    "renamed": False,
-                    "reason": "unchanged",
+                    "tool": "codes/update_code",
+                    "updated": False,
+                    "reason": "no_changes",
                     "code": self._code_ref(code),
                 }
-            existing = cur.execute(
-                "SELECT cid FROM code_name WHERE lower(name)=lower(?) AND cid != ?",
-                (new_name, cid),
-            ).fetchone()
-            if existing is not None:
-                raise ValueError(f'Another code already uses the name "{new_name}".')
 
-            cur.execute("UPDATE code_name SET name=? WHERE cid=?", (new_name, cid))
+            cur.execute("UPDATE code_name SET name=?, memo=? WHERE cid=?", (new_name, new_memo, cid))
             conn.commit()
             if hasattr(self.app, "delete_backup"):
                 self.app.delete_backup = False
             self._record_ai_change(
                 change_set_id,
                 {
-                    "type": "rename_code",
+                    "type": "update_code",
                     "cid": cid,
-                    "old_name": old_name,
-                    "new_name": new_name,
+                    "before": {
+                        "name": old_name,
+                        "memo": old_memo,
+                        "owner": str(code.get("owner", "")),
+                    },
+                    "after": {
+                        "name": new_name,
+                        "memo": new_memo,
+                        "owner": str(code.get("owner", "")),
+                    },
                 },
             )
             self._emit_project_table_changes(["code_name"])
             return {
-                "tool": "codes/rename_code",
-                "renamed": True,
-                "code": {"cid": cid, "old_name": old_name, "new_name": new_name},
+                "tool": "codes/update_code",
+                "updated": True,
+                "code": {
+                    "cid": cid,
+                    "name": new_name,
+                    "memo": new_memo,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_update_text_coding(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        ctid = self._to_int(arguments.get("ctid"), -1)
+        if ctid <= 0:
+            raise ValueError("ctid must be a positive integer.")
+        if "memo" not in arguments:
+            raise ValueError("Provide the memo field to update.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            coding = self._fetch_text_coding_row_cur(cur, ctid)
+            if coding is None:
+                raise ValueError(f"Text coding id {ctid} not found.")
+
+            old_memo = str(coding.get("memo", ""))
+            new_memo = self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            if new_memo == old_memo:
+                return {
+                    "tool": "codes/update_text_coding",
+                    "updated": False,
+                    "reason": "no_changes",
+                    "coding": {
+                        "ctid": ctid,
+                        "cid": int(coding.get("cid", -1)),
+                        "fid": int(coding.get("fid", -1)),
+                    },
+                }
+
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("UPDATE code_text SET memo=?, date=? WHERE ctid=?", (new_memo, now, ctid))
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "update_coding_text",
+                    "ctid": ctid,
+                    "before": {
+                        "memo": old_memo,
+                        "date": str(coding.get("date", "")),
+                        "owner": str(coding.get("owner", "")),
+                    },
+                    "after": {
+                        "memo": new_memo,
+                        "date": now,
+                        "owner": str(coding.get("owner", "")),
+                    },
+                },
+            )
+            self._emit_project_table_changes(["code_text"])
+            return {
+                "tool": "codes/update_text_coding",
+                "updated": True,
+                "coding": {
+                    "ctid": ctid,
+                    "cid": int(coding.get("cid", -1)),
+                    "fid": int(coding.get("fid", -1)),
+                    "memo": new_memo,
+                    "date": now,
+                },
             }
         except Exception:
             conn.rollback()
@@ -2079,7 +2272,7 @@ class AiMcpServer:
 
     def _tool_create_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
-        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        memo = self._memo_update_text(arguments.get("memo", ""))
         if name == "":
             raise ValueError("name must not be empty.")
 
@@ -2145,7 +2338,7 @@ class AiMcpServer:
         caseid = self._to_int(arguments.get("caseid"), -1)
         fid = self._to_int(arguments.get("fid"), -1)
         quote = str(arguments.get("quote", "") if arguments.get("quote", "") is not None else "").strip()
-        memo = str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+        memo = self._memo_update_text(arguments.get("memo", ""))
         pos0 = self._to_int(arguments.get("pos0"), -1)
         pos1 = self._to_int(arguments.get("pos1"), -1)
         full_document = bool(arguments.get("full_document", False))
@@ -2273,7 +2466,7 @@ class AiMcpServer:
             old_name = str(case_row.get("name", ""))
             old_memo = str(case_row.get("memo", ""))
             new_name = old_name if not has_name else " ".join(str(arguments.get("name", "")).split()).strip()
-            new_memo = old_memo if not has_memo else str(arguments.get("memo", "") if arguments.get("memo", "") is not None else "")
+            new_memo = old_memo if not has_memo else self._merge_public_memo(old_memo, arguments.get("memo", ""))
             if new_name == "":
                 raise ValueError("name must not be empty.")
             if new_name.casefold() != old_name.casefold():
@@ -2331,6 +2524,74 @@ class AiMcpServer:
                     "name": new_name,
                     "memo": new_memo,
                     "owner": str(case_row.get("owner", "")),
+                    "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_update_document(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        fid = self._to_int(arguments.get("fid"), -1)
+        if fid <= 0:
+            raise ValueError("fid must be a positive integer.")
+        if "memo" not in arguments:
+            raise ValueError("Provide the memo field to update.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            source_row = self._fetch_source_row_cur(cur, fid)
+            if source_row is None:
+                raise ValueError(f"Text document id {fid} not found.")
+
+            old_memo = str(source_row.get("memo", ""))
+            new_memo = self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            if new_memo == old_memo:
+                return {
+                    "tool": "documents/update_document",
+                    "updated": False,
+                    "reason": "no_changes",
+                    "document": {
+                        "fid": fid,
+                        "name": str(source_row.get("name", "")),
+                        "memo": old_memo,
+                    },
+                }
+
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("UPDATE source SET memo=?, date=? WHERE id=?", (new_memo, now, fid))
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "update_document",
+                    "fid": fid,
+                    "before": {
+                        "name": str(source_row.get("name", "")),
+                        "memo": old_memo,
+                        "owner": str(source_row.get("owner", "")),
+                    },
+                    "after": {
+                        "name": str(source_row.get("name", "")),
+                        "memo": new_memo,
+                        "owner": str(source_row.get("owner", "")),
+                    },
+                    "updated_at": now,
+                },
+            )
+            self._emit_project_table_changes(["source"])
+            return {
+                "tool": "documents/update_document",
+                "updated": True,
+                "document": {
+                    "fid": fid,
+                    "name": str(source_row.get("name", "")),
+                    "memo": new_memo,
                     "date": now,
                 },
             }
@@ -5039,7 +5300,7 @@ class AiMcpServer:
         order_sql = "ORDER BY ct.ctid"
         select_sql = (
             "SELECT ct.ctid, ct.cid, ct.fid, ifnull(ct.seltext,''), ct.pos0, "
-            "ct.pos1, ct.owner, source.name, code_name.name "
+            "ct.pos1, ct.owner, ifnull(ct.memo,''), source.name, code_name.name "
             f"FROM {table_name} AS ct "
             "JOIN source ON source.id = ct.fid "
             "JOIN code_name ON code_name.cid = ct.cid "
@@ -5062,10 +5323,10 @@ class AiMcpServer:
         else:
             diverse_sql = (
                 "SELECT ordered.ctid, ordered.cid, ordered.fid, ifnull(ordered.seltext,''), ordered.pos0, "
-                "ordered.pos1, ordered.owner, source.name, code_name.name "
+                "ordered.pos1, ordered.owner, ifnull(ordered.memo,''), source.name, code_name.name "
                 "FROM ("
                 "SELECT ct.ctid, ct.cid, ct.fid, ct.seltext, ct.pos0, ct.pos1, "
-                "ct.owner, ROW_NUMBER() OVER (PARTITION BY ct.fid ORDER BY ifnull(ct.pos0, ct.ctid), ct.ctid) AS rn "
+                "ct.owner, ct.memo, ROW_NUMBER() OVER (PARTITION BY ct.fid ORDER BY ifnull(ct.pos0, ct.ctid), ct.ctid) AS rn "
                 f"FROM {table_name} AS ct "
                 + where_sql
                 + ") AS ordered "
@@ -5113,8 +5374,9 @@ class AiMcpServer:
                 "pos0": row[4],
                 "pos1": row[5],
                 "owner": row[6],
-                "source_name": row[7],
-                "code_name": row[8],
+                "memo": "" if row[7] is None else str(row[7]),
+                "source_name": row[8],
+                "code_name": row[9],
                 "matching_cases": self._matching_cases_for_range(
                     self._to_int(row[4], -1),
                     self._to_int(row[5], -1),
