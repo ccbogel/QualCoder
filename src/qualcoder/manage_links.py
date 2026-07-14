@@ -31,7 +31,7 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
 from .helpers import Message
-from .view_av import DialogCodeAV  # for isinstance()
+from .code_av import DialogCodeAV  # for isinstance()
 from .view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
 path = os.path.abspath(os.path.dirname(__file__))

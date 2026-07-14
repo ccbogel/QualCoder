@@ -120,7 +120,7 @@ Codurile din întregul fișier text sunt utilizate pentru calcule.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="311"/>
       <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;b&gt;Diagrame de atribute&lt;/b&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="312"/>
@@ -401,7 +401,7 @@ Click dreapta pentru opțiuni</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
       <source>Coder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
@@ -454,44 +454,54 @@ Verificat - orice coduri selectate trebuie să se potrivească exact.</translati
   <context>
     <name>DialogOrganiser</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="62"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="72"/>
       <source>Graph Visualisation</source>
       <translation type="unfinished">Vizualizare grafică</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="63"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="73"/>
       <source>Export image</source>
       <translation type="unfinished">Exportă imaginea</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="64"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="74"/>
       <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
       <translation type="unfinished">Faceți clic pe zona grafică și apăsați + sau W pentru a mări. Apăsați - sau Q pentru a mări sau mări.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="65"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="75"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation type="unfinished">&lt;html &gt; &lt;head/&gt; &lt;body&gt; &lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="66"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="76"/>
       <source>Select code branch</source>
       <translation type="unfinished">Alegeți ramura de cod</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="67"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="77"/>
       <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
       <translation type="unfinished">Organizator de coduri. Faceţi clic dreapta pe coduri şi categorii pentru a lega şi fuziona. Adaugă categorii noi. Coduri de restructurare.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="68"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="78"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation type="unfinished">&lt;html &gt; &lt;head/&gt; &lt;body&gt; &lt;p&gt;Applică structura modificată.&lt;/p&gt; &lt;p&gt;Avertizare. Nicio opțiune Anulează.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="69"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
       <source>Apply</source>
       <translation type="unfinished">Aplicare</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
+      <source>Add code</source>
+      <translation type="unfinished">Adăugați codul</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
+      <source>Import and edit codebook</source>
+      <translation type="unfinished">Importarea și editarea registrului de coduri</translation>
     </message>
   </context>
   <context>
@@ -545,7 +555,7 @@ Verificat - orice coduri selectate trebuie să se potrivească exact.</translati
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="97"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="98"/>
@@ -891,7 +901,7 @@ Comandat de numele fișierului și numele de cod.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="170"/>
       <source>E</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Și</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_relations.py" line="171"/>
@@ -1075,17 +1085,17 @@ Faceți clic dreapta pentru opțiunile de format</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="98"/>
       <source>NONE</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">NICIUNUL</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="99"/>
       <source>MINIMAL</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">MINIM</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="100"/>
       <source>ALL</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">TOATE</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_import.py" line="101"/>
@@ -1198,39 +1208,80 @@ Faceți clic dreapta pentru opțiunile de format</translation>
   <context>
     <name>Dialog_ai_chat</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="146"/>
-      <source>AI Chat</source>
-      <translation type="unfinished">Al Chat</translation>
-    </message>
-    <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="147"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="223"/>
       <source>Create a new chat</source>
       <translation type="unfinished">Creează un chat nou</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="148"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="224"/>
       <source>New</source>
       <translation type="unfinished">Nou</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="149"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="219"/>
       <source>Delete the selected chat</source>
       <translation type="unfinished">Șterge chat-ul selectat</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="150"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="220"/>
       <source>Delete</source>
       <translation type="unfinished">Șterge</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="151"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="222"/>
       <source>Help</source>
       <translation type="unfinished">Ajutor</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="152"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="235"/>
       <source>Enter your question here and press Enter to continue the chat</source>
       <translation type="unfinished">Introduceți întrebarea aici și apăsați Enter pentru a continua chatul</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
+      <source>AI Agent</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
+      <source>Selectively undo AI induced changes</source>
+      <translation type="unfinished">Anulează în mod selectiv modificările generate de IA</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
+      <source>Define what the AI agent is allowed to do in your project:
+- Read-only: The AI agent cannot make any changes.
+- Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
+- Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
+      <translation type="unfinished">Stabiliți ce are voie să facă agentul AI în cadrul proiectului dumneavoastră:
+- Doar citire: Agentul AI nu poate efectua nicio modificare.
+- În mediu izolat (implicit): Agentul AI nu poate modifica codurile și notele dumneavoastră, dar poate crea propriile sale coduri și note.
+- Acces complet: Agentul AI poate modifica orice, dar, de obicei, va solicita mai întâi confirmarea.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
+      <source>Read-only</source>
+      <translation type="unfinished">Doar citire</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
+      <source>Sandboxed</source>
+      <translation type="unfinished">În mediul izolat</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
+      <source>Full access</source>
+      <translation type="unfinished">Acces complet</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
+      <source>Enlarge AI Agent</source>
+      <translation type="unfinished">Mărire agent AI</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
+      <source>...</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -1417,7 +1468,7 @@ Faceți clic dreapta pentru opțiunile de format</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
@@ -1708,7 +1759,7 @@ Pentru a seta un semn de carte apăsaţi B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
@@ -1853,22 +1904,22 @@ Pentru a seta un semn de carte apăsaţi B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
       <source>-1</source>
-      <translation type="unfinished"></translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
       <source>-2</source>
-      <translation type="unfinished"></translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
       <source>-3</source>
-      <translation type="unfinished"></translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
       <source>-4</source>
-      <translation type="unfinished"></translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
@@ -1898,7 +1949,7 @@ Pentru a seta un semn de carte apăsaţi B</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="309"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="310"/>
@@ -2145,7 +2196,7 @@ Deoarece toate pozițiile atribuite pot fi incorecte.</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
       <source>txt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">text</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
@@ -2182,7 +2233,7 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
       <source>REGEX</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Expresii regulate</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
@@ -2200,7 +2251,7 @@ Formatat ca mai jos pentru detectarea numelui.
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="534"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="535"/>
@@ -2634,7 +2685,7 @@ Pozițiile nu pot fi ajustate corect. Fă o copie de rezervă a proiectului îna
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="146"/>
       <source>Coder</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_journals.py" line="148"/>
@@ -3099,7 +3150,7 @@ Sensibil la caz, adăugați mai multe intrări pentru fiecare: de exemplu Tom Jo
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="179"/>
       <source>Coder:</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Programator:</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="180"/>
@@ -3119,7 +3170,7 @@ Sensibil la caz, adăugați mai multe intrări pentru fiecare: de exemplu Tom Jo
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="183"/>
       <source>txt</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">text</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="184"/>
@@ -3129,7 +3180,7 @@ Sensibil la caz, adăugați mai multe intrări pentru fiecare: de exemplu Tom Jo
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="185"/>
       <source>xlsx</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Excel 2016</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="186"/>
@@ -3139,7 +3190,7 @@ Sensibil la caz, adăugați mai multe intrări pentru fiecare: de exemplu Tom Jo
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="187"/>
       <source>iramuteq</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Iramuteq</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="188"/>
@@ -3216,12 +3267,12 @@ Schimbă setările pentru numărul de caractere și stilul de afișare.</transla
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="204"/>
       <source>A - z</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">A - Z</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="205"/>
       <source>Z - a</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Z - și</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_report_codings.py" line="206"/>
@@ -3467,404 +3518,488 @@ Cardurile Wild pentru "ca" sunt % și  </translation>
   <context>
     <name>Dialog_settings</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="530"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
       <source>Settings</source>
       <translation type="unfinished">Configurări</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="531"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
       <source>Backup project folder every time project is opened</source>
       <translation type="unfinished">Dosar proiect de rezervă de fiecare dată când proiectul este deschis</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="532"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="543"/>
       <source>Default project directory</source>
       <translation type="unfinished">Dosarul implicit al proiectului</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="533"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="544"/>
       <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
       <translation type="unfinished">Backup fișiere video și audio. Nu verifica pentru a accelera backup-uri.
 Nu este recomandat dacă nu aveți multe fișiere mari încetinirea backup.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="535"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="546"/>
       <source>Backups</source>
       <translation type="unfinished">Întăriri</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="536"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
       <source>0</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="537"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
       <source>1</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="538"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
       <source>2</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="539"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
       <source>3</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="540"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
       <source>4</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="552"/>
       <source>5</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
       <source>Set this name as the current coder.
 </source>
       <translation type="unfinished">Setează acest nume ca codor curent.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="544"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
       <source>Change</source>
       <translation type="unfinished">Modificare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="545"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
       <source>Current coder: </source>
       <translation type="unfinished">Codor curent:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="546"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
       <source>/</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
       <source>Language</source>
       <translation type="unfinished">Limba</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
-      <source>Close and open the software for the change in language to occur.
-Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
-Additional languages can be added if they are listed in the src/qualcoder/i18n folder. 
-To do this update the config.ini  file to another language that is available. 
-Find the line begining language = 
-Then update it. For example: 
-langauge = it</source>
-      <translation type="unfinished">Închideți și deschideți software-ul pentru schimbarea limbii să apară.
-Limbile actualizate în mod regulat (de om și / sau AI) sunt: de, es, fr, ja, pt, sv, zh.
-Limbi suplimentare pot fi adăugate dacă acestea sunt enumerate în dosarul Src/qualcoder/i18n.
-Pentru a face acest lucru actualizați fișierul config.ini la o altă limbă care este disponibilă.
-Găsiți linia de început limba =
-Atunci actualizează-l. De exemplu:
-langauge = it</translation>
-    </message>
-    <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="566"/>
       <source>General font and size</source>
       <translation type="unfinished">Font general și mărime</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="567"/>
       <source>Font size for codes tree</source>
       <translation type="unfinished">Mărime font pentru arborele codurilor</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="568"/>
       <source>Font size for documents</source>
       <translation type="unfinished">Mărime font pentru documente</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="569"/>
       <source>Reports with text context</source>
       <translation type="unfinished">Rapoarte cu context text</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="570"/>
       <source>Characters before and after</source>
       <translation type="unfinished">Caractere înainte și după</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="560"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="571"/>
       <source>Text context, coded text style</source>
       <translation type="unfinished">Context text, stil text codificat</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
       <source>8</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="574"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
       <source>10</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
       <source>12</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
       <source>14</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
       <source>16</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
       <source>18</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="579"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
       <source>100</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="580"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
       <source>200</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
       <source>300</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
       <source>50000</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">50 000</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="583"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
       <source>30000</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Utilizat la introducerea numelui vorbitorului în transcriere&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
       <source>Speaker format</source>
       <translation type="unfinished">Format speaker</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
       <source>Very large text documents. Load text chunks by number of characters.</source>
       <translation type="unfinished">Documente text foarte mari. Încarcă bucăți de text după numărul de caractere.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
       <source>Code text chunk size</source>
       <translation type="unfinished">Mărime bucată text cod</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
       <source>Style</source>
       <translation type="unfinished">Stil</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation type="unfinished">&lt;html &gt; &lt;head/&gt; &lt;body&gt; &lt;p&gt;Used when entry time position in transcription&lt;/p&gt;&lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
       <source>Time format</source>
       <translation type="unfinished">Format oră</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation type="unfinished">&lt;html &gt; &lt;head/&gt; &lt;body &gt; &lt;p&gt; Afișează numerele de identificare pentru fișiere, cazuri, coduri, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="603"/>
       <source>Show IDs</source>
       <translation type="unfinished">Arată ID-urile</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="604"/>
       <source>AI Integration</source>
       <translation type="unfinished">Integrare AI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
       <source>enable AI integration</source>
       <translation type="unfinished">permite integrarea AI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
       <source>API key</source>
       <translation type="unfinished">Cheie API</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
       <source>Get Access:</source>
       <translation type="unfinished">Obține acces:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
       <source>Description:</source>
       <translation type="unfinished">Descriere:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
       <source>Edit Name</source>
       <translation type="unfinished">Editează numele</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
       <source>...</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
       <source>AI Profile:</source>
       <translation type="unfinished">Profilul AI:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
       <source>Advanced AI Options...</source>
       <translation type="unfinished">Opțiuni avansate AI...</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
       <source>Advanced option. Only change when you know whatr you are doing.</source>
       <translation type="unfinished">Opţiune avansată. Doar când ştii ce faci.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
       <source>1.0</source>
       <translation type="unfinished">1, 0</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
       <source>context window:</source>
       <translation type="unfinished">fereastra contextului:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
       <source>Temperature:</source>
       <translation type="unfinished">Temperatura:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
       <source>New AI Profile...</source>
       <translation type="unfinished">Noul profil AI...</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="626"/>
       <source>General Parameters:</source>
       <translation type="unfinished">Parametrii generali:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="628"/>
       <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
       <translation type="unfinished">Dacă sunt selectate, conversațiile vor fi în aceeași limbă ca și restul interfeței cu utilizatorul. Puteți selecta acest limbaj în partea de sus a acestei ferestre.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="629"/>
       <source>same as UI</source>
       <translation type="unfinished">la fel ca UI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
       <source>Language for AI conversations: </source>
       <translation type="unfinished">Limba pentru conversații AI:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
       <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
       <translation type="unfinished">Selectaţi un model AI disponibil (poate fi acelaşi cu modelul mare). Modelul rapid este folosit doar pentru sarcini simple.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="643"/>
       <source>&lt;select available model&gt;</source>
       <translation type="unfinished">&lt;selectează modelul disponibil &gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="634"/>
       <source>API Base URL:</source>
       <translation type="unfinished">URL- ul bazei API:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="635"/>
       <source>   Top_p:</source>
       <translation type="unfinished">Top p:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
       <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
       <translation type="unfinished">Puteți utiliza Memo-ul Proiectului (descoperit în meniu: Project &gt; Project Memo) pentru a transmite informații de fond despre cercetarea dumneavoastră, inclusiv obiective, metodologie și date, AI. Acest lucru va ajuta AI să genereze răspunsuri mai precise și relevante. Deselectează această opțiune dacă folosești Memo-ul proiectului în alte scopuri.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="637"/>
       <source>Send project memo to AI</source>
       <translation type="unfinished">Trimite memo proiect la AI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
       <source>   Fast Model:</source>
       <translation type="unfinished">Model rapid:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
       <source>AI Models:</source>
       <translation type="unfinished">Modele AI:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="640"/>
       <source>Large Model:</source>
       <translation type="unfinished">Model mare:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="641"/>
       <source>Enter the name of your language here</source>
       <translation type="unfinished">Introduceți aici numele limbii dumneavoastră</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="642"/>
       <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
       <translation type="unfinished">Selectaţi un model AI disponibil. Modelul mare este folosit pentru majoritatea caracteristicilor AI din QualCoder.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="644"/>
       <source>Reasoning:</source>
       <translation type="unfinished">Motivare:</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
+      <source>Close and open the software for the change in language to occur.
+Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
+Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
+To do this update the config.ini  file to another language that is available.
+Find the line begining language =
+Then update it. For example:
+langauge = it</source>
+      <translation type="unfinished">Închideți și deschideți programul pentru ca schimbarea limbii să aibă loc.
+Limbile actualizate periodic (de către oameni și/sau IA) sunt: de, es, fr, ja, pt, sv, zh.
+Se pot adăuga limbi suplimentare dacă acestea sunt listate în folderul src/qualcoder/i18n.
+Pentru aceasta, actualizați fișierul config.ini cu o altă limbă disponibilă.
+Găsiți linia care începe cu language =
+Apoi modificați-o. De exemplu:
+language = it</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+      <source>Permissions:</source>
+      <translation type="unfinished">Permisiuni:</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+      <source>Define what the AI agent is allowed to do in your project:
+- Read-only: The AI agent cannot make any changes.
+- Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
+- Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
+      <translation type="unfinished">Stabiliți ce are voie să facă agentul AI în cadrul proiectului dumneavoastră:
+- Doar citire: Agentul AI nu poate efectua nicio modificare.
+- În mediu izolat (implicit): Agentul AI nu poate modifica codurile și notele dumneavoastră, dar poate crea propriile sale coduri și note.
+- Acces complet: Agentul AI poate modifica orice, dar, de obicei, va solicita mai întâi confirmarea.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+      <source>Read-only</source>
+      <translation type="unfinished">Doar citire</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
+      <source>Sandboxed</source>
+      <translation type="unfinished">În mediul izolat</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
+      <source>Full access</source>
+      <translation type="unfinished">Acces complet</translation>
     </message>
   </context>
   <context>
     <name>Dialog_speakers</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="53"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="82"/>
       <source>Mark Speakers</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Difuzoare Mark</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="54"/>
-      <source>The following speaker names were detected in the document. 
-Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the "code as" name in the table. To merge two speakers (e.g. to correct a typo), rename the "code as" in one entry so that it exactly matches the other.</source>
-      <translation type="unfinished">În document au fost detectate următoarele nume de vorbitor.
-Selectaţi ( Faceți click pe OK creează un cod pentru fiecare vorbitor selectat în categoria "Dispeaker" și atribuie toate segmentele de text corespunzătoare. Doubleclick pentru a edita numele "cod ca" din tabel. Pentru a uni două difuzoare (de exemplu, pentru a corecta o scriere), redenumi "cod ca" într-o singură intrare, astfel încât să se potrivească exact cu celălalt.</translation>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
+      <source>Identifier:</source>
+      <translation type="unfinished">Identificator:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="56"/>
-      <source>Doubleclick a "coded as" name to edit</source>
-      <translation type="unfinished"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
+      <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
+      <translation type="unfinished">Modul în care fiecare vorbitor este marcat la începutul unei linii: Nume: , #Nume: , @Nume: , [Nume] , {Nume} sau un model personalizat. Opțiunea „Detectare automată” alege formatul cu cele mai multe rânduri.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
+      <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
+      <translation type="unfinished">Expresie regulată personalizată. Trebuie să conțină un singur grup de captură pentru numele vorbitorului. Exemplu: ^\s*&gt;&gt;\s*(.+?):</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
+      <source>regex with one group, e.g. ^\s*(.+?):</source>
+      <translation type="unfinished">expresie regulată cu un singur grup, de exemplu ^\s*(.+?):</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
+      <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
+      <translation type="unfinished">Alegeți fișierele text pe care doriți să le scanați pentru a identifica vorbitorii. Puteți selecta vorbitori din mai multe fișiere simultan.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
+      <source>Select files</source>
+      <translation type="unfinished">Selectează fișierele</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="89"/>
+      <source>Help</source>
+      <translation type="unfinished">Ajutor</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
+      <source>Number of speakers and turns detected with the current identifier and files.</source>
+      <translation type="unfinished">Numărul de vorbitori și de rânduri de vorbire detectate cu ajutorul identificatorului și al fișierelor actuale.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
+      <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
+      <translation type="unfinished">Faceți dublu clic pe o celulă „cod ca” pentru a redenumi un vorbitor. Atribuiți același „cod ca” la două rânduri pentru a le uni, de exemplu pentru a corecta o greșeală de tastare.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
+      <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
+      <translation type="unfinished">Bifați vorbitorii pe care doriți să îi marcați. Apăsând pe „OK” se creează un cod pentru fiecare dintre ei în categoria „📌 Vorbitori” și se codifică rândurile lor de intervenție.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
+      <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
+      <translation type="unfinished">Codificați întreaga replică, inclusiv eticheta vorbitorului. Debifați această opțiune pentru a codifica doar textul răspunsului, fără nume.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
+      <source>Include speaker name</source>
+      <translation type="unfinished">Includeți numele vorbitorului</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
+      <source>Doubleclick a "code as" name to edit</source>
+      <translation type="unfinished">Faceți dublu clic pe numele unei opțiuni „code as” pentru a o edita</translation>
     </message>
   </context>
   <context>
@@ -3980,7 +4115,7 @@ Selectaţi ( Faceți click pe OK creează un cod pentru fiecare vorbitor selecta
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="87"/>
       <source>tab</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">pierdere</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_SQL.py" line="88"/>
@@ -4249,7 +4384,7 @@ Nu codați acest text până când nu reîncărcați Coding - Cod Text din bara 
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="100"/>
       <source>&lt;Error Message&gt; </source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">&lt;Mesaj de eroare&gt;</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_error_dlg.py" line="101"/>
@@ -4265,412 +4400,407 @@ Nu codați acest text până când nu reîncărcați Coding - Cod Text din bara 
   <context>
     <name>MainWindow</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="305"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="338"/>
       <source>QualCoder</source>
       <translation type="unfinished"/>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="306"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="339"/>
       <source>Action Log</source>
       <translation type="unfinished">Jurnal de acțiune</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="339"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="372"/>
       <source>Manage</source>
       <translation type="unfinished">Gestionează</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="340"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
       <source>Coding</source>
       <translation type="unfinished">Codificare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="341"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="374"/>
       <source>Reports</source>
       <translation type="unfinished">Rapoarte</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="407"/>
-      <source>AI Chat</source>
-      <translation type="unfinished">Al Chat</translation>
-    </message>
-    <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="335"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="368"/>
       <source>Project</source>
       <translation type="unfinished">Proiect</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="336"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="369"/>
       <source>Open Recent Project</source>
       <translation type="unfinished">Deschide proiectul recent</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="337"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="370"/>
       <source>Export</source>
       <translation type="unfinished">Exportă</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="338"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="371"/>
       <source>Import</source>
       <translation type="unfinished">Importă</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="342"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="375"/>
       <source>Help</source>
       <translation type="unfinished">Ajutor</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="343"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
       <source>AI</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Inteligența artificială</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="344"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="377"/>
       <source>Analysis</source>
       <translation type="unfinished">Analiză</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="345"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="378"/>
       <source>Create New Project</source>
       <translation type="unfinished">Creează un proiect nou</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="346"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="379"/>
       <source>Open Project</source>
       <translation type="unfinished">Deschide proiectul</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="347"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="380"/>
       <source>Close Project</source>
       <translation type="unfinished">Închide proiectul</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="406"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="439"/>
       <source>Project Memo</source>
       <translation type="unfinished">Memorie proiect</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="442"/>
       <source>Settings</source>
       <translation type="unfinished">Configurări</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="350"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="383"/>
       <source>Exit</source>
       <translation type="unfinished">Ieşire</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="351"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="384"/>
       <source>Files</source>
       <translation type="unfinished">Fișiere</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="352"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="385"/>
       <source>Cases</source>
       <translation type="unfinished">Cazuri</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="353"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="386"/>
       <source>File categories</source>
       <translation type="unfinished">Categorii de fișiere</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="354"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="387"/>
       <source>Journals</source>
       <translation type="unfinished">Jurnale</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="355"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="388"/>
       <source>Code text</source>
       <translation type="unfinished">Text cod</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="356"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="389"/>
       <source>Categories</source>
       <translation type="unfinished">Categorii</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="357"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
       <source>Codebook</source>
       <translation type="unfinished">Carte de coduri</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
       <source>Assign Attributes</source>
       <translation type="unfinished">Atribuiți Atribute</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="359"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="392"/>
       <source>Manage Attributes</source>
       <translation type="unfinished">Gestionează Atributele</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="360"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="393"/>
       <source>Import Attributes</source>
       <translation type="unfinished">Atribute de import</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="361"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="394"/>
       <source>Code retrieval</source>
       <translation type="unfinished">Recuperarea codului</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="362"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="395"/>
       <source>Coding summary</source>
       <translation type="unfinished">Rezumat codare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="363"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="396"/>
       <source>Database queries</source>
       <translation type="unfinished">Întrebări privind baza de date</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="364"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="397"/>
       <source>Contents</source>
       <translation type="unfinished">Cuprins</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="365"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="398"/>
       <source>About</source>
       <translation type="unfinished">Despre</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="399"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="432"/>
       <source>Import survey</source>
       <translation type="unfinished">Sondaj privind importurile</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="367"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="400"/>
       <source>Attributes</source>
       <translation type="unfinished">Atribute</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="368"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="401"/>
       <source>Frequency table</source>
       <translation type="unfinished">Tabel de frecvenţă</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="369"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="402"/>
       <source>Coding comparison</source>
       <translation type="unfinished">Comparație codare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="370"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="403"/>
       <source>Text mining</source>
       <translation type="unfinished">Minerit de text</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="371"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="404"/>
       <source>Graph</source>
       <translation type="unfinished">Grafic</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="372"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="405"/>
       <source>Export codebook as ODT file</source>
       <translation type="unfinished">Exportă codul ca fișier ODT</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="406"/>
       <source>Code image</source>
       <translation type="unfinished">Imagine cod</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="374"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="407"/>
       <source>Code frequencies</source>
       <translation type="unfinished">Frecvenţe de cod</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="375"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
       <source>Coding Matrix</source>
       <translation type="unfinished">Matricea codării</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
       <source>Code audio/video</source>
       <translation type="unfinished">Cod audio/video</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="378"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="411"/>
       <source>REFI-QDA Project export</source>
       <translation type="unfinished">REFI-QDA Export proiect</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="379"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="412"/>
       <source>REFI-QDA Codebook export</source>
       <translation type="unfinished">Exportul carnetului de coduri REFI-QDA</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="380"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="413"/>
       <source>REFI-QDA Codebook import</source>
       <translation type="unfinished">Importul carnetului de coduri REFI-QDA</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="381"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="414"/>
       <source>REFI-QDA Project import</source>
       <translation type="unfinished">REFI-QDA Import proiect</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="382"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="415"/>
       <source>RQDA Project import</source>
       <translation type="unfinished">Importul proiectului RQDA</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="383"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="416"/>
       <source>Project summary</source>
       <translation type="unfinished">Rezumat proiect</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="384"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="417"/>
       <source>None</source>
       <translation type="unfinished">Niciuna</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="385"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="418"/>
       <source>Code relations</source>
       <translation type="unfinished">Relaţiile de cod</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="386"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="419"/>
       <source>Export coded text as html</source>
       <translation type="unfinished">Exportă textul codificat ca html</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="387"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="420"/>
       <source>Bad links to files</source>
       <translation type="unfinished">Linkuri proaste către fișiere</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="388"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="421"/>
       <source>Special functions</source>
       <translation type="unfinished">Funcții speciale</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="389"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="422"/>
       <source>File summary</source>
       <translation type="unfinished">Rezumat fișier</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="423"/>
       <source>Code summary</source>
       <translation type="unfinished">Rezumatul codului</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="424"/>
       <source>Coding comparison by file</source>
       <translation type="unfinished">Comparație codare pe fișier</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="392"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="425"/>
       <source>Code by case</source>
       <translation type="unfinished">Cod după caz</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="393"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="426"/>
       <source>Charts</source>
       <translation type="unfinished">Grafice</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="394"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="427"/>
       <source>Export codebook with memos as ODT file</source>
       <translation type="unfinished">Exportă codul cu note ca fișier ODT</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="395"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="428"/>
       <source>Import references RIS format</source>
       <translation type="unfinished">Referinţe import format RIS</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="396"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="429"/>
       <source>References</source>
       <translation type="unfinished">Referințe</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="397"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="430"/>
       <source>Colour scheme</source>
       <translation type="unfinished">Schema de culori</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="398"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="431"/>
       <source>Import plain text codes list</source>
       <translation type="unfinished">Importă lista de coduri text</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="400"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="433"/>
       <source>Key Shortcuts</source>
       <translation type="unfinished">Scurtături cheie</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="401"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="434"/>
       <source>Import twitter data</source>
       <translation type="unfinished">Importă date twitter</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="402"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="435"/>
       <source>Code pdf</source>
       <translation type="unfinished">Cod pdf</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="403"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="436"/>
       <source>Code text exact matches</source>
       <translation type="unfinished">Cod text exact meciuri</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="404"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="437"/>
       <source>Setup Wizard</source>
       <translation type="unfinished">Vrajitor de configurare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="405"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="438"/>
       <source>Rebuild Internal Memory</source>
       <translation type="unfinished">Reconstruiește memoria internă</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="441"/>
       <source>AI Assisted Coding</source>
       <translation type="unfinished">Al asistat Coding</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="410"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="443"/>
       <source>AI related Settings</source>
       <translation type="unfinished">Configurări asociate AI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="411"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="444"/>
       <source>Prompt library</source>
       <translation type="unfinished">Bibliotecă promptă</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="412"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="445"/>
       <source>Code organiser</source>
       <translation type="unfinished">Organizator de coduri</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="413"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="446"/>
       <source>Codes by text segments</source>
       <translation type="unfinished">Coduri pe segmente de text</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="414"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="447"/>
       <source>AI assisted coding</source>
       <translation type="unfinished">Codificare asistată AI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="415"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="448"/>
       <source>Code co-occurrence</source>
       <translation type="unfinished">Co-acțiunea codului</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="416"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="449"/>
       <source>Code counts by file/case</source>
       <translation type="unfinished">Numărarea codului după fișier/caz</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="417"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="450"/>
       <source>Taguette import</source>
       <translation type="unfinished">Import Taguette</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="307"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="340"/>
       <source>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
@@ -4689,7 +4819,7 @@ Li.verificat::marker {content: "\2612"; }
 &lt;p style="margine-top:0px; marja-bottom:0px; marja-stânga:0px; marja-dreapta:0px; -qt-block-indent:0; text-indent:0px; zzSelectați o opțiune din meniul Manage &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="316"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="349"/>
       <source>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
@@ -4708,7 +4838,7 @@ Li.verificat::marker {content: "\2612"; }
 &lt;p style="margine-top:0px; marja-bottom:0px; marja-stânga:0px; marja-dreapta:0px; -qt-block-indent:0; text-indent:0px; [62]Selectați o opțiune din meniul de codare&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="325"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
       <source>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
@@ -4725,6 +4855,21 @@ Li.neverificat::marker {content: "\2610"; }
 Li.verificat::marker {content: "\2612"; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal; daphne
 &lt;p style="margine-top:0px; marja-bottom:0px; marja-stânga:0px; marja-dreapta:0px; -qt-block-indent:0; text-indent:0px; [52]Selectați o opțiune din meniul Analiză sau Rapoarte&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
+      <source>AI Agent</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
+      <source>Sidebar Mode</source>
+      <translation type="unfinished">Modul bara laterală</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
+      <source>Ask the AI Agent</source>
+      <translation type="unfinished">Întreabă agentul AI</translation>
     </message>
   </context>
 </TS>

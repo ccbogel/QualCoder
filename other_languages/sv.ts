@@ -454,44 +454,54 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
   <context>
     <name>DialogOrganiser</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="62"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="72"/>
       <source>Graph Visualisation</source>
       <translation>Grafvisualisering</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="63"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="73"/>
       <source>Export image</source>
       <translation>Exportbild</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="64"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="74"/>
       <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
       <translation>Klicka på grafområdet och tryck på + eller W för att zooma in. Tryck - eller Q för att zooma in eller zooma ut.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="65"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="75"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Skapa kategori &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="66"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="76"/>
       <source>Select code branch</source>
       <translation>Välj kodgren</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="67"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="77"/>
       <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
       <translation>Kodarrangör.Högerklicka på koder och kategorier för att länka och slå samman.Lägg till nya kategorier.Återstrukturkoder träd.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="68"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="78"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Tillämpa ändrad struktur. &lt;/p&gt; &lt;p&gt; varning.Inget ångra alternativ. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="69"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
       <source>Apply</source>
       <translation>Tillämpas</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
+      <source>Add code</source>
+      <translation type="unfinished">Lägg till kod</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
+      <source>Import and edit codebook</source>
+      <translation type="unfinished">Importera och redigera kodbok</translation>
     </message>
   </context>
   <context>
@@ -1198,39 +1208,80 @@ Högerklicka för formatalternativ</translation>
   <context>
     <name>Dialog_ai_chat</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="146"/>
-      <source>AI Chat</source>
-      <translation>Ai chatt</translation>
-    </message>
-    <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="147"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="223"/>
       <source>Create a new chat</source>
       <translation>Skapa en ny chatt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="148"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="224"/>
       <source>New</source>
       <translation>Ny</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="149"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="219"/>
       <source>Delete the selected chat</source>
       <translation>Ta bort den valda chatten</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="150"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="220"/>
       <source>Delete</source>
       <translation>Radera</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="151"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="222"/>
       <source>Help</source>
       <translation>Hjälp</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="152"/>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="235"/>
       <source>Enter your question here and press Enter to continue the chat</source>
       <translation>Ange din fråga här och tryck på Enter för att fortsätta chatten</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
+      <source>AI Agent</source>
+      <translation type="unfinished">AI-agent</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
+      <source>Selectively undo AI induced changes</source>
+      <translation type="unfinished">Ångra AI-orsakade ändringar selektivt</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
+      <source>Define what the AI agent is allowed to do in your project:
+- Read-only: The AI agent cannot make any changes.
+- Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
+- Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
+      <translation type="unfinished">Ange vad AI-agenten får göra i ditt projekt:
+- Skrivskyddad: AI-agenten kan inte göra några ändringar.
+- Sandbox (standard): AI-agenten kan inte göra ändringar i dina koder och anteckningar, men kan skapa egna.
+- Full åtkomst: AI-agenten kan ändra allt, men kommer vanligtvis att be om bekräftelse först.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
+      <source>Read-only</source>
+      <translation type="unfinished">Skrivskyddad</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
+      <source>Sandboxed</source>
+      <translation type="unfinished">I sandlåda</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
+      <source>Full access</source>
+      <translation type="unfinished">Fullständig åtkomst</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
+      <source>Enlarge AI Agent</source>
+      <translation type="unfinished">Förstora AI-agenten</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
+      <source>...</source>
+      <translation type="unfinished">...</translation>
     </message>
   </context>
   <context>
@@ -2267,7 +2318,7 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
       <source>REGEX</source>
-      <translation/>
+      <translation>Reguljära uttryck</translation>
     </message>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
@@ -2849,7 +2900,7 @@ från C:/users/OldUser/Images till C:/usersNewUser/Images</translation>
     <message>
       <location filename="../src/qualcoder/GUI/ui_dialog_manage_links.py" line="57"/>
       <source>Bulk change</source>
-      <translation type="unfinished"/>
+      <translation type="unfinished">Massändring</translation>
     </message>
   </context>
   <context>
@@ -3469,405 +3520,489 @@ Använd inte apostrof eller kommatecken i några värden</translation>
   <context>
     <name>Dialog_settings</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="530"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
       <source>Settings</source>
       <translation>Inställningar</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="531"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
       <source>Backup project folder every time project is opened</source>
       <translation>Backup Project -mappen varje gång projekt öppnas</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="532"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="543"/>
       <source>Default project directory</source>
       <translation>Standardprojektkatalog</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="533"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="544"/>
       <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
       <translation>Säkerhetskopieringsvideo- och ljudfiler.Avmarkera för att påskynda säkerhetskopior.
 Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopian.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="535"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="546"/>
       <source>Backups</source>
       <translation>Säkerhetskopiering</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="536"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
       <source>0</source>
       <translation>0</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="537"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
       <source>1</source>
       <translation>1</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="538"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
       <source>2</source>
       <translation>2</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="539"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
       <source>3</source>
       <translation>3</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="540"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
       <source>4</source>
       <translation>4</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="541"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="552"/>
       <source>5</source>
       <translation>5</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="569"/>
       <source>Reports with text context</source>
       <translation>Rapporter med textsammanhang</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="542"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
       <source>Set this name as the current coder.
 </source>
       <translation>Ställ in detta namn som den nuvarande kodaren.
 </translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="545"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
       <source>Current coder: </source>
       <translation>Aktuell kodare: </translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="546"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
       <source>/</source>
       <translation>/</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="547"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
       <source>Language</source>
       <translation>Språk</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="566"/>
       <source>General font and size</source>
       <translation>Allmänt teckensnitt och storlek</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="567"/>
       <source>Font size for codes tree</source>
       <translation>Teckensnittsstorlek för koder Träd</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="568"/>
       <source>Font size for documents</source>
       <translation>Teckensnittsstorlek för dokument</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="570"/>
       <source>Characters before and after</source>
       <translation>Tecken före och efter</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="560"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="571"/>
       <source>Text context, coded text style</source>
       <translation>Textsammanhang, kodad textstil</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
       <source>8</source>
       <translation>8</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="574"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
       <source>10</source>
       <translation>10</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
       <source>12</source>
       <translation>12</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
       <source>14</source>
       <translation>14</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
       <source>16</source>
       <translation>16</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
       <source>18</source>
       <translation>18</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="579"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
       <source>100</source>
       <translation>100</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="580"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
       <source>200</source>
       <translation>200</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
       <source>300</source>
       <translation>300</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Visa identifierande nummer för filer, fall, koder, et cetera. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="603"/>
       <source>Show IDs</source>
       <translation>Visa ID</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
       <source>50000</source>
       <translation>50000</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="583"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
       <source>30000</source>
       <translation>30000</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
       <source>Style</source>
       <translation>Stil</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
       <source>Very large text documents. Load text chunks by number of characters.</source>
       <translation>Mycket stora textdokument.Ladda textbitar efter antal tecken.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
       <source>Code text chunk size</source>
       <translation>Kodtextbitstorlek</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="589"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Används vid tidsposition i transkription &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="590"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
       <source>Time format</source>
       <translation>Tidsformat</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt; &lt;huvud/&gt; &lt;body&gt; &lt;p&gt; Används vid inmatning av högtalarnamn i transkription &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
       <source>Speaker format</source>
       <translation>Högtalarformat</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="604"/>
       <source>AI Integration</source>
       <translation>AI -integration</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
       <source>enable AI integration</source>
       <translation>Aktivera AI -integration</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
       <source>Description:</source>
       <translation>Beskrivning:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
       <source>Get Access:</source>
       <translation>Få åtkomst:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
       <source>API key</source>
       <translation>API -nyckel</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
       <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
       <translation>Du kan använda projektmemo (finns i menyn: Projekt&gt; Projektmemo) för att förmedla bakgrundsinformation om din forskning, inklusive mål, metodik och data, till AI.Detta hjälper AI att generera mer exakta och relevanta svar.Avmarkera det här alternativet om du använder projektmemo för andra ändamål.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="637"/>
       <source>Send project memo to AI</source>
       <translation>Skicka projektmemo till AI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
       <source>Language for AI conversations: </source>
       <translation>Språk för AI -konversationer: </translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="628"/>
       <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
       <translation>Om det väljs kommer konversationerna att vara på samma språk som resten av användargränssnittet.Du kan välja det här språket högst upp i detta fönster.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="629"/>
       <source>same as UI</source>
       <translation>Samma som UI</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="641"/>
       <source>Enter the name of your language here</source>
       <translation>Ange namnet på ditt språk här</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
       <source>Temperature:</source>
       <translation>Temperatur:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
       <source>Advanced option. Only change when you know whatr you are doing.</source>
       <translation>Avancerat alternativ.Byt bara när du vet vad du gör.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
       <source>1.0</source>
       <translation>1.0</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="635"/>
       <source>   Top_p:</source>
       <translation>   Top_p:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
       <source>Advanced AI Options...</source>
       <translation>Avancerade AI-alternativ </translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="640"/>
       <source>Large Model:</source>
       <translation>Stor modell:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
       <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
       <translation>Välj en tillgänglig AI-modell (kan vara samma som den stora modellen). Den snabba modellen används endast för enkla uppgifter.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="643"/>
       <source>&lt;select available model&gt;</source>
       <translation>välj tillgänglig modell</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
       <source>   Fast Model:</source>
       <translation>   Snabb modell:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
       <source>context window:</source>
       <translation>kontextfönster:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="642"/>
       <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
       <translation>Välj en tillgänglig AI-modell. Den stora modellen används för de flesta av AI-funktionerna i QualCoder.</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
       <source>AI Profile:</source>
       <translation>AI profil:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
       <source>Edit Name</source>
       <translation>Redigera namn</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
       <source>...</source>
       <translation>...</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
       <source>New AI Profile...</source>
       <translation>Ny AI-profil...</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="626"/>
       <source>General Parameters:</source>
       <translation>Allmänna parametrar:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="634"/>
       <source>API Base URL:</source>
-      <translation/>
+      <translation>API:s bas-URL:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
       <source>AI Models:</source>
       <translation>AI-modeller:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="644"/>
       <source>Reasoning:</source>
       <translation>Motivering:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="544"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
       <source>Change</source>
       <translation>Ändra</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
       <source>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
-Additional languages can be added if they are listed in the src/qualcoder/i18n folder. 
-To do this update the config.ini  file to another language that is available. 
-Find the line begining language = 
-Then update it. For example: 
+Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
+To do this update the config.ini  file to another language that is available.
+Find the line begining language =
+Then update it. For example:
 langauge = it</source>
-      <translation type="unfinished">Stäng och öppna programvaran för att språkförändringen ska ske.
-Språk uppdateras regelbundet (av människa och/eller AI) är: de, es, fr, ja, pt, sv, zh.
-Ytterligare språk kan läggas till om de är listade i src/qualcoder/i18n-mappen.
-För att göra denna uppdatering filen config.ini till ett annat språk som är tillgängligt.
-Hitta linjen börjar språket =
-Sedan uppdatera den. Till exempel:
-Langauge = den</translation>
+      <translation type="unfinished">Stäng och öppna programmet för att språkändringen ska träda i kraft.
+Språk som uppdateras regelbundet (av människor och/eller AI) är: de, es, fr, ja, pt, sv, zh.
+Ytterligare språk kan läggas till om de finns listade i mappen src/qualcoder/i18n.
+För att göra detta uppdaterar du filen config.ini till ett annat tillgängligt språk.
+Leta reda på raden som börjar med language =
+Uppdatera sedan den. Till exempel:
+language = it</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+      <source>Permissions:</source>
+      <translation type="unfinished">Behörigheter:</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+      <source>Define what the AI agent is allowed to do in your project:
+- Read-only: The AI agent cannot make any changes.
+- Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
+- Full access: The AI agent can change everything, but will usually ask for confirmation first.</source>
+      <translation type="unfinished">Ange vad AI-agenten får göra i ditt projekt:
+- Skrivskyddad: AI-agenten kan inte göra några ändringar.
+- Sandbox (standard): AI-agenten kan inte göra ändringar i dina koder och anteckningar, men kan skapa egna.
+- Full åtkomst: AI-agenten kan ändra allt, men kommer vanligtvis att be om bekräftelse först.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+      <source>Read-only</source>
+      <translation type="unfinished">Skrivskyddad</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
+      <source>Sandboxed</source>
+      <translation type="unfinished">I en sandlåda</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
+      <source>Full access</source>
+      <translation type="unfinished">Fullständig åtkomst</translation>
     </message>
   </context>
   <context>
     <name>Dialog_speakers</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="53"/>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="82"/>
       <source>Mark Speakers</source>
       <translation>Markera högtalare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="54"/>
-      <source>The following speaker names were detected in the document. 
-Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the "code as" name in the table. To merge two speakers (e.g. to correct a typo), rename the "code as" in one entry so that it exactly matches the other.</source>
-      <translation>Följande talarnamn har identifierats i dokumentet. 
-Markera (✓) de du vill markera. När du klickar på OK skapas en kod för varje vald talare i kategorin ”📌 Talare” och alla motsvarande textsegment tilldelas. Dubbelklicka för att redigera namnet ”kod som” i tabellen. För att slå samman två talare (t.ex. för att korrigera ett stavfel) byter du namn på ”kod som” i en post så att det stämmer exakt med den andra.</translation>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="83"/>
+      <source>Identifier:</source>
+      <translation type="unfinished">Identifiering:</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="56"/>
-      <source>Doubleclick a "coded as" name to edit</source>
-      <translation>Dubbelklicka på ett ”kodat som”-namn för att redigera det.</translation>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="84"/>
+      <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
+      <translation type="unfinished">Hur varje talare markeras i början av en rad: Namn: , #Namn: , @Namn: , [Namn] , {Namn} eller ett anpassat mönster. Funktionen för automatisk identifiering väljer det format som förekommer oftast.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="85"/>
+      <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
+      <translation type="unfinished">Anpassat reguljärt uttryck. Det måste innehålla en fångstgrupp för talarens namn. Exempel: ^\s*&gt;&gt;\s*(.+?):</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="86"/>
+      <source>regex with one group, e.g. ^\s*(.+?):</source>
+      <translation type="unfinished">Reguljärt uttryck med en grupp, t.ex. ^\s*(.+?):</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
+      <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
+      <translation type="unfinished">Välj vilka textfiler som ska genomsökas efter talare. Du kan markera talare i flera filer samtidigt.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
+      <source>Select files</source>
+      <translation type="unfinished">Välj filer</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="89"/>
+      <source>Help</source>
+      <translation type="unfinished">Hjälp</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
+      <source>Number of speakers and turns detected with the current identifier and files.</source>
+      <translation type="unfinished">Antal talare och talomgångar som har identifierats med den aktuella identifieraren och filerna.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
+      <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
+      <translation type="unfinished">Dubbelklicka på en ”kod som”-cell för att byta namn på en talare. Ange samma ”kod som” för två rader för att slå ihop dem, till exempel för att rätta till ett stavfel.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="92"/>
+      <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
+      <translation type="unfinished">Markera talarna genom att kryssa i rutorna. När du klickar på OK skapas en kod för var och en i kategorin ”📌 Talare” och deras inlägg kodas.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
+      <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
+      <translation type="unfinished">Kodifiera hela turen, inklusive talarens namn. Avmarkera rutan för att endast kodifiera svarstexten, utan namnet.</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="94"/>
+      <source>Include speaker name</source>
+      <translation type="unfinished">Ange talarens namn</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
+      <source>Doubleclick a "code as" name to edit</source>
+      <translation type="unfinished">Dubbelklicka på ett ”code as”-namn för att redigera det</translation>
     </message>
   </context>
   <context>
@@ -4268,412 +4403,407 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
   <context>
     <name>MainWindow</name>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="305"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="338"/>
       <source>QualCoder</source>
       <translation>Kardlare</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="306"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="339"/>
       <source>Action Log</source>
       <translation>Handlingslogg</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="339"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="372"/>
       <source>Manage</source>
       <translation>Hantera</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="340"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
       <source>Coding</source>
       <translation>Kodning</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="341"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="374"/>
       <source>Reports</source>
       <translation>Rapporter</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="407"/>
-      <source>AI Chat</source>
-      <translation>Ai chatt</translation>
-    </message>
-    <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="335"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="368"/>
       <source>Project</source>
       <translation>Projekt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="336"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="369"/>
       <source>Open Recent Project</source>
       <translation>Öppna det senaste projektet</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="337"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="370"/>
       <source>Export</source>
       <translation>Exportera</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="338"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="371"/>
       <source>Import</source>
       <translation>Importera</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="342"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="375"/>
       <source>Help</source>
       <translation>Hjälp</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="343"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
       <source>AI</source>
       <translation>Ai</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="345"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="378"/>
       <source>Create New Project</source>
       <translation>Skapa nytt projekt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="346"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="379"/>
       <source>Open Project</source>
       <translation>Öppna projekt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="347"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="380"/>
       <source>Close Project</source>
       <translation>Stänga projektet</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="406"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="439"/>
       <source>Project Memo</source>
       <translation>Projektmemo</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="442"/>
       <source>Settings</source>
       <translation>Inställningar</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="350"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="383"/>
       <source>Exit</source>
       <translation>Utgång</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="353"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="386"/>
       <source>File categories</source>
       <translation>Filkategorier</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="355"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="388"/>
       <source>Code text</source>
       <translation>Kodtext</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="356"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="389"/>
       <source>Categories</source>
       <translation>Kategorier</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="357"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
       <source>Codebook</source>
       <translation>Kodbok</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
       <source>Assign Attributes</source>
       <translation>Tilldela attribut</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="359"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="392"/>
       <source>Manage Attributes</source>
       <translation>Hantera attribut</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="360"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="393"/>
       <source>Import Attributes</source>
       <translation>Importattribut</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="362"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="395"/>
       <source>Coding summary</source>
       <translation>Kodningsöversikt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="363"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="396"/>
       <source>Database queries</source>
       <translation>Databasfrågor</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="364"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="397"/>
       <source>Contents</source>
       <translation>Innehåll</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="365"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="398"/>
       <source>About</source>
       <translation>Om</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="399"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="432"/>
       <source>Import survey</source>
       <translation>Importundersökning</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="368"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="401"/>
       <source>Frequency table</source>
       <translation>Frekvensbord</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="369"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="402"/>
       <source>Coding comparison</source>
       <translation>Kodningsjämförelse</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="370"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="403"/>
       <source>Text mining</source>
       <translation>Textbrytning</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="371"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="404"/>
       <source>Graph</source>
       <translation>Graf</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="372"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="405"/>
       <source>Export codebook as ODT file</source>
       <translation>Exportera kodbok som ODT -fil</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="373"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="406"/>
       <source>Code image</source>
       <translation>Kodbild</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="374"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="407"/>
       <source>Code frequencies</source>
       <translation>Kodfrekvenser</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="375"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
       <source>Coding Matrix</source>
       <translation>Kodningsmatris</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="376"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="409"/>
       <source>Code audio/video</source>
       <translation>Kodljud/video</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="378"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="411"/>
       <source>REFI-QDA Project export</source>
       <translation>Refi-QDA-projektexport</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="379"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="412"/>
       <source>REFI-QDA Codebook export</source>
       <translation>Refi-qda kodbok export</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="380"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="413"/>
       <source>REFI-QDA Codebook import</source>
       <translation>Refi-qda kodbok import</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="381"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="414"/>
       <source>REFI-QDA Project import</source>
       <translation>Refi-QDA-projektimport</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="382"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="415"/>
       <source>RQDA Project import</source>
       <translation>RQDA -projektimport</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="383"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="416"/>
       <source>Project summary</source>
       <translation>Projektöversikt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="384"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="417"/>
       <source>None</source>
       <translation>Ingen</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="385"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="418"/>
       <source>Code relations</source>
       <translation>Kodrelationer</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="386"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="419"/>
       <source>Export coded text as html</source>
       <translation>Exportkodad text som HTML</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="388"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="421"/>
       <source>Special functions</source>
       <translation>Specialfunktioner</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="389"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="422"/>
       <source>File summary</source>
       <translation>Filöversikt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="390"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="423"/>
       <source>Code summary</source>
       <translation>Kodöversikt</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="391"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="424"/>
       <source>Coding comparison by file</source>
       <translation>Kodningsjämförelse efter fil</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="392"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="425"/>
       <source>Code by case</source>
       <translation>Kod i fall</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="393"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="426"/>
       <source>Charts</source>
       <translation>Diagram</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="394"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="427"/>
       <source>Export codebook with memos as ODT file</source>
       <translation>Exportera kodbok med memos som ODT -fil</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="395"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="428"/>
       <source>Import references RIS format</source>
       <translation>Importera referenser RIS -format</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="397"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="430"/>
       <source>Colour scheme</source>
       <translation>Färgplan</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="398"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="431"/>
       <source>Import plain text codes list</source>
       <translation>Importera vanliga textkoder</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="401"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="434"/>
       <source>Import twitter data</source>
       <translation>Importera Twitter -data</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="402"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="435"/>
       <source>Code pdf</source>
       <translation>Kod pdf</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="403"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="436"/>
       <source>Code text exact matches</source>
       <translation>Kodtext Exakt matchningar</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="404"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="437"/>
       <source>Setup Wizard</source>
       <translation>Inställningsguide</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="405"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="438"/>
       <source>Rebuild Internal Memory</source>
       <translation>Ombyggnad av internt minne</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="408"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="441"/>
       <source>AI Assisted Coding</source>
       <translation>AI Assisterad kodning</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="410"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="443"/>
       <source>AI related Settings</source>
       <translation>AI -relaterade inställningar</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="411"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="444"/>
       <source>Prompt library</source>
       <translation>Snabbbibliotek</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="412"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="445"/>
       <source>Code organiser</source>
       <translation>Kodorganisatör</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="413"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="446"/>
       <source>Codes by text segments</source>
       <translation>Koder efter textsegment</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="414"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="447"/>
       <source>AI assisted coding</source>
       <translation>AI Assisted Coding</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="415"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="448"/>
       <source>Code co-occurrence</source>
       <translation>Kodens förekomst</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="416"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="449"/>
       <source>Code counts by file/case</source>
       <translation>Kodjämförelsestabell</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="417"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="450"/>
       <source>Taguette import</source>
       <translation>Import av Taguette</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="344"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="377"/>
       <source>Analysis</source>
       <translation>Analys</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="351"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="384"/>
       <source>Files</source>
       <translation>Filer</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="352"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="385"/>
       <source>Cases</source>
       <translation>Fall</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="354"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="387"/>
       <source>Journals</source>
       <translation>Tidskrifter</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="367"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="400"/>
       <source>Attributes</source>
       <translation>Attribut</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="387"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="420"/>
       <source>Bad links to files</source>
       <translation>Felaktiga länkar till filer</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="396"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="429"/>
       <source>References</source>
       <translation>Referenser</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="400"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="433"/>
       <source>Key Shortcuts</source>
       <translation>Tangentbordsgenvägar</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="361"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="394"/>
       <source>Code retrieval</source>
       <translation type="unfinished">Kodhämtning</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="307"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="340"/>
       <source>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
@@ -4692,7 +4822,7 @@ li.checked:marker { content: "\2612"; }
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; Välj ett alternativ från menyn Manage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="316"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="349"/>
       <source>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
@@ -4711,7 +4841,7 @@ li.checked:marker { content: "\2612"; }
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; Välj ett alternativ från kodningsmenyn&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../src/qualcoder/GUI/ui_main.py" line="325"/>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="358"/>
       <source>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
@@ -4728,6 +4858,21 @@ li.unchecked::marker { content: "\2610"; }
 li.checked:marker { content: "\2612"; }
 &lt;/stil&gt;&lt;/head&gt;&lt;body style=" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-stil:normal;"&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; Välj ett alternativ från menyn Analys eller rapporter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
+      <source>AI Agent</source>
+      <translation type="unfinished">AI-agent</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
+      <source>Sidebar Mode</source>
+      <translation type="unfinished">Sidopanelsläge</translation>
+    </message>
+    <message>
+      <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
+      <source>Ask the AI Agent</source>
+      <translation type="unfinished">Fråga AI-agenten</translation>
     </message>
   </context>
 </TS>
