@@ -65,7 +65,8 @@ from .pseudonyms import Pseudonyms
 from .report_codes import DialogReportCodes  # for isInstance()
 from .ris import Ris
 from .select_items import DialogSelectItems
-from .view_av import DialogViewAV, DialogCodeAV  # for isinstance update files
+from .view_av import DialogViewAV
+from .code_av import DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
 
 # If VLC not installed, it will not crash

@@ -60,6 +60,7 @@ import qtawesome as qta
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
 from .ai_async_worker import Worker
+from .ai_memo import extract_ai_memo as extract_public_ai_memo
 from .ai_vectorstore import AiVectorstore
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
@@ -128,12 +129,8 @@ def extract_ai_memo(memo: str) -> str:
     Returns:
         str: shortened memo for AI
     """
-    mark = memo.find('#####')
-    if mark > -1:
-        return memo[0:mark]
-    else:
-        return memo
-
+    return extract_public_ai_memo(memo)
+  
 
 def is_chatgpt_oauth_api_base(api_base: str) -> bool:
     """Return whether the api_base marker selects ChatGPT OAuth auth."""
@@ -213,6 +210,8 @@ def _chatgpt_oauth_reauth_message() -> str:
              'Open the settings dialog and click "Renew" to authenticate again.')
 
 
+    return extract_public_ai_memo(memo)
+    
 def get_available_models(app, api_base: str, api_key: str) -> list:
     """Queries the API and returns a list of all AI models available from this provider."""
     if is_chatgpt_oauth_api_base(api_base):
@@ -1838,6 +1837,14 @@ class AiLLM():
                 return _("Updated case: ") + after_name
             return _("Updated case")
 
+        if op_type == "update_document":
+            target_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if allow_db_lookup and target_name == "":
+                target_name = self._short_change_label(self._lookup_source_name(int(op.get("fid", -1))))
+            if target_name != "":
+                return _("Updated document: ") + target_name
+            return _("Updated document")
+
         if op_type == "update_case_attributes":
             target_name = self._short_change_label(op.get("target_name", ""))
             if allow_db_lookup and target_name == "":
@@ -1859,6 +1866,31 @@ class AiLLM():
             if target_name != "":
                 return _("Updated document attributes: ") + target_name
             return _("Updated document attributes")
+
+        if op_type == "update_category":
+            before_name = self._short_change_label(op.get("before", {}).get("name", ""))
+            after_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if allow_db_lookup and before_name == "":
+                before_name = self._short_change_label(self._lookup_category_name(int(op.get("catid", -1))))
+            if before_name != "" and after_name != "" and before_name != after_name:
+                return _("Updated category: ") + before_name + " -> " + after_name
+            if after_name != "":
+                return _("Updated category: ") + after_name
+            return _("Updated category")
+
+        if op_type == "update_code":
+            before_name = self._short_change_label(op.get("before", {}).get("name", ""))
+            after_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if allow_db_lookup and before_name == "":
+                before_name = self._short_change_label(self._lookup_code_name(int(op.get("cid", -1))))
+            if before_name != "" and after_name != "" and before_name != after_name:
+                return _("Updated code: ") + before_name + " -> " + after_name
+            if after_name != "":
+                return _("Updated code: ") + after_name
+            return _("Updated code")
+
+        if op_type == "update_coding_text":
+            return _("Updated text coding")
 
         if op_type == "rename_category":
             old_name = self._short_change_label(op.get("old_name", ""))
@@ -2083,6 +2115,7 @@ class AiLLM():
         code_count = 0
         case_count = 0
         coding_count = 0
+        document_count = 0
         case_link_count = 0
         attribute_count = 0
         operation_summaries = []
@@ -2092,14 +2125,16 @@ class AiLLM():
             if not isinstance(op, dict):
                 continue
             op_type = str(op.get("type", "")).strip()
-            if op_type in ("create_category", "rename_category", "move_category_tree", "delete_category_tree"):
+            if op_type in ("create_category", "update_category", "rename_category", "move_category_tree", "delete_category_tree"):
                 category_count += 1
-            elif op_type in ("create_code", "rename_code", "move_code", "delete_code"):
+            elif op_type in ("create_code", "update_code", "rename_code", "move_code", "delete_code"):
                 code_count += 1
-            elif op_type in ("create_coding_text", "move_coding_text", "delete_coding_text"):
+            elif op_type in ("create_coding_text", "update_coding_text", "move_coding_text", "delete_coding_text"):
                 coding_count += 1
             elif op_type in ("create_case", "update_case"):
                 case_count += 1
+            elif op_type == "update_document":
+                document_count += 1
             elif op_type in ("create_case_text", "delete_case_text"):
                 case_link_count += 1
             elif op_type in (
@@ -2122,6 +2157,8 @@ class AiLLM():
             parts.append(str(case_count) + " " + _("case(s)"))
         if coding_count > 0:
             parts.append(str(coding_count) + " " + _("text coding(s)"))
+        if document_count > 0:
+            parts.append(str(document_count) + " " + _("document(s)"))
         if case_link_count > 0:
             parts.append(str(case_link_count) + " " + _("case link(s)"))
         if attribute_count > 0:
@@ -2328,6 +2365,71 @@ class AiLLM():
         if expected_name != "" and str(row[1]) != expected_name:
             return False, "changed", row
         if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_document(self, cur, op):
+        fid = int(op.get("fid", -1))
+        if fid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT id, name, ifnull(memo,'') FROM source WHERE id=?", (fid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_category(self, cur, op):
+        catid = int(op.get("catid", -1))
+        if catid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT catid, name, ifnull(memo,'') FROM code_cat WHERE catid=?", (catid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_code(self, cur, op):
+        cid = int(op.get("cid", -1))
+        if cid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT cid, name, ifnull(memo,'') FROM code_name WHERE cid=?", (cid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_coding_text(self, cur, op):
+        ctid = int(op.get("ctid", -1))
+        if ctid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT ctid, ifnull(memo,'') FROM code_text WHERE ctid=?", (ctid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_memo = str(after.get("memo", ""))
+        if str(row[1]) != expected_memo:
             return False, "changed", row
         return True, "ok", row
 
@@ -2640,12 +2742,14 @@ class AiLLM():
         restore_codes = 0
         restore_codings = 0
         restore_case_links = 0
-        revert_renamed_categories = 0
-        revert_renamed_codes = 0
+        revert_updated_categories = 0
+        revert_updated_codes = 0
         revert_moved_categories = 0
         revert_moved_codes = 0
         revert_moved_codings = 0
         revert_updated_cases = 0
+        revert_updated_documents = 0
+        revert_updated_codings = 0
         remove_attributes = 0
         revert_updated_attributes = 0
 
@@ -2714,6 +2818,14 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "update_document":
+                ok, reason, row_data = self._can_undo_update_document(cur, op)
+                if ok:
+                    revert_updated_documents += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
             elif op_type in ("update_case_attributes", "update_document_attributes"):
                 ok, reason, row_data = self._can_undo_update_attributes(cur, op)
                 if ok:
@@ -2722,10 +2834,34 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "update_category":
+                ok, reason, row_data = self._can_undo_update_category(cur, op)
+                if ok:
+                    revert_updated_categories += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "update_code":
+                ok, reason, row_data = self._can_undo_update_code(cur, op)
+                if ok:
+                    revert_updated_codes += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "update_coding_text":
+                ok, reason, row_data = self._can_undo_update_coding_text(cur, op)
+                if ok:
+                    revert_updated_codings += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
             elif op_type == "rename_category":
                 ok, reason, row_data = self._can_undo_rename_category(cur, op)
                 if ok:
-                    revert_renamed_categories += 1
+                    revert_updated_categories += 1
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -2733,7 +2869,7 @@ class AiLLM():
             elif op_type == "rename_code":
                 ok, reason, row_data = self._can_undo_rename_code(cur, op)
                 if ok:
-                    revert_renamed_codes += 1
+                    revert_updated_codes += 1
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -2855,12 +2991,16 @@ class AiLLM():
             lines.append(_("Undo will restore ") + ", ".join(parts) + ".")
         if restore_case_links > 0:
             lines.append(_("Undo will restore ") + str(restore_case_links) + _(" case link(s)."))
-        if revert_renamed_categories > 0:
-            lines.append(str(revert_renamed_categories) + _(" renamed category(ies) would be restored to their old names."))
-        if revert_renamed_codes > 0:
-            lines.append(str(revert_renamed_codes) + _(" renamed code(s) would be restored to their old names."))
+        if revert_updated_categories > 0:
+            lines.append(str(revert_updated_categories) + _(" updated category(ies) would be restored to their previous values."))
+        if revert_updated_codes > 0:
+            lines.append(str(revert_updated_codes) + _(" updated code(s) would be restored to their previous values."))
         if revert_updated_cases > 0:
             lines.append(str(revert_updated_cases) + _(" updated case(s) would be restored to their previous values."))
+        if revert_updated_documents > 0:
+            lines.append(str(revert_updated_documents) + _(" updated document(s) would be restored to their previous values."))
+        if revert_updated_codings > 0:
+            lines.append(str(revert_updated_codings) + _(" updated text coding(s) would be restored to their previous values."))
         if revert_updated_attributes > 0:
             lines.append(str(revert_updated_attributes) + _(" attribute update(s) would be restored to their previous values."))
         if revert_moved_categories > 0:
@@ -3082,6 +3222,38 @@ class AiLLM():
                             self._add_project_table_changes(project_table_changes, "code_name")
                     continue
 
+                if op_type == "update_category":
+                    ok, reason, row = self._can_undo_update_category(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE code_cat SET name=?, memo=?, owner=? WHERE catid=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "code_cat")
+                    continue
+
                 if op_type == "rename_category":
                     ok, reason, row = self._can_undo_rename_category(cur, op)
                     if not ok:
@@ -3106,6 +3278,38 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "code_cat")
+                    continue
+
+                if op_type == "update_code":
+                    ok, reason, row = self._can_undo_update_code(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE code_name SET name=?, memo=?, owner=? WHERE cid=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "code_name")
                     continue
 
                 if op_type == "rename_code":
@@ -3164,6 +3368,70 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "cases")
+                    continue
+
+                if op_type == "update_document":
+                    ok, reason, row = self._can_undo_update_document(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE source SET name=?, memo=?, owner=? WHERE id=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "source")
+                    continue
+
+                if op_type == "update_coding_text":
+                    ok, reason, row = self._can_undo_update_coding_text(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE code_text SET memo=?, owner=?, date=? WHERE ctid=?",
+                        (
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            str(before.get("date", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "code_text")
                     continue
 
                 if op_type in ("update_case_attributes", "update_document_attributes"):

@@ -454,44 +454,54 @@ ausgewählt: Einer der gewählten Codes muss passen</translation>
   <context>
     <name>DialogOrganiser</name>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="62"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="72"/>
       <source>Graph Visualisation</source>
       <translation>Diagramm Visualisierung</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="63"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="73"/>
       <source>Export image</source>
       <translation>Bild exportieren</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="64"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="74"/>
       <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
       <translation>Klicken Sie auf den Diagrammbereich und drücken Sie + oder W, um die Ansicht zu vergrößern. Drücken Sie - oder Q zum Vergrößern oder Verkleinern.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="65"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="75"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kategorie erstellen&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="66"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="76"/>
       <source>Select code branch</source>
       <translation>Code-Zweig auswählen</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="67"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="77"/>
       <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
       <translation>Code Organisator: Rechtsklick auf Codes oder Kategorien zum Verknüpfen oder Verschmelzen. Neue Kategorien können hinzugefügt und der Code-Baum umstrukturiert werden.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="68"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="78"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
       <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Geänderte Struktur dauerhaft übernehmen.&lt;/p&gt;&lt;p&gt;Achtung: Kann nicht rückgängig gemacht werden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_organiser.py" line="69"/>
+      <location filename="../GUI/ui_dialog_organiser.py" line="79"/>
       <source>Apply</source>
       <translation>Anwenden</translation>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_organiser.py" line="80"/>
+      <source>Add code</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_organiser.py" line="81"/>
+      <source>Import and edit codebook</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

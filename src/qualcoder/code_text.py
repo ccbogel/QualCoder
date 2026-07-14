@@ -914,7 +914,8 @@ class DialogCodeText(QtWidgets.QWidget):
             return False
         try:
             return bool(ai.has_active_runs('ai_search', self._ai_search_scope_id()))
-        except Exception:
+        except Exception as err:
+            logger.warning(err)
             return False
 
     def _ai_search_scope_status(self) -> str:
@@ -1971,19 +1972,21 @@ class DialogCodeText(QtWidgets.QWidget):
             return None
 
         eff_catid = {cc[0]: _effective_catid(cc[0]) for cc in code_counts}
-
         total_cache = {}
 
-        def _code_total(cid):
-            """ Code count rolled up with all descendant sub-codes. Memoized, cycle-safe. <- L """
-            if cid in total_cache:
-                return total_cache[cid]
-            total_cache[cid] = own_count.get(cid, 0)  # seed guards against cycles
-            t = own_count.get(cid, 0)
-            for child_cid in children_of.get(cid, []):
-                t += _code_total(child_cid)
-            total_cache[cid] = t
-            return t
+        def _code_total(cid_):
+            """ Code count rolled up with all descendant sub-codes. Memoized, cycle-safe.
+            Args:
+                cid_ : Integer
+            """
+            if cid_ in total_cache:
+                return total_cache[cid_]
+            total_cache[cid_] = own_count.get(cid_, 0)  # Seed guards against cycles
+            total_count = own_count.get(cid_, 0)
+            for child_cid in children_of.get(cid_, []):
+                total_count += _code_total(child_cid)
+            total_cache[cid_] = total_count
+            return total_count
 
         categories = deepcopy(self.categories)
         # Set up category counts
@@ -3206,33 +3209,64 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         category = ui.get_selected()
         for s in selected_codes:
-            # Moving to a category (or to blank) removes any sub-code nesting. <- L
+            # Moving to a category (or to blank) removes any sub-code nesting.
             cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], s['cid']])
             self.app.conn.commit()
             self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
         self.update_dialog_codes_and_categories(["code_name"])
 
     def move_code(self, selected):
-        """ Move code to another category or to no category.
-        Uses a list selection.
+        """ Move code to another category, or code or to none (top level).
+        Uses a list selection which represents the codes tree.
         Args:
             selected : QTreeWidgetItem
          """
 
-        cid = int(selected.text(1)[4:])
-        cur = self.app.conn.cursor()
-        cur.execute("select name, catid from code_cat order by name")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        items_list = [{'name': " ", 'catid': -1, 'cid': -1}]  # Default blank item
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            can_append = True
+            item = iterator.value()
+            depth = 0
+            current = item
+            # Get depth and if circular reference present
+            while current.parent() is not None:
+                if current.text(1) == selected.text(1):
+                    can_append = False
+                current = current.parent()
+                depth += 1
+            prefix = ""
+            if depth > 0:
+                prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
+            name = prefix + item.text(0)
+            cid = -1
+            catid = -1
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+            else:
+                catid = int(item.text(1)[6:])
+                name += " " + _("[CATEGORY]")
+            # Check the same item is not the same selected item
+            if item.text(1) == selected.text(1) and item.text(2) == selected.text(2):
+                can_append = False
+            memo = item.toolTip(2)
+            if can_append:
+                items_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo})
+            iterator +=1
+        ui = DialogSelectItems(self.app, items_list, _("Select blank or category or code"), "single")
         ok = ui.exec()
         if not ok:
             return
-        category = ui.get_selected()
-        # Moving to a category (or to blank) removes any sub-code nesting. <- L
-        cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], cid])
+        destination = ui.get_selected()
+        #print(destination)
+        selected_cid = int(selected.text(1)[4:])
+        cur = self.app.conn.cursor()
+        if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
+            cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
+        elif destination['cid'] > 0:  # Move under another code
+            cur.execute("update code_name set catid=null, supercid=? where cid=?", [destination['cid'], selected_cid])
+        else:  # Move under a category
+            cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], selected_cid])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories(["code_name"])
 
@@ -4444,7 +4478,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # Scroll the tree when dragged item it as top or bottom edges
             if event.type() == QtCore.QEvent.Type.DragMove:
                 vsb = self.ui.treeWidget.verticalScrollBar()
-                item = self.ui.treeWidget.currentItem()
+                item = self.ui.treeWidget.currentItem()  # Not used
                 top = self.ui.treeWidget.visualRect(self.ui.treeWidget.indexAt(self.ui.treeWidget.rect().topLeft())).bottom()
                 bottom = self.ui.treeWidget.viewport().height()
                 y = event.position().toPoint().y()
@@ -8006,13 +8040,13 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         if self.ui.tabWidget.currentIndex() != 1:  # not in ai search mode
-            return
+            return None
 
         # Get the adjusted start and end positions from the text editor's current selection
         pos0 = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
         pos1 = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
         if pos0 == pos1:
-            return
+            return None
 
         best_doc = None
         max_overlap_length = 0
