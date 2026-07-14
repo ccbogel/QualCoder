@@ -545,7 +545,6 @@ CONFIG_INI_AI_EX4C0559 = {
     "ai_model_index": "2",
     "report_text_context_characters": "100",
     "report_text_context_style": "Bold",
-    "ai_send_project_memo": "True",
     "ai_language_ui": "True",
     "ai_language": "",
     "ai_temperature": "1.0",

@@ -3985,7 +3985,7 @@ class AiLLM():
     def get_default_system_prompt(self) -> str:
         p = 'You are assisting a team of qualitative social researchers.'
         project_memo = extract_ai_memo(self.app.get_project_memo())
-        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+        if len(project_memo) > 0:
             p += f' Here is some background information about the research project the team is working on:\n{project_memo}'
         return p
         

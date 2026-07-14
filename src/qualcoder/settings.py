@@ -269,7 +269,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_AI_model_fast.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_large.view().setMinimumWidth(500)  # Set a minimum width for the dropdown list
         self.ui.comboBox_AI_model_fast.view().setMinimumWidth(500)
-        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.setChecked(self.settings.get('ai_language_ui', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.stateChanged.connect(self.ai_language_ui_changed)
         self.ui.lineEdit_AI_language.setText(self.settings.get('ai_language', ''))
@@ -505,7 +504,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_ai_profile.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
@@ -926,10 +924,6 @@ class DialogSettings(QtWidgets.QDialog):
             return
         if self.settings['ai_enable'] == 'True' and not self.validate_ai_top_p():
             return
-        if self.ui.checkBox_ai_project_memo.isChecked():
-            self.settings['ai_send_project_memo'] = 'True'
-        else: 
-            self.settings['ai_send_project_memo'] = 'False'
         self.settings['ai_language_ui'] = 'True' if self.ui.checkBox_AI_language_ui.isChecked() else 'False'
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()

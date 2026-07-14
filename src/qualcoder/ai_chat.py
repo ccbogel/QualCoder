@@ -2612,7 +2612,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     sections.append(prompt_text)
 
         project_memo = extract_ai_memo(self.app.get_project_memo())
-        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+        if len(project_memo) > 0:
             for prompt in self.agent_prompts_catalog.resolve_prompt_references(project_memo):
                 prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
                 if prompt_key == "" or prompt_key in included_prompt_keys:
@@ -4586,7 +4586,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.new_chat(_('Code analysis') + f' "{code_name}"', 'code_analysis', summary, prompt_label)
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
-            if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
+            if len(project_memo) == 0:
                 msg = _('Note that it is highly recommended to use the project memo (Menu "Project > Project Memo") \
 to include a short description of your project\'s research topics, questions, objectives, and the empirical \
 data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
@@ -4654,7 +4654,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.new_chat(_('Topic exploration') + f' "{topic_name}"', 'topic_exploration', summary, prompt_label)
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
-            if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
+            if len(project_memo) == 0:
                 msg = _('Note that it is highly recommended to use the project memo (Menu "Project > Project Memo") \
 to include a short description of your project\'s research topics, questions, objectives, and the empirical \
 data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
