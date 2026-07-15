@@ -1,10 +1,13 @@
 from unittest import TestCase
-from qualcoder.__main__ import App
 import datetime
 import os
 import shutil
 import sqlite3
 import tempfile
+
+from qualcoder.__main__ import App
+from qualcoder.ai_mcp_server import AiMcpServer
+from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
 
 """ Useful insights from:
 https: // stackoverflow.com / questions / 32527861 / python - unit - test - that - uses - an - external - data - file / 32528173
@@ -328,6 +331,146 @@ class TestMainWindow(TestCase):
         pass
 
 
+class TestAiMemoPolicy(TestCase):
+
+    class FakeApp:
+        def __init__(self, project_path):
+            self.project_path = project_path
+            self.settings = {"ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS}
+            self.delete_backup = True
+            self.ai = None
+
+    def setUp(self):
+        self.project_path = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.project_path, "data.qda")
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cur.execute(
+            "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
+            "owner text, date text, av_text_id integer, risid integer, unique(name))")
+        cur.execute(
+            "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
+            "date text, owner text, unique(name,attr_type,id))")
+        cur.execute(
+            "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, "
+            "constraint ucm unique(name))")
+        cur.execute(
+            "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
+            "owner text, date text, memo text)")
+        cur.execute(
+            "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, "
+            "supercatid integer, unique(name))")
+        cur.execute(
+            "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text, "
+            "date text, color text, supercid integer, unique(name))")
+        cur.execute(
+            "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, "
+            "pos1 integer, owner text, date text, memo text, avid integer, important integer, "
+            "unique(cid,fid,pos0,pos1, owner))")
+        cur.execute(
+            "insert into source (id, name, fulltext, mediapath, memo, owner, date) values (?,?,?,?,?,?,?)",
+            (1, "doc one", "Alpha beta gamma delta", None, "Document memo\n#####\nPrivate document", "default", dt),
+        )
+        cur.execute(
+            "insert into cases (caseid, name, memo, owner, date) values (?,?,?,?,?)",
+            (1, "case one", "Case memo\n#####\nPrivate case", "default", dt),
+        )
+        cur.execute(
+            "insert into case_text (id, caseid, fid, pos0, pos1, owner, date, memo) values (?,?,?,?,?,?,?,?)",
+            (1, 1, 1, 0, 5, "default", dt, "Case text memo\n#####\nPrivate case text"),
+        )
+        cur.execute(
+            "insert into code_cat (catid, name, owner, date, memo, supercatid) values (?,?,?,?,?,?)",
+            (1, "cat one", "default", dt, "Category memo\n#####\nPrivate category", None),
+        )
+        cur.execute(
+            "insert into code_name (cid, name, memo, catid, owner, date, color, supercid) values (?,?,?,?,?,?,?,?)",
+            (1, "code one", "Code memo\n#####\nPrivate code", 1, "default", dt, "#F5A9A9", None),
+        )
+        cur.execute(
+            "insert into code_text (ctid, cid, fid, seltext, pos0, pos1, owner, date, memo, avid, important) "
+            "values (?,?,?,?,?,?,?,?,?,?,?)",
+            (1, 1, 1, "Alpha", 0, 5, "AI Agent", dt, "Coding memo\n#####\nPrivate coding", None, None),
+        )
+        conn.commit()
+        conn.close()
+        self.server = AiMcpServer(self.FakeApp(self.project_path))
+
+    def tearDown(self):
+        shutil.rmtree(self.project_path)
+
+    def test_ai_memo_helpers(self):
+        self.assertEqual("Visible note\n", extract_ai_memo("Visible note\n#####\nHidden note"))
+        self.assertEqual(
+            "Updated note\n#####\nHidden note",
+            merge_public_memo("Visible note\n#####\nHidden note", "Updated note"),
+        )
+        self.assertEqual("Updated only", merge_public_memo("Visible only", "Updated only#####ignore this"))
+
+    def test_mcp_memo_reads_and_updates_preserve_private_suffix(self):
+        documents_payload = self.server._sanitize_memo_payload(self.server._read_resource_payload("qualcoder://documents", {}))
+        self.assertEqual("Document memo\n", documents_payload["documents"][0]["memo"])
+
+        code_tree_payload = self.server._sanitize_memo_payload(self.server._read_resource_payload("qualcoder://codes/tree", {}))
+        self.assertEqual("Category memo\n", code_tree_payload["categories"][0]["memo"])
+        self.assertEqual("Code memo\n", code_tree_payload["codes"][0]["memo"])
+
+        code_segments_payload = self.server._sanitize_memo_payload(
+            self.server._read_code_segments(
+                1,
+                {
+                    "strategy": "sequential",
+                    "max_segments": 10,
+                    "max_chars": 1000,
+                    "cursor": 0,
+                    "file_ids": [],
+                    "case_ids": [],
+                    "owners": ["AI Agent"],
+                },
+            )
+        )
+        self.assertEqual("Coding memo\n", code_segments_payload["segments"][0]["memo"])
+
+        document_result = self.server._call_tool_payload(
+            "documents/update_document", {"fid": 1, "memo": "Updated document"}, "cs-doc"
+        )
+        self.assertTrue(document_result["structuredContent"]["updated"])
+        self.assertEqual("Updated document\n", document_result["structuredContent"]["document"]["memo"])
+
+        category_result = self.server._call_tool_payload(
+            "codes/update_category", {"catid": 1, "memo": "Updated category"}, "cs-cat"
+        )
+        self.assertTrue(category_result["structuredContent"]["updated"])
+        self.assertEqual("Updated category\n", category_result["structuredContent"]["category"]["memo"])
+
+        code_result = self.server._call_tool_payload(
+            "codes/update_code", {"cid": 1, "name": "code one updated", "memo": "Updated code"}, "cs-code"
+        )
+        self.assertTrue(code_result["structuredContent"]["updated"])
+        self.assertEqual("Updated code\n", code_result["structuredContent"]["code"]["memo"])
+
+        coding_result = self.server._call_tool_payload(
+            "codes/update_text_coding", {"ctid": 1, "memo": "Updated coding"}, "cs-coding"
+        )
+        self.assertTrue(coding_result["structuredContent"]["updated"])
+        self.assertEqual("Updated coding\n", coding_result["structuredContent"]["coding"]["memo"])
+
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        cur.execute("select memo from source where id=1")
+        self.assertEqual("Updated document\n#####\nPrivate document", cur.fetchone()[0])
+        cur.execute("select memo from code_cat where catid=1")
+        self.assertEqual("Updated category\n#####\nPrivate category", cur.fetchone()[0])
+        cur.execute("select name, memo from code_name where cid=1")
+        row = cur.fetchone()
+        self.assertEqual("code one updated", row[0])
+        self.assertEqual("Updated code\n#####\nPrivate code", row[1])
+        cur.execute("select memo from code_text where ctid=1")
+        self.assertEqual("Updated coding\n#####\nPrivate coding", cur.fetchone()[0])
+        conn.close()
+
+
 # TEST_PERSIST_PATH = '/fake/path/'
 CONFIG_INI_AI_EX4C0559 = {
     "backup_num": "5",
@@ -402,7 +545,6 @@ CONFIG_INI_AI_EX4C0559 = {
     "ai_model_index": "2",
     "report_text_context_characters": "100",
     "report_text_context_style": "Bold",
-    "ai_send_project_memo": "True",
     "ai_language_ui": "True",
     "ai_language": "",
     "ai_temperature": "1.0",

@@ -48,7 +48,7 @@ from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
-from .ai_llm import extract_ai_memo, ai_quote_search, strip_think_blocks, AICancelled
+from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
 from .ai_search_dialog import DialogAiSearch
 from .confirm_delete import DialogConfirmDelete
@@ -2612,7 +2612,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     sections.append(prompt_text)
 
         project_memo = extract_ai_memo(self.app.get_project_memo())
-        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+        if len(project_memo) > 0:
             for prompt in self.agent_prompts_catalog.resolve_prompt_references(project_memo):
                 prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
                 if prompt_key == "" or prompt_key in included_prompt_keys:
@@ -4586,7 +4586,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.new_chat(_('Code analysis') + f' "{code_name}"', 'code_analysis', summary, prompt_label)
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
-            if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
+            if len(project_memo) == 0:
                 msg = _('Note that it is highly recommended to use the project memo (Menu "Project > Project Memo") \
 to include a short description of your project\'s research topics, questions, objectives, and the empirical \
 data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
@@ -4654,7 +4654,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.new_chat(_('Topic exploration') + f' "{topic_name}"', 'topic_exploration', summary, prompt_label)
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
-            if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
+            if len(project_memo) == 0:
                 msg = _('Note that it is highly recommended to use the project memo (Menu "Project > Project Memo") \
 to include a short description of your project\'s research topics, questions, objectives, and the empirical \
 data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
@@ -7395,7 +7395,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             model_kind=model_kind,
             run_context=run_context,
         )
-        raw = strip_think_blocks(str(llm_response.content)).strip()
+        raw = strip_think_blocks(llm_content_to_text(getattr(llm_response, 'content', ''))).strip()
         raw = self._extract_first_json_object(raw)
         if raw == "":
             return {}
@@ -7664,7 +7664,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 fallback_without_response_format=False,
                 model_kind='large',
             )
-            return strip_think_blocks(str(repaired.content if repaired is not None else '')).strip()
+            return strip_think_blocks(llm_content_to_text(getattr(repaired, 'content', ''))).strip()
         except Exception as err:
             logger.warning("Final answer repair failed: %s", err)
             return ''

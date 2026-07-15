@@ -44,6 +44,12 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from langchain_core.runnables.config import RunnableConfig
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
+from langchain_openai.chat_models.codex import _ChatOpenAICodex
+from langchain_openai.chatgpt_oauth import (
+    _ChatGPTOAuthRefreshError,
+    _FileChatGPTOAuthTokenProvider,
+    login_chatgpt,
+)
 import json_repair
 from openai import OpenAI, BadRequestError
 from pydantic import ValidationError
@@ -54,6 +60,7 @@ import qtawesome as qta
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
 from .ai_async_worker import Worker
+from .ai_memo import extract_ai_memo as extract_public_ai_memo
 from .ai_vectorstore import AiVectorstore
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
@@ -66,6 +73,9 @@ max_memo_length = 1500  # Maximum length of the memo send to the AI
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+CHATGPT_OAUTH_API_BASE = 'ChatGPT_OAuth'
+NO_API_KEY_NEEDED = '<no API key needed>'
 
 
 class AICancelled(Exception):
@@ -119,14 +129,93 @@ def extract_ai_memo(memo: str) -> str:
     Returns:
         str: shortened memo for AI
     """
-    mark = memo.find('#####')
-    if mark > -1:
-        return memo[0:mark]
-    else:
-        return memo
+    return extract_public_ai_memo(memo)
+  
+
+def is_chatgpt_oauth_api_base(api_base: str) -> bool:
+    """Return whether the api_base marker selects ChatGPT OAuth auth."""
+
+    return str(api_base).strip() == CHATGPT_OAUTH_API_BASE
+
+
+def is_chatgpt_oauth_profile(model: dict | None) -> bool:
+    """Return whether the AI profile uses ChatGPT OAuth authentication."""
+
+    if model is None:
+        return False
+    return is_chatgpt_oauth_api_base(model.get('api_base', ''))
+
+
+def ensure_chatgpt_oauth_profile_defaults(model: dict | None) -> None:
+    """Normalize a ChatGPT OAuth profile in-place."""
+
+    if not is_chatgpt_oauth_profile(model):
+        return
+    model['api_key'] = NO_API_KEY_NEEDED
+
+
+def _chatgpt_oauth_provider(timeout: float = 5.0) -> _FileChatGPTOAuthTokenProvider:
+    """Return the default ChatGPT OAuth token provider."""
+
+    return _FileChatGPTOAuthTokenProvider(timeout=timeout)
+
+
+def _format_chatgpt_oauth_token_status(token) -> str:
+    """Format one human-readable ChatGPT OAuth status line."""
+
+    details = []
+    plan_type = str(getattr(token, 'plan_type', '')).strip()
+    if plan_type != '':
+        details.append(plan_type)
+    expires_at = getattr(token, 'expires_at', None)
+    if expires_at is not None:
+        try:
+            expires_text = expires_at.astimezone().strftime('%Y-%m-%d %H:%M')
+        except Exception:
+            expires_text = str(expires_at)
+        details.append(_('expires ') + expires_text)
+    if len(details) == 0:
+        return _('Authenticated')
+    return _('Authenticated') + ' (' + ', '.join(details) + ')'
+
+
+def get_chatgpt_oauth_status(timeout: float = 5.0) -> tuple[bool, str]:
+    """Return current ChatGPT OAuth status for the default token store."""
+
+    try:
+        token = _chatgpt_oauth_provider(timeout=timeout).get_token()
+        return True, _format_chatgpt_oauth_token_status(token)
+    except FileNotFoundError:
+        return False, _('Not authenticated')
+    except _ChatGPTOAuthRefreshError:
+        return False, _('Authentication expired. Please renew it.')
+    except Exception as err:
+        return False, _('Authentication error') + ': ' + str(err)
+
+
+def renew_chatgpt_oauth(timeout: float = 300.0) -> tuple[bool, str]:
+    """Start or renew ChatGPT OAuth authentication."""
+
+    try:
+        login_chatgpt(timeout=timeout)
+    except Exception as err:
+        return False, _('Authentication error') + ': ' + str(err)
+    return get_chatgpt_oauth_status()
+
+
+def _chatgpt_oauth_reauth_message() -> str:
+    """Return a user-facing re-authentication instruction."""
+
+    return _('ChatGPT authentication expired or could not be renewed. '
+             'Open the settings dialog and click "Renew" to authenticate again.')
+
+
+    return extract_public_ai_memo(memo)
     
 def get_available_models(app, api_base: str, api_key: str) -> list:
     """Queries the API and returns a list of all AI models available from this provider."""
+    if is_chatgpt_oauth_api_base(api_base):
+        return []
     msg = None
     if app is not None:
         msg = Message(app, _('AI Models'), _('Loading list of available AI models...'))
@@ -147,31 +236,44 @@ def get_available_models(app, api_base: str, api_key: str) -> list:
 
 def get_default_ai_models():
     ini_string = """
-[ai_model_OpenAI GPT5.2 reasoning]
+[ai_model_OpenAI GPT5.5 reasoning]
 desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.2
-large_model_context_window = 1000000
-fast_model = gpt-5-mini
-fast_model_context_window = 128000
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.4-mini
+fast_model_context_window = 400000
 reasoning_effort = medium
 api_base = 
 api_key = 
 
-[ai_model_OpenAI GPT5.2 no reasoning]
+[ai_model_OpenAI GPT5.5 no reasoning]
 desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.2
-large_model_context_window = 1000000
-fast_model = gpt-5-mini
-fast_model_context_window = 128000
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.4-mini
+fast_model_context_window = 400000
 reasoning_effort = low
 api_base = 
 api_key = 
+
+[ai_model_OpenAI_ChatGPT_Login GPT5.5]
+desc = Lets you use your ChatGPT Plus, Pro, or Team account with QualCoder.
+	No API key, no extra cost. Use the "Renew" button to authenticate your account.
+    Note that this is experimental, availability may vary. 
+access_info_url = https://chatgpt.com/
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.5
+fast_model_context_window = 272000
+reasoning_effort = medium
+api_base = ChatGPT_OAuth
+api_key = <no API key needed>
 
 [ai_model_Blablador]
 desc = Free and open source models, excellent privacy, but not as powerful 
@@ -204,27 +306,40 @@ reasoning_effort = default
 api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
 api_key = 
 
-[ai_model_Anthropic Claude Sonnet 4.5]
+[ai_model_Anthropic Claude Opus 4.8]
 desc = Claude is a family of high quality models from Anthropic.
 	You need an API-key from Anthropic and credits in your account.
 	Anthropic will charge a small amount for every use.
 access_info_url = https://console.anthropic.com/settings/keys
-large_model = claude-sonnet-4-5
-large_model_context_window = 200000
-fast_model = claude-sonnet-4-5
-fast_model_context_window = 200000
+large_model = claude-opus-4-8
+large_model_context_window = 1000000
+fast_model = claude-sonnet-5
+fast_model_context_window = 1000000
 reasoning_effort = medium
 api_base = https://api.anthropic.com/v1/
 api_key = 
 
-[ai_model_Google Gemini]
+[ai_model_Anthropic Claude Sonnet 5]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-sonnet-5
+large_model_context_window = 1000000
+fast_model = claude-sonnet-5
+fast_model_context_window = 1000000
+reasoning_effort = medium
+api_base = https://api.anthropic.com/v1/
+api_key = 
+
+[ai_model_Google Gemini 3.5 Flash]
 desc = Google offers several free and paid models on their servers.
 	Select one in the Advanced AI options below.
 	You need an API-key from Google.
 access_info_url = https://ai.google.dev/gemini-api/docs
-large_model = gemini-2.5-flash
+large_model = gemini-3.5-flash
 large_model_context_window = 1000000
-fast_model = gemini-2.5-flash
+fast_model = gemini-3.1-flash-lite
 fast_model_context_window = 1000000
 reasoning_effort = default
 api_base = https://generativelanguage.googleapis.com/v1beta/openai/
@@ -330,34 +445,151 @@ def add_new_ai_model(current_models: list, new_name: str) -> tuple[list, int]:
     current_models.append(new_model)
     return current_models, len(current_models) - 1
 
-def update_ai_models(current_models: list, current_model_index: int) -> tuple[list, int]:
+def get_ai_profile_group_key(model: dict) -> str:
+    """Return the group key for an AI profile based on the first word of its name."""
+
+    name = str(model.get('name', '')).strip()
+    if name == '':
+        return ''
+    return re.split(r'\s+', name, maxsplit=1)[0].lower()
+
+
+def _get_ai_profile_insertion_anchor_key(model: dict) -> str:
+    """Return the fallback provider group after which a profile should be inserted."""
+
+    group_key = get_ai_profile_group_key(model)
+    if group_key.startswith('openai_chatgpt_login'):
+        return 'openai'
+    return group_key
+
+
+def _find_first_ai_group_index(models: list, group_key: str) -> int:
+    """Return the first list index that belongs to the requested profile group."""
+
+    if group_key == '':
+        return -1
+    for idx, model in enumerate(models):
+        if get_ai_profile_group_key(model) == group_key:
+            return idx
+    return -1
+
+
+def _find_last_ai_group_index(models: list, group_key: str) -> int:
+    """Return the last list index that belongs to the requested profile group."""
+
+    if group_key == '':
+        return -1
+    last_match = -1
+    for idx, model in enumerate(models):
+        if get_ai_profile_group_key(model) == group_key:
+            last_match = idx
+    return last_match
+
+
+def _find_ai_model_index_by_name(models: list, model_name: str) -> int:
+    """Return the list index for a named AI profile, or -1 if it is not found."""
+
+    for idx, model in enumerate(models):
+        if str(model.get('name', '')).strip() == model_name:
+            return idx
+    return -1
+
+
+def _parse_seen_ai_model_upgrade_offers(settings: dict | None) -> set[str]:
+    """Return the set of one-time model-upgrade prompts that were already shown."""
+
+    if settings is None:
+        return set()
+    raw_value = str(settings.get('ai_model_upgrade_offers_seen', '')).strip()
+    if raw_value == '':
+        return set()
+    return {item for item in raw_value.split('||') if item != ''}
+
+
+def _store_seen_ai_model_upgrade_offers(settings: dict | None, seen_offers: set[str]) -> None:
+    """Persist the set of one-time model-upgrade prompts in the settings dictionary."""
+
+    if settings is None:
+        return
+    settings['ai_model_upgrade_offers_seen'] = '||'.join(sorted(seen_offers))
+
+
+def _queue_ai_profile_upgrade_offer(current_models: list, current_model_name: str,
+                                    suggested_model_name: str,
+                                    settings: dict | None) -> dict | None:
+    """Prepare one deferred upgrade offer for a newly added provider profile."""
+
+    current_index = _find_ai_model_index_by_name(current_models, current_model_name)
+    suggested_index = _find_ai_model_index_by_name(current_models, suggested_model_name)
+    if current_index < 0 or suggested_index < 0 or current_index == suggested_index:
+        return None
+
+    seen_offers = _parse_seen_ai_model_upgrade_offers(settings)
+    offer_key = str(suggested_model_name).strip()
+    if offer_key == '' or offer_key in seen_offers:
+        return None
+
+    return {
+        'current_model_name': str(current_model_name).strip(),
+        'suggested_model_name': offer_key,
+    }
+
+
+def update_ai_models(current_models: list, current_model_index: int,
+                     settings: dict | None = None) -> tuple[list, int, dict | None]:
     """Update the AI model definitions, and add new models from the default set
 
     Args:
         current_models (list): the current list from config.ini
         current_model_index (int): the index of the currently selected model
+        settings (dict | None): config settings used for one-time upgrade prompts
 
     Returns:
-        tuple[list, int]: updated list and current model index 
+        tuple[list, int, dict | None]: updated list, current model index, queued upgrade offer
     """
     if current_model_index < 0 or current_model_index > (len(current_models) - 1):
         current_model_index = 0
 
-    # add new models from the default model list
+    current_model_name = str(current_models[current_model_index].get('name', '')).strip()
+    current_group_key = get_ai_profile_group_key(current_models[current_model_index])
+
+    # add new models from the default model list, keeping provider groups together
     default_models = get_default_ai_models()
     current_models_names = {model['name'] for model in current_models}
+    missing_models_by_group = {}
+    missing_group_order = []
     for model in default_models:
-        if not model['name'] in current_models_names:
-            if model['name'] == 'OpenAI GPT5.1 reasoning': # insert this at the top, because it is the current default model
-                current_models.insert(0, model)
-                if current_model_index >= 0:
-                    current_model_index += 1
-            elif model['name'] == 'OpenAI GPT5.1 no reasoning' and len(current_models) > 1: # insert this at the second position
-                current_models.insert(1, model)
-                if current_model_index >= 1:
-                    current_model_index += 1        
+        if model['name'] not in current_models_names:
+            group_key = get_ai_profile_group_key(model)
+            if group_key not in missing_models_by_group:
+                missing_models_by_group[group_key] = []
+                missing_group_order.append(group_key)
+            missing_models_by_group[group_key].append(model)
+            current_models_names.add(model['name'])
+
+    newest_inserted_by_group = {}
+    for group_key in missing_group_order:
+        group_models = missing_models_by_group.get(group_key, [])
+        if len(group_models) == 0:
+            continue
+        first_group_index = _find_first_ai_group_index(current_models, group_key)
+        if first_group_index > -1:
+            insertion_index = first_group_index
+        else:
+            anchor_group_key = _get_ai_profile_insertion_anchor_key(group_models[0])
+            if anchor_group_key == group_key:
+                insertion_index = -1
             else:
-                current_models.append(model)
+                last_anchor_index = _find_last_ai_group_index(current_models, anchor_group_key)
+                insertion_index = -1 if last_anchor_index < 0 else last_anchor_index + 1
+        if insertion_index < 0:
+            insertion_index = len(current_models)
+        for offset, model in enumerate(group_models):
+            insert_at = insertion_index + offset
+            current_models.insert(insert_at, model)
+            if current_model_index >= insert_at:
+                current_model_index += 1
+        newest_inserted_by_group[group_key] = str(group_models[0].get('name', '')).strip()
                 
     # Blablador: update config (api base, model alias)
     curr_model = current_models[current_model_index]
@@ -396,8 +628,15 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
         # Correct an error in the QualCoder 3.8 release, where reasoning effort was set to medium for GPT-4.1:            
         if model['large_model'].lower().find('gpt-4.1') > -1: 
             model['reasoning_effort'] = 'default'
+
+    pending_upgrade_offer = None
+    suggested_model_name = newest_inserted_by_group.get(current_group_key, '')
+    if current_model_name != '' and suggested_model_name != '':
+        pending_upgrade_offer = _queue_ai_profile_upgrade_offer(
+            current_models, current_model_name, suggested_model_name, settings
+        )
     
-    return current_models, current_model_index
+    return current_models, current_model_index, pending_upgrade_offer
 
 def strip_think_blocks(text: str) -> str:
     """
@@ -412,6 +651,38 @@ def strip_think_blocks(text: str) -> str:
     text = re.sub(r"<think>.*$", "", text, flags=re.DOTALL)
 
     return text.strip()
+
+
+def llm_content_to_text(content) -> str:
+    """Convert LLM content payloads into plain text.
+
+    LangChain providers usually return a string in `AIMessage.content`, but
+    Responses-API based models can return a list of content blocks instead.
+    This helper flattens the common text-bearing block shapes that QualCoder
+    needs for logging and JSON parsing.
+    """
+
+    if content is None:
+        return ''
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            text = llm_content_to_text(item)
+            if text != '':
+                parts.append(text)
+        return "\n".join(parts)
+    if isinstance(content, dict):
+        for key in ('text', 'output_text'):
+            value = content.get(key, None)
+            if isinstance(value, str):
+                return value
+        value = content.get('content', None)
+        if value is not None:
+            return llm_content_to_text(value)
+        return ''
+    return str(content)
 
 def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
     """Searches the quote in the original text using the Smith-Waterman algorithm.
@@ -500,6 +771,8 @@ class AiLLM():
         self._fast_llm_factory = None
         self._large_reasoning_effort = ''
         self._fast_reasoning_effort = ''
+        self._unsupported_llm_params_lock = threading.RLock()
+        self._unsupported_llm_params_by_key = {}
 
     def _ai_log_target_path(self) -> str:
         """Return the file path for the dedicated AI communication log."""
@@ -607,6 +880,132 @@ class AiLLM():
             return str(self.app.ai_models[model_idx].get('name', '')).strip()
         return 'unknown'
 
+    def _llm_provider_name(self, factory) -> str:
+        if factory is AzureChatOpenAI:
+            return 'azure'
+        if factory is _ChatOpenAICodex:
+            return 'chatgpt_oauth'
+        return 'openai'
+
+    def _llm_setup_for_kind(self, model_kind: str):
+        normalized_kind = 'fast' if str(model_kind).strip().lower() == 'fast' else 'large'
+        if normalized_kind == 'fast':
+            return normalized_kind, self._fast_llm_params, self._fast_llm_factory
+        return normalized_kind, self._large_llm_params, self._large_llm_factory
+
+    def _llm_profile_key(self, factory, base_params: dict | None) -> tuple[str, str, str]:
+        if base_params is None:
+            return self._llm_provider_name(factory), '', ''
+        model_name = str(
+            base_params.get('model', '') or
+            base_params.get('azure_deployment', '') or
+            base_params.get('deployment_name', '')
+        ).strip().lower()
+        endpoint = str(
+            base_params.get('openai_api_base', '') or
+            base_params.get('azure_endpoint', '')
+        ).strip().lower()
+        return self._llm_provider_name(factory), endpoint, model_name
+
+    def _filtered_llm_base_params(self, factory, base_params: dict | None) -> dict:
+        if base_params is None:
+            return {}
+        filtered_params = dict(base_params)
+        key = self._llm_profile_key(factory, base_params)
+        with self._unsupported_llm_params_lock:
+            unsupported_params = set(self._unsupported_llm_params_by_key.get(key, set()))
+        for param_name in unsupported_params:
+            filtered_params.pop(param_name, None)
+        return filtered_params
+
+    def _remember_unsupported_llm_param(self, factory, base_params: dict | None, param_name: str) -> bool:
+        normalized_name = str(param_name).strip()
+        if normalized_name == '' or base_params is None:
+            return False
+        key = self._llm_profile_key(factory, base_params)
+        with self._unsupported_llm_params_lock:
+            known_params = set(self._unsupported_llm_params_by_key.get(key, set()))
+            was_new = normalized_name not in known_params
+            known_params.add(normalized_name)
+            self._unsupported_llm_params_by_key[key] = known_params
+        return was_new
+
+    def _close_http_client(self, client) -> None:
+        if client is None:
+            return
+        try:
+            client.close()
+        except Exception:
+            pass
+
+    def _build_llm_for_run(self, factory, base_params: dict | None, model_kind: str, purpose: str):
+        timeout_obj = self._run_timeout(model_kind, purpose)
+        http_client = httpx.Client(timeout=timeout_obj)
+        llm_params = self._filtered_llm_base_params(factory, base_params)
+        llm_params['timeout'] = timeout_obj
+        llm_params['http_client'] = http_client
+        llm = factory(**llm_params)
+        return llm, http_client
+
+    def _unsupported_param_from_message(self, message_text: str) -> str:
+        text = str(message_text).strip()
+        if text == '':
+            return ''
+        patterns = (
+            r"Unsupported parameter:\s*['\"]([^'\"]+)['\"]",
+            r"Unsupported parameter:\s*([A-Za-z0-9_.-]+)",
+            r"Parameter\s+['\"]([^'\"]+)['\"]\s+is\s+not\s+supported",
+            r"['\"]([^'\"]+)['\"]\s+is\s+not\s+supported\s+with\s+this\s+model",
+        )
+        for pattern in patterns:
+            match = re.search(pattern, text, flags=re.IGNORECASE)
+            if match is not None:
+                return str(match.group(1)).strip()
+        return ''
+
+    def _unsupported_param_from_error(self, err: BaseException) -> str:
+        for item in self._exception_chain(err):
+            param_name = str(getattr(item, 'param', '')).strip()
+            if param_name != '':
+                return param_name
+            body = getattr(item, 'body', None)
+            if isinstance(body, dict):
+                error_payload = body.get('error', body)
+                if isinstance(error_payload, dict):
+                    param_name = str(error_payload.get('param', '')).strip()
+                    if param_name != '':
+                        return param_name
+                    for key in ('message', 'detail'):
+                        message_text = self._safe_to_text(error_payload.get(key, ''))
+                        param_name = self._unsupported_param_from_message(message_text)
+                        if param_name != '':
+                            return param_name
+            elif body is not None:
+                param_name = self._unsupported_param_from_message(self._safe_to_text(body))
+                if param_name != '':
+                    return param_name
+            for attr_name in ('message', 'detail'):
+                attr_value = getattr(item, attr_name, None)
+                if attr_value is None:
+                    continue
+                param_name = self._unsupported_param_from_message(self._safe_to_text(attr_value))
+                if param_name != '':
+                    return param_name
+            param_name = self._unsupported_param_from_message(self._safe_to_text(item))
+            if param_name != '':
+                return param_name
+        return ''
+
+    def log_llm_retry(self, req_id: int, llm, param_name: str, source: str, context: str = ''):
+        """Log one automatic retry triggered by an unsupported parameter error."""
+
+        model_name = self._llm_name_for_log(llm)
+        line = f'[#{req_id}] RETRY model="{model_name}"'
+        if context.strip() != '':
+            line += f' context="{context.strip()}"'
+        line += f' unsupported_parameter="{str(param_name).strip()}" source="{str(source).strip()}"'
+        self._write_ai_log(line)
+
     def _message_role_and_text_for_log(self, msg) -> tuple[str, str]:
         if isinstance(msg, SystemMessage):
             return 'system', str(msg.content)
@@ -635,6 +1034,18 @@ class AiLLM():
                 return repr(value)
             except Exception:
                 return '<unprintable>'
+
+    def _chatgpt_oauth_user_error(self, err: BaseException) -> str:
+        """Return a friendly ChatGPT OAuth re-auth message, if applicable."""
+
+        for item in self._exception_chain(err):
+            if isinstance(item, _ChatGPTOAuthRefreshError):
+                return _chatgpt_oauth_reauth_message()
+            if isinstance(item, FileNotFoundError):
+                item_text = self._safe_to_text(item)
+                if 'ChatGPT OAuth token' in item_text or 'login_chatgpt()' in item_text:
+                    return _chatgpt_oauth_reauth_message()
+        return ''
 
     def _write_ai_log(self, text: str):
         if not self._ensure_ai_log_logger():
@@ -675,7 +1086,8 @@ class AiLLM():
         if context.strip() != '':
             header += f' context="{context.strip()}"'
         lines = [header, 'assistant:']
-        for line in self._safe_to_text(response_text if response_text is not None else '').splitlines():
+        response_body = llm_content_to_text(response_text)
+        for line in self._safe_to_text(response_body).splitlines():
             lines.append('  ' + line)
         if len(lines) == 2:
             lines.append('  ')
@@ -786,21 +1198,78 @@ class AiLLM():
             pool=pool_timeout,
         )
 
+    def _rebuild_run_context_without_param(self, run_context: AiRunContext, param_name: str) -> bool:
+        normalized_kind, base_params, factory = self._llm_setup_for_kind(run_context.model_kind)
+        normalized_name = str(param_name).strip()
+        if base_params is None or factory is None or normalized_name == '':
+            return False
+        if normalized_name not in base_params:
+            return False
+        self._remember_unsupported_llm_param(factory, base_params, normalized_name)
+        old_client = getattr(run_context, 'http_client', None)
+        llm, http_client = self._build_llm_for_run(
+            factory,
+            base_params,
+            normalized_kind,
+            str(getattr(run_context, 'purpose', '')).strip(),
+        )
+        run_context.llm = llm
+        run_context.http_client = http_client
+        run_context.provider = self._llm_provider_name(factory)
+        self._close_http_client(old_client)
+        return True
+
+    def _retry_after_unsupported_parameter_error(self, run_context: AiRunContext, invoke_kwargs: dict | None,
+                                                 err: BaseException, attempted_params: set[str],
+                                                 req_id: int, context: str = '') -> tuple[bool, dict | None]:
+        param_name = self._unsupported_param_from_error(err)
+        if param_name == '' or param_name in attempted_params:
+            return False, invoke_kwargs
+
+        if invoke_kwargs is not None and param_name in invoke_kwargs:
+            retry_kwargs = dict(invoke_kwargs)
+            retry_kwargs.pop(param_name, None)
+            attempted_params.add(param_name)
+            self.log_llm_retry(req_id, run_context.llm, param_name, source='invoke', context=context)
+            return True, retry_kwargs
+
+        if not self._rebuild_run_context_without_param(run_context, param_name):
+            return False, invoke_kwargs
+
+        attempted_params.add(param_name)
+        self.log_llm_retry(req_id, run_context.llm, param_name, source='model', context=context)
+        return True, invoke_kwargs
+
+    def _invoke_with_unsupported_parameter_retry(self, run_context: AiRunContext, messages,
+                                                 invoke_kwargs: dict | None, req_id: int,
+                                                 context: str = ''):
+        current_kwargs = {} if invoke_kwargs is None else dict(invoke_kwargs)
+        attempted_params = set()
+        while True:
+            self._raise_if_run_canceled(run_context)
+            try:
+                return run_context.llm.invoke(messages, **current_kwargs)
+            except Exception as err:
+                retried, current_kwargs = self._retry_after_unsupported_parameter_error(
+                    run_context,
+                    current_kwargs,
+                    err,
+                    attempted_params,
+                    req_id,
+                    context=context,
+                )
+                if retried:
+                    continue
+                raise
+
     def _create_run_context(self, model_kind: str = 'large', purpose: str = '',
                             scope_type: str = '', scope_id=None, group_id: str = '',
                             parent_run_id: str = '', cancel_result=None) -> AiRunContext:
-        normalized_kind = 'fast' if str(model_kind).strip().lower() == 'fast' else 'large'
-        base_params = self._fast_llm_params if normalized_kind == 'fast' else self._large_llm_params
-        factory = self._fast_llm_factory if normalized_kind == 'fast' else self._large_llm_factory
+        normalized_kind, base_params, factory = self._llm_setup_for_kind(model_kind)
         if base_params is None or factory is None:
             raise RuntimeError('AI model configuration is not initialized.')
 
-        timeout_obj = self._run_timeout(normalized_kind, purpose)
-        http_client = httpx.Client(timeout=timeout_obj)
-        llm_params = dict(base_params)
-        llm_params['timeout'] = timeout_obj
-        llm_params['http_client'] = http_client
-        llm = factory(**llm_params)
+        llm, http_client = self._build_llm_for_run(factory, base_params, normalized_kind, purpose)
 
         return AiRunContext(
             run_id=self._next_run_id(),
@@ -813,7 +1282,7 @@ class AiLLM():
             cancel_result=cancel_result,
             http_client=http_client,
             llm=llm,
-            provider=('azure' if factory is AzureChatOpenAI else 'openai'),
+            provider=self._llm_provider_name(factory),
         )
 
     def _register_run_context(self, run_context: AiRunContext):
@@ -1053,13 +1522,21 @@ class AiLLM():
                 invoke_kwargs['response_format'] = response_format
             if config is not None:
                 invoke_kwargs['config'] = config
-            res = active_llm.invoke(messages, **invoke_kwargs)
+            res = self._invoke_with_unsupported_parameter_retry(
+                current_context,
+                messages,
+                invoke_kwargs,
+                req_id,
+                context=context,
+            )
+            active_llm = current_context.llm
             self._raise_if_run_canceled(current_context)
         except Exception as err:
             if isinstance(err, AICancelled):
                 raise
             if current_context.cancel_event.is_set():
                 raise AICancelled(current_context.run_id)
+            active_llm = current_context.llm
             if str(current_context.model_kind).strip().lower() == 'fast':
                 self.log_llm_error(req_id, active_llm, err, context=f'{context}_fast_primary_error')
             try:
@@ -1083,7 +1560,14 @@ class AiLLM():
                 fallback_kwargs = {}
                 if config is not None:
                     fallback_kwargs['config'] = config
-                res = active_llm.invoke(messages, **fallback_kwargs)
+                res = self._invoke_with_unsupported_parameter_retry(
+                    current_context,
+                    messages,
+                    fallback_kwargs,
+                    req_id,
+                    context=context,
+                )
+                active_llm = current_context.llm
                 self._raise_if_run_canceled(current_context)
             except Exception as err2:
                 if isinstance(err2, AICancelled):
@@ -1120,7 +1604,14 @@ class AiLLM():
             fallback_context = self._create_run_context(model_kind='large', purpose='invoke')
             fallback_llm = fallback_context.llm
             fallback_req_id = self.log_llm_request(fallback_llm, messages, context=fallback_context_label)
-            res = fallback_llm.invoke(messages, **invoke_kwargs)
+            res = self._invoke_with_unsupported_parameter_retry(
+                fallback_context,
+                messages,
+                invoke_kwargs,
+                fallback_req_id,
+                context=fallback_context_label,
+            )
+            fallback_llm = fallback_context.llm
             self._raise_if_run_canceled(current_context)
             self.log_llm_response(fallback_req_id, fallback_llm, getattr(res, 'content', ''), context=fallback_context_label)
             return res
@@ -1346,6 +1837,14 @@ class AiLLM():
                 return _("Updated case: ") + after_name
             return _("Updated case")
 
+        if op_type == "update_document":
+            target_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if allow_db_lookup and target_name == "":
+                target_name = self._short_change_label(self._lookup_source_name(int(op.get("fid", -1))))
+            if target_name != "":
+                return _("Updated document: ") + target_name
+            return _("Updated document")
+
         if op_type == "update_case_attributes":
             target_name = self._short_change_label(op.get("target_name", ""))
             if allow_db_lookup and target_name == "":
@@ -1367,6 +1866,31 @@ class AiLLM():
             if target_name != "":
                 return _("Updated document attributes: ") + target_name
             return _("Updated document attributes")
+
+        if op_type == "update_category":
+            before_name = self._short_change_label(op.get("before", {}).get("name", ""))
+            after_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if allow_db_lookup and before_name == "":
+                before_name = self._short_change_label(self._lookup_category_name(int(op.get("catid", -1))))
+            if before_name != "" and after_name != "" and before_name != after_name:
+                return _("Updated category: ") + before_name + " -> " + after_name
+            if after_name != "":
+                return _("Updated category: ") + after_name
+            return _("Updated category")
+
+        if op_type == "update_code":
+            before_name = self._short_change_label(op.get("before", {}).get("name", ""))
+            after_name = self._short_change_label(op.get("after", {}).get("name", ""))
+            if allow_db_lookup and before_name == "":
+                before_name = self._short_change_label(self._lookup_code_name(int(op.get("cid", -1))))
+            if before_name != "" and after_name != "" and before_name != after_name:
+                return _("Updated code: ") + before_name + " -> " + after_name
+            if after_name != "":
+                return _("Updated code: ") + after_name
+            return _("Updated code")
+
+        if op_type == "update_coding_text":
+            return _("Updated text coding")
 
         if op_type == "rename_category":
             old_name = self._short_change_label(op.get("old_name", ""))
@@ -1591,6 +2115,7 @@ class AiLLM():
         code_count = 0
         case_count = 0
         coding_count = 0
+        document_count = 0
         case_link_count = 0
         attribute_count = 0
         operation_summaries = []
@@ -1600,14 +2125,16 @@ class AiLLM():
             if not isinstance(op, dict):
                 continue
             op_type = str(op.get("type", "")).strip()
-            if op_type in ("create_category", "rename_category", "move_category_tree", "delete_category_tree"):
+            if op_type in ("create_category", "update_category", "rename_category", "move_category_tree", "delete_category_tree"):
                 category_count += 1
-            elif op_type in ("create_code", "rename_code", "move_code", "delete_code"):
+            elif op_type in ("create_code", "update_code", "rename_code", "move_code", "delete_code"):
                 code_count += 1
-            elif op_type in ("create_coding_text", "move_coding_text", "delete_coding_text"):
+            elif op_type in ("create_coding_text", "update_coding_text", "move_coding_text", "delete_coding_text"):
                 coding_count += 1
             elif op_type in ("create_case", "update_case"):
                 case_count += 1
+            elif op_type == "update_document":
+                document_count += 1
             elif op_type in ("create_case_text", "delete_case_text"):
                 case_link_count += 1
             elif op_type in (
@@ -1630,6 +2157,8 @@ class AiLLM():
             parts.append(str(case_count) + " " + _("case(s)"))
         if coding_count > 0:
             parts.append(str(coding_count) + " " + _("text coding(s)"))
+        if document_count > 0:
+            parts.append(str(document_count) + " " + _("document(s)"))
         if case_link_count > 0:
             parts.append(str(case_link_count) + " " + _("case link(s)"))
         if attribute_count > 0:
@@ -1836,6 +2365,71 @@ class AiLLM():
         if expected_name != "" and str(row[1]) != expected_name:
             return False, "changed", row
         if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_document(self, cur, op):
+        fid = int(op.get("fid", -1))
+        if fid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT id, name, ifnull(memo,'') FROM source WHERE id=?", (fid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_category(self, cur, op):
+        catid = int(op.get("catid", -1))
+        if catid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT catid, name, ifnull(memo,'') FROM code_cat WHERE catid=?", (catid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_code(self, cur, op):
+        cid = int(op.get("cid", -1))
+        if cid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT cid, name, ifnull(memo,'') FROM code_name WHERE cid=?", (cid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_name = str(after.get("name", "")).strip()
+        expected_memo = str(after.get("memo", ""))
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_coding_text(self, cur, op):
+        ctid = int(op.get("ctid", -1))
+        if ctid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT ctid, ifnull(memo,'') FROM code_text WHERE ctid=?", (ctid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        expected_memo = str(after.get("memo", ""))
+        if str(row[1]) != expected_memo:
             return False, "changed", row
         return True, "ok", row
 
@@ -2148,12 +2742,14 @@ class AiLLM():
         restore_codes = 0
         restore_codings = 0
         restore_case_links = 0
-        revert_renamed_categories = 0
-        revert_renamed_codes = 0
+        revert_updated_categories = 0
+        revert_updated_codes = 0
         revert_moved_categories = 0
         revert_moved_codes = 0
         revert_moved_codings = 0
         revert_updated_cases = 0
+        revert_updated_documents = 0
+        revert_updated_codings = 0
         remove_attributes = 0
         revert_updated_attributes = 0
 
@@ -2222,6 +2818,14 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "update_document":
+                ok, reason, row_data = self._can_undo_update_document(cur, op)
+                if ok:
+                    revert_updated_documents += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
             elif op_type in ("update_case_attributes", "update_document_attributes"):
                 ok, reason, row_data = self._can_undo_update_attributes(cur, op)
                 if ok:
@@ -2230,10 +2834,34 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "update_category":
+                ok, reason, row_data = self._can_undo_update_category(cur, op)
+                if ok:
+                    revert_updated_categories += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "update_code":
+                ok, reason, row_data = self._can_undo_update_code(cur, op)
+                if ok:
+                    revert_updated_codes += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "update_coding_text":
+                ok, reason, row_data = self._can_undo_update_coding_text(cur, op)
+                if ok:
+                    revert_updated_codings += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
             elif op_type == "rename_category":
                 ok, reason, row_data = self._can_undo_rename_category(cur, op)
                 if ok:
-                    revert_renamed_categories += 1
+                    revert_updated_categories += 1
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -2241,7 +2869,7 @@ class AiLLM():
             elif op_type == "rename_code":
                 ok, reason, row_data = self._can_undo_rename_code(cur, op)
                 if ok:
-                    revert_renamed_codes += 1
+                    revert_updated_codes += 1
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -2363,12 +2991,16 @@ class AiLLM():
             lines.append(_("Undo will restore ") + ", ".join(parts) + ".")
         if restore_case_links > 0:
             lines.append(_("Undo will restore ") + str(restore_case_links) + _(" case link(s)."))
-        if revert_renamed_categories > 0:
-            lines.append(str(revert_renamed_categories) + _(" renamed category(ies) would be restored to their old names."))
-        if revert_renamed_codes > 0:
-            lines.append(str(revert_renamed_codes) + _(" renamed code(s) would be restored to their old names."))
+        if revert_updated_categories > 0:
+            lines.append(str(revert_updated_categories) + _(" updated category(ies) would be restored to their previous values."))
+        if revert_updated_codes > 0:
+            lines.append(str(revert_updated_codes) + _(" updated code(s) would be restored to their previous values."))
         if revert_updated_cases > 0:
             lines.append(str(revert_updated_cases) + _(" updated case(s) would be restored to their previous values."))
+        if revert_updated_documents > 0:
+            lines.append(str(revert_updated_documents) + _(" updated document(s) would be restored to their previous values."))
+        if revert_updated_codings > 0:
+            lines.append(str(revert_updated_codings) + _(" updated text coding(s) would be restored to their previous values."))
         if revert_updated_attributes > 0:
             lines.append(str(revert_updated_attributes) + _(" attribute update(s) would be restored to their previous values."))
         if revert_moved_categories > 0:
@@ -2590,6 +3222,38 @@ class AiLLM():
                             self._add_project_table_changes(project_table_changes, "code_name")
                     continue
 
+                if op_type == "update_category":
+                    ok, reason, row = self._can_undo_update_category(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE code_cat SET name=?, memo=?, owner=? WHERE catid=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "code_cat")
+                    continue
+
                 if op_type == "rename_category":
                     ok, reason, row = self._can_undo_rename_category(cur, op)
                     if not ok:
@@ -2614,6 +3278,38 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "code_cat")
+                    continue
+
+                if op_type == "update_code":
+                    ok, reason, row = self._can_undo_update_code(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE code_name SET name=?, memo=?, owner=? WHERE cid=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "code_name")
                     continue
 
                 if op_type == "rename_code":
@@ -2672,6 +3368,70 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "cases")
+                    continue
+
+                if op_type == "update_document":
+                    ok, reason, row = self._can_undo_update_document(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE source SET name=?, memo=?, owner=? WHERE id=?",
+                        (
+                            str(before.get("name", "")),
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "source")
+                    continue
+
+                if op_type == "update_coding_text":
+                    ok, reason, row = self._can_undo_update_coding_text(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE code_text SET memo=?, owner=?, date=? WHERE ctid=?",
+                        (
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            str(before.get("date", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "code_text")
                     continue
 
                 if op_type in ("update_case_attributes", "update_document_attributes"):
@@ -3028,13 +3788,16 @@ class AiLLM():
                 self.large_llm_context_window = int(curr_model['large_model_context_window'])
                 fast_model = curr_model['fast_model']
                 self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
+                ensure_chatgpt_oauth_profile_defaults(curr_model)
                 api_base = curr_model['api_base']
                 api_key = curr_model['api_key']
-                if api_key == '':
+                is_chatgpt_oauth = is_chatgpt_oauth_api_base(api_base)
+                if api_key == '' and not is_chatgpt_oauth:
                     msg = _('Please enter an API-key for the AI in the following dialog.')
                     Message(self.app, _('AI API-key'), msg).exec()
                     main_window.change_settings(section='AI', enable_ai=True)
                     curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+                    ensure_chatgpt_oauth_profile_defaults(curr_model)
                     if curr_model['api_key'] == '':
                         # still no API-key, disable AI:
                         self.app.settings['ai_enable'] = 'False'
@@ -3081,6 +3844,16 @@ class AiLLM():
                     }        
                     fast_llm_params = large_llm_params.copy()
                     fast_llm_params['model'] = fast_model
+                elif is_chatgpt_oauth:
+                    is_azure = False
+                    large_llm_params = {
+                        'model': large_model,
+                        'cache': False,
+                        'temperature': temp,
+                        'timeout': timeout,
+                    }
+                    fast_llm_params = large_llm_params.copy()
+                    fast_llm_params['model'] = fast_model
                 else: # OpenAI or compatible API
                     is_azure = False
                     large_llm_params = {
@@ -3109,8 +3882,15 @@ class AiLLM():
 
                 self._large_llm_params = dict(large_llm_params)
                 self._fast_llm_params = dict(fast_llm_params)
-                self._large_llm_factory = AzureChatOpenAI if is_azure else ChatOpenAI
-                self._fast_llm_factory = AzureChatOpenAI if is_azure else ChatOpenAI
+                if is_azure:
+                    self._large_llm_factory = AzureChatOpenAI
+                    self._fast_llm_factory = AzureChatOpenAI
+                elif is_chatgpt_oauth:
+                    self._large_llm_factory = _ChatOpenAICodex
+                    self._fast_llm_factory = _ChatOpenAICodex
+                else:
+                    self._large_llm_factory = ChatOpenAI
+                    self._fast_llm_factory = ChatOpenAI
                 self._large_reasoning_effort = str(curr_model.get('reasoning_effort', '')).strip().lower()
                 self._fast_reasoning_effort = ''
                 
@@ -3148,6 +3928,8 @@ class AiLLM():
             self._latest_run_by_scope.clear()
             self._last_status_by_scope.clear()
             self._last_streaming_output_by_run.clear()
+        with self._unsupported_llm_params_lock:
+            self._unsupported_llm_params_by_key.clear()
         self._status = ''
         
     def cancel(self, ask: bool) -> bool:
@@ -3203,7 +3985,7 @@ class AiLLM():
     def get_default_system_prompt(self) -> str:
         p = 'You are assisting a team of qualitative social researchers.'
         project_memo = extract_ai_memo(self.app.get_project_memo())
-        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+        if len(project_memo) > 0:
             p += f' Here is some background information about the research project the team is working on:\n{project_memo}'
         return p
         
@@ -3214,9 +3996,15 @@ class AiLLM():
         try:
             if exception_type is AICancelled or isinstance(value, AICancelled):
                 return
-            value_text = html_to_text(self._safe_to_text(value))
-            msg = _('AI Error:\n')
-            msg += exception_type.__name__ + ': ' + str(value_text)
+            auth_message = ''
+            if isinstance(value, BaseException):
+                auth_message = self._chatgpt_oauth_user_error(value)
+            if auth_message != '':
+                msg = _('AI Error:\n') + auth_message
+            else:
+                value_text = html_to_text(self._safe_to_text(value))
+                msg = _('AI Error:\n')
+                msg += exception_type.__name__ + ': ' + str(value_text)
             tb = '\n'.join(traceback.format_tb(tb_obj))
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
             # Trigger message box show
@@ -3241,14 +4029,21 @@ class AiLLM():
         """
         self.run_progress_msg = ''
         self.run_progress_count = -1
-        run_context = self._create_run_context(
-            model_kind=model_kind,
-            purpose='stream',
-            scope_type=scope_type,
-            scope_id=scope_id,
-            group_id=group_id,
-            parent_run_id=parent_run_id,
-        )
+        try:
+            run_context = self._create_run_context(
+                model_kind=model_kind,
+                purpose='stream',
+                scope_type=scope_type,
+                scope_id=scope_id,
+                group_id=group_id,
+                parent_run_id=parent_run_id,
+            )
+        except Exception as err:
+            auth_message = self._chatgpt_oauth_user_error(err)
+            if auth_message != '':
+                Message.warning(self.app, _('Authentication'), auth_message)
+                return ''
+            raise
         run_context.worker_type = 'stream'
         self._register_run_context(run_context)
         worker = Worker(self._run_stream_worker, run_context=run_context, messages=messages)
@@ -3269,53 +4064,69 @@ class AiLLM():
         self._set_current_run_context(run_context)
         self._update_run_status(run_context.run_id, 'running')
         run_context.streaming_output = ''
-        active_llm = run_context.llm
-        req_id = self.log_llm_request(active_llm, messages, context='run_stream')
+        req_id = self.log_llm_request(run_context.llm, messages, context='run_stream')
         stream_iter = None
+        attempted_params = set()
         try:
-            self._raise_if_run_canceled(run_context)
-            stream_iter = active_llm.stream(messages)
-            run_context.stream_iter = stream_iter
-            for chunk in stream_iter:
-                if run_context.cancel_event.is_set():
-                    break  # cancel the streaming
-                else:
-                    chunk_text = str(getattr(chunk, 'content', ''))
-                    run_context.streaming_output += chunk_text
-                    if signals is not None:
-                        if signals.streaming is not None:
-                            signals.streaming.emit(chunk_text)
-                        if signals.progress is not None:
-                            self.run_progress_count += len(chunk_text)
-                            signals.progress.emit(str(self.run_progress_count))
-            if run_context.cancel_event.is_set():
-                self._update_run_status(run_context.run_id, 'canceled')
-        except Exception as err:
-            if run_context.cancel_event.is_set():
-                self._update_run_status(run_context.run_id, 'canceled')
-                res = run_context.streaming_output
-                self.clear_streaming_output(run_context.run_id)
-                return res
-            self._update_run_status(run_context.run_id, 'errored', self._safe_to_text(err))
-            self.log_llm_error(req_id, active_llm, err, context='run_stream')
-            # Some providers emit malformed trailing streaming events after content is already complete.
-            # Prefer returning the accumulated text instead of failing the whole turn.
-            if run_context.streaming_output != '' and self._allow_partial_stream_result_after_error(err):
-                res = run_context.streaming_output
-                self.clear_streaming_output(run_context.run_id)
-                if not run_context.cancel_event.is_set():
-                    self.log_llm_response(req_id, active_llm, res, context='run_stream_partial')
-                return res
-            raise
+            while True:
+                active_llm = run_context.llm
+                try:
+                    self._raise_if_run_canceled(run_context)
+                    stream_iter = active_llm.stream(messages)
+                    run_context.stream_iter = stream_iter
+                    for chunk in stream_iter:
+                        if run_context.cancel_event.is_set():
+                            break  # cancel the streaming
+                        chunk_text = llm_content_to_text(getattr(chunk, 'content', ''))
+                        run_context.streaming_output += chunk_text
+                        if signals is not None:
+                            if signals.streaming is not None:
+                                signals.streaming.emit(chunk_text)
+                            if signals.progress is not None:
+                                self.run_progress_count += len(chunk_text)
+                                signals.progress.emit(str(self.run_progress_count))
+                    if run_context.cancel_event.is_set():
+                        self._update_run_status(run_context.run_id, 'canceled')
+                    break
+                except Exception as err:
+                    if run_context.cancel_event.is_set():
+                        self._update_run_status(run_context.run_id, 'canceled')
+                        res = run_context.streaming_output
+                        self.clear_streaming_output(run_context.run_id)
+                        return res
+                    if run_context.streaming_output == '':
+                        retried, _ = self._retry_after_unsupported_parameter_error(
+                            run_context,
+                            None,
+                            err,
+                            attempted_params,
+                            req_id,
+                            context='run_stream',
+                        )
+                        if retried:
+                            continue
+                    self._update_run_status(run_context.run_id, 'errored', self._safe_to_text(err))
+                    self.log_llm_error(req_id, run_context.llm, err, context='run_stream')
+                    # Some providers emit malformed trailing streaming events after content is already complete.
+                    # Prefer returning the accumulated text instead of failing the whole turn.
+                    if run_context.streaming_output != '' and self._allow_partial_stream_result_after_error(err):
+                        res = run_context.streaming_output
+                        self.clear_streaming_output(run_context.run_id)
+                        if not run_context.cancel_event.is_set():
+                            self.log_llm_response(req_id, run_context.llm, res, context='run_stream_partial')
+                        return res
+                    raise
+                finally:
+                    if stream_iter is not None and not run_context.cancel_event.is_set():
+                        close_fn = getattr(stream_iter, "close", None)
+                        if callable(close_fn):
+                            try:
+                                close_fn()
+                            except Exception as close_err:
+                                self.log_llm_error(req_id, active_llm, close_err, context='run_stream_close')
+                    run_context.stream_iter = None
+                    stream_iter = None
         finally:
-            if stream_iter is not None and not run_context.cancel_event.is_set():
-                close_fn = getattr(stream_iter, "close", None)
-                if callable(close_fn):
-                    try:
-                        close_fn()
-                    except Exception as close_err:
-                        self.log_llm_error(req_id, active_llm, close_err, context='run_stream_close')
-            run_context.stream_iter = None
             terminal_status = 'canceled' if run_context.cancel_event.is_set() else (
                 'errored' if run_context.error_text != '' else 'finished'
             )
@@ -3324,7 +4135,7 @@ class AiLLM():
         res = run_context.streaming_output
         self.clear_streaming_output(run_context.run_id)
         if not run_context.cancel_event.is_set():
-            self.log_llm_response(req_id, active_llm, res, context='run_stream')
+            self.log_llm_response(req_id, run_context.llm, res, context='run_stream')
         return res
 
     def start_query(self, func, result_callback, *args, progress_callback=None,
@@ -3339,15 +4150,22 @@ class AiLLM():
         """
         self.run_progress_msg = ''
         self.run_progress_count = -1
-        run_context = self._create_run_context(
-            model_kind=model_kind,
-            purpose='query',
-            scope_type=scope_type,
-            scope_id=scope_id,
-            group_id=group_id,
-            parent_run_id=parent_run_id,
-            cancel_result=cancel_result,
-        )
+        try:
+            run_context = self._create_run_context(
+                model_kind=model_kind,
+                purpose='query',
+                scope_type=scope_type,
+                scope_id=scope_id,
+                group_id=group_id,
+                parent_run_id=parent_run_id,
+                cancel_result=cancel_result,
+            )
+        except Exception as err:
+            auth_message = self._chatgpt_oauth_user_error(err)
+            if auth_message != '':
+                Message.warning(self.app, _('Authentication'), auth_message)
+                return ''
+            raise
         run_context.worker_type = 'query'
         self._register_run_context(run_context)
         worker = Worker(
@@ -3518,8 +4336,9 @@ class AiLLM():
             )
         except AICancelled:
             return []
-        logger.debug(str(res.content))
-        res.content = strip_think_blocks(res.content)
+        response_text = llm_content_to_text(getattr(res, 'content', ''))
+        logger.debug(response_text)
+        res.content = strip_think_blocks(response_text)
         code_descriptions = list(json_repair.loads(str(res.content))['descriptions'])
         code_descriptions.insert(0, code_name) # insert the original as well
         return code_descriptions
@@ -3729,7 +4548,8 @@ class AiLLM():
             )
         except AICancelled:
             return None
-        res.content = strip_think_blocks(res.content)
+        response_text = llm_content_to_text(getattr(res, 'content', ''))
+        res.content = strip_think_blocks(response_text)
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer

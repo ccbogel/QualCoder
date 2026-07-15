@@ -31,7 +31,14 @@ import unicodedata  # <- L normalize localized numerals when reading numeric com
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .coder_names import DialogCoderNames
 from .helpers import get_default_user_directory, Message
-from .ai_llm import get_available_models, add_new_ai_model
+from .ai_llm import (
+    add_new_ai_model,
+    ensure_chatgpt_oauth_profile_defaults,
+    get_available_models,
+    get_chatgpt_oauth_status,
+    is_chatgpt_oauth_profile,
+    renew_chatgpt_oauth,
+)
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -248,6 +255,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_ai_api_key.editingFinished.connect(self.ai_api_key_changed)
         self.ui.toolButtonShowApiKey.setIcon(qta.icon('mdi6.eye-outline'))
         self.ui.toolButtonShowApiKey.toggled.connect(self.ai_api_key_show)
+        self.ui.pushButton_renew_auth.clicked.connect(self.renew_ai_authentication)
         # advanced AI options:
         self.ui.pushButton_advanced_AI_options.clicked.connect(self.toggle_ai_advanced_options)
         self.toggle_ai_advanced_options() # hide the advanced AI options panel
@@ -261,7 +269,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_AI_model_fast.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_large.view().setMinimumWidth(500)  # Set a minimum width for the dropdown list
         self.ui.comboBox_AI_model_fast.view().setMinimumWidth(500)
-        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.setChecked(self.settings.get('ai_language_ui', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.stateChanged.connect(self.ai_language_ui_changed)
         self.ui.lineEdit_AI_language.setText(self.settings.get('ai_language', ''))
@@ -439,17 +446,69 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setEnabled(True)
         else:
             self.ui.checkBox_backup_AV_files.setEnabled(False)
-    
+
+    def current_ai_model_index(self) -> int:
+        """Return the currently selected AI profile index, or -1 if none is selected."""
+
+        try:
+            return int(self.settings.get('ai_model_index', -1))
+        except (TypeError, ValueError):
+            return -1
+
+    def current_ai_profile(self):
+        """Return the currently selected AI profile dictionary, or None."""
+
+        ai_model_index = self.current_ai_model_index()
+        if 0 <= ai_model_index < len(self.ai_models):
+            return self.ai_models[ai_model_index]
+        return None
+
+    def current_ai_profile_uses_oauth(self) -> bool:
+        """Return whether the current AI profile uses ChatGPT OAuth."""
+
+        return is_chatgpt_oauth_profile(self.current_ai_profile())
+
+    def refresh_ai_auth_status(self):
+        """Refresh the authentication status label for OAuth profiles."""
+
+        if not self.current_ai_profile_uses_oauth():
+            self.ui.label_auth_result.setText('')
+            self.ui.pushButton_renew_auth.setText(_('Renew'))
+            return
+        is_authenticated, status_text = get_chatgpt_oauth_status()
+        self.ui.label_auth_result.setText(status_text)
+        self.ui.pushButton_renew_auth.setText(_('Renew') if is_authenticated else _('Authenticate'))
+
+    def update_ai_auth_widgets(self):
+        """Toggle API-key and OAuth widgets according to the current profile type."""
+
+        is_enabled = self.ui.checkBox_AI_enable.isChecked()
+        uses_oauth = self.current_ai_profile_uses_oauth()
+        self.ui.label_ai_api_key.setVisible(not uses_oauth)
+        self.ui.lineEdit_ai_api_key.setVisible(not uses_oauth)
+        self.ui.toolButtonShowApiKey.setVisible(not uses_oauth)
+        self.ui.label_auth.setVisible(uses_oauth)
+        self.ui.label_auth_result.setVisible(uses_oauth)
+        self.ui.pushButton_renew_auth.setVisible(uses_oauth)
+        self.ui.lineEdit_ai_api_key.setEnabled(is_enabled and (not uses_oauth))
+        self.ui.toolButtonShowApiKey.setEnabled(is_enabled and (not uses_oauth))
+        self.ui.label_auth.setEnabled(is_enabled and uses_oauth)
+        self.ui.label_auth_result.setEnabled(is_enabled and uses_oauth)
+        self.ui.pushButton_renew_auth.setEnabled(is_enabled and uses_oauth)
+        if uses_oauth:
+            self.refresh_ai_auth_status()
+        else:
+            self.ui.label_auth_result.setText('')
+
     def ai_enable_state_changed(self):
         self.ui.comboBox_ai_profile.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.lineEdit_ai_api_key.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
+        self.update_ai_auth_widgets()
     
     def load_ai_profiles(self):
         with QtCore.QSignalBlocker(self.ui.comboBox_ai_profile):
@@ -472,6 +531,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['ai_model_index'] = self.ui.comboBox_ai_profile.currentIndex()
         if int(self.settings['ai_model_index']) >= 0:
             curr_ai_model = self.ai_models[int(self.settings['ai_model_index'])]
+            ensure_chatgpt_oauth_profile_defaults(curr_ai_model)
             self.ui.label_ai_model_desc.setText(curr_ai_model['desc'])
             self.ui.label_ai_access_info_url.setText(f'<a href="{curr_ai_model["access_info_url"]}">{curr_ai_model["access_info_url"]}</a>')
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_available_models() to trigger
@@ -506,6 +566,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_reasoning.setCurrentText('default')
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_base):
                 self.ui.lineEdit_ai_api_base.setText('')    
+        self.update_ai_auth_widgets()
         self.ai_update_available_models()
         
     def ai_profile_name_edit(self):
@@ -590,6 +651,11 @@ class DialogSettings(QtWidgets.QDialog):
 
     def ai_api_key_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
+            if self.current_ai_profile_uses_oauth():
+                ensure_chatgpt_oauth_profile_defaults(self.current_ai_profile())
+                with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key):
+                    self.ui.lineEdit_ai_api_key.setText(self.current_ai_profile()['api_key'])
+                return
             api_key = self.ui.lineEdit_ai_api_key.text()
             if not self.validate_ai_api_key(api_key, focus_field=True):
                 return
@@ -688,10 +754,30 @@ class DialogSettings(QtWidgets.QDialog):
             1.0,
             _("AI top_p parameter must be between 0.0 and 1.0."),
         )
+
+    def renew_ai_authentication(self):
+        """Start or renew ChatGPT OAuth authentication for the current profile."""
+
+        if not self.current_ai_profile_uses_oauth():
+            return
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.CursorShape.WaitCursor)
+        try:
+            is_authenticated, status_text = renew_chatgpt_oauth()
+        finally:
+            QtWidgets.QApplication.restoreOverrideCursor()
+        self.ui.label_auth_result.setText(status_text)
+        self.ui.pushButton_renew_auth.setText(_('Renew') if is_authenticated else _('Authenticate'))
+        if not is_authenticated:
+            Message.warning(self, _('Authentication'), status_text)
             
     def ai_api_base_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
-            self.ai_models[int(self.settings['ai_model_index'])]['api_base'] = self.ui.lineEdit_ai_api_base.text()   
+            curr_ai_model = self.ai_models[int(self.settings['ai_model_index'])]
+            curr_ai_model['api_base'] = self.ui.lineEdit_ai_api_base.text()
+            ensure_chatgpt_oauth_profile_defaults(curr_ai_model)
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key):
+                self.ui.lineEdit_ai_api_key.setText(curr_ai_model['api_key'])
+        self.update_ai_auth_widgets()
         self.ai_update_available_models()
             
     def set_coder(self):
@@ -817,9 +903,14 @@ class DialogSettings(QtWidgets.QDialog):
             msg = _('Please select an AI profile or disable the AI altogether.')
             Message(self.app, _('AI profile'), msg).exec()
             return
-        if self.settings['ai_enable'] == 'True' and not self.validate_ai_api_key(self.ui.lineEdit_ai_api_key.text(), focus_field=True):
+        uses_oauth = False
+        if 0 <= ai_model_index < len(self.ai_models):
+            ensure_chatgpt_oauth_profile_defaults(self.ai_models[ai_model_index])
+            uses_oauth = is_chatgpt_oauth_profile(self.ai_models[ai_model_index])
+        if self.settings['ai_enable'] == 'True' and (not uses_oauth) and \
+                (not self.validate_ai_api_key(self.ui.lineEdit_ai_api_key.text(), focus_field=True)):
             return
-        if self.settings['ai_enable'] == 'True' and self.ai_models[ai_model_index]['api_key'] == '':
+        if self.settings['ai_enable'] == 'True' and (not uses_oauth) and self.ai_models[ai_model_index]['api_key'] == '':
             msg = _('Please enter a valid API-key for the AI model.')
             Message(self.app, _('AI model'), msg).exec()
             return
@@ -833,10 +924,6 @@ class DialogSettings(QtWidgets.QDialog):
             return
         if self.settings['ai_enable'] == 'True' and not self.validate_ai_top_p():
             return
-        if self.ui.checkBox_ai_project_memo.isChecked():
-            self.settings['ai_send_project_memo'] = 'True'
-        else: 
-            self.settings['ai_send_project_memo'] = 'False'
         self.settings['ai_language_ui'] = 'True' if self.ui.checkBox_AI_language_ui.isChecked() else 'False'
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()
