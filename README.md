@@ -207,7 +207,7 @@ For example, you may now be in this folder, where you unzipped QualCoder:
 
 yourcomputer:~Downloads/QualCoder-3.8.2
 
-3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Righ-click and go to Properties), then type the below command and press Enter: 
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and go to Properties), then type the below command and press Enter: 
 
 `./run_from_source_Linux.sh`
 
