@@ -211,7 +211,7 @@ yourcomputer:~Downloads/QualCoder-3.8.2
 
 `./run_from_source_Linux.sh`
 
-3b. Instead of using the shell script, you can enter each of these commands to set up the virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
+3b. Instead of using the shell script, you can enter each of these commands to set up the virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing the required modules for the first time takes a while, maybe 10 minutes.
 
 ```
 python3 -m venv env
