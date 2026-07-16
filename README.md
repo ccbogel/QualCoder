@@ -2,8 +2,6 @@
 
 Please also read the manual here: [QualCoder Manual](https://qualcoder.org/)
 
-README QualCoder in other languages : [[Français](https://qualcoder.org/doc/fr/readme/)]
-
 # QualCoder
 QualCoder is a qualitative data analysis application written in Python.
 
@@ -189,14 +187,18 @@ python3 -m qualcoder
 
 ## Linux
 
-### Ubuntu / Lubuntu / ZorinOS
+To install from source code below, inside a virtual environment.
 
-To install from source code below, inside a virtual environment. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`  If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
+Depending on your operating system, you will need to download Python and its dependencies. Here are the commands for your operating system:
 
-0. Install pip. This is a tool that downloads extra python modules.
+- If you are on **Debian based system (Debian, Ubuntu / Lubuntu / ZorinOS, Linux Mint)** :
+  Install pip. This is a tool that downloads extra python modules :  `sudo apt install python3-pip`
+  If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
+  If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+- If you are on **Fedora 44** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
+- If you are on **Arch/Manjaro Linux** : If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc` and Install pip and venv: `sudo pacman -S python python-pip python-virtualenv`
 
-`sudo apt install python3-pip`
-
+  
 1. Download and unzip the Qualcoder folder. 
 
 2. Then `cd` to the QualCoder folder.
@@ -245,113 +247,6 @@ You can also make a .desktop file for launching QualCoder:
 Create a .Desktop file for launch, enter this command (adapt it according to the location of the source code folder):
 
 bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3.12 -m qualcoder'
-
-### Fedora 44
-
-**There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
-
-1. Download and unzip the Qualcoder folder. 
-
-2. Then `cd` to the QualCoder folder.
-
-For example, you may now be in this folder, where you unzipped QualCoder: 
-
-yourcomputer:~Downloads/QualCoder-3.8.2
-
-3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and select Properties), then type the below command and press Enter: 
-
-`./run_from_source_Linux.sh`
-
-3b. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
-
-```
-python -m venv env
-source env/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-3. Move to the inner src folder:
-   
-```
-cd src
-```
-
-4 Then start QualCofder:
-
-```
-python -m qualcoder
-```
-
-5. After using QualCoder deactivate the virtual environment.
-
-`deactivate`
-
-6 .Usage any time after the install, move to the QualCoder folder then:
-
-```
-source env/bin/activate
-cd src
-python3 -m qualcoder
-```
-
-On finishing type `deactivate` to exit the virtual environment.
-
-
-### Arch/Manjaro Linux
-
-If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc`
-
-0. Install pip and venv:
-
-`sudo pacman -S python python-pip python-virtualenv`
-
-1. Download and unzip the Qualcoder folder. 
-
-2. Then `cd` to the QualCoder folder.
-
-For example, you may now be in this folder, where you unzipped QualCoder: 
-
-yourcomputer:~Downloads/QualCoder-3.8.2
-
-3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and select Properties), then type the below command and press Enter: 
-
-`./run_from_source_Linux.sh`
-
-3b. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
-
-```
-python -m venv env
-source env/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-3. Move to the inner src folder:
-   
-```
-cd src
-```
-
-4 Then start QualCofder:
-
-```
-python -m qualcoder
-```
-
-5. After using QualCoder deactivate the virtual environment.
-
-`deactivate`
-
-6 .Usage any time after the install, move to the QualCoder folder then:
-
-```
-source env/bin/activate
-cd src
-python3 -m qualcoder
-```
-
-On finishing type `deactivate` to exit the virtual environment.
 
  
 ## Setup AI features
