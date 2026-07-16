@@ -302,7 +302,7 @@ On finishing type `deactivate` to exit the virtual environment.
 
 If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc`
 
-Install pip and venv:
+0. Install pip and venv:
 
 `sudo pacman -S python python-pip python-virtualenv`
 
