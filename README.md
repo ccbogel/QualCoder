@@ -306,40 +306,53 @@ Install pip and venv:
 
 `sudo pacman -S python python-pip python-virtualenv`
 
-Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
-Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
+1. Download and unzip the Qualcoder folder. 
+
+2. Then `cd` to the QualCoder folder.
+
+For example, you may now be in this folder, where you unzipped QualCoder: 
+
+yourcomputer:~Downloads/QualCoder-3.8.2
+
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and select Properties), then type the below command and press Enter: 
+
+`./run_from_source_Linux.sh`
+
+3b. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
 ```
-python3 -m venv env
+python -m venv env
 source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Now, the command to start QualCoder:
-
-Move to the inner src folder first:
-
+3. Move to the inner src folder:
+   
 ```
 cd src
+```
+
+4 Then start QualCofder:
+
+```
 python -m qualcoder
 ```
 
-After using QualCoder deactiatve the virtual environment.
+5. After using QualCoder deactivate the virtual environment.
 
 `deactivate`
 
-Usage any time after the install, move to the folder, then to inner src folder, then:
+6 .Usage any time after the install, move to the QualCoder folder then:
 
 ```
-cd QualCoder
 source env/bin/activate
+cd src
 python3 -m qualcoder
 ```
 
-To exit the environment:
+On finishing type `deactivate` to exit the virtual environment.
 
-`deactivate`
  
 ## Setup AI features
 If you want to use the AI-enhaced features in QualCoder, additional setup is needed. When you start the app for the first time, a wizard will lead you through the setup process. You can also start this later via the menu by clicking on AI > Setup Wizard. These are the main steps:
