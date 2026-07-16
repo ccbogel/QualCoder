@@ -201,7 +201,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 2. Then `cd` to the QualCoder folder.
 
-For example you might be in this folder, where you unzipped QualCoder: 
+For example, you may now be in this folder, where you unzipped QualCoder: 
 
 yourcomputer:~Downloads/QualCoder-3.8.2
 
@@ -254,7 +254,7 @@ Fedora has python 3.14 installed already. There is a problem with access VLC fro
 
 2. Then `cd` to the QualCoder folder.
 
-For example you might be in this folder, where you unzipped QualCoder: 
+For example, you may now be in this folder, where you unzipped QualCoder: 
 
 yourcomputer:~Downloads/QualCoder-3.8.2
 
