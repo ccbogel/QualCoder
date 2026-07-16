@@ -248,7 +248,7 @@ bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/py
 
 ### Fedora 44
 
-Fedora has python 3.14 installed already. There is a problem with access VLC from python. The software crashes, we are unable to find a solution to this. So audio and video are not recommended to be used within a Qualcoder project on Fedora.
+Fedora has python 3.14 installed already. There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. **So audio and video are not recommended to be used within a Qualcoder project on Fedora.**
 
 1. Download and unzip the Qualcoder folder. 
 
