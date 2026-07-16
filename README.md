@@ -259,7 +259,7 @@ For example you might be in this folder, where you unzipped QualCoder:
 yourcomputer:~Downloads/QualCoder-3.8.2
 
 ```
-python3 -m venv env
+python -m venv env
 source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -274,7 +274,7 @@ cd src
 4 Then start QualCofder:
 
 ```
-python3 -m qualcoder
+python -m qualcoder
 ```
 
 5. After using QualCoder deactivate the virtual environment.
