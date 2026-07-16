@@ -195,9 +195,9 @@ To install from source code below, inside a virtual environment. If you are usin
 
 1. If you are using audio or video, install vlc (download from site) or: `sudo apt install vlc`
 
-2. Install pip and venv
+2. Install pip
 
-`sudo apt install python3-pip python3.12-venv`
+`sudo apt install python3-pip`
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
@@ -246,41 +246,51 @@ Create a .Desktop file for launch, enter this command (adapt it according to the
 
 bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3.12 -m qualcoder'
 
-### Fedora 43
+### Fedora 44
 
-These instructions are adapted from the Fedora 42 instructions below, tested with QualCoder 3.7 on Fedora 43 with Python 3.12.12.
+Fedora has python 3.14 installed already. Fedora has a problem with coding audio / video. The software crashes, and unable to find a solution to this for now.
 
-1. Install dependencies:
+1. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
-    ```bash
-    sudo dnf install python3.12
-    ```
+2. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
-2. Set up QualCoder:
+For example you might be in this folder, where you unzipped QualCoder: 
 
-    ```bash
-    cd ~/qualcoder  # replace with appropriate location on your machine
-    python3.12 -m venv env
-    source env/bin/activate
-    python3.12 -m ensurepip
-    python3.12 -m pip install --upgrade pip
-    mkdir tmp
-    TMPDIR=./tmp python3.12 -m pip install -r requirements.txt
-    deactivate
-    ```
+yourcomputer:~Downloads/QualCoder-3.8.2
 
-3. Usage:
+```
+python3 -m venv env
+source env/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-    ```bash
-    cd ~/qualcoder  # replace with appropriate location on your machine
-    source env/bin/activate
-    cd src
-    python3.12 -m qualcoder
-    ```
+3. Move to the inner src folder:
+   
+```
+cd src
+```
+
+4 Then start QualCofder:
+
+```
+python3 -m qualcoder
+```
+
+5. After using QualCoder deactivate the virtual environment.
+
+`deactivate`
+
+6 .Usage any time after the install, move to the QualCoder folder then:
+
+```
+source env/bin/activate
+cd src
+python3 -m qualcoder
+```
 
 On finishing type `deactivate` to exit the virtual environment.
 
-Note re Fedora. This is an issue with coding audio / video. The software crashes, and unable to find a solution to this for now.
 
 ### Arch/Manjaro Linux
 
