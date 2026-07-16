@@ -38,7 +38,7 @@ On first use of the exe, Windows may ask you to allow to run QualCoder. This is 
 
 Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. Please use Python 3.11 to 3.14 on Windows.  [Python3](https://www.python.org/downloads/). Download the latest "Windows installer (64-bit)" (or the one matching your architecture) for one of the above mentioned Python versions.
+1. Download and install the Python programming language. Please use a recent version on Windows.  [Python3](https://www.python.org/downloads/). Download the latest "Windows installer (64-bit)" (or the one matching your architecture) for one of the above mentioned Python versions.
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
