@@ -191,25 +191,25 @@ python3 -m qualcoder
 
 ### Ubuntu / Lubuntu / ZorinOS
 
-To install from source code below, inside a virtual environment. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+To install from source code below, inside a virtual environment. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`  If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
 
-1. If you are using audio or video, install vlc (download from site) or: `sudo apt install vlc`
-
-2. Install pip
+0. Install pip. This is a tool that downloads extra python modules.
 
 `sudo apt install python3-pip`
 
-3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
+1. Download and unzip the Qualcoder folder. 
 
-3a. Instead of the next below commands, run the shell file which will run all these commands below, by making this file executable and typing this in and pressing Enter: 
-
-`./run_from_source_Ubuntu.sh`
-
-4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
+2. Then `cd` to the QualCoder folder.
 
 For example you might be in this folder, where you unzipped QualCoder: 
 
 yourcomputer:~Downloads/QualCoder-3.8.2
+
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Righ-click and go to Properties), then type the below command and press Enter: 
+
+`./run_from_source_Linux.sh`
+
+3b. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
 ```
 python3 -m venv env
@@ -250,13 +250,19 @@ bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/py
 
 Fedora has python 3.14 installed already. There is a problem with access VLC from python. The software crashes, we are unable to find a solution to this. So audio and video are not recommended to be used within a Qualcoder project on Fedora.
 
-1. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
+1. Download and unzip the Qualcoder folder. 
 
-2. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
+2. Then `cd` to the QualCoder folder.
 
 For example you might be in this folder, where you unzipped QualCoder: 
 
 yourcomputer:~Downloads/QualCoder-3.8.2
+
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and select Properties), then type the below command and press Enter: 
+
+`./run_from_source_Linux.sh`
+
+3b. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
 ```
 python -m venv env
