@@ -7950,6 +7950,50 @@ data collected. This information will accompany every prompt sent to the AI, res
         rows = cursor.fetchall()
         return [str(row[0]) for row in rows if isinstance(row, tuple) and len(row) > 0 and row[0] is not None]
 
+    @staticmethod
+    def _build_ref_candidates_for_excerpt(source_id: int, source_name: str, start: int,
+                                          excerpt: Any, context_before: Any = "",
+                                          context_after: Any = "") -> List[Dict[str, Any]]:
+        """Build resolver candidates for one excerpt plus optional surrounding context."""
+
+        excerpt_text = str(excerpt if excerpt is not None else "")
+        if source_id <= 0 or start < 0 or excerpt_text.strip() == "":
+            return []
+
+        before_text = str(context_before if context_before is not None else "")
+        after_text = str(context_after if context_after is not None else "")
+        before_start = start - len(before_text)
+        after_start = start + len(excerpt_text)
+
+        candidates: List[Dict[str, Any]] = []
+        seen: set[tuple[int, int, str]] = set()
+
+        def append_candidate(candidate_start: int, candidate_text: str) -> None:
+            text_value = str(candidate_text if candidate_text is not None else "")
+            if candidate_start < 0 or text_value.strip() == "":
+                return
+            key = (source_id, candidate_start, text_value)
+            if key in seen:
+                return
+            seen.add(key)
+            candidates.append(
+                {
+                    "source_id": source_id,
+                    "source_name": source_name,
+                    "start": candidate_start,
+                    "length": len(text_value),
+                    "text": text_value,
+                }
+            )
+
+        # Prefer the primary retrieved excerpt. Extra context is only fallback evidence.
+        append_candidate(start, excerpt_text)
+        append_candidate(before_start, before_text)
+        append_candidate(after_start, after_text)
+        if before_text != "" or after_text != "":
+            append_candidate(before_start, before_text + excerpt_text + after_text)
+        return candidates
+
     def _extract_ref_candidates_from_tool_result(self, tool_result_raw: str) -> List[Dict[str, Any]]:
         """Extract evidence spans from one persisted MCP tool_result message."""
 
@@ -8011,14 +8055,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_name = str(seg.get("source_name", "")).strip()
                     if source_name == "":
                         source_name = self.get_filename(source_id)
-                    candidates.append(
-                        {
-                            "source_id": source_id,
-                            "source_name": source_name,
-                            "start": start,
-                            "length": len(segment_quote),
-                            "text": segment_quote,
-                        }
+                    candidates.extend(
+                        self._build_ref_candidates_for_excerpt(
+                            source_id,
+                            source_name,
+                            start,
+                            segment_quote,
+                            seg.get("context_before", ""),
+                            seg.get("context_after", ""),
+                        )
                     )
                 continue
 
@@ -8031,14 +8076,13 @@ data collected. This information will accompany every prompt sent to the AI, res
                 source_name = str(payload.get("name", "")).strip()
                 if source_name == "":
                     source_name = self.get_filename(source_id)
-                candidates.append(
-                    {
-                        "source_id": source_id,
-                        "source_name": source_name,
-                        "start": start,
-                        "length": len(excerpt),
-                        "text": excerpt,
-                    }
+                candidates.extend(
+                    self._build_ref_candidates_for_excerpt(
+                        source_id,
+                        source_name,
+                        start,
+                        excerpt,
+                    )
                 )
                 continue
 
@@ -8057,14 +8101,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_name = str(hit.get("source_name", "")).strip()
                     if source_name == "":
                         source_name = self.get_filename(source_id)
-                    candidates.append(
-                        {
-                            "source_id": source_id,
-                            "source_name": source_name,
-                            "start": start,
-                            "length": len(excerpt),
-                            "text": excerpt,
-                        }
+                    candidates.extend(
+                        self._build_ref_candidates_for_excerpt(
+                            source_id,
+                            source_name,
+                            start,
+                            excerpt,
+                            hit.get("context_before", ""),
+                            hit.get("context_after", ""),
+                        )
                     )
                 continue
 
@@ -8083,14 +8128,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_name = str(hit.get("source_name", "")).strip()
                     if source_name == "":
                         source_name = self.get_filename(source_id)
-                    candidates.append(
-                        {
-                            "source_id": source_id,
-                            "source_name": source_name,
-                            "start": start,
-                            "length": len(excerpt),
-                            "text": excerpt,
-                        }
+                    candidates.extend(
+                        self._build_ref_candidates_for_excerpt(
+                            source_id,
+                            source_name,
+                            start,
+                            excerpt,
+                            hit.get("context_before", ""),
+                            hit.get("context_after", ""),
+                        )
                     )
                 continue
 
@@ -8109,14 +8155,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_name = str(hit.get("source_name", "")).strip()
                     if source_name == "":
                         source_name = self.get_filename(source_id)
-                    candidates.append(
-                        {
-                            "source_id": source_id,
-                            "source_name": source_name,
-                            "start": start,
-                            "length": len(excerpt),
-                            "text": excerpt,
-                        }
+                    candidates.extend(
+                        self._build_ref_candidates_for_excerpt(
+                            source_id,
+                            source_name,
+                            start,
+                            excerpt,
+                            hit.get("context_before", ""),
+                            hit.get("context_after", ""),
+                        )
                     )
         return candidates
 

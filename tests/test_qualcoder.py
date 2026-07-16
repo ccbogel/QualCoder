@@ -1,11 +1,13 @@
-from unittest import TestCase
 import datetime
+import json
 import os
 import shutil
 import sqlite3
 import tempfile
+from unittest import TestCase
 
 from qualcoder.__main__ import App
+from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
 
@@ -469,6 +471,125 @@ class TestAiMemoPolicy(TestCase):
         cur.execute("select memo from code_text where ctid=1")
         self.assertEqual("Updated coding\n#####\nPrivate coding", cur.fetchone()[0])
         conn.close()
+
+
+class DummyReferenceApp:
+    """Minimal app stub for AI reference-resolution tests."""
+
+    def __init__(self, fulltext: str):
+        self._fulltext = fulltext
+
+    def get_text_fulltext(self, source_id):
+        if int(source_id) == 1:
+            return self._fulltext
+        return None
+
+    @staticmethod
+    def get_line_numbers(fulltext, start, end):
+        return 1, 1
+
+
+class DummyReferenceResolver:
+    """Minimal resolver stub that can call DialogAIChat reference helpers."""
+
+    def __init__(self, fulltext: str):
+        self.app = DummyReferenceApp(fulltext)
+
+    @staticmethod
+    def _safe_int(value, default=-1):
+        try:
+            if value is None or isinstance(value, bool):
+                return default
+            return int(value)
+        except Exception:
+            return default
+
+    @staticmethod
+    def get_filename(source_id):
+        return "textfile one"
+
+    @staticmethod
+    def _build_ref_candidates_for_excerpt(source_id, source_name, start, excerpt,
+                                          context_before="", context_after=""):
+        return DialogAIChat._build_ref_candidates_for_excerpt(
+            source_id,
+            source_name,
+            start,
+            excerpt,
+            context_before,
+            context_after,
+        )
+
+
+class TestAiReferenceResolution(TestCase):
+    """Regression tests for MCP-based AI source reference resolution."""
+
+    def test_extract_ref_candidates_include_search_context_fields(self):
+        payload = {
+            "action": "mcp_result",
+            "contents": [
+                {
+                    "uri": "qualcoder://search/bm25",
+                    "payload": {
+                        "hits": [
+                            {
+                                "source_id": 1,
+                                "source_name": "textfile one",
+                                "start": 2,
+                                "length": 5,
+                                "text": "short",
+                                "context_before": "a ",
+                                "context_after": " boring",
+                            }
+                        ]
+                    },
+                }
+            ],
+        }
+        resolver = DummyReferenceResolver("a short boring story.")
+
+        candidates = DialogAIChat._extract_ref_candidates_from_tool_result(
+            resolver,
+            "MCP result:\n" + json.dumps(payload),
+        )
+
+        candidate_lookup = {(item["start"], item["text"]) for item in candidates}
+        self.assertIn((2, "short"), candidate_lookup)
+        self.assertIn((0, "a "), candidate_lookup)
+        self.assertIn((7, " boring"), candidate_lookup)
+        self.assertIn((0, "a short boring"), candidate_lookup)
+
+    def test_context_only_ref_quote_resolves_to_anchor(self):
+        payload = {
+            "action": "mcp_result",
+            "contents": [
+                {
+                    "uri": "qualcoder://search/bm25",
+                    "payload": {
+                        "hits": [
+                            {
+                                "source_id": 1,
+                                "source_name": "textfile one",
+                                "start": 2,
+                                "length": 5,
+                                "text": "short",
+                                "context_before": "a ",
+                                "context_after": " boring",
+                            }
+                        ]
+                    },
+                }
+            ],
+        }
+        resolver = DummyReferenceResolver("a short boring story.")
+        candidates = DialogAIChat._extract_ref_candidates_from_tool_result(
+            resolver,
+            "MCP result:\n" + json.dumps(payload),
+        )
+
+        resolved = DialogAIChat._resolve_ref_quote_to_anchor(resolver, "boring", candidates)
+
+        self.assertEqual('(<a href="quote:1_8_6">textfile one: 1</a>)', resolved)
 
 
 # TEST_PERSIST_PATH = '/fake/path/'
