@@ -274,7 +274,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.8.2
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
-https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
+https://discover.utas.edu.au/Colin.Curtain/publications
 
 **Artificial intelligence features and more:** 
 
