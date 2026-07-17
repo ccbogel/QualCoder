@@ -300,5 +300,5 @@ Also, if you like Qualcoder a lot and want to advertise interest in its use, ple
 
 A book _Qualitative Data Analysis With Chatgpt And Qualcoder_. We have been advised the book may contain some incorrect information about QualCoder.
 
-Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page or the Codebert equivalent: https://codeberg.org/qualcoder.
+Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page or the Codeberg equivalent: https://codeberg.org/qualcoder.
 
