@@ -278,10 +278,10 @@ https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
 
 **Dr. rer. soc. Kai Dröge,** [University for Applied Science](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), Lucerne, Switzerland and [Institute for Social Research](https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html) Frankfurt, Germany. Kai is an experienced researcher and teacher of qualitative methods. His research interests are wide-ranging and include the sociology of emotions and intimate relationships, digital life and new media, and questions of economic and labor sociology. Recently, he has focused on the methodological challenges and opportunities of integrating AI into qualitative research. He is also the creator of [noScribe](https://github.com/kaixxx/noScribe#readme), a popular open-source transcription tool aimed especially at qualitative interviews.
 
-**Justin Missaghieh--Poncet**
+**Dr. Justin Missaghieh--Poncet**
 
 
-**Lorenzo Salomón**
+**Dr. Lorenzo Salomón**
 
 
 ## Leave a review
