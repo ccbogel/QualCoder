@@ -195,7 +195,7 @@ Depending on your operating system, you will need to download Python and its dep
   Install pip. This is a tool that downloads extra python modules :  `sudo apt install python3-pip`
   If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
   If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
-- If you are on **Fedora 44** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
+- If you are on **Fedora** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
 - If you are on **Arch/Manjaro Linux** : If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc` and Install pip and venv: `sudo pacman -S python python-pip python-virtualenv`
 
   
