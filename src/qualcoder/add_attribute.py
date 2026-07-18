@@ -16,14 +16,13 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from PyQt6 import QtWidgets, QtCore
 import os
-import sys
 import logging
-import traceback
 
 from .GUI.ui_attribute import Ui_DialogAddAttribute
 from .helpers import Message
@@ -53,13 +52,11 @@ class DialogAddAttribute(QtWidgets.QDialog):
         res = cur.fetchall()
         for r in res:
             self.existing_names.append(r[0])
-
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogAddAttribute()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.radioButton_character.setChecked(True)
         self.ui.lineEdit_name.setFocus()
@@ -79,7 +76,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
             Message(self.app, _("Duplicate"), msg, "warning").exec()
             self.new_name = ""
             self.done(0)
-        if duplicate is False:
+        if not duplicate:
             self.new_name = new_name
         if self.ui.radioButton_numeric.isChecked():
             self.value_type = "numeric"
