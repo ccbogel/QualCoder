@@ -954,6 +954,7 @@ class App(object):
                 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
                 'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
+                'dialogcodetext_coding_margin_width',
                 'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
                 'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
                 'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
@@ -1031,6 +1032,8 @@ class App(object):
                     settings_data[key] = 320
                 if key == 'ai_chat_splitter_output_bottom':
                     settings_data[key] = 80
+                if key == 'dialogcodetext_coding_margin_width':
+                    settings_data[key] = 100
 
         ai_permissions = settings_data.get('ai_permissions', 1)
         if ai_permissions not in (0, 1, 2):
@@ -1314,6 +1317,7 @@ class App(object):
             'dialogcodetext_splitter1': 1,
             'dialogcodetext_splitter_v0': 1,
             'dialogcodetext_splitter_v1': 1,
+            'dialogcodetext_coding_margin_width': 100,
             'dialogcodeimage_splitter0': 1,
             'dialogcodeimage_splitter1': 1,
             'dialogcodeimage_splitter_h0': 1,

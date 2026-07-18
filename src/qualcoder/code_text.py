@@ -67,6 +67,10 @@ ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+DEFAULT_CODING_MARGIN_WIDTH = 100
+MINIMUM_CODING_MARGIN_WIDTH = 30
+MINIMUM_CODING_MARGIN_LABEL_WIDTH = 60
+
 
 class CodingMargin(QtWidgets.QWidget):
     """ Draws side bars adjacent to the text and code names.
@@ -89,7 +93,7 @@ class CodingMargin(QtWidgets.QWidget):
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._emit_context_menu_to_dialog)
         self.setMouseTracking(True)
-        self.setMinimumWidth(120)
+        self.setMinimumWidth(MINIMUM_CODING_MARGIN_WIDTH)
 
     def _emit_context_menu_to_dialog(self, position):
         if hasattr(self.dialog, 'coding_margin_context_menu'):
@@ -169,6 +173,7 @@ class CodingMargin(QtWidgets.QWidget):
 
         names_drawn_by_line = {}
         margin_width = self.width()
+        show_labels = margin_width >= MINIMUM_CODING_MARGIN_LABEL_WIDTH
 
         important_only = getattr(self.dialog, 'important', False)
         layout = block.layout()
@@ -221,7 +226,7 @@ class CodingMargin(QtWidgets.QWidget):
                 else:
                     painter.drawRect(offset_x, int(rect.top()), bar_w, int(rect.height()))
 
-                if ctid not in drawn_ctids and code['pos0'] >= block_start:
+                if show_labels and ctid not in drawn_ctids and code['pos0'] >= block_start:
                     painter.setPen(color.darker(150))
                     raw_name = code.get('name', '')
                     _fm = painter.fontMetrics()
@@ -268,6 +273,7 @@ class CodingMargin(QtWidgets.QWidget):
             return None
 
         margin_width = self.width()
+        show_labels = margin_width >= MINIMUM_CODING_MARGIN_LABEL_WIDTH
         bar_w = 3
         lane_step = 10
 
@@ -336,7 +342,7 @@ class CodingMargin(QtWidgets.QWidget):
                         if stripe_rect.contains(pos):
                             stripe_hit = code
 
-                if ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
+                if show_labels and ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
                     raw_name = code.get('name', '')
                     if self.side == 'right':
                         _lanes_end_x = 12 + (col_index + 1) * lane_step
@@ -763,6 +769,13 @@ class DialogCodeText(QtWidgets.QWidget):
         except (KeyError, AttributeError):
             self.margin_side = 'left'
         self.coding_margin = CodingMargin(self.ui.plainTextEdit, self, side=self.margin_side)
+        self.coding_margin_width = self._get_saved_coding_margin_width()
+        self._coding_margin_width_is_restoring = False
+        self._coding_margin_restore_attempts = 0
+        self._coding_margin_width_ready = False
+        self.coding_margin_width_save_timer = QtCore.QTimer(self)
+        self.coding_margin_width_save_timer.setSingleShot(True)
+        self.coding_margin_width_save_timer.timeout.connect(self.persist_coding_margin_width_setting)
 
         # Inject the margin widget into the chosen container (mirroring the
         # NumberBar pattern used for self.ui.lineNumbers)
@@ -776,6 +789,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self._text_margins_splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
         self._text_margins_splitter.setHandleWidth(4)
         self._text_margins_splitter.setChildrenCollapsible(False)
+        self._text_margins_splitter.splitterMoved.connect(self.on_coding_margin_splitter_moved)
 
         # Switch margin containers' size policy from Fixed to Preferred so
         # the splitter can resize them. plainTextEdit keeps Expanding
@@ -807,6 +821,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # apply initial visibility based on persisted preference <- L
         self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        QtCore.QTimer.singleShot(0, self._apply_coding_margin_width)
+        QtCore.QTimer.singleShot(60, self._apply_coding_margin_width)
         self.ui.lineNumbers.setToolTip(_("Right click for highlighting options"))
 
         # sync margin redraw with editor scroll <- L
@@ -1026,6 +1042,74 @@ class DialogCodeText(QtWidgets.QWidget):
             "}"
         )
         self.coding_margin.update()
+
+    def _get_saved_coding_margin_width(self) -> int:
+        """Return the stored coding margin width, or the default width."""
+
+        try:
+            width = int(self.app.settings.get('dialogcodetext_coding_margin_width', DEFAULT_CODING_MARGIN_WIDTH))
+        except (TypeError, ValueError, AttributeError):
+            width = DEFAULT_CODING_MARGIN_WIDTH
+        if width <= 0:
+            return DEFAULT_CODING_MARGIN_WIDTH
+        return max(MINIMUM_CODING_MARGIN_WIDTH, width)
+
+    def _apply_coding_margin_width(self):
+        """Apply the stored coding margin width to the active side of the splitter."""
+
+        if not hasattr(self, '_text_margins_splitter') or self._text_margins_splitter is None:
+            return
+        if not self.show_margin_stripes:
+            return
+        total_width = self._text_margins_splitter.width()
+        if total_width <= 0:
+            sizes = self._text_margins_splitter.sizes()
+            total_width = sum(sizes)
+        if total_width <= 0 or total_width < self.coding_margin_width + 200:
+            if self._coding_margin_restore_attempts < 20:
+                self._coding_margin_restore_attempts += 1
+                QtCore.QTimer.singleShot(30, self._apply_coding_margin_width)
+            return
+        self._coding_margin_restore_attempts = 0
+        margin_width = min(self.coding_margin_width, max(MINIMUM_CODING_MARGIN_WIDTH, total_width - 200))
+        editor_width = max(200, total_width - margin_width)
+        if self.margin_side == 'right':
+            sizes = [0, editor_width, margin_width]
+        else:
+            sizes = [margin_width, editor_width, 0]
+        self._coding_margin_width_is_restoring = True
+        try:
+            with QtCore.QSignalBlocker(self._text_margins_splitter):
+                self._text_margins_splitter.setSizes(sizes)
+        finally:
+            self._coding_margin_width_is_restoring = False
+        self._coding_margin_width_ready = True
+
+    def on_coding_margin_splitter_moved(self, pos=None, index=None):
+        """Track coding margin width changes and persist the active width."""
+
+        if self._coding_margin_width_is_restoring or not self.show_margin_stripes:
+            return
+        if not self._coding_margin_width_ready:
+            return
+        sizes = self._text_margins_splitter.sizes()
+        if len(sizes) < 3:
+            return
+        width = sizes[2] if self.margin_side == 'right' else sizes[0]
+        width = int(width)
+        if width < MINIMUM_CODING_MARGIN_WIDTH:
+            return
+        self.coding_margin_width = width
+        self.app.settings['dialogcodetext_coding_margin_width'] = width
+        self.coding_margin_width_save_timer.start(400)
+
+    def persist_coding_margin_width_setting(self):
+        """Write the coding margin width to config.ini after drag operations settle."""
+
+        try:
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        except Exception as e_:
+            logger.debug(f"Could not persist coding margin width setting: {e_}")
 
     def _set_margin_container_visibility(self, visible):  # <- L
         """ Show or hide the active container so the layout reclaims its space
@@ -1329,6 +1413,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        if self.show_margin_stripes:
+            self._apply_coding_margin_width()
 
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
@@ -1348,6 +1434,8 @@ class DialogCodeText(QtWidgets.QWidget):
             pass
 
         self._set_margin_container_visibility(self.show_margin_stripes)
+        if self.show_margin_stripes:
+            self._apply_coding_margin_width()
 
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()

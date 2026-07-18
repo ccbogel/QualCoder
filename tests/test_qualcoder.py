@@ -612,6 +612,7 @@ CONFIG_INI_AI_EX4C0559 = {
     "dialogcodetext_splitter1": "1",
     "dialogcodetext_splitter_v0": "1",
     "dialogcodetext_splitter_v1": "1",
+    "dialogcodetext_coding_margin_width": "100",
     "dialogcodeimage_splitter0": "1",
     "dialogcodeimage_splitter1": "1",
     "dialogcodeimage_splitter_h0": "1",
