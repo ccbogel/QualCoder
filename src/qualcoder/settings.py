@@ -474,11 +474,9 @@ class DialogSettings(QtWidgets.QDialog):
 
         if not self.current_ai_profile_uses_oauth():
             self.ui.label_auth_result.setText('')
-            self.ui.pushButton_renew_auth.setText(_('Renew'))
             return
         is_authenticated, status_text = get_chatgpt_oauth_status()
         self.ui.label_auth_result.setText(status_text)
-        self.ui.pushButton_renew_auth.setText(_('Renew') if is_authenticated else _('Authenticate'))
 
     def update_ai_auth_widgets(self):
         """Toggle API-key and OAuth widgets according to the current profile type."""
@@ -767,7 +765,6 @@ class DialogSettings(QtWidgets.QDialog):
         finally:
             QtWidgets.QApplication.restoreOverrideCursor()
         self.ui.label_auth_result.setText(status_text)
-        self.ui.pushButton_renew_auth.setText(_('Renew') if is_authenticated else _('Authenticate'))
         if not is_authenticated:
             Message.warning(self, _('Authentication'), status_text)
             
