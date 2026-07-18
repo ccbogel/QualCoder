@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -38,7 +39,7 @@ class DialogConfirmDelete(QtWidgets.QDialog):
     param:
         text: a string for display """
 
-    def __init__(self, app, text, title=""):
+    def __init__(self, app, text:str, title : str=""):
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_confirmDelete()
