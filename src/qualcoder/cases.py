@@ -27,6 +27,7 @@ import openpyxl
 from openpyxl import load_workbook
 import os
 import qtawesome as qta
+import sqlite3
 from urllib.parse import urlparse
 import webbrowser
 
@@ -114,6 +115,7 @@ class DialogCases(QtWidgets.QDialog):
         self.selected_file = None
         self.clipboard_text = ""  # Used to copy text into another cell
 
+        self.overwrite_attributes_on_import = False
         self.load_cases_data()
         self.fill_table()
         # Initial resize of table columns
@@ -433,7 +435,7 @@ class DialogCases(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
-        """ Get user chosen file as xlxs or csv for importation """
+        """ Get user chosen file as xlsx or csv for importation """
 
         if self.cases:
             logger.warning(_("Cases have already been created."))
@@ -443,6 +445,11 @@ class DialogCases(QtWidgets.QDialog):
                                                              "(*.csv *.CSV *.xlsx *.XLSX)",
                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                              )
+        msg = _("Do you want imported data to override existing attributes?")
+        ui = DialogConfirmDelete(self.app, msg, _("Cases exist"))
+        ok = ui.exec()
+        if ok:
+            self.overwrite_attributes_on_import = True
         if filename == "":
             return
         if filename[-4:].lower() == ".csv":
@@ -477,18 +484,20 @@ class DialogCases(QtWidgets.QDialog):
         data = data[1:]
         # Insert cases
         cur = self.app.conn.cursor()
+        sql_insert_case = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
+        sql_insert_attr_type = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
+
         for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
                     'date': now_date}
             try:
-                sql = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                cur.execute(sql, (item['name'], item['memo'], item['owner'], item['date']))
+                cur.execute(sql_insert_case, (item['name'], item['memo'], item['owner'], item['date']))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 item['caseid'] = cur.fetchone()[0]
                 self.cases.append(item)
             except Exception as e:
-                logger.error("item:" + str(item) + ", " + str(e))
+                logger.error(f"item: {item}, {e}")
         # Determine attribute type
         attribute_value_type = ["character"] * len(fields)
         for col, att_name in enumerate(fields):
@@ -504,8 +513,7 @@ class DialogCases(QtWidgets.QDialog):
         for col, att_name in enumerate(fields):
             if col > 0:
                 try:
-                    sql = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
-                    cur.execute(sql, (att_name, now_date, self.app.settings['codername'], "",
+                    cur.execute(sql_insert_attr_type, (att_name, now_date, self.app.settings['codername'], "",
                                       attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
@@ -514,13 +522,19 @@ class DialogCases(QtWidgets.QDialog):
         sql = "select name, caseid from cases"
         cur.execute(sql)
         name_and_ids = cur.fetchall()
+        insert_sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+        update_sql = "update attribute set value=?, owner=?, date=? where attr_type=? and name=? and id=? "
         for n_i in name_and_ids:
             for v in data:
                 if n_i[0] == v[0]:
                     for col in range(1, len(v)):
-                        sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-                        cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
+                        try:
+                            cur.execute(insert_sql, (fields[col], v[col], n_i[1], 'case',
                                           now_date, self.app.settings['codername']))
+                        except sqlite3.IntegrityError:
+                            if self.overwrite_attributes_on_import:
+                                cur.execute(update_sql, (v[col], self.app.settings['codername'], now_date,
+                                                         'case', fields[col], n_i[1]))
         self.app.conn.commit()
         self._emit_project_table_changes(["cases", "attribute_type", "attribute"])
         self.load_cases_data()
@@ -553,12 +567,13 @@ class DialogCases(QtWidgets.QDialog):
         data = values[1:]
         # Insert cases
         cur = self.app.conn.cursor()
+        sql_insert_case = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
+        sql_insert_attr_type = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
         for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
                     'date': now_date}
             try:
-                sql = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                cur.execute(sql, (item['name'], item['memo'], item['owner'], item['date']))
+                cur.execute(sql_insert_case, (item['name'], item['memo'], item['owner'], item['date']))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 item['caseid'] = cur.fetchone()[0]
@@ -580,9 +595,7 @@ class DialogCases(QtWidgets.QDialog):
         for col, att_name in enumerate(fields):
             if col > 0:
                 try:
-                    sql = "insert into attribute_type (name,date,owner,memo, \
-                    valueType, caseOrFile) values(?,?,?,?,?,?)"
-                    cur.execute(sql, (att_name, now_date, self.app.settings['codername'], "",
+                    cur.execute(sql_insert_attr_type, (att_name, now_date, self.app.settings['codername'], "",
                                       attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
@@ -591,13 +604,19 @@ class DialogCases(QtWidgets.QDialog):
         sql = "select name, caseid from cases"
         cur.execute(sql)
         name_and_ids = cur.fetchall()
+        insert_sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+        update_sql = "update attribute set value=?, owner=?, date=? where attr_type=? and name=? and id=? "
         for n_i in name_and_ids:
             for v in data:
                 if n_i[0] == v[0]:
                     for col in range(1, len(v)):
-                        sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-                        cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
-                                          now_date, self.app.settings['codername']))
+                        try:
+                            cur.execute(insert_sql, (fields[col], v[col], n_i[1], 'case', now_date,
+                                                     self.app.settings['codername']))
+                        except sqlite3.IntegrityError:
+                            if self.overwrite_attributes_on_import:
+                                cur.execute(update_sql, (v[col], self.app.settings['codername'], now_date,
+                                                         'case', fields[col], n_i[1]))
         self.app.conn.commit()
         self._emit_project_table_changes(["cases", "attribute_type", "attribute"])
         self.load_cases_data()
@@ -618,7 +637,7 @@ class DialogCases(QtWidgets.QDialog):
         case_name = ui.get_new_name()
         if case_name is None:
             return
-        # update case list and database
+        # Update case list and database
         item = {'name': case_name, 'memo': "", 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'files': [],
                 'attributes': []}
