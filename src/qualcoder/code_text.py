@@ -90,6 +90,7 @@ class CodingMargin(QtWidgets.QWidget):
         self.editor = editor
         self.dialog = dialog_code_text
         self.side = side  # 'left' or 'right'
+        self._hovered_tooltip_code_key = None
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._emit_context_menu_to_dialog)
         self.setMouseTracking(True)
@@ -116,6 +117,17 @@ class CodingMargin(QtWidgets.QWidget):
         """Restore the default tooltip styling when no code tooltip is active."""
 
         self.setStyleSheet("")
+
+    @staticmethod
+    def _tooltip_code_key(code):
+        """Return a stable identifier for one hovered coded segment."""
+
+        if code is None:
+            return None
+        ctid = code.get('ctid')
+        if ctid is not None:
+            return ('ctid', ctid)
+        return ('range', code.get('fid'), code.get('pos0'), code.get('pos1'), code.get('cid'))
 
     def _compute_lane_layout(self):
         """ Track-packing algorithm. Returns (ctid_columns, sorted_codes,
@@ -474,9 +486,17 @@ class CodingMargin(QtWidgets.QWidget):
             code = None
 
         if code is None:
-            QtWidgets.QToolTip.hideText()
-            self._clear_tooltip_style()
+            if self._hovered_tooltip_code_key is not None:
+                QtWidgets.QToolTip.hideText()
+                self._clear_tooltip_style()
+                self._hovered_tooltip_code_key = None
             self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
+            super().mouseMoveEvent(event)
+            return
+
+        code_key = self._tooltip_code_key(code)
+        if code_key == self._hovered_tooltip_code_key:
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             super().mouseMoveEvent(event)
             return
 
@@ -490,6 +510,7 @@ class CodingMargin(QtWidgets.QWidget):
         QtWidgets.QToolTip.showText(event.globalPosition().toPoint(),
                                     tooltip_html,
                                     self)
+        self._hovered_tooltip_code_key = code_key
         self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         super().mouseMoveEvent(event)
 
@@ -530,6 +551,7 @@ class CodingMargin(QtWidgets.QWidget):
     def leaveEvent(self, event):
         QtWidgets.QToolTip.hideText()
         self._clear_tooltip_style()
+        self._hovered_tooltip_code_key = None
         self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
         super().leaveEvent(event)
 
