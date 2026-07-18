@@ -132,10 +132,12 @@ class CodingMargin(QtWidgets.QWidget):
         return ctid_columns, sorted_codes, current_fid
 
     def paintEvent(self, event):
-        if not self.dialog.file_ or not self.dialog.code_text:
-            return
         try:
             painter = QtGui.QPainter(self)
+            background_color = self.editor.viewport().palette().color(QtGui.QPalette.ColorRole.Base)
+            painter.fillRect(event.rect(), background_color)
+            if not self.dialog.file_ or not self.dialog.code_text:
+                return
             font = QtGui.QFont(self.dialog.app.settings['font'], 9)
             painter.setFont(font)
             offset = self.editor.contentOffset()
@@ -422,6 +424,7 @@ class CodingMargin(QtWidgets.QWidget):
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.dialog.ui.plainTextEdit.setTextCursor(cursor)
+                self.dialog.ui.plainTextEdit.setFocus(QtCore.Qt.FocusReason.MouseFocusReason)
                 self.dialog.ui.plainTextEdit.ensureCursorVisible()
                 event.accept()
                 return
@@ -569,6 +572,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.settings['docfont'] = self.app.settings['font']
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["docfont"]}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self.ui.plainTextEdit.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.plainTextEdit.setPlainText("")
@@ -798,6 +802,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self._text_margins_splitter.indexOf(self.ui.plainTextEdit), 1)
 
         self._install_coding_margin_in_side(self.margin_side)
+        self._sync_coding_margin_background()
 
         # apply initial visibility based on persisted preference <- L
         self.coding_margin.setVisible(self.show_margin_stripes)
@@ -996,6 +1001,31 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.margin_side = side
         self.coding_margin.side = side
+
+    def _sync_coding_margin_background(self):
+        """Keep the coding margin area aligned with the text editor background."""
+
+        editor_palette = self.ui.plainTextEdit.viewport().palette()
+        background_color = editor_palette.color(QtGui.QPalette.ColorRole.Base)
+        background_hex = background_color.name()
+        for widget in (
+                self.ui.widget_code_margin_left,
+                self.ui.widget_code_margin_right,
+                self.coding_margin):
+            palette = widget.palette()
+            palette.setColor(QtGui.QPalette.ColorRole.Window, background_color)
+            palette.setColor(QtGui.QPalette.ColorRole.Base, background_color)
+            widget.setPalette(palette)
+            widget.setAutoFillBackground(True)
+        self._text_margins_splitter.setStyleSheet(
+            "QSplitter::handle {"
+            f" background-color: {background_hex};"
+            " border: 0px;"
+            " margin: 0px;"
+            " padding: 0px;"
+            "}"
+        )
+        self.coding_margin.update()
 
     def _set_margin_container_visibility(self, visible):  # <- L
         """ Show or hide the active container so the layout reclaims its space
@@ -1390,6 +1420,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['docfont'] = font
         doc_font = f'font: {size}pt "{font}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self._sync_coding_margin_background()
         tt = _("Select document font and size.") + "\n"
         tt += f"{size} {font}"
         self.ui.pushButton_font.setToolTip(tt)
