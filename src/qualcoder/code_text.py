@@ -135,6 +135,68 @@ class CodingMargin(QtWidgets.QWidget):
 
         return ctid_columns, sorted_codes, current_fid
 
+    @staticmethod
+    def _relative_luminance(color: QtGui.QColor) -> float:
+        """Return the WCAG relative luminance for one QColor."""
+
+        def channel_luminance(value: int) -> float:
+            normalized = value / 255.0
+            if normalized <= 0.03928:
+                return normalized / 12.92
+            return ((normalized + 0.055) / 1.055) ** 2.4
+
+        red = channel_luminance(color.red())
+        green = channel_luminance(color.green())
+        blue = channel_luminance(color.blue())
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+    @classmethod
+    def _contrast_ratio(cls, first: QtGui.QColor, second: QtGui.QColor) -> float:
+        """Return the WCAG contrast ratio for two QColors."""
+
+        first_luminance = cls._relative_luminance(first)
+        second_luminance = cls._relative_luminance(second)
+        lighter = max(first_luminance, second_luminance)
+        darker = min(first_luminance, second_luminance)
+        return (lighter + 0.05) / (darker + 0.05)
+
+    @classmethod
+    def _label_color_for_background(cls, base_color: QtGui.QColor,
+                                    background_color: QtGui.QColor,
+                                    minimum_ratio: float = 4.5) -> QtGui.QColor:
+        """Return a hue-preserving label color that meets the target contrast."""
+
+        if cls._contrast_ratio(base_color, background_color) >= minimum_ratio:
+            return base_color
+
+        hue, saturation, lightness, alpha = base_color.getHsl()
+        if hue < 0:
+            hue = 0
+            saturation = 0
+
+        light_candidate = None
+        for new_lightness in range(lightness + 1, 256):
+            candidate = QtGui.QColor.fromHsl(hue, saturation, new_lightness, alpha)
+            if cls._contrast_ratio(candidate, background_color) >= minimum_ratio:
+                light_candidate = candidate
+                break
+
+        dark_candidate = None
+        for new_lightness in range(lightness - 1, -1, -1):
+            candidate = QtGui.QColor.fromHsl(hue, saturation, new_lightness, alpha)
+            if cls._contrast_ratio(candidate, background_color) >= minimum_ratio:
+                dark_candidate = candidate
+                break
+
+        if light_candidate is None:
+            return dark_candidate if dark_candidate is not None else base_color
+        if dark_candidate is None:
+            return light_candidate
+
+        light_delta = abs(light_candidate.lightness() - lightness)
+        dark_delta = abs(dark_candidate.lightness() - lightness)
+        return light_candidate if light_delta <= dark_delta else dark_candidate
+
     def paintEvent(self, event):
         try:
             painter = QtGui.QPainter(self)
@@ -174,6 +236,7 @@ class CodingMargin(QtWidgets.QWidget):
         names_drawn_by_line = {}
         margin_width = self.width()
         show_labels = margin_width >= MINIMUM_CODING_MARGIN_LABEL_WIDTH
+        background_color = self.editor.viewport().palette().color(QtGui.QPalette.ColorRole.Base)
 
         important_only = getattr(self.dialog, 'important', False)
         layout = block.layout()
@@ -227,7 +290,7 @@ class CodingMargin(QtWidgets.QWidget):
                     painter.drawRect(offset_x, int(rect.top()), bar_w, int(rect.height()))
 
                 if show_labels and ctid not in drawn_ctids and code['pos0'] >= block_start:
-                    painter.setPen(color.darker(150))
+                    painter.setPen(self._label_color_for_background(color, background_color))
                     raw_name = code.get('name', '')
                     _fm = painter.fontMetrics()
                     if self.side == 'right':
