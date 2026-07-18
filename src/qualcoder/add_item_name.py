@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -42,13 +43,13 @@ class DialogAddItemName(QtWidgets.QDialog):
     Returns one item through get_new_name method.
     """
 
-    def __init__(self, app, items, title, text, reg_expression=None, parent=None):
+    def __init__(self, app, items, title:str, text:str, reg_expression=None, parent=None):
         """ Params:
             app : App class
             items: list of dictionaries containing 'name' key
             title: String
             text: String
-            validation: QRegularExpression object
+            reg_expression: QRegularExpression object
             """
 
         super(DialogAddItemName, self).__init__(parent)
