@@ -473,6 +473,14 @@ class CodingMargin(QtWidgets.QWidget):
         self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         super().mouseMoveEvent(event)
 
+    def wheelEvent(self, event):
+        """Forward mouse-wheel scrolling to the associated text editor."""
+
+        QtWidgets.QApplication.sendEvent(self.editor.viewport(), event)
+        if event.isAccepted():
+            return
+        super().wheelEvent(event)
+
     def mousePressEvent(self, event):
         """ left-click on stripe/label -> select that exact coded segment in editor. """
 
