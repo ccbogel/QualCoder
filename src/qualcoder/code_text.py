@@ -99,6 +99,24 @@ class CodingMargin(QtWidgets.QWidget):
         if hasattr(self.dialog, 'coding_margin_context_menu'):
             self.dialog.coding_margin_context_menu(position, self)
 
+    def _set_tooltip_style_for_code(self, code):
+        """Match the tooltip widget colors to the hovered code."""
+
+        tooltip_color = code.get('color', '#cccccc')
+        tooltip_text_color = TextColor(tooltip_color).recommendation
+        self.setStyleSheet(
+            "QToolTip {"
+            f" background-color: {tooltip_color};"
+            f" color: {tooltip_text_color};"
+            f" border: 1px solid {tooltip_color};"
+            "}"
+        )
+
+    def _clear_tooltip_style(self):
+        """Restore the default tooltip styling when no code tooltip is active."""
+
+        self.setStyleSheet("")
+
     def _compute_lane_layout(self):
         """ Track-packing algorithm. Returns (ctid_columns, sorted_codes,
         current_fid), or (None, [], None) if the layout cannot be computed. """
@@ -457,6 +475,7 @@ class CodingMargin(QtWidgets.QWidget):
 
         if code is None:
             QtWidgets.QToolTip.hideText()
+            self._clear_tooltip_style()
             self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
             super().mouseMoveEvent(event)
             return
@@ -467,6 +486,7 @@ class CodingMargin(QtWidgets.QWidget):
             logger.debug(f"CodingMargin tooltip build error: {e}")
             tooltip_html = code.get('name', '')
 
+        self._set_tooltip_style_for_code(code)
         QtWidgets.QToolTip.showText(event.globalPosition().toPoint(),
                                     tooltip_html,
                                     self)
@@ -509,6 +529,7 @@ class CodingMargin(QtWidgets.QWidget):
 
     def leaveEvent(self, event):
         QtWidgets.QToolTip.hideText()
+        self._clear_tooltip_style()
         self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
         super().leaveEvent(event)
 
