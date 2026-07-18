@@ -1185,6 +1185,24 @@ class App(object):
         palette = QtWidgets.QApplication.instance().palette()
         palette.setColor(QtGui.QPalette.ColorRole.Link, QtGui.QColor(self.highlight_color()))
         palette.setColor(QtGui.QPalette.ColorRole.LinkVisited, QtGui.QColor(self.highlight_color()))
+        if self.settings['stylesheet'] == "native":
+            def blend_colors(first: QtGui.QColor, second: QtGui.QColor, first_ratio: float) -> QtGui.QColor:
+                second_ratio = 1.0 - first_ratio
+                return QtGui.QColor(
+                    round(first.red() * first_ratio + second.red() * second_ratio),
+                    round(first.green() * first_ratio + second.green() * second_ratio),
+                    round(first.blue() * first_ratio + second.blue() * second_ratio)
+                )
+
+            active_highlight = palette.color(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Highlight)
+            active_highlighted_text = palette.color(
+                QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.HighlightedText)
+            inactive_base = palette.color(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Base)
+            inactive_highlight = blend_colors(active_highlight, inactive_base, 0.55)
+            palette.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Highlight,
+                             inactive_highlight)
+            palette.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.HighlightedText,
+                             active_highlighted_text)
         QtWidgets.QApplication.instance().setPalette(palette)
         if self.settings['stylesheet'] == 'dark':
             return style_dark
