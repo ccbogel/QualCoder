@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-13 12:21+0200\n"
+"POT-Creation-Date: 2026-07-16 08:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr ""
 msgid "Exception handler"
 msgstr ""
 
-#: src/qualcoder/error_dlg.py:95 src/qualcoder/ai_llm.py:3221
+#: src/qualcoder/error_dlg.py:95 src/qualcoder/ai_llm.py:4009
 #: src/qualcoder/ai_vectorstore.py:67 src/qualcoder/ai_chat.py:9024
 #: src/qualcoder/GUI/special_functions.py:53
 msgid "Uncaught exception: "
@@ -197,7 +197,7 @@ msgstr ""
 
 #: src/qualcoder/report_file_summary.py:308 src/qualcoder/code_pdf.py:393
 #: src/qualcoder/view_image.py:404 src/qualcoder/code_av.py:459
-#: src/qualcoder/__main__.py:3276 src/qualcoder/code_text.py:1527
+#: src/qualcoder/__main__.py:3341 src/qualcoder/code_text.py:1527
 #: src/qualcoder/reports.py:403 src/qualcoder/reports.py:492
 msgid "Date: "
 msgstr ""
@@ -458,7 +458,7 @@ msgid ""
 "affect coding stripes display."
 msgstr ""
 
-#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3810
+#: src/qualcoder/code_pdf.py:292 src/qualcoder/__main__.py:3875
 #: src/qualcoder/code_text.py:5718 src/qualcoder/code_text.py:7965
 msgid "Information"
 msgstr ""
@@ -1043,8 +1043,8 @@ msgstr ""
 #: src/qualcoder/ai_search_dialog.py:840 src/qualcoder/code_organiser.py:143
 #: src/qualcoder/code_organiser.py:657 src/qualcoder/code_av.py:3096
 #: src/qualcoder/view_graph.py:2721 src/qualcoder/view_graph.py:4058
-#: src/qualcoder/view_graph.py:4060 src/qualcoder/ai_mcp_server.py:410
-#: src/qualcoder/ai_mcp_server.py:432 src/qualcoder/code_text.py:4138
+#: src/qualcoder/view_graph.py:4060 src/qualcoder/ai_mcp_server.py:447
+#: src/qualcoder/ai_mcp_server.py:469 src/qualcoder/code_text.py:4138
 #: src/qualcoder/code_text.py:5153
 msgid "Category"
 msgstr ""
@@ -1474,7 +1474,7 @@ msgstr ""
 #: src/qualcoder/coder_names.py:354 src/qualcoder/coder_names.py:365
 #: src/qualcoder/coder_names.py:368 src/qualcoder/coder_names.py:377
 #: src/qualcoder/coder_names.py:380 src/qualcoder/coder_names.py:384
-#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:2416
+#: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:2481
 #: src/qualcoder/report_exact_matches.py:540
 msgid "Coder"
 msgstr ""
@@ -1680,15 +1680,41 @@ msgstr ""
 msgid "Pseudonym entry already exists."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:132
+#: src/qualcoder/ai_llm.py:176
+msgid "expires "
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:178 src/qualcoder/ai_llm.py:179
+msgid "Authenticated"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:189
+msgid "Not authenticated"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:191
+msgid "Authentication expired. Please renew it."
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:193 src/qualcoder/ai_llm.py:202
+msgid "Authentication error"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:209
+msgid ""
+"ChatGPT authentication expired or could not be renewed. Open the settings "
+"dialog and click \"Renew\" to authenticate again."
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:221
 msgid "AI Models"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:132
+#: src/qualcoder/ai_llm.py:221
 msgid "Loading list of available AI models..."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:365
+#: src/qualcoder/ai_llm.py:597
 msgid ""
 "You are using the \"Blablador\" service on an old server that will soon be "
 "disabled. Your configuration will be updated automatically. Please test if "
@@ -1696,603 +1722,658 @@ msgid ""
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:369 src/qualcoder/ai_llm.py:3003
+#: src/qualcoder/ai_llm.py:601 src/qualcoder/ai_llm.py:3763
+#: src/qualcoder/__main__.py:1768
 msgid "AI Setup"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1267
+#: src/qualcoder/ai_llm.py:1758
 #, python-brace-format
 msgid " (+{0} more)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1275 src/qualcoder/ai_llm.py:1626
+#: src/qualcoder/ai_llm.py:1766 src/qualcoder/ai_llm.py:2153
 msgid "category(ies)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1277 src/qualcoder/ai_llm.py:1628
+#: src/qualcoder/ai_llm.py:1768 src/qualcoder/ai_llm.py:2155
 msgid "code(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1279
+#: src/qualcoder/ai_llm.py:1770
 msgid "coding(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1291
+#: src/qualcoder/ai_llm.py:1782
 msgid "Created category: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1295
+#: src/qualcoder/ai_llm.py:1786
 msgid "Created code: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1308
+#: src/qualcoder/ai_llm.py:1799
 msgid "Text coding"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1309
+#: src/qualcoder/ai_llm.py:1800
 msgid "Created text coding: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1313
+#: src/qualcoder/ai_llm.py:1804
 msgid "Created case: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1317
+#: src/qualcoder/ai_llm.py:1808
 msgid "Created case attribute: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1321
+#: src/qualcoder/ai_llm.py:1812
 msgid "Created document attribute: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1338
+#: src/qualcoder/ai_llm.py:1829
 msgid "Linked text to case: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1338
+#: src/qualcoder/ai_llm.py:1829
 msgid "Linked text to case"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1344 src/qualcoder/ai_llm.py:1346
+#: src/qualcoder/ai_llm.py:1835 src/qualcoder/ai_llm.py:1837
 msgid "Updated case: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1347
+#: src/qualcoder/ai_llm.py:1838
 msgid "Updated case"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1355 src/qualcoder/ai_llm.py:1357
+#: src/qualcoder/ai_llm.py:1845
+msgid "Updated document: "
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1846
+msgid "Updated document"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1854 src/qualcoder/ai_llm.py:1856
 msgid "Updated case attributes: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1358
+#: src/qualcoder/ai_llm.py:1857
 msgid "Updated case attributes"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1366 src/qualcoder/ai_llm.py:1368
+#: src/qualcoder/ai_llm.py:1865 src/qualcoder/ai_llm.py:1867
 msgid "Updated document attributes: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1369
+#: src/qualcoder/ai_llm.py:1868
 msgid "Updated document attributes"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1378
+#: src/qualcoder/ai_llm.py:1876 src/qualcoder/ai_llm.py:1878
+msgid "Updated category: "
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1879
+msgid "Updated category"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1887 src/qualcoder/ai_llm.py:1889
+msgid "Updated code: "
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1890
+msgid "Updated code"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1893
+msgid "Updated text coding"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:1902
 msgid "Renamed category: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1387
+#: src/qualcoder/ai_llm.py:1911
 msgid "Renamed code: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1403 src/qualcoder/ai_llm.py:1404
+#: src/qualcoder/ai_llm.py:1927 src/qualcoder/ai_llm.py:1928
 msgid "Moved category tree: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1420 src/qualcoder/ai_llm.py:1421
+#: src/qualcoder/ai_llm.py:1944 src/qualcoder/ai_llm.py:1945
 msgid "Moved code tree: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1422
+#: src/qualcoder/ai_llm.py:1946
 msgid "Moved code: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1430
+#: src/qualcoder/ai_llm.py:1954
 msgid "Moved text coding: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1431
+#: src/qualcoder/ai_llm.py:1955
 msgid "Moved text coding"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1448 src/qualcoder/ai_llm.py:1449
+#: src/qualcoder/ai_llm.py:1972 src/qualcoder/ai_llm.py:1973
 msgid "Deleted category tree: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1468 src/qualcoder/ai_llm.py:1469
+#: src/qualcoder/ai_llm.py:1992 src/qualcoder/ai_llm.py:1993
 msgid "Deleted code tree: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1471 src/qualcoder/ai_llm.py:1472
+#: src/qualcoder/ai_llm.py:1995 src/qualcoder/ai_llm.py:1996
 msgid "Deleted code: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1484
+#: src/qualcoder/ai_llm.py:2008
 msgid "Deleted text coding: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1485
+#: src/qualcoder/ai_llm.py:2009
 msgid "Deleted text coding"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1505
+#: src/qualcoder/ai_llm.py:2029
 msgid "Removed case link: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1506
+#: src/qualcoder/ai_llm.py:2030
 msgid "Removed case link"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1530
+#: src/qualcoder/ai_llm.py:2054
 msgid "1 day ago"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1531
+#: src/qualcoder/ai_llm.py:2055
 #, python-brace-format
 msgid "{0} days ago"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1537
+#: src/qualcoder/ai_llm.py:2061
 msgid "1 minute ago"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1538
+#: src/qualcoder/ai_llm.py:2062
 #, python-brace-format
 msgid "{0} minutes ago"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1542
+#: src/qualcoder/ai_llm.py:2066
 msgid "1 hour ago"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1543
+#: src/qualcoder/ai_llm.py:2067
 #, python-brace-format
 msgid "{0} hours ago"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1630
+#: src/qualcoder/ai_llm.py:2157
 msgid "case(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1632
+#: src/qualcoder/ai_llm.py:2159
 msgid "text coding(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1634
+#: src/qualcoder/ai_llm.py:2161
+msgid "document(s)"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:2163
 msgid "case link(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1636
+#: src/qualcoder/ai_llm.py:2165
 msgid "attribute action(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:1662 src/qualcoder/ai_llm.py:1670
+#: src/qualcoder/ai_llm.py:2191 src/qualcoder/ai_llm.py:2199
 msgid "Additional actions: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2107
+#: src/qualcoder/ai_llm.py:2701
 msgid "Stored AI change"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2111
+#: src/qualcoder/ai_llm.py:2705
 msgid ""
 "Could not be undone because the affected item no longer matches the recorded "
 "state. It may have been edited afterwards or still be blocked by dependent "
 "data."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2116
+#: src/qualcoder/ai_llm.py:2710
 msgid "Could not be undone because the affected item is already missing."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2120
+#: src/qualcoder/ai_llm.py:2714
 msgid ""
 "Could not be undone because the stored undo information is incomplete or "
 "inconsistent."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2125
+#: src/qualcoder/ai_llm.py:2719
 msgid ""
 "This undo step remains in the list so you can remove the blocking condition "
 "and try again later."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2129
+#: src/qualcoder/ai_llm.py:2723
 msgid "This undo step was removed from the list."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2132
+#: src/qualcoder/ai_llm.py:2726
 msgid "Reason: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2326 src/qualcoder/ai_llm.py:2336
-#: src/qualcoder/ai_llm.py:2342 src/qualcoder/ai_llm.py:2350
-#: src/qualcoder/ai_llm.py:2352 src/qualcoder/ai_llm.py:2354
+#: src/qualcoder/ai_llm.py:2954 src/qualcoder/ai_llm.py:2964
+#: src/qualcoder/ai_llm.py:2970 src/qualcoder/ai_llm.py:2978
+#: src/qualcoder/ai_llm.py:2980 src/qualcoder/ai_llm.py:2982
 msgid "Undo will remove "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2326 src/qualcoder/ai_llm.py:2337
+#: src/qualcoder/ai_llm.py:2954 src/qualcoder/ai_llm.py:2965
 msgid " code(s) and "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2327
+#: src/qualcoder/ai_llm.py:2955
 msgid " related coding(s)."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2331 src/qualcoder/ai_llm.py:2346
+#: src/qualcoder/ai_llm.py:2959 src/qualcoder/ai_llm.py:2974
 msgid "Warning: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2332
+#: src/qualcoder/ai_llm.py:2960
 msgid " of these codings are not owned by 'AI Agent'."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2336
+#: src/qualcoder/ai_llm.py:2964
 msgid " category(ies). "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2338
+#: src/qualcoder/ai_llm.py:2966
 msgid " subcategory(ies) would be detached, not deleted."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2342
+#: src/qualcoder/ai_llm.py:2970
 msgid " standalone text coding(s)."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2347
+#: src/qualcoder/ai_llm.py:2975
 msgid " standalone coding(s) are not owned by 'AI Agent'."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2350
+#: src/qualcoder/ai_llm.py:2978
 msgid " case(s)."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2352 src/qualcoder/ai_llm.py:2365
+#: src/qualcoder/ai_llm.py:2980 src/qualcoder/ai_llm.py:2993
 msgid " case link(s)."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2354
+#: src/qualcoder/ai_llm.py:2982
 msgid " attribute definition(s)."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2358
+#: src/qualcoder/ai_llm.py:2986
 msgid " category(ies)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2360
+#: src/qualcoder/ai_llm.py:2988
 msgid " code(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2362
+#: src/qualcoder/ai_llm.py:2990
 msgid " coding(s)"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2363 src/qualcoder/ai_llm.py:2365
+#: src/qualcoder/ai_llm.py:2991 src/qualcoder/ai_llm.py:2993
 msgid "Undo will restore "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2367
-msgid " renamed category(ies) would be restored to their old names."
+#: src/qualcoder/ai_llm.py:2995
+msgid " updated category(ies) would be restored to their previous values."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2369
-msgid " renamed code(s) would be restored to their old names."
+#: src/qualcoder/ai_llm.py:2997
+msgid " updated code(s) would be restored to their previous values."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2371
+#: src/qualcoder/ai_llm.py:2999
 msgid " updated case(s) would be restored to their previous values."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2373
+#: src/qualcoder/ai_llm.py:3001
+msgid " updated document(s) would be restored to their previous values."
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:3003
+msgid " updated text coding(s) would be restored to their previous values."
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:3005
 msgid " attribute update(s) would be restored to their previous values."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2375
+#: src/qualcoder/ai_llm.py:3007
 msgid " moved category tree(s) would be moved back to their previous parent."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2377
+#: src/qualcoder/ai_llm.py:3009
 msgid " moved code(s) would be moved back to their previous parent."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2379
+#: src/qualcoder/ai_llm.py:3011
 msgid " moved text coding(s) would be moved back to their previous code."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2382
+#: src/qualcoder/ai_llm.py:3014
 msgid " operation(s) appear changed since creation and may be skipped."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2386
+#: src/qualcoder/ai_llm.py:3018
 msgid " operation(s) are already missing and may be skipped."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2851 src/qualcoder/ai_llm.py:2885
-#: src/qualcoder/ai_llm.py:2917 src/qualcoder/ai_llm.py:2939
+#: src/qualcoder/ai_llm.py:3611 src/qualcoder/ai_llm.py:3645
+#: src/qualcoder/ai_llm.py:3677 src/qualcoder/ai_llm.py:3699
 msgid "Undo AI changes"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2851
+#: src/qualcoder/ai_llm.py:3611
 msgid "No AI changes available to undo."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2854
+#: src/qualcoder/ai_llm.py:3614
 msgid "Select AI changes to undo"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2872
+#: src/qualcoder/ai_llm.py:3632
 #, python-brace-format
 msgid "Undo {count} AI change set(s)?"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2884
+#: src/qualcoder/ai_llm.py:3644
 msgid "Do you want to continue?"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2918
+#: src/qualcoder/ai_llm.py:3678
 msgid "Selected change sets: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2919
+#: src/qualcoder/ai_llm.py:3679
 msgid "Undone operations: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2922
+#: src/qualcoder/ai_llm.py:3682
 msgid "Skipped operations: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2925
+#: src/qualcoder/ai_llm.py:3685
 msgid "Blocked operations kept for retry: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2928
+#: src/qualcoder/ai_llm.py:3688
 msgid "Skipped operations removed from the list: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2931
+#: src/qualcoder/ai_llm.py:3691
 msgid "Warning: removed codings not owned by 'AI Agent': "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2933
+#: src/qualcoder/ai_llm.py:3693
 msgid "Undo details:"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2974
+#: src/qualcoder/ai_llm.py:3734
 msgid "AI: Legacy prompt migration failed."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2982
+#: src/qualcoder/ai_llm.py:3742
 #, python-brace-format
 msgid "AI: Migrated {count} {scope} prompts to Markdown format."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:2993
+#: src/qualcoder/ai_llm.py:3753
 msgid "AI: Starting up..."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3002
+#: src/qualcoder/ai_llm.py:3762
 msgid "AI: In the follwoing window, please set up the AI model."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3009
+#: src/qualcoder/ai_llm.py:3769
 msgid "AI: No model selected, AI is disabled."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3021
+#: src/qualcoder/ai_llm.py:3781
 msgid ""
 "AI: You are still using the outdated GPT-4 turbo. Consider switching to a "
 "newer model, such as GPT 4.1. Go to Project > Settings to change the AI "
 "profile and model."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3025
+#: src/qualcoder/ai_llm.py:3785
 msgid ""
 "AI: You are using the outdated Claude Opus 4 model from Anthropic. Consider "
 "switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
 "change the AI profile and model."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3034
+#: src/qualcoder/ai_llm.py:3796
 msgid "Please enter an API-key for the AI in the following dialog."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3035
+#: src/qualcoder/ai_llm.py:3797
 msgid "AI API-key"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3041
+#: src/qualcoder/ai_llm.py:3804
 msgid "AI: No API key set, AI is disabled."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3049
+#: src/qualcoder/ai_llm.py:3812
 msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3050
+#: src/qualcoder/ai_llm.py:3813
 msgid "AI Model Selection"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3056
+#: src/qualcoder/ai_llm.py:3819
 msgid "AI: No large/fast model selected, AI is disabled."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3124
+#: src/qualcoder/ai_llm.py:3904
 msgid "AI: Ready"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3135
+#: src/qualcoder/ai_llm.py:3915
 msgid ""
 "An error occured during AI initialization. The AI features will be disabled. "
 "Click on Project > Settings to reenable them."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3136
+#: src/qualcoder/ai_llm.py:3916
 msgid "AI Initialization"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3157 src/qualcoder/ai_chat.py:2360
+#: src/qualcoder/ai_llm.py:3939 src/qualcoder/ai_chat.py:2360
 msgid "Do you really want to cancel the AI operation?"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3165 src/qualcoder/ai_chat.py:2371
+#: src/qualcoder/ai_llm.py:3947 src/qualcoder/ai_chat.py:2371
 msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
 "the AI to be ready again."
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3218
+#: src/qualcoder/ai_llm.py:4003 src/qualcoder/ai_llm.py:4006
 msgid "AI Error:\n"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3225
+#: src/qualcoder/ai_llm.py:4013
 msgid "Uncaught exception while handling AI error: "
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3500
+#: src/qualcoder/ai_llm.py:4044 src/qualcoder/ai_llm.py:4166
+#: src/qualcoder/settings.py:771
+msgid "Authentication"
+msgstr ""
+
+#: src/qualcoder/ai_llm.py:4318
 msgid "AI generate_code_descriptions\n"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3501
+#: src/qualcoder/ai_llm.py:4319
 msgid "Prompt:\n"
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3558
+#: src/qualcoder/ai_llm.py:4377
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
 msgstr ""
 
-#: src/qualcoder/ai_llm.py:3665
+#: src/qualcoder/ai_llm.py:4484
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
 msgstr ""
 
-#: src/qualcoder/settings.py:205
+#: src/qualcoder/settings.py:212
 msgid "original"
 msgstr ""
 
-#: src/qualcoder/settings.py:205
+#: src/qualcoder/settings.py:212
 msgid "dark"
 msgstr ""
 
-#: src/qualcoder/settings.py:205 src/qualcoder/view_graph.py:1653
+#: src/qualcoder/settings.py:212 src/qualcoder/view_graph.py:1653
 msgid "blue"
 msgstr ""
 
-#: src/qualcoder/settings.py:205 src/qualcoder/view_graph.py:1655
+#: src/qualcoder/settings.py:212 src/qualcoder/view_graph.py:1655
 msgid "green"
 msgstr ""
 
-#: src/qualcoder/settings.py:205 src/qualcoder/view_graph.py:1656
+#: src/qualcoder/settings.py:212 src/qualcoder/view_graph.py:1656
 msgid "orange"
 msgstr ""
 
-#: src/qualcoder/settings.py:205
+#: src/qualcoder/settings.py:212
 msgid "purple"
 msgstr ""
 
-#: src/qualcoder/settings.py:205 src/qualcoder/view_graph.py:1656
+#: src/qualcoder/settings.py:212 src/qualcoder/view_graph.py:1656
 msgid "yellow"
 msgstr ""
 
-#: src/qualcoder/settings.py:205
+#: src/qualcoder/settings.py:212
 msgid "rainbow"
 msgstr ""
 
-#: src/qualcoder/settings.py:205
+#: src/qualcoder/settings.py:212
 msgid "native"
 msgstr ""
 
-#: src/qualcoder/settings.py:224
+#: src/qualcoder/settings.py:231
 msgid "Bold"
 msgstr ""
 
-#: src/qualcoder/settings.py:224
+#: src/qualcoder/settings.py:231
 msgid "Italic"
 msgstr ""
 
-#: src/qualcoder/settings.py:224
+#: src/qualcoder/settings.py:231
 msgid "Bigger"
 msgstr ""
 
-#: src/qualcoder/settings.py:232
+#: src/qualcoder/settings.py:239
 msgid "Default folder for storing automatic backups and for file outputs."
 msgstr ""
 
-#: src/qualcoder/settings.py:337
+#: src/qualcoder/settings.py:344
 msgid "Close and open the software for the change in language to occur."
 msgstr ""
 
-#: src/qualcoder/settings.py:338
+#: src/qualcoder/settings.py:345
 msgid ""
 "Additional community supported languages can be installed by selecting \"Add "
 "more languages...\" in the dropdown."
 msgstr ""
 
-#: src/qualcoder/settings.py:368 src/qualcoder/settings.py:419
-#: src/qualcoder/settings.py:423
+#: src/qualcoder/settings.py:375 src/qualcoder/settings.py:426
+#: src/qualcoder/settings.py:430
 msgid "Add more languages..."
 msgstr ""
 
-#: src/qualcoder/settings.py:424
+#: src/qualcoder/settings.py:431
 msgid "Could not open the user translation folder."
 msgstr ""
 
-#: src/qualcoder/settings.py:426
+#: src/qualcoder/settings.py:433
 msgid "Download additional language files from here:"
 msgstr ""
 
-#: src/qualcoder/settings.py:428
+#: src/qualcoder/settings.py:435
 msgid "Put either the zip file or the .qm and .mo files into the folder"
 msgstr ""
 
-#: src/qualcoder/settings.py:430
+#: src/qualcoder/settings.py:437
 msgid "Then select that language in the dropdown box."
 msgstr ""
 
-#: src/qualcoder/settings.py:431
+#: src/qualcoder/settings.py:438
 msgid ""
 "Additional languages may not be the most current translations, and they may "
 "contain inaccurate translations."
 msgstr ""
 
-#: src/qualcoder/settings.py:432
+#: src/qualcoder/settings.py:439
 msgid "Read the README.txt file in the i18n folder for more information."
 msgstr ""
 
-#: src/qualcoder/settings.py:433
+#: src/qualcoder/settings.py:440
 msgid "Add more languages"
 msgstr ""
 
-#: src/qualcoder/settings.py:513 src/qualcoder/settings.py:521
+#: src/qualcoder/settings.py:476 src/qualcoder/settings.py:480
+#: src/qualcoder/settings.py:769
+msgid "Renew"
+msgstr ""
+
+#: src/qualcoder/settings.py:480 src/qualcoder/settings.py:769
+msgid "Authenticate"
+msgstr ""
+
+#: src/qualcoder/settings.py:574 src/qualcoder/settings.py:582
 msgid "Edit AI profile name"
 msgstr ""
 
-#: src/qualcoder/settings.py:513
+#: src/qualcoder/settings.py:574
 msgid ""
 "Select a profile first. \n"
 "You can only edit the name of an existing profile. To create a new profile "
 "from scratch, follow the instructions in the QualCoder wiki on GitHub."
 msgstr ""
 
-#: src/qualcoder/settings.py:522 src/qualcoder/settings.py:737
+#: src/qualcoder/settings.py:583 src/qualcoder/settings.py:823
 msgid "Enter new profile name:"
 msgstr ""
 
-#: src/qualcoder/settings.py:582
+#: src/qualcoder/settings.py:643
 msgid ""
 "The API key contains non-ASCII characters and cannot be used.\n"
 "Please paste the key again exactly as provided by your AI provider. \n"
@@ -2300,81 +2381,81 @@ msgid ""
 "Invalid character(s): "
 msgstr ""
 
-#: src/qualcoder/settings.py:585
+#: src/qualcoder/settings.py:646
 msgid "Invalid API key"
 msgstr ""
 
-#: src/qualcoder/settings.py:669
+#: src/qualcoder/settings.py:735
 msgid "Invalid input"
 msgstr ""
 
-#: src/qualcoder/settings.py:681
+#: src/qualcoder/settings.py:747
 msgid "AI temperature parameter must be between 0.0 and 2.0."
 msgstr ""
 
-#: src/qualcoder/settings.py:689
+#: src/qualcoder/settings.py:755
 msgid "AI top_p parameter must be between 0.0 and 1.0."
 msgstr ""
 
-#: src/qualcoder/settings.py:712
+#: src/qualcoder/settings.py:798
 msgid "Choose a default output folder"
 msgstr ""
 
-#: src/qualcoder/settings.py:716 src/qualcoder/settings.py:719
+#: src/qualcoder/settings.py:802 src/qualcoder/settings.py:805
 msgid "Choose another folder"
 msgstr ""
 
-#: src/qualcoder/settings.py:716
+#: src/qualcoder/settings.py:802
 msgid "Do not use the QualCoder configuration folder."
 msgstr ""
 
-#: src/qualcoder/settings.py:719
+#: src/qualcoder/settings.py:805
 msgid "Do not use the QualCoder data folder."
 msgstr ""
 
-#: src/qualcoder/settings.py:736 src/qualcoder/settings.py:749
+#: src/qualcoder/settings.py:822 src/qualcoder/settings.py:835
 msgid "New AI profile"
 msgstr ""
 
-#: src/qualcoder/settings.py:749
+#: src/qualcoder/settings.py:835
 msgid "An AI profile with this name already exists: "
 msgstr ""
 
-#: src/qualcoder/settings.py:817
+#: src/qualcoder/settings.py:903
 msgid "Please select an AI profile or disable the AI altogether."
 msgstr ""
 
-#: src/qualcoder/settings.py:818
+#: src/qualcoder/settings.py:904
 msgid "AI profile"
 msgstr ""
 
-#: src/qualcoder/settings.py:823
+#: src/qualcoder/settings.py:914
 msgid "Please enter a valid API-key for the AI model."
 msgstr ""
 
-#: src/qualcoder/settings.py:824 src/qualcoder/settings.py:830
+#: src/qualcoder/settings.py:915 src/qualcoder/settings.py:921
 msgid "AI model"
 msgstr ""
 
-#: src/qualcoder/settings.py:829
+#: src/qualcoder/settings.py:920
 msgid "Please select a \"large\" and a \"fast\" AI model."
 msgstr ""
 
-#: src/qualcoder/settings.py:852
+#: src/qualcoder/settings.py:939
 msgid "Restart QualCoder"
 msgstr ""
 
-#: src/qualcoder/settings.py:852
+#: src/qualcoder/settings.py:939
 msgid "Restart QualCoder to enact some changes"
 msgstr ""
 
-#: src/qualcoder/settings.py:857
+#: src/qualcoder/settings.py:944
 msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
 
-#: src/qualcoder/settings.py:858 src/qualcoder/__main__.py:2415
+#: src/qualcoder/settings.py:945 src/qualcoder/__main__.py:2480
 msgid "Settings"
 msgstr ""
 
@@ -2733,8 +2814,8 @@ msgstr ""
 #: src/qualcoder/ai_search_dialog.py:840 src/qualcoder/code_organiser.py:899
 #: src/qualcoder/code_organiser.py:2373 src/qualcoder/view_graph.py:2723
 #: src/qualcoder/view_graph.py:4050 src/qualcoder/view_graph.py:4052
-#: src/qualcoder/ai_mcp_server.py:398 src/qualcoder/ai_mcp_server.py:420
-#: src/qualcoder/ai_mcp_server.py:440 src/qualcoder/code_text.py:4069
+#: src/qualcoder/ai_mcp_server.py:435 src/qualcoder/ai_mcp_server.py:457
+#: src/qualcoder/ai_mcp_server.py:477 src/qualcoder/code_text.py:4069
 #: src/qualcoder/code_text.py:4138 src/qualcoder/report_relations.py:724
 #: src/qualcoder/report_relations.py:1046
 msgid "Code"
@@ -3565,7 +3646,7 @@ msgstr ""
 
 #: src/qualcoder/manage_files.py:1260 src/qualcoder/view_graph.py:1811
 #: src/qualcoder/view_graph.py:2888 src/qualcoder/view_graph.py:2916
-#: src/qualcoder/ai_mcp_server.py:457 src/qualcoder/ai_mcp_server.py:464
+#: src/qualcoder/ai_mcp_server.py:497 src/qualcoder/ai_mcp_server.py:510
 #: src/qualcoder/cases.py:616
 msgid "Case"
 msgstr ""
@@ -3723,7 +3804,7 @@ msgstr ""
 msgid " imported."
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2142 src/qualcoder/__main__.py:3263
+#: src/qualcoder/manage_files.py:2142 src/qualcoder/__main__.py:3328
 msgid " created."
 msgstr ""
 
@@ -4638,7 +4719,7 @@ msgid "Project export error "
 msgstr ""
 
 #: src/qualcoder/refi.py:2019 src/qualcoder/refi.py:2025
-#: src/qualcoder/__main__.py:3157 src/qualcoder/__main__.py:3177
+#: src/qualcoder/__main__.py:3222 src/qualcoder/__main__.py:3242
 msgid "Project"
 msgstr ""
 
@@ -6536,8 +6617,8 @@ msgstr ""
 #: src/qualcoder/ai_chat.py:2237 src/qualcoder/ai_chat.py:2459
 #: src/qualcoder/ai_chat.py:9274 src/qualcoder/ai_chat.py:9279
 #: src/qualcoder/ai_chat.py:9284 src/qualcoder/ai_chat.py:9311
-#: src/qualcoder/ai_chat.py:9328 src/qualcoder/__main__.py:2785
-#: src/qualcoder/__main__.py:4039 src/qualcoder/__main__.py:4052
+#: src/qualcoder/ai_chat.py:9328 src/qualcoder/__main__.py:2850
+#: src/qualcoder/__main__.py:4104 src/qualcoder/__main__.py:4117
 msgid "AI Agent"
 msgstr ""
 
@@ -6582,7 +6663,7 @@ msgstr ""
 msgid "Unknown AI Agent New-menu target: "
 msgstr ""
 
-#: src/qualcoder/ai_chat.py:2002 src/qualcoder/__main__.py:1964
+#: src/qualcoder/ai_chat.py:2002 src/qualcoder/__main__.py:2029
 msgid "Cannot open link: "
 msgstr ""
 
@@ -7169,192 +7250,203 @@ msgid ""
 "Please check if the file is empty."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:386
+#: src/qualcoder/ai_mcp_server.py:423
 msgid "(unnamed category)"
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:387
-#, python-brace-format
-msgid "Creating category \"{name}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:391
-msgid "(unnamed code)"
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:392
-#, python-brace-format
-msgid "Creating code \"{name}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:401 src/qualcoder/ai_mcp_server.py:467
-msgid "Document"
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:402
-#, python-brace-format
-msgid "Creating text coding for code \"{code}\" in document \"{document}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:412
-#, python-brace-format
-msgid "Reviewing impact of deleting category \"{name}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:414
-#, python-brace-format
-msgid "Moving category \"{name}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:415
-#, python-brace-format
-msgid "Deleting category \"{name}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:422
-#, python-brace-format
-msgid "Reviewing impact of deleting code \"{name}\"..."
 msgstr ""
 
 #: src/qualcoder/ai_mcp_server.py:424
 #, python-brace-format
-msgid "Moving code \"{name}\"..."
+msgid "Creating category \"{name}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:425
-#, python-brace-format
-msgid "Deleting code \"{name}\"..."
+#: src/qualcoder/ai_mcp_server.py:428
+msgid "(unnamed code)"
 msgstr ""
 
 #: src/qualcoder/ai_mcp_server.py:429
-msgid "Renaming category \"error: missing category id\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:433
 #, python-brace-format
-msgid "Renaming category \"{name}\"..."
+msgid "Creating code \"{name}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:437
-msgid "Renaming code \"error: missing code id\"..."
+#: src/qualcoder/ai_mcp_server.py:438 src/qualcoder/ai_mcp_server.py:503
+#: src/qualcoder/ai_mcp_server.py:513
+msgid "Document"
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:441
+#: src/qualcoder/ai_mcp_server.py:439
 #, python-brace-format
-msgid "Renaming code \"{name}\"..."
+msgid "Creating text coding for code \"{code}\" in document \"{document}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:444
+#: src/qualcoder/ai_mcp_server.py:449
 #, python-brace-format
-msgid "Moving text coding #{ctid}..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:447
-#, python-brace-format
-msgid "Deleting text coding #{ctid}..."
+msgid "Reviewing impact of deleting category \"{name}\"..."
 msgstr ""
 
 #: src/qualcoder/ai_mcp_server.py:451
-msgid "(unnamed case)"
+#, python-brace-format
+msgid "Moving category \"{name}\"..."
 msgstr ""
 
 #: src/qualcoder/ai_mcp_server.py:452
 #, python-brace-format
+msgid "Deleting category \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:459
+#, python-brace-format
+msgid "Reviewing impact of deleting code \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:461
+#, python-brace-format
+msgid "Moving code \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:462
+#, python-brace-format
+msgid "Deleting code \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:466
+msgid "Updating category \"error: missing category id\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:470
+#, python-brace-format
+msgid "Updating category \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:474
+msgid "Updating code \"error: missing code id\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:478
+#, python-brace-format
+msgid "Updating code \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:481
+#, python-brace-format
+msgid "Updating text coding #{ctid}..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:484
+#, python-brace-format
+msgid "Moving text coding #{ctid}..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:487
+#, python-brace-format
+msgid "Deleting text coding #{ctid}..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:491
+msgid "(unnamed case)"
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:492
+#, python-brace-format
 msgid "Creating case \"{name}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:458
+#: src/qualcoder/ai_mcp_server.py:498
 #, python-brace-format
 msgid "Updating case \"{name}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:468
+#: src/qualcoder/ai_mcp_server.py:504
 #, python-brace-format
-msgid "Linking text from \"{document}\" to case \"{case}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:474
-#, python-brace-format
-msgid "Removing case-text link #{id}..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:475
-#, python-brace-format
-msgid "Executing tool \"{name}\"..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:483
-msgid "Reviewing the list of text documents..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:485
-msgid "Reviewing the list of cases..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:487
-msgid "Reviewing the current code structure..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:489
-msgid "Running semantic search in the project data..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:491
-msgid "Running keyword search in empirical data (BM25)..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:493
-msgid "Running keyword search in empirical data (Regex)..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:495
-msgid "Reviewing available QualCoder help pages..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:497
-msgid "Searching the QualCoder help..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:500
-msgid "Reviewing a QualCoder help page..."
-msgstr ""
-
-#: src/qualcoder/ai_mcp_server.py:507
-#, python-brace-format
-msgid "Reviewing text segments for case \"{name}\"..."
+msgid "Updating document \"{name}\"..."
 msgstr ""
 
 #: src/qualcoder/ai_mcp_server.py:514
 #, python-brace-format
-msgid "Reviewing case details for \"{name}\"..."
+msgid "Linking text from \"{document}\" to case \"{case}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:520
+#, python-brace-format
+msgid "Removing case-text link #{id}..."
 msgstr ""
 
 #: src/qualcoder/ai_mcp_server.py:521
 #, python-brace-format
+msgid "Executing tool \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:529
+msgid "Reviewing the list of text documents..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:531
+msgid "Reviewing the list of cases..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:533
+msgid "Reviewing the current code structure..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:535
+msgid "Running semantic search in the project data..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:537
+msgid "Running keyword search in empirical data (BM25)..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:539
+msgid "Running keyword search in empirical data (Regex)..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:541
+msgid "Reviewing available QualCoder help pages..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:543
+msgid "Searching the QualCoder help..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:546
+msgid "Reviewing a QualCoder help page..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:553
+#, python-brace-format
+msgid "Reviewing text segments for case \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:560
+#, python-brace-format
+msgid "Reviewing case details for \"{name}\"..."
+msgstr ""
+
+#: src/qualcoder/ai_mcp_server.py:567
+#, python-brace-format
 msgid "Reviewing coded text segments for \"{name}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:528
+#: src/qualcoder/ai_mcp_server.py:574
 #, python-brace-format
 msgid "Reviewing passages from \"{name}\"..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:530
+#: src/qualcoder/ai_mcp_server.py:576
 msgid "Reviewing project material..."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:1587
+#: src/qualcoder/ai_mcp_server.py:1672
 msgid ""
 "Deleting this category removes the full subtree, including descendant "
 "categories, codes, and codings."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:1592 src/qualcoder/ai_mcp_server.py:1624
+#: src/qualcoder/ai_mcp_server.py:1677 src/qualcoder/ai_mcp_server.py:1709
 #, python-brace-format
 msgid "Warning: {count} affected coding(s) are not owned by 'AI Agent'."
 msgstr ""
 
-#: src/qualcoder/ai_mcp_server.py:1619
+#: src/qualcoder/ai_mcp_server.py:1704
 msgid ""
 "Deleting this code removes the full subcode tree, including descendant "
 "subcodes and all codings that use any code in the subtree."
@@ -7931,34 +8023,55 @@ msgstr ""
 msgid "Field name invalid."
 msgstr ""
 
-#: src/qualcoder/__main__.py:887
+#: src/qualcoder/__main__.py:888
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
 "Using QualCoder default settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:889
+#: src/qualcoder/__main__.py:890
 msgid "Cannot load config.ini file"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1655 src/qualcoder/__main__.py:1674
+#: src/qualcoder/__main__.py:1662 src/qualcoder/__main__.py:1681
 msgid "There is already a backup with this name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1659 src/qualcoder/__main__.py:1677
+#: src/qualcoder/__main__.py:1666 src/qualcoder/__main__.py:1684
 msgid "Project backup could not be fully created."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1672
+#: src/qualcoder/__main__.py:1679
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1681
+#: src/qualcoder/__main__.py:1688
 msgid "Project backup created: "
 msgstr ""
 
+#: src/qualcoder/__main__.py:1759
+#, python-brace-format
+msgid ""
+"A newer default AI profile is now available for this provider.\n"
+"\n"
+"Current profile: {current}\n"
+"New profile: {new}\n"
+"\n"
+"Do you want to switch to the new profile now?\n"
+"Your existing API-key (if available) will be copied to the new profile for "
+"convenience."
+msgstr ""
+
+#: src/qualcoder/__main__.py:1769
+msgid "Switch to new profile"
+msgstr ""
+
 #: src/qualcoder/__main__.py:1770
+msgid "Keep current profile"
+msgstr ""
+
+#: src/qualcoder/__main__.py:1835
 msgid ""
 "Welcome\n"
 "\n"
@@ -7968,276 +8081,276 @@ msgid ""
 "\"Yes\" to start now."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1776
+#: src/qualcoder/__main__.py:1841
 msgid "AI Integration"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1847 src/qualcoder/__main__.py:1904
-#: src/qualcoder/__main__.py:1998
+#: src/qualcoder/__main__.py:1912 src/qualcoder/__main__.py:1969
+#: src/qualcoder/__main__.py:2063
 msgid "Unsupported QualCoder link target: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1850
+#: src/qualcoder/__main__.py:1915
 msgid "Menu link has no target path."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1857
+#: src/qualcoder/__main__.py:1922
 msgid "Menu not found: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1874
+#: src/qualcoder/__main__.py:1939
 msgid "Menu entry not found: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1879
+#: src/qualcoder/__main__.py:1944
 msgid "Action cannot contain subentries: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1907
+#: src/qualcoder/__main__.py:1972
 msgid "Action link has no target path."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1915
+#: src/qualcoder/__main__.py:1980
 msgid "Action not found: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1917
+#: src/qualcoder/__main__.py:1982
 msgid "Action name is ambiguous: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:1924
+#: src/qualcoder/__main__.py:1989
 msgid "Action link must end with a menu action."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1966
+#: src/qualcoder/__main__.py:2031
 msgid "Link error"
 msgstr ""
 
-#: src/qualcoder/__main__.py:1977
+#: src/qualcoder/__main__.py:2042
 msgid "Unsupported link scheme."
 msgstr ""
 
-#: src/qualcoder/__main__.py:1995
+#: src/qualcoder/__main__.py:2060
 msgid "Menu action is currently disabled."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2417
+#: src/qualcoder/__main__.py:2482
 msgid "Font"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2418
+#: src/qualcoder/__main__.py:2483
 msgid "Tree font size"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2419
+#: src/qualcoder/__main__.py:2484
 msgid "Working directory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2420
+#: src/qualcoder/__main__.py:2485
 msgid "Show IDs"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2421
+#: src/qualcoder/__main__.py:2486
 msgid "Language"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2422
+#: src/qualcoder/__main__.py:2487
 msgid "Timestamp format"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2423
+#: src/qualcoder/__main__.py:2488
 msgid "Speaker name format"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2424
+#: src/qualcoder/__main__.py:2489
 msgid "Report text context characters: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2425
+#: src/qualcoder/__main__.py:2490
 msgid "Report text context style: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:2426
+#: src/qualcoder/__main__.py:2491
 msgid "Style"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2427
+#: src/qualcoder/__main__.py:2492
 msgid "Backup on open"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2428
+#: src/qualcoder/__main__.py:2493
 msgid "Backup AV files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2430
+#: src/qualcoder/__main__.py:2495
 msgid "AI integration is enabled"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2432
+#: src/qualcoder/__main__.py:2497
 msgid "AI integration is disabled"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2439
+#: src/qualcoder/__main__.py:2504
 msgid "AI permissions"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2442
+#: src/qualcoder/__main__.py:2507
 msgid "Folder paths / represents \\"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2675
+#: src/qualcoder/__main__.py:2740
 msgid "This project contains no text files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2676
+#: src/qualcoder/__main__.py:2741
 msgid "No text files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2689
+#: src/qualcoder/__main__.py:2754
 msgid "This project contains no pdf files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2690
+#: src/qualcoder/__main__.py:2755
 msgid "No pdf files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2705
+#: src/qualcoder/__main__.py:2770
 msgid "This project contains no image files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2706
+#: src/qualcoder/__main__.py:2771
 msgid "No image files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2714
+#: src/qualcoder/__main__.py:2779
 msgid "This project contains no audio/video files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2715
+#: src/qualcoder/__main__.py:2780
 msgid "No a/v files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2718
+#: src/qualcoder/__main__.py:2783
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr ""
 
-#: src/qualcoder/__main__.py:2719
+#: src/qualcoder/__main__.py:2784
 msgid "Install VLC"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2728
+#: src/qualcoder/__main__.py:2793
 msgid "A/V Coding"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2763
+#: src/qualcoder/__main__.py:2828
 msgid "Move AI Agent to sidebar view"
 msgstr ""
 
-#: src/qualcoder/__main__.py:2784 src/qualcoder/__main__.py:4038
-#: src/qualcoder/__main__.py:4051 src/qualcoder/__main__.py:4064
+#: src/qualcoder/__main__.py:2849 src/qualcoder/__main__.py:4103
+#: src/qualcoder/__main__.py:4116 src/qualcoder/__main__.py:4129
 msgid "Please enable the AI first and set it up in Settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3038
+#: src/qualcoder/__main__.py:3103
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3040
+#: src/qualcoder/__main__.py:3105
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3041
+#: src/qualcoder/__main__.py:3106
 msgid "REFI-QDA import steps"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3045 src/qualcoder/__main__.py:3062
-#: src/qualcoder/__main__.py:3078
+#: src/qualcoder/__main__.py:3110 src/qualcoder/__main__.py:3127
+#: src/qualcoder/__main__.py:3143
 msgid "Project creation"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3045
+#: src/qualcoder/__main__.py:3110
 msgid "REFI-QDA Project not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3057
+#: src/qualcoder/__main__.py:3122
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Taguette.sqlite3 file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3058 src/qualcoder/__main__.py:3074
+#: src/qualcoder/__main__.py:3123 src/qualcoder/__main__.py:3139
 msgid "RQDA import steps"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3062 src/qualcoder/__main__.py:3078
+#: src/qualcoder/__main__.py:3127 src/qualcoder/__main__.py:3143
 msgid "Project not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3071
+#: src/qualcoder/__main__.py:3136
 msgid "IMPORTING RQDA PROJECT"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3073
+#: src/qualcoder/__main__.py:3138
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3091
+#: src/qualcoder/__main__.py:3156
 msgid "Are you sure you want to quit?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3153
+#: src/qualcoder/__main__.py:3218
 msgid "Enter project name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3157
+#: src/qualcoder/__main__.py:3222
 msgid "No project created."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3176
+#: src/qualcoder/__main__.py:3241
 msgid "Project creation error "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3177
+#: src/qualcoder/__main__.py:3242
 msgid " not successfully created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3263
+#: src/qualcoder/__main__.py:3328
 msgid "New project: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3264
+#: src/qualcoder/__main__.py:3329
 msgid "Opening: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3274
+#: src/qualcoder/__main__.py:3339
 msgid "New Project Created"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3275
+#: src/qualcoder/__main__.py:3340
 msgid "DB Version:"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3277
+#: src/qualcoder/__main__.py:3342
 msgid "About: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3278
+#: src/qualcoder/__main__.py:3343
 msgid "Coder:"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3281
+#: src/qualcoder/__main__.py:3346
 msgid "Problem creating database "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3325
+#: src/qualcoder/__main__.py:3390
 msgid "Coder name changed to: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3334
+#: src/qualcoder/__main__.py:3399
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -8250,165 +8363,165 @@ msgid ""
 "AI.)"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3339
+#: src/qualcoder/__main__.py:3404
 msgid "Memo for project "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3346
+#: src/qualcoder/__main__.py:3411
 msgid "Project memo entered."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3370 src/qualcoder/special_functions.py:113
+#: src/qualcoder/__main__.py:3435 src/qualcoder/special_functions.py:113
 msgid "Open project directory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3392
+#: src/qualcoder/__main__.py:3457
 msgid "Cannot open file"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3417
+#: src/qualcoder/__main__.py:3482
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3420
+#: src/qualcoder/__main__.py:3485
 msgid "Coder name"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3422
+#: src/qualcoder/__main__.py:3487
 msgid "Keep"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3423
+#: src/qualcoder/__main__.py:3488
 msgid "Switch"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3424
+#: src/qualcoder/__main__.py:3489
 msgid "Cancel"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3433
+#: src/qualcoder/__main__.py:3498
 msgid "Default coder name changed to: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3461 src/qualcoder/__main__.py:3490
-#: src/qualcoder/__main__.py:3510 src/qualcoder/__main__.py:3535
-#: src/qualcoder/__main__.py:3606 src/qualcoder/__main__.py:3630
-#: src/qualcoder/__main__.py:3638 src/qualcoder/__main__.py:3650
-#: src/qualcoder/__main__.py:3658 src/qualcoder/__main__.py:3666
-#: src/qualcoder/__main__.py:3675 src/qualcoder/__main__.py:3683
-#: src/qualcoder/__main__.py:3691 src/qualcoder/__main__.py:3701
-#: src/qualcoder/__main__.py:3709
+#: src/qualcoder/__main__.py:3526 src/qualcoder/__main__.py:3555
+#: src/qualcoder/__main__.py:3575 src/qualcoder/__main__.py:3600
+#: src/qualcoder/__main__.py:3671 src/qualcoder/__main__.py:3695
+#: src/qualcoder/__main__.py:3703 src/qualcoder/__main__.py:3715
+#: src/qualcoder/__main__.py:3723 src/qualcoder/__main__.py:3731
+#: src/qualcoder/__main__.py:3740 src/qualcoder/__main__.py:3748
+#: src/qualcoder/__main__.py:3756 src/qualcoder/__main__.py:3766
+#: src/qualcoder/__main__.py:3774
 msgid "Updating database to version"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3715
+#: src/qualcoder/__main__.py:3780
 msgid "Deleting code_text coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3722
+#: src/qualcoder/__main__.py:3787
 msgid "Deleting code_image coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3729
+#: src/qualcoder/__main__.py:3794
 msgid "Deleting code_av coding to deleted files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3779
+#: src/qualcoder/__main__.py:3844
 msgid "Repaired a cyclic code/category hierarchy."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3810
+#: src/qualcoder/__main__.py:3875
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3838
+#: src/qualcoder/__main__.py:3903
 msgid "Project summary"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3846
+#: src/qualcoder/__main__.py:3911
 msgid "Project memo: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3853 src/qualcoder/reports.py:405
+#: src/qualcoder/__main__.py:3918 src/qualcoder/reports.py:405
 #: src/qualcoder/reports.py:407 src/qualcoder/reports.py:493
 msgid "Files: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3886
+#: src/qualcoder/__main__.py:3951
 msgid "Bad links to files"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3906
+#: src/qualcoder/__main__.py:3971
 msgid "Closing project: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3972
+#: src/qualcoder/__main__.py:4037
 msgid "Deleting: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:3981
+#: src/qualcoder/__main__.py:4046
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3983 src/qualcoder/__main__.py:3999
+#: src/qualcoder/__main__.py:4048 src/qualcoder/__main__.py:4064
 msgid "AI Setup Wizard"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3985
+#: src/qualcoder/__main__.py:4050
 msgid "AI: Setup Wizard"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3990
+#: src/qualcoder/__main__.py:4055
 msgid "AI: Setup Wizard finished"
 msgstr ""
 
-#: src/qualcoder/__main__.py:3994
+#: src/qualcoder/__main__.py:4059
 msgid ""
 "The AI setup is complete. The AI is now reading your project data in the "
 "background."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3996
+#: src/qualcoder/__main__.py:4061
 msgid "The AI setup is complete and the AI is ready to use."
 msgstr ""
 
-#: src/qualcoder/__main__.py:3998
+#: src/qualcoder/__main__.py:4063
 msgid "The AI setup is complete."
 msgstr ""
 
-#: src/qualcoder/__main__.py:4008
+#: src/qualcoder/__main__.py:4073
 msgid "Please enable the AI first and set it in Settings."
 msgstr ""
 
-#: src/qualcoder/__main__.py:4009 src/qualcoder/__main__.py:4013
-#: src/qualcoder/__main__.py:4018 src/qualcoder/__main__.py:4065
+#: src/qualcoder/__main__.py:4074 src/qualcoder/__main__.py:4078
+#: src/qualcoder/__main__.py:4083 src/qualcoder/__main__.py:4130
 msgid "Rebuild AI Memory"
 msgstr ""
 
-#: src/qualcoder/__main__.py:4012
+#: src/qualcoder/__main__.py:4077
 msgid "The AI is busy or not set up correctly."
 msgstr ""
 
-#: src/qualcoder/__main__.py:4016
+#: src/qualcoder/__main__.py:4081
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr ""
 
-#: src/qualcoder/__main__.py:4077
+#: src/qualcoder/__main__.py:4142
 msgid "This version: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:4084
+#: src/qualcoder/__main__.py:4149
 msgid "Newer release available: "
 msgstr ""
 
-#: src/qualcoder/__main__.py:4089
+#: src/qualcoder/__main__.py:4154
 msgid "Latest Release: "
 msgstr ""
 

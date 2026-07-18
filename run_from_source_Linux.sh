@@ -1,6 +1,7 @@
 #!/bin/bash
 # Make this script executable
-# Run it by typing inside the Qualcoder folder: ./Ubuntu_run_from_source.sh
+# Run it by typing inside the Qualcoder folder: ./run_from_source_Linux.sh
+# Works on Ubuntu 24 and Fedora 44
 
 echo "Starting"
 # Create venv

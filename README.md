@@ -2,15 +2,13 @@
 
 Please also read the manual here: [QualCoder Manual](https://qualcoder.org/)
 
-README QualCoder in other languages : [[Français](https://qualcoder.org/doc/fr/readme/)]
-
 # QualCoder
 QualCoder is a qualitative data analysis application written in Python.
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, rtf and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies. AI models like GPT-4 from OpenAI can be used to explore your data and analyze the results.  
 
 This software has been used on MacOS and various Linux distros.
-Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Documentation](https://qualcoder.org/).
+Instructions and other information are available here: [Documentation](https://qualcoder.org/).
 
 It is best to download the Current Release from the Releases page: https://github.com/ccbogel/QualCoder/releases
 
@@ -38,7 +36,7 @@ On first use of the exe, Windows may ask you to allow to run QualCoder. This is 
 
 Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. Please use Python 3.11 to 3.14 on Windows.  [Python3](https://www.python.org/downloads/). Download the latest "Windows installer (64-bit)" (or the one matching your architecture) for one of the above mentioned Python versions.
+1. Download and install the Python programming language. Please use a recent version on Windows.  [Python3](https://www.python.org/downloads/). Download the latest "Windows installer (64-bit)" (or the one matching your architecture) for one of the above mentioned Python versions.
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
@@ -189,27 +187,31 @@ python3 -m qualcoder
 
 ## Linux
 
-### Ubuntu / Lubuntu / ZorinOS
+To install from source code below, inside a virtual environment.
 
-To install from source code below, inside a virtual environment. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+Depending on your operating system, you will need to download Python and its dependencies. Here are the commands for your operating system:
 
-1. If you are using audio or video, install vlc (download from site) or: `sudo apt install vlc`
+- If you are on **Debian based system (Debian, Ubuntu / Lubuntu / ZorinOS, Linux Mint)** :
+  Install pip. This is a tool that downloads extra python modules :  `sudo apt install python3-pip`
+  If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
+  If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+- If you are on **Fedora** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
+- If you are on **Arch/Manjaro Linux** : If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc` and Install pip and venv: `sudo pacman -S python python-pip python-virtualenv`
 
-2. Install pip and venv
+  
+1. Download and unzip the Qualcoder folder. 
 
-`sudo apt install python3-pip python3.12-venv`
+2. Then `cd` to the QualCoder folder.
 
-3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
-
-3a. Instead of the next below commands, run the shell file which will run all these commands below, by making this file executable and typing this in and pressing Enter: 
-
-`./run_from_source_Ubuntu.sh`
-
-4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
-
-For example you might be in this folder, where you unzipped QualCoder: 
+For example, you may now be in this folder, where you unzipped QualCoder: 
 
 yourcomputer:~Downloads/QualCoder-3.8.2
+
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and go to Properties), then type the below command and press Enter: 
+
+`./run_from_source_Linux.sh`
+
+3b. Instead of using the shell script, you can enter each of these commands to set up the virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing the required modules for the first time takes a while, maybe 10 minutes.
 
 ```
 python3 -m venv env
@@ -244,89 +246,11 @@ You can also make a .desktop file for launching QualCoder:
 
 Create a .Desktop file for launch, enter this command (adapt it according to the location of the source code folder):
 
-bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3.12 -m qualcoder'
+`bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3 -m qualcoder'`
 
-### Fedora 43
-
-These instructions are adapted from the Fedora 42 instructions below, tested with QualCoder 3.7 on Fedora 43 with Python 3.12.12.
-
-1. Install dependencies:
-
-    ```bash
-    sudo dnf install python3.12
-    ```
-
-2. Set up QualCoder:
-
-    ```bash
-    cd ~/qualcoder  # replace with appropriate location on your machine
-    python3.12 -m venv env
-    source env/bin/activate
-    python3.12 -m ensurepip
-    python3.12 -m pip install --upgrade pip
-    mkdir tmp
-    TMPDIR=./tmp python3.12 -m pip install -r requirements.txt
-    deactivate
-    ```
-
-3. Usage:
-
-    ```bash
-    cd ~/qualcoder  # replace with appropriate location on your machine
-    source env/bin/activate
-    cd src
-    python3.12 -m qualcoder
-    ```
-
-On finishing type `deactivate` to exit the virtual environment.
-
-Note re Fedora. This is an issue with coding audio / video. The software crashes, and unable to find a solution to this for now.
-
-### Arch/Manjaro Linux
-
-If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc`
-
-Install pip and venv:
-
-`sudo pacman -S python python-pip python-virtualenv`
-
-Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
-Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
-
-```
-python3 -m venv env
-source env/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Now, the command to start QualCoder:
-
-Move to the inner src folder first:
-
-```
-cd src
-python -m qualcoder
-```
-
-After using QualCoder deactiatve the virtual environment.
-
-`deactivate`
-
-Usage any time after the install, move to the folder, then to inner src folder, then:
-
-```
-cd QualCoder
-source env/bin/activate
-python3 -m qualcoder
-```
-
-To exit the environment:
-
-`deactivate`
  
 ## Setup AI features
-If you want to use the AI-enhaced features in QualCoder, additional setup is needed. When you start the app for the first time, a wizard will lead you through the setup process. You can also start this later via the menu by clicking on AI > Setup Wizard. These are the main steps:
+If you want to use the AI-enhanced features in QualCoder, additional setup is needed. When you start the app for the first time, a wizard will lead you through the setup process. You can also start this later via the menu by clicking on AI > Setup Wizard. These are the main steps:
 1) You will have to enable the AI and select which model you want to use. 
 - If you opt for one of the variants of GPT-4 (recommended), you'll need an API key from OpenAI. Go to https://platform.openai.com/ and create an account. Then go to your personal dashboard, click on 'API keys' in the menu on the left, create a key and enter it in the setting dialog of QualCoder. To use these models, you'll also need to purchase 'credits' from OpenAI. $5 seems to be the minimal amount you can pay, which will go a long way. The cost of a single request to the AI is usually in the order of a few cents only.  
 - You can also use ["Blablador"](https://helmholtz-blablador.fz-juelich.de), a free service offered by the German academic research agency Helmholtz Society. This service runs open-source models (Mixtral 8x7b being the largest at the moment) and is very privacy-friendly, storing no data at all. The quality of the output is usable for simple questions, but not yet on par with GPT-4 from OpenAI. If you want to use Blablador, you'll need an API-key from the Helmholtz Society. You can sign up with you university account or Github, Google, ORCID. Follow the [instructions here](https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/).
@@ -339,20 +263,28 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2025) QualCoder 3.82 [Computer software]. Retrieved from
+Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2025) QualCoder 3.8.2 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.8.2
 
-## Creator
+## Authors 
+
+**Creator**
 
 **Dr. Colin Curtain** BPharm GradDipComp PhD Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilise with some Masters's and Ph.D. students whom I supervise.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
-https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
+https://discover.utas.edu.au/Colin.Curtain/publications
 
 **Artificial intelligence features and more:** 
 
 **Dr. rer. soc. Kai Dröge,** [University for Applied Science](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), Lucerne, Switzerland and [Institute for Social Research](https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html) Frankfurt, Germany. Kai is an experienced researcher and teacher of qualitative methods. His research interests are wide-ranging and include the sociology of emotions and intimate relationships, digital life and new media, and questions of economic and labor sociology. Recently, he has focused on the methodological challenges and opportunities of integrating AI into qualitative research. He is also the creator of [noScribe](https://github.com/kaixxx/noScribe#readme), a popular open-source transcription tool aimed especially at qualitative interviews.
+
+**Dr. Justin Missaghieh--Poncet**
+
+
+**Dr. Lorenzo Salomón**
+
 
 ## Leave a review
 
@@ -368,5 +300,5 @@ Also, if you like Qualcoder a lot and want to advertise interest in its use, ple
 
 A book _Qualitative Data Analysis With Chatgpt And Qualcoder_. We have been advised the book may contain some incorrect information about QualCoder.
 
-Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page.
+Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page or the Codeberg equivalent: https://codeberg.org/qualcoder.
 
