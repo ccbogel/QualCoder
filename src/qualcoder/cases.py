@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -183,7 +184,7 @@ class DialogCases(QtWidgets.QDialog):
         return False
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the dialog when relevant project tables change elsewhere."""
+        """ Refresh the dialog when relevant project tables change elsewhere."""
 
         if source is self or not isinstance(tables, list):
             return
@@ -220,15 +221,14 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.clear()
 
     def _emit_project_table_changes(self, tables):
-        """Notify other open dialogs about changed project tables."""
+        """ Notify other open dialogs about changed project tables."""
 
         if getattr(self.app, "project_events", None) is not None:
             self.app.project_events.emit_table_changes(tables, source=self)
 
     def insert_nonexisting_attribute_placeholders(self):
         """ Check attribute placeholder is present in attribute table.
-        An error in earlier qualcoder versions did not fill these placeholders.
-        Fix if not present.
+        Create placeholder if not present.
         Cases are a list of dictionaries.
         Attributes are a list of tuples(name,value,id)
         """
@@ -269,8 +269,8 @@ class DialogCases(QtWidgets.QDialog):
 
         shortname = self.app.project_name.split(".qda")[0]
         filename = shortname + "_case_attributes.xlsx"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        export_dialog = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dialog.filepath
         if filepath is None:
             return
         cols = self.ui.tableWidget.columnCount()
@@ -292,20 +292,6 @@ class DialogCases(QtWidgets.QDialog):
                     pass
                 cell.value = data
         wb.save(filepath)
-        '''with open(filepath, mode='w') as f: # OLD csv save
-            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(header)
-            for r in range(0, rows):
-                data = []
-                for c in range(0, cols):
-                    # Table cell may be a None type
-                    cell = ""
-                    try:
-                        cell = self.ui.tableWidget.item(r, c).text()
-                    except AttributeError:
-                        pass
-                    data.append(cell)
-                writer.writerow(data)'''
         msg = _("Case attributes file exported to: ") + filepath
         Message(self.app, _('File export'), msg).exec()
         self.parent_text_edit.append(msg)
@@ -437,21 +423,21 @@ class DialogCases(QtWidgets.QDialog):
     def import_cases_and_attributes(self):
         """ Get user chosen file as xlsx or csv for importation """
 
-        if self.cases:
-            logger.warning(_("Cases have already been created."))
+        self.overwrite_attributes_on_import = False
         filename, ok = QtWidgets.QFileDialog.getOpenFileName(None,
                                                              _('Select cases file'),
                                                              self.app.settings['directory'],
                                                              "(*.csv *.CSV *.xlsx *.XLSX)",
                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                              )
-        msg = _("Do you want imported data to override existing attributes?")
-        ui = DialogConfirmDelete(self.app, msg, _("Cases exist"))
-        ok = ui.exec()
-        if ok:
-            self.overwrite_attributes_on_import = True
         if filename == "":
             return
+        if self.cases:
+            msg = _("Do you want imported data to override existing attributes?")
+            ui = DialogConfirmDelete(self.app, msg, _("Cases exist"))
+            ok = ui.exec()
+            if ok:
+                self.overwrite_attributes_on_import = True
         if filename[-4:].lower() == ".csv":
             self.import_csv(filename)
         if filename[-5:].lower() == ".xlsx":
@@ -486,7 +472,6 @@ class DialogCases(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql_insert_case = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
         sql_insert_attr_type = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
-
         for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
                     'date': now_date}
@@ -544,11 +529,13 @@ class DialogCases(QtWidgets.QDialog):
         self.parent_text_edit.append(msg)
         logger.info(msg)
 
-    def import_csv(self, filepath):
+    def import_csv(self, filepath:str):
         """ Import from a csv file with the cases and any attributes.
         The csv file must have a header row which details the attribute names.
         The csv file must be comma delimited. The first column must have the case ids.
         The attribute types are calculated from the data.
+        Args:
+            filepath : String
         """
 
         values = []
@@ -565,13 +552,13 @@ class DialogCases(QtWidgets.QDialog):
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         fields = values[0]
         data = values[1:]
+
         # Insert cases
         cur = self.app.conn.cursor()
         sql_insert_case = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
         sql_insert_attr_type = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
         for v in data:
-            item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
-                    'date': now_date}
+            item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'], 'date': now_date}
             try:
                 cur.execute(sql_insert_case, (item['name'], item['memo'], item['owner'], item['date']))
                 self.app.conn.commit()
@@ -604,18 +591,18 @@ class DialogCases(QtWidgets.QDialog):
         sql = "select name, caseid from cases"
         cur.execute(sql)
         name_and_ids = cur.fetchall()
-        insert_sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-        update_sql = "update attribute set value=?, owner=?, date=? where attr_type=? and name=? and id=? "
+        sql_insert_value = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+        sql_update_value = "update attribute set value=?, owner=?, date=? where attr_type=? and name=? and id=? "
         for n_i in name_and_ids:
             for v in data:
                 if n_i[0] == v[0]:
                     for col in range(1, len(v)):
                         try:
-                            cur.execute(insert_sql, (fields[col], v[col], n_i[1], 'case', now_date,
+                            cur.execute(sql_insert_value, (fields[col], v[col], n_i[1], 'case', now_date,
                                                      self.app.settings['codername']))
                         except sqlite3.IntegrityError:
                             if self.overwrite_attributes_on_import:
-                                cur.execute(update_sql, (v[col], self.app.settings['codername'], now_date,
+                                cur.execute(sql_update_value, (v[col], self.app.settings['codername'], now_date,
                                                          'case', fields[col], n_i[1]))
         self.app.conn.commit()
         self._emit_project_table_changes(["cases", "attribute_type", "attribute"])
@@ -984,9 +971,10 @@ class DialogCases(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeaderItem(self.ATTRIBUTE_START_COLUMN + i).setToolTip(_("Right click header row to hide columns") + f"\n{tt}")
         self.ui.tableWidget.blockSignals(False)
 
-    def get_tooltip_values(self, attribute_name):
+    def get_tooltip_values(self, attribute_name:str):
         """ Get values to display in tooltips for the value list column.
-        param: attribute_name : String """
+        Args:
+            attribute_name : String """
 
         tt = ""
         cur = self.app.conn.cursor()
@@ -1114,11 +1102,11 @@ class DialogCases(QtWidgets.QDialog):
     def link_clicked(self, position):
         """ View image or audio/video media in dialog.
         For A/V, added try block in case VLC bindings do not work.
-        Also check existence of media, as particularly, linked files may have bad links. """
+        Also check existence of media, linked files may have bad links. """
 
         cursor = self.ui.textBrowser.cursorForPosition(position)
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_link = None
         for item in self.display_text_links:
             if item['pos0'] <= cursor.position() <= item['pos1']:
