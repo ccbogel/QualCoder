@@ -1572,6 +1572,13 @@ class DialogCodeText(QtWidgets.QWidget):
             self.unlight()
             self.highlight()
 
+    def _code_label_contrast_color(self, color) -> QColor:
+        """Return the contrast-adjusted code color used for labels and underlines."""
+
+        background_color = self.ui.plainTextEdit.viewport().palette().color(
+            QtGui.QPalette.ColorRole.Base)
+        return CodingMargin._label_color_for_background(QColor(color), background_color)
+
     def show_right_side_pane(self):
         """ Toggle visibility of the right side pane (groupBox_info).
         Uses splitter sizes to detect actual visibility, since the widget can be
@@ -6199,7 +6206,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.highlight_style == 'underline':
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
-            fmt.setUnderlineColor(QColor(color))
+            fmt.setUnderlineColor(self._code_label_contrast_color(color))
         else:
             brush = QBrush(QColor(color))
             fmt.setBackground(brush)
@@ -6322,7 +6329,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # choose between underline-only and full background fill <- L
             if self.highlight_style == 'underline':
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
-                fmt.setUnderlineColor(QColor(color))
+                fmt.setUnderlineColor(self._code_label_contrast_color(color))
             else:
                 brush = QBrush(QColor(color))
                 fmt.setBackground(brush)
