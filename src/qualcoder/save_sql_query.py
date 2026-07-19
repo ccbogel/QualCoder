@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -37,12 +38,7 @@ class DialogSaveSql(QtWidgets.QDialog):
          report_sql.save_query
     """
 
-    name = ""
-    grouper = ""
-    description = ""
-
     def __init__(self, app_, parent=None):
-        """ """
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogSaveQuery()
@@ -50,6 +46,9 @@ class DialogSaveSql(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
+        self.name = ""
+        self.grouper = ""
+        self.description = ""
 
     def accept(self):
         """ Accept button overridden method """
