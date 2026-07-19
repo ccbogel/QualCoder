@@ -1203,6 +1203,26 @@ class App(object):
                              inactive_highlight)
             palette.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.HighlightedText,
                              active_highlighted_text)
+            if platform.system() == "Darwin":
+                native_dark = False
+                try:
+                    native_dark = QtGui.QGuiApplication.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark
+                except AttributeError:
+                    native_dark = palette.color(QtGui.QPalette.ColorRole.Window).lightness() < 128
+                tooltip_background = QtGui.QColor("#2b2b2b" if native_dark else "#f7f7f7")
+                tooltip_text = QtGui.QColor("#ffffff" if native_dark else "#000000")
+                tooltip_base_role = getattr(
+                    QtGui.QPalette.ColorRole, "ToolTipBase", QtGui.QPalette.ColorRole.Base)
+                tooltip_text_role = getattr(
+                    QtGui.QPalette.ColorRole, "ToolTipText", QtGui.QPalette.ColorRole.Text)
+                for color_group in (
+                        QtGui.QPalette.ColorGroup.Active,
+                        QtGui.QPalette.ColorGroup.Inactive,
+                        QtGui.QPalette.ColorGroup.Disabled,
+                ):
+                    palette.setColor(color_group, tooltip_base_role, tooltip_background)
+                    palette.setColor(color_group, tooltip_text_role, tooltip_text)
+                QtWidgets.QToolTip.setPalette(palette)
         QtWidgets.QApplication.instance().setPalette(palette)
         if self.settings['stylesheet'] == 'dark':
             return style_dark
@@ -1240,6 +1260,17 @@ class App(object):
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
+            if platform.system() == "Darwin":
+                native_dark = False
+                try:
+                    native_dark = QtGui.QGuiApplication.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark
+                except AttributeError:
+                    palette = QtWidgets.QApplication.instance().palette()
+                    native_dark = palette.color(QtGui.QPalette.ColorRole.Window).lightness() < 128
+                if native_dark:
+                    style += "\nQToolTip {background-color: #2b2b2b; color: #ffffff; border: 1px solid #5f5f5f;}"
+                else:
+                    style += "\nQToolTip {background-color: #f7f7f7; color: #000000; border: 1px solid #bdbdbd;}"
         ''' # Keep this as a test area for parsable / unparsable style sheet lines
         style_lines = style.split("\n")
         for i, sl in enumerate(style_lines):

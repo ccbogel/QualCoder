@@ -591,6 +591,7 @@ class DialogAIChat(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
+        self._ai_link_tooltip = None
         self._new_chat_popup_menu = None
         self.setup_chat_selector_widget()
         self.setup_ai_permissions_combobox()
@@ -9253,6 +9254,107 @@ data collected. This information will accompany every prompt sent to the AI, res
                     return True  # Event handled
         # For all other cases, return super's eventFilter result
         return super().eventFilter(source, event)
+
+    def _ai_link_tooltip_colors(self) -> Tuple[QtGui.QColor, QtGui.QColor, QtGui.QColor]:
+        """Return readable colors matching the current Qt tooltip palette where possible."""
+
+        if self.app.settings['stylesheet'] == "native" and platform.system() == "Darwin":
+            native_dark = False
+            try:
+                native_dark = QtGui.QGuiApplication.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark
+            except AttributeError:
+                palette = QtWidgets.QApplication.instance().palette()
+                native_dark = palette.color(QtGui.QPalette.ColorRole.Window).lightness() < 128
+            if native_dark:
+                return QtGui.QColor("#2b2b2b"), QtGui.QColor("#ffffff"), QtGui.QColor("#5f5f5f")
+            return QtGui.QColor("#f7f7f7"), QtGui.QColor("#000000"), QtGui.QColor("#bdbdbd")
+
+        tooltip_palette = QtWidgets.QToolTip.palette()
+        base_role = getattr(QtGui.QPalette.ColorRole, "ToolTipBase", QtGui.QPalette.ColorRole.Base)
+        text_role = getattr(QtGui.QPalette.ColorRole, "ToolTipText", QtGui.QPalette.ColorRole.Text)
+        background = tooltip_palette.color(base_role)
+        foreground = tooltip_palette.color(text_role)
+        if not background.isValid():
+            background = QtGui.QColor("#d9d9d9")
+        if not foreground.isValid():
+            foreground = QtGui.QColor("#000000")
+
+        border = background.darker(135) if background.lightness() >= 128 else background.lighter(135)
+        return background, foreground, border
+
+    def _ai_link_tooltip_position(self, tooltip_size: QtCore.QSize) -> QtCore.QPoint:
+        """Position the AI link tooltip near the cursor while keeping it on screen."""
+
+        cursor_pos = QCursor.pos()
+        screen = QtGui.QGuiApplication.screenAt(cursor_pos)
+        if screen is None:
+            screen = QtGui.QGuiApplication.primaryScreen()
+        if screen is None:
+            return cursor_pos + QtCore.QPoint(12, 18)
+
+        margin = 8
+        available = screen.availableGeometry()
+        preferred = cursor_pos + QtCore.QPoint(12, 18)
+        if preferred.y() + tooltip_size.height() + margin > available.y() + available.height():
+            preferred.setY(cursor_pos.y() - tooltip_size.height() - 18)
+
+        min_x = available.x() + margin
+        min_y = available.y() + margin
+        max_x = available.x() + available.width() - tooltip_size.width() - margin
+        max_y = available.y() + available.height() - tooltip_size.height() - margin
+        return QtCore.QPoint(
+            min(max(preferred.x(), min_x), max(min_x, max_x)),
+            min(max(preferred.y(), min_y), max(min_y, max_y)),
+        )
+
+    def _show_ai_link_tooltip(self, text: str) -> None:
+        """Show a styled tooltip for links in the AI chat output."""
+
+        if self._ai_link_tooltip is None:
+            tooltip = QtWidgets.QFrame(None, Qt.WindowType.ToolTip | Qt.WindowType.FramelessWindowHint)
+            tooltip.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
+            layout = QtWidgets.QVBoxLayout(tooltip)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.setSpacing(0)
+            label = QtWidgets.QLabel(tooltip)
+            label.setObjectName("ai_link_tooltip_label")
+            label.setTextFormat(Qt.TextFormat.PlainText)
+            label.setWordWrap(True)
+            layout.addWidget(label)
+            self._ai_link_tooltip = tooltip
+
+        label = self._ai_link_tooltip.findChild(QtWidgets.QLabel, "ai_link_tooltip_label")
+        if label is None:
+            return
+        background, foreground, border = self._ai_link_tooltip_colors()
+        self._ai_link_tooltip.setStyleSheet(
+            "QFrame {"
+            f"background-color: {background.name()};"
+            f"border: 1px solid {border.name()};"
+            "}"
+            "QLabel {"
+            f"background-color: {background.name()};"
+            f"color: {foreground.name()};"
+            "border: none;"
+            "padding: 6px;"
+            "}"
+        )
+        screen = QtGui.QGuiApplication.screenAt(QCursor.pos()) or QtGui.QGuiApplication.primaryScreen()
+        if screen is not None:
+            label.setMaximumWidth(max(240, min(560, screen.availableGeometry().width() - 32)))
+        else:
+            label.setMaximumWidth(560)
+        label.setText(str(text if text is not None else ""))
+        self._ai_link_tooltip.adjustSize()
+        tooltip_pos = self._ai_link_tooltip_position(self._ai_link_tooltip.size())
+        self._ai_link_tooltip.move(tooltip_pos)
+        self._ai_link_tooltip.show()
+
+    def _hide_ai_link_tooltip(self) -> None:
+        """Hide the styled AI link tooltip."""
+
+        if self._ai_link_tooltip is not None:
+            self._ai_link_tooltip.hide()
     
     def on_linkHovered(self, link: str):
 
@@ -9270,7 +9372,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 else:
                     prompt = self._resolve_prompt_reference_name(prompt_name)
                 if prompt is not None:
-                    QtWidgets.QToolTip.showText(QCursor.pos(), self._prompt_reference_tooltip(prompt), self.ui.ai_output)
+                    self._show_ai_link_tooltip(self._prompt_reference_tooltip(prompt))
             elif link.startswith('coding:'):
                 try:
                     coding_id = link[len('coding:'):]
@@ -9288,7 +9390,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     tooltip_txt += f'"{coding[2]}"'  # seltext
                 else:
                     tooltip_txt = _('Invalid source reference.')
-                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+                self._show_ai_link_tooltip(tooltip_txt)
             elif link.startswith('chunk:'):
                 try:
                     chunk_id = link[len('chunk:'):]
@@ -9309,7 +9411,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     source = None  # TODO source not used
                     tooltip_txt = _('Invalid source reference.')
-                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+                self._show_ai_link_tooltip(tooltip_txt)
             elif link.startswith('quote:'):
                 # tooltip_txt = _('Open source document')
                 tooltip_txt = ''
@@ -9322,14 +9424,15 @@ data collected. This information will accompany every prompt sent to the AI, res
                     tooltip_txt = ''
                 if tooltip_txt == '':
                     tooltip_txt = _('Error retrieving source text')
-                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+                self._show_ai_link_tooltip(tooltip_txt)
             elif link.startswith('action:topic_chat_analyze_more'):
                 tooltip_txt = _('This expands the data basis for the analysis. However, '
                                 'be careful not to overdo it, as this can also dilute '
                                 'the focus of the analysis.')
-                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+                self._show_ai_link_tooltip(tooltip_txt)
         else:
             QtWidgets.QToolTip.hideText()
+            self._hide_ai_link_tooltip()
 
     def _open_text_reference(self, doc_id: int, start: int, end: int):
         """Show AI chat in sidebar mode and open the selected text span."""
