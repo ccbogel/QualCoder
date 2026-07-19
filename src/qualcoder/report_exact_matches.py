@@ -45,24 +45,11 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
     Show exact match code overlaps.
     This is for text coding only. """
 
-    app = None
-    parent_textEdit = None
-    coder_names = []
-    categories = []
-    codes = []
-    coders = []
-    files = []
-    results_display = []
-    excluded_codes = []
-    excluded_icon = None
-    attributes = []  # File selection by attributes
-
     def __init__(self, app, parent_textedit):
 
         self.results_display = []
         self.app = app
         self.parent_textEdit = parent_textedit
-
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogMatchingTextSegments()
         self.ui.setupUi(self)
@@ -73,6 +60,14 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
         self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.excluded_icon = qta.icon('mdi6.window-close')
+        self.coder_names = []
+        self.categories = []
+        self.codes = []
+        self.coders = []
+        self.files = []
+        self.excluded_codes = []
+        self.excluded_icon = None
+        self.attributes = []  # File selection by attributes
         self.get_data()
 
         try:
@@ -110,8 +105,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_data(self):
-        """ Called from init. gets code_names, categories and owner names.
-        """
+        """ Called from init. gets code_names, categories and owner names. """
 
         current_coder = ""
         if hasattr(self, "ui") and hasattr(self.ui, "comboBox_coders"):
@@ -247,8 +241,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """ Select files based on attribute selections.
         Attribute results are a dictionary of:
         first item is a Boolean AND or OR list item
-        Followed by each attribute list item
-        """
+        Followed by each attribute list item. """
 
         # Clear ui
         self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
@@ -684,8 +677,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 break
 
     def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes.
-        """
+        """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         self.ui.treeWidget.clear()
         cats = copy(self.categories)
