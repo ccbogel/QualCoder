@@ -26,6 +26,7 @@ import json
 import logging
 import math
 import os
+import platform
 import re
 import sqlite3
 import threading
@@ -2030,6 +2031,12 @@ class DialogAIChat(QtWidgets.QDialog):
         logger.warning(msg)
         Message(self.app, _('AI Agent'), msg, icon='warning').exec()
 
+    def _use_ai_agent_tab_menu_links_as_actions(self) -> bool:
+        """Return True when teaching popups should be replaced by direct actions."""
+
+        menubar = getattr(getattr(self.main_window, 'ui', None), 'menubar', None)
+        return platform.system() == "Darwin" and menubar is not None and menubar.isNativeMenuBar()
+
     def _dispatch_ai_agent_tab_link(self, link: str) -> bool:
         """Handle AI-tab-local qualcoder://ai_agent_tab/... links."""
 
@@ -2042,6 +2049,8 @@ class DialogAIChat(QtWidgets.QDialog):
         link_path = [segment for segment in url.path().split('/') if segment]
         try:
             if len(link_path) == 1 and link_path[0] == 'new':
+                if self._use_ai_agent_tab_menu_links_as_actions():
+                    raise ValueError(_('This menu is shown from the New button. Please use the New button at the bottom left.'))
                 self._popup_new_chat_menu()
                 return True
             if len(link_path) == 1 and link_path[0] == 'permissions':
@@ -2049,6 +2058,10 @@ class DialogAIChat(QtWidgets.QDialog):
                 self.ui.comboBox_ai_permissions.setFocus(Qt.FocusReason.OtherFocusReason)
                 return True
             if len(link_path) == 2 and link_path[0] == 'new':
+                if self._use_ai_agent_tab_menu_links_as_actions():
+                    if not self._trigger_new_chat_menu_target(link_path[1]):
+                        raise ValueError(_('Unknown AI Agent New-menu target: ') + link_path[1])
+                    return True
                 self._popup_new_chat_menu(link_path[1])
                 return True
             raise ValueError(_('Unsupported AI Agent tab link target.'))

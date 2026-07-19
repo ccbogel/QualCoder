@@ -2057,6 +2057,11 @@ Click "Yes" to start now.')
         logger.warning(msg)
         Message(self.app, _("Link error"), msg, "warning").exec()
 
+    def _use_placeholder_menu_links_as_actions(self):
+        """Return True when native menus cannot be shown reliably in the window."""
+
+        return platform.system() == "Darwin" and self.ui.menubar.isNativeMenuBar()
+
     def handle_placeholder_link(self, url):
         """Open external links or dispatch custom qualcoder:// menu links."""
 
@@ -2076,6 +2081,13 @@ Click "Yes" to start now.')
                 return
             if host == "menu":
                 target, menu_chain = self._resolve_placeholder_menu_link(url)
+                if self._use_placeholder_menu_links_as_actions():
+                    if isinstance(target, QtWidgets.QMenu):
+                        raise ValueError(_("This menu is in the macOS menu bar. Please use the menu bar at the top of the screen."))
+                    if not target.isEnabled():
+                        raise ValueError(_("Menu action is currently disabled."))
+                    target.trigger()
+                    return
                 if isinstance(target, QtWidgets.QMenu):
                     self._popup_menu_chain(menu_chain)
                     return
