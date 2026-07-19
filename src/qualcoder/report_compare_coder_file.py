@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -24,6 +25,7 @@ from copy import copy
 import logging
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from typing import Any
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -57,28 +59,23 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     Used to help advise coders / second coder on how to improve accuracy of coding.
     """
 
-    app = None
-    parent_textedit = None
-    coders = []
-    selected_coders = []
-    categories = []
-    code_ = None  # Selected code
-    file_ = None  # Selected file
-    pixmap = None
-    files = []
-    codes = []
-    comparisons = ""
-
     def __init__(self, app, parent_text_edit):
 
         self.app = app
         self.parent_textedit = parent_text_edit
         self.comparisons = ""
+        self.coders = []
         self.selected_coders = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCompareCoderFile()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.categories = []
+        self.codes = []
+        self.files = []
+        self.code_ = None  # Selected code
+        self.file_ = None  # Selected file
+        self.pixmap = None
         self.get_data()
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.results)
@@ -198,8 +195,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.get_files(None, "date desc")
 
     def show_case_files(self):
-        """ Show files of specified case.
-        Or show all files. """
+        """ Show files of specified case. Or show all files. """
 
         cases = self.app.get_casenames()
         cases.insert(0, {"name": _("Show all files"), "id": -1})
@@ -264,7 +260,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             return
         self.get_files(ui.result_file_ids)
 
-    def get_files(self, ids=None, sort="name asc"):
+    def get_files(self, ids:list[int]|None=None, sort:str="name asc"):
         """ Get source files with additional details and fill list widget.
         Add file type to dictionary for each file.
         Args:
@@ -1036,19 +1032,9 @@ class DialogDualCodedImage(QtWidgets.QDialog):
     Called by: report_compare_coder_file.DialogCompareCoderByFile.
     """
 
-    app = None
-    img = None
-    coded0 = None
-    coded1 = None
-    pixmap = None
-    label = None
-    scale = None
-    scene = None
-
-    def __init__(self, app, img, coded0, coded1, parent=None):
+    def __init__(self, app, img:dict[str,Any], coded0:dict[str,Any], coded1:dict[str,Any], parent=None):
         """ Displays dialog with two coders image codings for selected code.
-
-        param:
+        Args:
             app : class containing app details such as database connection
             img contains {id, name, memo, mediapath, type:image}
             coded0 and coded1 contain: {x1, y1, width, height, area}
@@ -1060,11 +1046,11 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         self.coded0 = coded0
         self.coded1 = coded1
         self.scale = 1
+        self.label = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         abs_path = ""
         if "images:" in self.img['mediapath']:
@@ -1104,18 +1090,18 @@ class DialogDualCodedImage(QtWidgets.QDialog):
     def draw_coded_areas(self):
         """ Draw coded areas for both coders """
 
-        for c in self.coded0:
-            self.draw_coded_area(c, "#F4FA58")
-        for c in self.coded1:
-            self.draw_coded_area(c, "#81BEf7")
+        for coded in self.coded0:
+            self.draw_coded_area(coded, "#F4FA58")
+        for coded in self.coded1:
+            self.draw_coded_area(coded, "#81BEf7")
 
-    def draw_coded_area(self, coded, color):
+    def draw_coded_area(self, coded:dict[str,Any], color:str):
         """ Draw the coded rectangle in the scene.
          Provide detailed tooltip. """
 
         tooltip = coded['owner']
-        tooltip += "\n x: " + str(coded['x1']) + " y: " + str(coded['y1'])
-        tooltip += " w: " + str(coded['width']) + " h: " + str(coded['height']) + " "
+        tooltip += f"\n x: {coded['x1']} y: {coded['y1']}"
+        tooltip += f" w: {coded['width']} h: {coded['height']} "
         tooltip += _("Area: ") + str(coded['area']) + _(" pixels")
         if len(coded['intersections']) > 0:
             tooltip += "\n " + _("Intersections: ") + str(len(coded['intersections'])) + " "
