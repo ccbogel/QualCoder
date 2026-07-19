@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -64,11 +65,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
     Add files to case, add all text or text portions from a text file.
     Remove file from a case. View file.
     """
-
-    app = None
-    parent_text_edit = None
-    files = []
-    refs = []
 
     def __init__(self, app_, parent_text_edit):
 
@@ -289,13 +285,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ui.ui.textEdit.setReadOnly(True)
         ui.exec()
 
-    def view_av(self, row):
+    def view_av(self, row:int):
         """ View an audio or video file. Edit the memo. Edit the transcript file.
         Added try block in case VLC bindings do not work.
         Uses a non-modal dialog.
-
-        param:
-            x  :  row number Integer
+        Args:
+            row  :  row number Integer
         """
 
         if not vlc:
@@ -324,11 +319,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self.av_dialog_open = None
             return
 
-    def view_image(self, row):
+    def view_image(self, row:int):
         """ View an image file and edit the image memo.
-
-        param:
-            x  :  row number Integer
+        Args:
+            row  :  row number Integer
         """
 
         # Check image exists
@@ -701,13 +695,13 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 return True
         return False
 
-    def unlink_files(self, fid=None):
+    def unlink_files(self, fid:int|None=None):
         """ Remove linked reference from selected files.
         Called by:
             pushButton_unlink: Uses selected rows in files table. Does not use parameters.
             Method: edit_reference. Uses parameter.
-
-        :param: fid Integer source table id, or None
+        Args:
+            fid Integer source table id, or None
         """
 
         # Get selected file id from parameter or selected table_files rows
@@ -736,15 +730,15 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 self.app.conn.commit()
         self.get_data()
 
-    def link_reference_to_files(self, ris_id=None, fid=None):
+    def link_reference_to_files(self, ris_id:int|None=None, fid:int|None=None):
         """ Link the selected files to the selected reference.
 
         Called by:
             pushButton_link: Uses selected rows in references and files tables. Does not use parameters.
             Method: auto_link_files_to_references. Uses parameters.
-
-        :param: ris_id Integer reference id , or None
-        :param: fid Integer source table id, or None
+        Args:
+            ris_id Integer reference id , or None
+            fid Integer source table id, or None
         """
 
         # Get reference id from first selected row, or via parameter ris_id
