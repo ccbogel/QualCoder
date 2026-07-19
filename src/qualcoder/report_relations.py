@@ -16,13 +16,12 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from copy import copy, deepcopy
-import csv
 import logging
 import openpyxl
 import os
@@ -30,6 +29,7 @@ import pandas as pd
 import plotly.express as px
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import statistics
+from typing import Any
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -50,26 +50,19 @@ class DialogReportRelations(QtWidgets.QDialog):
     """ Show code relations/crossovers for one coder.
     This is for text only. """
 
-    app = None
-    parent_textEdit = None
-    coder_names = []
-    categories = []
-    codes = []
-    files = []
-    result_relations = []
-    result_summary = []
-    dataframe = None
-    attributes = []
-
     def __init__(self, app, parent_textedit):
 
         self.app = app
         self.parent_textEdit = parent_textedit
-        self.get_code_data()
         self.result_relations = []
         self.result_summary = []
         self.attributes = []
         self.dataframe = None
+        self.coder_names = []
+        self.categories = []
+        self.codes = []
+        self.files = []
+        self.get_code_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeRelations()
         self.ui.setupUi(self)
@@ -224,7 +217,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         """ Called from init. gets code_names, categories and owner names.
         """
 
-        self.coder_names = self.app.get_coder_names_in_project()
+        self.coder_names:list[str] = self.app.get_coder_names_in_project()
         self.codes, self.categories = self.app.get_codes_categories()
 
     def _on_project_data_changed(self, tables, source):
@@ -280,14 +273,15 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.fill_table()
         self.summary_statistics()
 
-    def calculate_relations_for_coder_and_selected_codes(self, coder_name, code_ids):
-        """ Calculate the relations for selected codes for selected coder.
-        For codings in code_text only.
-
-        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
-        relation is 1 character: Inclusion, Overlap, Exact, Proximity
+    def calculate_relations_for_coder_and_selected_codes(self, coder_name:str, code_ids:str):
+        """ Calculate the relations for selected codes for selected coder in text data only.
+        relation Dictonary of: id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
+        'relation' is 1 character: Inclusion, Overlap, Exact, Proximity
         Requires:
             self.files List of Dict
+        Args:
+            coder_name : String
+            code_ids : String of comma separated code_ids
         """
 
         index = self.ui.comboBox_relation_type.currentIndex()
@@ -316,7 +310,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select distinct fid, name from code_text join source on source.id=code_text.fid " \
               "where code_text.owner=? and code_text.cid in (" + code_ids + ") and " \
-                                                                            "fid in (" + selected_fids + ") order by fid"
+              "fid in (" + selected_fids + ") order by fid"
         cur.execute(sql, [coder_name, ])
         result = cur.fetchall()
         file_ids_names = []
@@ -333,10 +327,6 @@ class DialogReportRelations(QtWidgets.QDialog):
             cur.execute(sql, [coder_name, fid_name['fid']])
             result = cur.fetchall()
             coded = [row for row in result if row[0] == fid_name['fid']]
-            '''for row in result:
-                if row[0] == fid_name['fid']:
-                    coded.append(row)'''
-
             # TODO later, find the closest Other code for relation analysis
             # Look at each code again other codes, when done remove from list of codes
             cid = 1
@@ -371,7 +361,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
 
-    def relation(self, c0, c1):
+    def relation(self, c0:list[Any], c1:list[Any]) -> dict[str, Any]:
         """ Relation function as in RQDA
 
         whichmin is the code with the lowest pos0, or None if equal
@@ -381,7 +371,9 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         Called by:
             calculate_relations_for_coder_and_selected_codes
-
+        Args:
+            c0:
+            c1:
         Returns:
         id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
@@ -493,13 +485,9 @@ class DialogReportRelations(QtWidgets.QDialog):
             result['distance'] = 0
             return result
 
-        # Check for Overlap
-        # Should be all that is remaining
+        # Check for Overlap. Should be all that is remaining
         # c0 overlaps on the right side, left side is not overlapping
         if c0[pos0] < c1[pos0] and c0[pos1] < c1[pos1]:
-            '''print("c0 overlaps on the right side, left side is not overlapping")
-            print("c0", c0)
-            print("C1", c1)'''
             result['relation'] = "O"
             # Reorder lowest to highest
             result['overlapindex'] = sorted([c0[pos0], c1[pos1]])
@@ -549,17 +537,17 @@ class DialogReportRelations(QtWidgets.QDialog):
                 result['text_after'] = txt_after[0]
             result['distance'] = 0
             return result
+        return result  # incomplete result, backup option
 
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.
         Select all codes. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        selected = self.ui.treeWidget.currentItem()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        #selected = self.ui.treeWidget.currentItem()
         action_clear_selected = menu.addAction(_("Clear all"))
         action_select_all = menu.addAction(_("Select all"))
-
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action == action_clear_selected:
             selected = self.ui.treeWidget.selectedItems()
@@ -610,7 +598,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         """ Context menu to show row text in original context, row ordering. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         cell_value = ""
         try:
             row = self.ui.tableWidget.currentRow()
@@ -663,9 +651,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
 
     def show_context(self):
-        """ Show context of coding in dialog.
-        Called by table_menu.
-        """
+        """ Show context of coding in dialog. Called by table_menu. """
 
         row = self.ui.tableWidget.currentRow()
         d = self.result_relations[row]
@@ -697,10 +683,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         """ A table of:
         Tooltips with codenames on id1,id2, relation,fid - to minimise screen use
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
-        relation is: inclusion, overlap, exact, proximity
-
-        https://stackoverflow.com/questions/60512920/sorting-numbers-in-qtablewidget-work-doesnt-right-pyqt5
-        """
+        relation is: inclusion, overlap, exact, proximity. """
 
         fid = 0
         code0 = 1
