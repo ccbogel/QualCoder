@@ -1537,8 +1537,21 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_info_style = f'"{doc_font}"'
             self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
-        default_bg_color = self.ui.plainTextEdit_question.palette().color(self.ui.plainTextEdit_question.viewport().backgroundRole())
+        default_bg_color = self.ui.plainTextEdit_question.palette().color(
+            self.ui.plainTextEdit_question.viewport().backgroundRole()
+        )
         self._update_prompt_reference_styles(default_bg_color)
+        output_palette = self.ui.ai_output.palette()
+        for role in (QPalette.ColorRole.Base, QPalette.ColorRole.Window):
+            output_palette.setColor(role, default_bg_color)
+        for widget in (
+                self.ui.ai_output,
+                self.ui.scrollArea_ai_output,
+                self.ui.scrollArea_ai_output.viewport(),
+                self.ui.scrollArea_ai_output_contents,
+        ):
+            widget.setAutoFillBackground(True)
+            widget.setPalette(output_palette)
         self.ui.ai_output.setAutoFillBackground(True)
         self.ui.ai_output.setStyleSheet(f"""
             QLabel#ai_output {{
@@ -1550,7 +1563,10 @@ class DialogAIChat(QtWidgets.QDialog):
                 border: none;
             }}
         """)
-        self.ui.scrollArea_ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
+        output_background_style = f"background-color: {default_bg_color.name()};"
+        self.ui.scrollArea_ai_output.setStyleSheet(f"QScrollArea#scrollArea_ai_output {{ {output_background_style} }}")
+        self.ui.scrollArea_ai_output.viewport().setStyleSheet(output_background_style)
+        self.ui.scrollArea_ai_output_contents.setStyleSheet(output_background_style)
         default_panel_color = self.ui.widget_chat.palette().color(self.ui.widget_chat.backgroundRole())
         self.ui.comboBox_ai_chats.setStyleSheet(f"background-color: {default_panel_color.name()};")
         tree_font = QtGui.QFont(self.app.settings["font"], self.app.settings["treefontsize"], QtGui.QFont.Weight.Normal)
