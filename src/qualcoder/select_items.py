@@ -49,21 +49,15 @@ class DialogSelectItems(QtWidgets.QDialog):
     Called by by ViewGraph, DialogCodeText, DialogCodeAV, DialogCodeImage
     """
 
-    data = None
-    groups = []
-    data_refined = None
-    model = None
-    title = None
-
     def __init__(self, app_, data, title, selection_mode):
         """ present list of names to user for selection.
         Can use comboBox to select groups of items to reduce the length of the list.
         The group key is used with View_graph
-
-        params:
+        Args:
+            app : App class
             data: list of dictionaries containing the key 'name'
             title: Dialog title, String
-            selectionmode: 'single' or anything else for 'multiple', String
+            selection_mode: 'single' or anything else for 'multiple', String
         """
 
         QtWidgets.QDialog.__init__(self)
@@ -73,6 +67,9 @@ class DialogSelectItems(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
+        self.groups = []
+        self.data_refined = None
+        self.model = None
         self.data = data
         self.selection_mode = selection_mode
         # Check data exists
