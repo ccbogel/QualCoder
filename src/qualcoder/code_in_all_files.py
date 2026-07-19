@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -243,7 +244,10 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.te.blockSignals(False)
 
     def insert_title(self, row):
-        """ Convenience method for a/v, image, text title insertion. """
+        """ Convenience method for a/v, image, text title insertion.
+        Args:
+            row : Dictionary
+        """
 
         foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
         title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
@@ -259,12 +263,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         title += "</span><br />"
         self.te.insertHtml(title)
 
-    def put_image_into_textedit(self, img, counter, text_edit):
+    def put_image_into_textedit(self, img, counter:int, text_edit):
         """ Scale image, add resource to document, insert image.
         A counter is important as each image slice needs a unique name, counter adds
         the uniqueness to the name.
         Called by: coded_media_dialog
-        param:
+        Args:
             img: image data dictionary with file location and width, height, position data
             counter: a changing counter is needed to make discrete different images
             text_edit:  the widget that shows the data
@@ -279,6 +283,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         if not img['mediapath'].lower().endswith(".pdf"):
             image = QtGui.QImage(abs_path)
         else:  # A pdf, must create the image
+            source_path = ""
             if img['mediapath'][:6] == "/docs/":
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
@@ -312,7 +317,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # The image can be inserted into the document using the QTextCursor API:
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
-        # TODO Look at smoothtransformation scaling
         image_format.setWidth(image.width() * scaler)
         image_format.setHeight(image.height() * scaler)
         image_format.setName(url.toString())
@@ -415,6 +419,10 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.remove_important_flag(item)
 
     def add_important_flag(self, item):
+        """ Add flag to item
+        Args:
+            item : Dictionary
+        """
 
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
@@ -441,7 +449,10 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def edit_memo(self, item):
-        """ Edit item memo. """
+        """ Edit item memo.
+        Args:
+            item : Dictionary
+        """
 
         ui = DialogMemo(self.app, _("Memo for Coded: ") + item['type'], item['res']['memo'], "show")
         ui.exec()
@@ -475,7 +486,10 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
     def mark_with_more_codes(self, item):
-        """ Select and apply more codes to this coded segment. """
+        """ Select and apply more codes to this coded segment.
+        Args:
+            item : Dictionary
+        """
 
         codes = [c for c in self.codes if c['cid'] != item['res']['cid']]
         ui = DialogSelectItems(self.app, codes, _("Select codes"), "multi")
@@ -678,7 +692,10 @@ class DialogCodedIds(QtWidgets.QDialog):
         self.te.blockSignals(False)
 
     def insert_title(self, row):
-        """ Convenience method for a/v, image, text title insertion. """
+        """ Convenience method for a/v, image, text title insertion.
+        Args:
+            row : Dictionary
+        """
 
         foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
         title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
@@ -691,12 +708,12 @@ class DialogCodedIds(QtWidgets.QDialog):
         title += "</span><br />"
         self.te.insertHtml(title)
 
-    def put_image_into_textedit(self, img, counter, text_edit):
+    def put_image_into_textedit(self, img, counter: int, text_edit):
         """ Scale image, add resource to document, insert image.
         A counter is important as each image slice needs a unique name, counter adds
         the uniqueness to the name.
         Called by: coded_media_dialog
-        param:
+        Args:
             img: image data dictionary with file location and width, height, position data
             counter: a changing counter is needed to make discrete different images
             text_edit:  the widget that shows the data

@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -26,9 +27,7 @@ import ebooklib
 from ebooklib import epub
 import fitz
 import json
-# import logging  # Not needed -> L
 import openpyxl
-# import odf  # This is the package that provides the odf module used by pandas for reading .ods # Not needed -> L
 import os.path
 import pandas as pd
 from pathlib import Path
@@ -500,8 +499,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         else:
             item_text = cell.text()
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
-        mediapath = None
-        risid = None
+        mediapath:str|None = None
+        risid:int|None = None
         try:
             id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         except AttributeError:
@@ -715,7 +714,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_mark_speakers:
             self.mark_speakers()
 
-    def update_file_path(self, id_, bad_link):
+    def update_file_path(self, id_: int, bad_link: dict[str, Any]):
         """ Update the File Not Found file path to another path.
          Args:
              id_ : Integer source.id
@@ -740,7 +739,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.app.delete_backup = False
             self.update_files_in_dialogs()
 
-    def pdf_to_images(self, mediapath):
+    def pdf_to_images(self, mediapath: str):
         """ Turn pdf to an image for each page. """
 
         filepath = ""
@@ -771,9 +770,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.update_files_in_dialogs()
 
-    def view_original_text_file(self, mediapath):
+    def view_original_text_file(self, mediapath: str):
         """ View original text file.
-         param:
+         Args:
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
         if mediapath[:6] == "/docs/":
@@ -961,12 +960,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         if mediapath is None or (mediapath is not None and mediapath[0] == "/"):
             self.export_file_as_linked_file(id_, mediapath)
 
-    def export_file_as_linked_file(self, id_, mediapath):
+    def export_file_as_linked_file(self, id_:int, mediapath:str):
         """ Move an internal project file into an external location as a linked file.
-        #TODO Do not export text files as linked files. e.g. internally created in database, or
+        # TODO Do not export text files as linked files. e.g. internally created in database, or
         docx, txt, md, odt files.
 
-        params:
+        Args:
             id_ : the file id, Integer
             mediapath: stored path to media, will be None for text files, or String
         """
@@ -1041,7 +1040,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if mediapath is not None and mediapath[0] != "/":
             self.import_linked_file(id_, mediapath)
 
-    def import_linked_file(self, id_, mediapath):
+    def import_linked_file(self, id_:int, mediapath:str):
         """ Import a linked file into the project folder, and change mediapath details. """
 
         if self.av_dialog_open is not None:
@@ -1154,7 +1153,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Message(self.app, _('File Export'), msg).exec()
         self.parent_text_edit.append(msg)
 
-    def load_file_data(self, order_by=""):
+    def load_file_data(self, order_by :str=""):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question or created internally.
         This also fills out the table header labels with file attribute names.
@@ -1163,7 +1162,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Db version 5+: av_text_id links the text file to the audio/video
         Obtain some file metadata to use in table tooltip.
         Fills table after data is loaded.
-        param:
+        Args:
             order_by: string ""= name asc, "filename desc" = name desc,
             "date asc" = date ascending, "date desc" = date descending, "filetype" = mediapath,
                 "casename asc" = by alphabetic casename ascending
@@ -1282,7 +1281,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     s['attributes'].append(tmp)
         self.fill_table()
 
-    def get_icon_and_metadata(self, id_):
+    def get_icon_and_metadata(self, id_:int):
         """ Get metadata used in table tooltip.
         Called by: create_text_file, load_file_data
         param:
@@ -1398,9 +1397,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             metadata += f'\n{_("Case linked:")}\n{txt}'
         return icon, metadata, ""
 
-    def get_cases_by_filename(self, name):
+    def get_cases_by_filename(self, name: str):
         """ Called by get_icon_and_metadata, get_file_data
-        param: name String of filename """
+        Args:
+            name String of filename """
 
         cur = self.app.conn.cursor()
         # Case_text is the table, but this also links av and images
@@ -1582,7 +1582,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             fulltext = res[0]
         self.source[x]['fulltext'] = fulltext
 
-    def view_av(self, x):
+    def view_av(self, x: int):
         """ View an audio or video file. Edit the memo. Edit the transcript file.
         Added try block in case VLC bindings do not work.
         Uses a non-modal dialog.
@@ -1620,10 +1620,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open = None
             return
 
-    def view_image(self, x):
+    def view_image(self, x:int):
         """ View an image file and edit the image memo.
 
-        param:
+        Args:
             x  :  row number Integer
         """
 
@@ -1912,7 +1912,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Message(self.app, _("Import successful."), _("{} rows imported.").format(count)).exec()
         self.parent_text_edit.append(msg)
 
-    def import_files(self, link=False):
+    def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt, docx, rtf, and md.
@@ -1922,7 +1922,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Imports audio as flac, mp3, wav, ogg, m4a which are stored in an audio directory.
         Imports video as mp4, mov, wmv, webm, m4v which are stored in a video directory.
 
-        param:
+        Args:
             link:   False - files are imported into project folder,
                     True - files are linked and not imported
         """
@@ -2073,10 +2073,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if isinstance(c, DialogReportCodes):
                     c.get_files_and_cases()
 
-    def load_media_reference(self, mediapath):
+    def load_media_reference(self, mediapath:str):
         """ Load media reference information for all file types.
 
-        param:
+        Args:
             mediapath: QualCoder project folder path OR external link path to file
                        External link path contains prefix 'docs:', 'images:, 'audio:', 'video:'
         """
@@ -2156,8 +2156,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             pass
         return pseudonyms
 
-    def decode_text_with_best_encoding(self, import_file):
-        """Decode text file bytes using robust encoding detection and fallbacks."""
+    def decode_text_with_best_encoding(self, import_file:str):
+        """ Decode text file bytes using robust encoding detection and fallbacks. """
 
         with open(import_file, "rb") as sourcefile:
             raw_bytes = sourcefile.read()
@@ -2186,15 +2186,13 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         return raw_bytes.decode("utf-8", errors="backslashreplace"), "utf-8(backslashreplace)"
 
-    def load_file_text(self, import_file, link_path="", progress_ = None):
+    def load_file_text(self, import_file:str, link_path:str="", progress_ = None):
         """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
         Loading pdf text. I have removed additional line breaks. See commented sections below.
         Removing these allows the pdf to be coded in Code_text and Code_pdf without positional shifting problems.
-
         If pseudonyms.json is present in the qda folder, apply the pseudonyms to the words / phrases on import.
-
-        param:
+        Args:
             import_file: filepath of file to be imported, String
             link_path:  filepath of file to be linked, String
         """
@@ -2363,9 +2361,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             for obj in lobj:
                 self.get_item_and_hierarchy(page, obj)
 
-    def convert_odt_to_text(self, import_file):
+    def convert_odt_to_text(self, import_file:str):
         """ Convert odt to very rough equivalent with headings, list items and tables for
-        html display in qTextEdits. """
+        html display in qTextEdits.
+        Args:
+            import_file: String """
 
         odt_file = zipfile.ZipFile(import_file)
         data = str(odt_file.read('content.xml'))  # bytes class to string
@@ -2707,9 +2707,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.app.delete_backup = False
 
-    def get_tooltip_values(self, attribute_name):
+    def get_tooltip_values(self, attribute_name:str):
         """ Get values to display in tooltips for the value list column.
-        param: attribute_name : String """
+        Args:
+            attribute_name : String """
 
         tt = ""
         cur = self.app.conn.cursor()
@@ -2962,11 +2963,6 @@ class DialogSurveyImport(QtWidgets.QDialog):
         cases = [self.list_case.item(i).text() for i in range(self.list_case.count())]
         attrs = [self.list_attr.item(i).text() for i in range(self.list_attr.count())]
         return texts, cases, attrs
-        
-    '''def get_filename_column(self):
-        if self.combo_filename.currentIndex() == 0:
-            return None
-        return self.combo_filename.currentText()'''
         
     def get_autocode_setting(self):
         return self.cb_autocode.isChecked()

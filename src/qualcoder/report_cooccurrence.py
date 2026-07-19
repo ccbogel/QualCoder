@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -60,15 +61,11 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
      This shows overlapping and edge-connected codes against codes.
     """
 
-    app = None
-    parent_tetEdit = None
-    files = []
-    attributes = []
-
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_textEdit = parent_text_edit
         self.attributes = []
+        self.files = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Coocurrence()
         self.ui.setupUi(self)
@@ -153,7 +150,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def _refresh_selected_codes_from_project(self):
         fresh_codes, fresh_categories = self.app.get_codes_categories()
         self.codes, self.categories = fresh_codes, fresh_categories
-
         if self.code_selection_mode == "all":
             self.selected_codes = deepcopy(self.codes)
             self.selected_categories_string = ""
@@ -1099,10 +1095,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         # self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
         self.ui.tableWidget.resizeRowsToContents()
 
-    def calculate_relations(self, code_ids_str):
+    def calculate_relations(self, code_ids_str:str):
         """ Calculate the relations for selected codes for all coders.
         For codings in code_text only.
-
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, (Proximity - not used)
         owners is a combination of: owner of ctid0 pipe owner of ctid1
@@ -1160,17 +1155,18 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
 
-    def relation(self, c0, c1):
+    def relation(self, c0:list[int], c1:list[int]):
         """ Relation function as in RQDA
 
         whichmin is the code with the lowest pos0, or None if equal
         whichmax is the code with the highest pos1 or None if equal
         operlapindex is the combined lowest to the highest positions. Only used for E, O, P
         unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
-
         Called by:
             calculate_relations_for_coder_and_selected_codes
-
+        Args:
+            c0 : List
+            c1 : List
         Returns:
         id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
@@ -1186,7 +1182,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                   "text_before": "", "text_overlap": "", "text_after": ""}
 
         cur = self.app.conn.cursor()
-
         # Which min
         if c0[pos0] < c1[pos0]:
             result['whichmin'] = c0[cid]

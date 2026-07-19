@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -211,7 +212,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             return
         self.get_files(ui.result_file_ids)
 
-    def get_files(self, ids=None, sort="name asc"):
+    def get_files(self, ids:list[int]|None=None, sort:str="name asc"):
         """ Get source files with additional details and fill list widget.
         Args:
             ids : list, fill with ids to limit file selection list.
@@ -338,10 +339,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += self.video_statistics(file_['id'])
         self.ui.textEdit.setText(text_)
 
-    def get_case_assignment(self, id_):
+    def get_case_assignment(self, id_:int):
         """ Get case or cases associated with this file.
         Show text positions if a text file.
-        param: id : Integer """
+        Args: id_ : Integer """
 
         text_ = "\n" + _("CASE:") + "\n"
         cur = self.app.conn.cursor()
@@ -360,9 +361,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += "\n"
         return text_
 
-    def get_attributes(self, id_):
+    def get_attributes(self, id_:int):
         """ Get attributes and return text representation.
-        param: id : Integer """
+        Args: id_ : Integer """
 
         text_ = _("ATTRIBUTES:") + "\n"
         cur = self.app.conn.cursor()
@@ -378,9 +379,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += "\n"
         return text_
 
-    def video_statistics(self, id_):
+    def video_statistics(self, id_:str):
         """ Get video statistics for image file
-        param: id : Integer """
+        Args: id_ : Integer """
 
         text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
@@ -439,9 +440,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += _("END OF TRANSCRIPT") + "\n"
         return text_
 
-    def audio_statistics(self, id_):
-        """ Get audio statistics for image file
-        param: file_ Dictionary of {name, id, memo} """
+    def audio_statistics(self, id_:int):
+        """ Get audio statistics for audio file
+        Args: id_: int """
 
         text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
@@ -490,7 +491,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += _("END OF TRANSCRIPT") + "\n"
         return text_
 
-    def image_statistics(self, id_):
+    def image_statistics(self, id_:int):
         """ Get image statistics for image file, or from image of pdf page.
         param: id: Integer """
 
@@ -569,9 +570,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
         return text_
 
-    def text_statistics(self, id_):
+    def text_statistics(self, id_:int):
         """ Get details of text file statistics
-        param: id Integer
+        Args: id Integer
         """
 
         text_ = _("STATISTICS:") + "\n"

@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -27,6 +28,7 @@ import datetime
 import fitz
 import logging
 import openpyxl
+from PyQt6.QtWidgets import QTextEdit
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 import os
@@ -34,6 +36,7 @@ from PIL import Image
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
 from shutil import copyfile
+from typing import Any
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -65,42 +68,39 @@ class DialogReportCodes(QtWidgets.QDialog):
     """ Get reports on coded text/images/audio/video using a range of variables:
         Files, Cases, Coders, text limiters, Attribute limiters.
         Export reports as plain text, ODT, html, xlsx or csv.
-
         Text context of a coded text portion is shown in the third splitter panel in a text edit.
         Case matrix is also shown in a qtablewidget in the third splitter pane.
         If a case matrix is displayed, the text-in-context method overrides it and replaces the matrix with the
         text in context.
     """
 
-    app = None
-    parent_textEdit = None
-    code_names = []
-    coders = [""]
-    categories = []
-    files = []
-    cases = []
-    results = []
-    # html results need media links {imagename, QImage, char_pos, avname, av0, av1, avtext}
-    html_links = []
-    te = []  # Matrix (table) [row][col] of textEditWidget results
-    # Variables for search restrictions
-    file_ids_string = ""
-    case_ids_string = ""
-    attributes = []
-    attribute_file_ids = []
-    attribute_case_ids = []
-    attributes_msg = ""
-    # Text positions in the main textEdit for right-click context menu to View original file
-    text_links = []
-    # Text positions in the matrix textEdits for right-click context menu to View original file
-    # list of dictionaries of row, col, textEdit, list of links
-    matrix_links = []
-
     def __init__(self, app, parent_textedit, tab_coding):
         super(DialogReportCodes, self).__init__()
         self.app = app
         self.parent_textEdit = parent_textedit
         self.tab_coding = tab_coding
+        self.code_names = []
+        self.coders = [""]
+        self.categories = []
+        self.files = []
+        self.cases = []
+        self.results = []
+        # html results need media links {imagename, QImage, char_pos, avname, av0, av1, avtext}
+        self.html_links = []
+        self.te = []  # Matrix (table) [row][col] of textEditWidget results
+        # Text positions in the main textEdit for right-click context menu to View original file
+        self.text_links = []
+        # Text positions in the matrix textEdits for right-click context menu to View original file
+        # list of dictionaries of row, col, textEdit, list of links
+        self.matrix_links = []
+        # Variables for search restrictions
+        self.file_ids_string = ""
+        self.case_ids_string = ""
+        self.attributes = []
+        self.attribute_file_ids = []
+        self.attribute_case_ids = []
+        self.attributes_msg = ""
+
         self.get_codes_categories_coders()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
@@ -196,7 +196,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.app.settings['dialogreportcodes_splitter_v1'] = max(sizes_vert[1], 10)
         self.app.settings['dialogreportcodes_splitter_v2'] = max(sizes_vert[2], 10)
 
-    def get_files_and_cases(self, file_sort="name asc"):
+    def get_files_and_cases(self, file_sort:str="name asc"):
         """ Get source files with additional details and fill files list widget.
         Get cases and fill case list widget
         Called from : init, manage_files.delete manage_files.delete_button_multiple_files
@@ -290,7 +290,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.coders.append(row[0])
 
     def _on_project_data_changed(self, tables, source):
-        """Handle project change events from other dialogs.
+        """ Handle project change events from other dialogs.
 
         Args:
             tables: Changed database table names.
@@ -1071,11 +1071,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    def categories_of_code(self, cid):
+    def categories_of_code(self, cid:int) -> list[str]:
         """ Get parent categories of this code.
-
-        param: cid : Integer of code id
-        return: category_names : List
+        Args:
+            cid : Integer of code id
+        Return: category_names : List
         """
 
         code_ = None
@@ -1639,11 +1639,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         del prog_dialog
 
-    def search_by_files(self, code_ids):
+    def search_by_files(self, code_ids:str):
         """ Search by files and if attributes file ids are selected.
         Called by search() if self.file_ids_string is not empty and self.case_ids_string is empty
-
-        :param: code_ids : String comma separated ids
+        Args:
+        code_ids : String comma separated ids
         """
 
         coder = self.ui.comboBox_coders.currentText()
@@ -1758,15 +1758,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                                     'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
             self.results.append(tmp)
 
-    def search_by_cases(self, code_ids):
+    def search_by_cases(self, code_ids:str):
         """ Search by cases and if attributes file ids are selected.
         Called by search() if self.case_ids_string is not empty.
         Also uses self.file_ids_string to limit results.
-
         Unlike search_by_files, the results by case also include a 'filename' key value.
         This is used when exporting Excel (XLSX) and CSV spreadsheet data, so that case name and file name are displayed.
-
-        :param: code_ids : String comma separated ids
+        Args:
+            code_ids : String comma separated ids
         """
 
         coder = self.ui.comboBox_coders.currentText()
@@ -2404,9 +2403,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.matrix_by_codes(self.results, file_ids)
         self.ui.splitter.setSizes([100, 100, 500])
 
-    def put_image_into_textedit(self, img, counter, text_edit):
+    def put_image_into_textedit(self, img:dict[str, Any], counter:int, text_edit):
         """ Scale image, add resource to document, insert image.
         Extra work for pdf images.
+        Args:
+            img:
+            counter: Integer
+            text_edit:QtWidget
         """
 
         text_edit.append("\n")
@@ -2442,10 +2445,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
         # Default for an image  stored in the project folder.
-        imagename = str(counter) + '-' + img['mediapath']
+        imagename = f'{counter}-{img["mediapath"]}'
         # Check and change path for a linked image file
         if img['mediapath'][0:7] == "images:":
-            imagename = str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
+            imagename = f"{counter}-/images/{img['mediapath'].split('/')[-1]}"
         # imagename is now: 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
@@ -2462,11 +2465,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         if img['coded_memo'] != "":
             text_edit.insertPlainText(_("MEMO: ") + img['coded_memo'] + "\n")
 
-    def heading(self, item):
+    def heading(self, item:dict[str,Any]):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
         Inserts the heading into the main textEdit.
         Fills the textedit_start and textedit_end link positions
-        param:
+        Args:
             item: dictionary of code, file_or_casename, positions, text, coder
         """
 
@@ -2551,7 +2554,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # https://stackoverflow.com/questions/18700945/qtextbrowser-how-to-identify-image-from-mouse-click-position
         fmt = cursor_context_pos.charFormat()
         img_fmt = None
-        html_link = None
+        html_link:dict[str,Any]|None= None
         if fmt.isImageFormat():
             img_fmt = fmt.toImageFormat()  # QtGui.QTextImageFormat
             # print("name", img_fmt.name(), img_fmt.height(), img_fmt.width())
@@ -2573,7 +2576,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_change_code_to = None
         action_apply_additional_code = None
         action_show_overlaps = None
-        code_here = None
+        code_here:dict[str,Any]|None = None
         for row in self.results:
             if row['textedit_start'] <= pos < row['textedit_end']:
                 code_here = row
@@ -2643,10 +2646,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             DialogCodedIds(self.app, code_here)  # removed redundant .exec(); DialogCodedIds.__init__ already calls self.exec()
             return
 
-    def mark_important(self, code):
+    def mark_important(self, code:dict[str, Any]):
         """ Add important mark to coding.
         No effect if already marked important.
-        param:
+        Args:
             code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type
         """
 
@@ -2666,7 +2669,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def edit_memo(self, code):
+    def edit_memo(self, code:dict[str,Any]):
         """ Edit the coded memo """
 
         cur = self.app.conn.cursor()
@@ -2700,7 +2703,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def change_code_to_another_code(self, existing_code):
+    def change_code_to_another_code(self, existing_code:dict[str, Any]):
         """ Change the selected code to another from a list. """
 
         # Get replacement code
@@ -2740,7 +2743,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def apply_additional_code(self, existing_code):
+    def apply_additional_code(self, existing_code:dict[str,Any]):
         """ Apply another code to this exact segment. """
 
         # Get additional code
@@ -2797,9 +2800,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def unmark(self, code):
+    def unmark(self, code:dict[str,Any]):
         """ Unmark this coding.
-        param:
+        Args:
             code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type"""
 
         coded = f"{_('Delete coded section.')} {code['codename']}. {code['coder']}"
@@ -2845,12 +2848,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def show_context_from_text_edit(self, code):
+    def show_context_from_text_edit(self, code:dict[str,Any]):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
         Called by: textEdit.cursorPositionChanged, after results are filled.
         Called by context menu.
-        param:
-            code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type
+        Args:
+            code : Dictionary of codename, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type
         """
 
         if code['result_type'] == 'text':
@@ -2863,14 +2866,15 @@ class DialogReportCodes(QtWidgets.QDialog):
             ui = DialogCodeInAV(self.app, code)
             ui.exec()
 
-    def rotate_image(self, cursor_context_pos, img_fmt, html_link, degrees):
+    def rotate_image(self, cursor_context_pos:QtGui.QTextCursor, img_fmt, html_link:dict[str,Any], degrees:int):
         """  Rotate image 180 degrees.
         Tried to do 90 and 270 degree rotations but could not update the image format width and height.
-        param:
-            TextImage Format img_fmt
-            Dictionary html_link {imagename, image:QImage, avname, av0, av1, avtext}
+        Args:
+            cursor_context_pos : QTextCursor
+            img_fmt : TextImage Format img_fmt
+            html_link : Dictionary{imagename, image:QImage, avname, av0, av1, avtext}
+            degrees : Integer 0 90 180 270
         """
-
         document = self.ui.textEdit.document()
         url = QtCore.QUrl(img_fmt.name())  # Location in document
         image = html_link['image']
@@ -2898,11 +2902,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.removeSelectedText()
         cursor_context_pos.insertImage(img_fmt)
 
-    def matrix_heading(self, item, text_edit):
+    def matrix_heading(self, item:dict[str,Any], text_edit:QTextEdit):
         """ Takes a dictionary item and creates a heading for the coded text portion.
         Also adds the textEdit start and end character positions for this text in this text edit
-        param:
+        Args:
             item: dictionary of code, file_or_casename, positions, text, coder
+            text_edit : QTextEdit
         """
 
         cur = self.app.conn.cursor()
@@ -2942,13 +2947,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(text_edit.toPlainText())
 
-    def matrix_by_codes(self, results_, ids, type_="file"):
+    def matrix_by_codes(self, results_:list[dict[str, Any]], ids:str, type_:str="file"):
         """ Fill a tableWidget with rows of cases and columns of codes.
         First identify all codes.
         Fill tableWidget with columns of codes and rows of cases.
         Called by: fill_text_edit_with_search_results
-        param:
-        results_ : list of dictionary text, image, av result items
+        Args:
+            results_ : list of dictionary text, image, av result items
             ids : list of case ids OR file ids - as a string of integers, comma separated
             type_ : 'file' or 'case'
         """
@@ -2979,11 +2984,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
         self.fill_matrix_table(results, vertical_labels, horizontal_labels)
 
-    def matrix_by_categories(self, results_, ids, type_="file"):
+    def matrix_by_categories(self, results_:list[dict[str, Any]], ids:str, type_:str="file"):
         """ Fill a tableWidget with rows of case or file name and columns of categories.
         First identify the categories. Then map all codes which are directly assigned to the categories.
         Called by: fill_text_edit_with_search_results
-        param:
+        Args:
             results_ : list of dictionary of text, image, av result items
             ids : list of case ids OR file ids, as string of comma separated integers
             type_ : file or case ids
@@ -3042,12 +3047,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
         self.fill_matrix_table(results, vertical_labels, horizontal_labels)
 
-    def matrix_by_top_categories(self, results_, ids, type_="file"):
+    def matrix_by_top_categories(self, results_:list[dict[str, Any]], ids:str, type_:str="file"):
         """ Fill a tableWidget with rows of case or file name and columns of top level categories.
         First identify top-level categories. Then map all other codes to the
         top-level categories.
         Called by: fill_text_edit_with_search_results
-        param:
+        Args:
             results_ : list of dictionary of text, image, av result items
             ids : string list of case ids or file ids, comma separated
             type_ : file or case
@@ -3098,7 +3103,6 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Ony show top level categories
         results = res_categories
-
         cur = self.app.conn.cursor()
         sql = f"select distinct id, name from source where id in ({ids}) order by name"
         if type_ == "case":
@@ -3114,9 +3118,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
         self.fill_matrix_table(results, vertical_labels, horizontal_labels)
 
-    def fill_matrix_table(self, results, vertical_labels, horizontal_labels):
+    def fill_matrix_table(self, results:list[dict[str, Any]], vertical_labels: list[str], horizontal_labels:list[str]):
         """ Clear then fill the table.
         Called by matrix_by_codes, matrix_by_categories, matrix_by_top_categories.
+        Args:
+            results : List of dictionary results
+            vertical_labels : List
+            horizontal_labels : List
         """
 
         # Clear and fill tableWidget
@@ -3279,10 +3287,9 @@ class ToolTipEventFilter(QtCore.QObject):
 
     media_data = None
 
-    def set_positions(self, media_data):
+    def set_positions(self, media_data:list[dict[str,Any]]):
         """ Code_text contains the positions for the tooltip to be displayed.
-
-        param:
+        Args:
             media_data: List of dictionaries of the text contains: pos0, pos1
         """
 

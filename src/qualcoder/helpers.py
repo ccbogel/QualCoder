@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 
 
@@ -35,7 +36,6 @@ Import plain text codes - import from codebook file
 Markdown highlighter
 Number bar - display line numbers alongside text content
 Code resize handles for text coding
-
 """
 
 import csv
@@ -747,6 +747,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         if not self.data['mediapath'].lower().endswith(".pdf"):
             image = QtGui.QImage(abs_path)
         else:  # A pdf, must create the image
+            source_path = ""
             if self.data['mediapath'][:6] == "/docs/":
                 source_path = f"{self.app.project_path}/documents/{self.data['mediapath'][6:]}"
             if self.data['mediapath'][:5] == "docs:":
@@ -1178,7 +1179,7 @@ class NumberBar(QtWidgets.QFrame):
         self.text_edit.installEventFilter(self.event_filter)
         self.text_edit.viewport().installEventFilter(self.event_filter)
         if self.is_plain_text:
-            self.text_edit.blockCountChanged.connect(self.adjustWidth)
+            self.text_edit.blockCountChanged.connect(self.adjust_width)
             self.text_edit.updateRequest.connect(self._on_update_request)
 
     def _on_update_request(self, rect, dy):
@@ -1187,11 +1188,11 @@ class NumberBar(QtWidgets.QFrame):
             self.scroll(0, dy)
         else:
             self.update(0, rect.y(), self.width(), rect.height())
-        self.adjustWidth()
+        self.adjust_width()
 
-    def adjustWidth(self):
+    def adjust_width(self):
         """ 
-        Adjust the with of the NumberBar according to the length of the highest number. 
+        Adjust the width of the NumberBar according to the length of the highest number.
         The minimum width is 3 digits.
         Will try to adjust the scrolling position accordingly so that the visible text is 
         not jumping too much.
@@ -1228,7 +1229,7 @@ class NumberBar(QtWidgets.QFrame):
     def showEvent(self, event):
         """Adjusts the width based on the current font size"""
         super().showEvent(event)
-        self.adjustWidth()
+        self.adjust_width()
 
     def wheelEvent(self, event):
         """Forward mouse-wheel scrolling to the associated text editor."""
@@ -1243,7 +1244,7 @@ class NumberBar(QtWidgets.QFrame):
         Updates the number bar to display the current set of numbers.
         Also, adjusts the width of the number bar if necessary.
         """
-        self.adjustWidth()
+        self.adjust_width()
         QtWidgets.QWidget.update(self, *args)
            
     def paintEvent(self, event):
@@ -1346,7 +1347,6 @@ class CodeResizeHandle(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
         w = self.width()
-        h = self.height()
         radius = w / 2.0
         path = QtGui.QPainterPath()
         if self.is_start:
@@ -1499,8 +1499,8 @@ class ToolTipEventFilter(QtCore.QObject):
                             text_ += "<br /><em>" + _("IMPORTANT") + "</em>"
                         text_ += "</p>"
                         multiple += 1
-                    except Exception as e:
-                        msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
+                    except Exception as err:
+                        msg = f"Codes ToolTipEventFilter Exception\n{err} Possible key error: \n"
                         msg += str(item)
                         logger.error(msg)
             if multiple > 1:

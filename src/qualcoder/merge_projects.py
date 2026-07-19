@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -25,8 +26,6 @@ import logging
 import os
 import shutil
 import sqlite3
-
-from PyQt6 import QtWidgets
 
 from .helpers import Message
 
@@ -46,34 +45,27 @@ class MergeProjects:
     Existing attribute values in destination are not over-written, unless already blank
      """
 
-    app = None
-    path_d = ""  # Path to destination project folder
-    conn_d = None
-    path_s = ""  # Path to source project folder
-    conn_s = None
-    source_s = []  # source text from Source project
-    code_text_s = []  # coded text segments from Source project
-    annotations_s = []  # annotations from Source project
-    journals_s = []
-    stored_sql_s = []
-    summary_msg = ""
-    code_image_s = []  # coded image areas from Source project
-    code_av_s = []  # coded A/V segments from Source project
-    codes_s = []  # codes from Source project
-    categories_s = []  # code cats from Source project
-    attribute_types_s = []  # For new attributes that are not existing in the destination database
-    attributes_s = []  # values for Case and File attributes
-    cases_s = []  # cases
-    case_text_s = []  # case text and links to non-text files
-    projects_merged = False
-
     def __init__(self, app, path_s):
         self.app = app
-        self.path_s = path_s
+        self.path_s = path_s  # Path to source project folder
         self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))  # Source project that is to be merged in
         self.conn_d = self.app.conn  # Destination project - the currently opened project
-        self.path_d = self.app.project_path
+        self.path_d = self.app.project_path  # Path to destination project folder
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
+        self.projects_merged = False
+        self.source_s = []  # source text from Source project
+        self.code_text_s = []  # coded text segments from Source project
+        self.annotations_s = []  # annotations from Source project
+        self.journals_s = []
+        self.stored_sql_s = []
+        self.code_image_s = []  # coded image areas from Source project
+        self.code_av_s = []  # coded A/V segments from Source project
+        self.codes_s = []  # codes from Source project
+        self.categories_s = []  # code cats from Source project
+        self.attribute_types_s = []  # For new attributes that are not existing in the destination database
+        self.attributes_s = []  # values for Case and File attributes
+        self.cases_s = []
+        self.case_text_s = []  # case text and links to non-text files
         self.copy_source_files_into_destination()
         loaded = self.get_source_data()
         if loaded:
@@ -477,10 +469,9 @@ class MergeProjects:
         if attribute_count > 0:
             self.summary_msg += _("Added attribute values for cases and files: n=") + str(attribute_count) + "\n"
 
-    def get_source_data(self):
+    def get_source_data(self) -> bool:
         """ Load the database data into Lists of Dictionaries.
-
-        return:
+        Return:
             True or False if data could be loaded
         """
 

@@ -17,15 +17,14 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import datetime
 import os
 import re
-import sys
 import logging
-import traceback
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
@@ -55,15 +54,6 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     Remove file from a case. View file.
     """
 
-    app = None
-    parent_textEdit = None
-    case = None
-    allfiles = []
-    casefiles = []
-    case_text = []
-    selected_text_file = None
-    header_labels = ["id", "File name", "Assigned"]
-    attributes = []
 
     def __init__(self, app_, parent_text_edit, case):
 
@@ -110,7 +100,14 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
+        self.allfiles = []
+        self.casefiles = []
+        self.case_text = []
+        self.selected_text_file = None
         self.get_files()
+        self.header_labels = ["id", "File name", "Assigned"]
+        self.attribute_names = []
+        self.attributes = []
         self.get_attributes()
         self.fill_table()
 
@@ -328,10 +325,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     def double_clicked_to_view(self):
         """ Double-click on a row allow viewing of that file.
         rows begin at 0  to n.
-        param:
-            row: signal emitted by doubleclick event """
+        row: signal emitted by doubleclick event """
 
-        # TODO need this method? better in init to go to view_file
         self.view_file()
 
     def row_selection_changed(self):

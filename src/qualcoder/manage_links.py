@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 
 """
@@ -41,10 +42,6 @@ logger = logging.getLogger(__name__)
 class DialogManageLinks(QtWidgets.QDialog):
     """ Fix bad file links. Can browse to correct location to set a new file path.
     """
-
-    parent_textEdit = None
-    tab_coding = None  # Tab widget coding tab for updates
-    links = []
 
     def __init__(self, app, parent_text_edit, tab_coding):
 
@@ -191,9 +188,13 @@ class DialogManageLinks(QtWidgets.QDialog):
             return
         self.update_database(file_path, row)
 
-    def update_database(self, new_file_path, row):
+    def update_database(self, new_file_path: str, row:int):
         """ Update database and links list.
-         Called by: file_dialog_selection, cell_selected. """
+         Called by: file_dialog_selection, cell_selected.
+         Args:
+             new_file_path: String
+             row : Integer
+        """
 
         new_file_name = new_file_path.split('/')[-1]
         # Use split ':',1 as can have ':' as a part of the file path
