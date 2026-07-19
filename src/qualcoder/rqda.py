@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -36,10 +37,6 @@ logger = logging.getLogger(__name__)
 
 class RqdaImport:
     """ Import an RQDA database into a new QualCoder database. """
-
-    parent_textEdit = None
-    app = None
-    conn = None
 
     def __init__(self, app, parent_textedit):
         super(RqdaImport, self).__init__()
@@ -65,18 +62,15 @@ class RqdaImport:
             self.parent_textEdit.append(_("Data import unsuccessful from ") + f"{self.file_path}\n{e}")
 
     @staticmethod
-    def convert_date(r_date):
+    def convert_date(r_date:str) -> str:
         """ Convert RQDA date format from:
         Mon Oct 28 08:11:36 2019 to: yyyy-mm-dd hh:mm:ss
         Mon Oct 28 8:11:36 2019 to: yyyy-mm-dd hh:mm:ss
         RQDA does have a leading space for single digit days.
         RQDA does had 2 digit dates e.g. '12' '09'
         Fri Dec  6 09:26:07 2019
-
-        TODO some dates are like this after rqda conversion: 2019-03- 1 17:51:21
-        TODO original RQDA date:  Fri Mar  1 17:51:21 2019
-
-        param: rqda formatted date
+        Args:
+            rqda formatted date
         return: standard format date
         """
 
@@ -100,13 +94,12 @@ class RqdaImport:
         s = r_date.split(" ")
         # The first minus space is between time and year, the second minus space between date and time
         hh_mm_ss = s[-2]
-        return yyyy + "-" + mm + "-" + dd + " " + hh_mm_ss
+        return f"{yyyy}-{mm}-{dd} {hh_mm_ss}"
 
     def import_data(self):
         """ Code colours are randomly created.
          The codername in qualcoder settings is set to the first owner found in RQDA.
-
-         Note sqlite3.Integrity error can occur if he same text is coded by the same code and same owner.
+         sqlite3.Integrity error can occur if he same text is coded by the same code and same owner.
          So adding a check for this. """
 
         r_cur = self.conn.cursor()
