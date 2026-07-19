@@ -1568,14 +1568,25 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.scrollArea_ai_output.viewport().setStyleSheet(output_background_style)
         self.ui.scrollArea_ai_output_contents.setStyleSheet(output_background_style)
         default_panel_color = self.ui.widget_chat.palette().color(self.ui.widget_chat.backgroundRole())
-        self.ui.comboBox_ai_chats.setStyleSheet(f"background-color: {default_panel_color.name()};")
+        combo_background_color = default_panel_color.name()
+        combo_text_color = self.ui.widget_chat.palette().color(QPalette.ColorRole.WindowText).name()
+        if self.app.settings['stylesheet'] not in ('dark', 'rainbow', 'native'):
+            combo_background_color = "#fafafa"
+            combo_text_color = "#000000"
+        combo_style = f"""
+            QComboBox {{
+                background-color: {combo_background_color};
+                color: {combo_text_color};
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {combo_background_color};
+                color: {combo_text_color};
+            }}
+        """
+        self.ui.comboBox_ai_chats.setStyleSheet(combo_style)
         tree_font = QtGui.QFont(self.app.settings["font"], self.app.settings["treefontsize"], QtGui.QFont.Weight.Normal)
         self.ui.comboBox_ai_chats.view().setFont(tree_font)
-        self.ui.comboBox_ai_permissions.setStyleSheet(f"""
-            QComboBox {{
-                background-color: {default_panel_color.name()};
-            }}
-        """)
+        self.ui.comboBox_ai_permissions.setStyleSheet(combo_style)
         self.update_chat_window()
 
     def refresh_placeholder_if_visible(self) -> None:
