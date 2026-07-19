@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -24,7 +25,6 @@ import collections
 import datetime
 import logging
 import os
-import re
 import rispy
 from PyQt6 import QtWidgets
 
@@ -67,9 +67,10 @@ class Ris:
     def __init__(self, app):
         self.app = app
 
-    def get_references(self, selected_ris=None):
+    def get_references(self, selected_ris:int|None=None):
         """ As list of dictionaries with risid and summary.
-        ris: Integer risid
+        Args:
+            selected_ris: Integer risid
         """
 
         self.refs = []
@@ -81,7 +82,6 @@ class Ris:
         ris_ids_res = cur.fetchall()
         if not ris_ids_res:  # May be empty if selected_ris is incorrect or no references present
             return
-        # TODO missing title
         for ris_id in ris_ids_res:
             ref = {'risid': ris_id[0]}
             details = str(ris_id[0]) + " "
@@ -128,15 +128,16 @@ class Ris:
             ref['vancouver'], ref['apa'] = self.format_vancouver_and_apa(ref)
             self.refs.append(ref)
 
-    def format_vancouver_and_apa(self, ref):
+    def format_vancouver_and_apa(self, ref:dict[str,str]):
         """ Format items in list for display as Vancouver style and APA style.
             Vancouver:
             Title.  authors (or editor)
             journal name, year, date, volume, issue, pages
             publisher (and place) issn, url
-
             APA:
             authors (year). title, journal volume issue (page numbers) URL
+        Args:
+            ref : Dictionary
          """
 
         title = ""
@@ -153,8 +154,6 @@ class Ris:
         issn = None
         url = None
         doi = None
-        vancouver = ""  # Vancouver reference style, approximately
-        apa = ""  # American Psychological Association reference style v 7
 
         # Get the first title based on this order
         for tag in ("TI", "T1", "ST", "TT"):
@@ -254,7 +253,7 @@ class Ris:
         vancouver = vancouver.replace("  ", " ")
         vancouver = vancouver.strip()
 
-        # Wrap up APA style
+        # Wrap up APA style, American Psychological Association reference style v 7
         # authors(year).title, journal volume issue(page numbers) URL
         apa = authors.replace(";", ",")
         if editor:
@@ -281,7 +280,7 @@ class Ris:
         apa = apa.strip()
         return vancouver, apa
 
-    def apa_title(self, title):
+    def apa_title(self, title:str) -> str:
         """ APA 7 Sentence case. And after . : -
          Keep names Titled - not easy to do, but have added country names. """
 
@@ -317,9 +316,6 @@ class RisImport:
     Ref_Year (of publication) – numeric
     Ref_journal
     """
-
-    app = None
-    parent_text_edit = None
 
     def __init__(self, app, parent_text_edit):
         self.app = app
