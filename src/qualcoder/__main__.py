@@ -2848,18 +2848,37 @@ Click "Yes" to start now.')
         if tab_index < 0:
             return
         tab_bar = self.ui.tabWidget.tabBar()
+        tab_label = QtWidgets.QWidget(tab_bar)
+        tab_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        tab_label_layout = QtWidgets.QHBoxLayout(tab_label)
+        tab_label_layout.setContentsMargins(0, 0, 0, 0)
+        tab_label_layout.setSpacing(4)
+        icon_label = QtWidgets.QLabel(tab_label)
+        icon = tab_bar.tabIcon(tab_index)
+        if not icon.isNull():
+            icon_label.setPixmap(icon.pixmap(16, 16))
+            tab_label_layout.addWidget(icon_label)
+        text_label = QtWidgets.QLabel(_('AI Agent'), tab_label)
+        tab_label_layout.addWidget(text_label)
+        tab_label_layout.addStretch()
+        tab_bar.setTabText(tab_index, "")
+        tab_bar.setTabIcon(tab_index, QtGui.QIcon())
+        tab_bar.setTabToolTip(tab_index, _('AI Agent'))
+        tab_bar.setTabButton(
+            tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, tab_label
+        )
         button = QtWidgets.QToolButton(tab_bar)
         button.setAutoRaise(True)
         button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         button.setToolTip(_('Move AI Agent to sidebar view'))
-        button.setFixedSize(22, 22)
+        button.setFixedSize(16, 16)
         icon_color = tab_bar.tabTextColor(tab_index)
         if not icon_color.isValid():
             icon_color = tab_bar.palette().color(QtGui.QPalette.ColorRole.WindowText)
         try:
             button.setIcon(qta.icon('mdi6.arrow-right-bold-outline', color=icon_color))
-            button.setIconSize(QtCore.QSize(16, 16))
+            button.setIconSize(QtCore.QSize(12, 12))
         except Exception:
             button.setText(">")
         button.clicked.connect(self.open_ai_chat_sidebar_from_tab_button)
