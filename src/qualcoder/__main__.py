@@ -954,6 +954,7 @@ class App(object):
                 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
                 'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
+                'dialogcodetext_coding_margin_width',
                 'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
                 'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
                 'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
@@ -1031,6 +1032,8 @@ class App(object):
                     settings_data[key] = 320
                 if key == 'ai_chat_splitter_output_bottom':
                     settings_data[key] = 80
+                if key == 'dialogcodetext_coding_margin_width':
+                    settings_data[key] = 100
 
         ai_permissions = settings_data.get('ai_permissions', 1)
         if ai_permissions not in (0, 1, 2):
@@ -1182,6 +1185,24 @@ class App(object):
         palette = QtWidgets.QApplication.instance().palette()
         palette.setColor(QtGui.QPalette.ColorRole.Link, QtGui.QColor(self.highlight_color()))
         palette.setColor(QtGui.QPalette.ColorRole.LinkVisited, QtGui.QColor(self.highlight_color()))
+        if self.settings['stylesheet'] == "native":
+            def blend_colors(first: QtGui.QColor, second: QtGui.QColor, first_ratio: float) -> QtGui.QColor:
+                second_ratio = 1.0 - first_ratio
+                return QtGui.QColor(
+                    round(first.red() * first_ratio + second.red() * second_ratio),
+                    round(first.green() * first_ratio + second.green() * second_ratio),
+                    round(first.blue() * first_ratio + second.blue() * second_ratio)
+                )
+
+            active_highlight = palette.color(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Highlight)
+            active_highlighted_text = palette.color(
+                QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.HighlightedText)
+            inactive_base = palette.color(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Base)
+            inactive_highlight = blend_colors(active_highlight, inactive_base, 0.55)
+            palette.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Highlight,
+                             inactive_highlight)
+            palette.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.HighlightedText,
+                             active_highlighted_text)
         QtWidgets.QApplication.instance().setPalette(palette)
         if self.settings['stylesheet'] == 'dark':
             return style_dark
@@ -1314,6 +1335,7 @@ class App(object):
             'dialogcodetext_splitter1': 1,
             'dialogcodetext_splitter_v0': 1,
             'dialogcodetext_splitter_v1': 1,
+            'dialogcodetext_coding_margin_width': 100,
             'dialogcodeimage_splitter0': 1,
             'dialogcodeimage_splitter1': 1,
             'dialogcodeimage_splitter_h0': 1,

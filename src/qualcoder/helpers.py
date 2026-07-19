@@ -1231,6 +1231,14 @@ class NumberBar(QtWidgets.QFrame):
         super().showEvent(event)
         self.adjust_width()
 
+    def wheelEvent(self, event):
+        """Forward mouse-wheel scrolling to the associated text editor."""
+
+        QtWidgets.QApplication.sendEvent(self.text_edit.viewport(), event)
+        if event.isAccepted():
+            return
+        super().wheelEvent(event)
+
     def update(self, *args):
         """
         Updates the number bar to display the current set of numbers.

@@ -67,6 +67,10 @@ ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+DEFAULT_CODING_MARGIN_WIDTH = 100
+MINIMUM_CODING_MARGIN_WIDTH = 30
+MINIMUM_CODING_MARGIN_LABEL_WIDTH = 60
+
 
 class CodingMargin(QtWidgets.QWidget):
     """ Draws side bars adjacent to the text and code names.
@@ -86,14 +90,44 @@ class CodingMargin(QtWidgets.QWidget):
         self.editor = editor
         self.dialog = dialog_code_text
         self.side = side  # 'left' or 'right'
+        self._hovered_tooltip_code_key = None
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._emit_context_menu_to_dialog)
         self.setMouseTracking(True)
-        self.setMinimumWidth(120)
+        self.setMinimumWidth(MINIMUM_CODING_MARGIN_WIDTH)
 
     def _emit_context_menu_to_dialog(self, position):
         if hasattr(self.dialog, 'coding_margin_context_menu'):
             self.dialog.coding_margin_context_menu(position, self)
+
+    def _set_tooltip_style_for_code(self, code):
+        """Match the tooltip widget colors to the hovered code."""
+
+        tooltip_color = code.get('color', '#cccccc')
+        tooltip_text_color = TextColor(tooltip_color).recommendation
+        self.setStyleSheet(
+            "QToolTip {"
+            f" background-color: {tooltip_color};"
+            f" color: {tooltip_text_color};"
+            f" border: 1px solid {tooltip_color};"
+            "}"
+        )
+
+    def _clear_tooltip_style(self):
+        """Restore the default tooltip styling when no code tooltip is active."""
+
+        self.setStyleSheet("")
+
+    @staticmethod
+    def _tooltip_code_key(code):
+        """Return a stable identifier for one hovered coded segment."""
+
+        if code is None:
+            return None
+        ctid = code.get('ctid')
+        if ctid is not None:
+            return ('ctid', ctid)
+        return ('range', code.get('fid'), code.get('pos0'), code.get('pos1'), code.get('cid'))
 
     def _compute_lane_layout(self):
         """ Track-packing algorithm. Returns (ctid_columns, sorted_codes,
@@ -131,11 +165,75 @@ class CodingMargin(QtWidgets.QWidget):
 
         return ctid_columns, sorted_codes, current_fid
 
+    @staticmethod
+    def _relative_luminance(color: QtGui.QColor) -> float:
+        """Return the WCAG relative luminance for one QColor."""
+
+        def channel_luminance(value: int) -> float:
+            normalized = value / 255.0
+            if normalized <= 0.03928:
+                return normalized / 12.92
+            return ((normalized + 0.055) / 1.055) ** 2.4
+
+        red = channel_luminance(color.red())
+        green = channel_luminance(color.green())
+        blue = channel_luminance(color.blue())
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+    @classmethod
+    def _contrast_ratio(cls, first: QtGui.QColor, second: QtGui.QColor) -> float:
+        """Return the WCAG contrast ratio for two QColors."""
+
+        first_luminance = cls._relative_luminance(first)
+        second_luminance = cls._relative_luminance(second)
+        lighter = max(first_luminance, second_luminance)
+        darker = min(first_luminance, second_luminance)
+        return (lighter + 0.05) / (darker + 0.05)
+
+    @classmethod
+    def _label_color_for_background(cls, base_color: QtGui.QColor,
+                                    background_color: QtGui.QColor,
+                                    minimum_ratio: float = 4.5) -> QtGui.QColor:
+        """Return a hue-preserving label color that meets the target contrast."""
+
+        if cls._contrast_ratio(base_color, background_color) >= minimum_ratio:
+            return base_color
+
+        hue, saturation, lightness, alpha = base_color.getHsl()
+        if hue < 0:
+            hue = 0
+            saturation = 0
+
+        light_candidate = None
+        for new_lightness in range(lightness + 1, 256):
+            candidate = QtGui.QColor.fromHsl(hue, saturation, new_lightness, alpha)
+            if cls._contrast_ratio(candidate, background_color) >= minimum_ratio:
+                light_candidate = candidate
+                break
+
+        dark_candidate = None
+        for new_lightness in range(lightness - 1, -1, -1):
+            candidate = QtGui.QColor.fromHsl(hue, saturation, new_lightness, alpha)
+            if cls._contrast_ratio(candidate, background_color) >= minimum_ratio:
+                dark_candidate = candidate
+                break
+
+        if light_candidate is None:
+            return dark_candidate if dark_candidate is not None else base_color
+        if dark_candidate is None:
+            return light_candidate
+
+        light_delta = abs(light_candidate.lightness() - lightness)
+        dark_delta = abs(dark_candidate.lightness() - lightness)
+        return light_candidate if light_delta <= dark_delta else dark_candidate
+
     def paintEvent(self, event):
-        if not self.dialog.file_ or not self.dialog.code_text:
-            return
         try:
             painter = QtGui.QPainter(self)
+            background_color = self.editor.viewport().palette().color(QtGui.QPalette.ColorRole.Base)
+            painter.fillRect(event.rect(), background_color)
+            if not self.dialog.file_ or not self.dialog.code_text:
+                return
             font = QtGui.QFont(self.dialog.app.settings['font'], 9)
             painter.setFont(font)
             offset = self.editor.contentOffset()
@@ -167,6 +265,8 @@ class CodingMargin(QtWidgets.QWidget):
 
         names_drawn_by_line = {}
         margin_width = self.width()
+        show_labels = margin_width >= MINIMUM_CODING_MARGIN_LABEL_WIDTH
+        background_color = self.editor.viewport().palette().color(QtGui.QPalette.ColorRole.Base)
 
         important_only = getattr(self.dialog, 'important', False)
         layout = block.layout()
@@ -219,8 +319,8 @@ class CodingMargin(QtWidgets.QWidget):
                 else:
                     painter.drawRect(offset_x, int(rect.top()), bar_w, int(rect.height()))
 
-                if ctid not in drawn_ctids and code['pos0'] >= block_start:
-                    painter.setPen(color.darker(150))
+                if show_labels and ctid not in drawn_ctids and code['pos0'] >= block_start:
+                    painter.setPen(self._label_color_for_background(color, background_color))
                     raw_name = code.get('name', '')
                     _fm = painter.fontMetrics()
                     if self.side == 'right':
@@ -266,6 +366,7 @@ class CodingMargin(QtWidgets.QWidget):
             return None
 
         margin_width = self.width()
+        show_labels = margin_width >= MINIMUM_CODING_MARGIN_LABEL_WIDTH
         bar_w = 3
         lane_step = 10
 
@@ -334,7 +435,7 @@ class CodingMargin(QtWidgets.QWidget):
                         if stripe_rect.contains(pos):
                             stripe_hit = code
 
-                if ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
+                if show_labels and ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
                     raw_name = code.get('name', '')
                     if self.side == 'right':
                         _lanes_end_x = 12 + (col_index + 1) * lane_step
@@ -385,8 +486,17 @@ class CodingMargin(QtWidgets.QWidget):
             code = None
 
         if code is None:
-            QtWidgets.QToolTip.hideText()
+            if self._hovered_tooltip_code_key is not None:
+                QtWidgets.QToolTip.hideText()
+                self._clear_tooltip_style()
+                self._hovered_tooltip_code_key = None
             self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
+            super().mouseMoveEvent(event)
+            return
+
+        code_key = self._tooltip_code_key(code)
+        if code_key == self._hovered_tooltip_code_key:
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             super().mouseMoveEvent(event)
             return
 
@@ -396,11 +506,21 @@ class CodingMargin(QtWidgets.QWidget):
             logger.debug(f"CodingMargin tooltip build error: {e}")
             tooltip_html = code.get('name', '')
 
+        self._set_tooltip_style_for_code(code)
         QtWidgets.QToolTip.showText(event.globalPosition().toPoint(),
                                     tooltip_html,
                                     self)
+        self._hovered_tooltip_code_key = code_key
         self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         super().mouseMoveEvent(event)
+
+    def wheelEvent(self, event):
+        """Forward mouse-wheel scrolling to the associated text editor."""
+
+        QtWidgets.QApplication.sendEvent(self.editor.viewport(), event)
+        if event.isAccepted():
+            return
+        super().wheelEvent(event)
 
     def mousePressEvent(self, event):
         """ left-click on stripe/label -> select that exact coded segment in editor. """
@@ -422,6 +542,7 @@ class CodingMargin(QtWidgets.QWidget):
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.dialog.ui.plainTextEdit.setTextCursor(cursor)
+                self.dialog.ui.plainTextEdit.setFocus(QtCore.Qt.FocusReason.MouseFocusReason)
                 self.dialog.ui.plainTextEdit.ensureCursorVisible()
                 event.accept()
                 return
@@ -429,6 +550,8 @@ class CodingMargin(QtWidgets.QWidget):
 
     def leaveEvent(self, event):
         QtWidgets.QToolTip.hideText()
+        self._clear_tooltip_style()
+        self._hovered_tooltip_code_key = None
         self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
         super().leaveEvent(event)
 
@@ -569,6 +692,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.settings['docfont'] = self.app.settings['font']
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["docfont"]}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self.ui.plainTextEdit.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.plainTextEdit.setPlainText("")
@@ -759,6 +883,13 @@ class DialogCodeText(QtWidgets.QWidget):
         except (KeyError, AttributeError):
             self.margin_side = 'left'
         self.coding_margin = CodingMargin(self.ui.plainTextEdit, self, side=self.margin_side)
+        self.coding_margin_width = self._get_saved_coding_margin_width()
+        self._coding_margin_width_is_restoring = False
+        self._coding_margin_restore_attempts = 0
+        self._coding_margin_width_ready = False
+        self.coding_margin_width_save_timer = QtCore.QTimer(self)
+        self.coding_margin_width_save_timer.setSingleShot(True)
+        self.coding_margin_width_save_timer.timeout.connect(self.persist_coding_margin_width_setting)
 
         # Inject the margin widget into the chosen container (mirroring the
         # NumberBar pattern used for self.ui.lineNumbers)
@@ -772,6 +903,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self._text_margins_splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
         self._text_margins_splitter.setHandleWidth(4)
         self._text_margins_splitter.setChildrenCollapsible(False)
+        self._text_margins_splitter.splitterMoved.connect(self.on_coding_margin_splitter_moved)
 
         # Switch margin containers' size policy from Fixed to Preferred so
         # the splitter can resize them. plainTextEdit keeps Expanding
@@ -798,10 +930,13 @@ class DialogCodeText(QtWidgets.QWidget):
             self._text_margins_splitter.indexOf(self.ui.plainTextEdit), 1)
 
         self._install_coding_margin_in_side(self.margin_side)
+        self._sync_coding_margin_background()
 
         # apply initial visibility based on persisted preference <- L
         self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        QtCore.QTimer.singleShot(0, self._apply_coding_margin_width)
+        QtCore.QTimer.singleShot(60, self._apply_coding_margin_width)
         self.ui.lineNumbers.setToolTip(_("Right click for highlighting options"))
 
         # sync margin redraw with editor scroll <- L
@@ -996,6 +1131,99 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.margin_side = side
         self.coding_margin.side = side
+
+    def _sync_coding_margin_background(self):
+        """Keep the coding margin area aligned with the text editor background."""
+
+        editor_palette = self.ui.plainTextEdit.viewport().palette()
+        background_color = editor_palette.color(QtGui.QPalette.ColorRole.Base)
+        background_hex = background_color.name()
+        for widget in (
+                self.ui.widget_code_margin_left,
+                self.ui.widget_code_margin_right,
+                self.coding_margin):
+            palette = widget.palette()
+            palette.setColor(QtGui.QPalette.ColorRole.Window, background_color)
+            palette.setColor(QtGui.QPalette.ColorRole.Base, background_color)
+            widget.setPalette(palette)
+            widget.setAutoFillBackground(True)
+        self._text_margins_splitter.setStyleSheet(
+            "QSplitter::handle {"
+            f" background-color: {background_hex};"
+            " border: 0px;"
+            " margin: 0px;"
+            " padding: 0px;"
+            "}"
+        )
+        self.coding_margin.update()
+
+    def _get_saved_coding_margin_width(self) -> int:
+        """Return the stored coding margin width, or the default width."""
+
+        try:
+            width = int(self.app.settings.get('dialogcodetext_coding_margin_width', DEFAULT_CODING_MARGIN_WIDTH))
+        except (TypeError, ValueError, AttributeError):
+            width = DEFAULT_CODING_MARGIN_WIDTH
+        if width <= 0:
+            return DEFAULT_CODING_MARGIN_WIDTH
+        return max(MINIMUM_CODING_MARGIN_WIDTH, width)
+
+    def _apply_coding_margin_width(self):
+        """Apply the stored coding margin width to the active side of the splitter."""
+
+        if not hasattr(self, '_text_margins_splitter') or self._text_margins_splitter is None:
+            return
+        if not self.show_margin_stripes:
+            return
+        total_width = self._text_margins_splitter.width()
+        if total_width <= 0:
+            sizes = self._text_margins_splitter.sizes()
+            total_width = sum(sizes)
+        if total_width <= 0 or total_width < self.coding_margin_width + 200:
+            if self._coding_margin_restore_attempts < 20:
+                self._coding_margin_restore_attempts += 1
+                QtCore.QTimer.singleShot(30, self._apply_coding_margin_width)
+            return
+        self._coding_margin_restore_attempts = 0
+        margin_width = min(self.coding_margin_width, max(MINIMUM_CODING_MARGIN_WIDTH, total_width - 200))
+        editor_width = max(200, total_width - margin_width)
+        if self.margin_side == 'right':
+            sizes = [0, editor_width, margin_width]
+        else:
+            sizes = [margin_width, editor_width, 0]
+        self._coding_margin_width_is_restoring = True
+        try:
+            with QtCore.QSignalBlocker(self._text_margins_splitter):
+                self._text_margins_splitter.setSizes(sizes)
+        finally:
+            self._coding_margin_width_is_restoring = False
+        self._coding_margin_width_ready = True
+
+    def on_coding_margin_splitter_moved(self, pos=None, index=None):
+        """Track coding margin width changes and persist the active width."""
+
+        if self._coding_margin_width_is_restoring or not self.show_margin_stripes:
+            return
+        if not self._coding_margin_width_ready:
+            return
+        sizes = self._text_margins_splitter.sizes()
+        if len(sizes) < 3:
+            return
+        width = sizes[2] if self.margin_side == 'right' else sizes[0]
+        width = int(width)
+        if width < MINIMUM_CODING_MARGIN_WIDTH:
+            return
+        self.coding_margin_width = width
+        self.app.settings['dialogcodetext_coding_margin_width'] = width
+        self.coding_margin_width_save_timer.start(400)
+
+    def persist_coding_margin_width_setting(self):
+        """Write the coding margin width to config.ini after drag operations settle."""
+
+        try:
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        except Exception as e_:
+            logger.debug(f"Could not persist coding margin width setting: {e_}")
 
     def _set_margin_container_visibility(self, visible):  # <- L
         """ Show or hide the active container so the layout reclaims its space
@@ -1299,6 +1527,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        if self.show_margin_stripes:
+            self._apply_coding_margin_width()
 
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
@@ -1318,6 +1548,8 @@ class DialogCodeText(QtWidgets.QWidget):
             pass
 
         self._set_margin_container_visibility(self.show_margin_stripes)
+        if self.show_margin_stripes:
+            self._apply_coding_margin_width()
 
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
@@ -1339,6 +1571,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is not None and self.ui.plainTextEdit.toPlainText() != "":
             self.unlight()
             self.highlight()
+
+    def _code_label_contrast_color(self, color) -> QColor:
+        """Return the contrast-adjusted code color used for labels and underlines."""
+
+        background_color = self.ui.plainTextEdit.viewport().palette().color(
+            QtGui.QPalette.ColorRole.Base)
+        return CodingMargin._label_color_for_background(QColor(color), background_color)
 
     def show_right_side_pane(self):
         """ Toggle visibility of the right side pane (groupBox_info).
@@ -1390,6 +1629,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['docfont'] = font
         doc_font = f'font: {size}pt "{font}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self._sync_coding_margin_background()
         tt = _("Select document font and size.") + "\n"
         tt += f"{size} {font}"
         self.ui.pushButton_font.setToolTip(tt)
@@ -5966,7 +6206,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.highlight_style == 'underline':
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
-            fmt.setUnderlineColor(QColor(color))
+            fmt.setUnderlineColor(self._code_label_contrast_color(color))
         else:
             brush = QBrush(QColor(color))
             fmt.setBackground(brush)
@@ -6089,7 +6329,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # choose between underline-only and full background fill <- L
             if self.highlight_style == 'underline':
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
-                fmt.setUnderlineColor(QColor(color))
+                fmt.setUnderlineColor(self._code_label_contrast_color(color))
             else:
                 brush = QBrush(QColor(color))
                 fmt.setBackground(brush)
