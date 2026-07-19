@@ -1844,6 +1844,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal_display = None
         self.ai_chat_window = None
         self.ai_chat_sidebar_mode = False
+        self.ai_chat_tab_label = None
         self.ai_chat_tab_sidebar_button = None
         self.last_non_ai_chat_tab = None
 
@@ -2910,6 +2911,7 @@ Click "Yes" to start now.')
         tab_bar.setTabButton(
             tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, tab_label
         )
+        self.ai_chat_tab_label = tab_label
         button = QtWidgets.QToolButton(tab_bar)
         button.setAutoRaise(True)
         button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
@@ -2930,6 +2932,16 @@ Click "Yes" to start now.')
         tab_bar.setTabButton(
             tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, button
         )
+        self._sync_ai_chat_tab_widget_visibility()
+
+    def _sync_ai_chat_tab_widget_visibility(self):
+        """Keep custom AI tab widgets hidden when the AI tab is hidden."""
+
+        tab_visible = not bool(self.ai_chat_sidebar_mode)
+        if self.ai_chat_tab_label is not None:
+            self.ai_chat_tab_label.setVisible(tab_visible)
+        if self.ai_chat_tab_sidebar_button is not None:
+            self.ai_chat_tab_sidebar_button.setVisible(tab_visible)
 
     def open_ai_chat_sidebar_from_tab_button(self):
         """Switch AI chat to sidebar mode from the tab button."""
@@ -3083,6 +3095,7 @@ Click "Yes" to start now.')
         self.ai_chat_window.set_sidebar_mode(enabled)
         ai_tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
         self.ui.tabWidget.setTabVisible(ai_tab_index, not enabled)
+        self._sync_ai_chat_tab_widget_visibility()
         self.ui.sidebar.setVisible(enabled)
 
         if enabled:
