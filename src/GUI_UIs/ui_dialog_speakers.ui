@@ -63,6 +63,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="label_files">
+       <property name="toolTip">
+        <string>Files currently selected for the speaker scan. Hover to see the full list; use Select files to adjust it.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_top">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>

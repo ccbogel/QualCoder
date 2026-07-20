@@ -5995,29 +5995,49 @@ class DialogCodeText(QtWidgets.QWidget):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def mark_speakers(self):
-        if self.file_ is not None:
-            ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
-            if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-                self.update_dialog_codes_and_categories(["code_name", "code_text"])
-                if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(
-                        only_visible=True):
-                    msg = _(
-                        'Coder "{}" is currently hidden. Do you want to make it visible, to see the speaker codings?').format(
-                        speaker_coder_name)
-                    msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
-                    msg_box.setStandardButtons(
-                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
-                    msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
-                    reply = msg_box.exec()
-                    if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                        cur = self.app.conn
-                        cur.execute('update coder_names set visibility=1 where name=?', (speaker_coder_name,))
-                        cur.commit()
-                        self.update_coder_names()
+    def mark_speakers(self, preselected_ids=None):
+        """ Open the Mark speakers dialog.
+        Preselection:
+        - preselected_ids (multi-selection carried over from Manage files): those
+          files, in the given order.
+        - else the file currently open in the coding pane (previous behaviour).
+        - else all files currently VISIBLE in the file list, which may be filtered
+          by attributes, so an active filter carries over.
+        Args:
+            preselected_ids: optional list of source ids to preselect
+        """
 
+        files_ = []
+        if preselected_ids:
+            all_text_files = {f['id']: f['name'] for f in self.app.get_text_filenames()}
+            files_ = [{'id': fid, 'name': all_text_files[fid]}
+                      for fid in preselected_ids if fid in all_text_files]
+        elif self.file_ is not None:
+            files_ = [{'id': self.file_['id'], 'name': self.file_['name']}]
         else:
+            # all visible files (self.files respects the current attribute filter)
+            files_ = [{'id': f['id'], 'name': f['name']} for f in self.files]
+        if not files_:
             Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
+            return
+        ui_speaker = DialogSpeakers(self.app, files_)
+        if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self.update_dialog_codes_and_categories(["code_name", "code_text"])
+            if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(
+                    only_visible=True):
+                msg = _(
+                    'Coder "{}" is currently hidden. Do you want to make it visible, to see the speaker codings?').format(
+                    speaker_coder_name)
+                msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
+                msg_box.setStandardButtons(
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
+                reply = msg_box.exec()
+                if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                    cur = self.app.conn
+                    cur.execute('update coder_names set visibility=1 where name=?', (speaker_coder_name,))
+                    cur.commit()
+                    self.update_coder_names()
 
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.

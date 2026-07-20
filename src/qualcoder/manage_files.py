@@ -1071,19 +1071,45 @@ class DialogManageFiles(QtWidgets.QDialog):
     def mark_speakers(self):
         """ Mark the speakers in text files.
          Note: User generated files (not loaded files) have medipath None.
-         When text file found open the text coding pane. """
+         Preselection rules (Van's feedback):
+         - Every selected AND VISIBLE text file carries over to the speakers dialog,
+           not just the last selected one.
+         - If nothing usable is selected (no selection, or the selection is hidden by
+           the current filter), all VISIBLE text files become the preselection, which
+           also carries over an active filter.
+         When text files are found the text coding pane opens. """
 
-        try:
-            row = self.ui.tableWidget.currentRow()
-            if row == -1:
-                raise ValueError()
-            id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
-            text_item = next((item for item in self.source if item['id'] == id_ and item['fulltext']), None)
-            if not text_item:
-                raise ValueError()
-            self.main_window.text_coding(task='mark_speakers', doc_id=int(id_))
-        except (AttributeError, ValueError):
+        text_ids = {item['id'] for item in self.source if item['fulltext']}
+
+        def row_text_file_id(row):
+            """ id of the text file at a visible row, else None. """
+            if self.ui.tableWidget.isRowHidden(row):
+                return None  # hidden by the current filter: not usable
+            id_item = self.ui.tableWidget.item(row, self.ID_COLUMN)
+            if id_item is None:
+                return None
+            try:
+                id_ = int(id_item.text())
+            except ValueError:
+                return None
+            return id_ if id_ in text_ids else None
+
+        ids = []
+        selected_rows = sorted({index.row() for index in self.ui.tableWidget.selectedIndexes()})
+        for row in selected_rows:
+            id_ = row_text_file_id(row)
+            if id_ is not None and id_ not in ids:
+                ids.append(id_)
+        if not ids:
+            # Fallback: every visible text file (respects the active filter)
+            for row in range(self.ui.tableWidget.rowCount()):
+                id_ = row_text_file_id(row)
+                if id_ is not None and id_ not in ids:
+                    ids.append(id_)
+        if not ids:
             Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
+            return
+        self.main_window.text_coding(task='mark_speakers', doc_id=ids[0], doc_ids=ids)
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
