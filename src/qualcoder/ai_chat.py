@@ -9256,18 +9256,35 @@ data collected. This information will accompany every prompt sent to the AI, res
         return super().eventFilter(source, event)
 
     def _ai_link_tooltip_colors(self) -> Tuple[QtGui.QColor, QtGui.QColor, QtGui.QColor]:
-        """Return readable colors matching the current Qt tooltip palette where possible."""
+        """Return readable colors matching the current Qt tooltip style where possible."""
 
-        if self.app.settings['stylesheet'] == "native" and platform.system() == "Darwin":
-            native_dark = False
-            try:
-                native_dark = QtGui.QGuiApplication.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark
-            except AttributeError:
-                palette = QtWidgets.QApplication.instance().palette()
-                native_dark = palette.color(QtGui.QPalette.ColorRole.Window).lightness() < 128
-            if native_dark:
-                return QtGui.QColor("#2b2b2b"), QtGui.QColor("#ffffff"), QtGui.QColor("#5f5f5f")
-            return QtGui.QColor("#f7f7f7"), QtGui.QColor("#000000"), QtGui.QColor("#bdbdbd")
+        application = QtWidgets.QApplication.instance()
+        if application is not None:
+            stylesheet = application.styleSheet()
+            tooltip_rules = re.findall(r"QToolTip\s*\{([^}]*)\}", stylesheet, flags=re.IGNORECASE | re.DOTALL)
+            if tooltip_rules:
+                properties = {}
+                for declaration in tooltip_rules[-1].split(";"):
+                    if ":" not in declaration:
+                        continue
+                    name, value = declaration.split(":", 1)
+                    properties[name.strip().lower()] = value.strip()
+
+                def color_from_value(value: str) -> Optional[QtGui.QColor]:
+                    tokens = re.findall(r"#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|[A-Za-z]+", value)
+                    for token in reversed(tokens):
+                        color = QtGui.QColor(token)
+                        if color.isValid():
+                            return color
+                    return None
+
+                background = color_from_value(properties.get("background-color", properties.get("background", "")))
+                foreground = color_from_value(properties.get("color", ""))
+                border = color_from_value(properties.get("border-color", properties.get("border", "")))
+                if background is not None and foreground is not None:
+                    if border is None:
+                        border = background.darker(135) if background.lightness() >= 128 else background.lighter(135)
+                    return background, foreground, border
 
         tooltip_palette = QtWidgets.QToolTip.palette()
         base_role = getattr(QtGui.QPalette.ColorRole, "ToolTipBase", QtGui.QPalette.ColorRole.Base)
@@ -9326,6 +9343,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         label = self._ai_link_tooltip.findChild(QtWidgets.QLabel, "ai_link_tooltip_label")
         if label is None:
             return
+        label.setFont(QtGui.QFont(self.app.settings["font"], self.app.settings["docfontsize"]))
         background, foreground, border = self._ai_link_tooltip_colors()
         self._ai_link_tooltip.setStyleSheet(
             "QFrame {"

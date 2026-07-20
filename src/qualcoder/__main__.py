@@ -2894,15 +2894,18 @@ Click "Yes" to start now.')
         tab_bar = self.ui.tabWidget.tabBar()
         tab_label = QtWidgets.QWidget(tab_bar)
         tab_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        tab_label.setStyleSheet("QWidget {background-color: transparent; border: none;}")
         tab_label_layout = QtWidgets.QHBoxLayout(tab_label)
         tab_label_layout.setContentsMargins(0, 0, 0, 0)
         tab_label_layout.setSpacing(4)
         icon_label = QtWidgets.QLabel(tab_label)
+        icon_label.setStyleSheet("background-color: transparent; border: none;")
         icon = tab_bar.tabIcon(tab_index)
         if not icon.isNull():
             icon_label.setPixmap(icon.pixmap(16, 16))
             tab_label_layout.addWidget(icon_label)
         text_label = QtWidgets.QLabel(_('AI Agent'), tab_label)
+        text_label.setStyleSheet("background-color: transparent; border: none;")
         tab_label_layout.addWidget(text_label)
         tab_label_layout.addStretch()
         tab_bar.setTabText(tab_index, "")
@@ -2918,6 +2921,11 @@ Click "Yes" to start now.')
         button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         button.setToolTip(_('Move AI Agent to sidebar view'))
         button.setFixedSize(16, 16)
+        button.setStyleSheet(
+            "QToolButton {background-color: transparent; border: none; padding: 0px;}"
+            "QToolButton:hover {background-color: transparent; border: 1px solid #8a8a8a;}"
+            "QToolButton:pressed {background-color: transparent; border: 1px solid #707070;}"
+        )
         icon_color = tab_bar.tabTextColor(tab_index)
         if not icon_color.isValid():
             icon_color = tab_bar.palette().color(QtGui.QPalette.ColorRole.WindowText)
