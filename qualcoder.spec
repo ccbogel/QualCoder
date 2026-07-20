@@ -10,7 +10,7 @@ datas += collect_data_files('langchain_community')
 datas += collect_data_files('langchain_core')
 datas += collect_data_files('langchain_openai')
 datas += collect_data_files('langchain_text_splitters')
-datas += collect_data_files('qualcoder', includes=['ai_prompts/**/*'])
+datas += [('src/qualcoder/ai_prompts', 'qualcoder/ai_prompts')]
 datas += collect_data_files('transformers', include_py_files=True)
 datas += collect_data_files('plotly')
 # datas += collect_data_files('sentence_transformers')
@@ -30,7 +30,7 @@ datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('transformers')
 hiddenimports += collect_submodules('pydantic')
-hiddenimports += ['scipy._lib.array_api_compat.numpy.fft']
+hiddenimports += ['scipy._external.array_api_compat.numpy.fft']
 
 a = Analysis(
     ['src/qualcoder/__main__.py'],

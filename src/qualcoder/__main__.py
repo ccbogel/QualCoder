@@ -1203,6 +1203,26 @@ class App(object):
                              inactive_highlight)
             palette.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.HighlightedText,
                              active_highlighted_text)
+            if platform.system() == "Darwin":
+                native_dark = False
+                try:
+                    native_dark = QtGui.QGuiApplication.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark
+                except AttributeError:
+                    native_dark = palette.color(QtGui.QPalette.ColorRole.Window).lightness() < 128
+                tooltip_background = QtGui.QColor("#2b2b2b" if native_dark else "#f7f7f7")
+                tooltip_text = QtGui.QColor("#ffffff" if native_dark else "#000000")
+                tooltip_base_role = getattr(
+                    QtGui.QPalette.ColorRole, "ToolTipBase", QtGui.QPalette.ColorRole.Base)
+                tooltip_text_role = getattr(
+                    QtGui.QPalette.ColorRole, "ToolTipText", QtGui.QPalette.ColorRole.Text)
+                for color_group in (
+                        QtGui.QPalette.ColorGroup.Active,
+                        QtGui.QPalette.ColorGroup.Inactive,
+                        QtGui.QPalette.ColorGroup.Disabled,
+                ):
+                    palette.setColor(color_group, tooltip_base_role, tooltip_background)
+                    palette.setColor(color_group, tooltip_text_role, tooltip_text)
+                QtWidgets.QToolTip.setPalette(palette)
         QtWidgets.QApplication.instance().setPalette(palette)
         if self.settings['stylesheet'] == 'dark':
             return style_dark
@@ -1240,6 +1260,17 @@ class App(object):
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
+            if platform.system() == "Darwin":
+                native_dark = False
+                try:
+                    native_dark = QtGui.QGuiApplication.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark
+                except AttributeError:
+                    palette = QtWidgets.QApplication.instance().palette()
+                    native_dark = palette.color(QtGui.QPalette.ColorRole.Window).lightness() < 128
+                if native_dark:
+                    style += "\nQToolTip {background-color: #2b2b2b; color: #ffffff; border: 1px solid #5f5f5f;}"
+                else:
+                    style += "\nQToolTip {background-color: #f7f7f7; color: #000000; border: 1px solid #bdbdbd;}"
         ''' # Keep this as a test area for parsable / unparsable style sheet lines
         style_lines = style.split("\n")
         for i, sl in enumerate(style_lines):
@@ -1268,7 +1299,12 @@ class App(object):
             return "#ca1b9a"
         if self.settings['stylesheet'] == "native":
             palette = QtWidgets.QApplication.instance().palette()
-            return palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
+            color_role = getattr(
+                QtGui.QPalette.ColorRole,
+                "Accent",
+                QtGui.QPalette.ColorRole.Highlight,
+            )
+            return palette.color(color_role).name(QtGui.QColor.NameFormat.HexRgb)
         return '#f89407'  # Default
 
     def qtawesome_icon_color(self):
@@ -1808,6 +1844,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal_display = None
         self.ai_chat_window = None
         self.ai_chat_sidebar_mode = False
+        self.ai_chat_tab_label = None
         self.ai_chat_tab_sidebar_button = None
         self.last_non_ai_chat_tab = None
 
@@ -2052,6 +2089,11 @@ Click "Yes" to start now.')
         logger.warning(msg)
         Message(self.app, _("Link error"), msg, "warning").exec()
 
+    def _use_placeholder_menu_links_as_actions(self):
+        """Return True when native menus cannot be shown reliably in the window."""
+
+        return platform.system() == "Darwin" and self.ui.menubar.isNativeMenuBar()
+
     def handle_placeholder_link(self, url):
         """Open external links or dispatch custom qualcoder:// menu links."""
 
@@ -2071,6 +2113,13 @@ Click "Yes" to start now.')
                 return
             if host == "menu":
                 target, menu_chain = self._resolve_placeholder_menu_link(url)
+                if self._use_placeholder_menu_links_as_actions():
+                    if isinstance(target, QtWidgets.QMenu):
+                        raise ValueError(_("This menu is in the macOS menu bar. Please use the menu bar at the top of the screen."))
+                    if not target.isEnabled():
+                        raise ValueError(_("Menu action is currently disabled."))
+                    target.trigger()
+                    return
                 if isinstance(target, QtWidgets.QMenu):
                     self._popup_menu_chain(menu_chain)
                     return
@@ -2843,18 +2892,46 @@ Click "Yes" to start now.')
         if tab_index < 0:
             return
         tab_bar = self.ui.tabWidget.tabBar()
+        tab_label = QtWidgets.QWidget(tab_bar)
+        tab_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        tab_label.setStyleSheet("QWidget {background-color: transparent; border: none;}")
+        tab_label_layout = QtWidgets.QHBoxLayout(tab_label)
+        tab_label_layout.setContentsMargins(0, 0, 0, 0)
+        tab_label_layout.setSpacing(4)
+        icon_label = QtWidgets.QLabel(tab_label)
+        icon_label.setStyleSheet("background-color: transparent; border: none;")
+        icon = tab_bar.tabIcon(tab_index)
+        if not icon.isNull():
+            icon_label.setPixmap(icon.pixmap(16, 16))
+            tab_label_layout.addWidget(icon_label)
+        text_label = QtWidgets.QLabel(_('AI Agent'), tab_label)
+        text_label.setStyleSheet("background-color: transparent; border: none;")
+        tab_label_layout.addWidget(text_label)
+        tab_label_layout.addStretch()
+        tab_bar.setTabText(tab_index, "")
+        tab_bar.setTabIcon(tab_index, QtGui.QIcon())
+        tab_bar.setTabToolTip(tab_index, _('AI Agent'))
+        tab_bar.setTabButton(
+            tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, tab_label
+        )
+        self.ai_chat_tab_label = tab_label
         button = QtWidgets.QToolButton(tab_bar)
         button.setAutoRaise(True)
         button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         button.setToolTip(_('Move AI Agent to sidebar view'))
-        button.setFixedSize(22, 22)
+        button.setFixedSize(16, 16)
+        button.setStyleSheet(
+            "QToolButton {background-color: transparent; border: none; padding: 0px;}"
+            "QToolButton:hover {background-color: transparent; border: 1px solid #8a8a8a;}"
+            "QToolButton:pressed {background-color: transparent; border: 1px solid #707070;}"
+        )
         icon_color = tab_bar.tabTextColor(tab_index)
         if not icon_color.isValid():
             icon_color = tab_bar.palette().color(QtGui.QPalette.ColorRole.WindowText)
         try:
             button.setIcon(qta.icon('mdi6.arrow-right-bold-outline', color=icon_color))
-            button.setIconSize(QtCore.QSize(16, 16))
+            button.setIconSize(QtCore.QSize(12, 12))
         except Exception:
             button.setText(">")
         button.clicked.connect(self.open_ai_chat_sidebar_from_tab_button)
@@ -2863,6 +2940,16 @@ Click "Yes" to start now.')
         tab_bar.setTabButton(
             tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, button
         )
+        self._sync_ai_chat_tab_widget_visibility()
+
+    def _sync_ai_chat_tab_widget_visibility(self):
+        """Keep custom AI tab widgets hidden when the AI tab is hidden."""
+
+        tab_visible = not bool(self.ai_chat_sidebar_mode)
+        if self.ai_chat_tab_label is not None:
+            self.ai_chat_tab_label.setVisible(tab_visible)
+        if self.ai_chat_tab_sidebar_button is not None:
+            self.ai_chat_tab_sidebar_button.setVisible(tab_visible)
 
     def open_ai_chat_sidebar_from_tab_button(self):
         """Switch AI chat to sidebar mode from the tab button."""
@@ -3016,6 +3103,7 @@ Click "Yes" to start now.')
         self.ai_chat_window.set_sidebar_mode(enabled)
         ai_tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
         self.ui.tabWidget.setTabVisible(ai_tab_index, not enabled)
+        self._sync_ai_chat_tab_widget_visibility()
         self.ui.sidebar.setVisible(enabled)
 
         if enabled:
@@ -4186,12 +4274,15 @@ Click "Yes" to start now.')
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
-    app = QtWidgets.QApplication(sys.argv)
-    app._qc_installed_translators = []
     qual_app = App()
     settings = qual_app.settings
     ai_models = qual_app.ai_models
     project_path = qual_app.get_most_recent_projectpath()
+    if platform.system() == "Windows" and settings.get('stylesheet') == "native":
+        # Avoid early native Windows style initialization crashes in Qt before our later Fusion fallback runs.
+        os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
+    app = QtWidgets.QApplication(sys.argv)
+    app._qc_installed_translators = []
     # Noto Sans - for general application
     install_noto_sans()
     QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
