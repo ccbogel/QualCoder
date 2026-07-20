@@ -17,19 +17,24 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
+from charset_normalizer import from_bytes
 import datetime
 import ebooklib
 from ebooklib import epub
+import json
+from pathlib import Path
 from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+from pdfminer.layout import LAParams, LTTextLine
+from PyQt6 import QtCore
 from shutil import copyfile
+from striprtf.striprtf import rtf_to_text
+from typing import Any, Iterable
 import zipfile
 
 from .docx import opendocx, getdocumenttext
@@ -42,24 +47,15 @@ logger = logging.getLogger(__name__)
 
 
 class ReplaceTextFile:
-    """  """
+    """ Replace an older text file with a new text file.
+     Attempt to adjust case, annotation and code segment positions. """
 
-    app = None
-    old_file = None
-    annotations = []
-    codings = []
-    case_assign = []
-    case_is_full_file = None
-    new_file_path = None
-    new_file = {}
-    matching_filename = False
-
-    def __init__(self, app, old_file, new_file_path):
+    def __init__(self, app, old_file:dict[str,Any], new_file_path:str):
         """ Update codings, annotations in new file
-        param:
-            app: App opject
+        Args:
+            app: App object
             old_file: Dictionary of {name, id, fulltext}
-            new_file: String filepath """
+            new_file_path: String filepath """
 
         self.app = app
         self.old_file = old_file
@@ -75,7 +71,14 @@ class ReplaceTextFile:
                 msg = _(" New file name matches another existing file name")
                 Message(self.app, _("Warning"), msg, "warning").exec()
                 return
+        self.annotations = []
+        self.codings = []
         self.get_codings_annotations_case()
+        self.case_assign = []
+        self.case_is_full_file = None
+        self.new_file = {}
+        self.matching_filename = False
+        self.pdf_page_text = ""  # Used when loading pdf text
         self.load_file_text()
         errs = self.update_annotation_positions()
         errs += self.update_code_positions()
@@ -216,32 +219,41 @@ class ReplaceTextFile:
                 self.case_assign[0]['pos1'] == len(self.old_file['fulltext']) - 1:
             self.case_is_full_file = self.case_assign[0]['caseid']
 
-    # Copied from manage_files.DialogManageFiles
-
     def load_file_text(self):
-        """ Import from file types of odt, docx pdf, epub, txt, html, htm.
+        """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm, md.
         Implement character detection for txt imports.
         Do not link the new text, load it instead.
         Delete old project folder file, insert new file int project folder.
         Update database entry and keep same id.
 
-        param:
-            import_file: filepath of file to be imported, String
-            link_path:  filepath of file to be linked, String
+        import_file: filepath of file to be imported, String
+        link_path:  filepath of file to be linked, String
         """
 
         text = ""
         # Import from odt
-        if self.new_file_path[-4:].lower() == ".odt":
+        if Path(self.new_file_path).suffix.lower() == ".odt":
             text = self.convert_odt_to_text(self.new_file_path)
             text = text.replace("\n", "\n\n")  # Add line to paragraph spacing for visual format
         # Import from docx
-        if self.new_file_path[-5:].lower() == ".docx":
+        if Path(self.new_file_path).suffix.lower() == ".docx":
             document = opendocx(self.new_file_path)
             list_ = getdocumenttext(document)
             text = "\n\n".join(list_)  # Add line to paragraph spacing for visual format
+        # Import from rtf
+        if Path(self.new_file_path).suffix.lower() == ".rtf":
+            # text_ = rtf_to_text(import_file, encoding="latin-1", errors="replace")
+            with open(self.new_file_path, "r", encoding="latin-1") as sourcefile:
+                text = ""
+                try:
+                    rtf = sourcefile.read()
+                    text = rtf_to_text(rtf)
+                except Exception as err:
+                    msg = "Importing rtf. Expecting characters encoded as latin-1. Import failed."
+                    logger.debug(f"rtf_to_text error Not Latin-1: {err}")
+                    Message(self.app, "rtf to text error", msg).exec()
         # Import from epub
-        if self.new_file_path[-5:].lower() == ".epub":
+        if Path(self.new_file_path).suffix.lower() == ".epub":
             book = epub.read_epub(self.new_file_path)
             for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
                 try:
@@ -250,71 +262,74 @@ class ReplaceTextFile:
                     text += html_to_text(string) + "\n\n"  # add line to paragraph spacing for visual format
                 except TypeError as e:
                     logger.debug("ebooklib get_body_content error " + str(e))
+        # Import from html
+        if Path(self.new_file_path).suffix.lower() in (".html", ".htm"):
+            import_errors = 0
+            with open(self.new_file_path, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
+                html_text = ""
+                while 1:
+                    line = sourcefile.readline()
+                    if not line:
+                        break
+                    html_text += line
+                text = html_to_text(html_text)
+                if import_errors > 0:
+                    Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
-        if self.new_file_path[-4:].lower() == '.pdf':
-            fp = open(self.new_file_path, 'rb')  # read binary mode
-            parser = PDFParser(fp)
-            doc = PDFDocument(parser=parser)
-            parser.set_document(doc)
-            # Potential error with encrypted PDF
-            rsrcmgr = PDFResourceManager()
+        if Path(self.new_file_path).suffix.lower() == '.pdf':
+            pdf_file = open(self.new_file_path, 'rb')
+            resource_manager = PDFResourceManager()
             laparams = LAParams()
-            laparams.char_margin = 1.0
-            laparams.word_margin = 1.0
-            device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-            interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in PDFPage.create_pages(doc):
+            device = PDFPageAggregator(resource_manager, laparams=laparams)
+            interpreter = PDFPageInterpreter(resource_manager, device)
+            pages_generator = PDFPage.get_pages(pdf_file)  # Generator PDFpage objects
+            text = ""
+            # Can be very slow with large PDFs and older computers
+            for i, page in enumerate(pages_generator):
+                QtCore.QCoreApplication.processEvents()  # Trial this to see if it prevents 'App not responding'
+                self.pdf_page_text = ""
                 interpreter.process_page(page)
                 layout = device.get_result()
-                for lt_obj in layout:
-                    if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                        text += lt_obj.get_text() + "\n"  # add line to paragraph spacing for visual format
-            # Remove excess line endings, include those with one blank space on a line
-            text = text.replace('\n \n', '\n')
-            text = text.replace('\n\n\n', '\n\n')
-        # Import from html
-        if self.new_file_path[-5:].lower() == ".html" or self.new_file_path[-4:].lower() == ".htm":
-            with open(self.new_file_path, "r") as sourcefile:
-                file_text = ""
-                while 1:
-                    line_ = sourcefile.readline()
-                    if not line_:
-                        break
-                    file_text += line_
-                text = html_to_text(file_text)
+                for lobj in layout:
+                    self.get_item_and_hierarchy(page, lobj)
+                text += self.pdf_page_text
         # Try importing as a plain text file.
         if text == "":
-            import_errors = 0
             try:
-                # Can get UnicodeDecode Error on Windows so using error handler
-                with open(self.new_file_path, "r", encoding="utf-8", errors="backslashreplace") as sourcefile:
-                    while 1:
-                        line = sourcefile.readline()
-                        if not line:
-                            break
-                        try:
-                            text += line
-                        except Exception as err:
-                            import_errors += 1
-                            print(err)
-                    # Associated with notepad files
-                    if text[0:6] == "\ufeff":
-                        text = text[6:]
-            except Exception as e:
-                msg = _("Cannot import") + f"{self.new_file_path}\n{e}"
-                Message(self.app, _("Warning"), msg, "warning").exec()
+                text_, detected_encoding = self.decode_text_with_best_encoding(self.new_file_path)
+                logger.debug(f"Importing plain text file: {self.new_file_path} decoded as {detected_encoding}")
+                if text_ and text_[0] == "\ufeff":  # associated with notepad files
+                    text = text_[1:]
+            except Exception as err:
+                logger.warning(str(err))
+                Message(self.app, _("Warning"), _("Cannot import") + f"{self.new_file_path}\n{err}",
+                        "warning").exec()
                 return
-            if import_errors > 0:
-                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
-                logger.warning(f"{self.new_file_path}: {import_errors}" + _(" lines not imported"))
         # Import of text file did not work
         if text == "":
             msg = str(self.new_file_path) + _("\nPlease check if the file is empty.")
             Message(self.app, _("Warning"), _("Cannot import ") + msg, "warning").exec()
             return
-
+        # Normalise line endings and strip BOM so the stored fulltext matches
+        # exactly what QPlainTextEdit will display. Qt converts \r\n and lone \r
+        # into \n on setPlainText(), and a leftover BOM adds a char; either makes
+        # stored positions drift past the editor length (setPosition out of range,
+        # frozen highlight on resize).
+        if Path(self.new_file_path).suffix.lower() != '.pdf':  # skip PDF
+            text = text.replace("\r\n", "\n").replace("\r", "\n")
+            if text and text[0] == "\ufeff":
+                text = text[1:]
+        # Final checks: check for duplicated filename and update model, widget and database
         name_split = self.new_file_path.split("/")
         filename = name_split[-1]
+
+        # Apply pseudonym text replacement
+        pseudonyms = self.load_pseudonyms()
+        if Path(self.new_file_path).suffix.lower() != '.pdf':
+            for pseudonym in pseudonyms:
+                pseudonymised = re.sub(rf"\b{pseudonym['original']}\b", pseudonym['pseudonym'], text)
+                text = pseudonymised
+
         cur = self.app.conn.cursor()
         # Remove old file from project folder
         cur.execute("select mediapath from source where id=?", [self.old_file['id']])
@@ -339,10 +354,66 @@ class ReplaceTextFile:
         self.app.conn.commit()
         # Update vectorstore
         if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.import_document(self.old_file['id'], self.new_file['name'], self.new_file['fulltext'])  
+            self.app.ai.sources_vectorstore.import_document(self.old_file['id'], self.new_file['name'], self.new_file['fulltext'])
+
+    def get_item_and_hierarchy(self, page, lobj: Any):
+        """ Get text item details add to page_dict, with descendants.
+        Use LTextLine as this object can be parsed in Code_pdf for font size and colour.
+        """
+
+        if isinstance(lobj, LTTextLine):  # Do not use LTTextBox
+            obj_text = lobj.get_text()
+            # Fix Pdfminer recognising invalid unicode characters.
+            obj_text = obj_text.replace(u"\uE002", "Th")
+            obj_text = obj_text.replace(u"\uFB01", "fi")
+            self.pdf_page_text += obj_text
+        if isinstance(lobj, Iterable):
+            for obj in lobj:
+                self.get_item_and_hierarchy(page, obj)
+
+    def load_pseudonyms(self):
+        """ Pseudonyms stored in pseudonyms.json in qda data folder.
+        Loads into list of dictionaries of 'original', ;pseudonym' keys.
+        """
+
+        pseudonyms = []
+        pseudonyms_filepath = os.path.join(self.app.project_path, "pseudonyms.json")
+        try:
+            with open(pseudonyms_filepath, "r") as f:
+                pseudonyms = json.load(f)
+        except FileNotFoundError:
+            pass
+        return pseudonyms
 
     @staticmethod
-    def convert_odt_to_text(import_file):
+    def decode_text_with_best_encoding(import_file:str):
+        """ Decode text file bytes using robust encoding detection and fallbacks. """
+
+        with open(import_file, "rb") as sourcefile:
+            raw_bytes = sourcefile.read()
+        if not raw_bytes:
+            return "", "empty"
+        # Try Unicode first, with and without BOM
+        decode_order = ("utf-8-sig", "utf-8")
+        for encoding in decode_order:
+            try:
+                return raw_bytes.decode(encoding), encoding
+            except UnicodeDecodeError:
+                pass
+        # no Unicode, try to detect charset with charset-normalizer, then fall back to common encodings
+        best_match = from_bytes(raw_bytes).best()
+        if best_match is not None:
+            detected_encoding = best_match.encoding if best_match.encoding else "unknown"
+            return str(best_match), detected_encoding
+        for encoding in ("cp1252", "latin-1"):
+            try:
+                return raw_bytes.decode(encoding), encoding
+            except UnicodeDecodeError:
+                pass
+        return raw_bytes.decode("utf-8", errors="backslashreplace"), "utf-8(backslashreplace)"
+
+    @staticmethod
+    def convert_odt_to_text(import_file:str) -> str:
         """ Convert odt to very rough equivalent with headings, list items and tables for
         html display in qTextEdits. """
 
