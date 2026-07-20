@@ -10,7 +10,7 @@ datas += collect_data_files('langchain_community')
 datas += collect_data_files('langchain_core')
 datas += collect_data_files('langchain_openai')
 datas += collect_data_files('langchain_text_splitters')
-datas += collect_data_files('qualcoder', includes=['ai_prompts/**/*'])
+datas += [('src/qualcoder/ai_prompts', 'qualcoder/ai_prompts')]
 datas += collect_data_files('transformers', include_py_files=True)
 datas += collect_data_files('plotly')
 # datas += collect_data_files('sentence_transformers')
