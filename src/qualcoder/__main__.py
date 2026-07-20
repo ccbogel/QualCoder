@@ -2730,7 +2730,7 @@ Click "Yes" to start now.')
         self.journal_display = ui
         ui.show()
 
-    def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
+    def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0, doc_ids=None):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. 
         Args:
@@ -2739,6 +2739,9 @@ Click "Yes" to start now.')
             doc_id: If not None and task = "documents", this doument will be loaded in the coding window
             doc_sel_start: The character-position of the beginning of the selection in the coding window
             doc_sel_end: The end of the selection
+            doc_ids: Optional list of file ids; with task = "mark_speakers" they become
+                the preselected files in the Mark speakers dialog (multi-selection from
+                Manage files).
         """
 
         files = self.app.get_text_filenames()
@@ -2757,7 +2760,7 @@ Click "Yes" to start now.')
                 ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
                 if doc_id is not None:
                     ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
-                    ui.mark_speakers()                               
+                    ui.mark_speakers(preselected_ids=doc_ids)                               
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
