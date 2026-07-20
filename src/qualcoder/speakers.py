@@ -228,6 +228,14 @@ class DialogSpeakers(QtWidgets.QDialog):
             self.files = [dict(fid)]
         else:  # forma clasica (app, fid, filename). classic form
             self.files = [{'id': fid, 'name': filename}]
+        # Si el llamador no aporta una seleccion usable, la preseleccion pasa a ser
+        # todos los archivos de texto del proyecto (retroalimentacion de Van: nunca
+        # abrir con "No files selected").
+        # If the caller passed no usable selection, preselect every project text file
+        # (Van's feedback: never open with "No files selected").
+        self.files = [f for f in self.files if f.get('id') is not None]
+        if not self.files:
+            self.files = self._fetch_text_files()
         self._info_note = ""   # nota o error a mostrar en label_info. note or error for label_info
         self._additional_vocab: List[str] = []  # <- L  vocabulario acumulado de codigos adicionales. shared additional-codes vocab
         self._additional_combos: Dict[int, QtWidgets.QComboBox] = {}  # <- L  combo por fila. per-row combo
@@ -258,6 +266,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         self.codings: List[Dict[str, Any]] = []
         self.speaker_summary: List[Dict[str, Any]] = []
         self._update_title()
+        self._update_files_label()
         self.collect_names()
         self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.on_item_changed)
@@ -503,16 +512,22 @@ class DialogSpeakers(QtWidgets.QDialog):
 
     def select_files(self):
         """ 
-        Abre el selector estandar de archivos y reanaliza el conjunto elegido.
+        Abre el selector estandar de archivos, mostrando MARCADA la seleccion actual
+        para poder revisarla y ajustarla (retroalimentacion de Van), y reanaliza el
+        conjunto elegido.
         
-        Open the standard file picker and re-scan the chosen set. 
+        Open the standard file picker with the CURRENT selection shown selected, so
+        the user can check and adjust it (Van's feedback), and re-scan the chosen set. 
         """
         
         text_files = self._fetch_text_files()
         if not text_files:
             Message(self.app, _('Mark speakers'), _('No text files found.'), 'warning').exec()
             return
-        ui = DialogSelectItems(self.app, text_files, _("Select files to scan for speakers"), "many")
+        current_ids = {f['id'] for f in self.files}
+        preselected = [f for f in text_files if f['id'] in current_ids]
+        ui = DialogSelectItems(self.app, text_files, _("Select files to scan for speakers"), "many",
+                               preselected=preselected, with_checkboxes=True)
         if not ui.exec():
             return
         selected = ui.get_selected()
@@ -520,7 +535,34 @@ class DialogSpeakers(QtWidgets.QDialog):
             return
         self.files = [{'id': s['id'], 'name': s['name']} for s in selected]
         self._update_title()
+        self._update_files_label()
         self.reparse()
+
+    def _update_files_label(self):
+        """ 
+        Muestra la lista actual de archivos junto al boton "Select files", con
+        elipsis si es larga; el tooltip lista todos los archivos (retroalimentacion
+        de Van: una forma simple de comprobar la seleccion actual).
+        
+        Show the current file list next to the "Select files" button, elided when
+        long; the tooltip lists every file (Van's feedback: a simple way to check
+        the current selection). 
+        """
+        
+        label = getattr(self.ui, 'label_files', None)
+        if label is None:  # UI file not regenerated: degrade gracefully
+            return
+        names = [f['name'] for f in self.files]
+        if not names:
+            label.setText(_("No files selected"))
+            label.setToolTip("")
+            return
+        text = ", ".join(names)
+        if len(names) > 1:
+            text = f"({len(names)}) " + text
+        metrics = QtGui.QFontMetrics(label.font())
+        label.setText(metrics.elidedText(text, QtCore.Qt.TextElideMode.ElideRight, 420))
+        label.setToolTip("\n".join(names))
 
     def reparse(self):
         """ 
