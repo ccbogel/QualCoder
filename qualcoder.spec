@@ -30,7 +30,7 @@ datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('transformers')
 hiddenimports += collect_submodules('pydantic')
-hiddenimports += ['scipy._lib.array_api_compat.numpy.fft']
+hiddenimports += ['scipy._external.array_api_compat.numpy.fft']
 
 a = Analysis(
     ['src/qualcoder/__main__.py'],
