@@ -609,11 +609,14 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.pushButton_delete.clicked.connect(self.delete_chat)
         self.chat_list_model = QStandardItemModel(self)
         self.ui.treeView_chat_list.setModel(self.chat_list_model)
-        self.ui.treeView_chat_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.ui.treeView_chat_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeView_chat_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.shortcut_delete_chat = QShortcut(QKeySequence("Delete"), self.ui.treeView_chat_list)
         self.shortcut_delete_chat.setContext(QtCore.Qt.ShortcutContext.WidgetShortcut)
         self.shortcut_delete_chat.activated.connect(self.delete_chat)
+        self.shortcut_select_all_chats = QShortcut(QKeySequence("Ctrl+A"), self.ui.treeView_chat_list)
+        self.shortcut_select_all_chats.setContext(QtCore.Qt.ShortcutContext.WidgetShortcut)
+        self.shortcut_select_all_chats.activated.connect(self.select_all_chats)
         # Enable editing of items on double click and when pressing F2
         self.ui.treeView_chat_list.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked |
@@ -650,6 +653,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.agent_prompts_catalog = AiAgentPromptsCatalog(self.app)
         self.ai_mcp_server = AiMcpServer(self.app)
         self.ai_prompt = None
+        self._multi_chat_selection_active = False
         self._setup_prompt_completion()
         self.init_styles()
         self.ai_busy_timer = QtCore.QTimer(self)
@@ -1863,6 +1867,17 @@ class DialogAIChat(QtWidgets.QDialog):
     def set_sidebar_mode(self, enabled):
         """Switch dialog internals between main view and sidebar view."""
 
+        selected_rows = self._selected_chat_rows()
+        self.ui.treeView_chat_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection
+            if enabled else QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection
+        )
+        if enabled:
+            target_row = self.current_chat_idx
+            if len(selected_rows) > 0:
+                target_row = selected_rows[0]
+            self._multi_chat_selection_active = False
+            self._set_chat_list_current_row(target_row)
         if enabled:
             self.ui.gridLayout.setContentsMargins(0, 0, 0, 0)
             self._move_chat_widget_to_sidebar()
@@ -5398,27 +5413,36 @@ data collected. This information will accompany every prompt sent to the AI, res
         """Deletes the currently selected chat, connected to the button
            'pushButton_delete'
         """
-        if self.current_chat_idx <= -1:
+        selected_rows = self._selected_chat_rows()
+        if len(selected_rows) == 0:
             return
-        chat_id = int(self.chat_list[self.current_chat_idx][0])
-        chat_name = self._display_chat_name(
-            self.chat_list[self.current_chat_idx][1],
-            self.chat_list[self.current_chat_idx][2],
-        )
-        msg = _('Do you really want to delete ') + '"' + chat_name + '"?'
-        ui = DialogConfirmDelete(self.app, msg, _('Delete Chat'))
+        selected_chat_ids = [int(self.chat_list[row][0]) for row in selected_rows]
+        if len(selected_rows) == 1:
+            chat_row = selected_rows[0]
+            chat_name = self._display_chat_name(
+                self.chat_list[chat_row][1],
+                self.chat_list[chat_row][2],
+            )
+            msg = _('Do you really want to delete ') + '"' + chat_name + '"?'
+            title = _('Delete Chat')
+        else:
+            msg = _('Do you really want to delete {count} selected chats?').format(count=len(selected_rows))
+            title = _('Delete Chats')
+        ui = DialogConfirmDelete(self.app, msg, title)
         ok = ui.exec()
         if not ok:
             return
         cursor = self.chat_history_conn.cursor()
         try:
-            cursor.execute('DELETE from chat_messages WHERE chat_id = ?', (chat_id,))
-            cursor.execute('DELETE from chats WHERE id = ?', (chat_id,))
+            cursor.executemany('DELETE from chat_messages WHERE chat_id = ?', [(chat_id,) for chat_id in selected_chat_ids])
+            cursor.executemany('DELETE from chats WHERE id = ?', [(chat_id,) for chat_id in selected_chat_ids])
             self.chat_history_conn.commit()
         except Exception as e_:
             print(e_)
             self.chat_history_conn.rollback()
             raise
+        self.current_chat_idx = selected_rows[0]
+        self._multi_chat_selection_active = False
         self.fill_chat_list()
 
     def find_chat_idx(self, chat_id) -> int | None:
@@ -5558,6 +5582,19 @@ data collected. This information will accompany every prompt sent to the AI, res
 
     def update_chat_window(self, scroll_to_bottom=True):
         """load current chat into self.ai_output"""
+        if getattr(self, '_multi_chat_selection_active', False):
+            self.ui.ai_output.setAlignment(
+                QtCore.Qt.AlignmentFlag.AlignTop
+                | QtCore.Qt.AlignmentFlag.AlignLeading
+                | QtCore.Qt.AlignmentFlag.AlignLeft
+            )
+            self.ui.ai_output.setText('')
+            self.ui.plainTextEdit_question.setEnabled(False)
+            self.ui.pushButton_question.setEnabled(False)
+            self.ui.scrollArea_ai_output.verticalScrollBar().setValue(0)
+            if hasattr(self, "_prompt_reference_highlighter"):
+                self._prompt_reference_highlighter.rehighlight()
+            return
         if self.current_chat_idx > -1:
             self.is_updating_chat_window = True
             try:
@@ -5841,24 +5878,67 @@ data collected. This information will accompany every prompt sent to the AI, res
             return index.row()
         return -1
 
+    def _selected_chat_rows(self) -> list[int]:
+        """Return sorted selected chat rows from the left chat list."""
+
+        selection_model = self.ui.treeView_chat_list.selectionModel()
+        if selection_model is None:
+            return []
+        rows = {
+            index.row()
+            for index in selection_model.selectedRows()
+            if index.isValid() and 0 <= index.row() < self.chat_list_model.rowCount()
+        }
+        return sorted(rows)
+
+    def select_all_chats(self) -> None:
+        """Select all chats in the full tab chat list."""
+
+        if self.ui.treeView_chat_list.selectionMode() != QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection:
+            return
+        if self.chat_list_model.rowCount() == 0:
+            return
+        self.ui.treeView_chat_list.selectAll()
+
     def _set_chat_list_current_row(self, row):
+        selection_model = self.ui.treeView_chat_list.selectionModel()
         if row is None or row < 0 or row >= self.chat_list_model.rowCount():
             with QtCore.QSignalBlocker(self.ui.comboBox_ai_chats):
                 self.ui.comboBox_ai_chats.setCurrentIndex(-1)
+            if selection_model is not None:
+                selection_model.clearSelection()
+                selection_model.setCurrentIndex(
+                    QtCore.QModelIndex(),
+                    QtCore.QItemSelectionModel.SelectionFlag.NoUpdate
+                )
             self.ui.treeView_chat_list.setCurrentIndex(QtCore.QModelIndex())
             return
         with QtCore.QSignalBlocker(self.ui.comboBox_ai_chats):
             self.ui.comboBox_ai_chats.setCurrentIndex(row)
         index = self.chat_list_model.index(row, 0)
-        self.ui.treeView_chat_list.setCurrentIndex(index)
+        if selection_model is not None:
+            selection_model.setCurrentIndex(
+                index,
+                QtCore.QItemSelectionModel.SelectionFlag.ClearAndSelect
+                | QtCore.QItemSelectionModel.SelectionFlag.Rows
+            )
+        else:
+            self.ui.treeView_chat_list.setCurrentIndex(index)
 
     def chat_list_selection_changed(self, selected=None, deselected=None, force_update=False):
         self._dismiss_prompt_completion(accept=False)
-        current_row = self._chat_list_current_row()
+        previous_multi_selection = self._multi_chat_selection_active
+        selected_rows = self._selected_chat_rows()
+        current_row = selected_rows[0] if len(selected_rows) == 1 else -1
         with QtCore.QSignalBlocker(self.ui.comboBox_ai_chats):
             self.ui.comboBox_ai_chats.setCurrentIndex(current_row)
-        self.ui.pushButton_delete.setEnabled(current_row > -1)
-        if (not force_update) and (self.current_chat_idx == current_row):
+        self.ui.pushButton_delete.setEnabled(len(selected_rows) > 0)
+        self._multi_chat_selection_active = len(selected_rows) > 1
+        if self._multi_chat_selection_active:
+            self.chat_msg_list.clear()
+            self.update_chat_window(scroll_to_bottom=False)
+            return
+        if (not force_update) and (self.current_chat_idx == current_row) and not previous_multi_selection:
             return
         if self._cancel_chat_scope(self.current_chat_idx, ask=True):
             # AI generation is either finished or canceled, we can change to another chat
@@ -5891,20 +5971,31 @@ data collected. This information will accompany every prompt sent to the AI, res
 
     def open_context_menu(self, position):
         index = self.ui.treeView_chat_list.indexAt(position)
-        if index.isValid():
-            self.ui.treeView_chat_list.setCurrentIndex(index)
+        if index.isValid() and index.row() not in self._selected_chat_rows():
+            self._set_chat_list_current_row(index.row())
         context_menu = QtWidgets.QMenu(self)
+        selected_rows = self._selected_chat_rows()
         if self.chat_list_model.rowCount() > 0:
-            if self.current_chat_idx > -1:
-                edit_action = QAction("Edit Title", self)
-                delete_action = QAction("Delete Chat", self)
-                export_action = QAction("Export Chat", self)
+            select_all_action = QAction(_('Select all'), self)
+            select_all_action.setShortcut(QKeySequence("Ctrl+A"))
+            select_all_action.triggered.connect(self.select_all_chats)
+            context_menu.addAction(select_all_action)
+            if len(selected_rows) == 1 and self.current_chat_idx > -1:
+                edit_action = QAction(_('Edit Title'), self)
+                delete_action = QAction(_('Delete Chat'), self)
+                export_action = QAction(_('Export Chat'), self)
+                context_menu.addSeparator()
                 context_menu.addAction(edit_action)
                 context_menu.addAction(delete_action)
                 context_menu.addAction(export_action)
                 edit_action.triggered.connect(self.edit_title)
                 delete_action.triggered.connect(self.delete_chat)
                 export_action.triggered.connect(self.export_chat)
+            elif len(selected_rows) > 1:
+                delete_action = QAction(_('Delete Chats'), self)
+                context_menu.addSeparator()
+                context_menu.addAction(delete_action)
+                delete_action.triggered.connect(self.delete_chat)
 
             # The search function will be implemented later:
             # search_action = QAction("Search all Chats", self)
