@@ -9343,7 +9343,9 @@ data collected. This information will accompany every prompt sent to the AI, res
         label = self._ai_link_tooltip.findChild(QtWidgets.QLabel, "ai_link_tooltip_label")
         if label is None:
             return
-        label.setFont(QtGui.QFont(self.app.settings["font"], self.app.settings["docfontsize"]))
+        doc_font_size = self.app.settings["docfontsize"]
+        tooltip_font_family = self.app.settings["font"].replace("\\", "\\\\").replace('"', '\\"')
+        label.setFont(QtGui.QFont(self.app.settings["font"], doc_font_size))
         background, foreground, border = self._ai_link_tooltip_colors()
         self._ai_link_tooltip.setStyleSheet(
             "QFrame {"
@@ -9353,6 +9355,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             "QLabel {"
             f"background-color: {background.name()};"
             f"color: {foreground.name()};"
+            f'font-family: "{tooltip_font_family}";'
+            f"font-size: {doc_font_size}pt;"
             "border: none;"
             "padding: 6px;"
             "}"
