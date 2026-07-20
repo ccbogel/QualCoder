@@ -36,6 +36,7 @@ from PyQt6.QtWidgets import QDialog
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor, colors as valid_colors
+from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
 from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
@@ -125,7 +126,7 @@ class CodeOrganiser(QDialog):
                   " the coding concepts and their hierarchy.\n"
                   "Select a code branch or All, then right click to:\n"
                   "Add categories, rename codes and categories, update memos, merge codes, "
-                  "merge categories, delete categories.\n"
+                  "merge categories, delete codes, delete categories.\n"
                   "\n"
                   "Potential for unexpected errors could occur.\n"
                   "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON.")
@@ -1395,6 +1396,14 @@ class CodeOrganiser(QDialog):
                         location = _("unlinked")
                     changes.append(_("New code: ") + f"'{item['name'].strip()}' ({location})")
                 continue
+            # Deletions (canvas 'Delete code' / 'Delete category')
+            if item.get('delete') and is_code:
+                changes.append(_("Code deleted: ") + f"'{snap['name'].strip()}' "
+                               + _("(all its codings will be deleted)"))
+                continue
+            if item.get('delete') and not is_code and item.get('deleted_category'):
+                changes.append(_("Category deleted: ") + f"'{snap['name'].strip()}'")
+                continue
             # Merges
             if item.get('delete') and not is_code:
                 target = cat_name(item.get('merged_into_catid'))
@@ -1473,6 +1482,9 @@ class CodeOrganiser(QDialog):
             return
         code_merges_present = any(
             item['cid'] is not None and item['name'] == "" for item in model)
+        # code deletions also change the coding tables (code_text/av/image)
+        code_deletes_present = any(
+            item.get('delete') is True and item['cid'] is not None for item in model)
 
         # Merged new categories are not used. They are nameless. Remove from model.
         merged_new_categories = []
@@ -1520,6 +1532,21 @@ class CodeOrganiser(QDialog):
             for item in categories_to_delete:
                 logger.debug(f"Category to delete {item['original_name']} {item['catid']}")
                 cur.execute("delete from code_cat where catid=?", [item['catid']])
+
+            # Delete pre-existing codes flagged for deletion (canvas 'Delete
+            # code'). The code and ALL its codings are removed, mirroring the code tree
+            # delete (code_text.delete_code). Their sub-codes were re-parented in the
+            # model at delete time, so the general update pass persists the new parents.
+            codes_to_delete = [it for it in model
+                               if it.get('delete') is True and it.get('cid') is not None]
+            for item in codes_to_delete:
+                model.remove(item)
+            for item in codes_to_delete:
+                logger.debug(f"Code to delete {item['original_name']} {item['cid']}")
+                cur.execute("delete from code_name where cid=?", [item['cid']])
+                cur.execute("delete from code_text where cid=?", [item['cid']])
+                cur.execute("delete from code_av where cid=?", [item['cid']])
+                cur.execute("delete from code_image where cid=?", [item['cid']])
 
             # Get inserted new categories where supercatid is < 0 and update with insert_id
             cur.execute("select catid, supercatid, name from code_cat where supercatid < 0")
@@ -1628,7 +1655,7 @@ class CodeOrganiser(QDialog):
         # notify the project event bus so the graph and reports resync live
         if self.app.project_events is not None:
             tables = ['code_cat', 'code_name']
-            if code_merges_present:
+            if code_merges_present or code_deletes_present:
                 tables += ['code_text', 'code_image', 'code_av']
             self.app.project_events.emit_table_changes(tables, source=self)
 
@@ -1835,7 +1862,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
         # Garbage items for removal
         for item in self.items():
-            if isinstance(item, TextGraphicsItem) and item.code_or_cat['name'] == "":
+            if isinstance(item, TextGraphicsItem) and \
+                    (item.code_or_cat['name'] == "" or item.code_or_cat.get('delete')):
                 self.removeItem(item)
         # Update code.catid or category.supercatid if a category has been merged into another category
         global model  # noqa: F824
@@ -1948,7 +1976,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                             cat_item.code_or_cat['cid'] is None and \
                             cat_item.code_or_cat['catid'] == code_item.code_or_cat['catid']:
                         link_item = LinkGraphicsItem(cat_item, code_item, color=link_color)
-                        self.addItem(link_item)
+                        if cat_item.isVisible() and code_item.isVisible():
+                            self.addItem(link_item)
 
         # Link from Category to Category
         for item1 in self.items():
@@ -2133,6 +2162,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         rename_action = menu.addAction(_('Rename'))
         if self.code_or_cat['memo'] != "":
             show_memo_action = menu.addAction(_("Display memo"))
+        # deletion from the canvas (model only; the database is written on Apply)
+        menu.addSeparator()
+        if self.code_or_cat['cid'] is not None:
+            delete_action = menu.addAction(_('Delete code'))
+        else:
+            delete_action = menu.addAction(_('Delete category'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -2177,6 +2212,11 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.add_code_to_category()
         if action == add_sub_code_action:
             self.add_sub_code()
+        if action == delete_action:
+            if self.code_or_cat['cid'] is not None:
+                self.delete_this_code()
+            else:
+                self.delete_this_category()
 
     def update_name(self):
         """ Update name of code or category.
@@ -2228,7 +2268,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         categories_ = []
         global model  # noqa: F824
         for item in model:
-            if item['cid'] is None and item['name'] != "":
+            if item['cid'] is None and item['name'] != "" and not item.get('delete'):
                 categories_.append(item)
         ui = DialogSelectItems(self.app, categories_, _('Link code: Select category'), 'single')
         ok = ui.exec()
@@ -2260,7 +2300,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         blocked_cids = descendant_cids(model, self.code_or_cat['cid'])
         for item in model:
             if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "" \
-                    and item['cid'] not in blocked_cids:
+                    and item['cid'] not in blocked_cids and not item.get('delete'):
                 codes_.append(item)
         codes_ = sorted(codes_, key=lambda d: d['name'])
         ui = DialogSelectItems(self.app, codes_, _('Nest under: Select parent code'), 'single')
@@ -2305,7 +2345,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         unsorted_codes = []
         global model  # noqa: F824
         for item in model:
-            if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "":
+            if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "" \
+                    and not item.get('delete'):
                 unsorted_codes.append(item)
         # Sort codes alphabetically
         codes = sorted(unsorted_codes, key=lambda d: d['name'])
@@ -2433,7 +2474,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         blocked_catids = descendant_catids(model, self.code_or_cat['catid'])
         for item in model:
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None and \
-                    item['catid'] not in blocked_catids:
+                    item['catid'] not in blocked_catids and not item.get('delete'):
                 categories_.append(item)
 
         ui = DialogSelectItems(self.app, categories_, _('Link under: Select category'), 'single')
@@ -2460,7 +2501,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         blocked_catids = descendant_catids(model, self.code_or_cat['catid'])
         for item in model:
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None and \
-                    item['catid'] not in blocked_catids:
+                    item['catid'] not in blocked_catids and not item.get('delete'):
                 categories.append(item)
         ui = DialogSelectItems(self.app, categories, _('Merge into: Select category'), 'single')
         ok = ui.exec()
@@ -2505,6 +2546,85 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         for item in model:
             if item['catid'] == self.code_or_cat['catid']:
                 item['supercatid'] = None
+        global update_graphics_item_models  # noqa: F824
+        update_graphics_item_models = True
+
+    def delete_this_code(self):
+        """ Delete this code from the canvas. Model only: the code row and ALL its
+        codings are deleted from the database on Apply, inside the single transaction
+        (mirrors code_text.delete_code). Sub-codes are re-parented like the code tree
+        delete: lifted to the grandparent code, or moved into this code's category
+        (or top level) when there is no parent code. """
+
+        global model  # noqa: F824
+        msg = _("Code: ") + self.code_or_cat['name'].strip() + "\n" \
+            + _("All codings of this code will also be deleted when changes are applied.")
+        ui = DialogConfirmDelete(self.app, msg)
+        if not ui.exec():
+            return
+        cid = self.code_or_cat['cid']
+        # Re-parent sub-codes so they are not orphaned by the deletion
+        for item in model:
+            if item.get('cid') is not None and item.get('supercid') == cid:
+                if self.code_or_cat.get('supercid') is not None:
+                    item['supercid'] = self.code_or_cat['supercid']
+                    item['original_supercid'] = self.code_or_cat['supercid']
+                else:
+                    item['supercid'] = None
+                    item['original_supercid'] = None
+                    item['catid'] = self.code_or_cat['catid']
+        if cid is not None and cid < 0:
+            # New code, never written to the database: drop it from the model entirely
+            for item in list(model):
+                if item.get('cid') == cid:
+                    model.remove(item)
+        else:
+            for item in model:
+                if item.get('cid') == cid:
+                    item['delete'] = True  # deleted from database on Apply
+                    break
+            self.code_or_cat['delete'] = True
+        self.hide()
+        scene = self.scene()
+        if scene is not None:
+            scene.remove_links()
+            scene.create_links()
+        global update_graphics_item_models  # noqa: F824
+        update_graphics_item_models = True
+
+    def delete_this_category(self):
+        """ Delete this category from the canvas. Model only: the category row is
+        deleted from the database on Apply, inside the single transaction. Its codes
+        and sub-categories become top level, mirroring code_text.delete_category. """
+
+        global model  # noqa: F824
+        ui = DialogConfirmDelete(self.app, _("Category: ") + self.code_or_cat['name'].strip())
+        if not ui.exec():
+            return
+        catid = self.code_or_cat['catid']
+        # Children become top level (mirrors the code tree delete semantics)
+        for item in model:
+            if item.get('cid') is not None and item.get('catid') == catid:
+                item['catid'] = None
+            if item.get('cid') is None and item.get('supercatid') == catid:
+                item['supercatid'] = None
+        if catid is not None and catid < 0:
+            # New category, never written to the database: drop it from the model
+            for item in list(model):
+                if item.get('cid') is None and item.get('catid') == catid:
+                    model.remove(item)
+        else:
+            for item in model:
+                if item.get('cid') is None and item.get('catid') == catid:
+                    item['delete'] = True  # deleted from database on Apply
+                    item['deleted_category'] = True  # deleted, NOT merged: change-preview wording
+                    break
+            self.code_or_cat['delete'] = True
+        self.hide()
+        scene = self.scene()
+        if scene is not None:
+            scene.remove_links()
+            scene.create_links()
         global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
