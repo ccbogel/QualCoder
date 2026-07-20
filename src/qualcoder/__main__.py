@@ -4274,12 +4274,15 @@ Click "Yes" to start now.')
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
-    app = QtWidgets.QApplication(sys.argv)
-    app._qc_installed_translators = []
     qual_app = App()
     settings = qual_app.settings
     ai_models = qual_app.ai_models
     project_path = qual_app.get_most_recent_projectpath()
+    if platform.system() == "Windows" and settings.get('stylesheet') == "native":
+        # Avoid early native Windows style initialization crashes in Qt before our later Fusion fallback runs.
+        os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
+    app = QtWidgets.QApplication(sys.argv)
+    app._qc_installed_translators = []
     # Noto Sans - for general application
     install_noto_sans()
     QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
