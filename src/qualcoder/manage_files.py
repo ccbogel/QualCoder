@@ -1752,7 +1752,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                                                                       _("Data files") + " (*.csv *.CSV *.tsv *.TSV *.ods *.ODS *.xlsx *.XLSX *.xls *.XLS)")
         if not filepath: return
 
-        msg = _("Import from survey: ") + f"{filepath}\n"
+        msg = _("Import from survey: ") + f"{filepath}"
         if filepath.lower().endswith('.csv') or filepath.lower().endswith('.tsv'):
             delimiter = ','
             try:
@@ -1790,9 +1790,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         attr_file_or_case = "case"
         if not dialog.get_case_setting() or not case_cols:
             attr_file_or_case = "file"
+        popup_msg = ""
         if not text_cols:
-            Message(self.app, _("Notice"), _("Survey - No qualitative text columns to analyse.")).exec()
-            msg += _("\nNo columns assigned as qualitative. Survey files will be empty.")
+            popup_msg = _("No columns assigned as qualitative.")
+            msg += _("\nNo columns assigned as qualitative.")
+            #msg += _("\nEmpty files will be created with attributes assigned to them.")
         cur = self.app.conn.cursor()
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_attributes = {}  # Change from character to numeric attribute_type after checking when loading data
@@ -1808,31 +1810,27 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         count = 0
         for index, row in df.iterrows():
-            text_content = ""
+            fulltext = ""
             code_positions = []
 
             for t_col in text_cols:
                 val = str(row[t_col]) if pd.notna(row[t_col]) else ""
                 if val.strip():
-                    if text_content:
-                        text_content += "\n\n"
-
+                    if fulltext:
+                        fulltext += "\n\n"
                     header = f"[{t_col}]:\n"
                     val_clean = val.strip()
-                    current_len = len(text_content)
-                    text_content += header + val_clean
+                    current_len = len(fulltext)
+                    fulltext += header + val_clean
                     start_pos = current_len + len(header)
                     end_pos = start_pos + len(val_clean)
                     code_positions.append((t_col, start_pos, end_pos, val_clean))
-
-            '''if not text_content.strip(): 
-                continue'''
+            # if not fulltext.strip(): continue
 
             case_name = ""
             if case_cols:
                 c_vals = [str(row[c]) for c in case_cols if pd.notna(row[c])]
                 case_name = sanitize_name("_".join(c_vals))
-
             '''if filename_col and pd.notna(row[filename_col]):
                 base_filename = sanitize_name(row[filename_col])'''
             if case_name:
@@ -1850,12 +1848,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                     break
                 filename = f"{base_filename}_{suffix}"
                 suffix += 1
-
+            # Wondering if only case and case attributes are imported and no freeetext columns selected, if
+            # the empty 'placeholder' files should be created .. ?
             filepath_save = os.path.join(self.app.project_path, "documents", filename + ".txt")
             with open(filepath_save, 'w', encoding='utf-8') as f:
-                f.write(text_content)
+                f.write(fulltext)
             cur.execute("insert into source(name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
-                        (filename, text_content, None, "", self.app.settings['codername'], now))
+                        (filename, fulltext, None, "", self.app.settings['codername'], now))
             file_id = cur.lastrowid
 
             if autocode_enabled:
@@ -1886,7 +1885,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     case_id = cur.lastrowid
 
                 cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
-                            (case_id, file_id, 0, len(text_content), self.app.settings['codername'], now, ""))
+                            (case_id, file_id, 0, len(fulltext), self.app.settings['codername'], now, ""))
 
             # Insert file or case attributes from survey, and check if character or numeric
             for i, col in enumerate(attr_cols):
@@ -1911,11 +1910,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             count += 1
 
         # Update attribute type for new attributes, if values were all numeric, default was character
-        msg += "\n" + _("Attributes ") + " (" + attr_file_or_case + "):"
+        msg += "\n" + _("Attributes") + " → (" + attr_file_or_case + "):"
         for key, value in new_attributes.items():
             cur.execute("update attribute_type set valuetype=? where name=?", [value, key])
-            msg += f"\n{key} - {value}"
-
+            msg += f"\n    {key} - {value}"
         self.app.conn.commit()
         changed_tables = {"source"}
         if attr_cols:
@@ -1926,12 +1924,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             changed_tables.update({"code_name", "code_text"})
         self._emit_project_table_changes(sorted(changed_tables))
         msg += f"\n{count} " + _("rows imported.")
+        msg += "\n" + "▔" * 20  # U2594
         self.app.delete_backup = False
         self.update_files_in_dialogs()
         self.load_file_data()
+        self.parent_text_edit.append("<h2>" + _("Survey Import") + "</h2>")
         self.parent_text_edit.append(msg)
-        Message(self.app, _("Import successful."), _("{} rows imported.").format(count)).exec()
-        
+        Message(self.app, _("Import successful."), popup_msg + "\n" + _("{} rows imported.").format(count)).exec()
 
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
