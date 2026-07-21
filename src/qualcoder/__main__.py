@@ -3449,12 +3449,12 @@ Click "Yes" to start now.')
             self.project['date'] = result[1]
             self.project['memo'] = result[2]
             self.project['about'] = result[3]
-            self.ui.textEdit.append(_("New Project Created") + "\n========\n"
+            self.ui.textEdit.append(_("New Project Created") + "\n" + "▔" * 20 + "\n"  # U2594
                                     + _("DB Version:") + f"{self.project['databaseversion']}\n"
                                     + _("Date: ") + f"{self.project['date']}\n"
                                     + _("About: ") + f"{self.project['about']}\n"
                                     + _("Coder:") + f"{self.app.settings['codername']}\n"
-                                    + "========")
+                                    + "▔" * 20)
         except Exception as err:
             msg = _("Problem creating database ")
             logger.warning(f"{msg}{self.app.project_path} Exception: {err}")
@@ -3994,7 +3994,7 @@ Click "Yes" to start now.')
         # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
         self.app.ai.init_llm(self)
         self.ai_chat_window.init_ai_chat(self.app)
-        msg = f"<p>{_('Project Opened: ')}{self.app.project_name}</p>"
+        msg = f"{_('Project Opened: ')}{self.app.project_name}"
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
@@ -4049,7 +4049,7 @@ Click "Yes" to start now.')
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f"{_('Journals: ')}{res[0]}<br />"
+        msg += f"{_('Journals: ')}{res[0]}"
         msg += "</p>"
         self.ui.textEdit.append(msg)
         msg = ""
@@ -4081,8 +4081,7 @@ Click "Yes" to start now.')
             self.clear_tab_widgets(tab_widget, show_placeholder=True)
         # Added if statement for the first opening of QualCoder. Looks odd closing a project that is not there.
         if self.app.project_name != "":
-            self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
-            self.ui.textEdit.append("========\n")
+            self.ui.textEdit.append(_("Closing project: ") + self.app.project_name +"\n" + "▔" * 20 + "\n")
             self.app.append_recent_project(self.app.project_path)
         # AI
         self.ai_chat_window.close()
