@@ -1743,11 +1743,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Import from CSV/TSV/ODS/XLSX Header row to contain column headings.
         Process Qual Texts, Cases, Attributes and optional assign autocoding.
         Can assign attributes to either files or cases.
-
-        The Case name can be absent. Or cand be from one primary column, or can also collate values from additional columns.
-
-        Qualitative texts from multiple columns are collated int one file.
-        The header for each block if text is the columns name from the survey
+        The Case name can be absent. Or can be from one primary column, or can also collate values from additional columns.
+        Qualitative texts from multiple columns are collated into one file.
+        The header for each block of text is the column name from the survey.
         """
 
         filepath, filter_type = QtWidgets.QFileDialog.getOpenFileName(None, _("Select Survey"), "",
@@ -1786,21 +1784,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         columns = [str(c) for c in df.columns]
         dialog = DialogSurveyImport(columns, self)
         if not dialog.exec(): return
-
         text_cols, case_cols, attr_cols = dialog.get_selections()
         #filename_col = dialog.get_filename_column()
         autocode_enabled = dialog.get_autocode_setting()
         attr_file_or_case = "case"
         if not dialog.get_case_setting() or not case_cols:
             attr_file_or_case = "file"
-
         if not text_cols:
-            Message(self.app, _("Notice"), _("Select at least one Qualitative Text column to analyse.")).exec()
-            return
-
+            Message(self.app, _("Notice"), _("Survey - No qualitative text columns to analyse.")).exec()
+            msg += _("\nNo columns assigned as qualitative. Survey files will be empty.")
         cur = self.app.conn.cursor()
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         new_attributes = {}  # Change from character to numeric attribute_type after checking when loading data
         for col in attr_cols:
             cur.execute("select name from attribute_type where name=?", [col])
@@ -1809,7 +1803,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                             (col, now, self.app.settings['codername'], "", attr_file_or_case, "character"))
                 new_attributes[col] = 'numeric'
 
-        def sanitize_name(name_str):
+        def sanitize_name(name_str:str):
             return re.sub(r'[\\/:*?"<>|]', '-', str(name_str)).strip()
 
         count = 0
@@ -1831,7 +1825,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     end_pos = start_pos + len(val_clean)
                     code_positions.append((t_col, start_pos, end_pos, val_clean))
 
-            if not text_content.strip(): continue
+            '''if not text_content.strip(): 
+                continue'''
 
             case_name = ""
             if case_cols:
@@ -1859,7 +1854,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             filepath_save = os.path.join(self.app.project_path, "documents", filename + ".txt")
             with open(filepath_save, 'w', encoding='utf-8') as f:
                 f.write(text_content)
-
             cur.execute("insert into source(name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
                         (filename, text_content, None, "", self.app.settings['codername'], now))
             file_id = cur.lastrowid
@@ -1935,8 +1929,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.update_files_in_dialogs()
         self.load_file_data()
-        Message(self.app, _("Import successful."), _("{} rows imported.").format(count)).exec()
         self.parent_text_edit.append(msg)
+        Message(self.app, _("Import successful."), _("{} rows imported.").format(count)).exec()
+        
 
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
