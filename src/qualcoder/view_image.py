@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -783,7 +784,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         """ Use to quicky open memo. """
 
         if column == 2:
-            self.add_edit_code_memo(item)
+            self.add_edit_cat_or_code_memo(item)
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
@@ -1519,7 +1520,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if selected is not None and action == action_rename:
             self.rename_category_or_code(selected)
         if selected is not None and action == action_edit_memo:
-            self.add_edit_code_memo(selected)
+            self.add_edit_cat_or_code_memo(selected)
         if selected is not None and action == action_delete:
             self.delete_category_or_code(selected)
         if action == action_cat_show_coded_files:
@@ -1859,7 +1860,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         Ctrl G - Gray image with highlighted codings
         L Show codes like
         Ctrl Z Undo last unmarking
-        F2 Rename code or category
+        Code Tree:
+            F2 Rename code or category
+            F3 Code / Cat Memo
+            F4 Delete
+            F5 Change Colour
+            F6 Move under
         """
 
         key = event.key()
@@ -1890,11 +1896,35 @@ class DialogCodeImage(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
             self.zoom_in()
             return
-        # Rename code or category
-        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
+
+        # Tree widget menu items keys F2 - F6
+        if self.ui.treeWidget.hasFocus():
             selected = self.ui.treeWidget.currentItem()
-            self.rename_category_or_code(selected)
-            return
+            if selected is None:
+                return
+            if key == QtCore.Qt.Key.Key_F2:
+                self.rename_category_or_code(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F3:
+                self.add_edit_cat_or_code_memo(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F4:
+                if selected.text(1)[0:3] == 'cat':
+                    # TODO self.delete_category_branch(selected)
+                    pass
+                else:
+                    self.delete_code(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F5 and selected.text(1)[0:3] == 'cid':
+                self.change_code_color(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F6:
+                if selected.text(1)[0:3] == 'cat':
+                    self.move_category(selected)
+                else:
+                    self.move_code(selected)
+                return
+
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_G:
@@ -3145,7 +3175,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
         self.app.delete_backup = False
 
-    def add_edit_code_memo(self, selected):
+    def add_edit_cat_or_code_memo(self, selected):
         """ View and edit a memo.
         param:
             selected : QTreeWidgetItem """
