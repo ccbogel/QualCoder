@@ -3166,8 +3166,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_merge_category = modify_menu.addAction(_("Merge category into category"))
             action_move_category = modify_menu.addAction(_("Move category under category"))
-        action_delete = modify_menu.addAction(_("Delete"))
-        action_delete_branch = None  # <- L
+        action_delete = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_delete = modify_menu.addAction(_("Delete"))
+        action_delete_branch = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             # Cascade deletion of the whole branch, only offered for categories. <- L
             action_delete_branch = modify_menu.addAction(_("Delete category branch"))
@@ -3256,9 +3258,10 @@ class DialogCodeText(QtWidgets.QWidget):
             if selected is not None and action == action_edit_memo:
                 self.add_edit_cat_or_code_memo(selected)
             if selected is not None and action == action_delete:
-                self.delete_category_or_code(selected)
+                #self.delete_category_or_code(selected)
+                self.delete_code(selected)
             if selected is not None and action == action_delete_branch:
-                self.delete_category_branch(selected)  # <- L
+                self.delete_category_branch(selected)
                 return  # Avoid error as selected is now None
             if action == action_cat_show_coded_files:
                 branch_codes = self.recursive_get_branch_codes(selected, [])
@@ -5039,7 +5042,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def item_moved_update_data(self, item, parent):
+    def item_moved_update_data(self, item:QtWidgets.QTreeWidgetItem, parent:QtWidgets.QTreeWidgetItem):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
         Also merge codes if one code is dropped on another code.
@@ -5170,7 +5173,7 @@ class DialogCodeText(QtWidgets.QWidget):
             stack.extend(children.get(catid, []))
         return False
 
-    def merge_code_into_code(self, selected):
+    def merge_code_into_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Merge the selected code into another code chosen from a list.
         Reuses merge_codes (the same logic used by drag-and-drop with Ctrl). The source code
         and all of its descendant sub-codes are excluded from the candidate targets to avoid
@@ -5215,7 +5218,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         self.merge_codes(source_code, target_item)
 
-    def merge_codes(self, item, parent):
+    def merge_codes(self, item, parent:QtWidgets.QTreeWidgetItem):
         """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code.
         code text unique(cid,fid,pos0,pos1, owner)
@@ -5224,7 +5227,7 @@ class DialogCodeText(QtWidgets.QWidget):
             parent : QTreeWidgetItem
         """
 
-        # Check item dropped on itself, an error can occur on Ubuntu 22.04.
+        # Check item dropped on itself
         if item['name'] == parent.text(0):
             return
         # Prevent a supercid cycle <- L
@@ -5413,7 +5416,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
-    def delete_category_or_code(self, selected):
+    '''def delete_category_or_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Determine if selected item is a code or category before deletion.
         Args:
             selected: QTreeWidgetItem
@@ -5423,9 +5426,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.delete_category(selected)
             return  # Avoid error as selected is now None
         if selected.text(1)[0:3] == 'cid':
-            self.delete_code(selected)
+            self.delete_code(selected)'''
 
-    def delete_code(self, selected):
+    def delete_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Find code, remove from database, refresh and code data and fill treeWidget.
         Args:
             selected: QTreeWidgetItem
@@ -5467,7 +5470,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.app.delete_backup = False
 
-    def delete_category(self, selected):
+    '''def delete_category(self, selected:QtWidgets.QTreeWidgetItem):
         """ Find category, remove from database, refresh categories and code data
         and fill treeWidget.
         Args:
@@ -5497,9 +5500,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
         self.app.delete_backup = False
-        self.parent_textEdit.append(_("Category deleted: ") + category['name'])
+        self.parent_textEdit.append(_("Category deleted: ") + category['name'])'''
 
-    def get_branch_catids_and_cids(self, catid):
+    def get_branch_catids_and_cids(self, catid:int):
         """ Gather every category and code that hangs below a category, including the category itself.
         Sub-codes (supercid) nested under branch codes are collected too.
         Read straight from the database, not from the cached self.codes / self.categories, so a
@@ -5535,7 +5538,7 @@ class DialogCodeText(QtWidgets.QWidget):
             i += 1
         return catids, cids
 
-    def delete_category_branch(self, selected):
+    def delete_category_branch(self, selected:QtWidgets.QTreeWidgetItem):
         """ Delete a category and everything underneath it: nested categories, codes, sub-codes
         and all the codings (text, audio/video, image) made with those codes.
         Unlike Delete, which only removes the category and re-parents its contents,
@@ -5637,14 +5640,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories(["code_cat", "code_name", "code_text", "code_av", "code_image"])
 
-    def add_edit_cat_or_code_memo(self, selected):
+    def add_edit_cat_or_code_memo(self, selected:QtWidgets.QTreeWidgetItem):
         """ View and edit a memo for a category or code.
         Args:
             selected: QTreeWidgetItem
         """
 
         changed_tables = []
-
         if selected.text(1)[0:3] == 'cid':
             # Find the code in the list
             found = -1
@@ -5695,7 +5697,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
         self.update_dialog_codes_and_categories(changed_tables)
 
-    def rename_category_or_code(self, selected):
+    def rename_category_or_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Rename a code or category.
         Check that the code or category name is not currently in use.
         Args:
@@ -5769,7 +5771,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.update_dialog_codes_and_categories(["code_cat"])
             self.parent_textEdit.append(_("Category renamed from: ") + f"{old_name} --> {new_name}")
 
-    def change_code_color(self, selected):
+    def change_code_color(self, selected:QtWidgets.QTreeWidgetItem):
         """ Change the colour of the currently selected code.
         Args:
             selected : QTreeWidgetItem """
