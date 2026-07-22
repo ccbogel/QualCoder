@@ -3840,7 +3840,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 return
             if key == QtCore.Qt.Key.Key_F6:
                 if selected.text(1)[0:3] == 'cat':
-                    self.move_category()
+                    self.move_category(selected)
                 else:
                     self.move_code(selected)
                 return
