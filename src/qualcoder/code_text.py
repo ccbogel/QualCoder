@@ -5564,12 +5564,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 if row[0] in cids_set:
                     codings += row[1]
         msg = _("Category branch") + ": " + category['name'] + "\n\n"
-        msg += _("All categories and/or codes under this category will be deleted.") + "\n"
-        msg += _("All codings made with those codes will also be deleted.") + "\n\n"
+        msg += _("All categories and codes under this category will also be deleted.") + "\n"
+        msg += _("All codings made with these codes across all files will be deleted.") + "\n\n"
         msg += _("Categories to delete") + f": {len(catids)}\n"
         msg += _("Codes to delete") + f": {len(cids)}\n"
         msg += _("Codings to delete") + f": {codings}\n\n"
-        msg += _("This cannot be undone from here.")
+        msg += _("Make a project backup first. This action cannot be undone.")
         ui = DialogConfirmDelete(self.app, msg)
         # Cancel is the default button here, so a stray Enter cannot wipe out the branch. <- L
         button_box = ui.findChild(QtWidgets.QDialogButtonBox)
