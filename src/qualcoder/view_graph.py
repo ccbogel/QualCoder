@@ -193,12 +193,16 @@ def build_line_label(line_item, label=None):
         return None
     if line_item.text_item is not None:
         try:
-            line_item.text_item.setPlainText(line_item.label)
+            # Display translated; line_item.label keeps the canonical name (data).
+            line_item.text_item.setPlainText(_(line_item.label))
             return line_item.text_item
         except RuntimeError:
             line_item.text_item = None
             line_item._label_bg = None
-    ti = QtWidgets.QGraphicsTextItem(line_item.label)
+    # Translate at display time only: the DB stores the canonical English name, so
+    # the graph follows the interface language and custom labels pass through
+    # unchanged (gettext returns the string as-is when no translation exists).
+    ti = QtWidgets.QGraphicsTextItem(_(line_item.label))
     ti._is_line_label = True  # marker for the anti-overlap positioner
     font = QtGui.QFont()
     font.setPointSize(9)
@@ -1064,9 +1068,6 @@ class GraphSynchronizer:
                 if (is_case_fw and is_code_tw) or (is_case_tw and is_code_fw):
                     case_node = fw if is_case_fw else tw
                     code_node = tw if is_code_tw else fw
-                    # Same as the file branch and the graph models: counts text, image and
-                    # A/V; it previously counted text only and pruned valid lines to codes
-                    # present solely in the case's image or A/V codings.
                     sql = ("select sum(c) from ("
                            "select count(ct.cid) as c from code_text ct "
                            "join case_text cas on cas.fid=ct.fid "
@@ -1635,6 +1636,10 @@ class ViewGraph(QDialog):
                     continue
                 if item.parentItem() is not None and item.parentItem() in snapshot_items:
                     continue
+                # Line labels are top-level items managed by their line: removing the line
+                # already detaches them via itemChange, but they remain in this frozen
+                # list; removing them again triggered the QGraphicsScene::removeItem
+                # warning (scene 0x0).
                 if getattr(item, '_is_line_label', False):
                     continue
                 if item.scene() is not self.scene:
@@ -4018,7 +4023,7 @@ class ViewGraph(QDialog):
         Message(self.app, _("Image exported"), filepath).exec()
 
     def export_drawio(self):
-        """ Export the canvas as a native editable Draw.io (.drawio) file. """
+        """ export the canvas as a native editable Draw.io (.drawio) file. """
 
         filename = "QualCoder_graph.drawio"
         e_dir = ExportDirectoryPathDialog(self.app, filename)
@@ -4070,12 +4075,13 @@ class ViewGraph(QDialog):
                     label = item.text
                 label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
                 label = label.replace('\n', '&lt;br&gt;')
+                # Sanitiza cualquier nombre de color a hex; mxGraph requiere #RRGGBB.
                 # Sanitize any color name to hex; mxGraph requires #RRGGBB.
                 def to_hex(value, default):
                     return COLORS_HEX.get(value, value
                                           if isinstance(value, str) and value.startswith('#')
                                           else default)
-                # Dashed gray outline for coded segments.
+                # Contorno punteado gris para segmentos codificados. Dashed gray outline for coded segments.
                 coded_outline = "strokeColor=#808080;dashed=1;dashPattern=4 3;"
                 if item_type == "PixmapGraphicsItem":
                     buffer = QtCore.QBuffer()
@@ -4101,15 +4107,16 @@ class ViewGraph(QDialog):
                     else:
                         style += "strokeColor=#333333;"
                 elif item_type == "CaseTextGraphicsItem":
-                    # Faithful to canvas: rounded box, orange border.
+                    # Fiel al lienzo: caja redondeada con borde naranja. Faithful to canvas: rounded box, orange border.
                     style = "rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#F57C00;strokeWidth=2;fontColor=#000000;"
                 elif item_type == "FileTextGraphicsItem":
-                    # Faithful to canvas: folded-corner note, blue border.
+                    # Fiel al lienzo: nota con esquina doblada y borde azul. Faithful to canvas: folded-corner note, blue border.
                     style = "shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#FAFAFA;strokeColor=#1976D2;strokeWidth=2;fontColor=#000000;"
                 elif item_type == "MemoGraphicsItem":
-                    # Faithful to canvas: light blue fill, dashed blue border.
+                    # Fiel al lienzo: fondo azul claro con borde azul discontinuo. Faithful to canvas: light blue fill, dashed blue border.
                     style = "rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;dashed=1;fontColor=#000000;"
                 else:
+                    # Codigos y categorias: color real de fondo con fuente de contraste.
                     # Codes and categories: real fill color with contrast font color.
                     fill_hex = to_hex(color, "#FFFFFF")
                     font_hex = "#000000"
@@ -4138,6 +4145,9 @@ class ViewGraph(QDialog):
                     dashed = "1" if getattr(item, 'line_type', None) == QtCore.Qt.PenStyle.DotLine else "0"
                     width = item.line_width if hasattr(item, 'line_width') else 2
                     label = item.label if hasattr(item, 'label') else ""
+                    # Exportar como se ve en pantalla: traducido; el dato sigue siendo canonico.
+                    # Export as seen on screen: translated; the stored data stays canonical.
+                    label = _(str(label)) if label else ""
                     label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
                     # Respect arrow_mode (forward / backward / both / none)
                     if type(item).__name__ == "FreeLineGraphicsItem":
@@ -4418,6 +4428,9 @@ class ViewGraph(QDialog):
                 if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
                     label = getattr(item, 'label', '') or ''
                     if label:
+                        # Traducido al mostrar; el dato guardado sigue canonico.
+                        # Translated at display time; stored data stays canonical.
+                        label = _(str(label))
                         # Arrow rendered as glyph-only so it reads in any language
                         arrow = getattr(item, 'arrow_mode', 'none')
                         if arrow == 'forward':
@@ -6203,7 +6216,8 @@ class DialogGraphPicker(QDialog):
             self.preview_scene.addItem(dot)
         # relation label: italic blue text on a borderless white chip, like the graph
         if label:
-            lt = QtWidgets.QGraphicsTextItem(str(label))
+            # Traducido al mostrar, igual que en el lienzo. Translated at display time, as on the canvas.
+            lt = QtWidgets.QGraphicsTextItem(_(str(label)))
             f = QtGui.QFont()
             f.setPointSize(9)
             f.setItalic(True)
@@ -7798,6 +7812,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def paint(self, painter, option, widget=None):
         painter.save()
+        # Fondo claro para cualquier color de texto; oscuro solo si el texto es blanco.
         # Light background for any text color; dark only when the text is white.
         bg_color = QtGui.QColor("#101010") if self.color == "white" else QtGui.QColor("#fafafa")
         painter.setBrush(QtGui.QBrush(bg_color, style=QtCore.Qt.BrushStyle.SolidPattern))
