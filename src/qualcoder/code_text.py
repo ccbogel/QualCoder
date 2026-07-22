@@ -3151,37 +3151,37 @@ class DialogCodeText(QtWidgets.QWidget):
         action_add_category = menu.addAction(_("Add a new category"))
         action_add_subcode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_add_subcode = menu.addAction(_("Add a new sub-code to code"))  # <- L
+            action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
         action_cat_show_coded_files = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
             action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         if selected is not None and selected.text(1)[0:3] == 'cid' and selected.childCount() > 0:
-            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))  # <- L
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
-        action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_edit_memo = modify_menu.addAction(_("View or edit memo F3"))
         action_merge_category = None
         action_move_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_merge_category = modify_menu.addAction(_("Merge category into category"))
-            action_move_category = modify_menu.addAction(_("Move category under category"))
+            action_move_category = modify_menu.addAction(_("Move category under category F6"))
         action_delete = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_delete = modify_menu.addAction(_("Delete"))
+            action_delete = modify_menu.addAction(_("Delete F4"))
         action_delete_branch = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
-            # Cascade deletion of the whole branch, only offered for categories. <- L
-            action_delete_branch = modify_menu.addAction(_("Delete category branch"))
+            # Cascade deletion of the whole branch, only offered for categories.
+            action_delete_branch = modify_menu.addAction(_("Delete category branch F4"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
         action_move_multi_codes = None
         action_merge_code_into_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = modify_menu.addAction(_("Change code color"))
+            action_color = modify_menu.addAction(_("Change code color F5"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
-            action_move_code = modify_menu.addAction(_("Move code to"))
+            action_move_code = modify_menu.addAction(_("Move code to F6"))
             action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
             action_merge_code_into_code = modify_menu.addAction(_("Merge code into code"))  # <- L
         filter_menu = menu.addMenu(_("Filter"))
@@ -3750,7 +3750,12 @@ class DialogCodeText(QtWidgets.QWidget):
         ! Display Clicked character position
         ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
-        F2 Rename code or category
+        Code Tree:
+            F2 Rename code or category
+            F3 Code / Cat Memo
+            F4 Delete
+            F5 Change Colour
+            F6 Move under
         """
 
         key = event.key()
@@ -3813,11 +3818,33 @@ class DialogCodeText(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
-        # Rename code or category
-        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
+        # Tree widget menu items keys F2 - F6
+        if self.ui.treeWidget.hasFocus():
             selected = self.ui.treeWidget.currentItem()
-            self.rename_category_or_code(selected)
-            return
+            if selected is None:
+                return
+            if key == QtCore.Qt.Key.Key_F2:
+                self.rename_category_or_code(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F3:
+                self.add_edit_cat_or_code_memo(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F4:
+                if selected.text(1)[0:3] == 'cat':
+                    self.delete_category_branch(selected)
+                else:
+                    self.delete_code(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F5 and selected.text(1)[0:3] == 'cid':
+                self.change_code_color(selected)
+                return
+            if key == QtCore.Qt.Key.Key_F6:
+                if selected.text(1)[0:3] == 'cat':
+                    self.move_category()
+                else:
+                    self.move_code(selected)
+                return
+
         if not self.ui.plainTextEdit.hasFocus():
             return
         # Ignore all other key events if edit mode is active
@@ -4710,7 +4737,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Ctrl E Enter and exit Edit Mode
         """
 
-        # request a margin redraw on editor resize so stripes follow text reflow <- L
+        # Request a margin redraw on editor resize so stripes follow text reflow <- L
         if object_ is self.ui.plainTextEdit and event.type() == QtCore.QEvent.Type.Resize:
             if hasattr(self, 'coding_margin') and self.coding_margin is not None:
                 self.coding_margin.update()
