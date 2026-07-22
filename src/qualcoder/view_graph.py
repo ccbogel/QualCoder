@@ -1064,12 +1064,23 @@ class GraphSynchronizer:
                 if (is_case_fw and is_code_tw) or (is_case_tw and is_code_fw):
                     case_node = fw if is_case_fw else tw
                     code_node = tw if is_code_tw else fw
-                    sql = ("select count(ct.cid) from code_text ct "
+                    # Same as the file branch and the graph models: counts text, image and
+                    # A/V; it previously counted text only and pruned valid lines to codes
+                    # present solely in the case's image or A/V codings.
+                    sql = ("select sum(c) from ("
+                           "select count(ct.cid) as c from code_text ct "
                            "join case_text cas on cas.fid=ct.fid "
                            "and ct.pos0 >= cas.pos0 and ct.pos1 <= cas.pos1 "
-                           "where cas.caseid=? and ct.cid=?")
-                    cur.execute(sql, [case_node.case_id, code_node.code_or_cat.get('cid')])
-                    if cur.fetchone()[0] == 0:
+                           "where cas.caseid=? and ct.cid=? "
+                           "union all select count(ci.cid) as c from code_image ci "
+                           "join case_text cas on cas.fid=ci.id where cas.caseid=? and ci.cid=? "
+                           "union all select count(cav.cid) as c from code_av cav "
+                           "join case_text cas on cas.fid=cav.id where cas.caseid=? and cav.cid=? )")
+                    caseid = case_node.case_id
+                    cid = code_node.code_or_cat.get('cid')
+                    cur.execute(sql, [caseid, cid, caseid, cid, caseid, cid])
+                    res = cur.fetchone()
+                    if not res or res[0] is None or res[0] == 0:
                         self.vg.scene.removeItem(line)
                 is_file_fw = type(fw).__name__ == "FileTextGraphicsItem"
                 is_file_tw = type(tw).__name__ == "FileTextGraphicsItem"
@@ -1623,6 +1634,10 @@ class ViewGraph(QDialog):
                 if _ResizeHandle is not None and isinstance(item, _ResizeHandle):
                     continue
                 if item.parentItem() is not None and item.parentItem() in snapshot_items:
+                    continue
+                if getattr(item, '_is_line_label', False):
+                    continue
+                if item.scene() is not self.scene:
                     continue
                 self.scene.removeItem(item)
             except RuntimeError:
@@ -4003,7 +4018,7 @@ class ViewGraph(QDialog):
         Message(self.app, _("Image exported"), filepath).exec()
 
     def export_drawio(self):
-        """ export the canvas as a native editable Draw.io (.drawio) file. """
+        """ Export the canvas as a native editable Draw.io (.drawio) file. """
 
         filename = "QualCoder_graph.drawio"
         e_dir = ExportDirectoryPathDialog(self.app, filename)
@@ -4055,21 +4070,55 @@ class ViewGraph(QDialog):
                     label = item.text
                 label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
                 label = label.replace('\n', '&lt;br&gt;')
+                # Sanitize any color name to hex; mxGraph requires #RRGGBB.
+                def to_hex(value, default):
+                    return COLORS_HEX.get(value, value
+                                          if isinstance(value, str) and value.startswith('#')
+                                          else default)
+                # Dashed gray outline for coded segments.
+                coded_outline = "strokeColor=#808080;dashed=1;dashPattern=4 3;"
                 if item_type == "PixmapGraphicsItem":
                     buffer = QtCore.QBuffer()
                     buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
                     item.pixmap().toImage().save(buffer, "PNG")
                     b64_data = buffer.data().toBase64().data().decode('ascii').replace('\n', '').replace('\r', '')
                     style = f"shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;aspect=fixed;image=data:image/png,{b64_data};"
+                    if getattr(item, 'imid', -1) is not None and getattr(item, 'imid', -1) > 0:
+                        style += "imageBorder=#808080;dashed=1;dashPattern=4 3;"
                 elif item_type == "AVGraphicsItem":
-                    style = "rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#333333;fontColor=#000000;"
+                    style = "rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;fontColor=#000000;"
+                    if getattr(item, 'avid', -1) is not None and getattr(item, 'avid', -1) > 0:
+                        style += coded_outline
+                    else:
+                        style += "strokeColor=#333333;"
+                elif item_type == "FreeTextGraphicsItem":
+                    font_hex = to_hex(color, "#000000")
+                    if font_hex.upper() == "#FFFFFF":
+                        font_hex = "#333333"
+                    style = f"rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;fontColor={font_hex};"
+                    if getattr(item, 'ctid', -1) is not None and getattr(item, 'ctid', -1) > 0:
+                        style += coded_outline
+                    else:
+                        style += "strokeColor=#333333;"
+                elif item_type == "CaseTextGraphicsItem":
+                    # Faithful to canvas: rounded box, orange border.
+                    style = "rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#F57C00;strokeWidth=2;fontColor=#000000;"
+                elif item_type == "FileTextGraphicsItem":
+                    # Faithful to canvas: folded-corner note, blue border.
+                    style = "shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#FAFAFA;strokeColor=#1976D2;strokeWidth=2;fontColor=#000000;"
+                elif item_type == "MemoGraphicsItem":
+                    # Faithful to canvas: light blue fill, dashed blue border.
+                    style = "rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;dashed=1;fontColor=#000000;"
                 else:
-                    # Sanitize fill color to hex; mxGraph requires #RRGGBB
-                    fill_hex = COLORS_HEX.get(color, color
-                                              if isinstance(color, str) and color.startswith('#')
-                                              else "#FFFFFF")
+                    # Codes and categories: real fill color with contrast font color.
+                    fill_hex = to_hex(color, "#FFFFFF")
+                    font_hex = "#000000"
+                    try:
+                        font_hex = TextColor(fill_hex).recommendation
+                    except Exception:
+                        pass
                     shape = "ellipse" if is_ellipse else "rounded=1"
-                    style = f"{shape};whiteSpace=wrap;html=1;fillColor={fill_hex};strokeColor=#333333;fontColor=#000000;"
+                    style = f"{shape};whiteSpace=wrap;html=1;fillColor={fill_hex};strokeColor=#333333;fontColor={font_hex};"
                 xml += f'        <mxCell id="{current_id}" value="{label}" style="{style}" vertex="1" parent="1">\n'
                 xml += f'          <mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry" />\n'
                 xml += '        </mxCell>\n'
@@ -7749,12 +7798,12 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def paint(self, painter, option, widget=None):
         painter.save()
-        if self.color in ("black", "gray"):
-            color = QtGui.QColor("#fafafa")
-            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
-        if self.color == "white":
-            color = QtGui.QColor("#101010")
-            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        # Light background for any text color; dark only when the text is white.
+        bg_color = QtGui.QColor("#101010") if self.color == "white" else QtGui.QColor("#fafafa")
+        painter.setBrush(QtGui.QBrush(bg_color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        if self.ctid is not None and self.ctid > 0:
+            # Segmento codificado: contorno gris punteado. Coded segment: dotted gray outline.
+            painter.setPen(QtGui.QPen(QtGui.QColor("#808080"), 1, QtCore.Qt.PenStyle.DotLine))
         painter.drawRect(self.boundingRect())
         painter.restore()
         super().paint(painter, option, widget)
