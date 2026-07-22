@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogGraphModels</class>
+ <widget class="QDialog" name="DialogGraphModels">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>520</width>
+    <height>440</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Graph Models</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_model">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Select graph model:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboBox_model"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_description">
+     <property name="styleSheet">
+      <string notr="true">color: #555; margin: 6px 0;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>4</number>
+     </property>
+     <widget class="QWidget" name="page_case_hier">
+      <layout class="QVBoxLayout" name="verticalLayout_case_hier">
+       <item>
+        <widget class="QLabel" name="label_case_hier_limit">
+         <property name="text">
+          <string>Max coded segments per code (0 = none):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBox_case_hier_limit">
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>500</number>
+         </property>
+         <property name="value">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_case_hier">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_case_comp">
+      <layout class="QVBoxLayout" name="verticalLayout_case_comp">
+       <item>
+        <widget class="QLabel" name="label_comp_level_case">
+         <property name="text">
+          <string>Comparison level:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_case_comp_level"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_case_a">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; margin-top: 8px;</string>
+         </property>
+         <property name="text">
+          <string>Case 1:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_case_a"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_case_b">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; margin-top: 4px;</string>
+         </property>
+         <property name="text">
+          <string>Case 2:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_case_b"/>
+       </item>
+       <item>
+        <spacer name="spacer_case_comp">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_file_hier">
+      <layout class="QVBoxLayout" name="verticalLayout_file_hier">
+       <item>
+        <widget class="QLabel" name="label_file_hier_limit">
+         <property name="text">
+          <string>Max coded segments per code (0 = none):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBox_file_hier_limit">
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>500</number>
+         </property>
+         <property name="value">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_file_hier">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_file_comp">
+      <layout class="QVBoxLayout" name="verticalLayout_file_comp">
+       <item>
+        <widget class="QLabel" name="label_comp_level_file">
+         <property name="text">
+          <string>Comparison level:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_file_comp_level"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_file_a">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; margin-top: 8px;</string>
+         </property>
+         <property name="text">
+          <string>File 1:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_file_a"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_file_b">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; margin-top: 4px;</string>
+         </property>
+         <property name="text">
+          <string>File 2:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_file_b"/>
+       </item>
+       <item>
+        <spacer name="spacer_file_comp">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_cooc_net">
+      <layout class="QVBoxLayout" name="verticalLayout_cooc_net">
+       <item>
+        <widget class="QLabel" name="label_cooc_types">
+         <property name="text">
+          <string>Co-occurrence types:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_overlap">
+         <property name="text">
+          <string>Overlap (partial intersection)</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_inclusion">
+         <property name="text">
+          <string>Inclusion (one inside another)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_exact">
+         <property name="text">
+          <string>Exact (identical span)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_proximity">
+         <property name="text">
+          <string>Proximity (within N characters)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_proximity">
+         <item>
+          <widget class="QLabel" name="label_proximity">
+           <property name="text">
+            <string>  Proximity threshold (characters):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_proximity">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>5000</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_show_cats">
+         <property name="text">
+          <string>Show categories as parent nodes</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_cooc_net">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_cooc_seg">
+      <layout class="QVBoxLayout" name="verticalLayout_cooc_seg">
+       <item>
+        <widget class="QLabel" name="label_seg_info">
+         <property name="text">
+          <string>Select 1 or more categories after clicking Generate.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_seg_limit">
+         <property name="text">
+          <string>Max segments to display  (0 = none):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBox_seg_limit">
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>200</number>
+         </property>
+         <property name="value">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_cooc_seg">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_buttons">
+     <item>
+      <spacer name="spacer_buttons">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_generate">
+       <property name="text">
+        <string>Generate</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

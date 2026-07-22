@@ -14,18 +14,210 @@
    <string>Graph Visualisation</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="2" column="1">
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="layoutDirection">
+      <enum>Qt::LayoutDirection::RightToLeft</enum>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>45</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>45</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QPushButton" name="pushButton_minimap">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show minimap</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_align_vertical">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Align horizontal</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_align_horizontal">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Align vertical</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_distribute_vertical">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>170</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Distribute vertical</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_distribute_horizontal">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Distribute horizontal</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_compact_graph">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>200</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Compact graph</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_expand_graph">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>230</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Expand graph</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_org_graph">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Organize graph</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_remove_nodes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>360</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Remove nodes</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_undo_changes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>310</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Undo changes</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_header">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>44</height>
+       <height>45</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>45</height>
       </size>
      </property>
      <property name="title">
@@ -34,7 +226,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>390</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -66,7 +258,7 @@
      <widget class="QPushButton" name="pushButton_reveal">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>330</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -82,7 +274,7 @@
      <widget class="QPushButton" name="pushButton_savegraph">
       <property name="geometry">
        <rect>
-        <x>490</x>
+        <x>530</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -98,7 +290,7 @@
      <widget class="QPushButton" name="pushButton_loadgraph">
       <property name="geometry">
        <rect>
-        <x>522</x>
+        <x>560</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -115,7 +307,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_deletegraph">
       <property name="geometry">
        <rect>
-        <x>552</x>
+        <x>590</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -131,7 +323,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_freetextitem">
       <property name="geometry">
        <rect>
-        <x>73</x>
+        <x>90</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -147,7 +339,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_addcase">
       <property name="geometry">
        <rect>
-        <x>103</x>
+        <x>120</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -163,7 +355,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_addfile">
       <property name="geometry">
        <rect>
-        <x>133</x>
+        <x>150</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -179,14 +371,14 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_addline">
       <property name="geometry">
        <rect>
-        <x>163</x>
+        <x>180</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Add connecting line</string>
+       <string>Add relationship line</string>
       </property>
       <property name="text">
        <string/>
@@ -211,7 +403,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>650</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -224,29 +416,10 @@ Right-click for options</string>
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_loaded_graph">
-      <property name="geometry">
-       <rect>
-        <x>590</x>
-        <y>2</y>
-        <width>461</width>
-        <height>40</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Changing to another report will lose unsaved graph.</string>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="openExternalLinks">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_codes_of_text">
       <property name="geometry">
        <rect>
-        <x>193</x>
+        <x>210</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -262,7 +435,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_memos_of_file">
       <property name="geometry">
        <rect>
-        <x>287</x>
+        <x>300</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -278,7 +451,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_codes_of_images">
       <property name="geometry">
        <rect>
-        <x>224</x>
+        <x>240</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -294,7 +467,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_codes_of_av">
       <property name="geometry">
        <rect>
-        <x>256</x>
+        <x>270</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -310,7 +483,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_export_pdf">
       <property name="geometry">
        <rect>
-        <x>379</x>
+        <x>420</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -326,7 +499,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_export_drawio">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>450</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -342,18 +515,47 @@ Right-click for options</string>
        <iconset theme="QIcon::ThemeIcon::WeatherClear"/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_graph_models">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Graph models</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_graph_summary">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export Graph Summary</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset theme="QIcon::ThemeIcon::WeatherClear"/>
+      </property>
+     </widget>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QGraphicsView" name="graphicsView">
-     <property name="layoutDirection">
-      <enum>Qt::LayoutDirection::RightToLeft</enum>
-     </property>
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="label_loaded_graph">
+     <property name="text">
+      <string>Changing to another report will lose unsaved graph.</string>
      </property>
     </widget>
    </item>
