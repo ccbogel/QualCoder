@@ -3167,6 +3167,10 @@ class DialogCodeText(QtWidgets.QWidget):
             action_merge_category = modify_menu.addAction(_("Merge category into category"))
             action_move_category = modify_menu.addAction(_("Move category under category"))
         action_delete = modify_menu.addAction(_("Delete"))
+        action_delete_branch = None  # <- L
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            # Cascade deletion of the whole branch, only offered for categories. <- L
+            action_delete_branch = modify_menu.addAction(_("Delete category branch"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
@@ -3253,6 +3257,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.add_edit_cat_or_code_memo(selected)
             if selected is not None and action == action_delete:
                 self.delete_category_or_code(selected)
+            if selected is not None and action == action_delete_branch:
+                self.delete_category_branch(selected)  # <- L
+                return  # Avoid error as selected is now None
             if action == action_cat_show_coded_files:
                 branch_codes = self.recursive_get_branch_codes(selected, [])
                 DialogCodeInAllFiles(self.app, branch_codes, "File", selected.text(0))
@@ -5491,6 +5498,144 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
+
+    def get_branch_catids_and_cids(self, catid):
+        """ Gather every category and code that hangs below a category, including the category itself.
+        Sub-codes (supercid) nested under branch codes are collected too.
+        Read straight from the database, not from the cached self.codes / self.categories, so a
+        stale dialog snapshot can never delete or miss the wrong rows.
+        Iterative walk, so cyclic or malformed data cannot cause infinite recursion. <- L
+        Args:
+            catid: Integer, category id of the branch root
+        Returns:
+            Tuple: (list of category ids, list of code ids)
+        """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select catid, supercatid from code_cat")
+        db_cats = cur.fetchall()
+        cur.execute("select cid, catid, supercid from code_name")
+        db_codes = cur.fetchall()
+        catids = [catid]
+        i = 0
+        while i < len(catids):
+            for cat_ in db_cats:
+                if cat_[1] == catids[i] and cat_[0] not in catids:
+                    catids.append(cat_[0])
+            i += 1
+        cids = []
+        for code_ in db_codes:
+            if code_[1] in catids and code_[0] not in cids:
+                cids.append(code_[0])
+        i = 0
+        while i < len(cids):
+            for code_ in db_codes:
+                if code_[2] == cids[i] and code_[0] not in cids:
+                    cids.append(code_[0])
+            i += 1
+        return catids, cids
+
+    def delete_category_branch(self, selected):
+        """ Delete a category and everything underneath it: nested categories, codes, sub-codes
+        and all the codings (text, audio/video, image) made with those codes.
+        Unlike Delete, which only removes the category and re-parents its contents,
+        this cascades down the whole branch. All writes run in a single transaction. <- L
+        Args:
+            selected: QTreeWidgetItem
+        """
+
+        if selected is None or selected.text(1)[0:3] != 'cat':
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select catid, name from code_cat where catid=?", [int(selected.text(1)[6:]), ])
+        res = cur.fetchone()
+        if res is None:  # Already deleted elsewhere, the tree item is stale
+            self.update_dialog_codes_and_categories([])
+            return
+        category = {'catid': res[0], 'name': res[1]}
+        catids, cids = self.get_branch_catids_and_cids(category['catid'])
+        # Count the codings that will be lost, so the user knows what is at stake.
+        # One grouped scan per table, instead of one query per code. <- L
+        cids_set = set(cids)
+        codings = 0
+        for table in ("code_text", "code_av", "code_image"):
+            cur.execute(f"select cid, count(*) from {table} group by cid")
+            for row in cur.fetchall():
+                if row[0] in cids_set:
+                    codings += row[1]
+        msg = _("Category branch") + ": " + category['name'] + "\n\n"
+        msg += _("All categories and/or codes under this category will be deleted.") + "\n"
+        msg += _("All codings made with those codes will also be deleted.") + "\n\n"
+        msg += _("Categories to delete") + f": {len(catids)}\n"
+        msg += _("Codes to delete") + f": {len(cids)}\n"
+        msg += _("Codings to delete") + f": {codings}\n\n"
+        msg += _("This cannot be undone from here.")
+        ui = DialogConfirmDelete(self.app, msg)
+        # Cancel is the default button here, so a stray Enter cannot wipe out the branch. <- L
+        button_box = ui.findChild(QtWidgets.QDialogButtonBox)
+        if button_box is not None:
+            ok_button = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok)
+            cancel_button = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            if ok_button is not None:
+                ok_button.setAutoDefault(False)
+                ok_button.setDefault(False)
+            if cancel_button is not None:
+                cancel_button.setAutoDefault(True)
+                cancel_button.setDefault(True)
+                cancel_button.setFocus()
+        ok = ui.exec()
+        if not ok:
+            return
+        try:
+            for cid in cids:
+                cur.execute("delete from code_text where cid=?", [cid, ])
+                cur.execute("delete from code_av where cid=?", [cid, ])
+                cur.execute("delete from code_image where cid=?", [cid, ])
+                cur.execute("delete from code_name where cid=?", [cid, ])
+                # Saved graphs: drop nodes and links pointing at this code, so that a reused
+                # cid cannot silently re-bind an old graph node to an unrelated code. <- L
+                cur.execute("delete from gr_cdct_text_item where cid=?", [cid, ])
+                cur.execute("delete from gr_cdct_line_item where fromcid=? or tocid=?", [cid, cid])
+                cur.execute("delete from gr_free_line_item where fromcid=? or tocid=?", [cid, cid])
+            for cat_id in catids:
+                cur.execute("delete from code_cat where catid=?", [cat_id, ])
+                cur.execute("delete from gr_cdct_text_item where catid=?", [cat_id, ])
+                cur.execute("delete from gr_cdct_line_item where fromcatid=? or tocatid=?", [cat_id, cat_id])
+                cur.execute("delete from gr_free_line_item where fromcatid=? or tocatid=?", [cat_id, cat_id])
+            # Drop the deleted codes from the stored recently used codes. <- L
+            cur.execute("select recently_used_codes from project")
+            recent_res = cur.fetchone()
+            if recent_res is not None and recent_res[0]:
+                keep = []
+                for token in recent_res[0].split():
+                    try:
+                        if int(token) in cids:
+                            continue
+                    except ValueError:
+                        pass
+                    keep.append(token)
+                cur.execute("update project set recently_used_codes=?", [" ".join(keep), ])
+            # Extra check. Clear any dangling references left behind by the deletion. <- L
+            cur.execute("update code_cat set supercatid=null where supercatid is not null and supercatid not in "
+                        "(select catid from code_cat)")
+            cur.execute("update code_name set catid=null where catid is not null and catid not in "
+                        "(select catid from code_cat)")
+            cur.execute("update code_name set supercid=null where supercid is not null and supercid not in "
+                        "(select cid from code_name)")
+            self.app.conn.commit()
+        except Exception as e_:
+            print(e_)
+            self.app.conn.rollback()  # Revert all changes
+            self.update_dialog_codes_and_categories([])
+            raise
+        # Remove the deleted codes from the recent codes list
+        self.recent_codes = [c for c in self.recent_codes if c['cid'] not in cids]
+        self.app.delete_backup = False
+        msg = _("Category branch deleted") + ": " + category['name'] + ". "
+        msg += _("Categories") + f": {len(catids)}, " + _("Codes") + f": {len(cids)}, "
+        msg += _("Codings") + f": {codings}"
+        self.parent_textEdit.append(msg)
+        self.update_dialog_codes_and_categories(["code_cat", "code_name", "code_text", "code_av", "code_image"])
 
     def add_edit_cat_or_code_memo(self, selected):
         """ View and edit a memo for a category or code.
