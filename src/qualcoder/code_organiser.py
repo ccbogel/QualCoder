@@ -111,8 +111,11 @@ class CodeOrganiser(QDialog):
         self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
         self._space_pressed = False
         self._is_panning = False  # middle-button / space+drag panning
-        # hierarchical drag-to-connect handle (same UX as the relations
-        # handle in view_graph). Click a selected node's blue handle, move, then click
+        self.ui.graphicsView.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+        self.ui.graphicsView.installEventFilter(self)
+        self._initial_canvas_focus_done = False
+        # hierarchical drag-to-connect handle
+        # Click a selected node's blue handle, move, then click
         # the parent: the first node becomes a sub-code / sub-category / code-in-category.
         self._connect_state = 'idle'
         self._connect_source = None
@@ -127,6 +130,10 @@ class CodeOrganiser(QDialog):
                   "Select a code branch or All, then right click to:\n"
                   "Add categories, rename codes and categories, update memos, merge codes, "
                   "merge categories, delete codes, delete categories.\n"
+                  "Rubber-band or Ctrl+click several nodes, then right click any of them for "
+                  "group actions (delete, or link them under a code/category).\n"
+                  "Pan the canvas by dragging with the middle mouse button, or hold the "
+                  "spacebar and drag with the left button.\n"
                   "\n"
                   "Potential for unexpected errors could occur.\n"
                   "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON.")
@@ -477,11 +484,10 @@ class CodeOrganiser(QDialog):
         if key == QtCore.Qt.Key.Key_Escape and self._connect_state != 'idle':
             self._cancel_connection()
             return
-        # spacebar panning (ported from view_graph)
+        # spacebar panning (ported from view_graph). Also handled in eventFilter
+        # on the view, so it works even when this dialog does not hold focus.
         if key == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
-            self._space_pressed = True
-            self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
-            self.ui.graphicsView.viewport().setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+            self._begin_space_pan()
             return
         if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
             if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
@@ -512,11 +518,39 @@ class CodeOrganiser(QDialog):
 
     def keyReleaseEvent(self, event):  # end spacebar panning
         if event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
-            self._space_pressed = False
-            self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
-            self.ui.graphicsView.viewport().unsetCursor()
+            self._end_space_pan()
             return
         super().keyReleaseEvent(event)
+
+    def _begin_space_pan(self):
+        """ Enter spacebar hand-pan mode. Shared by keyPressEvent and the view
+        event filter so it fires no matter which widget received the key. """
+
+        if getattr(self, '_space_pressed', False):
+            return
+        self._space_pressed = True
+        self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
+        self.ui.graphicsView.viewport().setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+
+    def _end_space_pan(self):
+        """ Leave spacebar hand-pan mode and restore rubber-band selection. """
+
+        if not getattr(self, '_space_pressed', False):
+            return
+        self._space_pressed = False
+        self._is_panning = False
+        self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
+        self.ui.graphicsView.viewport().unsetCursor()
+
+    def showEvent(self, event):
+        """ Give the canvas keyboard focus the first time the dialog appears so
+        spacebar-pan and the zoom keys work immediately, and so Space does not
+        accidentally activate a focused push button. """
+
+        super().showEvent(event)
+        if not getattr(self, '_initial_canvas_focus_done', False):
+            self._initial_canvas_focus_done = True
+            self.ui.graphicsView.setFocus()
 
     def reject(self):
 
@@ -535,6 +569,20 @@ class CodeOrganiser(QDialog):
         if obj == self.ui.label_zoom:
             if event.type() == QtCore.QEvent.Type.MouseButtonPress:
                 self.fit_and_center_view()
+                return True
+            return super().eventFilter(obj, event)
+
+        # spacebar hand-pan: the VIEW (not its viewport) receives key events, so
+        # catch Space here. This makes space+drag work regardless of which child
+        # widget or graphics item currently holds focus.
+        if obj == self.ui.graphicsView:
+            if event.type() == QtCore.QEvent.Type.KeyPress and \
+                    event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
+                self._begin_space_pan()
+                return True
+            if event.type() == QtCore.QEvent.Type.KeyRelease and \
+                    event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
+                self._end_space_pan()
                 return True
             return super().eventFilter(obj, event)
 
@@ -2124,6 +2172,19 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         the Dialog screen position.
         """
 
+        # When several nodes are selected (rubber band / Ctrl+click) and this one is
+        # part of the selection, offer the GROUP menu instead of the single-node one.
+        # Only actions meaningful for a whole group are shown there.
+        scene = self.scene()
+        if scene is not None:
+            selected = [it for it in scene.selectedItems()
+                        if isinstance(it, TextGraphicsItem)
+                        and it.code_or_cat.get('name', '') != ""
+                        and not it.code_or_cat.get('delete')]
+            if len(selected) > 1 and self in selected:
+                self.multiple_selection_context_menu(selected)
+                return
+
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         # every action variable initialised once (the dispatch below
@@ -2217,6 +2278,264 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 self.delete_this_code()
             else:
                 self.delete_this_category()
+
+    # ----- multi-selection (group) context menu -----
+    # Shown when more than one node is selected. Only actions that make sense for a
+    # whole group are offered: deletions and the hierarchy "Link ..." operations.
+    # Per-node actions (rename, memo, merge, add code/sub-code/category, display
+    # memo, coded/case media) stay on the single-node menu and are NOT offered here.
+
+    def multiple_selection_context_menu(self, items):
+        """ Build and dispatch the group menu for a multi-node selection.
+        The available actions depend on whether the selection holds only codes,
+        only categories, or a mix of both. """
+
+        code_items = [it for it in items if it.code_or_cat.get('cid') is not None]
+        cat_items = [it for it in items if it.code_or_cat.get('cid') is None]
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        # Non-clickable header describing the selection.
+        if code_items and cat_items:
+            header = str(len(code_items)) + _(" codes and ") + str(len(cat_items)) \
+                + _(" categories selected")
+        elif code_items:
+            header = str(len(code_items)) + _(" codes selected")
+        else:
+            header = str(len(cat_items)) + _(" categories selected")
+        header_action = menu.addAction(header)
+        header_action.setEnabled(False)
+        menu.addSeparator()
+
+        link_codes_to_category_action = None
+        link_codes_under_code_action = None
+        link_categories_under_category_action = None
+        delete_codes_action = None
+        delete_categories_action = None
+
+        if code_items:
+            link_codes_to_category_action = menu.addAction(_('Link codes to category'))
+            link_codes_under_code_action = menu.addAction(_('Link codes under code'))
+        if cat_items:
+            link_categories_under_category_action = menu.addAction(_('Link categories under category'))
+        menu.addSeparator()
+        if code_items:
+            delete_codes_action = menu.addAction(_('Delete codes'))
+        if cat_items:
+            delete_categories_action = menu.addAction(_('Delete categories'))
+
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action == link_codes_to_category_action:
+            self.multi_link_codes_to_category(code_items)
+        elif action == link_codes_under_code_action:
+            self.multi_link_codes_under_code(code_items)
+        elif action == link_categories_under_category_action:
+            self.multi_link_categories_under_category(cat_items)
+        elif action == delete_codes_action:
+            self.multi_delete_codes(code_items)
+        elif action == delete_categories_action:
+            self.multi_delete_categories(cat_items)
+
+    def refresh_after_multi(self):
+        """ Redraw hierarchy links and flag the model as changed after a batch
+        (multi-selection) operation, mirroring the single-item actions. """
+
+        global update_graphics_item_models  # noqa: F824
+        update_graphics_item_models = True
+        scene = self.scene()
+        if scene is not None:
+            scene.remove_links()
+            scene.create_links()
+            dialog = getattr(scene, 'parent', None)
+            if dialog is not None and getattr(dialog, 'show_frequencies', False):
+                dialog.apply_frequency_labels()
+            scene.update()
+
+    def multi_link_codes_to_category(self, code_items):
+        """ Link every selected code to one chosen category. Batch version of
+        link_code_to_category (same model mutation, same exclusivity rule). """
+
+        global model  # noqa: F824
+        if not code_items:
+            return
+        categories_ = [item for item in model
+                       if item['cid'] is None and item['name'] != "" and not item.get('delete')]
+        if not categories_:
+            Message(self.app, _("Code organiser"),
+                    _("There are no categories to link to."), "warning").exec()
+            return
+        ui = DialogSelectItems(self.app, categories_, _('Link codes: Select category'), 'single')
+        if not ui.exec():
+            return
+        category = ui.get_selected()
+        if not category:
+            return
+        target_catid = category['catid']
+        selected_cids = {it.code_or_cat['cid'] for it in code_items}
+        for item in model:
+            if item.get('cid') in selected_cids:
+                item['catid'] = target_catid
+                # exclusivity: a categorised code is not a sub-code (see
+                # link_code_to_category).
+                item['supercid'] = None
+        for it in code_items:
+            it.code_or_cat['catid'] = target_catid
+            it.code_or_cat['supercid'] = None
+        self.refresh_after_multi()
+
+    def multi_link_codes_under_code(self, code_items):
+        """ Nest every selected code under one chosen parent code. Batch version of
+        link_code_under_code. The parent cannot be one of the selected codes nor a
+        descendant of any of them (circular-nesting guard). """
+
+        global model  # noqa: F824
+        if not code_items:
+            return
+        selected_cids = {it.code_or_cat['cid'] for it in code_items}
+        blocked_cids = set(selected_cids)
+        for cid in selected_cids:
+            blocked_cids |= descendant_cids(model, cid)
+        codes_ = [item for item in model
+                  if item['cid'] is not None and item['name'] != ""
+                  and item['cid'] not in blocked_cids and not item.get('delete')]
+        codes_ = sorted(codes_, key=lambda d: d['name'])
+        if not codes_:
+            Message(self.app, _("Code organiser"),
+                    _("There is no eligible parent code for this selection."), "warning").exec()
+            return
+        ui = DialogSelectItems(self.app, codes_, _('Nest codes under: Select parent code'), 'single')
+        if not ui.exec():
+            return
+        parent_code = ui.get_selected()
+        if not parent_code:
+            return
+        target_cid = parent_code['cid']
+        for item in model:
+            if item.get('cid') in selected_cids:
+                item['supercid'] = target_cid
+                item['original_supercid'] = target_cid
+                item['catid'] = None
+                item['supercatid'] = None
+        for it in code_items:
+            it.code_or_cat['supercid'] = target_cid
+            it.code_or_cat['original_supercid'] = target_cid
+            it.code_or_cat['catid'] = None
+            it.code_or_cat['supercatid'] = None
+        self.refresh_after_multi()
+
+    def multi_link_categories_under_category(self, cat_items):
+        """ Nest every selected category under one chosen parent category. Batch
+        version of link_category_under_category. The parent cannot be one of the
+        selected categories nor a descendant of any of them. """
+
+        global model  # noqa: F824
+        if not cat_items:
+            return
+        selected_catids = {it.code_or_cat['catid'] for it in cat_items}
+        blocked_catids = set(selected_catids)
+        for catid in selected_catids:
+            blocked_catids |= descendant_catids(model, catid)
+        categories_ = [item for item in model
+                       if item['cid'] is None and item['name'] != ""
+                       and item['catid'] not in blocked_catids and not item.get('delete')]
+        if not categories_:
+            Message(self.app, _("Code organiser"),
+                    _("There is no eligible parent category for this selection."), "warning").exec()
+            return
+        ui = DialogSelectItems(self.app, categories_, _('Link categories under: Select category'), 'single')
+        if not ui.exec():
+            return
+        category = ui.get_selected()
+        if not category:
+            return
+        target_catid = category['catid']
+        for item in model:
+            if item.get('cid') is None and item.get('catid') in selected_catids:
+                item['supercatid'] = target_catid
+        for it in cat_items:
+            it.code_or_cat['supercatid'] = target_catid
+        self.refresh_after_multi()
+
+    def multi_delete_codes(self, code_items):
+        """ Delete every selected code from the canvas. Batch version of
+        delete_this_code with a single confirmation. Sub-codes that are NOT
+        themselves being deleted are re-parented as in the single delete (lifted to
+        a surviving parent code, otherwise moved into the deleted code's category or
+        to top level). Model only; the database is written on Apply. """
+
+        global model  # noqa: F824
+        if not code_items:
+            return
+        names = ", ".join(sorted(it.code_or_cat['name'].strip() for it in code_items))
+        msg = str(len(code_items)) + _(" codes will be deleted:") + "\n" + names + "\n" \
+            + _("All codings of these codes will also be deleted when changes are applied.")
+        ui = DialogConfirmDelete(self.app, msg)
+        if not ui.exec():
+            return
+        delete_cids = {it.code_or_cat['cid'] for it in code_items}
+        by_cid = {m['cid']: m for m in model if m.get('cid') is not None}
+        # Re-parent surviving sub-codes of each deleted code.
+        for cid in delete_cids:
+            deleted = by_cid.get(cid)
+            if deleted is None:
+                continue
+            for item in model:
+                if item.get('cid') is not None and item.get('supercid') == cid \
+                        and item['cid'] not in delete_cids:
+                    if deleted.get('supercid') is not None and deleted['supercid'] not in delete_cids:
+                        item['supercid'] = deleted['supercid']
+                        item['original_supercid'] = deleted['supercid']
+                    else:
+                        item['supercid'] = None
+                        item['original_supercid'] = None
+                        item['catid'] = deleted.get('catid')
+        # Drop brand-new (negative id) codes entirely; flag pre-existing ones.
+        for item in list(model):
+            if item.get('cid') in delete_cids:
+                if item['cid'] < 0:
+                    model.remove(item)
+                else:
+                    item['delete'] = True
+        for it in code_items:
+            it.code_or_cat['delete'] = True
+            it.hide()
+        self.refresh_after_multi()
+
+    def multi_delete_categories(self, cat_items):
+        """ Delete every selected category from the canvas. Batch version of
+        delete_this_category with a single confirmation. Codes and sub-categories of
+        a deleted category become top level, unless they are themselves being
+        deleted. Model only; the database is written on Apply. """
+
+        global model  # noqa: F824
+        if not cat_items:
+            return
+        names = ", ".join(sorted(it.code_or_cat['name'].strip() for it in cat_items))
+        msg = str(len(cat_items)) + _(" categories will be deleted:") + "\n" + names
+        ui = DialogConfirmDelete(self.app, msg)
+        if not ui.exec():
+            return
+        delete_catids = {it.code_or_cat['catid'] for it in cat_items}
+        # Children become top level (mirrors delete_this_category), unless also deleted.
+        for item in model:
+            if item.get('cid') is not None and item.get('catid') in delete_catids:
+                item['catid'] = None
+            if item.get('cid') is None and item.get('supercatid') in delete_catids \
+                    and item.get('catid') not in delete_catids:
+                item['supercatid'] = None
+        for item in list(model):
+            if item.get('cid') is None and item.get('catid') in delete_catids:
+                if item['catid'] < 0:
+                    model.remove(item)
+                else:
+                    item['delete'] = True
+                    item['deleted_category'] = True  # deleted, NOT merged: change-preview wording
+        for it in cat_items:
+            it.code_or_cat['delete'] = True
+            it.hide()
+        self.refresh_after_multi()
 
     def update_name(self):
         """ Update name of code or category.
