@@ -400,6 +400,52 @@ class DialogGraphModels(QDialog):
         cids.update(r[0] for r in cur.fetchall())
         return cids
 
+    def _get_code_frequencies_for_case(self, case_id):
+        """
+        Frecuencia de codificaciones por codigo (texto, imagen y A/V) aplicadas a un caso.
+        Coding frequency per code (text, image and A/V) applied to a case.
+        param: case_id : Integer
+        return: dict cid -> Integer count
+        """
+        cur = self.app.conn.cursor()
+        freq = {}
+        # count(distinct pk): un caso puede enlazar el mismo archivo por varios rangos
+        # de case_text; el distinct evita contar la misma codificacion dos veces.
+        # count(distinct pk): a case may link the same file through several case_text
+        # ranges; distinct avoids counting the same coding twice.
+        sql_text = ("select ct.cid, count(distinct ct.ctid) from code_text ct "
+                    "join case_text cas on cas.fid = ct.fid "
+                    "and ct.pos0 >= cas.pos0 and ct.pos1 <= cas.pos1 "
+                    "where cas.caseid=? group by ct.cid")
+        sql_image = ("select ci.cid, count(distinct ci.imid) from code_image ci "
+                     "join case_text cas on cas.fid = ci.id "
+                     "where cas.caseid=? group by ci.cid")
+        sql_av = ("select cav.cid, count(distinct cav.avid) from code_av cav "
+                  "join case_text cas on cas.fid = cav.id "
+                  "where cas.caseid=? group by cav.cid")
+        for sql in (sql_text, sql_image, sql_av):
+            cur.execute(sql, [case_id])
+            for cid, n in cur.fetchall():
+                freq[cid] = freq.get(cid, 0) + n
+        return freq
+
+    def _get_code_frequencies_for_file(self, file_id):
+        """
+        Frecuencia de codificaciones por codigo (texto, imagen y A/V) en un archivo.
+        Coding frequency per code (text, image and A/V) in a file.
+        param: file_id : Integer
+        return: dict cid -> Integer count
+        """
+        cur = self.app.conn.cursor()
+        freq = {}
+        for sql in ("select cid, count(*) from code_text where fid=? group by cid",
+                    "select cid, count(*) from code_image where id=? group by cid",
+                    "select cid, count(*) from code_av where id=? group by cid"):
+            cur.execute(sql, [file_id])
+            for cid, n in cur.fetchall():
+                freq[cid] = freq.get(cid, 0) + n
+        return freq
+
     def _get_code_info(self, cid):
         """
         Get code name and color from code_name table.
@@ -1038,18 +1084,30 @@ class DialogGraphModels(QDialog):
         case_b = {'id': case_b_id, 'name': case_b_name}
         cids_a = self._get_codes_for_case(case_a['id'])
         cids_b = self._get_codes_for_case(case_b['id'])
+        # Frecuencias por codigo, mostradas como etiqueta en las lineas de conexion.
+        # Per-code frequencies, shown as label on the connection lines.
+        freq_a = self._get_code_frequencies_for_case(case_a['id'])
+        freq_b = self._get_code_frequencies_for_case(case_b['id'])
 
         if compare_by_cats:
             items_a = set()
             items_b = set()
+            catfreq_a = {}
+            catfreq_b = {}
             for cid in cids_a:
                 info = self._get_code_info(cid)
                 if info and info['catid']:
                     items_a.add(info['catid'])
+                    catfreq_a[info['catid']] = catfreq_a.get(info['catid'], 0) + freq_a.get(cid, 0)
             for cid in cids_b:
                 info = self._get_code_info(cid)
                 if info and info['catid']:
                     items_b.add(info['catid'])
+                    catfreq_b[info['catid']] = catfreq_b.get(info['catid'], 0) + freq_b.get(cid, 0)
+            # Al comparar por categorias la frecuencia es la suma de sus codigos.
+            # When comparing by categories the frequency is the sum over its codes.
+            freq_a = catfreq_a
+            freq_b = catfreq_b
         else:
             items_a = cids_a
             items_b = cids_b
@@ -1066,6 +1124,8 @@ class DialogGraphModels(QDialog):
         node_a = self._add_case_node(case_a['id'], case_a['name'], left_x, top_y)
         node_b = self._add_case_node(case_b['id'], case_b['name'], right_x, top_y)
 
+        # Cada linea lleva como etiqueta la frecuencia respecto a su caso.
+        # Each line is labelled with the frequency relative to its case.
         shared_y = top_y + 100
         for si, item_id in enumerate(sorted(shared)):
             ny = shared_y + si * 50
@@ -1074,8 +1134,8 @@ class DialogGraphModels(QDialog):
             else:
                 node = self._add_code_node(item_id, center_x, ny)
             if node:
-                self._add_free_line(node_a, node, "blue", 2, "solid")
-                self._add_free_line(node_b, node, "blue", 2, "solid")
+                self._add_free_line(node_a, node, "blue", 2, "solid", str(freq_a.get(item_id, 0)))
+                self._add_free_line(node_b, node, "blue", 2, "solid", str(freq_b.get(item_id, 0)))
 
         excl_y = top_y + 100
         for si, item_id in enumerate(sorted(only_a)):
@@ -1085,7 +1145,7 @@ class DialogGraphModels(QDialog):
             else:
                 node = self._add_code_node(item_id, left_x, ny)
             if node:
-                self._add_free_line(node_a, node, "cyan", 2, "dotted")
+                self._add_free_line(node_a, node, "cyan", 2, "dotted", str(freq_a.get(item_id, 0)))
 
         for si, item_id in enumerate(sorted(only_b)):
             ny = excl_y + si * 50
@@ -1094,7 +1154,7 @@ class DialogGraphModels(QDialog):
             else:
                 node = self._add_code_node(item_id, right_x, ny)
             if node:
-                self._add_free_line(node_b, node, "magenta", 2, "dotted")
+                self._add_free_line(node_b, node, "magenta", 2, "dotted", str(freq_b.get(item_id, 0)))
 
         self._finalize_graph()
 
@@ -1301,18 +1361,30 @@ class DialogGraphModels(QDialog):
         file_b = {'id': file_b_id, 'name': file_b_name}
         cids_a = self._get_codes_for_file(file_a['id'])
         cids_b = self._get_codes_for_file(file_b['id'])
+        # Frecuencias por codigo, mostradas como etiqueta en las lineas de conexion.
+        # Per-code frequencies, shown as label on the connection lines.
+        freq_a = self._get_code_frequencies_for_file(file_a['id'])
+        freq_b = self._get_code_frequencies_for_file(file_b['id'])
 
         if compare_by_cats:
             items_a = set()
             items_b = set()
+            catfreq_a = {}
+            catfreq_b = {}
             for cid in cids_a:
                 info = self._get_code_info(cid)
                 if info and info['catid']:
                     items_a.add(info['catid'])
+                    catfreq_a[info['catid']] = catfreq_a.get(info['catid'], 0) + freq_a.get(cid, 0)
             for cid in cids_b:
                 info = self._get_code_info(cid)
                 if info and info['catid']:
                     items_b.add(info['catid'])
+                    catfreq_b[info['catid']] = catfreq_b.get(info['catid'], 0) + freq_b.get(cid, 0)
+            # Al comparar por categorias la frecuencia es la suma de sus codigos.
+            # When comparing by categories the frequency is the sum over its codes.
+            freq_a = catfreq_a
+            freq_b = catfreq_b
         else:
             items_a = cids_a
             items_b = cids_b
@@ -1329,6 +1401,8 @@ class DialogGraphModels(QDialog):
         node_a = self._add_file_node(file_a['id'], file_a['name'], left_x, top_y)
         node_b = self._add_file_node(file_b['id'], file_b['name'], right_x, top_y)
 
+        # Cada linea lleva como etiqueta la frecuencia respecto a su archivo.
+        # Each line is labelled with the frequency relative to its file.
         shared_y = top_y + 100
         for si, item_id in enumerate(sorted(shared)):
             ny = shared_y + si * 50
@@ -1337,8 +1411,8 @@ class DialogGraphModels(QDialog):
             else:
                 node = self._add_code_node(item_id, center_x, ny)
             if node:
-                self._add_free_line(node_a, node, "blue", 2, "solid")
-                self._add_free_line(node_b, node, "blue", 2, "solid")
+                self._add_free_line(node_a, node, "blue", 2, "solid", str(freq_a.get(item_id, 0)))
+                self._add_free_line(node_b, node, "blue", 2, "solid", str(freq_b.get(item_id, 0)))
 
         excl_y = top_y + 100
         for si, item_id in enumerate(sorted(only_a)):
@@ -1348,7 +1422,7 @@ class DialogGraphModels(QDialog):
             else:
                 node = self._add_code_node(item_id, left_x, ny)
             if node:
-                self._add_free_line(node_a, node, "cyan", 2, "dotted")
+                self._add_free_line(node_a, node, "cyan", 2, "dotted", str(freq_a.get(item_id, 0)))
 
         for si, item_id in enumerate(sorted(only_b)):
             ny = excl_y + si * 50
@@ -1357,7 +1431,7 @@ class DialogGraphModels(QDialog):
             else:
                 node = self._add_code_node(item_id, right_x, ny)
             if node:
-                self._add_free_line(node_b, node, "magenta", 2, "dotted")
+                self._add_free_line(node_b, node, "magenta", 2, "dotted", str(freq_b.get(item_id, 0)))
 
         self._finalize_graph()
 
