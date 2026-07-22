@@ -3415,14 +3415,19 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
                     "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
                     "tooltip text, ctid integer,memo_ctid integer, memo_imid integer, memo_avid integer);")
+        # Database version v17. Label and arrow_mode columns on line items
         cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                     "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
-                    "linewidth real, linetype text, isvisible integer);")
+                    "linewidth real, linetype text, isvisible integer, label text, arrow_mode text);")
         cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, "
                     "fromfreetextid integer, fromcatid integer, fromcid integer, fromcaseid integer,"
                     "fromfileid integer, fromimid integer, fromavid integer, tofreetextid integer, tocatid integer, "
                     "tocid integer, tocaseid integer, tofileid integer, toimid integer, toavid integer, color text,"
-                    "linewidth real, linetype text);")
+                    "linewidth real, linetype text, label text, arrow_mode text);")
+        # Database version v17. Memo nodes on graphs
+        cur.execute("CREATE TABLE gr_memo_item (gmemoid integer primary key, grid integer, "
+                    "memo_source_type text, memo_source_id integer, x integer, y integer, "
+                    "color text, font_size integer);")
         cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, imid integer,"
                     "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
                     "tooltip text, pdf_page integer);")
@@ -3433,7 +3438,7 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null)",
-                    ('v16', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v17', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -3885,6 +3890,20 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v16", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v16")
+        # Database version v17. Graph memo nodes and relation line label/arrow persistence
+        try:
+            cur.execute("select label, arrow_mode from gr_cdct_line_item")
+        except sqlite3.OperationalError:
+            cur.execute("alter table gr_cdct_line_item add label text")
+            cur.execute("alter table gr_cdct_line_item add arrow_mode text")
+            cur.execute("alter table gr_free_line_item add label text")
+            cur.execute("alter table gr_free_line_item add arrow_mode text")
+            cur.execute("CREATE TABLE IF NOT EXISTS gr_memo_item (gmemoid integer primary key, grid integer, "
+                        "memo_source_type text, memo_source_id integer, x integer, y integer, "
+                        "color text, font_size integer);")
+            cur.execute('update project set databaseversion="v17", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v17")
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)
