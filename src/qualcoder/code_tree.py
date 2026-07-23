@@ -42,7 +42,19 @@ logger = logging.getLogger(__name__)
 
 
 class CodeTreeController(QtCore.QObject):
-    """ Owns the shared behaviour of a codes treeWidget for a coding dialog. """
+    """ Owns the shared behaviour of a codes treeWidget for a coding dialog.
+    Host protocol:
+    The host dialog must provide: codes (list of dict), categories (list of dict)
+    and parent_textEdit. Both lists are read live, never cached here.
+    Optional callbacks, set after construction:
+        fill_counts_callback() - fill the Count column after fill_tree
+        coded_files_callback(code_or_codes, title) - one code dict, or a list for a category branch
+        find_code_callback(), show_codes_like_callback(), show_codes_of_colour_callback()
+        on_codes_deleted(cids), on_code_renamed(old_name, new_name) - host cache cleanup
+    Signals:
+        menu_requested(menu, selected_item) - emitted before the context menu is shown
+        codes_changed(list_of_table_names) - emitted after every database change
+    """
 
     # Built QMenu and selected QTreeWidgetItem (or None), emitted before menu.exec
     menu_requested = QtCore.pyqtSignal(object, object)
@@ -55,7 +67,7 @@ class CodeTreeController(QtCore.QObject):
         Args:
             app: App object
             tree_widget: the QTreeWidget the dialog already owns (from its .ui)
-            host: the coding dialog, see the host protocol in the module docstring
+            host: the coding dialog, see the host protocol in the class docstring
             column_width_factors: Dictionary or None, passed to restore_persistent_tree_widths
         """
 
@@ -66,7 +78,7 @@ class CodeTreeController(QtCore.QObject):
         self.tree_sort_option = "all asc"  # all asc, all desc, cat and code asc
         self.column_width_factors = column_width_factors if column_width_factors is not None \
             else {0: 0.70, 2: 0.15, 3: 0.15}
-        # Optional host callbacks, see module docstring
+        # Optional host callbacks, see class docstring
         self.fill_counts_callback = None
         self.coded_files_callback = None
         self.find_code_callback = None
