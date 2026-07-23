@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -27,7 +27,7 @@ import fitz
 import html
 from io import BytesIO
 import logging
-import os
+from pathlib import Path
 import PIL.Image
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
@@ -52,7 +52,9 @@ from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems
 
-path = os.path.abspath(os.path.dirname(__file__))
+# path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
+
 logger = logging.getLogger(__name__)
 
 
@@ -117,7 +119,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
-
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
@@ -939,9 +940,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if page.number == self.pdf_page:
                     # Only need the current page image of interest
                     pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
-
-            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+                    pixmap.save(Path(self.app.confighome) / "tmp_pdf_page.png")
+            source_path = Path(self.app.confighome) / "tmp_pdf_page.png"
+            print(source_path)
+            # TODO TypeError pdf image - When opening file.pdf - but open file.pdf_p1.png is ok
             image = QtGui.QImage(source_path)
             self.pdf_controls_toggle(True)
             self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
@@ -1570,7 +1572,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         font = ImageFont.load_default()
         try:
-            font_path = os.path.join(self.app.confighome, 'DroidSansMono.ttf')
+            font_path = Path(self.app.confighome, 'DroidSansMono.ttf')
             font = ImageFont.truetype(font_path, size=int(background_width / 90))
         except OSError:
             pass
@@ -1702,7 +1704,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Menu for show/hide top panel
         if not items:
             menu = QtWidgets.QMenu()
-            menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
             action_rotate = menu.addAction(_("Rotate clockwise"))
             action_rotate_counter = menu.addAction(_("Rotate counter-clockwise"))
             action_highlight_gray = menu.addAction(_("Highlight area - gray"))
