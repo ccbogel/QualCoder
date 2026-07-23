@@ -33,6 +33,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
+from typing import Any
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, QBuffer
@@ -1417,33 +1418,39 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_add_category = menu.addAction(_("Add a new category"))
         action_add_subcode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_add_subcode = menu.addAction(_("Add a new sub-code to code"))  # <- L
+            action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
         action_expand_collapse = None
         action_cat_show_coded_files = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
             action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         if selected is not None and selected.text(1)[0:3] == 'cid' and selected.childCount() > 0:
-            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))  # <- L
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
-        action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_edit_memo = modify_menu.addAction(_("View or edit memo F3"))
         action_merge_category = None
         action_move_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_merge_category = modify_menu.addAction(_("Merge category into category"))
-            action_move_category = modify_menu.addAction(_("Move category under category"))
-        action_delete = modify_menu.addAction(_("Delete"))
+            action_move_category = modify_menu.addAction(_("Move category under category F6"))
+        action_delete = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_delete = modify_menu.addAction(_("Delete F4"))
+        action_delete_branch = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            # Cascade deletion of the whole branch, only offered for categories.
+            action_delete_branch = modify_menu.addAction(_("Delete category branch F4"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
         action_move_multi_codes = None
         action_merge_code_into_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = modify_menu.addAction(_("Change code color"))
-            action_move_code = modify_menu.addAction(_("Move code to"))
+            action_color = modify_menu.addAction(_("Change code color F5"))
+            action_move_code = modify_menu.addAction(_("Move code to F6"))
             action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
-            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code"))  # <- L
+            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
         action_find_code = menu.addAction(_("Find code"))
         filter_menu = menu.addMenu(_("Filter"))
@@ -1522,7 +1529,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         if selected is not None and action == action_edit_memo:
             self.add_edit_cat_or_code_memo(selected)
         if selected is not None and action == action_delete:
-            self.delete_category_or_code(selected)
+            #self.delete_category_or_code(selected)
+            self.delete_code(selected)
+            return
+        if selected is not None and action == action_delete_branch:
+            self.delete_category_branch(selected)
+            return
+        if selected is not None and action == action_delete:
+            self.delete_category_branch(selected)
         if action == action_cat_show_coded_files:
             branch_codes = self.recursive_get_branch_codes(selected, [])
             self.coded_media_dialog(branch_codes, selected.text(0))
@@ -1594,7 +1608,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         category_list = [{'name': "", 'catid': None, 'supercatid': None}]
         for r in res:
             category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ui = DialogSelectItems(self.app, category_list, _("Move Category: Select blank or category"), "single")
         ok = ui.exec()
         if not ok:
             return
@@ -1645,7 +1659,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
         self.update_dialog_codes_and_categories(["code_name"])
 
-    def move_code(self, selected):
+    def move_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Move code to another category or to no category in the tree.
         Uses a list selection.
         param:
@@ -1683,7 +1697,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             if can_append:
                 items_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo})
             iterator += 1
-        ui = DialogSelectItems(self.app, items_list, _("Select blank or category or code"), "single")
+        ui = DialogSelectItems(self.app, items_list, _("Move code: Select blank or category or code"), "single")
         ok = ui.exec()
         if not ok:
             return
@@ -1699,23 +1713,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], selected_cid])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories(["code_name"])
-        '''cid = int(selected.text(1)[4:])
-        cur = self.app.conn.cursor()
-        cur.execute("select name, catid from code_cat order by name")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        # Moving to a category (or to blank) removes any sub-code nesting. <- L
-        cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], cid])
-        self.update_dialog_codes_and_categories(["code_name"])'''
 
-    def show_codes_like(self, preset=None):
+    def show_codes_like(self, preset:str|None=None):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
          The input dialog is too narrow, so it is re-created.
@@ -1780,7 +1779,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.show_codes_colour_filter = ""
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
-        if self.show_codes_colour_filter == "":  # for clear filter code<- L
+        if self.show_codes_colour_filter == "":  # for clear filter code
             self.ui.pushButton_clear_filter_code.setVisible(False)
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
@@ -1800,7 +1799,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def clear_file_filter(self):
         """ Clear any active file filter (show files like, case files, attributes)
-        and reload all files. """ # <- L
+        and reload all files. """ 
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
@@ -1809,7 +1808,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_clear_filter_file.setVisible(False)
         self.ui.pushButton_clear_filter_file.setStyleSheet("")  # reset blue style
 
-    def recursive_traverse(self, item, text_="", case_sensitive=False):
+    def recursive_traverse(self, item, text_:str="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories and sub-codes. A code stays visible if it matches or
         if any of its descendant sub-codes matches, so a match is never hidden under a
@@ -1910,8 +1909,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 return
             if key == QtCore.Qt.Key.Key_F4:
                 if selected.text(1)[0:3] == 'cat':
-                    # TODO self.delete_category_branch(selected)
-                    pass
+                    self.delete_category_branch(selected)
                 else:
                     self.delete_code(selected)
                 return
@@ -1963,12 +1961,14 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         self.ui.horizontalSlider.setValue(v)
 
-    def image_highlight(self, image_operation="gray", coded_area=None, code_id=None):
+    def image_highlight(self, image_operation:str="gray", coded_area=None, code_id:int|None=None):
         """ Gray, blurred or solarised image with coloured coded highlight(s).
         Highlight all coded area, or selected coded area, or all areas coded by one specific code.
         Takes a few seconds to build and show image.
-        :param: coded_area Dictionary of coded area
-        :param: coded_id Integer code id
+        Args:
+            image_operation: gray, blurred, solarised
+            coded_area: Dictionary of coded area
+            coded_id: Integer code id
         """
 
         img = self.pixmap.toImage()
@@ -2035,7 +2035,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Message(self.app, _('Image saved'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    def text_box(self, draw, background_width, position, text, memo):
+    def text_box(self, draw, background_width, position, text:str, memo:str):
         """ Draw codename caption if show_code_captions=1, or codename plus memo if show_code_captions=2. """
 
         if self.show_code_captions == 0:
@@ -2309,11 +2309,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.degrees = 270
         self.redraw_scene()
 
-    def move_or_resize_coding(self, item):
+    def move_or_resize_coding(self, item:dict[str,Any]):
         """ Move or resize a coding rectangle, in pixels.
-
-        params:
-        :name item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
+        Args:
+            item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
         """
 
         ui = DialogMoveResizeRectangle(self.app)
@@ -2353,11 +2352,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for all visible coders.
-
-        params:
-        :name pos:
-        :type pos:
-        returns: [] or coded items
+        Args:
+           pos:
+        Returns: [] or coded items
         """
 
         if self.file_ is None:
@@ -2382,7 +2379,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def fill_coded_area_label(self, items):
         """ Fill details of label about the currently clicked on coded area.
-        Called by: right click scene menu, """
+        Called by: right click scene menu.
+        Args:
+            items :  
+        """
 
         if not items:
             return
@@ -2421,9 +2421,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.draw_coded_areas()
 
-    def coded_area_memo(self, item):
+    def coded_area_memo(self, item:dict[str,Any]):
         """ Add memo to this coded area.
-        param:
+        Args:
             item : dictionary of coded area """
 
         ui = DialogMemo(self.app, _("Memo for code: ") + item['name'],
@@ -2461,7 +2461,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def unmark(self, item):
         """ Remove coded area.
-        param:
+        Args:
             item : dictionary of coded area """
 
         self.undo_deleted_code = deepcopy(item)
@@ -2724,7 +2724,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             stack.extend(children.get(catid, []))
         return False
 
-    def item_moved_update_data(self, item, parent):
+    def item_moved_update_data(self, item:QtWidgets.QTreeWidgetItem, parent:QtWidgets.QTreeWidgetItem):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
         Also merge codes if one code is dropped on another code.
@@ -2914,7 +2914,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             raise
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
 
-    def merge_code_into_code(self, selected):
+    def merge_code_into_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Merge the selected code into another code chosen from a list.
         Reuses merge_codes (the same logic used by drag-and-drop with Ctrl). The source code
         and all of its descendant sub-codes are excluded from the candidate targets to avoid
@@ -2959,7 +2959,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         self.merge_codes(source_code, target_item)
 
-    def merge_codes(self, item, parent):
+    def merge_codes(self, item:QtWidgets.QTreeWidgetItem, parent):
         """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code.
         param:
@@ -3096,7 +3096,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.parent_textEdit.append(_("New category: ") + item['name'])
         self.app.delete_backup = False
 
-    def delete_category_or_code(self, selected):
+    '''def delete_category_or_code(self, selected):
         """ Delete the selected category or code.
         If category deleted, sublevel items are retained.
         param:
@@ -3106,9 +3106,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.delete_category(selected)
             return  # Avoids error as selected is now None
         if selected.text(1)[0:3] == 'cid':
-            self.delete_code(selected)
+            self.delete_code(selected)'''
 
-    def delete_code(self, selected):
+    def delete_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Find code, remove from database, refresh and code_name data and fill
         treeWidget.
         param:
@@ -3144,7 +3144,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.app.delete_backup = False
 
-    def delete_category(self, selected):
+    '''def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
         and fill treeWidget. Sublevel items are retained.
         param:
@@ -3173,7 +3173,145 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
         self.update_dialog_codes_and_categories(["code_cat", "code_name"])
+        self.app.delete_backup = False'''
+
+    def get_branch_catids_and_cids(self, catid:int):
+            """ Gather every category and code that hangs below a category, including the category itself.
+            Sub-codes (supercid) nested under branch codes are collected too.
+            Read straight from the database, not from the cached self.codes / self.categories, so a
+            stale dialog snapshot can never delete or miss the wrong rows.
+            Iterative walk, so cyclic or malformed data cannot cause infinite recursion. <- L
+            Args:
+                catid: Integer, category id of the branch root
+            Returns:
+                Tuple: (list of category ids, list of code ids)
+            """
+    
+            cur = self.app.conn.cursor()
+            cur.execute("select catid, supercatid from code_cat")
+            db_cats = cur.fetchall()
+            cur.execute("select cid, catid, supercid from code_name")
+            db_codes = cur.fetchall()
+            catids = [catid]
+            i = 0
+            while i < len(catids):
+                for cat_ in db_cats:
+                    if cat_[1] == catids[i] and cat_[0] not in catids:
+                        catids.append(cat_[0])
+                i += 1
+            cids = []
+            for code_ in db_codes:
+                if code_[1] in catids and code_[0] not in cids:
+                    cids.append(code_[0])
+            i = 0
+            while i < len(cids):
+                for code_ in db_codes:
+                    if code_[2] == cids[i] and code_[0] not in cids:
+                        cids.append(code_[0])
+                i += 1
+            return catids, cids
+    
+    def delete_category_branch(self, selected:QtWidgets.QTreeWidgetItem):
+        """ Delete a category and everything underneath it: nested categories, codes, sub-codes
+        and all the codings (text, audio/video, image) made with those codes.
+        Unlike Delete, which only removes the category and re-parents its contents,
+        this cascades down the whole branch. All writes run in a single transaction. <- L
+        Args:
+            selected: QTreeWidgetItem
+        """
+
+        if selected is None or selected.text(1)[0:3] != 'cat':
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select catid, name from code_cat where catid=?", [int(selected.text(1)[6:]), ])
+        res = cur.fetchone()
+        if res is None:  # Already deleted elsewhere, the tree item is stale
+            self.update_dialog_codes_and_categories([])
+            return
+        category = {'catid': res[0], 'name': res[1]}
+        catids, cids = self.get_branch_catids_and_cids(category['catid'])
+        # Count the codings that will be lost, so the user knows what is at stake.
+        # One grouped scan per table, instead of one query per code. <- L
+        cids_set = set(cids)
+        codings = 0
+        for table in ("code_text", "code_av", "code_image"):
+            cur.execute(f"select cid, count(*) from {table} group by cid")
+            for row in cur.fetchall():
+                if row[0] in cids_set:
+                    codings += row[1]
+        msg = _("Category branch") + ": " + category['name'] + "\n\n"
+        msg += _("All categories and codes under this category will also be deleted.") + "\n"
+        msg += _("All codings made with these codes across all files will be deleted.") + "\n\n"
+        msg += _("Categories to delete") + f": {len(catids)}\n"
+        msg += _("Codes to delete") + f": {len(cids)}\n"
+        msg += _("Codings to delete") + f": {codings}\n\n"
+        msg += _("Make a project backup first. This action cannot be undone.")
+        ui = DialogConfirmDelete(self.app, msg)
+        # Cancel is the default button here, so a stray Enter cannot wipe out the branch. <- L
+        button_box = ui.findChild(QtWidgets.QDialogButtonBox)
+        if button_box is not None:
+            ok_button = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok)
+            cancel_button = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            if ok_button is not None:
+                ok_button.setAutoDefault(False)
+                ok_button.setDefault(False)
+            if cancel_button is not None:
+                cancel_button.setAutoDefault(True)
+                cancel_button.setDefault(True)
+                cancel_button.setFocus()
+        ok = ui.exec()
+        if not ok:
+            return
+        try:
+            for cid in cids:
+                cur.execute("delete from code_text where cid=?", [cid, ])
+                cur.execute("delete from code_av where cid=?", [cid, ])
+                cur.execute("delete from code_image where cid=?", [cid, ])
+                cur.execute("delete from code_name where cid=?", [cid, ])
+                # Saved graphs: drop nodes and links pointing at this code, so that a reused
+                # cid cannot silently re-bind an old graph node to an unrelated code. <- L
+                cur.execute("delete from gr_cdct_text_item where cid=?", [cid, ])
+                cur.execute("delete from gr_cdct_line_item where fromcid=? or tocid=?", [cid, cid])
+                cur.execute("delete from gr_free_line_item where fromcid=? or tocid=?", [cid, cid])
+            for cat_id in catids:
+                cur.execute("delete from code_cat where catid=?", [cat_id, ])
+                cur.execute("delete from gr_cdct_text_item where catid=?", [cat_id, ])
+                cur.execute("delete from gr_cdct_line_item where fromcatid=? or tocatid=?", [cat_id, cat_id])
+                cur.execute("delete from gr_free_line_item where fromcatid=? or tocatid=?", [cat_id, cat_id])
+            # Drop the deleted codes from the stored recently used codes. <- L
+            cur.execute("select recently_used_codes from project")
+            recent_res = cur.fetchone()
+            if recent_res is not None and recent_res[0]:
+                keep = []
+                for token in recent_res[0].split():
+                    try:
+                        if int(token) in cids:
+                            continue
+                    except ValueError:
+                        pass
+                    keep.append(token)
+                cur.execute("update project set recently_used_codes=?", [" ".join(keep), ])
+            # Extra check. Clear any dangling references left behind by the deletion. <- L
+            cur.execute("update code_cat set supercatid=null where supercatid is not null and supercatid not in "
+                        "(select catid from code_cat)")
+            cur.execute("update code_name set catid=null where catid is not null and catid not in "
+                        "(select catid from code_cat)")
+            cur.execute("update code_name set supercid=null where supercid is not null and supercid not in "
+                        "(select cid from code_name)")
+            self.app.conn.commit()
+        except Exception as e_:
+            print(e_)
+            self.app.conn.rollback()  # Revert all changes
+            self.update_dialog_codes_and_categories([])
+            raise
+        # Remove the deleted codes from the recent codes list
+        self.recent_codes = [c for c in self.recent_codes if c['cid'] not in cids]
         self.app.delete_backup = False
+        msg = _("Category branch deleted") + ": " + category['name'] + ". "
+        msg += _("Categories") + f": {len(catids)}, " + _("Codes") + f": {len(cids)}, "
+        msg += _("Codings") + f": {codings}"
+        self.parent_textEdit.append(msg)
+        self.update_dialog_codes_and_categories(["code_cat", "code_name", "code_text", "code_av", "code_image"])
 
     def add_edit_cat_or_code_memo(self, selected):
         """ View and edit a memo.
