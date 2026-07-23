@@ -100,7 +100,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.code_text = []  # The coded text segments
         self.codes, self.categories = self.app.get_codes_categories()
         self.get_recent_codes()  # After codes obtained!
-        self.tree_sort_option = "all asc"  # all desc, cat then code asc
         self.annotations = self.app.get_annotations()
         self.autocode_history = []
         self.default_new_code_color = None
@@ -2038,19 +2037,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-
-    def delete_category_or_code(self, selected):
-        """ Determine if selected item is a code or category before deletion.
-        Category deletion now cascades down the whole branch, matching the
-        Delete category branch option propagated from the text coding page.
-        Args:
-            selected: QTreeWidgetItem
-        """
-        if selected.text(1)[0:3] == 'cat':
-            self.code_tree.delete_category_branch(selected)
-            return  # Avoid error as selected is now None
-        if selected.text(1)[0:3] == 'cid':
-            self.code_tree.delete_code(selected)
 
     def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
