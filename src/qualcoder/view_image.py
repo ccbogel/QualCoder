@@ -32,14 +32,15 @@ import PIL.Image
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
+from typing import Any
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, QBuffer
 from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
-from .coder_names import DialogCoderNames
 from .code_tree import CodeTreeController
+from .coder_names import DialogCoderNames
 from .color_selector import DialogColorSelect
 from .color_selector import colour_ranges, show_codes_of_colour_range
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
@@ -79,17 +80,16 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.log = ""
         self.scale = 1.0  # Image scaling
         self.selection = None  # Initial code rectangle point
-        # State variables for interactive resizing functionality <- L
-        self.item_to_resize = None         # Stores the segment dictionary selected for resizing <- L
-        self.is_dragging_handle = False    # Flag indicating if a resize handle is being dragged <- L
-        self.active_handle = None          # Identifies the active corner ("TL", "TR", "BL", "BR") <- L
-        self.interactive_rect_item = None  # Visual dashed rectangle shown during drag <- L
-        self.original_resize_geom = None   # Stores original geometry (x, y, w, h) before drag <- L
+        # State variables for interactive resizing functionality
+        self.item_to_resize = None         # Stores the segment dictionary selected for resizing
+        self.is_dragging_handle = False    # Flag indicating if a resize handle is being dragged
+        self.active_handle = None          # Identifies the active corner ("TL", "TR", "BL", "BR")
+        self.interactive_rect_item = None  # Visual dashed rectangle shown during drag
+        self.original_resize_geom = None   # Stores original geometry (x, y, w, h) before drag
         self.important = False  # Show/hide important flagged codes
         self.attributes = []
         self.degrees = 0  # For image rotation
         self.get_codes_and_categories()
-        self.tree_sort_option = "all asc"  # all desc, cat then code asc
         self.show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
         self.default_new_code_color = None
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
@@ -138,7 +138,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         # Shared code tree controller: tree loading, common context menu, drag and drop
         # reparenting, F2-F6 shortcuts and category branch deletion live in code_tree.py,
-        # so the four coding pages no longer duplicate this logic by hand. <- L
+        # so the four coding pages no longer duplicate this logic by hand.
         self.code_tree = CodeTreeController(self.app, self.ui.treeWidget, self)
         self.ui.treeWidget.customContextMenuRequested.connect(self.code_tree.tree_menu)
         self.code_tree.fill_counts_callback = self.fill_code_counts_in_tree
@@ -147,7 +147,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.code_tree.show_codes_like_callback = self.show_codes_like
         self.code_tree.show_codes_of_colour_callback = self.show_codes_of_color
         self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
-
         self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
         init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodeimage_tree_widths')
         # Header widgets
@@ -178,7 +177,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter file <- L
+        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter file
         self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)  # hidden until a filter is active        
@@ -394,7 +393,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
         self.ui.listWidget.clear()
         cur = self.app.conn.cursor()
-        sql = "select name, id, memo, owner, date, mediapath, risid from source where "  # Missing parentheses <- L
+        sql = "select name, id, memo, owner, date, mediapath, risid from source where "
         sql += "((substr(mediapath,1,7) in ('/images', 'images:')) or "  # added outer opening parenthesis to group OR conditions
         sql += "(lower(substr(mediapath, -4)) = '.pdf')) "  # added closing parenthesis so AND id IN(...) applies to both branches
         sql += bad_link_sql + " "
@@ -513,7 +512,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
-        self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter <- L
+        self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def fill_code_counts_in_tree(self):
@@ -538,7 +537,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             code_counts.append([c['cid'], result[0], result[1]])
 
         # Sub-code roll-up. Build own counts, the parent/children maps and an effective
-        # category for each code (a sub-code is attributed to its top ancestor's category). <- L
+        # category for each code (a sub-code is attributed to its top ancestor's category).
         own_count = {cc[0]: cc[2] for cc in code_counts}
         code_by_cid = {c['cid']: c for c in self.codes}
         children_of = {}
@@ -548,7 +547,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 children_of.setdefault(sup, []).append(c['cid'])
 
         def _effective_catid(cid):
-            """ Resolve a (possibly nested) code to the catid of its top ancestor code. <- L """
+            """ Resolve a (possibly nested) code to the catid of its top ancestor code. """
             seen = set()
             cur_c = code_by_cid.get(cid)
             while cur_c is not None and cur_c['cid'] not in seen:
@@ -566,7 +565,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         total_cache = {}
 
         def _code_total(cid):
-            """ Code count rolled up with all descendant sub-codes. Memoized, cycle-safe. <- L """
+            """ Code count rolled up with all descendant sub-codes. Memoized, cycle-safe. """
             if cid in total_cache:
                 return total_cache[cid]
             total_cache[cid] = own_count.get(cid, 0)  # seed guards against cycles
@@ -581,7 +580,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for category in categories:
             category['count'] = 0
         # Add each code's own count to its effective category (sub-codes roll up to the
-        # category of their top ancestor code, not to a raw catid that is None). <- L
+        # category of their top ancestor code, not to a raw catid that is None).
         for category in categories:
             for code in code_counts:
                 if eff_catid.get(code[0]) == category['catid']:
@@ -780,7 +779,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         if selection['id'] == -1:
             self.get_files()
-            self.ui.pushButton_clear_filter_file.setVisible(False)  # reset filter button when showing all <- L
+            self.ui.pushButton_clear_filter_file.setVisible(False)  # reset filter button when showing all
             self.ui.pushButton_clear_filter_file.setStyleSheet("")
             return
         cur = self.app.conn.cursor()
@@ -790,14 +789,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         for r in res:
             file_ids.append(r[0])
         self.get_files(file_ids)
-        self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter <- L
+        self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def show_files_like(self):
         """ Show files that contain specified filename text.
         If blank, show all files. """
 
-        dialog = QtWidgets.QInputDialog(None) #correct: dialog embedded in workspace instead of floating <- L
+        dialog = QtWidgets.QInputDialog(None) #correct: dialog embedded in workspace instead of floating
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -810,18 +809,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         text_ = str(dialog.textValue())
         if text_ == "":
             self.get_files()
-            self.ui.pushButton_clear_filter_file.setVisible(False)  # hide filter button when showing all <- L
+            self.ui.pushButton_clear_filter_file.setVisible(False)  # hide filter button when showing all
             self.ui.pushButton_clear_filter_file.setStyleSheet("")
             return
         cur = self.app.conn.cursor()
-        cur.execute("select id from source where name like ? and "  # restrict to image/pdf files only <- L
+        cur.execute("select id from source where name like ? and "  # restrict to image/pdf files only
                     "((substr(mediapath,1,7) in ('/images', 'images:')) or "
                     "(lower(substr(mediapath, -4)) = '.pdf'))",
                     ['%' + text_ + '%'])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
         self.get_files(file_ids)
-        self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter file <- L
+        self.ui.pushButton_clear_filter_file.setVisible(True)  # for clear filter file
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def file_selection_changed(self):
@@ -1263,7 +1262,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.get_coded_areas()
         self.redraw_scene()
 
-    def show_codes_like(self, preset=None):
+    def show_codes_like(self, preset:str|None=None):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
          The input dialog is too narrow, so it is re-created.
@@ -1328,7 +1327,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.show_codes_colour_filter = ""
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
-        if self.show_codes_colour_filter == "":  # for clear filter code<- L
+        if self.show_codes_colour_filter == "":  # for clear filter code
             self.ui.pushButton_clear_filter_code.setVisible(False)
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
@@ -1348,7 +1347,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def clear_file_filter(self):
         """ Clear any active file filter (show files like, case files, attributes)
-        and reload all files. """ # <- L
+        and reload all files. """ 
         self.attributes = []
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
@@ -1357,7 +1356,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_clear_filter_file.setVisible(False)
         self.ui.pushButton_clear_filter_file.setStyleSheet("")  # reset blue style
 
-    def recursive_traverse(self, item, text_="", case_sensitive=False):
+    def recursive_traverse(self, item, text_:str="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories and sub-codes. A code stays visible if it matches or
         if any of its descendant sub-codes matches, so a match is never hidden under a
@@ -1445,11 +1444,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.zoom_in()
             return
 
-        # Tree widget menu items keys F2 - F6
         # Tree widget menu item keys F2 - F6, handled by the shared controller. <- L
         if self.ui.treeWidget.hasFocus():
             if self.code_tree.handle_key_press(event):
                 return
+
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_G:
@@ -1488,12 +1487,14 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         self.ui.horizontalSlider.setValue(v)
 
-    def image_highlight(self, image_operation="gray", coded_area=None, code_id=None):
+    def image_highlight(self, image_operation:str="gray", coded_area=None, code_id:int|None=None):
         """ Gray, blurred or solarised image with coloured coded highlight(s).
         Highlight all coded area, or selected coded area, or all areas coded by one specific code.
         Takes a few seconds to build and show image.
-        :param: coded_area Dictionary of coded area
-        :param: coded_id Integer code id
+        Args:
+            image_operation: gray, blurred, solarised
+            coded_area: Dictionary of coded area
+            coded_id: Integer code id
         """
 
         img = self.pixmap.toImage()
@@ -1560,7 +1561,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Message(self.app, _('Image saved'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    def text_box(self, draw, background_width, position, text, memo):
+    def text_box(self, draw, background_width, position, text:str, memo:str):
         """ Draw codename caption if show_code_captions=1, or codename plus memo if show_code_captions=2. """
 
         if self.show_code_captions == 0:
@@ -1834,11 +1835,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.degrees = 270
         self.redraw_scene()
 
-    def move_or_resize_coding(self, item):
+    def move_or_resize_coding(self, item:dict[str,Any]):
         """ Move or resize a coding rectangle, in pixels.
-
-        params:
-        :name item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
+        Args:
+            item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
         """
 
         ui = DialogMoveResizeRectangle(self.app)
@@ -1878,11 +1878,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for all visible coders.
-
-        params:
-        :name pos:
-        :type pos:
-        returns: [] or coded items
+        Args:
+           pos:
+        Returns: [] or coded items
         """
 
         if self.file_ is None:
@@ -1907,7 +1905,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def fill_coded_area_label(self, items):
         """ Fill details of label about the currently clicked on coded area.
-        Called by: right click scene menu, """
+        Called by: right click scene menu.
+        Args:
+            items :  
+        """
 
         if not items:
             return
@@ -1946,9 +1947,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.draw_coded_areas()
 
-    def coded_area_memo(self, item):
+    def coded_area_memo(self, item:dict[str,Any]):
         """ Add memo to this coded area.
-        param:
+        Args:
             item : dictionary of coded area """
 
         ui = DialogMemo(self.app, _("Memo for code: ") + item['name'],
@@ -1986,7 +1987,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def unmark(self, item):
         """ Remove coded area.
-        param:
+        Args:
             item : dictionary of coded area """
 
         self.undo_deleted_code = deepcopy(item)
@@ -2043,19 +2044,19 @@ class DialogCodeImage(QtWidgets.QDialog):
             y = y + height
             height = abs(height)
         # instead of cancelling when the selection goes outside the image,
-        # clamp it to the image bounds so it cannot exceed the limits but still codes <- L
+        # clamp it to the image bounds so it cannot exceed the limits but still codes
         for item in self.scene.items():
             if type(item) == QtWidgets.QGraphicsPixmapItem:
                 max_w = item.boundingRect().width()
                 max_h = item.boundingRect().height()
-                # Clamp top-left corner inside the image <- L
+                # Clamp top-left corner inside the image
                 if x < 0:
-                    width += x  # reduce width by the part that fell off the left edge <- L
+                    width += x  # reduce width by the part that fell off the left edge
                     x = 0
                 if y < 0:
-                    height += y  # reduce height by the part that fell off the top edge <- L
+                    height += y  # reduce height by the part that fell off the top edge
                     y = 0
-                # Clamp bottom-right corner to the image edges <- L
+                # Clamp bottom-right corner to the image edges
                 if x + width > max_w:
                     width = max_w - x
                 if y + height > max_h:
@@ -2091,7 +2092,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.fill_code_counts_in_tree()
 
-    # Functions responsible for mathematically processing the interactive resizing <- L
+    # Functions responsible for mathematically processing the interactive resizing
     def update_interactive_resize(self, pos):
         """ Update the visual dashed rectangle during mouse movement. """ 
         if not self.interactive_rect_item or not self.original_resize_geom:
@@ -2111,10 +2112,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         # clamp the mouse position to the visible image bounds before using it,
         # so dragging outside the image cannot push the rectangle past the edges
-        # and removes the "jump" / over-reach when leaving the image area <- L
+        # and removes the "jump" / over-reach when leaving the image area
         scaled_w = self.pixmap.width() * self.scale
         scaled_h = self.pixmap.height() * self.scale
-        # When rotated 90/270 the visible image swaps width/height on screen <- L
+        # When rotated 90/270 the visible image swaps width/height on screen
         if self.degrees in (90, 270):
             scaled_w, scaled_h = scaled_h, scaled_w
         if mouse_x < 0:
@@ -2208,7 +2209,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         
         # Execute SQL statement to permanently update SQLite
         cur = self.app.conn.cursor()
-        # Prevent app crash if the user resizes the segment to perfectly match an existing identical one <- L
+        # Prevent app crash if the user resizes the segment to perfectly match an existing identical one
         try:
             cur.execute("update code_image set x1=?, y1=?, width=?, height=? where imid=?",
                         (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
@@ -2226,19 +2227,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         
         self.redraw_scene()
         self.app.delete_backup = False
-
-    def delete_category_or_code(self, selected):
-        """ Determine if selected item is a code or category before deletion.
-        Category deletion now cascades down the whole branch, matching the
-        Delete category branch option propagated from the text coding page. <- L
-        Args:
-            selected: QTreeWidgetItem
-        """
-        if selected.text(1)[0:3] == 'cat':
-            self.code_tree.delete_category_branch(selected)
-            return  # Avoid error as selected is now None
-        if selected.text(1)[0:3] == 'cid':
-            self.code_tree.delete_code(selected)
 
 class DialogViewImage(QtWidgets.QDialog):
     """ View image. View and edit displayed memo.
