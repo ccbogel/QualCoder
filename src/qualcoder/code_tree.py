@@ -1115,12 +1115,11 @@ class CodeTreeController(QtCore.QObject):
             item = iterator.value()
             depth = 0
             current = item
-            # Get depth and if circular reference present
             while current.parent() is not None:
-                if current.text(1) == selected.text(1):
-                    can_append = False
                 current = current.parent()
                 depth += 1
+                if current.text(1) == selected.text(1):
+                    can_append = False
             prefix = ""
             if depth > 0:
                 prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
@@ -1149,6 +1148,12 @@ class CodeTreeController(QtCore.QObject):
         if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
             cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
         elif destination['cid'] > 0:  # Move under another code
+            # Belt and braces: never write a supercid cycle, even if the selection list
+            # was built from a stale or corrupted tree.
+            if self.code_is_descendant(destination['cid'], selected_cid):
+                Message(self.app, _("Cannot move code"),
+                        _("Cannot move a code under itself or one of its own sub-codes.")).exec()
+                return
             cur.execute("update code_name set catid=null, supercid=? where cid=?", [destination['cid'], selected_cid])
         else:  # Move under a category
             cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], selected_cid])
