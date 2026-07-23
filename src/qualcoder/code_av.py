@@ -17,8 +17,8 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-https://qualcoder.org/
 https://qualcoder-org.github.io
+https://qualcoder.org/
 """
 
 import sqlite3
@@ -29,7 +29,6 @@ import logging
 import os
 import platform
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-from random import randint
 import re
 import subprocess
 import time
@@ -38,13 +37,13 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
-from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
-from .color_selector import DialogColorSelect, colors, TextColor, colour_ranges, show_codes_of_colour_range
+from .code_tree import CodeTreeController
+from .color_selector import TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .helpers import msecs_to_hours_mins_secs, Message, ToolTipEventFilter, CodeResizeHandle, \
-    init_persistent_tree_header, restore_persistent_tree_widths, ExportDirectoryPathDialog
+    init_persistent_tree_header, ExportDirectoryPathDialog
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -72,7 +71,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_text_edit
         self.tab_reports = tab_reports
-        self.tree_sort_option = "all asc"  # Options: all desc, cat then code asc
         self.files = []
         self.attributes = []  # Show selected files in list widget
         self.file_ = None  # Current file
@@ -226,12 +224,23 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        # Shared code tree controller: tree loading, common context menu, drag and drop
+        # reparenting, F2-F6 shortcuts and category branch deletion live in code_tree.py,
+        # so the four coding pages no longer duplicate this logic by hand. <- L
+        self.code_tree = CodeTreeController(self.app, self.ui.treeWidget, self)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.code_tree.tree_menu)
+        self.code_tree.fill_counts_callback = self.fill_code_counts_in_tree
+        self.code_tree.coded_files_callback = self.coded_media_dialog
+        self.code_tree.find_code_callback = self.find_code_in_tree
+        self.code_tree.show_codes_like_callback = self.show_codes_like
+        self.code_tree.show_codes_of_colour_callback = self.show_codes_of_color
+        self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
+
         self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)  # open memo, or assign text to code
         init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodeav_tree_widths')
         self.get_files()
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
-        self.fill_tree()
+        self.code_tree.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
@@ -579,169 +588,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Set the scene to the top
         self.ui.graphicsView.verticalScrollBar().setValue(0)
 
-    def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes. """
-
-        cats = deepcopy(self.categories)
-        codes = deepcopy(self.codes)
-        self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(4)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
-        if not self.app.settings['showids']:
-            self.ui.treeWidget.setColumnHidden(1, True)
-        else:
-            self.ui.treeWidget.setColumnHidden(1, False)
-
-        # Add top level categories
-        remove_list = []
-        for c in cats:
-            if c['supercatid'] is None:
-                memo = ""
-                if c['memo'] != "":
-                    memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                top_item.setToolTip(0, '')
-                if len(c['name']) > 52:
-                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                    top_item.setToolTip(0, c['name'])
-                top_item.setToolTip(2, c['memo'])
-                self.ui.treeWidget.addTopLevelItem(top_item)
-                if f"catid:{c['catid']}" in self.app.collapsed_categories:
-                    top_item.setExpanded(False)
-                else:
-                    top_item.setExpanded(True)
-                remove_list.append(c)
-        for item in remove_list:
-            cats.remove(item)
-
-        ''' Add child categories. Look at each unmatched category, iterate through tree
-        to add as child, then remove matched categories from the list. '''
-        count = 0
-        while len(cats) > 0 and count < 10000:
-            remove_list = []
-            for c in cats:
-                it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-                item = it.value()
-                count2 = 0
-                while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == f"catid:{c['supercatid']}":
-                        memo = ""
-                        if c['memo'] != "":
-                            memo = "Memo"
-                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                        child.setToolTip(0, '')
-                        if len(c['name']) > 52:
-                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                            child.setToolTip(0, c['name'])
-                        child.setToolTip(2, c['memo'])
-                        item.addChild(child)
-                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
-                            child.setExpanded(False)
-                        else:
-                            child.setExpanded(True)
-                        remove_list.append(c)
-                    it += 1
-                    item = it.value()
-                    count2 += 1
-            if not remove_list:
-                break  # cycle or dangling parent: leftovers placed at top level below
-            for item in remove_list:
-                cats.remove(item)
-            count += 1
-        # Fallback: never lose a category. Any with a missing/cyclic parent goes to top level. <- L
-        for c in cats:
-            memo = _("Memo") if c['memo'] != "" else ""
-            top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-            top_item.setToolTip(2, c['memo'])
-            top_item.setToolTip(0, '')
-            if len(c['name']) > 52:
-                top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                top_item.setToolTip(0, c['name'])
-            self.ui.treeWidget.addTopLevelItem(top_item)
-
-        # Add codes, with sub-code nesting. A code is top level only when it has neither a
-        # parent category (catid) nor a parent code (supercid). The rest are nested under
-        # their category (catid:) or under their parent code (cid:). <- L
-
-        def _make_code_item(code_dict):
-            """ Build a styled tree item for a code. Sub-codes share this styling. <- L """
-            memo_ = _("Memo") if code_dict['memo'] != "" else ""
-            code_item = QtWidgets.QTreeWidgetItem([code_dict['name'], f"cid:{code_dict['cid']}", memo_])
-            code_item.setToolTip(2, code_dict['memo'])
-            code_item.setToolTip(0, '')
-            if len(code_dict['name']) > 52:
-                code_item.setText(0, f"{code_dict['name'][:25]}..{code_dict['name'][-25:]}")
-                code_item.setToolTip(0, code_dict['name'])
-            code_item.setBackground(0, QBrush(QColor(code_dict['color']), Qt.BrushStyle.SolidPattern))
-            code_item.setForeground(0, QBrush(QColor(TextColor(code_dict['color']).recommendation)))
-            code_item.setFlags(
-                Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
-                Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
-            return code_item
-
-        # Index every node already in the tree (categories) by its id text for O(1) lookup. <- L
-        node_index = {}
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        while it.value():
-            node_index[it.value().text(1)] = it.value()
-            it += 1
-        # Top level codes: no category and no parent code.
-        remove_items = []
-        for c in codes:
-            if c['catid'] is None and c.get('supercid') is None:
-                node = _make_code_item(c)
-                self.ui.treeWidget.addTopLevelItem(node)
-                node_index[f"cid:{c['cid']}"] = node
-                remove_items.append(c)
-        for c in remove_items:
-            codes.remove(c)
-        # Remaining codes: nest under category or parent code. Iterate because a parent code
-        # may itself be a not-yet-placed sub-code. Each pass places every code whose parent
-        # already exists; the loop ends when all are placed or no further progress is possible.
-        count = 0
-        while codes and count < 10000:
-            remove_items = []
-            for c in codes:
-                if c.get('supercid') is not None:
-                    parent_key = f"cid:{c['supercid']}"
-                else:
-                    parent_key = f"catid:{c['catid']}"
-                parent_node = node_index.get(parent_key)
-                if parent_node is not None:
-                    node = _make_code_item(c)
-                    parent_node.addChild(node)
-                    node_index[f"cid:{c['cid']}"] = node
-                    remove_items.append(c)
-            if not remove_items:
-                break  # remaining codes have a missing/cyclic parent: placed at top level below
-            for c in remove_items:
-                codes.remove(c)
-            count += 1
-        # Fallback: never lose a code. Any code with a dangling parent goes to top level. <- L
-        for c in codes:
-            node = _make_code_item(c)
-            self.ui.treeWidget.addTopLevelItem(node)
-            node_index[f"cid:{c['cid']}"] = node
-
-        if self.tree_sort_option == "all asc":
-            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        if self.tree_sort_option == "all desc":
-            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
-        # Show the code tree expanded from the start: sub-code branches are visible by default;
-        # categories the user had collapsed are restored to their collapsed state. <- L
-        self.ui.treeWidget.expandAll()
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        while it.value():
-            node = it.value()
-            if node.text(1) in self.app.collapsed_categories:
-                node.setExpanded(False)
-            it += 1
-        self.fill_code_counts_in_tree()
-        restore_persistent_tree_widths(
-            self.ui.treeWidget,
-            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
-        )
-
     def fill_code_counts_in_tree(self):
         """ Calculate the frequency of each code and category for this coder and the selected file.
         Add a list item to each code that can be used to display in treeWidget.
@@ -820,7 +666,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         # until only top categories are left
         sub_categories = copy(categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 10000:
+        # 'and', not 'or': with 'or' the 10,000 guard never fires (cycle in code_cat =
+        # infinite loop) and healthy data still spins 10,000 empty passes.
+        while len(sub_categories) > 0 and counter < 10000:
             leaf_list = []
             branch_list = []
             for cat in sub_categories:
@@ -861,7 +709,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Assign selected text on left-click on code in tree. """
 
         if column == 2:
-            self.add_edit_code_memo(item)
+            self.code_tree.add_edit_cat_or_code_memo(item)
             return
         if item.text(1)[0:3] == 'cat':
             return
@@ -1618,171 +1466,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             txt = _("Segment: ") + str(self.segment['start']) + " - " + self.segment['end']
             self.ui.label_segment.setText(txt)
 
-    def tree_menu(self, position):
-        """ Context menu for treeWidget items.
-        Add, rename, memo, move or delete code or category. Change code color. """
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
-        selected = self.ui.treeWidget.currentItem()
-        action_color = None
-        action_assign_segment = None
-        action_show_coded_media = None
-        action_move_code = None
-        if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
-            action_assign_segment = menu.addAction("Assign segment to code")
-        action_add_code_to_category = None
-        action_add_category_to_category = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_add_code_to_category = menu.addAction(_("Add new code to category"))
-            action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-        action_add_code = menu.addAction(_("Add a new code"))
-        action_add_category = menu.addAction(_("Add a new category"))
-        action_add_subcode = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_add_subcode = menu.addAction(_("Add a new sub-code to code"))  # <- L
-        action_expand_collapse = None
-        action_cat_show_coded_files = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
-            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
-        if selected is not None and selected.text(1)[0:3] == 'cid' and selected.childCount() > 0:
-            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))  # <- L
-        modify_menu = menu.addMenu(_("Modify"))
-        action_rename = modify_menu.addAction(_("Rename F2"))
-        action_edit_memo = modify_menu.addAction(_("View or edit memo"))
-        action_merge_category = None
-        action_move_category = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_merge_category = modify_menu.addAction(_("Merge category into category"))
-            action_move_category = modify_menu.addAction(_("Move category under category"))
-        action_delete = modify_menu.addAction(_("Delete"))
-        action_move_multi_codes = None
-        action_merge_code_into_code = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = modify_menu.addAction(_("Change code color"))
-            action_move_code = modify_menu.addAction(_("Move code to"))
-            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
-            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code"))  # <- L
-            action_show_coded_media = menu.addAction(_("Show coded files"))
-        action_find_code = menu.addAction(_("Find code"))
-        filter_menu = menu.addMenu(_("Filter"))
-        action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
-        action_show_codes_of_colour = filter_menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
-        sort_menu = menu.addMenu(_("Sort"))
-        action_all_asc = sort_menu.addAction(_("Sort ascending"))
-        action_all_desc = sort_menu.addAction(_("Sort descending"))
-        action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
-        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
-        if action is None:
-            return
-        if action == action_show_codes_of_colour:
-            self.show_codes_of_color()
-            return
-        if action == action_all_asc:
-            self.tree_sort_option = "all asc"
-            self.fill_tree()
-            return
-        if action == action_all_desc:
-            self.tree_sort_option = "all desc"
-            self.fill_tree()
-            return
-        if action == action_cat_then_code_asc:
-            self.tree_sort_option = "cat and code asc"
-            self.fill_tree()
-            return
-        if action == action_show_codes_like:
-            self.show_codes_like()
-            return
-        if action == action_find_code:
-            self.find_code_in_tree()
-            return
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
-            self.change_code_color(selected)
-            return
-        if selected is not None and action == action_move_code:
-            self.move_code(selected)
-            return
-        if action == action_move_multi_codes:
-            self.move_multiple_codes()
-            return
-        if action == action_merge_code_into_code and selected is not None:
-            self.merge_code_into_code(selected)  # <- L
-            return
-        if action == action_add_category_to_category:
-            catid = int(selected.text(1).split(":")[1])
-            self.add_category(catid)
-            return
-        if action == action_add_category:
-            self.add_category()
-            return
-        if action == action_add_code:
-            self.add_code()
-            return
-        if action == action_move_category:
-            catid = int(selected.text(1).split(":")[1])
-            self.move_category(catid)
-            return
-        if action == action_merge_category:
-            catid = int(selected.text(1).split(":")[1])
-            self.merge_category(catid)
-            return
-        if action == action_add_code_to_category:
-            catid = int(selected.text(1).split(":")[1])
-            self.add_code(catid)
-            return
-        if action == action_add_subcode and selected is not None:
-            supercid = int(selected.text(1).split(":")[1])  # <- L
-            self.add_code(supercid=supercid)
-            return
-        if action == action_expand_collapse:
-            expand_toggle = not selected.isExpanded()
-            self.recursive_expand_collapse_branch(selected, expand_toggle)
-            return
-        if selected is not None and action == action_rename:
-            self.rename_category_or_code(selected)
-        if selected is not None and action == action_edit_memo:
-            self.add_edit_code_memo(selected)
-        if selected is not None and action == action_delete:
-            self.delete_category_or_code(selected)
-        if action == action_assign_segment:
-            self.assign_segment_to_code(selected)
-        if action == action_cat_show_coded_files:
-            branch_codes = self.recursive_get_branch_codes(selected, [])
-            self.coded_media_dialog(branch_codes, selected.text(0))
-            return
-        if selected is not None and action == action_show_coded_media:
-            to_find = int(selected.text(1)[4:])
-            found = next((code for code in self.codes if code['cid'] == to_find), None)
-            if found:
-                self.coded_media_dialog(found)
-
-    def recursive_get_branch_codes(self, item, branch_codes):
-        """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories. """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cid":
-                cid = int(item.child(i).text(1)[4:])
-                for code_ in self.codes:
-                    if cid == code_['cid']:
-                        branch_codes.append(code_)
-                        break
-                self.recursive_get_branch_codes(item.child(i), branch_codes)  # also gather sub-codes nested under this code (supercid) <- L
-            if item.child(i).text(1)[0:3] == "cat":
-                self.recursive_get_branch_codes(item.child(i), branch_codes)
-        return branch_codes
-
-    def recursive_expand_collapse_branch(self, item, expand_toggle):
-        """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories. """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            item.setExpanded(expand_toggle)
-            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
-
     def coded_media_dialog(self, code_dict, category_name:str = ""):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
@@ -1796,146 +1479,6 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.update_dialog_codes_and_categories(["code_name", "code_cat", "code_text", "code_av", "code_image"])
-
-    def move_multiple_codes(self):
-        """ Move multiple codes to another category. """
-
-        cur = self.app.conn.cursor()
-        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
-                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
-        res = cur.fetchall()
-        code_list = []
-        for r in res:
-            name = r[0]
-            if r[1] is not None:
-                name = r[1] + " ← " + r[0]
-            code_list.append({'name': name, 'cid': r[2]})
-        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
-        ok = ui.exec()
-        if not ok:
-            return
-        selected_codes = ui.get_selected()
-        cur.execute("select name, catid from code_cat order by upper(name)")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        for s in selected_codes:
-            # Moving to a category (or to blank) removes any sub-code nesting. <- L
-            cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], s['cid']])
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
-        self.update_dialog_codes_and_categories(["code_name"])
-
-    def move_code(self, selected):
-        """ Move code to another category or to no category.
-        Uses a list selection.
-        param:
-            selected : QTreeWidgetItem
-         """
-
-        items_list = [{'name': " ", 'catid': -1, 'cid': -1}]  # Default blank item
-        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        while iterator.value():
-            can_append = True
-            item = iterator.value()
-            depth = 0
-            current = item
-            # Get depth and if circular reference present
-            while current.parent() is not None:
-                if current.text(1) == selected.text(1):
-                    can_append = False
-                current = current.parent()
-                depth += 1
-            prefix = ""
-            if depth > 0:
-                prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
-            name = prefix + item.text(0)
-            cid = -1
-            catid = -1
-            if "cid" in item.text(1):
-                cid = int(item.text(1)[4:])
-            else:
-                catid = int(item.text(1)[6:])
-                name += " " + _("[CATEGORY]")
-            # Check the same item is not the same selected item
-            if item.text(1) == selected.text(1) and item.text(2) == selected.text(2):
-                can_append = False
-            memo = item.toolTip(2)
-            if can_append:
-                items_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo})
-            iterator += 1
-        ui = DialogSelectItems(self.app, items_list, _("Select blank or category or code"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        destination = ui.get_selected()
-        # print(destination)
-        selected_cid = int(selected.text(1)[4:])
-        cur = self.app.conn.cursor()
-        if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
-            cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
-        elif destination['cid'] > 0:  # Move under another code
-            cur.execute("update code_name set catid=null, supercid=? where cid=?", [destination['cid'], selected_cid])
-        else:  # Move under a category
-            cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], selected_cid])
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories(["code_name"])
-
-        '''cid = int(selected.text(1)[4:])
-        cur = self.app.conn.cursor()
-        cur.execute("select name, catid from code_cat order by name")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        # Moving to a category (or to blank) removes any sub-code nesting. <- L
-        cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], cid])
-        self.update_dialog_codes_and_categories(["code_name"])'''
-
-    def move_category(self, catid: int):
-        """ Select another category to move this category underneath.
-        Args:
-            catid : Integer category identifier
-        """
-
-        do_not_merge_list = []
-        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
-        do_not_merge_list.append(str(catid))
-        do_not_merge_ids_string = f"({','.join(do_not_merge_list)})"
-        sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += do_not_merge_ids_string + " order by name"
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        current_cat_name = self.ui.treeWidget.currentItem().text(0)
-        if category['name'] == '':
-            cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
-        else:
-            cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
-        self.update_dialog_codes_and_categories()
 
     def show_codes_like(self, preset=None):
         """ Show all codes if text is empty.
@@ -2077,7 +1620,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         self.get_codes_and_categories()
-        self.fill_tree()
+        self.code_tree.fill_tree()
         self.load_segments()
         self.unlight()
         self.highlight()
@@ -2108,7 +1651,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if code_tree_changed:
             self.get_codes_and_categories()
-            self.fill_tree()
+            self.code_tree.fill_tree()
         elif not refresh_counts and not refresh_segments and not refresh_transcript:
             return
 
@@ -2181,7 +1724,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             selected = self.ui.treeWidget.currentItem()
             if selected is not None and selected.text(1)[0:3] == 'cat':
                 supercatid = int(selected.text(1)[6:])
-            self.add_category(supercatid)
+            self.code_tree.add_category(supercatid)
             return
         # Glue segment to currently selected code and open segment memo
         if key == QtCore.Qt.Key.Key_G and self.segment['start_msecs'] is not None and \
@@ -2214,11 +1757,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
             return
-        # Rename code or category
-        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
-            selected = self.ui.treeWidget.currentItem()
-            self.rename_category_or_code(selected)
-            return
+        # Tree widget menu item keys F2 - F6, handled by the shared controller. <- L
+        if self.ui.treeWidget.hasFocus():
+            if self.code_tree.handle_key_press(event):
+                return
         # Ctrl 0 to 9
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             #  Ctrl + P pause/play toggle
@@ -2414,7 +1956,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = self.ui.treeWidget.currentItem()
                 # event position is QPointF, itemAt requires toPoint
                 parent = self.ui.treeWidget.itemAt(event.position().toPoint())
-                self.item_moved_update_data(item, parent)
+                self.code_tree.item_moved_update_data(item, parent)
                 return True
             # Scroll the tree when dragged item it as top or bottom edges
             if event.type() == QtCore.QEvent.Type.DragMove:
@@ -2717,629 +2259,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.label_segment.setText(_("Segment:"))
         self.ui.pushButton_coding.setText(_("Start segment"))
 
-    def _category_is_descendant(self, candidate_catid, ancestor_catid):
-        """ Return True if candidate_catid is ancestor_catid or one of its descendant
-        sub-categories. Used to prevent cycles when moving a category under another. <- L """
-        if candidate_catid == ancestor_catid:
-            return True
-        children = {}
-        for c in self.categories:
-            sup = c.get('supercatid')
-            if sup is not None:
-                children.setdefault(sup, []).append(c['catid'])
-        stack = list(children.get(ancestor_catid, []))
-        seen = set()
-        while stack:
-            catid = stack.pop()
-            if catid == candidate_catid:
-                return True
-            if catid in seen:
-                continue
-            seen.add(catid)
-            stack.extend(children.get(catid, []))
-        return False
-
-    def item_moved_update_data(self, item, parent):
-        """ Called from drop event in treeWidget view port.
-        identify code or category to move.
-        Also merge codes if one code is dropped on another code.
-        param:
-            item: QTreeWidgetItem
-            parent: QTreeWidgetItem """
-
-        # Find the category in the list
-        if item.text(1)[0:3] == 'cat':
-            found = -1  # use -1 sentinel, not None <- L
-            for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(item.text(1)[6:]):
-                    found = i
-            if found == -1:  # check against sentinel, not falsy
-                return
-            if parent is None:
-                self.categories[found]['supercatid'] = None
-            else:
-                if parent.text(1).split(':')[0] == 'cid':
-                    # parent is code (leaf) cannot add child
-                    return
-                supercatid = int(parent.text(1).split(':')[1])
-                if supercatid == self.categories[found]['catid']:
-                    # Cannot be its own parent.
-                    return
-                # Guard against cycles: moving a category under one of its own sub-categories
-                # would make the branch disappear and corrupt the tree. <- L
-                if self._category_is_descendant(supercatid, self.categories[found]['catid']):
-                    Message(self.app, _("Cannot move category"),
-                            _("Cannot move a category under one of its own sub-categories.")).exec()
-                    return
-                self.categories[found]['supercatid'] = supercatid
-            cur = self.app.conn.cursor()
-            cur.execute("update code_cat set supercatid=? where catid=?",
-                        [self.categories[found]['supercatid'], self.categories[found]['catid']])
-            self.app.conn.commit()
-            self.update_dialog_codes_and_categories(["code_cat"])
-            return
-
-        # Find the code in the list
-        if item.text(1)[0:3] == 'cid':
-            found = -1
-            for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(item.text(1)[4:]):
-                    found = i
-            if found == -1:
-                return
-            if parent is None:
-                # Move code to top level: clear both parents. <- L
-                self.codes[found]['catid'] = None
-                self.codes[found]['supercid'] = None
-            else:
-                if parent.text(1).split(':')[0] == 'cid':
-                    parent_cid = int(parent.text(1).split(':')[1])
-                    # Ctrl held while dropping a code on a code merges (previous behaviour);
-                    # otherwise the code is nested as a sub-code. <- L
-                    ctrl = bool(QtWidgets.QApplication.keyboardModifiers() &
-                                QtCore.Qt.KeyboardModifier.ControlModifier)
-                    if ctrl:
-                        self.merge_codes(self.codes[found], parent)
-                        return
-                    if parent_cid == self.codes[found]['cid']:
-                        return  # cannot nest under itself
-                    if self._code_is_descendant(parent_cid, self.codes[found]['cid']):
-                        Message(self.app, _("Cannot nest code"),
-                                _("Cannot move a code under one of its own sub-codes.")).exec()
-                        return
-                    # Nest as a sub-code (mutually exclusive with category). <- L
-                    self.codes[found]['supercid'] = parent_cid
-                    self.codes[found]['catid'] = None
-                else:
-                    # Dropped onto a category. <- L
-                    catid = int(parent.text(1).split(':')[1])
-                    self.codes[found]['catid'] = catid
-                    self.codes[found]['supercid'] = None
-            cur = self.app.conn.cursor()
-            cur.execute("update code_name set catid=?, supercid=? where cid=?",
-                        [self.codes[found]['catid'], self.codes[found].get('supercid'),
-                         self.codes[found]['cid']])
-            self.app.conn.commit()
-            self.update_dialog_codes_and_categories(["code_name"])
-            self.app.delete_backup = False
-
-    def _code_is_descendant(self, candidate_cid, ancestor_cid):
-        """ Return True if candidate_cid is ancestor_cid or one of its descendant sub-codes.
-        Used to prevent cycles when nesting a code under another code. <- L """
-        if candidate_cid == ancestor_cid:
-            return True
-        children = {}
-        for c in self.codes:
-            sup = c.get('supercid')
-            if sup is not None:
-                children.setdefault(sup, []).append(c['cid'])
-        stack = list(children.get(ancestor_cid, []))
-        seen = set()
-        while stack:
-            cid = stack.pop()
-            if cid == candidate_cid:
-                return True
-            if cid in seen:
-                continue
-            seen.add(cid)
-            stack.extend(children.get(cid, []))
-        return False
-
-    def recursive_non_merge_item(self, item, no_merge_list):
-        """ Find matching item to be the current selected item.
-        Recurse through any child categories.
-        Tried to use QTreeWidget.finditems - but this did not find matching item text
-        Called by: textEdit recent codes menu option
-        Required for: merge_category()
-        param:
-            item: QTreeWidgetItem
-            no_merge_list: list of ?
-        """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cat":
-                no_merge_list.append(item.child(i).text(1)[6:])
-            self.recursive_non_merge_item(item.child(i), no_merge_list)
-        return no_merge_list
-
-    def merge_category(self, catid):
-        """ Select another category to merge this category into.
-        param:
-            catid: Integer  category identifier """
-
-        do_not_merge_list = []
-        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
-        do_not_merge_list.append(str(catid))
-        do_not_merge_ids_str = "(" + ",".join(do_not_merge_list) + ")"
-        sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += do_not_merge_ids_str + " order by name"
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        try:
-            # Always record merge info in target category memo  # <- L
-            source_cat = None
-            for c in self.categories:
-                if c['catid'] == catid:
-                    source_cat = c
-                    break
-            if source_cat is not None and category['catid'] is not None:
-                target_cat = None
-                for c in self.categories:
-                    if c['catid'] == category['catid']:
-                        target_cat = c
-                        break
-                if target_cat is not None:
-                    merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-                    source_memo = (source_cat.get('memo', '') or '').strip()
-                    source_owner = source_cat.get('owner', self.app.settings['codername'])
-                    merged_block = f"\n\n[{_('Merged from category:')} {source_cat['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"
-                    if source_memo:
-                        merged_block += f"\n{source_memo}"
-                    target_memo = target_cat.get('memo', '') or ''
-                    new_memo = (target_memo + merged_block).strip()
-                    cur.execute("update code_cat set memo=? where catid=?", [new_memo, category['catid']])
-                    target_cat['memo'] = new_memo
-            for code in self.codes:
-                if code['catid'] == catid:
-                    cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
-            cur.execute("delete from code_cat where catid=?", [catid])
-            for cat in self.categories:
-                if cat['supercatid'] == catid:
-                    cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
-            # Clear any orphan supercatids
-            sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
-            cur.execute(sql)
-            orphans = cur.fetchall()
-            sql = "update code_cat set supercatid=Null where supercatid=?"
-            for orphan in orphans:
-                cur.execute(sql, [orphan[0]])
-            self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
-            logger.warning(e_)
-            self.app.conn.rollback()  # revert all changes
-            self.update_dialog_codes_and_categories()
-            raise            
-        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
-
-    def merge_code_into_code(self, selected):
-        """ Merge the selected code into another code chosen from a list.
-        Reuses merge_codes (the same logic used by drag-and-drop with Ctrl). The source code
-        and all of its descendant sub-codes are excluded from the candidate targets to avoid
-        creating a supercid cycle when merging a code into one of its own sub-codes. <- L
-        param:
-            selected: QTreeWidgetItem
-        """
-
-        if selected is None or selected.text(1)[0:3] != 'cid':
-            return
-        src_cid = int(selected.text(1)[4:])
-        source_code = next((c for c in self.codes if c['cid'] == src_cid), None)
-        if source_code is None:
-            return
-        # Candidate targets: every code that is not the source nor a descendant of the source.
-        target_list = []
-        for c in self.codes:
-            if not self._code_is_descendant(c['cid'], src_cid):
-                target_list.append({'name': c['name'], 'cid': c['cid']})
-        if not target_list:
-            Message(self.app, _("Merge code into code"),
-                    _("There is no other code to merge into.")).exec()
-            return
-        target_list = sorted(target_list, key=lambda x: x['name'].lower())
-        ui = DialogSelectItems(self.app, target_list, _("Select code to merge into"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        target = ui.get_selected()
-        if not target:
-            return
-        # merge_codes expects the target as a QTreeWidgetItem, so find it in the tree.
-        target_item = None
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        while it.value():
-            node = it.value()
-            if node.text(1) == f"cid:{target['cid']}":
-                target_item = node
-                break
-            it += 1
-        if target_item is None:
-            return
-        self.merge_codes(source_code, target_item)
-
-    def merge_codes(self, item, parent):
-        """ Merge code with another code .
-        Called by item_moved_update_data when a code is moved onto another code.
-        param:
-            item: QTreeWidgetItem
-            parent: QTreeWidgetItem """
-
-        # Check item dropped on itself. Error can occur on Ubuntu 22.04.
-        if item['name'] == parent.text(0):
-            return
-        # Prevent a supercid cycle <- L
-        target_cid = int(parent.text(1).split(':')[1])
-        if self._code_is_descendant(target_cid, item['cid']):
-            Message(self.app, _("Cannot merge code"),
-                    _("Cannot merge a code into itself or one of its own sub-codes.")).exec()
-            return
-        msg_ = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
-        reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
-                                               msg_, QtWidgets.QMessageBox.StandardButton.Yes,
-                                               QtWidgets.QMessageBox.StandardButton.No)
-        if reply == QtWidgets.QMessageBox.StandardButton.No:
-            return
-        cur = self.app.conn.cursor()
-        old_cid = item['cid']
-        new_cid = int(parent.text(1).split(':')[1])
-        # Always record merge info in target code memo <- L
-        target_code = None
-        for c in self.codes:
-            if c['cid'] == new_cid:
-                target_code = c
-                break
-        if target_code is not None:
-            merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-            source_memo = item.get('memo', '').strip()
-            source_owner = item.get('owner', self.app.settings['codername'])
-            merged_block = f"\n\n[{_('Merged from code:')} {item['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"
-            if source_memo:
-                merged_block += f"\n{source_memo}"
-            target_memo = target_code.get('memo', '') or ''
-            new_memo = (target_memo + merged_block).strip()
-            cur.execute("update code_name set memo=? where cid=?", [new_memo, new_cid])
-            target_code['memo'] = new_memo
-        # Update cid for each coded segment in text, av, image. Delete where there is an Integrity error
-        ct_sql = "select ctid from code_text where cid=?"
-        cur.execute(ct_sql, [old_cid])
-        ct_res = cur.fetchall()
-        try:
-            for ct in ct_res:
-                try:
-                    cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
-                except sqlite3.IntegrityError:
-                    cur.execute("delete from code_text where ctid=?", [ct[0]])
-            av_sql = "select avid from code_av where cid=?"
-            cur.execute(av_sql, [old_cid])
-            av_res = cur.fetchall()
-            for av in av_res:
-                try:
-                    cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
-                except sqlite3.IntegrityError:
-                    cur.execute("delete from code_av where avid=?", [av[0]])
-            img_sql = "select imid from code_image where cid=?"
-            cur.execute(img_sql, [old_cid])
-            img_res = cur.fetchall()
-            for img in img_res:
-                try:
-                    cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
-                except sqlite3.IntegrityError:
-                    cur.execute("delete from code_image where imid=?", [img[0]])
-            # Re-parent the merged code's sub-codes onto the target code (no orphans). <- L
-            cur.execute("update code_name set supercid=?, catid=null where supercid=?", [new_cid, old_cid])
-            cur.execute("delete from code_name where cid=?", [old_cid, ])
-            self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
-            logger.warning(e_)
-            self.app.conn.rollback()  # revert all changes
-            raise                
-        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
-        self.parent_textEdit.append(msg_)
-        self.load_segments()
-
-    def add_code(self, catid=None, supercid=None):
-        """  Use add_item dialog to get new code text. Add_code_name dialog checks for
-        duplicate code name. A random color is selected for the code.
-        New code is added to data and database.
-        param:
-            catid : None to add to without category, catid to add to to category.
-            supercid : None, or Integer to add the code as a sub-code of another code. <- L """
-
-        # Mutual exclusivity: a sub-code never belongs to a category as well. <- L
-        if supercid is not None:
-            catid = None
-        ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("New code name"))
-        ui.exec()
-        new_name = ui.get_new_name()
-        if new_name is None:
-            return
-        code_color = colors[randint(0, len(colors) - 1)]
-        item = {'name': new_name, 'memo': "", 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
-                'color': code_color, 'supercid': supercid}
-        cur = self.app.conn.cursor()
-        cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,?,?,?,?,?)",
-                    (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color'],
-                     item['supercid']))
-        self.app.conn.commit()
-        self.parent_textEdit.append(_("Code added: ") + item['name'])
-        self.update_dialog_codes_and_categories(["code_name"])
-        self.app.delete_backup = False
-
-    def add_category(self, supercatid=None):
-        """ Add a new category.
-        Note: the addItem dialog does the checking for duplicate category names
-        param:
-            supercatid : None to add without category, supercatid to add to category. """
-
-        ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
-        ui.exec()
-        new_name = ui.get_new_name()
-        if new_name is None:
-            return
-        item = {'name': new_name, 'cid': None, 'memo': "",
-                'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-        cur = self.app.conn.cursor()
-        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
-                    (item['name'], item['memo'], item['owner'], item['date'], supercatid))
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories(["code_cat"])
-        self.app.delete_backup = False
-
-    def delete_category_or_code(self, selected):
-        """ Determine if category or code is to be deleted.
-        param:
-            selected: QTreeWidgetItem """
-
-        if selected.text(1)[0:3] == 'cat':
-            self.delete_category(selected)
-            return  # avoid error as selected is now None
-        if selected.text(1)[0:3] == 'cid':
-            self.delete_code(selected)
-
-    def delete_code(self, selected):
-        """ Find code, remove from database, refresh and code_name data and fill
-        treeWidget.
-        param:
-            selected: QTreeWidgetItem """
-
-        # find the code_in the list, check to delete
-        found = -1
-        for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == int(selected.text(1)[4:]):
-                found = i
-        if found == -1:
-            return
-        code_ = self.codes[found]
-        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
-        ok = ui.exec()
-        if not ok:
-            return
-        cur = self.app.conn.cursor()
-        # Re-parent this code's sub-codes so they are not orphaned by the deletion. <- L
-        if code_.get('supercid') is not None:
-            # Was itself a sub-code: lift its children to the grandparent code.
-            cur.execute("update code_name set supercid=? where supercid=?", [code_['supercid'], code_['cid']])
-        else:
-            # Was top level (possibly under a category): move children into that category (or top level).
-            cur.execute("update code_name set supercid=null, catid=? where supercid=?",
-                        [code_['catid'], code_['cid']])
-        cur.execute("delete from code_name where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_av where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_image where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        self.app.conn.commit()
-        self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
-        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
-        self.app.delete_backup = False
-
-    def delete_category(self, selected):
-        """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget.
-        param:
-            selected: QTreeWidgetItem """
-
-        found = -1
-        for i in range(0, len(self.categories)):
-            if self.categories[i]['catid'] == int(selected.text(1)[6:]):
-                found = i
-        if found == -1:
-            return
-        category = self.categories[found]
-        ui = DialogConfirmDelete(self.app, _("Category: ") + selected.text(0))
-        ok = ui.exec()
-        if not ok:
-            return
-        cur = self.app.conn.cursor()
-        cur.execute("update code_name set catid=null where catid=?", [category['catid'], ])
-        cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
-        cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
-        self.app.conn.commit()
-        # An extra check. Fix 'lost' categories if present.
-        sql = "update code_cat set supercatid=null where supercatid is not null and supercatid not in " \
-              "(select catid from code_cat)"
-        cur.execute(sql)
-        self.app.conn.commit()
-        self.parent_textEdit.append(_("Category deleted: ") + category['name'])
-        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
-        self.app.delete_backup = False
-
-    def add_edit_code_memo(self, selected):
-        """ View and edit a memo to a code.
-        param:
-            selected: QTreeWidgetItem """
-
-        changed_tables = []
-
-        if selected.text(1)[0:3] == 'cid':
-            # find the code in the list
-            found = -1
-            for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(selected.text(1)[4:]):
-                    found = i
-            if found == -1:
-                return
-            ui = DialogMemo(self.app, _("Memo for Code ") + self.codes[found]['name'],
-                            self.codes[found]['memo'])
-            ui.exec()
-            memo = ui.memo
-            if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
-            else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-            # Update codes list and database
-            if memo != self.codes[found]['memo']:
-                self.codes[found]['memo'] = memo
-                cur = self.app.conn.cursor()
-                cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
-                self.app.conn.commit()
-                self.app.delete_backup = False
-                changed_tables = ["code_name"]
-
-        if selected.text(1)[0:3] == 'cat':
-            # Find the category in the list
-            found = -1  # use -1 sentinel <- L
-            for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(selected.text(1)[6:]):
-                    found = i
-            if found == -1:  # check against sentinel
-                return
-            ui = DialogMemo(self.app, _("Memo for Category ") + self.categories[found]['name'],
-                            self.categories[found]['memo'])
-            ui.exec()
-            memo = ui.memo
-            if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
-            else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-            # Update codes list and database
-            if memo != self.categories[found]['memo']:
-                self.categories[found]['memo'] = memo
-                cur = self.app.conn.cursor()
-                cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
-                self.app.conn.commit()
-                self.app.delete_backup = False
-                changed_tables = ["code_cat"]
-        self.update_dialog_codes_and_categories(changed_tables)
-
-    def rename_category_or_code(self, selected):
-        """ Rename a code or category. Checks that the proposed code or category name is
-        not currently in use.
-        param:
-            selected: QTreeWidgetItem """
-
-        if selected.text(1)[0:3] == 'cid':
-            found_code = None
-            check_codes = []
-            for code_ in self.codes:
-                if code_['cid'] == int(selected.text(1)[4:]):
-                    found_code = code_
-                else:
-                    check_codes.append(code_)
-            ui = DialogAddItemName(self.app, check_codes, _("Rename code"), _("Code name"))
-            ui.ui.lineEdit.setText(found_code['name'])
-            ui.exec()
-            new_name = ui.get_new_name()
-            if new_name is None or new_name == found_code['name']:
-                return
-            # Find the code in the list
-            found = -1
-            for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(selected.text(1)[4:]):
-                    found = i
-            if found == -1:
-                return
-            # update codes list and database
-            cur = self.app.conn.cursor()
-            cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Code renamed: ") + f"{self.codes[found]['name']} ==> {new_name}")
-            self.update_dialog_codes_and_categories(["code_name"])
-            self.app.delete_backup = False
-            return
-
-        if selected.text(1)[0:3] == 'cat':
-            found_cat = None
-            check_categories = []
-            for category in self.categories:
-                if category['catid'] == int(selected.text(1)[6:]):
-                    found_cat = category
-                else:
-                    check_categories.append(category)
-            ui = DialogAddItemName(self.app, check_categories, _("Rename category"), _("Category name"))
-            ui.ui.lineEdit.setText(found_cat['name'])
-            ui.exec()
-            new_name = ui.get_new_name()
-            if new_name is None or new_name == found_cat['name']:
-                return
-            # Find the category in the list
-            found = -1
-            for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(selected.text(1)[6:]):
-                    found = i
-            if found == -1:
-                return
-            # update category list and database
-            cur = self.app.conn.cursor()
-            cur.execute("update code_cat set name=? where catid=?",
-                        (new_name, self.categories[found]['catid']))
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
-            self.update_dialog_codes_and_categories(["code_cat"])
-            self.app.delete_backup = False
-
-    def change_code_color(self, selected):
-        """ Change the color of the currently selected code.
-        param:
-            selected: QTreeWidgetItem """
-
-        cid = int(selected.text(1)[4:])
-        found = -1
-        for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == cid:
-                found = i
-        if found == -1:
-            return
-        ui = DialogColorSelect(self.app, self.codes[found])
-        ok = ui.exec()
-        if not ok:
-            return
-        new_color = ui.get_color()
-        if new_color is None:
-            return
-        selected.setBackground(0, QBrush(QColor(new_color), Qt.BrushStyle.SolidPattern))
-        # update codes list and database
-        self.codes[found]['color'] = new_color
-        cur = self.app.conn.cursor()
-        cur.execute("update code_name set color=? where cid=?",
-                    (self.codes[found]['color'], self.codes[found]['cid']))
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories(["code_name"])
-        self.app.delete_backup = False
-
-    # Methods used with the textEdit transcribed text
     def unlight(self):
         """ Remove all text highlighting from current file. """
 
