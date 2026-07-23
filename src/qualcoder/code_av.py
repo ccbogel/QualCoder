@@ -666,7 +666,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         # until only top categories are left
         sub_categories = copy(categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 10000:
+        # 'and', not 'or': with 'or' the 10,000 guard never fires (cycle in code_cat =
+        # infinite loop) and healthy data still spins 10,000 empty passes.
+        while len(sub_categories) > 0 and counter < 10000:
             leaf_list = []
             branch_list = []
             for cat in sub_categories:
