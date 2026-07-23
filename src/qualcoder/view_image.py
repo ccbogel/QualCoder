@@ -589,7 +589,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         # until only top categories are left
         sub_categories = copy(categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 10000:
+        # 'and', not 'or': with 'or' the 10,000 guard never fires (cycle in code_cat =
+        # infinite loop) and healthy data still spins 10,000 empty passes.
+        while len(sub_categories) > 0 and counter < 10000:
             leaf_list = []
             branch_list = []
             for cat in sub_categories:
@@ -845,7 +847,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.file_ = None
         self.selection = None
         self.scale = 1.0
-        # Clear handle states on image change/close to prevent ghost handles or memory errors <- L
+        # Clear handle states on image change/close to prevent ghost handles or memory errors
         self.item_to_resize = None
         self.is_dragging_handle = False
         self.active_handle = None
@@ -1030,7 +1032,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if self.pixmap is None:
             return
-        # If the user uses keyboard shortcuts to zoom/rotate WHILE dragging, safely cancel the drag <- L
+        # If the user uses keyboard shortcuts to zoom/rotate WHILE dragging, safely cancel the drag
         if hasattr(self, 'is_dragging_handle') and self.is_dragging_handle:
             self.is_dragging_handle = False
             self.interactive_rect_item = None
@@ -1132,24 +1134,24 @@ class DialogCodeImage(QtWidgets.QDialog):
                     self.scene.addItem(rect_item)
                 if not self.important:
                     self.scene.addItem(rect_item)
-                # Draw 4 handles (red squares) on the corners of the active segment <- L
+                # Draw 4 handles (red squares) on the corners of the active segment
                 if hasattr(self, 'item_to_resize') and self.item_to_resize and self.item_to_resize['imid'] == coded['imid']:
                     handle_size = 12
                     # Dictionary with relative X, Y coordinates for the 4 corners:
-                    # Top-Left (TL), Top-Right (TR), Bottom-Left (BL), Bottom-Right (BR) <- L
+                    # Top-Left (TL), Top-Right (TR), Bottom-Left (BL), Bottom-Right (BR)
                     handles = {
                         "TL": (x, y),
                         "TR": (x + width - handle_size, y),
                         "BL": (x, y + height - handle_size),
                         "BR": (x + width - handle_size, y + height - handle_size)
                     }
-                    # Iterate through corners to create interactive square items in the scene <- L
+                    # Iterate through corners to create interactive square items in the scene
                     for h_type, (hx, hy) in handles.items():
                         handle_item = QtWidgets.QGraphicsRectItem(hx, hy, handle_size, handle_size)
-                        handle_item.setBrush(QBrush(QtGui.QColor("#ff0000")))  # Red color for visibility <- L
-                        handle_item.setData(0, "resize_handle")  # Main tag to detect clicks <- L
-                        handle_item.setData(1, h_type)          # Identifies the specific corner <- L
-                        handle_item.setZValue(1000)  # keep handles above all coded rectangles so they are always clickable <- L
+                        handle_item.setBrush(QBrush(QtGui.QColor("#ff0000")))  # Red color for visibility
+                        handle_item.setData(0, "resize_handle")  # Main tag to detect clicks
+                        handle_item.setData(1, h_type)          # Identifies the specific corner
+                        handle_item.setZValue(1000)  # keep handles above all coded rectangles so they are always clickable
                         self.scene.addItem(handle_item)
                 if self.show_code_captions == 1:
                     self.caption(x, y, code_name)
@@ -1360,7 +1362,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories and sub-codes. A code stays visible if it matches or
         if any of its descendant sub-codes matches, so a match is never hidden under a
-        non-matching parent code. Returns True if this item or any descendant matches. <- L
+        non-matching parent code. Returns True if this item or any descendant matches.
         Called by: show_codes_like
         Args:
             item: a QTreeWidgetItem
@@ -1373,7 +1375,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for i in range(child_count):
             child = item.child(i)
             is_code = "cid:" in child.text(1)
-            # Recurse first so we know whether any descendant matches. <- L
+            # Recurse first so we know whether any descendant matches.
             descendant_match = self.recursive_traverse(child, text_, case_sensitive)
             if text_ == "":
                 if is_code:
@@ -1444,7 +1446,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.zoom_in()
             return
 
-        # Tree widget menu item keys F2 - F6, handled by the shared controller. <- L
+        # Tree widget menu item keys F2 - F6, handled by the shared controller.
         if self.ui.treeWidget.hasFocus():
             if self.code_tree.handle_key_press(event):
                 return
@@ -1611,30 +1613,30 @@ class DialogCodeImage(QtWidgets.QDialog):
                     vsb.setValue(vsb.value() + 1)
                 return True
         if object_ is self.scene:
-            # Detect mouse movement on the scene to update the dashed rectangle in real-time <- L
+            # Detect mouse movement on the scene to update the dashed rectangle in real-time
             if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.type() == QtCore.QEvent.Type.GraphicsSceneMouseMove:
                 if hasattr(self, 'is_dragging_handle') and self.is_dragging_handle:
-                    # Call function to recalculate boundaries based on cursor movement <- L
+                    # Call function to recalculate boundaries based on cursor movement
                     self.update_interactive_resize(event.scenePos())
                     return True
             if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.LeftButton:
                 pos = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
-                # Intercept left click to initiate handle dragging or cancel it <- L
+                # Intercept left click to initiate handle dragging or cancel it
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
                     item_at = self.scene.itemAt(pos, QtGui.QTransform())
-                    # Check if the click is exactly on one of the 4 handles... <- L
+                    # Check if the click is exactly on one of the 4 handles...
                     if hasattr(self, 'item_to_resize') and self.item_to_resize and item_at and item_at.data(0) == "resize_handle":
                         self.is_dragging_handle = True
-                        self.active_handle = item_at.data(1)  # Store which corner was clicked <- L
+                        self.active_handle = item_at.data(1)  # Store which corner was clicked
                         
-                        # Extract absolute data from the active segment, scaled to screen <- L
+                        # Extract absolute data from the active segment, scaled to screen
                         it = self.item_to_resize
                         vx = it['x1'] * self.scale
                         vy = it['y1'] * self.scale
                         vw = it['width'] * self.scale
                         vh = it['height'] * self.scale
                         
-                        # Calculate exact visual position applying rotations manually (90, 180, 270 degrees) <- L
+                        # Calculate exact visual position applying rotations manually (90, 180, 270 degrees)
                         if self.degrees == 90:
                             vy = it['x1'] * self.scale
                             vx = (self.pixmap.height() - it['y1'] - it['height']) * self.scale
@@ -1651,9 +1653,9 @@ class DialogCodeImage(QtWidgets.QDialog):
                             vh = it['width'] * self.scale
                             vw = it['height'] * self.scale
 
-                        # Store this starting geometric position <- L
+                        # Store this starting geometric position
                         self.original_resize_geom = (vx, vy, vw, vh)
-                        # Create the temporary rectangle that guides the user visually (live feedback) <- L
+                        # Create the temporary rectangle that guides the user visually (live feedback)
                         self.interactive_rect_item = QtWidgets.QGraphicsRectItem(vx, vy, vw, vh)
                         pen = QtGui.QPen(QtGui.QColor("#ff0000"), 2, QtCore.Qt.PenStyle.DashLine)
                         self.interactive_rect_item.setPen(pen)
@@ -1662,10 +1664,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                         # Temporarily disable standard selection rubber band
                         self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.NoDrag)
                         return True
-                    # If we didn't click a handle, but a segment was active, cancel the process <- L
+                    # If we didn't click a handle, but a segment was active, cancel the process
                     elif hasattr(self, 'item_to_resize') and self.item_to_resize:
                         self.item_to_resize = None
-                        self.redraw_scene()  # Redraw clears the handles from the screen <- L
+                        self.redraw_scene()  # Redraw clears the handles from the screen
                 self.fill_coded_area_label(self.find_coded_areas_for_pos(pos))
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
                     p0 = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
@@ -1673,7 +1675,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     return True
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMouseRelease:
                     p1 = event.lastScenePos()
-                    # On button release, process and save the final change if dragging a handle <- L
+                    # On button release, process and save the final change if dragging a handle
                     if hasattr(self, 'is_dragging_handle') and self.is_dragging_handle:
                         self.execute_interactive_resize(p1)
                         return True
@@ -1732,27 +1734,27 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         # build and show the context menu FIRST, before resolving which
         # segment to act on. The segment is only disambiguated after an action that
-        # needs a specific segment is chosen (see below). <- L
-        item = items[0]  # used only for important-mark menu options when a single segment <- L
+        # needs a specific segment is chosen (see below).
+        item = items[0]  # used only for important-mark menu options when a single segment
 
         # Determine importance state for menu construction when there is only one segment.
-        # With multiple segments we show both important options, since the target is not yet known. <- L
+        # With multiple segments we show both important options, since the target is not yet known.
         single_segment = len(items) == 1
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo'))
         action_unmark = menu.addAction(_('Unmark'))
         action_move_resize = menu.addAction(_("Move or resize"))
-        # Add the option Interactive resize <- L
+        # Add the option Interactive resize
         action_interactive_resize = menu.addAction(_("Interactive resize"))
         action_important = None
         action_not_important = None
-        if single_segment:  # only filter important options when the target segment is unambiguous <- L
+        if single_segment:  # only filter important options when the target segment is unambiguous
             if item['important'] is None or item['important'] != 1:
                 action_important = menu.addAction(_("Add important mark"))
             if item['important'] == 1:
                 action_not_important = menu.addAction(_("Remove important mark"))
-        else:  # multiple segments: offer both, decide after segment is selected <- L
+        else:  # multiple segments: offer both, decide after segment is selected
             action_important = menu.addAction(_("Add important mark"))
             action_not_important = menu.addAction(_("Remove important mark"))
         action_highlight_gray = menu.addAction(_("Highlight this area - gray"))
@@ -1767,9 +1769,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
 
         # after an action is chosen, if it acts on a specific segment and there is
-        # more than one segment under the cursor, ask which segment now. <- L
+        # more than one segment under the cursor, ask which segment now.
         # include "Highlight this code" actions so the user picks which code's
-        # cid is used when several segments overlap <- L
+        # cid is used when several segments overlap
         segment_actions = (action_memo, action_unmark, action_move_resize, action_interactive_resize,
                            action_important, action_not_important, action_highlight_gray,
                            action_highlight_solarize, action_highlight_blur,
@@ -1816,10 +1818,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.set_coded_importance(item, False)
         if action == action_move_resize:
             self.move_or_resize_coding(item)
-        # If the user selects the new option, store the segment to be resized <- L
+        # If the user selects the new option, store the segment to be resized
         if action == action_interactive_resize:
             self.item_to_resize = item
-            self.redraw_scene()  # Redrawing triggers draw_coded_areas, showing the handles <- L
+            self.redraw_scene()  # Redrawing triggers draw_coded_areas, showing the handles
         items = self.find_coded_areas_for_pos(pos)
         self.fill_coded_area_label(items)
 
