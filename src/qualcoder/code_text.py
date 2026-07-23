@@ -580,7 +580,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.code_text = []  # List of coded segments for the curent file
         self.undo_deleted_codes = []  # To restore recently deleted codes
         self.attributes = []  # Show selected files using these attributes in list widget
-        self.tree_sort_option = "all asc"  # all asc, all desc, cat then code asc
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
         self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
 
@@ -6853,7 +6852,8 @@ class DialogCodeText(QtWidgets.QWidget):
             selected_id = int(code_item.text(1).split(':')[1])
             selected_is_code = True
 
-        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code, self.tree_sort_option)
+        # Sort option lives in the shared code tree controller
+        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code, self.code_tree.tree_sort_option)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
             self.ai_search_code_name = ui.selected_code_name
