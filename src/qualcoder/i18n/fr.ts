@@ -291,19 +291,19 @@ Les calculs se font à partir du texte complet.</translation>
     <message>
         <location filename="../GUI/ui_dialog_graph.py" line="198"/>
         <source>Save graph</source>
-        <translation>Sauvegarder le graphique</translation>
+        <translation>Sauvegarder le graphe</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_graph.py" line="199"/>
         <source>Load graph
 Right-click for options</source>
-        <translation>Charger le graphique
+        <translation>Charger le graphe
 Clic droit pour les options</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_graph.py" line="201"/>
         <source>Delete graph</source>
-        <translation>Supprimer le graphique</translation>
+        <translation>Supprimer le graphe</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_graph.py" line="202"/>
@@ -559,7 +559,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="114"/>
         <source>Coder</source>
-        <translation>Codeur</translation>
+        <translation>Codeur⋅euse</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="117"/>
@@ -713,7 +713,7 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="../GUI/ui_report_codes_by_segments.py" line="97"/>
         <source>Coder:</source>
-        <translation>Codeur :</translation>
+        <translation>Codeur⋅euse :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_codes_by_segments.py" line="98"/>
@@ -3594,7 +3594,7 @@ Modifiez les paramètres du nombre de caractères et du style d&apos;affichage.<
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
         <source>Coders:</source>
-        <translation>codeur·euses:</translation>
+        <translation>Codeur⋅euses :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="99"/>
@@ -3649,7 +3649,7 @@ Sélectionnez deux codeur·euses, un fichier, un code.</translation>
     <message>
         <location filename="../GUI/ui_dialog_report_comparisons.py" line="82"/>
         <source>Coders:</source>
-        <translation>Codeurs:</translation>
+        <translation>Codeur⋅euses :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_comparisons.py" line="86"/>
@@ -5053,7 +5053,7 @@ N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avan
     <message>
         <location filename="../GUI/ui_main.py" line="387"/>
         <source>Journals</source>
-        <translation>Journaux de bord</translation>
+        <translation>Journaux</translation>
     </message>
     <message>
         <location filename="../GUI/ui_main.py" line="400"/>

@@ -1,0 +1,63 @@
+<!DOCTYPE QPH>
+<QPH sourcelanguage="en_US" language="fr_FR">
+<phrase>
+    <source>codebook</source>
+    <target>Grille de codage</target>
+</phrase>
+<phrase>
+    <source>graph</source>
+    <target>graphe</target>
+</phrase>
+<phrase>
+    <source>Numeric</source>
+    <target>Numérique</target>
+</phrase>
+<phrase>
+    <source>Case</source>
+    <target>Cas</target>
+</phrase>
+<phrase>
+    <source>File</source>
+    <target>Fichier</target>
+</phrase>
+<phrase>
+    <source>Stop words</source>
+    <target>Mots vides</target>
+</phrase>
+<phrase>
+    <source>codebook</source>
+    <target>grille de codage</target>
+</phrase>
+<phrase>
+    <source>Coders</source>
+    <target>Codeur⋅euses</target>
+</phrase>
+<phrase>
+    <source>Coders</source>
+    <target>Codeur⋅euses</target>
+</phrase>
+<phrase>
+    <source>Settings</source>
+    <target>Paramètres</target>
+</phrase>
+<phrase>
+    <source>Character</source>
+    <target>Caractère</target>
+</phrase>
+<phrase>
+    <source>Pie charts</source>
+    <target>Diagrammes circulaires</target>
+</phrase>
+<phrase>
+    <source>Bar charts</source>
+    <target>Graphiques à barres</target>
+</phrase>
+<phrase>
+    <source>Charts</source>
+    <target>Graphiques</target>
+</phrase>
+<phrase>
+    <source>Journals</source>
+    <target>Journaux</target>
+</phrase>
+</QPH>
