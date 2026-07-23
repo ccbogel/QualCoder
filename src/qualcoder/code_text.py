@@ -3345,7 +3345,7 @@ class DialogCodeText(QtWidgets.QWidget):
         category_list = [{'name': "", 'catid': None, 'supercatid': None}]
         for r in res:
             category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ui = DialogSelectItems(self.app, category_list, _("Move category: Select blank or category"), "single")
         ok = ui.exec()
         if not ok:
             return
@@ -3465,7 +3465,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
         self.update_dialog_codes_and_categories(["code_name"])
 
-    def move_code(self, selected):
+    def move_code(self, selected:QtWidgets.QTreeWidgetItem):
         """ Move code to another category, or code or to none (top level).
         Uses a list selection which represents the codes tree.
         Args:
@@ -3503,7 +3503,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if can_append:
                 items_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo})
             iterator +=1
-        ui = DialogSelectItems(self.app, items_list, _("Select blank or category or code"), "single")
+        ui = DialogSelectItems(self.app, items_list, _("Move code: Select blank or category or code"), "single")
         ok = ui.exec()
         if not ok:
             return
