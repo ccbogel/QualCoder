@@ -22,6 +22,8 @@ ui_dialog_colour_selector.py \
 ui_dialog_confirm_delete.py \
 ui_dialog_cooccurrence.py \
 ui_dialog_graph.py \
+ui_dialog_graph_models.py \
+ui_dialog_graph_picker.py \
 ui_dialog_import.py \
 ui_dialog_information.py \
 ui_dialog_journals.py \
@@ -29,6 +31,7 @@ ui_dialog_manage_attributes.py \
 ui_dialog_manage_files.py \
 ui_dialog_manage_links.py \
 ui_dialog_memo.py \
+ui_dialog_node_relations.py \
 ui_dialog_organiser.py \
 ui_dialog_pseudonyms.py \
 ui_dialog_refi_export_endings.py \
@@ -60,6 +63,18 @@ ui_save_query.py \
 ui_special_functions.py
 
 TRANSLATIONS = \
-../i18n/fr.ts
+../i18n/es.ts \
+../i18n/de.ts \
+../i18n/fr.ts \
+../../../other_languages/sv.ts \
+../../../other_languages/zh.ts \
+../../../other_languages/ht.ts \
+../../../other_languages/pt.ts \
+../../../other_languages/ja.ts \
+../../../other_languages/eo.ts \
+../../../other_languages/eu.ts \
+../../../other_languages/fa.ts \
+../../../other_languages/it.ts \
+../../../other_languages/ro.ts
 
 CODECFORTR = ISO-8859-5
