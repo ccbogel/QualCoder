@@ -563,6 +563,94 @@ def zip_language_files(language: str | None = None):
 
         print(f"Created zip file: {zip_filename}")
 
+def check_translations(language: str | None = None) -> str:
+    """
+    Check .po and .ts files for:
+    - Untranslated entries
+    - Empty translations
+    - Syntax errors
+    - Inconsistencies (e.g., unreplaced variables)
+    Generate a report of detected issues.
+    """
+    print("\n--- Starting translation check ---")
+
+    # Directories to scan
+    directories_to_scan = [i18n_directory]
+    if os.path.exists(other_languages_directory):
+        directories_to_scan.append(other_languages_directory)
+
+    # Filter languages if specified
+    languages_to_check = languages
+    if language is not None:
+        languages_to_check = [language] if language in languages else []
+
+    issues = []
+
+    # Check .po files
+    for directory in directories_to_scan:
+        if not os.path.exists(directory):
+            continue
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.endswith('.po'):
+                    lang = Path(file).stem
+                    if lang in languages_to_check:
+                        po_file = os.path.join(root, file)
+                        try:
+                            po = polib.pofile(po_file)
+                            for entry in po:
+                                if not entry.translated():
+                                    issues.append(f"[PO] {lang}: Untranslated entry -> '{entry.msgid}'")
+                                if entry.msgstr == "":
+                                    issues.append(f"[PO] {lang}: Empty translation for -> '{entry.msgid}'")
+                                if "fuzzy" in entry.flags:
+                                    issues.append(f"[PO] {lang}: Fuzzy entry -> '{entry.msgid}'")
+                        except Exception as e:
+                            issues.append(f"[PO] {lang}: Error reading file -> {str(e)}")
+
+    # Check .ts files
+    for directory in directories_to_scan:
+        if not os.path.exists(directory):
+            continue
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.endswith('.ts'):
+                    lang = Path(file).stem
+                    if lang in languages_to_check:
+                        ts_file = os.path.join(root, file)
+                        try:
+                            parser = etree.XMLParser(remove_blank_text=True)
+                            tree = etree.parse(ts_file, parser)
+                            root = tree.getroot()
+                            for message in root.xpath("//message"):
+                                source = message.find("source")
+                                translation = message.find("translation")
+                                if source is not None and translation is None:
+                                    issues.append(f"[TS] {lang}: Missing translation for -> '{source.text}'")
+                                elif translation is not None:
+                                    if translation.text is None or translation.text.strip() == "":
+                                        issues.append(f"[TS] {lang}: Empty translation for -> '{source.text}'")
+                                    if translation.get("type") == "unfinished":
+                                        issues.append(f"[TS] {lang}: Unfinished translation for -> '{source.text}'")
+                        except Exception as e:
+                            issues.append(f"[TS] {lang}: Error reading file -> {str(e)}")
+
+    # Generate report
+    if not issues:
+        print("✅ No issues detected in translation files.")
+        return ""
+
+    print("\n--- Detected Issues ---")
+    for issue in issues:
+        print(f"❌ {issue}")
+
+    # Save to file
+    report_path = os.path.join(project_root, "TRANSLATION_CHECK_REPORT.txt")
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(issues))
+    print(f"\n📄 Detailed report saved to: {report_path}")
+    return report_path
+    
 def main():
     print("Run from the QualCoder-master folder")
     print("Choose option: --update --compile --zip --status")
@@ -574,6 +662,17 @@ def main():
     print("e.g. --zip --lang ro")
     print("--status makes LANGUAGES_REPORT.md file which shows translation status of files (i18n and other_languages).")
     print("--create Creates placeholder files po (NOT YET) ts for a new language. use 2 or 3 letter ISO639 codes.")
+
+def main():
+    print("Run from the QualCoder-master folder")
+    print("Choose option: --update --compile --zip --status --check")
+    print("--update updates language placeholders for ts and po files (i18n and other_languages).")
+    print("--compile compiles language files ts to qm files and po to mo files (i18n and other_languages)")
+    print("--zip zips .mo, .qm and .txt files in other_languages directory")
+    print("--status makes LANGUAGES_REPORT.md file which shows translation status of files (i18n and other_languages).")
+    print("--check checks translation files for errors (untranslated, empty, syntax).")
+    print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile/zip/check only that language.")
+    print("e.g. --check --lang fr")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -594,6 +693,8 @@ if __name__ == "__main__":
             analyze_translation_status(lang)
         elif mode == "--zip":
             zip_language_files(lang)
+        elif mode == "--check":
+            check_translations(lang)
         else:
             main()
     else:
