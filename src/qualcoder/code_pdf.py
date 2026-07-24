@@ -5909,14 +5909,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         """
 
         msg = _("The text extracted from this PDF does not match the imported text.") + "\n"
-        msg += _("This usually means the file was imported with the previous method.") + "\n\n"
+        msg += _("This usually means the file was imported in an older QualCoder version using an older text method.") + "\n\n"
         msg += _("Restructure this file to the new method now?") + "\n"
-        msg += _("The stored text will be updated. Its codings (all coders), annotations and "
-                 "case assignments will be relocated in the new text.") + "\n"
+        msg += _("The stored text will be updated. The codings (all coders), annotations and "
+                 "case assignments will be adjusted to the new text method.") + "\n"
         msg += _("Segments that cannot be located exactly keep their original quote and are "
                  "reported for review.") + "\n\n"
         msg += _("If you answer No, text coding stays disabled for this file. "
-                 "Area coding and search still work.")
+                 "Image area coding and search can be performed.")
         reply = QtWidgets.QMessageBox.question(
             self, _("Text mismatch"), msg,
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
