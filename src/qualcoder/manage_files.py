@@ -31,10 +31,6 @@ import openpyxl
 import os.path
 import pandas as pd
 from pathlib import Path
-from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTTextLine
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.pdfpage import PDFPage
 import PIL
 from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -50,7 +46,8 @@ import zipfile
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
-from .code_pdf import DialogCodePdf  # For isinstance update files
+from .code_pdf import DialogCodePdf, extract_pdf_fulltext, extract_pdf_highlights, \
+    pdf_highlights_to_positions, extract_pdf_annotations  # Same extractor and word map as the PDF viewer
 from .code_text import DialogCodeText  # for isinstance()
 from .color_selector import colour_ranges, colors
 from .confirm_delete import DialogConfirmDelete
@@ -77,6 +74,246 @@ except Exception as e:
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+
+class PdfPreviewWidget(QtWidgets.QWidget):
+    """
+    Shared PDF preview widget: rendered page in the centre, boundable < > navigation
+    and in-memory rendering with document closing. Used by DialogPdfPagesToImages
+    (converter) and DialogPdfPreview (viewer).
+    """
+
+    def __init__(self, filepath, parent=None):
+        super().__init__(parent)
+        self.filepath = filepath
+        self.total_pages = 0
+        self.preview_page = 0  # base 0
+        self.page_min = 0
+        self.page_max = 0
+        try:
+            doc = fitz.open(filepath)
+            self.total_pages = len(doc)
+            doc.close()
+        except Exception as err:
+            logger.warning(f"PdfPreviewWidget: {filepath} {err}")
+        self.page_max = max(0, self.total_pages - 1)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.label_preview = QtWidgets.QLabel()
+        self.label_preview.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_preview.setMinimumSize(380, 380)
+        self.label_preview.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        layout.addWidget(self.label_preview, stretch=1)
+        nav = QtWidgets.QHBoxLayout()
+        self.btn_prev = QtWidgets.QPushButton("<")
+        self.btn_prev.setMaximumWidth(40)
+        self.btn_prev.clicked.connect(lambda: self.change_preview_page(-1))
+        self.label_page = QtWidgets.QLabel("")
+        self.label_page.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.btn_next = QtWidgets.QPushButton(">")
+        self.btn_next.setMaximumWidth(40)
+        self.btn_next.clicked.connect(lambda: self.change_preview_page(1))
+        nav.addStretch(1)
+        nav.addWidget(self.btn_prev)
+        nav.addWidget(self.label_page)
+        nav.addWidget(self.btn_next)
+        nav.addStretch(1)
+        layout.addLayout(nav)
+        self.render_preview()
+
+    def set_page_limits(self, page_min, page_max):
+        """
+        Bounds navigation (0-based) and repositions the previewed page.
+        """
+
+        self.page_min = max(0, page_min)
+        self.page_max = min(max(0, self.total_pages - 1), max(self.page_min, page_max))
+        self.preview_page = min(max(self.preview_page, self.page_min), self.page_max)
+        self.render_preview()
+
+    def change_preview_page(self, delta):
+        nueva = self.preview_page + delta
+        if self.page_min <= nueva <= self.page_max:
+            self.preview_page = nueva
+            self.render_preview()
+
+    def render_preview(self):
+        """
+        Renders the previewed page in memory, fitted to the area, and always closes
+        the document (no handle retained).
+        """
+
+        if self.total_pages == 0:
+            self.label_preview.setText(_("Cannot open: ") + self.filepath)
+            self.label_page.setText("0/0")
+            self.btn_prev.setEnabled(False)
+            self.btn_next.setEnabled(False)
+            return
+        try:
+            doc = fitz.open(self.filepath)
+            try:
+                page = doc.load_page(self.preview_page)
+                zoom = max(0.1, min(2.0, 370.0 / max(1.0, page.rect.width)))
+                pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False, annots=False)  # PDF highlights/notes not painted in the preview
+                image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                     QtGui.QImage.Format.Format_RGB888).copy()
+            finally:
+                doc.close()
+        except Exception as err:
+            logger.warning(f"render_preview: {self.filepath} {err}")
+            self.label_preview.setText(_("Cannot open: ") + self.filepath)
+            return
+        pixmap = QtGui.QPixmap.fromImage(image)
+        self.label_preview.setPixmap(pixmap.scaled(
+            self.label_preview.size(), QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+            QtCore.Qt.TransformationMode.SmoothTransformation))
+        self.label_page.setText(f"{self.preview_page + 1}/{self.total_pages}")
+        self.btn_prev.setEnabled(self.preview_page > self.page_min)
+        self.btn_next.setEnabled(self.preview_page < self.page_max)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.render_preview()
+
+
+class DialogPdfPreview(QtWidgets.QDialog):
+    """
+    PDF viewer for Manage files, in the style of the image converter: navigable
+    preview of all pages, no editing. The stored fulltext of a PDF is NOT
+    editable: it must match, character by character, the text extracted from
+    the pages. To work with an editable text, "Convert to txt" creates a new
+    text source with a copy of the PDF's text.
+    """
+
+    def __init__(self, app, filepath, filename, parent=None):
+        super().__init__(parent)
+        self.app = app
+        self.convert_txt_requested = False
+        self.setWindowTitle(_("View PDF") + f" - {filename}")
+        self.setMinimumSize(520, 560)
+        layout = QtWidgets.QVBoxLayout(self)
+        self.preview = PdfPreviewWidget(filepath, self)
+        layout.addWidget(self.preview, stretch=1)
+        buttons = QtWidgets.QHBoxLayout()
+        self.btn_convert_txt = QtWidgets.QPushButton(_("Convert to txt"))
+        self.btn_convert_txt.setToolTip(
+            _("Create a new editable text file with a copy of this PDF's text"))
+        self.btn_convert_txt.clicked.connect(self.request_convert_txt)
+        btn_close = QtWidgets.QPushButton(_("Close"))
+        btn_close.clicked.connect(self.reject)
+        buttons.addWidget(self.btn_convert_txt)
+        buttons.addStretch(1)
+        buttons.addWidget(btn_close)
+        layout.addLayout(buttons)
+
+    def request_convert_txt(self):
+        """
+        Flags the txt copy request; the caller (view) runs extract_pdf_text_copy,
+        which already validates scanned PDFs and duplicate names.
+        """
+
+        self.convert_txt_requested = True
+        self.accept()
+
+    @property
+    def total_pages(self):
+        return self.preview.total_pages
+
+
+class DialogPdfPagesToImages(QtWidgets.QDialog):
+    """
+    Dialog to convert PDF pages into images, print-preview style: navigable page
+    preview, page range selection (1-based) and output resolution. Returns the chosen
+    range and resolution; the caller (pdf_to_images) performs the conversion.
+    """
+
+    def __init__(self, app, filepath, filename, parent=None):
+        super().__init__(parent)
+        self.app = app
+        self.setWindowTitle(_("Pdf pages to images") + f" - {filename}")
+        self.setMinimumSize(520, 560)
+        layout = QtWidgets.QVBoxLayout(self)
+        self.preview = PdfPreviewWidget(filepath, self)
+        layout.addWidget(self.preview, stretch=1)
+        # Range and resolution
+        form = QtWidgets.QHBoxLayout()
+        form.addWidget(QtWidgets.QLabel(_("From page")))
+        self.spin_from = QtWidgets.QSpinBox()
+        self.spin_from.setRange(1, max(1, self.preview.total_pages))
+        self.spin_from.setValue(1)
+        self.spin_from.valueChanged.connect(self.range_changed)
+        form.addWidget(self.spin_from)
+        form.addWidget(QtWidgets.QLabel(_("To page")))
+        self.spin_to = QtWidgets.QSpinBox()
+        self.spin_to.setRange(1, max(1, self.preview.total_pages))
+        self.spin_to.setValue(max(1, self.preview.total_pages))
+        self.spin_to.valueChanged.connect(self.range_changed)
+        form.addWidget(self.spin_to)
+        form.addStretch(1)
+        form.addWidget(QtWidgets.QLabel(_("Resolution")))
+        self.combo_dpi = QtWidgets.QComboBox()
+        # 72 dpi reproduces the previous behaviour; higher resolution gives sharper
+        # images for coding (larger files).
+        self.combo_dpi.addItems(["72", "150", "300"])
+        form.addWidget(self.combo_dpi)
+        form.addWidget(QtWidgets.QLabel(_("dpi")))
+        layout.addLayout(form)
+        # Botones. Buttons
+        # Manual button row instead of QDialogButtonBox: guarantees the layout on
+        # every platform style. "Convert current page" left-aligned; "Convert" and
+        # "Cancel" right-aligned.
+        buttons = QtWidgets.QHBoxLayout()
+        self.btn_current_page = QtWidgets.QPushButton(_("Convert current page"))
+        self.btn_current_page.setToolTip(_("Convert only the page shown in the preview"))
+        # Pins the range to the previewed page and accepts, reusing the whole
+        # conversion pipeline unchanged (dpi, duplicates, progress).
+        self.btn_current_page.clicked.connect(self.convert_current_page)
+        buttons.addWidget(self.btn_current_page)
+        buttons.addStretch(1)
+        self.btn_convert = QtWidgets.QPushButton(_("Convert"))
+        self.btn_convert.setDefault(True)
+        self.btn_convert.clicked.connect(self.accept)
+        buttons.addWidget(self.btn_convert)
+        btn_cancel = QtWidgets.QPushButton(_("Cancel"))
+        btn_cancel.clicked.connect(self.reject)
+        buttons.addWidget(btn_cancel)
+        layout.addLayout(buttons)
+
+    @property
+    def total_pages(self):
+        return self.preview.total_pages
+
+    def convert_current_page(self):
+        """
+        Pins the range to the previewed page and accepts. Order matters: spin_to
+        first (if the page is below the range, range_changed pulls spin_from down
+        with it), then spin_from; the from <= to invariant holds both ways.
+        """
+
+        page = self.preview.preview_page + 1  # a base 1. To 1-based.
+        self.spin_to.setValue(page)
+        self.spin_from.setValue(page)
+        self.accept()
+
+    def get_range_and_dpi(self):
+        """ 
+        return: (0-based first page, 0-based last page inclusive, dpi Integer). 
+        """
+
+        return self.spin_from.value() - 1, self.spin_to.value() - 1, int(self.combo_dpi.currentText())
+
+    def range_changed(self):
+        """ 
+        Keeps from <= to and the previewed page inside the range. 
+        """
+
+        if self.spin_from.value() > self.spin_to.value():
+            if self.sender() is self.spin_from:
+                self.spin_to.setValue(self.spin_from.value())
+            else:
+                self.spin_from.setValue(self.spin_to.value())
+        self.preview.set_page_limits(self.spin_from.value() - 1, self.spin_to.value() - 1)
+
 
 
 class DialogManageFiles(QtWidgets.QDialog):
@@ -106,8 +343,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attribute_names = []  # list of dictionary name:value for AddAtribute dialog
         self.attribute_labels_ordered = []  # helps with filling table data
         self.files_renamed = []  # list of dictionaries of old and new names and fid
-        self.pdf_page_text = ""  # Used when loading pdf text
         self.clipboard_text = ""  # Used to copy text into another cell
+        self.pdf_import_code_highlights = None  # Per-batch tri-state: code PDF highlight annotations as codings
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
@@ -516,11 +753,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_view = menu.addAction(_("View"))
         action_view_original_text = None
         action_pdf_to_images = None
+        action_extract_pdf_text = None
         if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
             action_view_original_text = menu.addAction(_("View original text file"))
         if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:') \
                 and mediapath[-4:].lower() == ".pdf":
             action_pdf_to_images = menu.addAction(_("Pdf pages to images"))
+            # Editable copy of the PDF text as a new text source: the stored fulltext
+            # of a PDF is not editable, this copy is the way to edit its text.
+            action_extract_pdf_text = menu.addAction(_("Extract pdf text to new file"))
         action_filename_asc = None
         action_filename_desc = None
         action_type = None
@@ -608,6 +849,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if action == action_pdf_to_images:
             self.pdf_to_images(mediapath)
+            return
+        if action == action_extract_pdf_text:
+            self.extract_pdf_text_copy(row)
             return
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
@@ -739,8 +983,66 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.app.delete_backup = False
             self.update_files_in_dialogs()
 
-    def pdf_to_images(self, mediapath: str):
-        """ Turn pdf to an image for each page. """
+    def extract_pdf_text_copy(self, row):
+        """        Creates a new TEXT source with a copy of the PDF's fulltext (the one already
+        extracted and stored at import, no re-extraction). The stored fulltext of a
+        PDF is not editable, so this copy is the way to work with and edit its text,
+        without touching the PDF's fulltext or breaking the page mapping.
+
+        param:
+            row: table row of the pdf source, Integer
+        """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, fulltext from source where id=?", [self.source[row]['id']])
+        res = cur.fetchone()
+        if res is None:
+            return
+        fulltext = res[1] if res[1] is not None else ""
+        if fulltext.strip() == "":
+            Message(self.app, _("Extract pdf text"),
+                    _("This PDF has no stored text (scanned PDF?)."), "warning").exec()
+            return
+        # Unique name: name.pdf.txt, with _n suffix if it already exists.
+        base_name = res[0] + ".txt"
+        new_name = base_name
+        existing_names = {s['name'] for s in self.source}
+        n = 1
+        while new_name in existing_names:
+            new_name = f"{res[0]}_{n}.txt"
+            n += 1
+        now_ = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        entry = {'name': new_name, 'id': -1, 'fulltext': fulltext, 'mediapath': None,
+                 'memo': _("Text extracted from pdf: ") + res[0],
+                 'owner': self.app.settings['codername'], 'date': now_, 'risid': None}
+        cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                    (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'],
+                     entry['owner'], entry['date']))
+        self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        id_ = cur.fetchone()[0]
+        entry['id'] = id_
+        # File attribute placeholders, as in create_text_file.
+        cur.execute('select name from attribute_type where caseOrFile ="file"')
+        attr_types = cur.fetchall()
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for a in attr_types:
+            cur.execute(insert_sql, [a[0], id_, now_, self.app.settings['codername']])
+        self.app.conn.commit()
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.sources_vectorstore.import_document(id_, entry['name'], entry['fulltext'])
+        self.parent_text_edit.append(_("Text extracted from pdf to new file: ") + new_name)
+        self.load_file_data()
+        self.fill_table()
+        self.app.delete_backup = False
+        self.update_files_in_dialogs()
+
+    def pdf_to_images(self, mediapath):
+        """ Turn pdf pages into an image for each page.
+        With a page range dialog, preview and resolution; skips duplicate names
+        without per-page modal warnings, shows progress and closes the document
+        (the handle previously stayed open).
+        """
 
         filepath = ""
         filename = ""
@@ -752,19 +1054,43 @@ class DialogManageFiles(QtWidgets.QDialog):
             filename = os.path.split(filepath)[1]
         if filepath == "" or filename == "":
             return
-
-        fitz_pdf = fitz.open(filepath)  # Use pymupdf to get page image
-        for i in range(len(fitz_pdf)):
-            fitz_page = fitz_pdf.load_page(i)
-            # fitz_page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)  # Do not touch images
-            pymypdf_pixmap = fitz_page.get_pixmap()
-            image_filename = filename + f"_p{i + 1}.jpg"
-            # Not using os.path.join. Other methods 'might' look for the forward slash.
-            destination = f"{self.app.project_path}/images/{image_filename}"
-            # print(destination)
-            pymypdf_pixmap.save(destination)
-            self.load_media_reference(f"/images/{image_filename}")
-            self.parent_text_edit.append(_("Image loaded from pdf: ") + image_filename)
+        ui = DialogPdfPagesToImages(self.app, filepath, filename, self)
+        if ui.total_pages == 0:
+            Message(self.app, _("Image Error"), _("Cannot open: ") + filepath, "warning").exec()
+            return
+        if ui.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+            return
+        page_from, page_to, dpi = ui.get_range_and_dpi()
+        existing_names = {s['name'] for s in self.source}
+        matrix = fitz.Matrix(dpi / 72.0, dpi / 72.0)
+        progress_ = QtWidgets.QProgressDialog(_("Converting pages"), None, page_from,
+                                              page_to + 1, self)
+        progress_.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+        try:
+            fitz_pdf = fitz.open(filepath)
+            try:
+                for i in range(page_from, page_to + 1):
+                    progress_.setValue(i)
+                    QtCore.QCoreApplication.processEvents()
+                    image_filename = filename + f"_p{i + 1}.jpg"
+                    if image_filename in existing_names:
+                        # No QMessageBox for each repeated page (large ranges).
+                        self.parent_text_edit.append(_("Skipped duplicate image: ") + image_filename)
+                        continue
+                    fitz_page = fitz_pdf.load_page(i)
+                    pymypdf_pixmap = fitz_page.get_pixmap(matrix=matrix)
+                    # Not using os.path.join. Other methods 'might' look for the forward slash.
+                    destination = f"{self.app.project_path}/images/{image_filename}"
+                    pymypdf_pixmap.save(destination)
+                    self.load_media_reference(f"/images/{image_filename}")
+                    self.parent_text_edit.append(_("Image loaded from pdf: ") + image_filename)
+            finally:
+                fitz_pdf.close()
+        except Exception as err:
+            logger.warning(f"pdf_to_images: {filepath} {err}")
+            Message(self.app, _("Image Error"), _("Cannot open: ") + f"{filepath}\n{err}",
+                    "warning").exec()
+        progress_.setValue(page_to + 1)
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
@@ -1597,8 +1923,26 @@ class DialogManageFiles(QtWidgets.QDialog):
             if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
+        # PDFs are NOT editable: their stored fulltext must match, character by
+        # character, the text extracted from the pages (the PDF coding view depends
+        # on that mapping). The preview offers "Convert to txt" to work with an
+        # editable copy as a new text source.
+        mediapath_ = self.source[x]['mediapath']
+        if mediapath_ is not None and mediapath_.lower().endswith(".pdf") and \
+                (mediapath_[0:6] == '/docs/' or mediapath_[0:5] == 'docs:'):
+            if mediapath_[0:6] == '/docs/':
+                pdf_filepath = os.path.join(self.app.project_path, "documents", mediapath_[6:])
+            else:
+                pdf_filepath = mediapath_[5:]
+            preview = DialogPdfPreview(self.app, pdf_filepath, self.source[x]['name'], self)
+            preview.exec()
+            if preview.convert_txt_requested:
+                # Reuses the context-menu extraction (name uniqueness, scanned
+                # PDFs, attributes, vectorstore).
+                self.extract_pdf_text_copy(x)
+            return
         ui = DialogEditTextFile(self.app, self.source[x]['id'])
-        ui.exec()
+        result = ui.exec()
         # Get fulltext if changed (for metadata)
         cur = self.app.conn.cursor()
         cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
@@ -1607,6 +1951,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res is not None:
             fulltext = res[0]
         self.source[x]['fulltext'] = fulltext
+        # The editor saved changes: notify the bus so open coding dialogs
+        # (code_text, code_pdf) reload and do not keep stale positions.
+        if result == QtWidgets.QDialog.DialogCode.Accepted and \
+                getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(
+                ['source', 'code_text', 'annotation', 'case_text'], source=self)
 
     def view_av(self, x: int):
         """ View an audio or video file. Edit the memo. Edit the transcript file.
@@ -1966,10 +2316,18 @@ class DialogManageFiles(QtWidgets.QDialog):
         progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         progress.setWindowTitle(_("Importing"))
         progress.setMinimumDuration(0)  # Show immediately
+        # Without these, QProgressDialog auto-resets and HIDES the moment the value
+        # reaches the maximum: with a single file, setValue(1) of max 1 closed the
+        # dialog before the PDF page-by-page extraction even started.
+        progress.setAutoReset(False)
+        progress.setAutoClose(False)
         progress.show()
         known_file_type = False
         self.default_import_directory = os.path.dirname(imports[0])
         pdf_msg = ""
+        # Highlight coding option, asked ONCE per batch and only when the first PDF
+        # with highlight annotations is detected (tri-state: None = not asked yet).
+        self.pdf_import_code_highlights = None
         for import_path in imports:
             link_path = ""
             if link:
@@ -1983,17 +2341,32 @@ class DialogManageFiles(QtWidgets.QDialog):
             filename = os.path.basename(import_path)
             progress.setValue(file_number + 1)
             progress.setLabelText(filename)
+            # Duplicate: check BEFORE copying and extracting. Previously the file was copied
+            # and, for large PDFs, all the text was extracted only to be rejected at the end.
+            if any(d['name'] == filename for d in self.source):
+                QtWidgets.QMessageBox.warning(self, _('Duplicate file'),
+                                              _("Duplicate filename.\nFile not imported") + f"\n{filename}")
+                file_number += 1
+                continue
             destination = self.app.project_path
             if os.path.splitext(import_path)[1].lower() in ('.docx', '.odt', '.rtf', '.txt', '.htm', '.html', '.epub', '.md'):
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
                         copyfile(import_path, destination)
-                        self.load_file_text(import_path)
+                        imported_ok = self.load_file_text(import_path)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
+                        continue
+                    if not imported_ok:
+                        # Import failed (duplicate, empty, error): remove the copy
+                        # so no residual files are left in /documents.
+                        try:
+                            os.remove(destination)
+                        except OSError as err:
+                            logger.warning(_("Removing failed import copy: ") + str(err))
                         continue
                 else:
                     self.load_file_text(import_path, f"docs:{link_path}")
@@ -2003,14 +2376,23 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if link_path == "":
                     try:
                         copyfile(import_path, destination)
-                        self.load_file_text(import_path, "", progress)
+                        imported_ok = self.load_file_text(import_path, "", progress)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
+                    if not imported_ok:
+                        # Rejected PDF (protected, damaged, duplicate): remove the copy
+                        # so no residual files are left in /documents.
+                        try:
+                            os.remove(destination)
+                        except OSError as err:
+                            logger.warning(_("Removing failed import copy: ") + str(err))
+                        continue
                 else:
-                    self.load_file_text(import_path, f"docs:{link_path}")
+                    # Progress also applies to linked PDFs (extraction takes just as long).
+                    self.load_file_text(import_path, f"docs:{link_path}", progress)
                 known_file_type = True
             # Media files
             if os.path.splitext(import_path)[1].lower() in ('.jpg', '.jpeg', '.png'):
@@ -2062,6 +2444,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
             file_number += 1
 
+        progress.close()
         if pdf_msg != "":
             self.parent_text_edit.append(pdf_msg)
         self.load_file_data()
@@ -2220,6 +2603,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
+        # Duplicate: check BEFORE extracting (extraction is expensive for large PDFs).
+        # The check used to sit at the end, after all the extraction time was wasted.
+        filename = os.path.basename(import_file)
+        if any(d['name'] == filename for d in self.source):
+            QtWidgets.QMessageBox.warning(self, _('Duplicate file'),
+                                          _("Duplicate filename.\nFile not imported"))
+            return False
         text_ = ""
         # Import from odt
         if import_file[-4:].lower() == ".odt":
@@ -2267,26 +2657,39 @@ class DialogManageFiles(QtWidgets.QDialog):
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
         if os.path.splitext(import_file)[1].lower() == '.pdf':
-            pdf_file = open(import_file, 'rb')
-            resource_manager = PDFResourceManager()
-            laparams = LAParams()
-            device = PDFPageAggregator(resource_manager, laparams=laparams)
-            interpreter = PDFPageInterpreter(resource_manager, device)
-            pages_generator = PDFPage.get_pages(pdf_file)  # Generator PDFpage objects
-            text_ = ""
-            # Can be very slow with large PDFs and older computers
-            for i, page in enumerate(pages_generator):
-                name_and_page = f"{os.path.basename(import_file)} p:{i}"
-                progress_.setLabelText(name_and_page)
-                QtCore.QCoreApplication.processEvents()  # Trial this to see if it prevents 'App not responding'
-                self.pdf_page_text = ""
-                interpreter.process_page(page)
-                layout = device.get_result()
-                for lobj in layout:
-                    self.get_item_and_hierarchy(page, lobj)
-                text_ += self.pdf_page_text
+            # Extraction with the SAME extractor as the viewer (code_pdf.extract_pdf_fulltext),
+            # otherwise coding positions do not map onto the PDF pages.
+            def pdf_progress(current_page, total_pages):
+                if progress_ is not None:
+                    progress_.setLabelText(f"{os.path.basename(import_file)} p:{current_page}/{total_pages}")
+                QtCore.QCoreApplication.processEvents()
+            try:
+                # Paragraph layout: block lines joined into whole paragraphs. The
+                # viewer verifies both reconstructions, so files imported earlier
+                # with the classic one-line-per-visual-line layout keep working.
+                text_ = extract_pdf_fulltext(import_file, pdf_progress, join_lines=True)
+            except ValueError as err:
+                Message(self.app, _("Cannot import PDF"),
+                        f"{os.path.basename(import_file)}\n{err}", "warning").exec()
+                return False
+            except Exception as err:
+                # Damaged or unreadable PDF
+                logger.warning(f"PDF import error: {import_file} {err}")
+                Message(self.app, _("Cannot import PDF"),
+                        _("Damaged or unreadable PDF") + f":\n{os.path.basename(import_file)}\n{err}",
+                        "warning").exec()
+                return False
+            if text_.strip() == "":
+                # No text layer (scanned PDF): imported anyway, with page markers,
+                # so AREA coding works in the PDF viewer.
+                msg = _("No text layer detected (scanned PDF?).") + "\n"
+                msg += _("Area coding will be available in the PDF view, "
+                         "but text coding and text search will not.")
+                Message(self.app, _("PDF without text"),
+                        f"{os.path.basename(import_file)}\n{msg}", "warning").exec()
         # Try importing as a plain text file.
-        if text_ == "":
+        # Never decode a PDF as plain text (it would produce unreadable binary).
+        if text_ == "" and os.path.splitext(import_file)[1].lower() != '.pdf':
             try:
                 text_, detected_encoding = self.decode_text_with_best_encoding(import_file)
                 logger.debug(f"Importing plain text file: {import_file} decoded as {detected_encoding}")
@@ -2296,12 +2699,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                 logger.warning(str(err))
                 Message(self.app, _("Warning"), _("Cannot import") + f"{import_file}\n{err}",
                         "warning").exec()
-                return
+                return False
         # Import of text file did not work
         if text_ == "":
             Message(self.app, _("Warning"),
                     _("Cannot import ") + str(import_file) + "\nPlease check if the file is empty.", "warning").exec()
-            return
+            return False
         # normalise line endings and strip BOM so the stored fulltext matches
         # exactly what QPlainTextEdit will display. Qt converts \r\n and lone \r
         # into \n on setPlainText(), and a leftover BOM adds a char; either makes
@@ -2311,13 +2714,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
             if text_ and text_[0] == "\ufeff":
                 text_ = text_[1:]
-        # Final checks: check for duplicated filename and update model, widget and database
-        name_split = import_file.split("/")
-        filename = name_split[-1]
-        if any(d['name'] == filename for d in self.source):
-            QtWidgets.QMessageBox.warning(self, _('Duplicate file'),
-                                          _("Duplicate filename.\nFile not imported"))
-            return
+        # Name and duplicate were already checked at the start, before extracting.
 
         # Apply pseudonym text replacement
         pseudonyms = self.load_pseudonyms()
@@ -2364,22 +2761,229 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _(" linked")
         self.parent_text_edit.append(msg)
         self.source.append(entry)
+        # Highlight annotations in the imported PDF: offer (once per batch) to code
+        # them. The highlights themselves are not painted in the coding view
+        # (annots=False), so coding them is how they survive into the analysis.
+        if os.path.splitext(import_file)[1].lower() == '.pdf':
+            # Non-highlight annotations with text (sticky notes, comments): appended
+            # to the FILE memo so they are not lost, since annotations are no longer
+            # painted in the coding views.
+            try:
+                notes = extract_pdf_annotations(import_file)
+            except Exception as err:
+                logger.warning(f"Annotation detection: {import_file} {err}")
+                notes = []
+            if notes:
+                memo_lines = [_("PDF annotations:")]
+                for n in notes:
+                    memo_lines.append(f"[p. {n['page']}] {n['content']}")
+                memo_text = "\n".join(memo_lines)
+                if entry['memo']:
+                    memo_text = entry['memo'] + "\n\n" + memo_text
+                cur.execute("update source set memo=? where id=?", [memo_text, entry['id']])
+                self.app.conn.commit()
+                entry['memo'] = memo_text
+                self.parent_text_edit.append(
+                    _("PDF annotations added to file memo: ") + f"{len(notes)}")
+            try:
+                highlights = extract_pdf_highlights(import_file)
+            except Exception as err:
+                logger.warning(f"Highlight detection: {import_file} {err}")
+                highlights = []
+            if highlights:
+                if self.pdf_import_code_highlights is None:
+                    ask_msg = _("Highlighted segments were detected in the imported PDF(s).") + "\n\n"
+                    ask_msg += _("Code those segments? A 'PDF Highlights' category will be "
+                                 "created, with one code per highlight colour (named and "
+                                 "coloured after the closest QualCoder colour).")
+                    reply = QtWidgets.QMessageBox.question(
+                        self, _("PDF highlights"), ask_msg,
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                        QtWidgets.QMessageBox.StandardButton.Yes)
+                    self.pdf_import_code_highlights = reply == QtWidgets.QMessageBox.StandardButton.Yes
+                if self.pdf_import_code_highlights:
+                    # Reuses the batch import dialog: one single progress view, and
+                    # the highlight phase only appears when the user accepted it.
+                    self.code_pdf_highlights(entry['id'], import_file, entry['fulltext'],
+                                             highlights, progress_)
+        return True  # Import completed; lets import_files clean up failed copies
 
-    # Pdf loading method
-    def get_item_and_hierarchy(self, page, lobj: Any):
-        """ Get text item details add to page_dict, with descendants.
-        Use LTextLine as this object can be parsed in Code_pdf for font size and colour.
+    @staticmethod
+    def _closest_qualcoder_color(hex_color):
+        """
+        Closest colour of the QualCoder palette (color_selector.colors) by RGB
+        distance, with its family name from colour_ranges.
+        Returns (hex of the palette colour, family name).
         """
 
-        if isinstance(lobj, LTTextLine):  # Do not use LTTextBox
-            obj_text = lobj.get_text()
-            # Fix Pdfminer recognising invalid unicode characters.
-            obj_text = obj_text.replace(u"\uE002", "Th")
-            obj_text = obj_text.replace(u"\uFB01", "fi")
-            self.pdf_page_text += obj_text
-        if isinstance(lobj, Iterable):
-            for obj in lobj:
-                self.get_item_and_hierarchy(page, obj)
+        try:
+            r = int(hex_color[1:3], 16)
+            g = int(hex_color[3:5], 16)
+            b = int(hex_color[5:7], 16)
+        except (ValueError, IndexError):
+            r, g, b = 247, 254, 46  # default highlight yellow
+        # Achromatic highlights (white, black, grays): the palette has no pure white
+        # or black, and plain RGB distance lands them on odd hues (white -> pale
+        # pink, black -> dark green). When the channels are nearly equal, restrict
+        # the search to the palette's gray family instead.
+        candidate_indexes = range(len(colors))
+        if max(r, g, b) - min(r, g, b) < 32:
+            for rng in colour_ranges:
+                if rng['name'] == 'gray':
+                    candidate_indexes = range(rng['min'], min(rng['max'] + 1, len(colors)))
+                    break
+        best_idx = 0
+        best_dist = None
+        for idx in candidate_indexes:
+            c = colors[idx]
+            cr = int(c[1:3], 16)
+            cg = int(c[3:5], 16)
+            cb = int(c[5:7], 16)
+            dist = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2
+            if best_dist is None or dist < best_dist:
+                best_dist = dist
+                best_idx = idx
+        family = "colour"
+        for rng in colour_ranges:
+            if rng['name'] != 'all' and rng['min'] <= best_idx <= rng['max']:
+                family = rng['name']
+                break
+        return colors[best_idx], family
+
+    def code_pdf_highlights(self, fid, filepath, fulltext, highlights, progress_=None):
+        """
+        Codes the PDF's highlighted segments: creates (or reuses) the
+        'PDF Highlights' category and one code per distinct highlight colour,
+        named and coloured after the closest QualCoder palette colour, then
+        inserts code_text rows over the exact highlighted positions.
+        Progress is shown INSIDE the batch import dialog when one is passed
+        (single progress view); a standalone dialog is only created when called
+        without one. Headless-safe: with no QApplication, runs silently.
+        Args:
+            fid: source id, Integer
+            filepath: PDF path
+            fulltext: the imported fulltext (paragraph layout)
+            highlights: output of extract_pdf_highlights
+            progress_: the batch QProgressDialog from import_files, or None
+        """
+
+        filename_ = os.path.basename(filepath)
+        external = progress_ is not None
+        progress = progress_
+        if progress is None and QtWidgets.QApplication.instance() is not None:
+            progress = QtWidgets.QProgressDialog("", "", 0, 100, self)
+            progress.setCancelButton(None)  # Partial runs are safe, but avoid them
+            progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+            progress.setMinimumDuration(500)  # Only appears if it takes a while
+            progress.setAutoReset(False)
+            progress.setAutoClose(False)
+
+        def _show_phase(phase_label, pct):
+            if progress is None:
+                return
+            progress.setLabelText(f"{filename_}\n{phase_label} {pct}%")
+            if not external:
+                progress.setValue(pct)
+            QtWidgets.QApplication.processEvents()
+
+        def _map_progress(step, total):
+            if total > 0:
+                _show_phase(_("Mapping highlighted segments"), int(step * 60 / total))
+
+        positions = pdf_highlights_to_positions(filepath, highlights, _map_progress)
+        if not positions:
+            if progress is not None and not external:
+                progress.close()
+            elif external and progress is not None:
+                progress.setLabelText(filename_)
+            return
+        now_ = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        owner = self.app.settings['codername']
+        cur = self.app.conn.cursor()
+        # Category, created once and reused across batches and projects re-runs.
+        cat_name = "PDF Highlights"
+        cur.execute("select catid from code_cat where name=?", [cat_name])
+        res = cur.fetchone()
+        if res is None:
+            cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
+                        (cat_name, _("Codes created from PDF highlight annotations"), owner, now_, None))
+            self.app.conn.commit()
+            cur.execute("select last_insert_rowid()")
+            catid = cur.fetchone()[0]
+        else:
+            catid = res[0]
+        # One code per distinct highlight colour. Name is the colour family only
+        # ("Highlight yellow"); a second distinct shade of the same family gets a
+        # numeric suffix ("Highlight yellow_2"). A code is reused when a
+        # family-named code already exists with the SAME palette colour.
+        cids_by_color = {}
+        for hl_color in sorted({p['color'] for p in positions}):
+            qc_hex, family = self._closest_qualcoder_color(hl_color)
+            base_name = f"Highlight {family}"
+            cur.execute("select cid, name, color from code_name where name=? or name like ?",
+                        [base_name, base_name + "_%"])
+            existing = [row for row in cur.fetchall()
+                        if row[1] == base_name or
+                        (row[1].startswith(base_name + "_") and row[1][len(base_name) + 1:].isdigit())]
+            reuse = next((row for row in existing if row[2] == qc_hex), None)
+            if reuse is not None:
+                cids_by_color[hl_color] = reuse[0]
+                continue
+            taken = {row[1] for row in existing}
+            code_name = base_name
+            n = 2
+            while code_name in taken:
+                code_name = f"{base_name}_{n}"
+                n += 1
+            try:
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                            (code_name, "", owner, now_, catid, qc_hex))
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                cids_by_color[hl_color] = cur.fetchone()[0]
+                self.parent_text_edit.append(_("New code: ") + code_name)
+            except sqlite3.IntegrityError:
+                # Roll back the failed insert so no implicit transaction stays open.
+                self.app.conn.rollback()
+                cur.execute("select cid from code_name where name=?", [code_name])
+                res2 = cur.fetchone()
+                if res2 is not None:
+                    cids_by_color[hl_color] = res2[0]
+        # Codings over the highlighted positions. Insertion: 60-100 % of the bar.
+        count = 0
+        for seq, pos in enumerate(positions, start=1):
+            cid = cids_by_color.get(pos['color'])
+            if cid is None:
+                continue
+            seltext = fulltext[pos['pos0']:pos['pos1']]
+            if seltext.strip() == "":
+                continue
+            try:
+                # The comment attached to the highlight (if any) becomes the memo of
+                # this coded segment.
+                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important) "
+                            "values(?,?,?,?,?,?,?,?,?)",
+                            (cid, fid, seltext, pos['pos0'], pos['pos1'], owner,
+                             pos.get('memo', ''), now_, None))
+                self.app.conn.commit()
+                count += 1
+            except sqlite3.IntegrityError:
+                # Same segment already coded with this code (re-import). Roll back so
+                # no implicit transaction stays open behind the failed insert.
+                self.app.conn.rollback()
+            _show_phase(_("Coding highlighted segments"), 60 + int(seq * 40 / len(positions)))
+        if progress is not None:
+            if external:
+                progress.setLabelText(filename_)  # Back to the batch label
+            else:
+                progress.setValue(100)
+                progress.close()
+        if count > 0:
+            self.parent_text_edit.append(
+                _("PDF highlights coded: ") + f"{count}" + _(" segments in ") + os.path.basename(filepath))
+            if getattr(self.app, "project_events", None) is not None:
+                self.app.project_events.emit_table_changes(
+                    ['code_cat', 'code_name', 'code_text'], source=self)
 
     def convert_odt_to_text(self, import_file:str):
         """ Convert odt to very rough equivalent with headings, list items and tables for
@@ -2531,6 +3135,47 @@ class DialogManageFiles(QtWidgets.QDialog):
         export_msg += "\n" + msg
         self.parent_text_edit.append(export_msg)
 
+    def release_files_in_coding_dialogs(self):
+        """
+        Releases file handles held by open coding dialogs. DialogCodePdf workers
+        (render and text) keep the PDF open while coding; on Windows that blocks
+        os.remove and the file would remain as a residual. Call ALWAYS before
+        deleting project files.
+        """
+
+        contents = self.tab_coding.layout()
+        if contents is None:
+            return
+        for i in reversed(range(contents.count())):
+            c = contents.itemAt(i).widget()
+            if isinstance(c, DialogCodePdf):
+                try:
+                    c.stop_workers()
+                except (AttributeError, RuntimeError):
+                    pass
+
+    def vectorstore_delete_document_safe(self, fid):
+        """
+        Removes the document from the AI index without letting a vectorstore lock
+        abort the project file deletion (e.g. "database is locked" when an embeddings
+        worker is writing to search.sqlite in the background). The index is derived
+        data: the next update_vectorstore prunes ids no longer in source, so failing
+        soft here is safe and self-repairing.
+
+        param:
+            fid: source id, Integer
+        """
+
+        if self.app.settings['ai_enable'] != 'True':
+            return
+        try:
+            self.app.ai.sources_vectorstore.delete_document(fid)
+        except Exception as err:
+            logger.warning(f"vectorstore delete_document fid {fid}: {err}")
+            self.parent_text_edit.append(
+                _("AI index is busy; the deleted file will be removed from the index "
+                  "on the next update."))
+
     def delete_button_multiple_files(self):
         """ Delete files from database and update model and widget.
         Also, delete files from sub-directories, if not externally linked.
@@ -2556,6 +3201,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not ok:
             return
 
+        # Release PDFs open in coding tabs before deleting on disk.
+        self.release_files_in_coding_dialogs()
         msg = ""
         cur = self.app.conn.cursor()
         for s in selection:
@@ -2568,19 +3215,21 @@ class DialogManageFiles(QtWidgets.QDialog):
                         # Legacy for older < 3.4 QualCoder projects
                         os.remove(self.app.project_path + "/documents/" + s['name'])
                     if s['mediapath'][0:6] == '/docs/':
-                        os.remove(self.app.project_path + "/documents/" + s['name'][6:])
+                        # Previously sliced s['name'][6:] leaving the file as a residual.
+                        os.remove(self.app.project_path + "/documents/" + s['mediapath'][6:])
                 except OSError as err:
                     logger.warning(_("Deleting file error: ") + str(err))
                 # Delete stored coded sections and source details
                 cur.execute("delete from source where id = ?", [s['id']])
                 cur.execute("delete from code_text where fid = ?", [s['id']])
+                # Coded areas over PDF pages (code_image with pdf_page); orphaned without this.
+                cur.execute("delete from code_image where id = ?", [s['id']])
                 cur.execute("delete from annotation where fid = ?", [s['id']])
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 self.app.conn.commit()
                 # Delete from vectorstore
-                if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.delete_document(s['id'])
+                self.vectorstore_delete_document_safe(s['id'])
 
                     # Delete image, audio or video source
             if s['mediapath'] is not None and s['mediapath'][0:5] != 'docs:' and s['mediapath'][0:6] != '/docs/':
@@ -2653,6 +3302,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not ok:
             return
 
+        # Release PDFs open in coding tabs before deleting on disk.
+        self.release_files_in_coding_dialogs()
         cur = self.app.conn.cursor()
         for row in rows:
             file_id = self.source[row]['id']
@@ -2660,8 +3311,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or \
                     self.source[row]['mediapath'][0:6] == '/docs/':
                 try:
-                    if self.source[row]['mediapath']:
+                    if self.source[row]['mediapath'] is None:
                         # Legacy for older QualCoder Projects < 3.3
+                        # The condition was inverted (deleted when mediapath was present).
                         os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
                     if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:6] == '/docs/':
                         os.remove(self.app.project_path + "/documents/" + self.source[row]['mediapath'][6:])
@@ -2670,13 +3322,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                 # Delete stored coded sections and source details
                 cur.execute("delete from source where id = ?", [file_id])
                 cur.execute("delete from code_text where fid = ?", [file_id])
+                # Coded areas over PDF pages (code_image with pdf_page); orphaned without this.
+                cur.execute("delete from code_image where id = ?", [file_id])
                 cur.execute("delete from annotation where fid = ?", [file_id])
                 cur.execute("delete from case_text where fid = ?", [file_id])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
                 self.app.conn.commit()
                 # Delete from vectorstore
-                if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.delete_document(file_id)
+                self.vectorstore_delete_document_safe(file_id)
 
             else:  # Delete image, audio or video source
                 # Get linked transcript file id

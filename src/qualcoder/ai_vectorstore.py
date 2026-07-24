@@ -608,7 +608,11 @@ class AiVectorstore:
                 normalized[str(key)] = [np.asarray(vec, dtype=np.float32) for vec in vectors]
             candidate_vectors_by_hash = normalized
 
-        self._delete_source_rows(conn, source_id)
+        # NOTE: old rows are deleted AFTER the embedding (below). It used to happen
+        # here, without commit, and the implicit write transaction stayed open for
+        # the whole embed_documents (minutes with local models): any other writer of
+        # search.sqlite (e.g. delete_document from the UI thread when deleting a
+        # file) exhausted the 30 s busy_timeout and died with "database is locked".
 
         if signals is not None and signals.progress is not None and self.reading_doc != source_name:
             self.reading_doc = source_name
@@ -629,6 +633,10 @@ class AiVectorstore:
         if texts_to_embed:
             embedded = self.app.ai_embedding_function.embed_documents(texts_to_embed)
             new_vectors = [np.asarray(vec, dtype=np.float32) for vec in embedded]
+
+        # Delete + reinsert in one short atomic transaction, with the vectors already
+        # computed: the write-lock window is minimal.
+        self._delete_source_rows(conn, source_id)
 
         embedded_idx = 0
         for doc in docs:

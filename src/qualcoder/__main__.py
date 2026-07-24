@@ -955,6 +955,8 @@ class App(object):
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
                 'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
                 'dialogcodetext_coding_margin_width',
+                'dialogcodepdf_coding_margin_width',
+                'dialogcodepdf_page_view',
                 'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
                 'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
                 'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
@@ -1034,6 +1036,10 @@ class App(object):
                     settings_data[key] = 80
                 if key == 'dialogcodetext_coding_margin_width':
                     settings_data[key] = 100
+                if key == 'dialogcodepdf_coding_margin_width':
+                    settings_data[key] = 120
+                if key == 'dialogcodepdf_page_view':
+                    settings_data[key] = 0
 
         ai_permissions = settings_data.get('ai_permissions', 1)
         if ai_permissions not in (0, 1, 2):
@@ -1372,6 +1378,8 @@ class App(object):
             'dialogcodetext_splitter_v0': 1,
             'dialogcodetext_splitter_v1': 1,
             'dialogcodetext_coding_margin_width': 100,
+            'dialogcodepdf_coding_margin_width': 120,
+            'dialogcodepdf_page_view': 0,
             'dialogcodeimage_splitter0': 1,
             'dialogcodeimage_splitter1': 1,
             'dialogcodeimage_splitter_h0': 1,
@@ -2794,6 +2802,17 @@ Click "Yes" to start now.')
         """
 
         files = self.app.get_text_filenames()
+        # Central redirection: if the referred document is a PDF, open the PDF coding
+        # view. Covers all callers at once: mark speakers from Manage files, AI chat
+        # internal references and qualcoder:// links (PDFs no longer load in code_text).
+        if doc_id is not None:
+            cur = self.app.conn.cursor()
+            cur.execute("select mediapath from source where id=?", [int(doc_id)])
+            res_mp = cur.fetchone()
+            if res_mp is not None and res_mp[0] is not None and res_mp[0].lower().endswith(".pdf"):
+                self.pdf_coding(task=task, doc_id=doc_id,
+                                doc_sel_start=doc_sel_start, doc_sel_end=doc_sel_end)
+                return
         if len(files) > 0:
             self.ui.textBrowser_coding.hide()
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
@@ -2814,9 +2833,19 @@ Click "Yes" to start now.')
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
 
-    def pdf_coding(self):
+    def pdf_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
         """ Create edit and delete codes. Apply and remove codes  to the pdf
-        text in imported pdf files. """
+        text in imported pdf files.
+        Signature equivalent to text_coding, to receive its redirections when the
+        referred document is a PDF (mark speakers, AI chat references,
+        qualcoder:// links).
+        Args:
+            task: "documents": the default. "mark_speakers": opens the Mark Speakers
+                  dialog for doc_id after loading it.
+            doc_id: If not None, this document will be loaded in the pdf coding window
+            doc_sel_start: The character-position of the beginning of the selection
+            doc_sel_end: The end of the selection
+        """
 
         files = self.app.get_pdf_filenames()
         if len(files) > 0:
@@ -2824,6 +2853,11 @@ Click "Yes" to start now.')
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
+            if doc_id is not None:
+                ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
+                if task == 'mark_speakers':
+                    # DialogSpeakers works on the DB; it only requires file_ loaded.
+                    ui.mark_speakers()
         else:
             msg = _("This project contains no pdf files.")
             Message(self.app, _('No pdf files'), msg).exec()

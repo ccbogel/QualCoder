@@ -60,6 +60,20 @@ class ReplaceTextFile:
         self.app = app
         self.old_file = old_file
         self.new_file_path = new_file_path
+        # PDF sources are NOT replaceable: their stored fulltext must match, character
+        # by character, the extraction of the PDF coding view; rewriting it here (with
+        # a different extractor besides) would break that mapping. This mirrors the
+        # no-editing policy of code_text and Manage Files.
+        cur_ = self.app.conn.cursor()
+        cur_.execute("select mediapath from source where id=?", [self.old_file['id']])
+        res_mp = cur_.fetchone()
+        if res_mp is not None and res_mp[0] is not None and res_mp[0].lower().endswith(".pdf"):
+            Message(self.app, _("PDF file"),
+                    _("PDF files cannot be replaced: their stored text must match the "
+                      "text extracted from the pages. Use Manage Files > "
+                      "'Extract pdf text to new file' to work with an editable copy."),
+                    "warning").exec()
+            return
         # Check for matching file name
         name_split = self.new_file_path.split("/")
         new_filename = name_split[-1]

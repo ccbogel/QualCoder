@@ -820,7 +820,7 @@ class GraphSynchronizer:
                     if os.path.exists(source_path):
                         fitz_pdf = fitz.open(source_path)
                         page = fitz_pdf[item.pdf_page]
-                        pixmap_pdf = page.get_pixmap()
+                        pixmap_pdf = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
                         abs_path_ = os.path.join(item.app.confighome, "tmp_pdf_page.png")
                         pixmap_pdf.save(abs_path_)
                         fitz_pdf.close()
@@ -6101,7 +6101,7 @@ class DialogGraphPicker(QDialog):
                     source_path = filepath[5:]
                 fitz_pdf = fitz.open(source_path)
                 page = fitz_pdf[pdf_page]
-                pm = page.get_pixmap()
+                pm = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
                 abs_path_ = os.path.join(self.app.confighome, "tmp_preview_pdf_page.png")
                 pm.save(abs_path_)
             image = QtGui.QImageReader(abs_path_).read()
@@ -7701,7 +7701,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == image_context_action:
             cur = self.app.conn.cursor()
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_image.owner,"
-                        "ifnull(code_image.memo,''), x1, y1,width,height, source.name, source.id, source.mediapath "
+                        "ifnull(code_image.memo,''), x1, y1,width,height, source.name, source.id, "
+                        "source.mediapath, pdf_page "
                         "from code_image join code_name on code_name.cid=code_image.cid join source on "
                         "source.id=code_image.id where code_image.imid=?",
                         [self.memo_imid])
@@ -7711,7 +7712,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 return
             data = {'cid': res[0], 'codename': res[1], 'color': res[2], 'coder': res[3], 'memo': res[4],
                     'x1': res[5], 'y1': res[6], 'width': res[7], 'height': res[8], 'file_or_casename': res[9],
-                    'fid': res[10], 'file_or_case': 'File', 'mediapath': res[11]}
+                    'fid': res[10], 'file_or_case': 'File', 'mediapath': res[11], 'pdf_page': res[12]}
             DialogCodeInImage(self.app, data).exec()
         if action == av_context_action:
             cur = self.app.conn.cursor()
@@ -8348,13 +8349,26 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                 source_path = f"{self.app.project_path}/documents/{path_[6:]}"
             if path_[:5] == "docs:":
                 source_path = path_[5:]
-            fitz_pdf = fitz.open(source_path)
-            page = fitz_pdf[self.pdf_page]
-            pixmap = page.get_pixmap()
-            abs_path_ = os.path.join(self.app.confighome, "tmp_pdf_page.png")
-            pixmap.save(abs_path_)
-
-        image = QtGui.QImageReader(abs_path_).read()
+            # In-memory render of ONLY the needed page, range-guarded and with the
+            # document always closed. The previous code indexed fitz_pdf[self.pdf_page]
+            # without a guard (IndexError crashed loading a saved graph if the pdf
+            # changed page count), never closed the handle (blocked pdf deletion on
+            # Windows) and wrote a residual tmp_pdf_page.png.
+            image = QtGui.QImage()
+            try:
+                fitz_pdf = fitz.open(source_path)
+                try:
+                    if 0 <= self.pdf_page < len(fitz_pdf):
+                        page = fitz_pdf.load_page(self.pdf_page)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Graph pdf area: {source_path} {err}")
+        else:
+            image = QtGui.QImageReader(abs_path_).read()
         image = image.copy(int(px), int(py), int(pwidth), int(pheight))
 
         # Scale to max 200 wide or high. (TODO Perhaps add option to change maximum limits)
@@ -8425,7 +8439,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             cur = self.app.conn.cursor()
             # join source so fid is available for the context dialog
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_image.owner,"
-                        "ifnull(code_image.memo,''), source.id "
+                        "ifnull(code_image.memo,''), source.id, pdf_page "
                         "from code_image join code_name on code_name.cid=code_image.cid "
                         "join source on source.id=code_image.id where code_image.imid=?",
                         [self.imid])
@@ -8438,7 +8452,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             data = {'x1': self.px, 'y1': self.py, 'width': self.pwidth, 'height': self.pheight,
                     'file_or_casename': self.path_, 'mediapath': self.path_, 'coder': res[3],
                     'codename': res[1], 'cid': res[0], 'color': res[2], 'memo': res[4],
-                    'fid': res[5], 'file_or_case': 'File'}
+                    'fid': res[5], 'file_or_case': 'File', 'pdf_page': res[6]}
             DialogCodeInImage(self.app, data).exec()
 
         if action == remove_action:
