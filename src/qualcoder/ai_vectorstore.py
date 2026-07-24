@@ -608,7 +608,8 @@ class AiVectorstore:
                 normalized[str(key)] = [np.asarray(vec, dtype=np.float32) for vec in vectors]
             candidate_vectors_by_hash = normalized
 
-        self._delete_source_rows(conn, source_id)
+        # Old rows are deleted AFTER embedding (below): deleting here kept a write
+        # transaction open for the whole embed, locking search.sqlite for minutes.
 
         if signals is not None and signals.progress is not None and self.reading_doc != source_name:
             self.reading_doc = source_name
@@ -629,6 +630,9 @@ class AiVectorstore:
         if texts_to_embed:
             embedded = self.app.ai_embedding_function.embed_documents(texts_to_embed)
             new_vectors = [np.asarray(vec, dtype=np.float32) for vec in embedded]
+
+        # Delete + reinsert in one short atomic transaction; minimal lock window.
+        self._delete_source_rows(conn, source_id)
 
         embedded_idx = 0
         for doc in docs:

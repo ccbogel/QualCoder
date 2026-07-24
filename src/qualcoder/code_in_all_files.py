@@ -288,14 +288,26 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 source_path = img['mediapath'][5:]
-            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
-            for page in fitz_pdf:
-                if page.number == img['pdf_page']:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
-            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            image = QtGui.QImage(source_path)
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
+            image = QtGui.QImage()
+            # Areas from older imports may have pdf_page NULL: they belong to page 0
+            # (same normalization as the image coding view).
+            pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
+            try:
+                fitz_pdf = fitz.open(source_path)
+                try:
+                    if 0 <= pdf_page_ < len(fitz_pdf):
+                        page = fitz_pdf.load_page(pdf_page_)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf area image: {source_path} {err}")
+            if image.isNull():
+                return
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
@@ -728,18 +740,31 @@ class DialogCodedIds(QtWidgets.QDialog):
         if not img['mediapath'].lower().endswith(".pdf"):
             image = QtGui.QImage(abs_path)
         else:  # A pdf, must create the image
+            source_path = ""
             if img['mediapath'][:6] == "/docs/":
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 source_path = img['mediapath'][5:]
-            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
-            for page in fitz_pdf:
-                if page.number == img['pdf_page']:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
-            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            image = QtGui.QImage(source_path)
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
+            image = QtGui.QImage()
+            # Areas from older imports may have pdf_page NULL: they belong to page 0
+            # (same normalization as the image coding view).
+            pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
+            try:
+                fitz_pdf = fitz.open(source_path)
+                try:
+                    if 0 <= pdf_page_ < len(fitz_pdf):
+                        page = fitz_pdf.load_page(pdf_page_)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf area image: {source_path} {err}")
+            if image.isNull():
+                return
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 600 wide or high. Add option to change maximum limit?
         scaler_w = 1.0

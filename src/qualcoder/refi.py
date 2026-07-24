@@ -1391,6 +1391,77 @@ class RefiImport:
                 # print("PDF Representation element found")
                 self.load_text_source(el, name, create_date, media_path)
                 break
+        # Coded areas over pages (PDFSelection): previously ignored, so area codings
+        # were lost when importing a REFI-QDA project. Loaded after the Representation,
+        # once the source row exists.
+        cur = self.app.conn.cursor()
+        cur.execute("select id from source where name=?", [name])
+        res_id = cur.fetchone()
+        if res_id is not None:
+            for el in element:
+                if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PDFSelection":
+                    self.load_codings_for_pdf_areas(res_id[0], el)
+
+    def load_codings_for_pdf_areas(self, id_:int, element):
+        """ Loads coded areas over PDF pages (PDFSelection) into code_image with pdf_page.
+        Coordinates in page points, top-left origin, 0-based page: the
+        pdf_selection_xml convention.
+
+        Example format:
+        <PDFSelection guid="..." page="2" firstX="100" firstY="200" secondX="150"
+        secondY="230" name="memo." creatingUser="..." creationDateTime="...">
+        <Coding guid="..." creatingUser="..."><CodeRef targetGUID="..."/></Coding>
+        </PDFSelection>
+        """
+
+        try:
+            pdf_page = int(element.get("page"))
+            first_x = int(element.get("firstX"))
+            first_y = int(element.get("firstY"))
+            second_x = int(element.get("secondX"))
+            second_y = int(element.get("secondY"))
+        except (TypeError, ValueError) as err:
+            logger.warning(f"PDFSelection attributes: {err}")
+            return
+        width = second_x - first_x
+        height = second_y - first_y
+        if width <= 0 or height <= 0:
+            return
+        memo = element.get("name")
+        if memo is None:
+            memo = ""
+        create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
+        if create_date is None:
+            create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%SZ")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        cur = self.app.conn.cursor()
+        for el in element:
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Coding":
+                # Get the code id from the CodeRef guid
+                cid = None
+                code_ref = list(el)[0]
+                for c in self.codes:
+                    if c['guid'] == code_ref.get("targetGUID"):
+                        cid = c['cid']
+                try:
+                    cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,"
+                                "date,owner,pdf_page) values(?,?,?,?,?,?,?,?,?,?)",
+                                (id_, first_x, first_y, width, height, cid, memo,
+                                 create_date, creating_user, pdf_page))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    # Duplicate area on re-import; roll back the failed insert.
+                    self.app.conn.rollback()
 
     def load_text_source(self, element, pdf_rep_name:str="", pdf_rep_date:str="", mediapath:str|None=None):
         """ Load this text source into sqlite.
@@ -2572,6 +2643,9 @@ class RefiExport(QtWidgets.QDialog):
                         a['NoteRef_guid'] = self.create_guid()
                         break
                 xml += '</Representation>'
+                # Coded areas over pages (code_image with pdf_page): without this they
+                # were silently lost in REFI-QDA interchange.
+                xml += self.pdf_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PDFSource>\n'
             # Images
@@ -2704,6 +2778,45 @@ class RefiExport(QtWidgets.QDialog):
                 xml += f'<CodeRef targetGUID="{code_guid}"/>\n'
             xml += '</Coding>\n'
             xml += '</PictureSelection>\n'
+        return xml
+
+    def pdf_selection_xml(self, id_:int) -> str:
+        """
+        Coded areas over PDF pages as PDFSelection elements (REFI-QDA).
+        Coordinates in page points (top-left origin, page already rotated), the same
+        convention QualCoder stores and displays them with; page is 0-based.
+        Called by: sources_xml (PDFSource block).
+
+        :param id_ is the source id
+        :returns xml string
+        """
+
+        xml = ""
+        sql = "select imid, cid, x1, y1, width, height, owner, date, memo, pdf_page " \
+              "from code_image where id=? and pdf_page is not null"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [id_, ])
+        results = cur.fetchall()
+        for r in results:
+            memo_ = r[8] if r[8] is not None else ""
+            xml += f'<PDFSelection guid="{self.create_guid()}" '
+            xml += f'page="{int(r[9])}" '
+            xml += f'firstX="{int(r[2])}" '
+            xml += f'firstY="{int(r[3])}" '
+            xml += f'secondX="{int(r[2] + r[4])}" '
+            xml += f'secondY="{int(r[3] + r[5])}" '
+            xml += f'name="{html.escape(memo_)}" '
+            xml += f'creatingUser="{self.user_guid(r[6])}" '
+            xml += f'creationDateTime="{self.convert_timestamp(r[7])}">\n'
+            if memo_ != "":
+                xml += f"<Description>{html.escape(memo_)}</Description>\n"
+            xml += f'<Coding guid="{self.create_guid()}" '
+            xml += f'creatingUser="{self.user_guid(r[6])}" >\n'
+            code_guid = self.code_guid(r[1])
+            if code_guid != "":
+                xml += f'<CodeRef targetGUID="{code_guid}"/>\n'
+            xml += '</Coding>\n'
+            xml += '</PDFSelection>\n'
         return xml
 
     def av_selection_xml(self, id_: int, mediatype:str) -> str:

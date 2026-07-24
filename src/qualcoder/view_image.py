@@ -99,6 +99,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.pdf_page = None  # display at 1
         self.pdf_total_pages = None
+        # Id of the file currently loaded in the scene; allows resetting the PDF page
+        # when switching files (it previously inherited the page from the prior PDF).
+        self.loaded_file_id = None
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
@@ -119,6 +122,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
+
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
@@ -846,6 +850,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by null file in load_file, and from ManageFiles.delete. """
 
         self.file_ = None
+        self.loaded_file_id = None
         self.selection = None
         self.scale = 1.0
         # Clear handle states on image change/close to prevent ghost handles or memory errors
@@ -931,28 +936,58 @@ class DialogCodeImage(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{self.file_['mediapath'][6:]}"
             if self.file_['mediapath'][:5] == "docs:":
                 source_path = self.file_['mediapath'][5:]
-            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
-            if not self.pdf_page:
-                self.pdf_page = 0
-            self.pdf_total_pages = 0
-            for page in fitz_pdf:
-                self.pdf_total_pages += 1
-                if page.number == self.pdf_page:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(Path(self.app.confighome) / "tmp_pdf_page.png")
-            source_path = Path(self.app.confighome) / "tmp_pdf_page.png"
-            print(source_path)
-            # TODO TypeError pdf image - When opening file.pdf - but open file.pdf_p1.png is ok
-            image = QtGui.QImage(source_path)
+            # In-memory render, identity matrix (1 pixel = 1 page point, the same
+            # system code_pdf stores); no temp file and the document is closed.
+            try:
+                fitz_pdf = fitz.open(source_path)
+            except Exception as err:
+                self.clear_file()
+                Message(self.app, _("Image Error"), _("Cannot open: ") + f"{source_path}\n{err}").exec()
+                logger.warning(f"Cannot open pdf: {source_path} {err}")
+                return
+            try:
+                self.pdf_total_pages = len(fitz_pdf)
+                if self.pdf_total_pages == 0:
+                    # PDF with no pages: nothing to display.
+                    self.clear_file()
+                    Message(self.app, _("Image Error"), _("Cannot open: ") + source_path).exec()
+                    logger.warning(f"Pdf with no pages: {source_path}")
+                    return
+                if self.loaded_file_id != self.file_['id']:
+                    # Different file: start at page one.
+                    self.pdf_page = 0
+                if not self.pdf_page:
+                    self.pdf_page = 0
+                if self.pdf_page > self.pdf_total_pages - 1:
+                    self.pdf_page = max(0, self.pdf_total_pages - 1)
+                page = fitz_pdf.load_page(self.pdf_page)
+                pix = page.get_pixmap(alpha=False, annots=False)  # Identity matrix, do not change: defines the coordinate scale. annots=False: PDF highlights/notes not painted in the coding view.
+                image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                     QtGui.QImage.Format.Format_RGB888).copy()
+            finally:
+                fitz_pdf.close()
             self.pdf_controls_toggle(True)
             self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
+            # Legacy areas with NULL pdf_page were invisible in both viewers;
+            # normalized to page 0 so they are visible and editable again.
+            cur_ = self.app.conn.cursor()
+            cur_.execute("update code_image set pdf_page=0 where id=? and pdf_page is null",
+                         [self.file_['id']])
+            # Unconditional commit: an UPDATE with 0 rows also opens an implicit
+            # transaction in sqlite3 and would leave it dangling.
+            normalized = cur_.rowcount
+            self.app.conn.commit()
+            if normalized > 0:
+                logger.info(f"Normalized {normalized} legacy coded areas with NULL pdf_page "
+                            f"to page 0, fid {self.file_['id']}")
+                self._emit_code_image_changed()
 
         if image.isNull():
             self.clear_file()
             Message(self.app, _("Image Error"), _("Cannot open: ") + source_path).exec()
             logger.warning("Cannot open image: " + source_path)
             return
+        self.loaded_file_id = self.file_['id']
 
         items = list(self.scene.items())
         for i in range(items.__len__()):
@@ -1743,7 +1778,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # With multiple segments we show both important options, since the target is not yet known.
         single_segment = len(items) == 1
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_memo = menu.addAction(_('Memo'))
         action_unmark = menu.addAction(_('Unmark'))
         action_move_resize = menu.addAction(_("Move or resize"))
@@ -1770,10 +1805,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if action is None:
             return
 
-        # after an action is chosen, if it acts on a specific segment and there is
-        # more than one segment under the cursor, ask which segment now.
-        # include "Highlight this code" actions so the user picks which code's
-        # cid is used when several segments overlap
+        # If the chosen action targets one segment and several overlap under the
+        # cursor, ask which segment now (including "Highlight this code").
         segment_actions = (action_memo, action_unmark, action_move_resize, action_interactive_resize,
                            action_important, action_not_important, action_highlight_gray,
                            action_highlight_solarize, action_highlight_blur,
@@ -1877,8 +1910,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("update code_image set x1=?,y1=?,width=?,height=? where imid=?",
                     (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
         self.app.conn.commit()
+        self._emit_code_image_changed()
         self.redraw_scene()
         self.app.delete_backup = False
+
+    def _emit_code_image_changed(self):
+        """
+        Notifies code_image changes to the project event bus so other open dialogs
+        (e.g. the PDF coding viewer) refresh live.
+        """
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['code_image'], source=self)
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for all visible coders.
@@ -1948,6 +1991,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute('update code_image set important=? where imid=?', (importance, item['imid']))
         self.app.conn.commit()
+        self._emit_code_image_changed()
         self.app.delete_backup = False
         self.draw_coded_areas()
 
@@ -1965,6 +2009,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute('update code_image set memo=? where imid=?', (ui.memo, item['imid']))
             self.app.conn.commit()
+            self._emit_code_image_changed()
             self.app.delete_backup = False
         # Re-draw to update memos in tooltips
         self.draw_coded_areas()
@@ -1983,6 +2028,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             (item['id'], item['x1'], item['y1'], item['width'], item['height'], item['cid'], item['memo'],
              item['date'], item['owner'], item['important'], item['pdf_page']))
         self.app.conn.commit()
+        self._emit_code_image_changed()
         self.undo_deleted_code = []
         self.get_coded_areas()
         self.redraw_scene()
@@ -1998,6 +2044,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("delete from code_image where imid=?", [item['imid'], ])
         self.app.conn.commit()
+        self._emit_code_image_changed()
         self.get_coded_areas()
         self.redraw_scene()
         self.fill_code_counts_in_tree()
@@ -2091,6 +2138,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         imid = cur.fetchone()[0]
         item['imid'] = imid
         self.code_areas.append(item)
+        self._emit_code_image_changed()
         self.redraw_scene()
         self.selection = None
         self.app.delete_backup = False
@@ -2218,6 +2266,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur.execute("update code_image set x1=?, y1=?, width=?, height=? where imid=?",
                         (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
             self.app.conn.commit()
+            self._emit_code_image_changed()
         except sqlite3.IntegrityError:
             self.app.conn.rollback()
             Message(self.app, _("Duplicate Error"), _("This exact coded area already exists."), "warning").exec()

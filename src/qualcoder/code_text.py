@@ -2972,10 +2972,8 @@ class DialogCodeText(QtWidgets.QWidget):
             # Add reference, if any
             cur = self.app.conn.cursor()
             cur.execute("select risid from source where source.id=?", [self.file_['id']])
-            print(self.file_['id'])
             ris_res = cur.fetchone()
-            print("ris_res", ris_res)
-            if ris_res[0]:
+            if ris_res and ris_res[0]:
                 ris = Ris(self.app)
                 ris.get_references(ris_res[0])
                 if ris.refs:
@@ -4573,6 +4571,13 @@ class DialogCodeText(QtWidgets.QWidget):
         tables = set(tables)
         if ("attribute" in tables or "attribute_type" in tables) and len(self.attributes) > 1:
             self.get_files_from_attributes(refresh_only=True)
+        # Fulltext edited in another dialog (manage_files or code_pdf via restructuring):
+        # reloading the current file avoids coding over stale in-memory positions,
+        # which would corrupt pos0/pos1 of new codings.
+        if "source" in tables and self.file_ is not None:
+            self.annotations = self.app.get_annotations()
+            self.load_file(self.file_)
+            return
         if "code_cat" not in tables and "code_name" not in tables:
             if "code_text" not in tables:
                 return
@@ -6171,6 +6176,19 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
 
+        # PDF fulltext is not editable anywhere (the PDF coding view depends on
+        # the exact page mapping); PDFs stay listed and codable, editing needs a copy.
+        if not self.edit_mode and self.file_.get('mediapath') is not None and \
+                str(self.file_['mediapath']).lower().endswith(".pdf"):
+            msg = _("This file is a PDF. Its stored text is not editable: it matches, "
+                    "character by character, the text extracted from the PDF pages, and "
+                    "the PDF coding view depends on that mapping.")
+            msg += "\n\n"
+            msg += _("To work with an editable copy of the text use Manage Files > "
+                     "'Extract pdf text to new file'.")
+            Message(self.app, _("PDF file"), msg).exec()
+            return
+
         self.edit_mode = not self.edit_mode
         if self.edit_mode:
             self.edit_mode_on()
@@ -6298,6 +6316,12 @@ class DialogCodeText(QtWidgets.QWidget):
         # above) already restores visibility based on settings <- L
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
+        # Notify the fulltext edit to the bus: an open DialogCodePdf with this file
+        # must reload and re-verify the page mapping; without this it keeps stale
+        # text and positions in memory.
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(
+                ['source', 'code_text', 'annotation', 'case_text'], source=self)
 
     def edit_mode_find(self, direction:str="next"):
         """  Move forward or backward through the edit document.

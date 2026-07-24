@@ -752,14 +752,24 @@ class DialogCodeInImage(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{self.data['mediapath'][6:]}"
             if self.data['mediapath'][:5] == "docs:":
                 source_path = self.data['mediapath'][5:]
-            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
-            for page in fitz_pdf:
-                if page.number == self.data['pdf_page']:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
-            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            image = QtGui.QImage(source_path)
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
+            image = QtGui.QImage()
+            try:
+                fitz_pdf = fitz.open(source_path)
+                try:
+                    # .get(): some callers build the dict by hand; a missing or NULL
+                    # pdf_page falls back to page 0 instead of raising KeyError.
+                    pdf_page_ = self.data.get('pdf_page') if self.data.get('pdf_page') is not None else 0
+                    if 0 <= pdf_page_ < len(fitz_pdf):
+                        page = fitz_pdf.load_page(pdf_page_)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf page image: {source_path} {err}")
 
         if image.isNull():
             Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec()
