@@ -2849,6 +2849,25 @@ Click "Yes" to start now.')
 
         files = self.app.get_pdf_filenames()
         if len(files) > 0:
+            existing = None
+            contents = self.ui.tab_coding.layout()
+            if contents is not None:
+                for i in range(contents.count()):
+                    widget = contents.itemAt(i).widget()
+                    if isinstance(widget, DialogCodePdf):
+                        try:
+                            widget.ui.treeWidget.objectName()  # Detects a deleted C++ object.
+                        except RuntimeError:
+                            continue
+                        existing = widget
+                        break
+            if existing is not None:
+                self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
+                if doc_id is not None:
+                    existing.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
+                    if task == 'mark_speakers':
+                        existing.mark_speakers()
+                return
             self.ui.textBrowser_coding.hide()
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
