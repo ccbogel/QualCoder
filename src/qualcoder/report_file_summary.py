@@ -510,45 +510,60 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             pdf_path = f"{self.app.project_path}/documents/{mediapath[6:]}"
         if mediapath[:5] == "docs:":
             pdf_path = mediapath[5:]
+        w, h = 1, 1
         if mediapath[-4:].lower() == ".pdf":
             text_ = "\n\n" + _("PDF IMAGE DETAILS") + ":" + text_
-            fitz_pdf = fitz.open(pdf_path)
-            text_ += _("Pages") + f": {len(fitz_pdf)}\n"
-            pixmap = fitz_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
-            abs_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            pixmap.save(abs_path)
+            # In-memory dimensions with the document always closed: the previous code
+            # never closed the handle (blocked PDF deletion on Windows while the
+            # report was open) and wrote a residual tmp_pdf_page.png just to read its
+            # size back with PIL. PIL and EXIF are skipped for pdfs below (the temp
+            # png never had metadata anyway); w and h feed the code counts.
+            try:
+                fitz_pdf = fitz.open(pdf_path)
+                try:
+                    text_ += _("Pages") + f": {len(fitz_pdf)}\n"
+                    if len(fitz_pdf) > 0:
+                        pix = fitz_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
+                        w, h = pix.width, pix.height
+                        text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + \
+                            f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + _(" pixels") + "\n"
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf metadata: {pdf_path} {err}")
 
         # Image size and metadata
-        try:
-            image = Image.open(abs_path)
-            w, h = image.size
-            text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
-                    _(" pixels") + "\n"
-            image_type = abs_path[-3:].lower()
-            # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
-            if image_type in ("jpg", "peg"):
-                exifdata = image.getexif()
-                # iterating over the EXIF data fields
-                for tag_id in exifdata:
-                    # get the tag name, instead of human unreadable tag id
-                    tag = TAGS.get(tag_id, tag_id)
-                    data = exifdata.get(tag_id)
-                    # Decode bytes
-                    if isinstance(data, bytes):
-                        try:
-                            data = data.decode()
-                            text_ += f"{tag:25}: {data}\n"
-                        except UnicodeDecodeError as e_:
-                            logger.debug(e_)
-            # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
-            if image_type == "png":
-                for tag, value in image.info.items():
-                    key = TAGS.get(tag, tag)
-                    text_ += f"{key} {value}\n"
-        except Image.DecompressionBombError:
-            w = 1
-            h = 1
-            Message(self.app, _("Image too large"), _("Cannot open image with PIL module to ge t size and details.\n(DecompressionBombError)")).exec()
+        if mediapath[-4:].lower() != ".pdf":
+            try:
+                image = Image.open(abs_path)
+                w, h = image.size
+                text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
+                        _(" pixels") + "\n"
+                image_type = abs_path[-3:].lower()
+                # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
+                if image_type in ("jpg", "peg"):
+                    exifdata = image.getexif()
+                    # iterating over the EXIF data fields
+                    for tag_id in exifdata:
+                        # get the tag name, instead of human unreadable tag id
+                        tag = TAGS.get(tag_id, tag_id)
+                        data = exifdata.get(tag_id)
+                        # Decode bytes
+                        if isinstance(data, bytes):
+                            try:
+                                data = data.decode()
+                                text_ += f"{tag:25}: {data}\n"
+                            except UnicodeDecodeError as e_:
+                                logger.debug(e_)
+                # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
+                if image_type == "png":
+                    for tag, value in image.info.items():
+                        key = TAGS.get(tag, tag)
+                        text_ += f"{key} {value}\n"
+            except Image.DecompressionBombError:
+                w = 1
+                h = 1
+                Message(self.app, _("Image too large"), _("Cannot open image with PIL module to ge t size and details.\n(DecompressionBombError)")).exec()
 
         # Codes
         sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)), "

@@ -24,6 +24,7 @@ from copy import deepcopy
 import fitz
 import logging
 import os
+import PIL
 from PIL import Image
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
@@ -600,21 +601,36 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             if r[1][:5] == "docs:":
                 pdf_path = r[1][5:]
             if pdf_path != "":
-                fitz_pdf = fitz.open(pdf_path)
-                page = fitz_pdf[0]  # Use first page and assume the remainder are the same size
-                pixmap = page.get_pixmap()
-                pdf_width = pixmap.width
-                pdf_height = pixmap.height
+                # Always close the document: this runs in a loop over every pdf source,
+                # so the previous code leaked one file handle PER PDF per report run
+                # (blocked PDF deletion on Windows while the report stayed open).
+                try:
+                    fitz_pdf = fitz.open(pdf_path)
+                    try:
+                        if len(fitz_pdf) > 0:
+                            page = fitz_pdf[0]  # Use first page and assume the remainder are the same size
+                            pixmap = page.get_pixmap()
+                            pdf_width = pixmap.width
+                            pdf_height = pixmap.height
+                    finally:
+                        fitz_pdf.close()
+                except Exception as err:
+                    logger.warning(f"Pdf statistics: {pdf_path} {err}")
 
             # Image size and area
             if pdf_path == "":
                 image['abspath'] = abs_path
-                img = Image.open(abs_path)
-                w, h = img.size
+                w, h = 1, 1
+                try:
+                    img = Image.open(abs_path)
+                    w, h = img.size
+                except (FileNotFoundError, PIL.UnidentifiedImageError, Image.DecompressionBombError) as err:
+                    logger.warning(str(err))
                 image['area'] = w * h
             else:
                 image['abspath'] = pdf_path
-                image['area'] = pdf_height * pdf_width
+                # Never zero: 'area' divides percent_of_image below.
+                image['area'] = max(1, pdf_height * pdf_width)
             images.append(image)
             total_area = 0
             count = 0

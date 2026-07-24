@@ -32,6 +32,7 @@ from PyQt6.QtWidgets import QTextEdit
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 import os
+import PIL
 from PIL import Image
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
@@ -2055,16 +2056,36 @@ class DialogReportCodes(QtWidgets.QDialog):
             res = cur.fetchone()
             abs_path = ""
             w, h = 1, 1
+            area_total = None
             if 'images:' == res[2][0:7]:
                 abs_path = res[2][7:]
+            elif 'docs:' == res[2][0:5]:
+                abs_path = res[2][5:]
             else:
                 abs_path = self.app.project_path + res[2]
-            try:
-                image = Image.open(abs_path)
-                w, h = image.size
-            except (FileNotFoundError, Image.DecompressionBombError) as err:
-                logger.warning(str(err))
-            res_dict = {"fid": res[0], "area": w * h, "filename": res[1]}
+                if res[2][0:6] == '/docs/':
+                    abs_path = self.app.project_path + "/documents/" + res[2][6:]
+            if res[2].lower().endswith(".pdf"):
+                # Area of a PDF: sum of its pages' areas in points, the same unit the
+                # coded areas are stored in (pdf_page). PIL cannot open PDFs
+                # (uncaught UnidentifiedImageError: report crash).
+                try:
+                    fitz_pdf = fitz.open(abs_path)
+                    try:
+                        area_total = sum(p.rect.width * p.rect.height for p in fitz_pdf)
+                    finally:
+                        fitz_pdf.close()
+                except Exception as err:
+                    logger.warning(str(err))
+            else:
+                try:
+                    image = Image.open(abs_path)
+                    w, h = image.size
+                except (FileNotFoundError, PIL.UnidentifiedImageError, Image.DecompressionBombError) as err:
+                    logger.warning(str(err))
+            if area_total is None or area_total <= 0:
+                area_total = w * h
+            res_dict = {"fid": res[0], "area": area_total, "filename": res[1]}
             file_areas.append(res_dict)
 
         # Stats results dictionary preparation
@@ -2413,24 +2434,38 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         text_edit.append("\n")
-        pdf_path = ""
         path_ = self.app.project_path + img['mediapath']
         if img['mediapath'][0:7] == "images:":
             path_ = img['mediapath'][7:]
-        if img['pdf_page'] is not None:
+        image = None
+        # Detect the PDF by mediapath (areas from older imports may have pdf_page
+        # NULL; they belong to page 0, same normalization as the image coding view).
+        if img['mediapath'].lower().endswith(".pdf"):
+            pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
+            pdf_path = ""
             if img['mediapath'][:6] == "/docs/":
                 pdf_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 pdf_path = img['mediapath'][5:]
-            fitz_pdf = fitz.open(pdf_path)  # Use pymupdf to get page images
-            for page in fitz_pdf:
-                if page.number == img['pdf_page']:
-                    # Only need the current page image of interest
-                    path_ = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-                    pixmap = page.get_pixmap()
-                    pixmap.save(path_)
+            # In-memory render, identity matrix (1 point = 1 pixel, the stored
+            # scale), only the needed page and the document closed.
+            try:
+                fitz_pdf = fitz.open(pdf_path)
+                try:
+                    if 0 <= pdf_page_ < len(fitz_pdf):
+                        page = fitz_pdf.load_page(pdf_page_)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"put_image_into_textedit pdf: {pdf_path} {err}")
+            if image is None:
+                return
         document = text_edit.document()
-        image = QtGui.QImageReader(path_).read()
+        if image is None:
+            image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # Scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0

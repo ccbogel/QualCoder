@@ -331,14 +331,14 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 # Image results
                 sql = "select source.id,source.name, code_image.cid, code_name.name, code_name.color, x1,y1," \
                       "width,height, ifnull(code_image.memo,''), " \
-                      "code_image.owner, mediapath, 'file', 'image' from code_image " \
+                      "code_image.owner, mediapath, 'file', 'image', pdf_page from code_image " \
                       "join code_name on code_name.cid=code_image.cid " \
                       "join source on code_image.id=source.id " \
                       "where code_image.id=? and code_image.cid=? order by code_image.imid"
                 cur.execute(sql, [file_['id'], code_['cid']])
                 results_image = cur.fetchall()
                 keys_image = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'x1', 'y1', 'width', 'height', \
-                    'memo', 'owner', 'mediapath', 'file_or_case', 'result_type'
+                    'memo', 'owner', 'mediapath', 'file_or_case', 'result_type', 'pdf_page'
                 image_data = []
                 for res in results_image:
                     image_data.append(dict(zip(keys_image, res)))

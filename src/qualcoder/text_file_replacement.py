@@ -60,6 +60,18 @@ class ReplaceTextFile:
         self.app = app
         self.old_file = old_file
         self.new_file_path = new_file_path
+        # PDF sources are not replaceable: the stored fulltext must match the page
+        # extraction (same no-editing policy as code_text and Manage Files).
+        cur_ = self.app.conn.cursor()
+        cur_.execute("select mediapath from source where id=?", [self.old_file['id']])
+        res_mp = cur_.fetchone()
+        if res_mp is not None and res_mp[0] is not None and res_mp[0].lower().endswith(".pdf"):
+            Message(self.app, _("PDF file"),
+                    _("PDF files cannot be replaced: their stored text must match the "
+                      "text extracted from the pages. Use Manage Files > "
+                      "'Extract pdf text to new file' to work with an editable copy."),
+                    "warning").exec()
+            return
         # Check for matching file name
         name_split = self.new_file_path.split("/")
         new_filename = name_split[-1]
@@ -310,11 +322,8 @@ class ReplaceTextFile:
             msg = str(self.new_file_path) + _("\nPlease check if the file is empty.")
             Message(self.app, _("Warning"), _("Cannot import ") + msg, "warning").exec()
             return
-        # Normalise line endings and strip BOM so the stored fulltext matches
-        # exactly what QPlainTextEdit will display. Qt converts \r\n and lone \r
-        # into \n on setPlainText(), and a leftover BOM adds a char; either makes
-        # stored positions drift past the editor length (setPosition out of range,
-        # frozen highlight on resize).
+        # Normalise line endings and strip BOM: Qt converts \r\n/\r to \n on
+        # setPlainText, so mismatches make stored positions drift.
         if Path(self.new_file_path).suffix.lower() != '.pdf':  # skip PDF
             text = text.replace("\r\n", "\n").replace("\r", "\n")
             if text and text[0] == "\ufeff":
