@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-24 10:03+0200\n"
-"PO-Revision-Date: 2026-07-24 10:09+0200\n"
+"PO-Revision-Date: 2026-07-24 15:28+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:655
 #: src/qualcoder/case_file_manager.py:447 src/qualcoder/cases.py:1158
@@ -44,14 +44,14 @@ msgstr "Exception non prise : "
 #: src/qualcoder/report_compare_coder_file.py:224
 #: src/qualcoder/code_text.py:4630 src/qualcoder/code_text.py:4735
 msgid "Show files like"
-msgstr "Afficher les fichiers tels que"
+msgstr "Montrer les fichiers tels que"
 
 #: src/qualcoder/report_file_summary.py:118 src/qualcoder/code_pdf.py:2207
 #: src/qualcoder/view_image.py:736 src/qualcoder/code_av.py:747
 #: src/qualcoder/report_compare_coder_file.py:167
 #: src/qualcoder/code_text.py:4631
 msgid "Show files by attributes"
-msgstr "Afficher les fichiers par attributs"
+msgstr "Montrer les fichiers par attributs"
 
 #: src/qualcoder/report_file_summary.py:119 src/qualcoder/code_pdf.py:2208
 #: src/qualcoder/view_image.py:735 src/qualcoder/code_av.py:746
@@ -113,7 +113,7 @@ msgstr "Trier par date décroissante"
 #: src/qualcoder/report_compare_coder_file.py:201
 #: src/qualcoder/code_text.py:4708
 msgid "Show all files"
-msgstr "Afficher tous les fichiers"
+msgstr "Montrer tous les fichiers"
 
 #: src/qualcoder/report_file_summary.py:154 src/qualcoder/code_pdf.py:2278
 #: src/qualcoder/view_image.py:780 src/qualcoder/code_av.py:816
@@ -127,7 +127,7 @@ msgstr "Sélectionner un cas"
 #: src/qualcoder/report_compare_coder_file.py:227
 #: src/qualcoder/code_text.py:4738
 msgid "Show files containing the text. (Blank for all)"
-msgstr "Afficher les fichiers contenant le texte. (Vide pour tous)"
+msgstr "Montrer les fichiers contenant le texte. (Vide pour tous)"
 
 #: src/qualcoder/report_file_summary.py:211 src/qualcoder/code_pdf.py:4989
 #: src/qualcoder/view_image.py:502 src/qualcoder/code_av.py:544
@@ -444,7 +444,7 @@ msgstr "Rechercher du texte. 3 caractères minimum, ou appuyez sur Entrée."
 
 #: src/qualcoder/code_pdf.py:1905
 msgid "Show codes containing the text"
-msgstr "Afficher les codes contenant le texte"
+msgstr "Ontrer les codes contenant le texte"
 
 #: src/qualcoder/code_pdf.py:1906
 msgid "Case sensitive search"
@@ -727,7 +727,7 @@ msgstr "Fichiers d'auto-codes avec le code actuel de ce texte :"
 #: src/qualcoder/code_pdf.py:3846 src/qualcoder/code_text.py:5679
 #: src/qualcoder/code_text.py:5801 src/qualcoder/code_text.py:5986
 msgid "Select files to code"
-msgstr "Sélectionner les fichiers à coder"
+msgstr "Sélectionner des fichiers à coder"
 
 #: src/qualcoder/code_pdf.py:3607 src/qualcoder/code_pdf.py:3753
 #: src/qualcoder/code_text.py:5856 src/qualcoder/code_text.py:6002
@@ -902,12 +902,12 @@ msgstr "Annuler l'autocode : "
 #: src/qualcoder/code_pdf.py:3950 src/qualcoder/view_image.py:340
 #: src/qualcoder/code_av.py:573 src/qualcoder/code_text.py:3036
 msgid "Showing important codings"
-msgstr "Affichage des codages importants"
+msgstr "Montrer les codages importants"
 
 #: src/qualcoder/code_pdf.py:3953 src/qualcoder/view_image.py:343
 #: src/qualcoder/code_av.py:576 src/qualcoder/code_text.py:3039
 msgid "Show codings flagged important"
-msgstr "Afficher les codages marqués comme importants"
+msgstr "Montrer les codages marqués comme importants"
 
 #: src/qualcoder/code_pdf.py:3993 src/qualcoder/report_codes.py:142
 #: src/qualcoder/report_codes.py:1508
@@ -1081,7 +1081,7 @@ msgstr "Cacher les bandes de codes"
 #: src/qualcoder/code_pdf.py:4424 src/qualcoder/code_pdf.py:5500
 #: src/qualcoder/code_text.py:1275
 msgid "Show code stripes margin"
-msgstr "Afficher les bandes de codes"
+msgstr "Montrer les bandes de codes"
 
 #: src/qualcoder/code_pdf.py:4428 src/qualcoder/code_pdf.py:5505
 #: src/qualcoder/code_text.py:1282
@@ -1147,12 +1147,12 @@ msgstr "Page exportée : "
 
 #: src/qualcoder/code_pdf.py:4847
 msgid "Show codes"
-msgstr "Afficher les codes"
+msgstr "Montrer les codes"
 
 #: src/qualcoder/code_pdf.py:4848 src/qualcoder/view_image.py:1318
 #: src/qualcoder/code_av.py:1497 src/qualcoder/code_text.py:3057
 msgid "Show codes containing the text. (Blank for all)"
-msgstr "Afficher les codes contenant le texte. (vide pour tous)"
+msgstr "Montrer les codes contenant le texte. (vide pour tous)"
 
 #: src/qualcoder/code_pdf.py:4875 src/qualcoder/view_image.py:1359
 #: src/qualcoder/code_av.py:1538 src/qualcoder/code_text.py:3104
@@ -1573,7 +1573,7 @@ msgstr "Rechercher des données"
 
 #: src/qualcoder/manage_links.py:163 src/qualcoder/manage_links.py:178
 msgid "Select file"
-msgstr "Sélectionnez le fichier"
+msgstr "Sélectionnez un fichier"
 
 #: src/qualcoder/manage_links.py:186
 msgid "Filename does not match."
@@ -1742,7 +1742,7 @@ msgstr "Montrer des noms comme"
 
 #: src/qualcoder/journals.py:420
 msgid "Show this coder"
-msgstr "Afficher ce codeur·euse"
+msgstr "Montrer ce codeur·euse"
 
 #: src/qualcoder/journals.py:426 src/qualcoder/manage_files.py:787
 #: src/qualcoder/cases.py:876
@@ -1756,7 +1756,7 @@ msgstr "Entrez la date"
 #: src/qualcoder/journals.py:433 src/qualcoder/manage_files.py:829
 #: src/qualcoder/cases.py:883
 msgid "Show all rows Ctrl A"
-msgstr "Afficher toutes les lignes Ctlr+A"
+msgstr "Montrer toutes les lignes Ctlr+A"
 
 #: src/qualcoder/journals.py:438
 msgid "Convert journal to source file"
@@ -2752,7 +2752,7 @@ msgstr "Compter"
 #: src/qualcoder/reports.py:764 src/qualcoder/reports.py:1323
 #: src/qualcoder/reports.py:1327
 msgid "Show coded files"
-msgstr "Afficher les fichiers codés"
+msgstr "Montrer les fichiers codés"
 
 #: src/qualcoder/report_code_summary.py:369
 #: src/qualcoder/report_codes_by_segments.py:595 src/qualcoder/reports.py:754
@@ -2901,7 +2901,7 @@ msgstr "Image exportée"
 #: src/qualcoder/view_image.py:1316 src/qualcoder/code_av.py:1495
 #: src/qualcoder/code_text.py:3055
 msgid "Show some codes"
-msgstr "Afficher quelques codes"
+msgstr "Montrer quelques codes"
 
 #: src/qualcoder/view_image.py:1320 src/qualcoder/code_av.py:1499
 #: src/qualcoder/code_text.py:3059
@@ -2951,7 +2951,7 @@ msgstr "Zone de surbrillance - flou"
 
 #: src/qualcoder/view_image.py:1751 src/qualcoder/report_codes.py:2638
 msgid "Show control panel"
-msgstr "Afficher le panneau de contrôle"
+msgstr "Montrer le panneau de contrôle"
 
 #: src/qualcoder/view_image.py:1753 src/qualcoder/report_codes.py:2640
 msgid "Hide control panel"
@@ -3769,7 +3769,7 @@ msgstr "Convertir la page actuelle"
 
 #: src/qualcoder/manage_files.py:267
 msgid "Convert only the page shown in the preview"
-msgstr "Convertir seulement la page affichée dans l'aperçu"
+msgstr "Convertir seulement la page montrée dans l'aperçu"
 
 #: src/qualcoder/manage_files.py:273
 msgid "Convert"
@@ -3853,7 +3853,7 @@ msgstr "Supprimer l'affichage"
 
 #: src/qualcoder/manage_files.py:692 src/qualcoder/cases.py:819
 msgid "Show all columns"
-msgstr "Afficher toutes les colonnes"
+msgstr "Montrer toutes les colonnes"
 
 #: src/qualcoder/manage_files.py:695 src/qualcoder/cases.py:822
 msgid "Hide column"
@@ -3865,7 +3865,7 @@ msgstr "Masquer les colonnes commençant par"
 
 #: src/qualcoder/manage_files.py:697 src/qualcoder/cases.py:824
 msgid "Show columns starting with"
-msgstr "Afficher les colonnes commençant par"
+msgstr "Montrer les colonnes commençant par"
 
 #: src/qualcoder/manage_files.py:709 src/qualcoder/cases.py:836
 msgid "Hide columns starting with:"
@@ -3877,11 +3877,11 @@ msgstr "Masquer les colonnes"
 
 #: src/qualcoder/manage_files.py:717 src/qualcoder/cases.py:845
 msgid "Show columns starting with:"
-msgstr "Afficher les colonnes commençant par :"
+msgstr "Montrer les colonnes commençant par :"
 
 #: src/qualcoder/manage_files.py:718 src/qualcoder/cases.py:846
 msgid "Show Columns"
-msgstr "Afficher les colonnes"
+msgstr "Montrer les colonnes"
 
 #: src/qualcoder/manage_files.py:753
 msgid "View"
@@ -3922,7 +3922,7 @@ msgstr "Cacher des valeurs comme"
 #: src/qualcoder/manage_files.py:789 src/qualcoder/manage_references.py:604
 #: src/qualcoder/cases.py:877
 msgid "Show this value"
-msgstr "Afficher cette valeur"
+msgstr "Montrer cette valeur"
 
 #: src/qualcoder/manage_files.py:807
 msgid "Copy reference to clipboard. APA"
@@ -5527,7 +5527,7 @@ msgstr "Sélectionnez quelques fichiers"
 #: src/qualcoder/report_codes_by_segments.py:304
 #: src/qualcoder/report_codes.py:358 src/qualcoder/report_exact_matches.py:227
 msgid "Show files containing text"
-msgstr "Afficher les fichiers contenant du texte"
+msgstr "Montrer les fichiers contenant du texte"
 
 #: src/qualcoder/report_codes_by_segments.py:330
 #: src/qualcoder/report_codes.py:384
@@ -5637,7 +5637,7 @@ msgstr "Sélectionner l'attribut"
 #: src/qualcoder/report_relations.py:131 src/qualcoder/report_relations.py:213
 #: src/qualcoder/reports.py:199
 msgid "Select files"
-msgstr "Sélectionner les fichiers"
+msgstr "Sélectionner des fichiers"
 
 #: src/qualcoder/report_comparison_table.py:277
 #: src/qualcoder/report_comparison_table.py:283
@@ -5688,12 +5688,12 @@ msgstr "Tout est sélectionné"
 #: src/qualcoder/report_comparison_table.py:580
 #: src/qualcoder/report_cooccurrence.py:889
 msgid "Co-occurrence exported: "
-msgstr "Cooccurrence exportée : "
+msgstr "Co-occurrence exportée : "
 
 #: src/qualcoder/report_comparison_table.py:581
 #: src/qualcoder/report_cooccurrence.py:890
 msgid "Co-occurrence exported"
-msgstr "Cooccurrence exportée"
+msgstr "Co-occurrence exportée"
 
 #: src/qualcoder/report_comparison_table.py:616
 msgid "Click for details."
@@ -7141,7 +7141,7 @@ msgstr "Cacher les attributs"
 
 #: src/qualcoder/view_graph.py:7136 src/qualcoder/view_graph.py:7382
 msgid "Show attributes"
-msgstr "Afficher les attributs"
+msgstr "Montrer les attributs"
 
 #: src/qualcoder/view_graph.py:7146 src/qualcoder/view_graph.py:7391
 msgid "Add categories"
@@ -7163,7 +7163,7 @@ msgstr "Ajouter et lier un mémo"
 
 #: src/qualcoder/view_graph.py:7642
 msgid "Toggle co-occurrence lines"
-msgstr "Basculer les lignes de cooccurrence"
+msgstr "Basculer les lignes de co-occurrence"
 
 #: src/qualcoder/view_graph.py:7687
 msgid "Update text to"
@@ -7848,8 +7848,8 @@ msgstr ""
 "- [Relations entre codes](qualcoder://menu/analysis/code_relations) affiche "
 "la proximité, les chevauchements, l’inclusion et les correspondances exactes "
 "entre les codes sélectionnés.\n"
-"- [Cooccurrence des codes](qualcoder://menu/analysis/code_co_occurrence) met "
-"l’accent sur les endroits où deux codes se chevauchent ou se touchent "
+"- [Co-occurrence des codes](qualcoder://menu/analysis/code_co_occurrence) "
+"met l’accent sur les endroits où deux codes se chevauchent ou se touchent "
 "directement.\n"
 "- [Correspondances exactes de texte de codes](qualcoder://menu/analysis/"
 "code_text_exact_matches) répertorie les passages où des codes différents ont "
@@ -8453,8 +8453,8 @@ msgstr ""
 "Seuls {loaded} des {total} segments codés ({coverage:.1f} %) ont pu être "
 "chargés avant que la limite de caractères ne soit atteinte. Veuillez "
 "restreindre la portée par code, fichiers, cas, attributs ou codeur⋅euses. Si "
-"vous souhaitez tout de même continuer, envoyez un message de suivi tel que « "
-"Analyser quand même »."
+"vous souhaitez tout de même continuer, envoyez un message de suivi tel que "
+"« Analyser quand même »."
 
 #: src/qualcoder/ai_chat.py:4572
 msgid "Error during MCP-based code analysis bootstrap: "
@@ -9080,8 +9080,8 @@ msgstr ""
 #, python-brace-format
 msgid "Warning: {count} affected coding(s) are not owned by 'AI Agent'."
 msgstr ""
-"Avertissement : les {count} codes concernés n'appartiennent pas à « AI Agent "
-"»."
+"Avertissement : les {count} codes concernés n'appartiennent pas à « AI "
+"Agent »."
 
 #: src/qualcoder/ai_mcp_server.py:1704
 msgid ""
@@ -9095,7 +9095,7 @@ msgstr ""
 #: src/qualcoder/manage_references.py:231
 #: src/qualcoder/manage_references.py:605
 msgid "Show value like"
-msgstr "Afficher des valeurs comme"
+msgstr "Montrer des valeurs comme"
 
 #: src/qualcoder/manage_references.py:232
 msgid "View file"
@@ -9104,7 +9104,7 @@ msgstr "Voir le fichier"
 #: src/qualcoder/manage_references.py:237
 #: src/qualcoder/manage_references.py:608
 msgid "Show all rows"
-msgstr "Afficher toutes les lignes"
+msgstr "Montrer toutes les lignes"
 
 #: src/qualcoder/manage_references.py:245
 #: src/qualcoder/manage_references.py:626
@@ -9611,11 +9611,11 @@ msgstr "Filtre"
 
 #: src/qualcoder/code_tree.py:338
 msgid "Show codes like"
-msgstr "Afficher des codes comme"
+msgstr "Montrer des codes comme"
 
 #: src/qualcoder/code_tree.py:341
 msgid "Show codes of colour"
-msgstr "Afficher les codes de couleur"
+msgstr "Montrer les codes de couleur"
 
 #: src/qualcoder/code_tree.py:343 src/qualcoder/report_exact_matches.py:455
 #: src/qualcoder/report_relations.py:611 src/qualcoder/report_relations.py:1092
@@ -10454,7 +10454,7 @@ msgstr "Deux thèmes ou codes sont en tension."
 
 #: src/qualcoder/view_graph_relations.py:387
 msgid "Co-occurrence or conceptual affinity."
-msgstr "Cooccurrence ou affinité conceptuelle."
+msgstr "Co-occurrence ou affinité conceptuelle."
 
 #: src/qualcoder/view_graph_relations.py:388
 msgid ""
@@ -11478,7 +11478,7 @@ msgstr "Fichiers : "
 
 #: src/qualcoder/__main__.py:4136
 msgid "Bad links to files"
-msgstr "Mauvais liens avec les dossiers"
+msgstr "Liens incorrects vers les dossiers"
 
 #: src/qualcoder/__main__.py:4156
 msgid "Closing project: "
@@ -11650,7 +11650,7 @@ msgstr "Pas de codes visibles à exporter."
 
 #: src/qualcoder/report_cooccurrence.py:818
 msgid "There are no co-occurrences to export."
-msgstr "Il n'y a aucune cooccurrence à exporter."
+msgstr "Il n'y a aucune co-occurrence à exporter."
 
 #: src/qualcoder/report_cooccurrence.py:1001
 msgid "Merge into new code"
@@ -11681,7 +11681,7 @@ msgid ""
 "Left click: Show coded text.\n"
 "Right click: merge codes."
 msgstr ""
-"Clic gauche : afficher le texte codé.\n"
+"Clic gauche : Montrer le texte codé.\n"
 "Clic droit : fusionner les codes."
 
 #: src/qualcoder/report_cooccurrence.py:1215
@@ -11701,7 +11701,7 @@ msgstr ""
 
 #: src/qualcoder/report_exact_matches.py:224
 msgid "Select files matching text"
-msgstr "Sélectionner les fichiers contenant le texte"
+msgstr "Sélectionner des fichiers contenant le texte"
 
 #: src/qualcoder/report_exact_matches.py:298
 msgid "No file has been selected."
@@ -11898,7 +11898,7 @@ msgstr "6. Réseau de co-occurrence"
 #: src/qualcoder/view_graph_models.py:209
 #: src/qualcoder/view_graph_models.py:237
 msgid "Max coded segments per code (0 = none):"
-msgstr "Nombre maximal de segments codés par code (0 = aucun):"
+msgstr "Nombre maximal de segments codés par code (0 = aucun) :"
 
 #: src/qualcoder/view_graph_models.py:223
 #: src/qualcoder/view_graph_models.py:251
@@ -11939,7 +11939,7 @@ msgstr " Seuil de proximité (caractères):"
 
 #: src/qualcoder/view_graph_models.py:284
 msgid "Show categories as parent nodes"
-msgstr "Afficher les catégories comme nœuds parent"
+msgstr "Montrer les catégories comme nœuds parent"
 
 #: src/qualcoder/view_graph_models.py:295
 msgid "Select 2 or more categories after clicking Generate."
@@ -12017,7 +12017,7 @@ msgstr "Sélectionnez au moins un type de co-occurrence."
 
 #: src/qualcoder/view_graph_models.py:1462
 msgid "Select codes for co-occurrence network"
-msgstr "Sélectionner les codes pour le réseau de cooccurrence"
+msgstr "Sélectionner les codes pour le réseau de co-occurrence"
 
 #: src/qualcoder/view_graph_models.py:1468
 msgid "Select at least 2 codes to build a co-occurrence network."
@@ -12108,7 +12108,7 @@ msgstr "Aucun fichier texte n'a été trouvé."
 #: src/qualcoder/speakers.py:529
 msgid "Select files to scan for speakers"
 msgstr ""
-"Sélectionnez les fichiers à analyser pour identifier les intervenant⋅es"
+"Sélectionnez des fichiers à analyser pour identifier les intervenant⋅es"
 
 #: src/qualcoder/speakers.py:557 src/qualcoder/special_functions.py:171
 msgid "No files selected"
@@ -12286,7 +12286,9 @@ msgstr " caractères.\n"
 #: src/qualcoder/GUI/special_functions.py:107
 #: src/qualcoder/GUI/special_functions.py:150
 msgid "Made by coder: "
-msgstr "Fait par le codeur·euse : "
+msgstr ""
+"Fait par le \n"
+"·euse : "
 
 #: src/qualcoder/special_functions.py:196
 #: src/qualcoder/special_functions.py:242
@@ -12417,7 +12419,7 @@ msgstr "Mettre un signet (B)"
 
 #: src/qualcoder/code_text.py:2575
 msgid "Show control panel (H)"
-msgstr "Afficher le panneau de contrôle (H)"
+msgstr "Montrer le panneau de contrôle (H)"
 
 #: src/qualcoder/code_text.py:2577
 msgid "Hide control panel (H)"
@@ -12559,12 +12561,12 @@ msgstr "Sélectionner un code"
 #: src/qualcoder/code_text.py:4418 src/qualcoder/code_text.py:4489
 #: src/qualcoder/code_text.py:4504
 msgid "Show previous coding of selected code"
-msgstr "Afficher le codage précédent du code sélectionné"
+msgstr "Montrer le codage précédent du code sélectionné"
 
 #: src/qualcoder/code_text.py:4421 src/qualcoder/code_text.py:4493
 #: src/qualcoder/code_text.py:4507
 msgid "Show next coding of selected code"
-msgstr "Afficher le codage suivant du code sélectionné"
+msgstr "Montrer le codage suivant du code sélectionné"
 
 #: src/qualcoder/code_text.py:4625
 msgid "view original text file"
@@ -12910,11 +12912,11 @@ msgstr "Masquer la colonne : "
 
 #: src/qualcoder/reports.py:117
 msgid "Show column: "
-msgstr "Afficher la colonne : "
+msgstr "Montrer la colonne : "
 
 #: src/qualcoder/reports.py:138
 msgid "Select files to view"
-msgstr "Sélectionnez les fichiers à afficher"
+msgstr "Sélectionnez des fichiers à afficher"
 
 #: src/qualcoder/reports.py:142
 msgid "File Attributes"
@@ -12986,15 +12988,15 @@ msgstr "Exporter Excel"
 
 #: src/qualcoder/reports.py:968
 msgid "Coder comparisons report exported: "
-msgstr "Rapport de comparaison des codeurs exporté : "
+msgstr "Rapport de comparaison des codeur⋅euses exporté : "
 
 #: src/qualcoder/reports.py:992
 msgid "CODER COMPARISON"
-msgstr "COMPARAISON DES CODEURS"
+msgstr "COMPARAISON DES CODEUR⋅EUSES"
 
 #: src/qualcoder/reports.py:992
 msgid "Selected coders: "
-msgstr "Codeurs sélectionnés : "
+msgstr "Codeur⋅euses sélectionnés : "
 
 #: src/qualcoder/reports.py:1010
 msgid "agreement: "
