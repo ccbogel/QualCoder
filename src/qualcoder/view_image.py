@@ -936,10 +936,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{self.file_['mediapath'][6:]}"
             if self.file_['mediapath'][:5] == "docs:":
                 source_path = self.file_['mediapath'][5:]
-            # In-memory render with identity matrix (72 dpi): 1 pixel = 1 page point,
-            # exactly the same coordinate system code_pdf stores in code_image.
-            # No temp file (residual tmp_pdf_page.png) and the document is closed
-            # so the handle is not retained (it blocked PDF deletion on Windows).
+            # In-memory render, identity matrix (1 pixel = 1 page point, the same
+            # system code_pdf stores); no temp file and the document is closed.
             try:
                 fitz_pdf = fitz.open(source_path)
             except Exception as err:
@@ -970,10 +968,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 fitz_pdf.close()
             self.pdf_controls_toggle(True)
             self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
-            # Legacy areas with NULL pdf_page on a PDF (rows predating the v10 migration):
-            # invisible in this viewer (filters pdf_page=?) and in code_pdf (filters pdf_page
-            # is not null), that is, ghost codings. Normalized to page 0 so they become
-            # visible and editable again in both viewers.
+            # Legacy areas with NULL pdf_page were invisible in both viewers;
+            # normalized to page 0 so they are visible and editable again.
             cur_ = self.app.conn.cursor()
             cur_.execute("update code_image set pdf_page=0 where id=? and pdf_page is null",
                          [self.file_['id']])
@@ -1809,10 +1805,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if action is None:
             return
 
-        # after an action is chosen, if it acts on a specific segment and there is
-        # more than one segment under the cursor, ask which segment now.
-        # include "Highlight this code" actions so the user picks which code's
-        # cid is used when several segments overlap
+        # If the chosen action targets one segment and several overlap under the
+        # cursor, ask which segment now (including "Highlight this code").
         segment_actions = (action_memo, action_unmark, action_move_resize, action_interactive_resize,
                            action_important, action_not_important, action_highlight_gray,
                            action_highlight_solarize, action_highlight_blur,

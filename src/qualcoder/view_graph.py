@@ -8349,11 +8349,8 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                 source_path = f"{self.app.project_path}/documents/{path_[6:]}"
             if path_[:5] == "docs:":
                 source_path = path_[5:]
-            # In-memory render of ONLY the needed page, range-guarded and with the
-            # document always closed. The previous code indexed fitz_pdf[self.pdf_page]
-            # without a guard (IndexError crashed loading a saved graph if the pdf
-            # changed page count), never closed the handle (blocked pdf deletion on
-            # Windows) and wrote a residual tmp_pdf_page.png.
+            # In-memory render, range-guarded, document always closed (the old
+            # code crashed on out-of-range pages and leaked the handle/temp file).
             image = QtGui.QImage()
             try:
                 fitz_pdf = fitz.open(source_path)

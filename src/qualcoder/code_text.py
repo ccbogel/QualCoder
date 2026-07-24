@@ -6176,11 +6176,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
 
-        # Text editing is DISABLED for PDFs everywhere: the stored fulltext matches,
-        # character by character, the text extracted from the PDF pages, and the PDF
-        # coding view depends on that mapping. PDFs remain listed and codable in this
-        # view; the only editable text is a COPY created with Manage Files >
-        # Extract pdf text to new file (or Convert to txt in the PDF preview).
+        # PDF fulltext is not editable anywhere (the PDF coding view depends on
+        # the exact page mapping); PDFs stay listed and codable, editing needs a copy.
         if not self.edit_mode and self.file_.get('mediapath') is not None and \
                 str(self.file_['mediapath']).lower().endswith(".pdf"):
             msg = _("This file is a PDF. Its stored text is not editable: it matches, "

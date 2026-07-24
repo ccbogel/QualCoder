@@ -2447,10 +2447,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 pdf_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 pdf_path = img['mediapath'][5:]
-            # In-memory render with identity matrix (1 point = 1 pixel, the scale of the
-            # stored coordinates), loading ONLY the needed page and closing the document:
-            # previously the handle stayed open (blocked PDF deletion on Windows while
-            # the report was open) and a residual temp file was written.
+            # In-memory render, identity matrix (1 point = 1 pixel, the stored
+            # scale), only the needed page and the document closed.
             try:
                 fitz_pdf = fitz.open(pdf_path)
                 try:

@@ -340,12 +340,8 @@ def extract_pdf_fulltext(filepath, progress_callback=None, join_lines=False):
         doc.close()
 
 
-# Global registry of live PDF worker threads. An abandoned QThread keeps the
-# Python process alive after the last window closes (the console never returns),
-# so the workers register themselves here and are force-stopped on ANY exit path:
-# aboutToQuit covers every way the Qt application quits (even when the coding tab
-# never receives its closeEvent), and atexit is the final belt at interpreter
-# shutdown. Safe: the workers only READ the PDF file, never the project database.
+# Live PDF worker registry, force-stopped on app quit (aboutToQuit + atexit):
+# an abandoned QThread keeps the Python process alive after the window closes.
 _ACTIVE_PDF_WORKERS = weakref.WeakSet()
 _QUIT_HOOK_INSTALLED = False
 
@@ -403,11 +399,8 @@ class PdfTextWorker(QtCore.QThread):
         try:
             doc = fitz.open(self.filepath)
             total = len(doc)
-            # Both text variants are built from a SINGLE raw read per page:
-            # 'lines' (one "\n" per visual line, the historical layout) and
-            # 'joined' (block lines joined into whole paragraphs). The dialog
-            # verifies which one matches the imported fulltext, so files
-            # imported either way keep working side by side.
+            # Both text variants ('lines' and 'joined' paragraphs) come from one
+            # raw read per page; the dialog activates the one matching the fulltext.
             pages = []
             parts = []
             pages_j = []
@@ -503,17 +496,13 @@ class PdfRenderWorker(QtCore.QThread):
                 try:
                     page = doc.load_page(page_idx)
                     scale = zoom * dpr
-                    # Safety limit to avoid creating giant images: 5000 px per side
-                    # is sharp beyond ZOOM_MAX on any screen; the previous 12000 px
-                    # produced 400-780 MB pixmaps on large-format pages (plans,
-                    # posters, scanned maps), several of which were kept by the
-                    # visible-pages cache and could also outlive the 3 s stop wait.
+                    # Safety limit: 5000 px per side is sharp beyond ZOOM_MAX;
+                    # larger renders produced pixmaps of hundreds of MB.
                     max_side = max(page.rect.width, page.rect.height) * scale
                     if max_side > 5000:
                         scale = 5000 / max(page.rect.width, page.rect.height)
                     mat = fitz.Matrix(scale, scale)
-                    # annots=False: PDF annotations (highlights, notes) are NOT painted
-                    # in the coding view, so the page shows only QualCoder's own layers.
+                    # annots=False: PDF highlights/notes are not painted in the coding view.
                     pix = page.get_pixmap(matrix=mat, alpha=False, annots=False)
                     img = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                        QtGui.QImage.Format.Format_RGB888).copy()
@@ -574,11 +563,9 @@ class PdfPageItem(QtWidgets.QGraphicsItem):
                                  QtCore.QPointF(mark_rect.right(), y_under))
             painter.setPen(Qt.PenStyle.NoPen)
         else:
-            # Marker: on overlaps colors do NOT blend; only the code most recently applied to
-            # the segment (latest date; ctid only breaks same-second ties) shows over the text.
-            # Painted newest-to-oldest, filling each area once (clipping out what was already
-            # painted with a region), so the text stays legible even with many codes stacked.
-            # Every code's identity is still given by the margin bars.
+            # Marker: overlap colors do not blend; the most recent code shows over
+            # the text (painted newest-to-oldest, each area filled once) and every
+            # code's identity is still given by the margin bars.
             if self.text_marks:
                 painter.save()
                 painter.setPen(Qt.PenStyle.NoPen)
@@ -1849,8 +1836,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         pdf_layout.insertWidget(_insert_index, self._pdf_margins_splitter)
         self._pdf_margins_splitter.setStretchFactor(
             self._pdf_margins_splitter.indexOf(self.view), 1)
-        # Persistent user-resizable margin width (mirror of code_text): the width the
-        # user drags is stored in config.ini and restored on the next open.
+        # Persistent user-resizable margin width (mirror of code_text).
         self.coding_margin_width = self._get_saved_coding_margin_width()
         self._coding_margin_width_is_restoring = False
         self._coding_margin_restore_attempts = 0
@@ -1939,9 +1925,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_next_page.clicked.connect(self.next_page)
         self.ui.lineEdit_page.editingFinished.connect(self.goto_page_from_edit)
         self.ui.comboBox_page_view.currentIndexChanged.connect(self.change_page_view_mode)
-        # Restore the persisted page view mode (0 whole document, 1 single page),
-        # same pattern as the coding margin width. Signals blocked: applying the
-        # saved mode must not re-persist it.
+        # Restore the persisted page view mode; signals blocked so applying it
+        # does not re-persist it.
         try:
             saved_view = int(self.app.settings.get('dialogcodepdf_page_view', 0))
         except (TypeError, ValueError, AttributeError):
@@ -2197,9 +2182,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         
         action_memo = menu.addAction(_("Open memo"))
         action_view_original_file = None
-        # Layout conversion: only for the file currently loaded, once both text
-        # variants are available from the worker. Reuses the restructuring engine,
-        # which relocates codings, annotations and case assignments in the new text.
+        # Layout conversion for the loaded file; the restructuring engine
+        # relocates codings, annotations and case assignments.
         action_to_paragraphs = None
         action_to_lines = None
         if self.file_ is not None and file_['id'] == self.file_['id'] and \
@@ -2524,11 +2508,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         try:
             db_text = self.file_.get('fulltext') or ""
-            # Two reconstruction variants arrive from the worker: 'lines' (historical,
-            # one newline per visual line) and 'joined' (block lines joined into whole
-            # paragraphs). The one matching the imported fulltext becomes active, so
-            # files imported either way coexist in the same project. Both are kept so
-            # a file can be restructured from one layout to the other on demand.
+            # The variant matching the stored fulltext becomes active; both are
+            # kept so the file can be restructured to the other layout on demand.
             self._text_variants = {
                 'lines': {'fulltext': data['fulltext'], 'pages': data['pages']},
                 'joined': {'fulltext': data.get('fulltext_joined', data['fulltext']),
@@ -4816,10 +4797,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.code_tree.fill_tree()
             self.get_coded_text_update_eventfilter_tooltips()
             return
-        # Fulltext changed elsewhere (a layout restructuring, or a text file edited in
-        # another dialog): reloading the current file re-verifies the page mapping
-        # (extracted_ok) and refreshes text, codings and margins; without this the
-        # dialog keeps stale positions.
+        # Fulltext changed elsewhere: reload re-verifies the page mapping and
+        # refreshes text, codings and margins (otherwise positions go stale).
         if "source" in tables and self.file_ is not None:
             self.load_file(self.file_)
             return

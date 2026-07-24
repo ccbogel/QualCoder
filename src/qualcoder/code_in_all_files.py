@@ -288,11 +288,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 source_path = img['mediapath'][5:]
-            # In-memory render of ONLY the needed page, with the document always
-            # closed. The previous pattern (iterate all pages, save tmp_pdf_page.png,
-            # never close) leaked the file handle (blocked PDF deletion on Windows),
-            # left a residual temp file, and on an out-of-range pdf_page silently
-            # loaded the STALE temp image of a previous render (wrong document shown).
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
             image = QtGui.QImage()
             # Areas from older imports may have pdf_page NULL: they belong to page 0
             # (same normalization as the image coding view).
@@ -748,11 +745,8 @@ class DialogCodedIds(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 source_path = img['mediapath'][5:]
-            # In-memory render of ONLY the needed page, with the document always
-            # closed. The previous pattern (iterate all pages, save tmp_pdf_page.png,
-            # never close) leaked the file handle (blocked PDF deletion on Windows),
-            # left a residual temp file, and on an out-of-range pdf_page silently
-            # loaded the STALE temp image of a previous render (wrong document shown).
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
             image = QtGui.QImage()
             # Areas from older imports may have pdf_page NULL: they belong to page 0
             # (same normalization as the image coding view).

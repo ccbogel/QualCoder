@@ -1923,10 +1923,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
-        # PDFs are NOT editable: their stored fulltext must match, character by
-        # character, the text extracted from the pages (the PDF coding view depends
-        # on that mapping). The preview offers "Convert to txt" to work with an
-        # editable copy as a new text source.
+        # PDF fulltext is not editable (it must match the page extraction);
+        # "Convert to txt" creates an editable copy as a new text source.
         mediapath_ = self.source[x]['mediapath']
         if mediapath_ is not None and mediapath_.lower().endswith(".pdf") and \
                 (mediapath_[0:6] == '/docs/' or mediapath_[0:5] == 'docs:'):
@@ -2316,9 +2314,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         progress.setWindowTitle(_("Importing"))
         progress.setMinimumDuration(0)  # Show immediately
-        # Without these, QProgressDialog auto-resets and HIDES the moment the value
-        # reaches the maximum: with a single file, setValue(1) of max 1 closed the
-        # dialog before the PDF page-by-page extraction even started.
+        # Without these, QProgressDialog auto-hides at maximum: with a single
+        # file it closed before the page-by-page extraction started.
         progress.setAutoReset(False)
         progress.setAutoClose(False)
         progress.show()
@@ -2664,9 +2661,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     progress_.setLabelText(f"{os.path.basename(import_file)} p:{current_page}/{total_pages}")
                 QtCore.QCoreApplication.processEvents()
             try:
-                # Paragraph layout: block lines joined into whole paragraphs. The
-                # viewer verifies both reconstructions, so files imported earlier
-                # with the classic one-line-per-visual-line layout keep working.
+                # Paragraph layout; the viewer also verifies the classic line
+                # layout, so older imports keep working.
                 text_ = extract_pdf_fulltext(import_file, pdf_progress, join_lines=True)
             except ValueError as err:
                 Message(self.app, _("Cannot import PDF"),
@@ -2705,11 +2701,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             Message(self.app, _("Warning"),
                     _("Cannot import ") + str(import_file) + "\nPlease check if the file is empty.", "warning").exec()
             return False
-        # normalise line endings and strip BOM so the stored fulltext matches
-        # exactly what QPlainTextEdit will display. Qt converts \r\n and lone \r
-        # into \n on setPlainText(), and a leftover BOM adds a char; either makes
-        # stored positions drift past the editor length (setPosition out of range,
-        # frozen highlight on resize). <- L
+        # Normalise line endings and strip BOM: Qt converts \r\n/\r to \n on
+        # setPlainText, so mismatches make stored positions drift. <- L
         if os.path.splitext(import_file)[1].lower() != '.pdf': # skip PDF 
             text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
             if text_ and text_[0] == "\ufeff":
@@ -2761,13 +2754,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _(" linked")
         self.parent_text_edit.append(msg)
         self.source.append(entry)
-        # Highlight annotations in the imported PDF: offer (once per batch) to code
-        # them. The highlights themselves are not painted in the coding view
-        # (annots=False), so coding them is how they survive into the analysis.
+        # Offer (once per batch) to code highlight annotations; they are not
+        # painted in the coding view (annots=False).
         if os.path.splitext(import_file)[1].lower() == '.pdf':
-            # Non-highlight annotations with text (sticky notes, comments): appended
-            # to the FILE memo so they are not lost, since annotations are no longer
-            # painted in the coding views.
+            # Non-highlight annotations with text are appended to the file memo.
             try:
                 notes = extract_pdf_annotations(import_file)
             except Exception as err:
@@ -2802,8 +2792,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         QtWidgets.QMessageBox.StandardButton.Yes)
                     self.pdf_import_code_highlights = reply == QtWidgets.QMessageBox.StandardButton.Yes
                 if self.pdf_import_code_highlights:
-                    # Reuses the batch import dialog: one single progress view, and
-                    # the highlight phase only appears when the user accepted it.
+                    # Reuses the batch import dialog; the phase only shows after acceptance.
                     self.code_pdf_highlights(entry['id'], import_file, entry['fulltext'],
                                              highlights, progress_)
         return True  # Import completed; lets import_files clean up failed copies
@@ -2822,10 +2811,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             b = int(hex_color[5:7], 16)
         except (ValueError, IndexError):
             r, g, b = 247, 254, 46  # default highlight yellow
-        # Achromatic highlights (white, black, grays): the palette has no pure white
-        # or black, and plain RGB distance lands them on odd hues (white -> pale
-        # pink, black -> dark green). When the channels are nearly equal, restrict
-        # the search to the palette's gray family instead.
+        # Achromatic highlights (white/black/grays) map to the gray family;
+        # plain RGB distance lands them on odd hues.
         candidate_indexes = range(len(colors))
         if max(r, g, b) - min(r, g, b) < 32:
             for rng in colour_ranges:
@@ -2912,10 +2899,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             catid = cur.fetchone()[0]
         else:
             catid = res[0]
-        # One code per distinct highlight colour. Name is the colour family only
-        # ("Highlight yellow"); a second distinct shade of the same family gets a
-        # numeric suffix ("Highlight yellow_2"). A code is reused when a
-        # family-named code already exists with the SAME palette colour.
+        # One code per distinct colour, named by family ("Highlight yellow",
+        # "_2" suffix for further shades); reused if the palette colour exists.
         cids_by_color = {}
         for hl_color in sorted({p['color'] for p in positions}):
             qc_hex, family = self._closest_qualcoder_color(hl_color)

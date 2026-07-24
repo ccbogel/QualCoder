@@ -752,12 +752,8 @@ class DialogCodeInImage(QtWidgets.QDialog):
                 source_path = f"{self.app.project_path}/documents/{self.data['mediapath'][6:]}"
             if self.data['mediapath'][:5] == "docs:":
                 source_path = self.data['mediapath'][5:]
-            # In-memory render of ONLY the needed page, range-guarded and with the
-            # document always closed. The previous pattern (iterate all pages, save
-            # tmp_pdf_page.png, never close the document) leaked the file handle
-            # (blocked pdf deletion on Windows while this viewer was open), left a
-            # residual temp file, and on an out-of-range pdf_page silently loaded
-            # the STALE temp image of a previous render.
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
             image = QtGui.QImage()
             try:
                 fitz_pdf = fitz.open(source_path)

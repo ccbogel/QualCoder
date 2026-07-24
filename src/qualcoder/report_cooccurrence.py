@@ -1039,9 +1039,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             13 - 16 text_before, text_overlap, text_after, relation
             '''
             for item in data_list:
-                # Image-area relations (kind marker at 17): the merged coding is the
-                # UNION rectangle of both areas, stored in code_image; code_text
-                # positions do not apply to them.
+                # Image-area relations: the merged coding is the UNION rectangle
+                # stored in code_image.
                 if len(item) > 17 and item[17] == 'image':
                     fid_, page_, ux, uy, uw, uh = item[18]
                     try:
