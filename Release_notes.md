@@ -206,6 +206,8 @@ Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). 
 
 A refactoring method was added for older QualCoder projects. the text is re-extracted and existing codings are matched against the new text extraction method. Any codings that cannot be remapped are recorded in Journals as lost codes, so the user can review them.
 
+PDF highlight export: generates a copy of the original PDF with the coded segments embedded as native highlight annotations (in each code's color, with the code name as annotation comment), so the coded document can be opened and reviewed in any standard PDF reader.
+
 ## Code images
 
 Can resize coded areas using rightclick menu option and resize using handles.
