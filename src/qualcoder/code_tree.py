@@ -287,8 +287,8 @@ class CodeTreeController(QtCore.QObject):
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-        action_add_code = menu.addAction(_("Add a new code"))
-        action_add_category = menu.addAction(_("Add a new category"))
+        action_add_code = menu.addAction(_("Create new code"))
+        action_add_category = menu.addAction(_("Create new category"))
         action_add_subcode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
@@ -305,7 +305,7 @@ class CodeTreeController(QtCore.QObject):
         action_merge_category = None
         action_move_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_merge_category = modify_menu.addAction(_("Merge category into category"))
+            action_merge_category = modify_menu.addAction(_("Merge category into category F8"))
             action_move_category = modify_menu.addAction(_("Move category under category F6"))
         action_delete = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
@@ -324,8 +324,8 @@ class CodeTreeController(QtCore.QObject):
             if self.coded_files_callback is not None:
                 action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = modify_menu.addAction(_("Move code to F6"))
-            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
-            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes F7"))
+            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code F8"))
         action_find_code = None
         if self.find_code_callback is not None:
             action_find_code = menu.addAction(_("Find code"))
@@ -335,13 +335,13 @@ class CodeTreeController(QtCore.QObject):
             filter_menu = menu.addMenu(_("Filter"))
             if self.show_codes_like_callback is not None:
                 like_filter = getattr(self.host, 'show_codes_like_filter', "")
-                action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + like_filter)
+                action_show_codes_like = filter_menu.addAction(_("Show codes like") + f": {like_filter}  F9")
             if self.show_codes_of_colour_callback is not None:
                 colour_filter = getattr(self.host, 'show_codes_colour_filter', "")
-                action_show_codes_colour = filter_menu.addAction(_("Show codes of colour") + f": {colour_filter}")
+                action_show_codes_colour = filter_menu.addAction(_("Show codes by colour") + f": {colour_filter} F10")
         sort_menu = menu.addMenu(_("Sort"))
-        action_all_asc = sort_menu.addAction(_("Sort ascending"))
-        action_all_desc = sort_menu.addAction(_("Sort descending"))
+        action_all_asc = sort_menu.addAction(_("Sort ascending F11"))
+        action_all_desc = sort_menu.addAction(_("Sort descending F12"))
         action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
 
         # Let the host dialog add its own entries before the menu is shown.
@@ -435,7 +435,7 @@ class CodeTreeController(QtCore.QObject):
 
     def handle_key_press(self, event) -> bool:
         """
-        Tree widget menu item keys F2 - F6. Called from the host keyPressEvent
+        Tree widget menu item keys F2 - F12. Called from the host keyPressEvent
         when the treeWidget has focus. Returns True when the key was handled.
         Args:
             event: QKeyEvent
@@ -465,6 +465,29 @@ class CodeTreeController(QtCore.QObject):
                 self.move_category(int(selected.text(1).split(":")[1]))
             else:
                 self.move_code(selected)
+            return True
+        if key == QtCore.Qt.Key.Key_F7 and selected.text(1)[0:3] == 'cid':
+            self.move_multiple_codes()
+            return True
+        if key == QtCore.Qt.Key.Key_F8:
+            if selected.text(1)[0:3] == 'cat':
+                self.merge_category(int(selected.text(1)[6:]))
+            else:
+                self.merge_code_into_code(selected)
+            return True
+        if key == QtCore.Qt.Key.Key_F9:
+            self.show_codes_like_callback()
+            return True
+        if key == QtCore.Qt.Key.Key_F10:
+            self.show_codes_of_colour_callback()
+            return True
+        if key == QtCore.Qt.Key.Key_F11:
+            self.tree_sort_option = "all asc"
+            self.fill_tree()
+            return True
+        if key == QtCore.Qt.Key.Key_F12:
+            self.tree_sort_option = "all desc"
+            self.fill_tree()
             return True
         return False
 
