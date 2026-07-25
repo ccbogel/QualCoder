@@ -167,7 +167,7 @@ Core languages will be English, German, French, Spanish. this is due to having r
 
 ## Data structure change
 
-One major requested change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
+One major change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
 
 ## Backups
 
