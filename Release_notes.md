@@ -8,7 +8,7 @@ QualCoder is released under the LGPL v3 license
 
 Attached to the end of release page you will find two options:
 
-Executables will be aviable when a release is made.
+Executables will be available when a release is made.
 
 QualCoder_4_0_Win_setup.exe: a Windows installer, will set up QualCoder like any normal app, with entries in the start menu, etc.
 QualCoder_4_0_Win_Portable.exe: A portable binary. Double-click to run and wait for 15 seconds.
