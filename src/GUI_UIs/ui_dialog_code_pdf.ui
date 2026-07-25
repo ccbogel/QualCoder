@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1098</width>
+    <width>958</width>
     <height>756</height>
    </rect>
   </property>
@@ -46,759 +46,632 @@
      <property name="title">
       <string/>
      </property>
-     <layout class="QGridLayout" name="gridLayout_toolbar">
-      <property name="leftMargin">
-       <number>6</number>
+     <widget class="QWidget" name="widget_coder" native="true">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>0</y>
+        <width>231</width>
+        <height>28</height>
+       </rect>
       </property>
-      <property name="topMargin">
-       <number>4</number>
+      <layout class="QHBoxLayout" name="horizontalLayout_coder">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_coder">
+         <property name="minimumSize">
+          <size>
+           <width>44</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Codername</string>
+         </property>
+         <property name="text">
+          <string>Coder:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>6</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_coder">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>170</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Codername</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_coder">
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Coder visibility</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_annotations">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
       </property>
-      <property name="rightMargin">
-       <number>6</number>
+      <property name="toolTip">
+       <string>Show all annotations for this file</string>
       </property>
-      <property name="bottomMargin">
-       <number>4</number>
+      <property name="text">
+       <string/>
       </property>
-      <property name="spacing">
-       <number>4</number>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_memos">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
       </property>
-      <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_row1">
-        <property name="spacing">
-         <number>4</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="label_coder">
-          <property name="minimumSize">
-           <size>
-            <width>44</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Codername</string>
-          </property>
-          <property name="text">
-           <string>Coder:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_coder">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>170</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Codername</string>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_coder">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Coder visibility</string>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_show_annotations">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Show all annotations for this file</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_show_memos">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Show all coding memos for this file</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_default_new_code_color">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Set a default colour for new codes, instead of a random colour</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_mark_speakers">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Mark speakers</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_auto_code">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="contextMenuPolicy">
-           <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-          </property>
-          <property name="toolTip">
-           <string>Auto code with exact text.
+      <property name="toolTip">
+       <string>Show all coding memos for this file</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_mark_speakers">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Mark speakers</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_default_new_code_color">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set a default colour for new codes, instead of a random colour</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>28</y>
+        <width>190</width>
+        <height>8</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Orientation::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+      </property>
+      <property name="toolTip">
+       <string>Auto code with exact text.
 Right click to change options: all, first, last, code within code</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="contextMenuPolicy">
-           <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-          </property>
-          <property name="toolTip">
-           <string>Text fragment to auto code sentences.
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+      </property>
+      <property name="toolTip">
+       <string>Text fragment to auto code sentences.
 Right click to change options: all, first, last, code within code</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_auto_code_surround">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Auto code using start and end marks</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_auto_code_undo">
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Undo auto coding</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBox_auto_regex">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Apply REGEX to autocoding for exact text and sentences buttons.
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_surround">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Auto code using start and end marks</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_undo">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Undo auto coding</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_auto_regex">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>5</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Apply REGEX to autocoding for exact text and sentences buttons.
 Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
-          </property>
-          <property name="text">
-           <string>REGEX</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_page_view">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Page display: whole document scroll or one page at a time</string>
-          </property>
-          <item>
-           <property name="text">
-            <string>Whole document</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Single page</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_help">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Help</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      </property>
+      <property name="text">
+       <string>REGEX</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_page_view">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>0</y>
+        <width>141</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Page display: whole document scroll or one page at a time</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Whole document</string>
+       </property>
       </item>
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_row2">
-        <property name="spacing">
-         <number>4</number>
-        </property>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_search">
-          <property name="minimumSize">
-           <size>
-            <width>140</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Search text</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBox_search_case">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Case sensitive</string>
-          </property>
-          <property name="text">
-           <string>Aa</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_previous">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Previous</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_next">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Next</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_search_totals">
-          <property name="minimumSize">
-           <size>
-            <width>56</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Search results: current / total</string>
-          </property>
-          <property name="text">
-           <string>0 / 0</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_1">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_mode_text">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Code text</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_mode_area">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Code image</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_captions">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Captions over coded areas.
+      <item>
+       <property name="text">
+        <string>Single page</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton_help">
+      <property name="geometry">
+       <rect>
+        <x>900</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Help</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_search">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>38</y>
+        <width>171</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search text</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_search_case">
+      <property name="geometry">
+       <rect>
+        <x>188</x>
+        <y>41</y>
+        <width>40</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Case sensitive</string>
+      </property>
+      <property name="text">
+       <string>Aa</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_previous">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Previous</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_next">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Next</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_totals">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>44</y>
+        <width>51</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search results: current / total</string>
+      </property>
+      <property name="text">
+       <string>0 / 0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_mode_text">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Code text</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_mode_area">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Code image</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_captions">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Captions over coded areas.
 Click to cycle: hidden, code name, code name and memo</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_exports">
-          <property name="toolTip">
-           <string>Export</string>
-          </property>
-          <property name="text">
-           <string>Exports</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_exports">
-          <property name="toolTip">
-           <string>Export options.
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_exports">
+      <property name="geometry">
+       <rect>
+        <x>780</x>
+        <y>43</y>
+        <width>51</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export</string>
+      </property>
+      <property name="text">
+       <string>Exports</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_exports">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>40</y>
+        <width>101</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export options.
 pdf highlight: copy of the pdf with codings as native annotations.
 odt report: report of the coded text and areas.</string>
-          </property>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>pdf highlight</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>odt report</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_previous_page">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Previous page</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_page">
-          <property name="minimumSize">
-           <size>
-            <width>48</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>48</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Go to page number</string>
-          </property>
-          <property name="text">
-           <string>1</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_pages">
-          <property name="minimumSize">
-           <size>
-            <width>36</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Total pages</string>
-          </property>
-          <property name="text">
-           <string>/ 0</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_next_page">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Next page</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_zoom_out">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Zoom out</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_zoom">
-          <property name="minimumSize">
-           <size>
-            <width>44</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Zoom level. Ctrl + mouse wheel to zoom</string>
-          </property>
-          <property name="text">
-           <string>100%</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_zoom_in">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Zoom in</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_fit_width">
-          <property name="minimumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>28</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Fit view</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
       </item>
-     </layout>
+      <item>
+       <property name="text">
+        <string>pdf highlight</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>odt report</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton_previous_page">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Previous page</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_page">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>38</y>
+        <width>48</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Go to page number</string>
+      </property>
+      <property name="text">
+       <string>1</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_pages">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>41</y>
+        <width>36</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Total pages</string>
+      </property>
+      <property name="text">
+       <string>/ 0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_next_page">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Next page</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_zoom_out">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Zoom out</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_zoom">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>41</y>
+        <width>44</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Zoom level. Ctrl + mouse wheel to zoom</string>
+      </property>
+      <property name="text">
+       <string>100%</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_zoom_in">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Zoom in</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_fit_width">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Fit view</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
@@ -857,178 +730,118 @@ odt report: report of the coded text and areas.</string>
           <property name="title">
            <string/>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_file_buttons">
-           <property name="spacing">
-            <number>2</number>
+          <widget class="QPushButton" name="pushButton_next_file">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
            </property>
-           <property name="leftMargin">
-            <number>1</number>
+           <property name="toolTip">
+            <string>Next file</string>
            </property>
-           <property name="topMargin">
-            <number>1</number>
+           <property name="text">
+            <string/>
            </property>
-           <property name="rightMargin">
-            <number>1</number>
+          </widget>
+          <widget class="QPushButton" name="pushButton_latest">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
            </property>
-           <property name="bottomMargin">
-            <number>1</number>
+           <property name="toolTip">
+            <string>File with latest coding</string>
            </property>
-           <item>
-            <widget class="QPushButton" name="pushButton_next_file">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Next file</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_latest">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>File with latest coding</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_bookmark_go">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Go to bookmark</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_document_memo">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>File memo</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_file_attributes">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Show files with file attributes</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_clear_filter_file">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Clear file filter</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_files">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>10</width>
-               <height>10</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_status">
-             <property name="toolTip">
-              <string>Text extraction status</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_bookmark_go">
+           <property name="geometry">
+            <rect>
+             <x>60</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Go to bookmark</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_document_memo">
+           <property name="geometry">
+            <rect>
+             <x>90</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>File memo</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_file_attributes">
+           <property name="geometry">
+            <rect>
+             <x>120</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Show files with file attributes</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_clear_filter_file">
+           <property name="geometry">
+            <rect>
+             <x>150</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Clear file filter</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_status">
+           <property name="geometry">
+            <rect>
+             <x>180</x>
+             <y>4</y>
+             <width>161</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Text extraction status</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -1085,174 +898,115 @@ odt report: report of the coded text and areas.</string>
           <property name="title">
            <string/>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_coding_buttons">
-           <property name="spacing">
-            <number>2</number>
+          <widget class="QPushButton" name="pushButton_find_code">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
            </property>
-           <property name="leftMargin">
-            <number>1</number>
+           <property name="toolTip">
+            <string>Find code</string>
            </property>
-           <property name="topMargin">
-            <number>1</number>
+           <property name="text">
+            <string/>
            </property>
-           <property name="rightMargin">
-            <number>1</number>
+          </widget>
+          <widget class="QPushButton" name="pushButton_show_codings_prev">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
            </property>
-           <property name="bottomMargin">
-            <number>1</number>
+           <property name="toolTip">
+            <string>Show codings prev</string>
            </property>
-           <item>
-            <widget class="QPushButton" name="pushButton_show_codings_prev">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Show codings prev</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_show_codings_next">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Show coding next</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_important">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Show codings falgged important</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_code">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_find_code">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Find code</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_clear_filter_code">
-             <property name="minimumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Clear code filter</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_code_filter">
-             <property name="minimumSize">
-              <size>
-               <width>60</width>
-               <height>26</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>26</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Code name filter</string>
-             </property>
-             <property name="placeholderText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_show_codings_next">
+           <property name="geometry">
+            <rect>
+             <x>70</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Show coding next</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_important">
+           <property name="geometry">
+            <rect>
+             <x>100</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Show codings falgged important</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_code">
+           <property name="geometry">
+            <rect>
+             <x>131</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_clear_filter_code">
+           <property name="geometry">
+            <rect>
+             <x>161</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Clear code filter</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="lineEdit_code_filter">
+           <property name="geometry">
+            <rect>
+             <x>196</x>
+             <y>1</y>
+             <width>113</width>
+             <height>26</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Code name filter</string>
+           </property>
+           <property name="placeholderText">
+            <string/>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -1316,6 +1070,32 @@ odt report: report of the coded text and areas.</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton_coder</tabstop>
+  <tabstop>pushButton_show_annotations</tabstop>
+  <tabstop>pushButton_show_memos</tabstop>
+  <tabstop>pushButton_mark_speakers</tabstop>
+  <tabstop>pushButton_auto_code</tabstop>
+  <tabstop>pushButton_auto_code_frag_this_file</tabstop>
+  <tabstop>pushButton_auto_code_surround</tabstop>
+  <tabstop>pushButton_auto_code_undo</tabstop>
+  <tabstop>comboBox_page_view</tabstop>
+  <tabstop>pushButton_help</tabstop>
+  <tabstop>lineEdit_search</tabstop>
+  <tabstop>checkBox_search_case</tabstop>
+  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_next</tabstop>
+  <tabstop>pushButton_mode_text</tabstop>
+  <tabstop>pushButton_mode_area</tabstop>
+  <tabstop>pushButton_captions</tabstop>
+  <tabstop>comboBox_exports</tabstop>
+  <tabstop>pushButton_previous_page</tabstop>
+  <tabstop>lineEdit_page</tabstop>
+  <tabstop>pushButton_next_page</tabstop>
+  <tabstop>pushButton_zoom_out</tabstop>
+  <tabstop>pushButton_zoom_in</tabstop>
+  <tabstop>pushButton_fit_width</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
