@@ -182,55 +182,27 @@ Agentic restructure of AI features. Turns the AI chat into an agent that can not
 
 ## Menus and tabs
 
-A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. 
-
-The manage, Coding and Reports tabs have placeholder information that explains in more detail what each of these tabs is used for.
+A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. The manage, Coding and Reports tabs have placeholder information that explains in more detail what each of these tabs is used for.
 
 ## Journals
 
-Export are now to ODT format.
-
-Right-click menu option to convert a journal to a file for coding within the QualCoder project.
+Export are now to ODT format. Right-click menu option to convert a journal to a file for coding within the QualCoder project.
 
 ## Manage files
 
-There is an 'Import survey' button for importing surveys from Excel and csv files.
-
-Multiple rows selection. For context menu Delete and Export.
-
-When in the file name column pressing delete will delete the file(s).
+There is an 'Import survey' button for importing surveys from Excel and csv files. Multiple rows selection. For context menu Delete and Export. When in the file name column pressing delete will delete the file(s).
 
 ## The Codes Tree in all coding screens
 
-Added sub-menus for Modify (Code or categories selected), Filter, Sort.
-
-Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour).
-
-Added a code names text filter underneath the codes tree.
-
-Add a move category underneath category function.
-
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
-
-Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
+Added sub-menus for Modify (Code or categories selected), Filter, Sort. Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour). Added a code names text filter underneath the codes tree. Add a move category underneath category function. Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll. Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
 
 ## Code text
 
-Can set font and size for the document.
-
-Can resize codes with movable handles.
-
-Can change text highlighting from marker style to underline style and or vertical code stripes. 
-
-Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report.
-
-Key presse for Shift B to go to bookmark, andC to add a new category.
-
-Edit text mode - now has a search bar.
+Can set font and size for the document. Can resize codes with movable handles. Can change text highlighting from marker style to underline style and or vertical code stripes. Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report. Key presse for Shift B to go to bookmark, andC to add a new category. Edit text mode - now has a search bar.
 
 ## Code PDF
 
-Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). Text coding and image area coding can be performed on the PDF page.
+Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). Text coding and image area coding can be performed on the PDF page. AI-assisted text analysis can be applied directly from the Code PDF window.
 
 ## Code images
 
@@ -242,23 +214,11 @@ A bookmark option has been added. So after it is aplied, in code A/V and view A/
 
 ## Co-occurrence report
 
-Proximity graphs
-
-Export format for Gephi import.
+Proximity graphs. Export format for Gephi import.
 
 ## Graph (mind map)
 
-Improved manipulation of objects.
-
-Export format for draw.io import.
-
-Ability to expand and collapse graph portions (categories).
-
-Another way via a dialog window to add coded segments.
-
-Options to organise the graph layout - radion, vertical, horizontal.
-
-Improved selection of font sizes and colours in menus.
+Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus.
 
 ## Report codes
 
