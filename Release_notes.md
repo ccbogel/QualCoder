@@ -1,4 +1,4 @@
-We have jumped from version 3.8.2 to 4.0 as there are quite a few changes in this release.
+We have jumped to version 4.0 as there are quite a few changes in this release.
 
 # Installation
 
@@ -38,21 +38,66 @@ Start QualCoder by double-clicking the app within your applications folder. You 
 Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder was prevented from starting. Click on "open anyway".
 From now on, QualCoder should start without issues.
 
-## Linux Ubuntu, Lubuntu, Mint, ZorinOS, Debian, Arch
+To install from source code below, inside a virtual environment.
 
-This binary should work on the above recent releases of Linux distros, e.g. Linux Mint 22.3, Ubuntu 24.04 etc. Make the file executable after downloading by right-click -> Properties -> check the executable box. Then double-click to run.
+Depending on your operating system, you will need to download Python and its dependencies. Here are the commands for your operating system:
 
-QualCoder_4_0_ubuntu executable  (Will be avaible when a release is made).
+- If you are on **Debian based system (Debian, Ubuntu / Lubuntu / ZorinOS, Linux Mint)** :
+  Install pip. This is a tool that downloads extra python modules :  `sudo apt install python3-pip`
+  If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
+  If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+- If you are on **Fedora** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
+- If you are on **Arch/Manjaro Linux** : If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc` and Install pip and venv: `sudo pacman -S python python-pip python-virtualenv`
 
-The binary file may work in other distros also. You need to make it executable, via the GUI or using the terminal.
+  
+1. Download and unzip the Qualcoder folder. 
 
-### Linux Fedora
+2. Then `cd` to the QualCoder folder.
 
-Fedora has a segmentation fault (software crashes) which is, we believe, is currently not fixed, regarding audio / video coding. This fault has not been recently tested, so it may or may not still be present.
+For example, you may now be in this folder, where you unzipped QualCoder: 
 
-## Manual install
+yourcomputer:~Downloads/QualCoder-4.0
 
-For install from source code, download the zip file below and use the instructions in the README file to install on your operating system. Existing projects are migrated automatically when opened.
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and go to Properties), then type the below command and press Enter: 
+
+`./run_from_source_Linux.sh`
+
+3b. Instead of using the shell script, you can enter each of these commands to set up the virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing the required modules for the first time takes a while, maybe 10 minutes.
+
+```
+python3 -m venv env
+source env/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+5. Move to the inner src folder, then:
+```
+cd src
+python3 -m qualcoder
+```
+
+6. After using QualCoder deactivate the virtual environment.
+
+`deactivate`
+
+**Usage any time after the install, move to the QualCoder folder then:**
+
+```
+source env/bin/activate
+cd src
+python3 -m qualcoder
+```
+
+To exit the environment:
+
+`deactivate`
+
+You can also make a .desktop file for launching QualCoder:
+
+Create a .Desktop file for launch, enter this command (adapt it according to the location of the source code folder):
+
+`bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3 -m qualcoder'`
 
 # Changes in this release
 
@@ -93,13 +138,19 @@ Multiple rows selection. For context menu Delete and Export.
 
 When in the file name column pressing delete will delete the file(s).
 
-## All coding screens
+## The Codes Tree in all coding screens
 
 Added sub-menus for Modify (Code or categories selected), Filter, Sort.
 
-Added a code namestext filter under neathte codes tree.
+Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour).
+
+Added a code names text filter underneath the codes tree.
 
 Add a move category underneath category function.
+
+Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
+
+Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
 
 ## Code text
 
@@ -111,29 +162,17 @@ Can change text highlighting from marker style to underline style and or vertica
 
 Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report.
 
-Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
-
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
-
-Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour).
-
 Key presse for Shift B to go to bookmark, andC to add a new category.
 
 Edit text mode - now has a search bar.
 
 ## Code PDF
 
-Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
-
-Added a Filter icon when the Codes tree is fileter to specific codes (via Show codes like, or Show codes by colour).
-
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
+Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). Text coding and image area coding can be performed on the PDF page.
 
 ## Code images
 
 Can resize coded areas using rightclick menu option and resize using handles.
-
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
 
 ## Code Audio / Video
 
