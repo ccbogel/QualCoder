@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-24 10:03+0200\n"
-"PO-Revision-Date: 2026-07-24 15:28+0200\n"
+"POT-Creation-Date: 2026-07-25 16:07+0200\n"
+"PO-Revision-Date: 2026-07-25 16:09+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -940,7 +940,7 @@ msgstr "Annotations pour le fichier : "
 #: src/qualcoder/view_graph.py:5220 src/qualcoder/view_graph.py:5245
 #: src/qualcoder/view_graph.py:5271 src/qualcoder/view_graph.py:5297
 #: src/qualcoder/view_graph.py:5316 src/qualcoder/view_graph.py:5337
-#: src/qualcoder/code_tree.py:782 src/qualcoder/view_graph_models.py:993
+#: src/qualcoder/code_tree.py:804 src/qualcoder/view_graph_models.py:993
 #: src/qualcoder/view_graph_models.py:1021
 #: src/qualcoder/view_graph_models.py:1049
 #: src/qualcoder/view_graph_models.py:1274
@@ -2727,8 +2727,8 @@ msgstr "Id"
 #: src/qualcoder/view_graph.py:8642 src/qualcoder/code_in_all_files.py:398
 #: src/qualcoder/code_tree.py:114 src/qualcoder/code_tree.py:126
 #: src/qualcoder/code_tree.py:155 src/qualcoder/code_tree.py:179
-#: src/qualcoder/code_tree.py:193 src/qualcoder/code_tree.py:979
-#: src/qualcoder/code_tree.py:1004 src/qualcoder/cases.py:790
+#: src/qualcoder/code_tree.py:193 src/qualcoder/code_tree.py:1001
+#: src/qualcoder/code_tree.py:1026 src/qualcoder/cases.py:790
 #: src/qualcoder/cases.py:948 src/qualcoder/code_text.py:3854
 #: src/qualcoder/report_relations.py:710 src/qualcoder/report_relations.py:894
 msgid "Memo"
@@ -3005,7 +3005,7 @@ msgstr "Surligner ce code - solariser"
 msgid "Highlight this code - blur"
 msgstr "Surligner ce code - flou"
 
-#: src/qualcoder/view_image.py:2003 src/qualcoder/code_tree.py:980
+#: src/qualcoder/view_image.py:2003 src/qualcoder/code_tree.py:1002
 msgid "Memo for code: "
 msgstr "Mémo de code : "
 
@@ -3070,7 +3070,7 @@ msgstr "n'a pas été trouvé. L’instruction sera réinitialisée par défaut.
 #: src/qualcoder/ai_search_dialog.py:923 src/qualcoder/report_codes.py:1523
 #: src/qualcoder/view_graph.py:3239 src/qualcoder/view_graph.py:3313
 #: src/qualcoder/view_graph.py:3376 src/qualcoder/view_graph.py:8837
-#: src/qualcoder/report_exact_matches.py:317
+#: src/qualcoder/code_tree.py:1222 src/qualcoder/report_exact_matches.py:317
 #: src/qualcoder/view_graph_models.py:870
 #: src/qualcoder/view_graph_models.py:1184
 #: src/qualcoder/view_graph_models.py:1459
@@ -3125,7 +3125,7 @@ msgstr "Recherche dans tous les cas"
 #: src/qualcoder/view_graph.py:4634 src/qualcoder/view_graph.py:5729
 #: src/qualcoder/view_graph.py:8559 src/qualcoder/view_graph.py:8561
 #: src/qualcoder/view_graph.py:8625 src/qualcoder/ai_mcp_server.py:447
-#: src/qualcoder/ai_mcp_server.py:469 src/qualcoder/code_tree.py:749
+#: src/qualcoder/ai_mcp_server.py:469 src/qualcoder/code_tree.py:771
 #: src/qualcoder/code_text.py:3854
 msgid "Category"
 msgstr "Catégorie"
@@ -3340,7 +3340,7 @@ msgstr "IA : Vérification des documents, la mémoire est à jour."
 msgid "AI: Finished loading (no project open)."
 msgstr "IA : Chargement terminé (aucun projet ouvert)."
 
-#: src/qualcoder/coder_names.py:72 src/qualcoder/code_tree.py:944
+#: src/qualcoder/coder_names.py:72 src/qualcoder/code_tree.py:966
 msgid "Codings"
 msgstr "Codages"
 
@@ -4321,7 +4321,7 @@ msgid "Codes created from PDF highlight annotations"
 msgstr "Codes créés à partir des annotations de surlignage du PDF"
 
 #: src/qualcoder/manage_files.py:2929 src/qualcoder/code_organiser.py:1445
-#: src/qualcoder/code_tree.py:733 src/qualcoder/report_cooccurrence.py:1031
+#: src/qualcoder/code_tree.py:755 src/qualcoder/report_cooccurrence.py:1031
 msgid "New code: "
 msgstr "Nouveau code : "
 
@@ -4536,7 +4536,7 @@ msgstr ""
 "validées via le bouton « Appliquer »."
 
 #: src/qualcoder/code_organiser.py:151 src/qualcoder/code_organiser.py:706
-#: src/qualcoder/code_tree.py:749 src/qualcoder/code_tree.py:1055
+#: src/qualcoder/code_tree.py:771 src/qualcoder/code_tree.py:1077
 msgid "Category name"
 msgstr "Nom de la catégorie"
 
@@ -4596,7 +4596,7 @@ msgstr ""
 "Une catégorie ne peut pas être déplacée sous l'une de ses sous-catégories."
 
 #: src/qualcoder/code_organiser.py:948 src/qualcoder/code_organiser.py:2733
-#: src/qualcoder/code_tree.py:711 src/qualcoder/code_tree.py:1026
+#: src/qualcoder/code_tree.py:733 src/qualcoder/code_tree.py:1048
 msgid "Code name"
 msgstr "Nom du code"
 
@@ -4677,7 +4677,7 @@ msgstr "(vide)"
 msgid "top level"
 msgstr "niveau supérieur"
 
-#: src/qualcoder/code_organiser.py:1437 src/qualcoder/code_tree.py:762
+#: src/qualcoder/code_organiser.py:1437 src/qualcoder/code_tree.py:784
 msgid "New category: "
 msgstr "Nouvelle catégorie : "
 
@@ -4693,7 +4693,7 @@ msgstr "dans la catégorie "
 msgid "unlinked"
 msgstr "délié"
 
-#: src/qualcoder/code_organiser.py:1449 src/qualcoder/code_tree.py:801
+#: src/qualcoder/code_organiser.py:1449 src/qualcoder/code_tree.py:823
 msgid "Code deleted: "
 msgstr "Code supprimé : "
 
@@ -4787,8 +4787,7 @@ msgstr "Lier le code à la catégorie"
 msgid "Link code under code"
 msgstr "Lier un code à un autre"
 
-#: src/qualcoder/code_organiser.py:2208 src/qualcoder/code_tree.py:328
-#: src/qualcoder/code_tree.py:1332
+#: src/qualcoder/code_organiser.py:2208 src/qualcoder/code_tree.py:1394
 msgid "Merge code into code"
 msgstr "Fusionner le code dans le code"
 
@@ -4816,7 +4815,7 @@ msgstr "Texte du cas et médias"
 msgid "Link category under category"
 msgstr "Lier une catégorie à une autre"
 
-#: src/qualcoder/code_organiser.py:2218 src/qualcoder/code_tree.py:308
+#: src/qualcoder/code_organiser.py:2218
 msgid "Merge category into category"
 msgstr "Fusionner la catégorie dans la catégorie"
 
@@ -5101,8 +5100,8 @@ msgstr "Position de la vidéo à l'horodatage"
 #: src/qualcoder/report_comparison_table.py:418
 #: src/qualcoder/view_graph.py:3215 src/qualcoder/view_graph.py:3287
 #: src/qualcoder/view_graph.py:3418 src/qualcoder/code_in_all_files.py:507
-#: src/qualcoder/code_tree.py:1179 src/qualcoder/report_cooccurrence.py:313
-#: src/qualcoder/code_text.py:2706 src/qualcoder/code_text.py:2795
+#: src/qualcoder/report_cooccurrence.py:313 src/qualcoder/code_text.py:2706
+#: src/qualcoder/code_text.py:2795
 msgid "Select codes"
 msgstr "Sélectionnez les codes"
 
@@ -7470,7 +7469,7 @@ msgstr ""
 msgid "This will update the database schema. Then try merging again."
 msgstr "Mettez à jour la base de données et essayez de fusionner à nouveau."
 
-#: src/qualcoder/information.py:454
+#: src/qualcoder/information.py:465
 msgid ""
 "# Manage\n"
 "\n"
@@ -7588,7 +7587,7 @@ msgstr ""
 "- [Aide : Importer des références](qualcoder://help/6.1.-Imports-and-"
 "Exports/)\n"
 
-#: src/qualcoder/information.py:503
+#: src/qualcoder/information.py:514
 msgid ""
 "# Coding\n"
 "\n"
@@ -7729,7 +7728,7 @@ msgstr ""
 "codes et catégories. \n"
 "- Des palettes spéciales sont disponibles pour les utilisateurs daltoniens.\n"
 
-#: src/qualcoder/information.py:560
+#: src/qualcoder/information.py:571
 msgid ""
 "# Reports tab\n"
 "\n"
@@ -7903,7 +7902,7 @@ msgstr ""
 "lorsque les rapports standard ne répondent pas à une question de recherche "
 "spécifique sous la forme exacte dont vous avez besoin.\n"
 
-#: src/qualcoder/information.py:621
+#: src/qualcoder/information.py:632
 msgid ""
 "# AI Agent\n"
 "\n"
@@ -8015,7 +8014,7 @@ msgstr ""
 "lancer le [codage assisté par IA](qualcoder://menu/ai/"
 "ai_search_and_coding).\n"
 
-#: src/qualcoder/information.py:663
+#: src/qualcoder/information.py:674
 msgid ""
 "\n"
 "<br />\n"
@@ -9434,7 +9433,7 @@ msgstr "Cas"
 #: src/qualcoder/view_charts.py:851 src/qualcoder/view_charts.py:858
 #: src/qualcoder/view_charts.py:925 src/qualcoder/view_charts.py:932
 #: src/qualcoder/view_charts.py:1000 src/qualcoder/view_charts.py:1007
-#: src/qualcoder/code_tree.py:943 src/qualcoder/view_graph_models.py:95
+#: src/qualcoder/code_tree.py:965 src/qualcoder/view_graph_models.py:95
 #: src/qualcoder/view_graph_models.py:96 src/qualcoder/view_graph_models.py:225
 #: src/qualcoder/view_graph_models.py:253
 msgid "Codes"
@@ -9549,12 +9548,12 @@ msgid "Add a new category to category"
 msgstr "Ajouter une nouvelle catégorie à la catégorie"
 
 #: src/qualcoder/code_tree.py:290
-msgid "Add a new code"
-msgstr "Ajouter un nouveau code"
+msgid "Create new code"
+msgstr "Créer un nouveau code"
 
 #: src/qualcoder/code_tree.py:291
-msgid "Add a new category"
-msgstr "Ajouter une nouvelle catégorie"
+msgid "Create new category"
+msgstr "Créer une nouvelle catégorie"
 
 #: src/qualcoder/code_tree.py:294
 msgid "Add a new sub-code to code"
@@ -9577,6 +9576,10 @@ msgstr "Renommer F2"
 msgid "View or edit memo F3"
 msgstr "Afficher ou modifier le mémo F3"
 
+#: src/qualcoder/code_tree.py:308
+msgid "Merge category into category F8"
+msgstr "Fusionner la catégorie dans la catégorie F8"
+
 #: src/qualcoder/code_tree.py:309
 msgid "Move category under category F6"
 msgstr "Déplacer la catégorie dans la catégorie F6"
@@ -9598,8 +9601,12 @@ msgid "Move code to F6"
 msgstr "Déplacer le code vers F6"
 
 #: src/qualcoder/code_tree.py:327
-msgid "Move multiple codes"
-msgstr "Déplacer plusieurs codes"
+msgid "Move multiple codes F7"
+msgstr "Déplacer plusieurs codes F7"
+
+#: src/qualcoder/code_tree.py:328
+msgid "Merge code into code F8"
+msgstr "Fusionner le code dans le code F8"
 
 #: src/qualcoder/code_tree.py:331
 msgid "Find code"
@@ -9614,176 +9621,184 @@ msgid "Show codes like"
 msgstr "Montrer des codes comme"
 
 #: src/qualcoder/code_tree.py:341
-msgid "Show codes of colour"
-msgstr "Montrer les codes de couleur"
+msgid "Show codes by colour"
+msgstr "Montrer les codes par couleur"
 
-#: src/qualcoder/code_tree.py:343 src/qualcoder/report_exact_matches.py:455
-#: src/qualcoder/report_relations.py:611 src/qualcoder/report_relations.py:1092
-#: src/qualcoder/report_sql.py:536 src/qualcoder/report_sql.py:633
-msgid "Sort ascending"
-msgstr "Trier par ordre croissant"
+#: src/qualcoder/code_tree.py:343
+msgid "Sort ascending F11"
+msgstr "Trier par ordre croissant F11"
 
-#: src/qualcoder/code_tree.py:344 src/qualcoder/report_exact_matches.py:456
-#: src/qualcoder/report_relations.py:612 src/qualcoder/report_relations.py:1093
-#: src/qualcoder/report_sql.py:538 src/qualcoder/report_sql.py:635
-msgid "Sort descending"
-msgstr "Trier par ordre décroissant"
+#: src/qualcoder/code_tree.py:344
+msgid "Sort descending F12"
+msgstr "Trier par ordre décroissant F12"
 
 #: src/qualcoder/code_tree.py:345
 msgid "Sort category then code ascending"
 msgstr "Trier la catégorie puis le code par ordre croissant"
 
-#: src/qualcoder/code_tree.py:533
+#: src/qualcoder/code_tree.py:556
 msgid "Cannot move category"
 msgstr "Impossible de déplacer la catégorie"
 
-#: src/qualcoder/code_tree.py:534
+#: src/qualcoder/code_tree.py:557
 msgid "Cannot move a category under one of its own sub-categories."
 msgstr ""
 "Une catégorie ne peut pas être déplacée sous l'une de ses sous-catégories."
 
-#: src/qualcoder/code_tree.py:570
+#: src/qualcoder/code_tree.py:593
 msgid "Cannot nest code"
 msgstr "Impossible d'imbriquer le code"
 
-#: src/qualcoder/code_tree.py:571
+#: src/qualcoder/code_tree.py:594
 msgid "Cannot move a code under one of its own sub-codes."
 msgstr "Impossible de déplacer un code sous l'un de ses propres sous-codes."
 
-#: src/qualcoder/code_tree.py:711
+#: src/qualcoder/code_tree.py:733
 msgid "Add new code"
 msgstr "Ajouter un nouveau code"
 
-#: src/qualcoder/code_tree.py:873
+#: src/qualcoder/code_tree.py:895
 msgid "Category branch"
 msgstr "Branche de catégorie"
 
-#: src/qualcoder/code_tree.py:874
+#: src/qualcoder/code_tree.py:896
 msgid "All categories and codes under this category will also be deleted."
 msgstr ""
 "Toutes les catégories et codes de cette catégorie seront également supprimés."
 
-#: src/qualcoder/code_tree.py:875
+#: src/qualcoder/code_tree.py:897
 msgid "All codings made with these codes across all files will be deleted."
 msgstr ""
 "Tous les codages effectués avec ces codes dans tous les fichiers seront "
 "supprimés."
 
-#: src/qualcoder/code_tree.py:876
+#: src/qualcoder/code_tree.py:898
 msgid "Categories to delete"
 msgstr "Catégories à supprimer"
 
-#: src/qualcoder/code_tree.py:877
+#: src/qualcoder/code_tree.py:899
 msgid "Codes to delete"
 msgstr "Codes à supprimer"
 
-#: src/qualcoder/code_tree.py:878
+#: src/qualcoder/code_tree.py:900
 msgid "Codings to delete"
 msgstr "Codages à supprimer"
 
-#: src/qualcoder/code_tree.py:879
+#: src/qualcoder/code_tree.py:901
 msgid "Make a project backup first. This action cannot be undone."
 msgstr ""
 "Faites d'abord une sauvegarde de projet. Cette action ne peut être annulée."
 
-#: src/qualcoder/code_tree.py:942
+#: src/qualcoder/code_tree.py:964
 msgid "Category branch deleted"
 msgstr "Branche de catégorie supprimée"
 
-#: src/qualcoder/code_tree.py:943 src/qualcoder/view_graph_models.py:95
+#: src/qualcoder/code_tree.py:965 src/qualcoder/view_graph_models.py:95
 #: src/qualcoder/view_graph_models.py:96 src/qualcoder/view_graph_models.py:225
 #: src/qualcoder/view_graph_models.py:253
 msgid "Categories"
 msgstr "Catégories"
 
-#: src/qualcoder/code_tree.py:966
+#: src/qualcoder/code_tree.py:988
 msgid "Memo for Code: "
 msgstr "Mémo du code : "
 
-#: src/qualcoder/code_tree.py:990
+#: src/qualcoder/code_tree.py:1012
 msgid "Memo for Category: "
 msgstr "Mémo de Catégorie : "
 
-#: src/qualcoder/code_tree.py:1005
+#: src/qualcoder/code_tree.py:1027
 msgid "Memo for category: "
 msgstr "Mémo de catégorie : "
 
-#: src/qualcoder/code_tree.py:1026
+#: src/qualcoder/code_tree.py:1048
 msgid "Rename code"
 msgstr "Renommer le code"
 
-#: src/qualcoder/code_tree.py:1041
+#: src/qualcoder/code_tree.py:1063
 msgid "Code renamed from: "
 msgstr "Code renommé en : "
 
-#: src/qualcoder/code_tree.py:1055
+#: src/qualcoder/code_tree.py:1077
 msgid "Rename category"
 msgstr "Renommer la catégorie"
 
-#: src/qualcoder/code_tree.py:1067
+#: src/qualcoder/code_tree.py:1089
 msgid "Category renamed from: "
 msgstr "Catégorie renommée en : "
 
-#: src/qualcoder/code_tree.py:1133
+#: src/qualcoder/code_tree.py:1154 src/qualcoder/code_tree.py:1210
 msgid "[CATEGORY]"
 msgstr "[CATEGORIE]"
 
-#: src/qualcoder/code_tree.py:1141
+#: src/qualcoder/code_tree.py:1162
 msgid "Move code: Select blank or category or code"
 msgstr ""
 "Déplacer le code : Sélectionnez une case vide, une catégorie ou un code"
 
-#: src/qualcoder/code_tree.py:1154
+#: src/qualcoder/code_tree.py:1175 src/qualcoder/code_tree.py:1252
 msgid "Cannot move code"
 msgstr "Impossible de déplacer le code"
 
-#: src/qualcoder/code_tree.py:1155
+#: src/qualcoder/code_tree.py:1176 src/qualcoder/code_tree.py:1253
 msgid "Cannot move a code under itself or one of its own sub-codes."
 msgstr "Impossible de déplacer un code sous lui-même ou un de ses sous-codes."
 
-#: src/qualcoder/code_tree.py:1189 src/qualcoder/code_tree.py:1258
-msgid "Select blank or category"
-msgstr "Sélectionnez un blanc ou une catégorie"
+#: src/qualcoder/code_tree.py:1215
+msgid "Move: Select multiple codes"
+msgstr "Déplacer : Sélectionner plusieurs codes"
 
-#: src/qualcoder/code_tree.py:1198
+#: src/qualcoder/code_tree.py:1222
+msgid "No codes selected"
+msgstr "Aucun code sélectionné"
+
+#: src/qualcoder/code_tree.py:1236
+msgid "Move codes to:"
+msgstr "Déplacer les codes vers :"
+
+#: src/qualcoder/code_tree.py:1259
 msgid "Code moved."
 msgstr "Code déplacé."
 
-#: src/qualcoder/code_tree.py:1221
+#: src/qualcoder/code_tree.py:1283
 msgid "Move category: Select blank or category"
 msgstr "Déplacer la catégorie : Sélectionner une case vide ou catégorie"
 
-#: src/qualcoder/code_tree.py:1230 src/qualcoder/code_tree.py:1234
+#: src/qualcoder/code_tree.py:1292 src/qualcoder/code_tree.py:1296
 msgid "Moved category: "
 msgstr "Catégorie déplacée : "
 
-#: src/qualcoder/code_tree.py:1333
+#: src/qualcoder/code_tree.py:1320
+msgid "Select blank or category"
+msgstr "Sélectionnez un blanc ou une catégorie"
+
+#: src/qualcoder/code_tree.py:1395
 msgid "There is no other code to merge into."
 msgstr "Il n'y a pas d'autre code dans lequel effectuer la fusion."
 
-#: src/qualcoder/code_tree.py:1336
+#: src/qualcoder/code_tree.py:1398
 msgid "Select code to merge into"
 msgstr "Sélectionnez le code à fusionner"
 
-#: src/qualcoder/code_tree.py:1372
+#: src/qualcoder/code_tree.py:1433
 msgid "Cannot merge code"
 msgstr "Impossible de fusionner le code"
 
-#: src/qualcoder/code_tree.py:1373
+#: src/qualcoder/code_tree.py:1434
 msgid "Cannot merge a code into itself or one of its own sub-codes."
 msgstr ""
 "Un code ne peut pas être fusionné avec lui-même ou avec l'un de ses sous-"
 "codes."
 
-#: src/qualcoder/code_tree.py:1376
+#: src/qualcoder/code_tree.py:1437
 msgid "Merge code: "
 msgstr "Fusionner le code : "
 
-#: src/qualcoder/code_tree.py:1376
+#: src/qualcoder/code_tree.py:1437
 msgid " into code: "
 msgstr " dans le code : "
 
-#: src/qualcoder/code_tree.py:1377
+#: src/qualcoder/code_tree.py:1438
 msgid "Merge codes"
 msgstr "Fusionner les codes"
 
@@ -11733,6 +11748,18 @@ msgstr "TOUS les codes sélectionnés doivent se chevaucher exactement."
 msgid "No results"
 msgstr "Pas de résultats"
 
+#: src/qualcoder/report_exact_matches.py:455
+#: src/qualcoder/report_relations.py:611 src/qualcoder/report_relations.py:1092
+#: src/qualcoder/report_sql.py:536 src/qualcoder/report_sql.py:633
+msgid "Sort ascending"
+msgstr "Trier par ordre croissant"
+
+#: src/qualcoder/report_exact_matches.py:456
+#: src/qualcoder/report_relations.py:612 src/qualcoder/report_relations.py:1093
+#: src/qualcoder/report_sql.py:538 src/qualcoder/report_sql.py:635
+msgid "Sort descending"
+msgstr "Trier par ordre décroissant"
+
 #: src/qualcoder/report_exact_matches.py:457
 #: src/qualcoder/report_relations.py:613 src/qualcoder/report_relations.py:1094
 #: src/qualcoder/report_sql.py:530 src/qualcoder/report_sql.py:627
@@ -13163,6 +13190,12 @@ msgstr " commence avec : "
 #: src/qualcoder/GUI/special_functions.py:54
 msgid "Uncaught Exception"
 msgstr "Uncaught Exception"
+
+#~ msgid "Add a new code"
+#~ msgstr "Ajouter un nouveau code"
+
+#~ msgid "Add a new category"
+#~ msgstr "Ajouter une nouvelle catégorie"
 
 #~ msgid "QualCoder roughly displays PDFs."
 #~ msgstr "QualCoder affiche grossièrement les PDF."
