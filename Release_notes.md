@@ -208,6 +208,8 @@ A refactoring method was added for older QualCoder projects. the text is re-extr
 
 PDF highlight export: generates a copy of the original PDF with the coded segments embedded as native highlight annotations (in each code's color, with the code name as annotation comment), so the coded document can be opened and reviewed in any standard PDF reader.
 
+ODT report: exports a coding report in OpenDocument Text format (.odt), listing the coded segments with their codes (text and images).
+
 ## Code images
 
 Can resize coded areas using rightclick menu option and resize using handles.
