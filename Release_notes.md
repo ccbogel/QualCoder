@@ -38,9 +38,71 @@ Start QualCoder by double-clicking the app within your applications folder. You 
 Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder was prevented from starting. Click on "open anyway".
 From now on, QualCoder should start without issues.
 
-To install from source code below, inside a virtual environment.
+**Alternatively, install from source:**
 
-Depending on your operating system, you will need to download Python and its dependencies. Here are the commands for your operating system:
+Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
+
+1. Download and install the Python programming language. Please use Python 3.12 on Windows, other versions may cause issues  [Python3](https://www.python.org/downloads/macos/). Download the latest "macOS 64-bit universal2 installer" for one of the above mentioned Python versions and open it to install Python.
+
+2. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases.
+
+3. Unzip the folder to a location (e.g. downloads) by double-clicking it. 
+
+4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
+
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-4.0 folder, e.g. 
+
+```bash
+cd Downloads/QualCoder-4.0
+```
+
+6. Install the virtual environment and required python modules. 
+
+The `python3` command uses the most recent installed version of Python. You can use a specific version on your macOS, if you have many Python versions installed, e.g. `python3.12`. To verify you are using the correct Python version type `which python3`, which should output: `/Library/Frameworks/Python.framework/Versions/3.<version>/bin/python3`. If the output is `/usr/bin/python3`, don't continue, since this is your system's Python and it is discouraged to use.
+
+The install may take up to 10 minutes. 
+
+```bash
+python3 -m venv env # this creates the virtual environment with the name "env" in your current directory
+source env/bin/activate # this activates the virtual environment "env", (env) should appear in front of your prompt
+pip3 install --upgrade pip # optionally; pip and pip3 are equivalent withing a virtual environment
+pip3 install -r requirements.txt
+```
+
+7. Run QualCoder from the command prompt
+
+```bash
+cd src
+python3 -m qualcoder # python and python3 are equivalent withing a virtual environment
+```
+
+8. If running QualCoder in a virtual environment, to exit the virtual environment type:
+
+```bash
+deactivate
+```
+
+The command prompt will then remove the *(env)* wording.
+
+**To start QualCoder again**
+
+If you are not using a virtual environment:
+
+```bash
+cd Downloads/QualCoder-4.0
+cd src 
+python3 -m qualcoder
+```
+
+If you are using a virtual environment:
+
+```bash
+cd Downloads/QualCoder-4.0
+source env/bin/activate
+cd src 
+python3 -m qualcoder
+
+## Linux
 
 - If you are on **Debian based system (Debian, Ubuntu / Lubuntu / ZorinOS, Linux Mint)** :
   Install pip. This is a tool that downloads extra python modules :  `sudo apt install python3-pip`
@@ -48,7 +110,6 @@ Depending on your operating system, you will need to download Python and its dep
   If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 - If you are on **Fedora** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
 - If you are on **Arch/Manjaro Linux** : If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc` and Install pip and venv: `sudo pacman -S python python-pip python-virtualenv`
-
   
 1. Download and unzip the Qualcoder folder. 
 
