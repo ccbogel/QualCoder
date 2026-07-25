@@ -101,6 +101,7 @@ cd Downloads/QualCoder-4.0
 source env/bin/activate
 cd src 
 python3 -m qualcoder
+```
 
 ## Linux
 
