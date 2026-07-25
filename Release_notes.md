@@ -204,6 +204,8 @@ Can set font and size for the document. Can resize codes with movable handles. C
 
 Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). Text coding and image area coding can be performed on the PDF page. AI-assisted text analysis can be applied directly from the Code PDF window.
 
+A refactoring method was added for older QualCoder projects. the text is re-extracted and existing codings are matched against the new text extraction method. Any codings that cannot be remapped are recorded in Journals as lost codes, so the user can review them.
+
 ## Code images
 
 Can resize coded areas using rightclick menu option and resize using handles.
