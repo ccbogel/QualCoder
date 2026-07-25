@@ -226,7 +226,7 @@ Proximity graphs. Export format for Gephi import.
 
 ## Graph (mind map)
 
-Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus.
+Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus. A mini map for scrolling. Dfferent node styles are available - box, oval, more. Mutlipe selection options are available.
 
 ## Report codes
 
