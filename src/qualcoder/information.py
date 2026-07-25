@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -331,6 +331,20 @@ F2 {_("When tree item selected - Rename code or category")}<br /><br />'
 
 menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
+code_tree_shortcuts = f'<h2>Code tree</h2>\
+When coding. Click on codes / categories in code tree to activate these options<br />\
+F2 {_("Rename code or category")}<br />\
+F3 {_("Edit memo")}<br />\
+F4 {_("Delete code or category")}<br />\
+F5 {_("Change code coloury")}<br />\
+F6 {_("Move code or category")}<br />\
+F7 {_("Move multiple codes")}<br />\
+F8 {_("Merge code into code or category into category")}<br />\
+F9 {_("Show codes like")}<br />\
+F10 {_("Show codes by colour")}<br />\
+F11 {_("Sort ascending")}<br />\
+F12 {_("Sort descending")}<br />'
+
 coding_text_shortcuts = f'<h2>{_("Code text key shortcuts")}</h2>\
 Ctrl 1 {_("Next file")}<br />\
 Ctrl 2 {_("File with latest coding")}<br />\
@@ -366,8 +380,7 @@ V {_("assign in vivo code to selected text")}<br />\
 {_("Shift Left arrow.Extend coding to the left")}<br />\
 {_("Shift Right arrow.Extend coding to the right")}<br />\
 ! {_("Describes clicked text character position")}<br />\
-$ {_("Shift all coding positions after a clicked position by X characters (negative numbers shift left)")}<br />\
-F2 {_("When tree item selected - Rename code or category")}'
+$ {_("Shift all coding positions after a clicked position by X characters (negative numbers shift left)")}<br />'
 
 coding_pdf_shortcuts = f'<h2>{_("Code PDF key shortcuts")}</h2>\
 Ctrl 0 {_("Help - opens in browser")}<br />\
@@ -391,8 +404,7 @@ V {_("assign in vivo code to selected text")}<br />\
 Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
 Minus {_("Zoom out")}<br />\
 Plus {_("Zoom in")}<br />\
-! {_("Describes clicked text character position")}<br />\
-F2 {_("When tree item selected - Rename code or category")}'
+! {_("Describes clicked text character position")}<br />'
 
 coding_image_shortcuts = f'<h2>{_("Code image key shortcuts")}</h2>\
 Ctrl 1 {_("Next file")}<br />\
@@ -407,8 +419,7 @@ Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
 Ctrl G {_("Create a grayed-out image with coloured coded highlights (Wait a few seconds)")}<br />\
 Minus or Q {_("Zoom out")}<br />\
 Plus or W {_("Zoom in")}<br />\
-{_("Right - click on image for menu to rotate image")}<br />\
-F2 {_("When tree item selected - Rename code or category")}'
+{_("Right - click on image for menu to rotate image")}<br />'
 
 coding_av_shortcuts = f'<h2>{_("Code audio/video key shortcuts")}</h2>\
 Ctrl 1 {_("Next file")}<br />\
@@ -418,8 +429,8 @@ Ctrl 4 {_("Filter files by attributes")}<br />\
 Ctrl 9 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
 A {_("Annotate - for current selection")}<br />\
-B <br />\
-Shift B <br />\
+B {_("Set Bookmark in text for this audio/video file")}<br />\
+Shift B {_("Open file and move to bookmarked text position")}<br />\
 C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 G {_("Assign segment to currently selected code, and open memo for segment.")}<br />\
 I {_("Tag important")}<br />\
@@ -439,13 +450,13 @@ Ctrl P {_("Play / pause.On start rewind slightly")}<br />\
 Ctrl D {_("Play / pause.On start rewind slightly")}<br />\
 Ctrl S {_("Start and stop av segment creation")}<br />\
 Ctrl Shift &gt; {_("Increase play rate")}<br />\
-Ctrl Shift &lt; {_("Decrease play rate")}<br />\n\
-F2 {_("When tree item selected - Rename code or category")}'
+Ctrl Shift &lt; {_("Decrease play rate")}<br />'
 
 database_queries_shortcuts = f'<h2>{_("Database Queries key shortcuts")}</h2>\
 Ctrl + Enter {_("Run SQL query")}<br />'
 
-coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts + coding_image_shortcuts + coding_av_shortcuts
+coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts
+coding_shortcuts_display += coding_image_shortcuts + coding_av_shortcuts + code_tree_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
 
 def manage_tab_info():
