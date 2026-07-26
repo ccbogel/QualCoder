@@ -2203,13 +2203,17 @@ class DialogManageFiles(QtWidgets.QDialog):
                 suffix += 1
             # Wondering if only case and case attributes are imported and no freeetext columns selected, if
             # the empty 'placeholder' files should be created .. ?
-            filename_txt = filename + ".txt"
-            filepath_save = Path(self.app.project_path) / "documents" / filename_txt
-            with open(filepath_save, 'w', encoding='utf-8') as f:
-                f.write(fulltext)
-            cur.execute("insert into source(name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
-                        (filename, fulltext, None, "", self.app.settings['codername'], now))
-            file_id = cur.lastrowid
+
+            if text_cols:
+                filename_txt = filename + ".txt"
+                filepath_save = Path(self.app.project_path) / "documents" / filename_txt
+                with open(filepath_save, 'w', encoding='utf-8') as f:
+                    f.write(fulltext)
+                cur.execute("insert into source(name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
+                            (filename, fulltext, None, "", self.app.settings['codername'], now))
+                file_id = cur.lastrowid
+            else:
+                file_id = None
 
             if autocode_enabled:
                 for col_name, start_pos, end_pos, text_chunk in code_positions:
@@ -2223,8 +2227,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                         cur.execute("insert into code_name (name, memo, owner, date, color) values(?,?,?,?,?)",
                                     (col_name, "", self.app.settings['codername'], now, color))
                         cid = cur.lastrowid
-
-                    cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)",
+                    if text_cols:
+                        cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)",
                                 (cid, file_id, text_chunk, start_pos, end_pos, self.app.settings['codername'], now, ""))
             #  Correct posiciones de autocodificación (aun sin resolver)
             case_id = -1
@@ -2237,8 +2241,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute("insert into cases (name, memo, owner, date) values(?,?,?,?)",
                                 (case_name, "", self.app.settings['codername'], now))
                     case_id = cur.lastrowid
-
-                cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
+                if text_cols:
+                    cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
                             (case_id, file_id, 0, len(fulltext), self.app.settings['codername'], now, ""))
 
             # Insert file or case attributes from survey, and check if character or numeric
