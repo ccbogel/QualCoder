@@ -749,6 +749,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             if s['id'] == id_:
                 mediapath = s['mediapath']
                 risid = s['risid']
+        # Check and get all selected indexes
+        selected_indexes = self.ui.tableWidget.selectionModel().selectedIndexes()
         # Action cannot be None otherwise may default to one of the actions below depending on column clicked
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
@@ -794,6 +796,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_date_picker = None
         action_ref_apa = None
         action_ref_vancouver = None
+        action_multiple_cells_value = None
         if col > self.CASE_COLUMN:
             action_order_by_value_asc = menu.addAction(_("Order ascending"))
             action_order_by_value_desc = menu.addAction(_("Order descending"))
@@ -808,6 +811,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             if self.header_labels[col] in ("Ref_Authors", "Ref_Title", "Ref_Journal", "Ref_Type", "Ref_Year"):
                 action_ref_apa = menu.addAction(_("Copy reference to clipboard. APA"))
                 action_ref_vancouver = menu.addAction(_("Copy reference to clipboard. Vancouver"))
+            if len(selected_indexes) > 1:
+                action_multiple_cells_value = menu.addAction(_("Set value of selected cells"))
         action_rename = None
         action_export = None
         action_delete = None
@@ -830,7 +835,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
-        url_test = urlparse(item_text)
+        url_test = urlparse(item_text) # TODO revise for those staring with www.
         if all([url_test.scheme, url_test.netloc]):
             action_url = menu.addAction(_("Open URL"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
@@ -959,6 +964,51 @@ class DialogManageFiles(QtWidgets.QDialog):
             cb.setText(vancouver[0]['vancouver'].replace("\n", " "))
         if action == action_mark_speakers:
             self.mark_speakers()
+        if action == action_multiple_cells_value:
+            self.multiple_cells_value()
+
+    def multiple_cells_value(self):
+        """ Assign a value to all selected cells.
+         If column > CASE_COLUMN. """
+
+        value, ok = QtWidgets.QInputDialog.getText(self, _("Selected cells"), _("Set value:"),
+                                                        QtWidgets.QLineEdit.EchoMode.Normal)
+        if not ok: return
+        msg = ""
+        value = value.strip()
+        selected_indexes = self.ui.tableWidget.selectionModel().selectedIndexes()
+        for i in selected_indexes:
+            col, row =  i.column(), i.row()
+            # Check if cell it an editable attribute
+            if col > self.CASE_COLUMN and self.header_labels[col] not in ("Ref_Authors", "Ref_Journal","Ref_Title","Ref_Type","Ref_Year"):
+                try:
+                    prev_value = str(self.ui.tableWidget.item(col, row).text()).strip()
+                except AttributeError:
+                    prev_value = ""
+                attribute_name = self.header_labels[col]
+                cur = self.app.conn.cursor()
+                # Check numeric for numeric attributes, clear "" if it cannot be cast
+                cur.execute("select valuetype from attribute_type where caseOrFile='file' and name=?",
+                            (attribute_name,))
+                result = cur.fetchone()
+                if result is None:
+                    return
+                if result[0] == "numeric" and value != "":
+                    try:
+                        float(value)
+                    except ValueError:
+                        value = prev_value
+                        msg = _("Value must be numeric")
+                cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
+                            (value, self.source[row]['id'], attribute_name))
+                item = QtWidgets.QTableWidgetItem(value)
+                self.ui.tableWidget.blockSignals(True)  # Otherwise, cell_modified() is called
+                self.ui.tableWidget.setItem(row,col, item)
+                self.ui.tableWidget.blockSignals(False)
+            self.app.conn.commit()
+        self._emit_project_table_changes(["attribute"])
+        if msg != "":
+            Message(self.app, _("Value error"), msg).exec()
 
     def update_file_path(self, id_: int, bad_link: dict[str, Any]):
         """ Update the File Not Found file path to another path.
@@ -1866,11 +1916,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Memo"))
 
     def cell_modified(self):
-        """ Attribute values can be changed. """
+        """ Attribute values can be changed.  """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-
         # Update attribute value
         if y > self.CASE_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
