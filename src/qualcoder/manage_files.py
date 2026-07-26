@@ -835,7 +835,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
-        url_test = urlparse(item_text) # TODO revise for those staring with www.
+        url_test = urlparse(item_text)
         if all([url_test.scheme, url_test.netloc]):
             action_url = menu.addAction(_("Open URL"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
@@ -1581,7 +1581,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 "attribute desc: attribute name ttribute - descending
         """
 
-        # TODO add progress dialog
         # Check a placeholder attribute is present for the file, add if missing
         self.check_attribute_placeholders()
         self.source = []
@@ -2858,7 +2857,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                                              highlights, progress_)
         return True  # Import completed; lets import_files clean up failed copies
 
-    #TODO why not use: color_selector.color_matcher() method
+    # why not use: color_selector.color_matcher() method
     @staticmethod
     def _closest_qualcoder_color(hex_color:str):
         """
