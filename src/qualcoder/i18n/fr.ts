@@ -3661,7 +3661,7 @@ Modifiez les paramètres du nombre de caractères et du style d&apos;affichage.<
     <message>
         <location filename="../GUI/ui_dialog_report_codings.py" line="211"/>
         <source>Export matrix</source>
-        <translation>Matrice d&apos;exportation</translation>
+        <translation>Exporter la matrice</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_codings.py" line="212"/>
