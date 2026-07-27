@@ -296,9 +296,9 @@ https://alternativeto.net/software/qualcoder
 
 Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
 
-## Warnings about other sources of information about QualCoder 
+## Other sources of information about QualCoder 
 
-A book _Qualitative Data Analysis With Chatgpt And Qualcoder_. We have been advised the book may contain some incorrect information about QualCoder.
+Literature about QualCoder. Literature from authors not listed above may potneitally be inaccurate.
 
 Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page or the Codeberg equivalent: https://codeberg.org/qualcoder.
 
