@@ -3753,7 +3753,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     name_tt += f"\nORIGINAL FILE NOT FOUND"
             name_item.setToolTip(name_tt)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
-            date_item = QtWidgets.QTableWidgetItem(data['date'])
+            trimmed_date = data['date'].split()[0]
+            date_item = QtWidgets.QTableWidgetItem(trimmed_date)
             date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.DATE_COLUMN, date_item)
             memo_string = ""
