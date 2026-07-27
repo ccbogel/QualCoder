@@ -31,6 +31,7 @@ from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
+#from .__main__ import App
 from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect, colors, TextColor
 from .confirm_delete import DialogConfirmDelete
@@ -45,7 +46,7 @@ class CodeTreeController(QtCore.QObject):
     """ Owns the shared behaviour of a codes treeWidget for a coding dialog.
     Host protocol:
     The host dialog must provide: codes (list of dict), categories (list of dict)
-    and parent_textEdit. Both lists are read live, never cached here.
+    and parent_textEdit. Both lists are read live, never cached.
     Optional callbacks, set after construction:
         fill_counts_callback() - fill the Count column after fill_tree
         coded_files_callback(code_or_codes, title) - one code dict, or a list for a category branch
@@ -268,7 +269,7 @@ class CodeTreeController(QtCore.QObject):
             default_width_factors=self.column_width_factors
         )
 
-    # context menu
+    # Context menu
 
     def tree_menu(self, position):
         """
@@ -445,6 +446,9 @@ class CodeTreeController(QtCore.QObject):
         if selected is None:
             return False
         key = event.key()
+        if key == QtCore.Qt.Key.Key_F1:
+            cid = int(selected.text(1)[4:])
+            self.get_branch_cids(cid)
         if key == QtCore.Qt.Key.Key_F2:
             self.rename_category_or_code(selected)
             return True
@@ -786,6 +790,30 @@ class CodeTreeController(QtCore.QObject):
 
     # delete
 
+    def get_branch_cids(self, root_cid:int) -> list:
+        """
+        Gather every code that hangs below a code, including the code itself.
+        Read straight from the database, not from the cached host codes / categories, so a
+        stale dialog snapshot can never delete or miss the wrong rows.
+        Iterative walk, so cyclic or malformed data cannot cause infinite recursion.
+        Args:
+            root_cid: Integer, code id of the branch root
+        Returns:
+            List: list of code ids
+        """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select cid, supercid from code_name")
+        db_codes = cur.fetchall()
+        cids = [root_cid]
+        i = 0
+        while i < len(cids):
+            for code_ in db_codes:
+                if code_[1] == cids[i] and code_[0] not in cids:
+                    cids.append(code_[0])
+            i += 1
+        return cids
+
     def delete_code(self, selected:QtWidgets.QTreeWidgetItem):
         """
         Find code, remove from database, refresh code data and fill treeWidget.
@@ -801,11 +829,22 @@ class CodeTreeController(QtCore.QObject):
         if found == -1:
             return
         code_ = self.codes[found]
-        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
+        cids = self.get_branch_cids(code_['cid'])
+        code_names = self.app.get_code_names(cids)
+        names = ""
+        for name in code_names:
+            names += name['name'] + ", "
+        msg = _("Code: ") + selected.text(0)
+        if len(cids) > 1:  # Includes this code also
+            msg += f"\n{len(cids) - 1} " + _("sub-codes will also be deleted.")
+            msg += "\n" + _("Move the sub-codes first. If they are needed.")
+        ui = DialogConfirmDelete(self.app, msg)
         ok = ui.exec()
         if not ok:
             return
         cur = self.app.conn.cursor()
+        ''' Van and Kai think all the sub-codes should be deleted if the root code is deleted.
+        Can move all sub-codes using the menu Move Multiple Codes function.
         # Re-parent this code's sub-codes so they are not orphaned by the deletion.
         if code_.get('supercid') is not None:
             # Was itself a sub-code: lift its children to the grandparent code.
@@ -813,17 +852,21 @@ class CodeTreeController(QtCore.QObject):
         else:
             # Was top level (possibly under a category): move children into that category (or top level).
             cur.execute("update code_name set supercid=null, catid=? where supercid=?",
-                        [code_['catid'], code_['cid']])
-        cur.execute("delete from code_name where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_av where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_image where cid=?", [code_['cid'], ])
-        self.app.conn.commit()
+                        [code_['catid'], code_['cid']])'''
+        for cid in cids:
+            cur.execute("delete from code_name where cid=?", [cid, ])
+            cur.execute("delete from code_text where cid=?", [cid, ])
+            cur.execute("delete from code_av where cid=?", [cid, ])
+            cur.execute("delete from code_image where cid=?", [cid, ])
+            self.app.conn.commit()
         self.app.delete_backup = False
-        self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
+        #self.parent_textEdit.append(_("Code(s) deleted: ") + code_['name'] + "\n")
+        self.parent_textEdit.append(_("Code(s) deleted: ") + names + "\n")
         # Let the host clean its own caches, such as the recent codes list.
+        print(cids)
+
         if self.on_codes_deleted is not None:
-            self.on_codes_deleted([code_['cid']])
+            self.on_codes_deleted(cids)
         self.codes_changed.emit(["code_name", "code_text", "code_av", "code_image"])
 
     def get_branch_catids_and_cids(self, catid:int) -> tuple:
