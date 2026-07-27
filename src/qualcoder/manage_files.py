@@ -544,7 +544,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Must check for each column name, as some columns might be renamed. Renamed columns will be ignored
             for col_name_width in column_name_width_list:
                 colname, width = col_name_width.split("\t")
-                # print(colname, width)
                 if self.ui.tableWidget.horizontalHeaderItem(col).text() == colname and int(width) > 0:
                     self.ui.tableWidget.setColumnWidth(col, int(width))
                     break
@@ -1771,7 +1770,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res[2][:6] == "audio:":
             icon = QtGui.QIcon(qta.icon('mdi6.play-protected-content', options=[{'scale_factor': 1.2}]))
         if res[2][:6] in ("/audio", "audio:", "/video", "video:"):
-            if not Path.exists(abs_path):
+            if not Path(abs_path).exists():
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata, "Not found Error"
             if vlc:
@@ -1798,8 +1797,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         bytes_ = 0
         try:
             file_bytes = Path(abs_path).stat().st_size
-        except OSError as e_:
-            print(e_)
+        except OSError as err:
+            print(err)
         metadata += f"\nBytes: {bytes_}"
         if 1024 < bytes_ < 1024 * 1024:
             metadata += f"  {int(bytes_ / 1024)}KB"
@@ -1868,9 +1867,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute(sql, (name, "", id_[0], 'file', now_date, self.app.settings['codername']))
             self.app.conn.commit()
             self.app.delete_backup = False
-        except Exception as e_:
-            print(e_)
-            logger.debug(str(e_))
+        except Exception as err:
+            print(err)
+            logger.debug(str(err))
             self.app.conn.rollback()  # Revert all changes
             raise
         self._emit_project_table_changes(["attribute_type", "attribute"])
@@ -2065,7 +2064,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.source[x]['mediapath'][7:]
         else:
             abs_path = self.app.project_path + self.source[x]['mediapath']
-        if not Path.exists(abs_path):
+        if not Path(abs_path)).exists():
             self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
             return
         ui = DialogViewImage(self.app, self.source[x])
