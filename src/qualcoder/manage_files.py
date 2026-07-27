@@ -1029,7 +1029,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if col == self.CASE_COLUMN:
             action_casename_asc = menu.addAction(_("Order ascending"))
             action_casename_desc = menu.addAction(_("Order descending"))
-            action_assign_case = menu.addAction(_("Assign case to files"))
+            action_assign_case = menu.addAction(_("Assign files to case"))
         action_show_values_like = None
         action_hide_values_like = None
         if col != self.MEMO_COLUMN:
@@ -2175,7 +2175,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             result = cur.fetchone()
             if result is None:
                 return
-            if result[0] == "numeric":
+            if result[0] == "numeric" and value != "":
                 try:
                     float(value)
                 except ValueError:
