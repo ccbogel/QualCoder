@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -31,6 +31,7 @@ from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
+#from .__main__ import App
 from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect, colors, TextColor
 from .confirm_delete import DialogConfirmDelete
@@ -45,7 +46,7 @@ class CodeTreeController(QtCore.QObject):
     """ Owns the shared behaviour of a codes treeWidget for a coding dialog.
     Host protocol:
     The host dialog must provide: codes (list of dict), categories (list of dict)
-    and parent_textEdit. Both lists are read live, never cached here.
+    and parent_textEdit. Both lists are read live, never cached.
     Optional callbacks, set after construction:
         fill_counts_callback() - fill the Count column after fill_tree
         coded_files_callback(code_or_codes, title) - one code dict, or a list for a category branch
@@ -61,8 +62,8 @@ class CodeTreeController(QtCore.QObject):
     # List of changed database table names, emitted after every database change
     codes_changed = QtCore.pyqtSignal(list)
 
-    def __init__(self, app, tree_widget: QtWidgets.QTreeWidget, host,
-                 column_width_factors: dict | None = None):
+    def __init__(self, app, tree_widget:QtWidgets.QTreeWidget, host,
+                 column_width_factors:dict|None=None):
         """
         Args:
             app: App object
@@ -268,7 +269,7 @@ class CodeTreeController(QtCore.QObject):
             default_width_factors=self.column_width_factors
         )
 
-    # context menu
+    # Context menu
 
     def tree_menu(self, position):
         """
@@ -287,8 +288,8 @@ class CodeTreeController(QtCore.QObject):
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-        action_add_code = menu.addAction(_("Add a new code"))
-        action_add_category = menu.addAction(_("Add a new category"))
+        action_add_code = menu.addAction(_("Create new code"))
+        action_add_category = menu.addAction(_("Create new category"))
         action_add_subcode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
@@ -305,7 +306,7 @@ class CodeTreeController(QtCore.QObject):
         action_merge_category = None
         action_move_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_merge_category = modify_menu.addAction(_("Merge category into category"))
+            action_merge_category = modify_menu.addAction(_("Merge category into category F8"))
             action_move_category = modify_menu.addAction(_("Move category under category F6"))
         action_delete = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
@@ -324,8 +325,8 @@ class CodeTreeController(QtCore.QObject):
             if self.coded_files_callback is not None:
                 action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = modify_menu.addAction(_("Move code to F6"))
-            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
-            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code"))
+            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes F7"))
+            action_merge_code_into_code = modify_menu.addAction(_("Merge code into code F8"))
         action_find_code = None
         if self.find_code_callback is not None:
             action_find_code = menu.addAction(_("Find code"))
@@ -335,13 +336,13 @@ class CodeTreeController(QtCore.QObject):
             filter_menu = menu.addMenu(_("Filter"))
             if self.show_codes_like_callback is not None:
                 like_filter = getattr(self.host, 'show_codes_like_filter', "")
-                action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + like_filter)
+                action_show_codes_like = filter_menu.addAction(_("Show codes like") + f": {like_filter}  F9")
             if self.show_codes_of_colour_callback is not None:
                 colour_filter = getattr(self.host, 'show_codes_colour_filter', "")
-                action_show_codes_colour = filter_menu.addAction(_("Show codes of colour") + f": {colour_filter}")
+                action_show_codes_colour = filter_menu.addAction(_("Show codes by colour") + f": {colour_filter} F10")
         sort_menu = menu.addMenu(_("Sort"))
-        action_all_asc = sort_menu.addAction(_("Sort ascending"))
-        action_all_desc = sort_menu.addAction(_("Sort descending"))
+        action_all_asc = sort_menu.addAction(_("Sort ascending F11"))
+        action_all_desc = sort_menu.addAction(_("Sort descending F12"))
         action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
 
         # Let the host dialog add its own entries before the menu is shown.
@@ -435,7 +436,7 @@ class CodeTreeController(QtCore.QObject):
 
     def handle_key_press(self, event) -> bool:
         """
-        Tree widget menu item keys F2 - F6. Called from the host keyPressEvent
+        Tree widget menu item keys F2 - F12. Called from the host keyPressEvent
         when the treeWidget has focus. Returns True when the key was handled.
         Args:
             event: QKeyEvent
@@ -445,6 +446,9 @@ class CodeTreeController(QtCore.QObject):
         if selected is None:
             return False
         key = event.key()
+        if key == QtCore.Qt.Key.Key_F1:
+            cid = int(selected.text(1)[4:])
+            self.get_branch_cids(cid)
         if key == QtCore.Qt.Key.Key_F2:
             self.rename_category_or_code(selected)
             return True
@@ -465,6 +469,29 @@ class CodeTreeController(QtCore.QObject):
                 self.move_category(int(selected.text(1).split(":")[1]))
             else:
                 self.move_code(selected)
+            return True
+        if key == QtCore.Qt.Key.Key_F7 and selected.text(1)[0:3] == 'cid':
+            self.move_multiple_codes()
+            return True
+        if key == QtCore.Qt.Key.Key_F8:
+            if selected.text(1)[0:3] == 'cat':
+                self.merge_category(int(selected.text(1)[6:]))
+            else:
+                self.merge_code_into_code(selected)
+            return True
+        if key == QtCore.Qt.Key.Key_F9:
+            self.show_codes_like_callback()
+            return True
+        if key == QtCore.Qt.Key.Key_F10:
+            self.show_codes_of_colour_callback()
+            return True
+        if key == QtCore.Qt.Key.Key_F11:
+            self.tree_sort_option = "all asc"
+            self.fill_tree()
+            return True
+        if key == QtCore.Qt.Key.Key_F12:
+            self.tree_sort_option = "all desc"
+            self.fill_tree()
             return True
         return False
 
@@ -637,7 +664,7 @@ class CodeTreeController(QtCore.QObject):
 
     # recursive tree helpers
 
-    def recursive_get_branch_codes(self, item, branch_codes) -> list:
+    def recursive_get_branch_codes(self, item:QtWidgets.QTreeWidgetItem, branch_codes) -> list:
         """
         Gather all code dictionaries below this item, including sub-codes.
         Recurse through all child categories.
@@ -659,9 +686,8 @@ class CodeTreeController(QtCore.QObject):
                 self.recursive_get_branch_codes(item.child(i), branch_codes)
         return branch_codes
 
-    def recursive_expand_collapse_branch(self, item, expand_toggle: bool):
-        """
-        Set all children of this item to be expanded or collapsed.
+    def recursive_expand_collapse_branch(self, item:QtWidgets.QTreeWidgetItem, expand_toggle: bool):
+        """ Set all children of this item to be expanded or collapsed.
         Recurse through all child categories.
         Args:
             item: QTreeWidgetItem
@@ -673,7 +699,7 @@ class CodeTreeController(QtCore.QObject):
             item.setExpanded(expand_toggle)
             self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
-    def recursive_non_merge_item(self, item, no_merge_list) -> list:
+    def recursive_non_merge_item(self, item:QtWidgets.QTreeWidgetItem, no_merge_list:list[str]) -> list:
         """
         Find child category ids below the item, as strings.
         Required for merge_category() and move_category().
@@ -691,7 +717,7 @@ class CodeTreeController(QtCore.QObject):
 
     # add
 
-    def add_code(self, catid: int | None = None, code_name: str = "", supercid: int | None = None) -> bool:
+    def add_code(self, catid:int|None=None, code_name:str="", supercid:int|None=None) -> bool:
         """
         Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code, or a color has been pre-set by the user.
@@ -738,7 +764,7 @@ class CodeTreeController(QtCore.QObject):
         self.codes_changed.emit(["code_name"])
         return True
 
-    def add_category(self, supercatid: int | None = None):
+    def add_category(self, supercatid:int|None=None):
         """
         Add a new category.
         Note: the addItem dialog does the checking for duplicate category names
@@ -764,7 +790,31 @@ class CodeTreeController(QtCore.QObject):
 
     # delete
 
-    def delete_code(self, selected: QtWidgets.QTreeWidgetItem):
+    def get_branch_cids(self, root_cid:int) -> list:
+        """
+        Gather every code that hangs below a code, including the code itself.
+        Read straight from the database, not from the cached host codes / categories, so a
+        stale dialog snapshot can never delete or miss the wrong rows.
+        Iterative walk, so cyclic or malformed data cannot cause infinite recursion.
+        Args:
+            root_cid: Integer, code id of the branch root
+        Returns:
+            List: list of code ids
+        """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select cid, supercid from code_name")
+        db_codes = cur.fetchall()
+        cids = [root_cid]
+        i = 0
+        while i < len(cids):
+            for code_ in db_codes:
+                if code_[1] == cids[i] and code_[0] not in cids:
+                    cids.append(code_[0])
+            i += 1
+        return cids
+
+    def delete_code(self, selected:QtWidgets.QTreeWidgetItem):
         """
         Find code, remove from database, refresh code data and fill treeWidget.
         Args:
@@ -779,11 +829,22 @@ class CodeTreeController(QtCore.QObject):
         if found == -1:
             return
         code_ = self.codes[found]
-        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
+        cids = self.get_branch_cids(code_['cid'])
+        code_names = self.app.get_code_names(cids)
+        names = ""
+        for name in code_names:
+            names += name['name'] + ", "
+        msg = _("Code: ") + selected.text(0)
+        if len(cids) > 1:  # Includes this code also
+            msg += f"\n{len(cids) - 1} " + _("sub-codes will also be deleted.")
+            msg += "\n" + _("Move the sub-codes first. If they are needed.")
+        ui = DialogConfirmDelete(self.app, msg)
         ok = ui.exec()
         if not ok:
             return
         cur = self.app.conn.cursor()
+        ''' Van and Kai think all the sub-codes should be deleted if the root code is deleted.
+        Can move all sub-codes using the menu Move Multiple Codes function.
         # Re-parent this code's sub-codes so they are not orphaned by the deletion.
         if code_.get('supercid') is not None:
             # Was itself a sub-code: lift its children to the grandparent code.
@@ -791,20 +852,24 @@ class CodeTreeController(QtCore.QObject):
         else:
             # Was top level (possibly under a category): move children into that category (or top level).
             cur.execute("update code_name set supercid=null, catid=? where supercid=?",
-                        [code_['catid'], code_['cid']])
-        cur.execute("delete from code_name where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_av where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_image where cid=?", [code_['cid'], ])
-        self.app.conn.commit()
+                        [code_['catid'], code_['cid']])'''
+        for cid in cids:
+            cur.execute("delete from code_name where cid=?", [cid, ])
+            cur.execute("delete from code_text where cid=?", [cid, ])
+            cur.execute("delete from code_av where cid=?", [cid, ])
+            cur.execute("delete from code_image where cid=?", [cid, ])
+            self.app.conn.commit()
         self.app.delete_backup = False
-        self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
+        #self.parent_textEdit.append(_("Code(s) deleted: ") + code_['name'] + "\n")
+        self.parent_textEdit.append(_("Code(s) deleted: ") + names + "\n")
         # Let the host clean its own caches, such as the recent codes list.
+        print(cids)
+
         if self.on_codes_deleted is not None:
-            self.on_codes_deleted([code_['cid']])
+            self.on_codes_deleted(cids)
         self.codes_changed.emit(["code_name", "code_text", "code_av", "code_image"])
 
-    def get_branch_catids_and_cids(self, catid: int) -> tuple:
+    def get_branch_catids_and_cids(self, catid:int) -> tuple:
         """
         Gather every category and code that hangs below a category, including the category itself.
         Sub-codes (supercid) nested under branch codes are collected too.
@@ -1067,9 +1132,8 @@ class CodeTreeController(QtCore.QObject):
             self.parent_textEdit.append(_("Category renamed from: ") + f"{old_name} --> {new_name}")
             self.codes_changed.emit(["code_cat"])
 
-    def change_code_color(self, selected: QtWidgets.QTreeWidgetItem):
-        """
-        Change the colour of the currently selected code.
+    def change_code_color(self, selected:QtWidgets.QTreeWidgetItem):
+        """ Change the colour of the currently selected code.
         Args:
             selected : QTreeWidgetItem
         """
@@ -1162,40 +1226,81 @@ class CodeTreeController(QtCore.QObject):
         self.codes_changed.emit(["code_name"])
 
     def move_multiple_codes(self):
-        """
-        Move multiple codes to another category.
-        """
+        """ Move multiple codes to another code or category. """
 
-        cur = self.app.conn.cursor()
-        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
-                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
-        res = cur.fetchall()
-        code_list = []
-        for r in res:
-            name = r[0]
-            if r[1] is not None:
-                name = r[1] + " ← " + r[0]
-            code_list.append({'name': name, 'cid': r[2]})
-        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
+        # List of destinations for the move, initial item
+        destinations = [{'name': " ", 'catid': -1, 'cid': -1}]
+        # From list move codes from
+        from_list = [{'name': " ", 'catid': -1, 'cid': -1}]  # Default blank item
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.tree)
+        while iterator.value():
+            item = iterator.value()
+            depth = 0
+            current = item
+            while current.parent() is not None:
+                current = current.parent()
+                depth += 1
+            prefix = ""
+            if depth > 0:
+                prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
+            name = prefix + item.text(0)
+            cid = -1
+            catid = -1
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+            else:
+                catid = int(item.text(1)[6:])
+                name += " " + _("[CATEGORY]")
+                destinations.append({'name': name, 'catid': catid, 'cid': -1})
+            memo = item.toolTip(2)
+            from_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo,'treeitem': item})
+            iterator += 1
+        ui = DialogSelectItems(self.app, from_list, _("Move: Select multiple codes"), "multi")
         ok = ui.exec()
         if not ok:
             return
         selected_codes = ui.get_selected()
-        cur.execute("select name, catid from code_cat order by upper(name)")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
+        source_codes = [x for x in selected_codes if x['cid'] > 0]
+        if len(source_codes) == 0:
+            Message(self.app, _("No codes"), _("No codes selected")).exec()
+            return
+
+        # cids of source_codes and subcodes to exclude
+        exclude_cids = []
+        for code_to_move in source_codes:
+            exclude_cids.append(code_to_move['cid'])
+            sub_codes_exclude = (self.recursive_get_branch_codes(code_to_move['treeitem'], []))
+            for sce in sub_codes_exclude:
+                exclude_cids.append(sce['cid'])
+        # Append codes to destinations, without excludes and without the codes_to_move
+        for c in self.codes:
+            if c['cid'] not in exclude_cids:
+                destinations.append(c)
+        ui_to = DialogSelectItems(self.app, destinations, _("Move codes to:"), "multi")
+        ok = ui_to.exec()
         if not ok:
             return
-        category = ui.get_selected()
-        for s in selected_codes:
-            # Moving to a category (or to blank) removes any sub-code nesting.
-            cur.execute("update code_name set catid=?, supercid=null where cid=?", [category['catid'], s['cid']])
+        selected = ui_to.get_selected()
+        if selected == []:
+            return
+        destination = selected[0]
+        cur = self.app.conn.cursor()
+        for code_ in source_codes:
+            if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
+                cur.execute("update code_name set catid=null, supercid=null where cid=?", [code_['cid']])
+            elif destination['cid'] > 0:  # Move under another code
+                # Belt and braces: never write a supercid cycle, even if the selection list
+                # was built from a stale or corrupted tree.
+                if self.code_is_descendant(destination['cid'], code_['cid']):
+                    Message(self.app, _("Cannot move code"),
+                            _("Cannot move a code under itself or one of its own sub-codes.")).exec()
+                    return
+                cur.execute("update code_name set catid=null, supercid=? where cid=?", [destination['cid'], code_['cid']])
+            else:  # Move under a category
+                cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], code_['cid']])
             self.app.conn.commit()
-            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
+            self.parent_textEdit.append(_("Code moved.") + destination['name'].replace(" ← ", "/") + " → " + code_['name'])
+        self.app.conn.commit()
         self.app.delete_backup = False
         self.codes_changed.emit(["code_name"])
 
@@ -1354,8 +1459,7 @@ class CodeTreeController(QtCore.QObject):
         self.merge_codes(source_code, target_item)
 
     def merge_codes(self, item: dict, parent: QtWidgets.QTreeWidgetItem):
-        """
-        Merge code with another code.
+        """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code with Ctrl held.
         code text unique(cid,fid,pos0,pos1, owner)
         Args:

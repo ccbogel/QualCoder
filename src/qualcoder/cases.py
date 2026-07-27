@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -26,7 +26,7 @@ import datetime
 import logging
 import openpyxl
 from openpyxl import load_workbook
-import os
+from pathlib import Path
 import qtawesome as qta
 import sqlite3
 from urllib.parse import urlparse
@@ -46,7 +46,8 @@ from .memo import DialogMemo
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
+
 logger = logging.getLogger(__name__)
 
 
@@ -296,7 +297,7 @@ class DialogCases(QtWidgets.QDialog):
         Message(self.app, _('File export'), msg).exec()
         self.parent_text_edit.append(msg)
 
-    def load_cases_data(self, order_by="asc"):
+    def load_cases_data(self, order_by:str="asc"):
         """ Load case (to maximum) and attribute details from database. Display in tableWidget.
         Cases are a list of dictionaries.
         Attributes are a list of tuples(name,value,id)
@@ -424,13 +425,13 @@ class DialogCases(QtWidgets.QDialog):
         """ Get user chosen file as xlsx or csv for importation """
 
         self.overwrite_attributes_on_import = False
-        filename, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+        filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
                                                              _('Select cases file'),
                                                              self.app.settings['directory'],
                                                              "(*.csv *.CSV *.xlsx *.XLSX)",
                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                              )
-        if filename == "":
+        if filepath == "":
             return
         if self.cases:
             msg = _("Do you want imported data to override existing attributes?")
@@ -438,12 +439,12 @@ class DialogCases(QtWidgets.QDialog):
             ok = ui.exec()
             if ok:
                 self.overwrite_attributes_on_import = True
-        if filename[-4:].lower() == ".csv":
-            self.import_csv(filename)
-        if filename[-5:].lower() == ".xlsx":
-            self.import_xlsx(filename)
+        if filepath[-4:].lower() == ".csv":
+            self.import_csv(filepath)
+        if filepath[-5:].lower() == ".xlsx":
+            self.import_xlsx(filepath)
 
-    def import_xlsx(self, filepath):
+    def import_xlsx(self, filepath:str):
         """ Import from a xlsx file with the cases and any attributes.
         The file must have a header row which details the attribute names.
         The first column must have the case ids.
@@ -685,65 +686,64 @@ class DialogCases(QtWidgets.QDialog):
         """ If the case name has been changed in the table widget update the database.
          Cells that can be changed directly are the case name, and attributes. """
 
-        x = self.ui.tableWidget.currentRow()
-        y = self.ui.tableWidget.currentColumn()
-        if y == self.NAME_COLUMN:  # update case name
-            new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
-            # check that no other case name has this text and this is not empty
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        value = str(self.ui.tableWidget.item(row, col).text()).strip()
+        if col == self.NAME_COLUMN:  # update case name
+            # Check that no other case name has this text and this is not empty
             update = True
-            if new_text == "":
+            if value == "":
                 update = False
             for c in self.cases:
-                if c['name'] == new_text:
+                if c['name'] == value:
                     update = False
             if update:
                 cur = self.app.conn.cursor()
-                cur.execute("update cases set name=? where caseid=?", (new_text, self.cases[x]['caseid']))
+                cur.execute("update cases set name=? where caseid=?", (value, self.cases[row]['caseid']))
                 self.app.conn.commit()
-                self.cases[x]['name'] = new_text
+                self.cases[row]['name'] = value
             else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.cases[x]['name'])
-        if y > 2:  # update attribute value
+                self.ui.tableWidget.item(row, col).setText(self.cases[row]['name'])
+        if col >= self.ATTRIBUTE_START_COLUMN:  # Update attribute value
             now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
-            value = str(self.ui.tableWidget.item(x, y).text()).strip()
-            attribute_name = self.header_labels[y]
+            attribute_name = self.header_labels[col]
             cur = self.app.conn.cursor()
             # Check numeric for numeric attributes, clear "" if cannot be cast
             cur.execute("select valuetype from attribute_type where caseOrFile='case' and name=?", [attribute_name])
             result = cur.fetchone()
             if result is None:
                 return
-            if result[0] == "numeric":
+            if result[0] == "numeric" and value != "":
                 try:
                     float(value)
                 except ValueError:
-                    self.ui.tableWidget.item(x, y).setText("")
+                    self.ui.tableWidget.item(row, col).setText("")
                     value = ""
                     msg = _("This attribute is numeric")
                     Message(self.app, _("Warning"), msg, "warning").exec()
             # Check attribute row is present before updating
             cur.execute("select value from attribute where id=? and name=? and attr_type='case'",
-                        [self.cases[x]['caseid'], attribute_name])
+                        [self.cases[row]['caseid'], attribute_name])
             res = cur.fetchone()
             if res is None:
                 cur.execute("insert into attribute (value,id,name,attr_type, date,owner) values(?,?,?,'case',?,?)",
-                            (value, self.cases[x]['caseid'], attribute_name, now_date, self.app.settings['codername']))
+                            (value, self.cases[row]['caseid'], attribute_name, now_date, self.app.settings['codername']))
                 self.app.conn.commit()
             cur.execute("update attribute set value=?, date=?, owner=? where id=? and name=? and attr_type='case'",
-                        (value, now_date, self.app.settings['codername'], self.cases[x]['caseid'], attribute_name))
+                        (value, now_date, self.app.settings['codername'], self.cases[row]['caseid'], attribute_name))
             self.app.conn.commit()
-            self._emit_project_table_changes(["attribute"])
+        self._emit_project_table_changes(["attribute"])
 
         # Update self.cases[attributes]
-        # Add list of attribute values to files, order matches header columns
+        # Add list of attribute values to cases, order matches header columns
         sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? and id=?"
-        self.cases[x]['attributes'] = []
+        self.cases[row]['attributes'] = []
         cur = self.app.conn.cursor()
         for att_name in self.attribute_labels_ordered:
-            cur.execute(sql, [att_name, self.cases[x]['caseid']])
+            cur.execute(sql, [att_name, self.cases[row]['caseid']])
             res = cur.fetchone()
             if res:
-                self.cases[x]['attributes'].append(res[0])
+                self.cases[row]['attributes'].append(res[0])
 
         self.app.delete_backup = False
 
@@ -863,9 +863,11 @@ class DialogCases(QtWidgets.QDialog):
             item_text = self.ui.tableWidget.item(row, col).text()
         except AttributeError:  # NoneType error
             pass
+        # Check and get all selected indexes
+        selected_indexes = self.ui.tableWidget.selectionModel().selectedIndexes()
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_asc = None
         action_desc = None
         action_view_case = None
@@ -877,9 +879,12 @@ class DialogCases(QtWidgets.QDialog):
         action_equals_value = menu.addAction(_("Show this value"))
         action_order_by_value_asc = None
         action_order_by_value_desc = None
+        action_multiple_cells_value = None
         if col >= self.ATTRIBUTE_START_COLUMN:
             action_order_by_value_asc = menu.addAction(_("Order ascending"))
             action_order_by_value_desc = menu.addAction(_("Order descending"))
+            if len(selected_indexes) > 1:
+                action_multiple_cells_value = menu.addAction(_("Set value of selected cells"))
         action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
         url_test = urlparse(item_text)
@@ -927,6 +932,50 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.tableWidget.setRowHidden(r, False)
         if action == action_url:
             webbrowser.open(item_text)
+        if action == action_multiple_cells_value:
+            self.multiple_cells_value()
+
+    def multiple_cells_value(self):
+        """ Assign a value to all selected attribute cells. """
+
+        value, ok = QtWidgets.QInputDialog.getText(self, _("Selected cells"), _("Set value:"),
+                                                        QtWidgets.QLineEdit.EchoMode.Normal)
+        if not ok: return
+        msg = ""
+        value = value.strip()
+        selected_indexes = self.ui.tableWidget.selectionModel().selectedIndexes()
+        for i in selected_indexes:
+            col, row =  i.column(), i.row()
+            # Check if cell is an editable attribute
+            if col >= self.ATTRIBUTE_START_COLUMN:
+                try:
+                    prev_value = str(self.ui.tableWidget.item(col, row).text()).strip()
+                except AttributeError:
+                    prev_value = ""
+                attribute_name = self.header_labels[col]
+                cur = self.app.conn.cursor()
+                # Check numeric for numeric attributes, clear "" if it cannot be cast
+                cur.execute("select valuetype from attribute_type where caseOrFile='case' and name=?",
+                            (attribute_name,))
+                result = cur.fetchone()
+                if result is None:
+                    return
+                if result[0] == "numeric" and value != "":
+                    try:
+                        float(value)
+                    except ValueError:
+                        value = prev_value
+                        msg = _("Value must be numeric")
+                cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
+                            (value, self.cases[row]['caseid'], attribute_name))
+                item = QtWidgets.QTableWidgetItem(value)
+                self.ui.tableWidget.blockSignals(True)  # Otherwise, cell_modified() is called
+                self.ui.tableWidget.setItem(row,col, item)
+                self.ui.tableWidget.blockSignals(False)
+            self.app.conn.commit()
+        self._emit_project_table_changes(["attribute"])
+        if msg != "":
+            Message(self.app, _("Value error"), msg).exec()
 
     def fill_table(self):
         """ Fill the table widget with case details. """
@@ -1120,32 +1169,32 @@ class DialogCases(QtWidgets.QDialog):
                 ui = None
                 if item['mediapath'][:6] == "video:":
                     abs_path = item['mediapath'].split(':')[1]
-                    if not os.path.exists(abs_path):
+                    if not Path(abs_path).exists():
                         return
                     ui = DialogViewAV(self.app, item)
                 if item['mediapath'][:6] == "/video":
                     abs_path = self.app.project_path + item['mediapath']
-                    if not os.path.exists(abs_path):
+                    if not Path(abs_path).exists():
                         return
                     ui = DialogViewAV(self.app, item)
                 if item['mediapath'][:6] == "audio:":
                     abs_path = item['mediapath'].split(':')[1]
-                    if not os.path.exists(abs_path):
+                    if not Path(abs_path).exists():
                         return
                     ui = DialogViewAV(self.app, item)
                 if item['mediapath'][0:6] == "/audio":
                     abs_path = self.app.project_path + item['mediapath']
-                    if not os.path.exists(abs_path):
+                    if not Path(abs_path).exists():
                         return
                     ui = DialogViewAV(self.app, item)
                 if item['mediapath'][0:7] == "images:":
                     abs_path = item['mediapath'].split(':')[1]
-                    if not os.path.exists(abs_path):
+                    if not Path(abs_path).exists():
                         return
                     ui = DialogViewImage(self.app, item)
                 if item['mediapath'][0:7] == "/images":
                     abs_path = self.app.project_path + item['mediapath']
-                    if not os.path.exists(abs_path):
+                    if not Path(abs_path).exists():
                         return
                     ui = DialogViewImage(self.app, item)
                 ui.exec()
@@ -1174,8 +1223,7 @@ class ToolTipEventFilter(QtCore.QObject):
 
     def set_positions(self, media_data):
         """ Code_text contains the positions for the tooltip to be displayed.
-
-        param:
+        Args:
             media_data: List of dictionaries of the text contains: pos0, pos1
         """
 

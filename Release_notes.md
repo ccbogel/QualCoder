@@ -1,4 +1,4 @@
-We have jumped from version 3.8.2 to 4.0 as there are quite a few changes in this release.
+We have jumped to version 4.0 as there are quite a few changes in this release.
 
 # Installation
 
@@ -8,7 +8,7 @@ QualCoder is released under the LGPL v3 license
 
 Attached to the end of release page you will find two options:
 
-Executables will be aviable when a release is made.
+Executables will be available when a release is made.
 
 QualCoder_4_0_Win_setup.exe: a Windows installer, will set up QualCoder like any normal app, with entries in the start menu, etc.
 QualCoder_4_0_Win_Portable.exe: A portable binary. Double-click to run and wait for 15 seconds.
@@ -38,21 +38,128 @@ Start QualCoder by double-clicking the app within your applications folder. You 
 Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder was prevented from starting. Click on "open anyway".
 From now on, QualCoder should start without issues.
 
-## Linux Ubuntu, Lubuntu, Mint, ZorinOS, Debian, Arch
+**Alternatively, install from source:**
 
-This binary should work on the above recent releases of Linux distros, e.g. Linux Mint 22.3, Ubuntu 24.04 etc. Make the file executable after downloading by right-click -> Properties -> check the executable box. Then double-click to run.
+Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-QualCoder_4_0_ubuntu executable  (Will be avaible when a release is made).
+1. Download and install the Python programming language. Please use Python 3.12 on Windows, other versions may cause issues  [Python3](https://www.python.org/downloads/macos/). Download the latest "macOS 64-bit universal2 installer" for one of the above mentioned Python versions and open it to install Python.
 
-The binary file may work in other distros also. You need to make it executable, via the GUI or using the terminal.
+2. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases.
 
-### Linux Fedora
+3. Unzip the folder to a location (e.g. downloads) by double-clicking it. 
 
-Fedora has a segmentation fault (software crashes) which is, we believe, is currently not fixed, regarding audio / video coding. This fault has not been recently tested, so it may or may not still be present.
+4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
 
-## Manual install
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-4.0 folder, e.g. 
 
-For install from source code, download the zip file below and use the instructions in the README file to install on your operating system. Existing projects are migrated automatically when opened.
+```bash
+cd Downloads/QualCoder-4.0
+```
+
+6. Install the virtual environment and required python modules. 
+
+The `python3` command uses the most recent installed version of Python. You can use a specific version on your macOS, if you have many Python versions installed, e.g. `python3.12`. To verify you are using the correct Python version type `which python3`, which should output: `/Library/Frameworks/Python.framework/Versions/3.<version>/bin/python3`. If the output is `/usr/bin/python3`, don't continue, since this is your system's Python and it is discouraged to use.
+
+The install may take up to 10 minutes. 
+
+```bash
+python3 -m venv env # this creates the virtual environment with the name "env" in your current directory
+source env/bin/activate # this activates the virtual environment "env", (env) should appear in front of your prompt
+pip3 install --upgrade pip # optionally; pip and pip3 are equivalent withing a virtual environment
+pip3 install -r requirements.txt
+```
+
+7. Run QualCoder from the command prompt
+
+```bash
+cd src
+python3 -m qualcoder # python and python3 are equivalent withing a virtual environment
+```
+
+8. If running QualCoder in a virtual environment, to exit the virtual environment type:
+
+```bash
+deactivate
+```
+
+The command prompt will then remove the *(env)* wording.
+
+**To start QualCoder again**
+
+If you are not using a virtual environment:
+
+```bash
+cd Downloads/QualCoder-4.0
+cd src 
+python3 -m qualcoder
+```
+
+If you are using a virtual environment:
+
+```bash
+cd Downloads/QualCoder-4.0
+source env/bin/activate
+cd src 
+python3 -m qualcoder
+```
+
+## Linux
+
+- If you are on **Debian based system (Debian, Ubuntu / Lubuntu / ZorinOS, Linux Mint)** :
+  Install pip. This is a tool that downloads extra python modules :  `sudo apt install python3-pip`
+  If you are using audio or video, install VLC (download from site) or: `sudo apt install vlc`
+  If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+- If you are on **Fedora** : **There is a problem with using VLC from python. The software crashes, we are unable to find a solution to this. So audio and video cannot be used within a QualCoder project on Fedora.**
+- If you are on **Arch/Manjaro Linux** : If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc` and Install pip and venv: `sudo pacman -S python python-pip python-virtualenv`
+  
+1. Download and unzip the Qualcoder folder. 
+
+2. Then `cd` to the QualCoder folder.
+
+For example, you may now be in this folder, where you unzipped QualCoder: 
+
+yourcomputer:~Downloads/QualCoder-4.0
+
+3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and go to Properties), then type the below command and press Enter: 
+
+`./run_from_source_Linux.sh`
+
+3b. Instead of using the shell script, you can enter each of these commands to set up the virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing the required modules for the first time takes a while, maybe 10 minutes.
+
+```
+python3 -m venv env
+source env/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+5. Move to the inner src folder, then:
+```
+cd src
+python3 -m qualcoder
+```
+
+6. After using QualCoder deactivate the virtual environment.
+
+`deactivate`
+
+**Usage any time after the install, move to the QualCoder folder then:**
+
+```
+source env/bin/activate
+cd src
+python3 -m qualcoder
+```
+
+To exit the environment:
+
+`deactivate`
+
+You can also make a .desktop file for launching QualCoder:
+
+Create a .Desktop file for launch, enter this command (adapt it according to the location of the source code folder):
+
+`bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3 -m qualcoder'`
 
 # Changes in this release
 
@@ -60,7 +167,7 @@ Core languages will be English, German, French, Spanish. this is due to having r
 
 ## Data structure change
 
-One major requested change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
+One major change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
 
 ## Backups
 
@@ -75,65 +182,39 @@ Agentic restructure of AI features. Turns the AI chat into an agent that can not
 
 ## Menus and tabs
 
-A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. 
-
-The manage, Coding and Reports tabs have placeholder information that explains in more detail what each of these tabs is used for.
+A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. The manage, Coding and Reports tabs have placeholder information that explains in more detail what each of these tabs is used for.
 
 ## Journals
 
-Export are now to ODT format.
-
-Right-click menu option to convert a journal to a file for coding within the QualCoder project.
+Export are now to ODT format. Right-click menu option to convert a journal to a file for coding within the QualCoder project.
 
 ## Manage files
 
-There is an 'Import survey' button for importing surveys from Excel and csv files.
+There is an 'Import survey' button for importing surveys from Excel and csv files. Multiple rows selection. For context menu Delete and Export. When in the file name column pressing delete will delete the file(s).
 
-Multiple rows selection. For context menu Delete and Export.
+PDFs with highlights can be imported and their highlighted segments coded automatically, one code per highlight colour under a 'PDF Highlights' category, using the closest QualCoder palette colours.
 
-When in the file name column pressing delete will delete the file(s).
+## The Codes Tree in all coding screens
 
-## All coding screens
-
-Added sub-menus for Modify (Code or categories selected), Filter, Sort.
-
-Added a code namestext filter under neathte codes tree.
-
-Add a move category underneath category function.
+Added sub-menus for Modify (Code or categories selected), Filter, Sort. Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour). Added a code names text filter underneath the codes tree. Add a move category underneath category function. Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll. Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
 
 ## Code text
 
-Can set font and size for the document.
-
-Can resize codes with movable handles.
-
-Can change text highlighting from marker style to underline style and or vertical code stripes. 
-
-Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report.
-
-Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
-
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
-
-Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour).
-
-Key presse for Shift B to go to bookmark, andC to add a new category.
-
-Edit text mode - now has a search bar.
+Can set font and size for the document. Can resize codes with movable handles. Can change text highlighting from marker style to underline style and or vertical code stripes. Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report. Key presse for Shift B to go to bookmark, andC to add a new category. Edit text mode - now has a search bar.
 
 ## Code PDF
 
-Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
+Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). Text coding and image area coding can be performed on the PDF page. AI-assisted text analysis can be applied directly from the Code PDF window.
 
-Added a Filter icon when the Codes tree is fileter to specific codes (via Show codes like, or Show codes by colour).
+A refactoring method was added for older QualCoder projects. the text is re-extracted and existing codings are matched against the new text extraction method. Any codings that cannot be remapped are recorded in Journals as lost codes, so the user can review them.
 
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
+PDF highlight export: generates a copy of the original PDF with the coded segments embedded as native highlight annotations (in each code's color, with the code name as annotation comment), so the coded document can be opened and reviewed in any standard PDF reader.
+
+ODT report: exports a coding report in OpenDocument Text format (.odt), listing the coded segments with their codes (text and images).
 
 ## Code images
 
 Can resize coded areas using rightclick menu option and resize using handles.
-
-Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll.
 
 ## Code Audio / Video
 
@@ -141,23 +222,11 @@ A bookmark option has been added. So after it is aplied, in code A/V and view A/
 
 ## Co-occurrence report
 
-Proximity graphs
-
-Export format for Gephi import.
+Proximity graphs. Export format for Gephi import.
 
 ## Graph (mind map)
 
-Improved manipulation of objects.
-
-Export format for draw.io import.
-
-Ability to expand and collapse graph portions (categories).
-
-Another way via a dialog window to add coded segments.
-
-Options to organise the graph layout - radion, vertical, horizontal.
-
-Improved selection of font sizes and colours in menus.
+Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus. A mini map for scrolling. Dfferent node styles are available - box, oval, more. Mutlipe selection options are available.
 
 ## Report codes
 
