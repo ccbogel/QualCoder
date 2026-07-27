@@ -2064,7 +2064,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.source[x]['mediapath'][7:]
         else:
             abs_path = self.app.project_path + self.source[x]['mediapath']
-        if not Path(abs_path)).exists():
+        if not Path(abs_path).exists():
             self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
             return
         ui = DialogViewImage(self.app, self.source[x])
