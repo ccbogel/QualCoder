@@ -955,6 +955,8 @@ class App(object):
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
                 'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
                 'dialogcodetext_coding_margin_width',
+                'codetext_show_margin_stripes',
+                'codetext_highlight_style',
                 'dialogcodepdf_coding_margin_width',
                 'dialogcodepdf_page_view',
                 'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
@@ -1010,6 +1012,10 @@ class App(object):
                     settings_data[key] = 50000
                 if key == 'showids':
                     settings_data[key] = False
+                if key == 'codetext_show_margin_stripes':
+                    settings_data[key] = True
+                if key == 'codetext_highlight_style':
+                    settings_data[key] = 'marker'
                 if key.endswith('_tree_widths'):
                     settings_data[key] = ""
                 if key == 'report_text_context_style':
@@ -1378,6 +1384,8 @@ class App(object):
             'dialogcodetext_splitter_v0': 1,
             'dialogcodetext_splitter_v1': 1,
             'dialogcodetext_coding_margin_width': 100,
+            'codetext_show_margin_stripes': True,
+            'codetext_highlight_style': 'marker',
             'dialogcodepdf_coding_margin_width': 120,
             'dialogcodepdf_page_view': 0,
             'dialogcodeimage_splitter0': 1,
@@ -3225,6 +3233,19 @@ Click "Yes" to start now.')
         if ui is not None:
             contents.addWidget(ui)
 
+    def refresh_open_code_display_settings(self):
+        """Apply saved code stripe and highlight settings to open code text and PDF dialogs."""
+
+        for tab_widget in (self.ui.tab_coding, self.ui.tab_reports, self.ui.tab_manage):
+            layout = tab_widget.layout()
+            if layout is None:
+                continue
+            for i in range(layout.count()):
+                widget = layout.itemAt(i).widget()
+                if isinstance(widget, (DialogCodeText, DialogCodePdf)):
+                    widget.apply_margin_stripe_setting()
+                    widget.apply_highlight_style_setting()
+
     def codebook(self):
         """ Export a text file code book of categories and codes. """
 
@@ -3547,6 +3568,7 @@ Click "Yes" to start now.')
         self.setStyleSheet(font)
         self.update_placeholder_tab_styles()
         self.ai_chat_window.init_styles()
+        self.refresh_open_code_display_settings()
         
         if self.app.settings['ai_enable'] == 'True':
             self.app.ai.init_llm(self, rebuild_vectorstore=False)

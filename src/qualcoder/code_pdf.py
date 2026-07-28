@@ -1748,13 +1748,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         # View preferences SHARED with code_text (same settings keys): margin stripes, highlight style, and margin side.
         # Whatever is saved in code_text is visible here and vice versa.
         try:
-            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'False')
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'True')
             if isinstance(saved_pref, bool):
                 self.show_margin_stripes = saved_pref
             else:
                 self.show_margin_stripes = str(saved_pref).lower() == 'true'
         except (KeyError, AttributeError):
-            self.show_margin_stripes = False
+            self.show_margin_stripes = True
         try:
             saved_style = self.app.settings.get('codetext_highlight_style', None)
         except (KeyError, AttributeError):
@@ -1762,7 +1762,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if saved_style in ('marker', 'underline'):
             self.highlight_style = saved_style
         else:
-            self.highlight_style = 'underline' if self.show_margin_stripes else 'marker'
+            self.highlight_style = 'marker'
         try:
             saved_side = self.app.settings.get('codetext_margin_side', 'left')
             if saved_side not in ('left', 'right'):
@@ -5603,7 +5603,19 @@ class DialogCodePdf(QtWidgets.QWidget):
         and persists the shared preference.
         """
 
-        self.show_margin_stripes = not self.show_margin_stripes
+        self.apply_margin_stripe_setting(not self.show_margin_stripes)
+
+    def apply_margin_stripe_setting(self, show_margin_stripes: bool | None = None):
+        """Apply and persist the code stripe margin visibility without toggling blindly."""
+
+        if show_margin_stripes is None:
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', True)
+            if isinstance(saved_pref, bool):
+                show_margin_stripes = saved_pref
+            else:
+                show_margin_stripes = str(saved_pref).lower() == 'true'
+
+        self.show_margin_stripes = show_margin_stripes
         try:
             self.app.settings['codetext_show_margin_stripes'] = (
                 'True' if self.show_margin_stripes else 'False')
@@ -5649,6 +5661,15 @@ class DialogCodePdf(QtWidgets.QWidget):
         except (TypeError, AttributeError):
             pass
         self.rebuild_marks()
+
+    def apply_highlight_style_setting(self, style: str | None = None):
+        """Apply the saved highlight style without relying on translated UI text."""
+
+        if style is None:
+            style = self.app.settings.get('codetext_highlight_style', 'marker')
+        if style not in ('marker', 'underline'):
+            style = 'marker'
+        self._set_highlight_style(style)
 
     # Resizing of codings (text and areas)
     def _select_single(self, entries, title):

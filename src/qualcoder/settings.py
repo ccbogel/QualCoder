@@ -22,6 +22,7 @@ https://qualcoder.org/
 
 import logging
 import os
+from typing import Any
 from PyQt6 import QtGui, QtWidgets, QtCore
 import qtawesome as qta
 import copy
@@ -78,6 +79,15 @@ BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
 CHUNK_SIZES = [50000, 30000]                # comboBox_text_chunk_size  
 STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
+HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
+
+
+def _setting_is_true(value: Any) -> bool:
+    """Return True when a stored setting value represents an enabled state."""
+
+    if isinstance(value, bool):
+        return value
+    return str(value).lower() == 'true'
 
 
 def _combo_value(combobox, values, default):  
@@ -109,6 +119,15 @@ def _set_combo_by_value(combobox, values, value):
         combobox.setCurrentIndex(values.index(value))
     except ValueError:
         combobox.setCurrentIndex(0)
+
+
+def _combo_choice(combobox, values, default):
+    """Return the canonical selected value by index for non-numeric comboboxes."""
+
+    idx = combobox.currentIndex()
+    if 0 <= idx < len(values):
+        return values[idx]
+    return default
 
 
 def _combo_int(text, default=0, minimum=None, maximum=None):  # <- L
@@ -223,6 +242,12 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
+        self.ui.checkBox_code_stripes.setChecked(
+            _setting_is_true(self.settings.get('codetext_show_margin_stripes', True)))
+        _set_combo_by_value(
+            self.ui.comboBox_code_highlight_style,
+            HIGHLIGHT_STYLE_OPTIONS,
+            self.settings.get('codetext_highlight_style', 'marker'))
 
         _set_combo_by_value(self.ui.comboBox_backups, BACKUP_COUNTS, self.settings['backup_num'])
 
@@ -882,6 +907,12 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['backup_av_files'] = 'True'
         else:
             self.settings['backup_av_files'] = 'False'
+        self.settings['codetext_show_margin_stripes'] = (
+            'True' if self.ui.checkBox_code_stripes.isChecked() else 'False')
+        self.settings['codetext_highlight_style'] = _combo_choice(
+            self.ui.comboBox_code_highlight_style,
+            HIGHLIGHT_STYLE_OPTIONS,
+            self.settings.get('codetext_highlight_style', 'marker'))
         self.settings['backup_num'] = _combo_value(self.ui.comboBox_backups, BACKUP_COUNTS,
                                                    self.app.settings['backup_num'])  # <- L
         self.settings['report_text_context_characters'] = _combo_value(
