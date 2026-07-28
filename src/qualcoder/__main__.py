@@ -15,7 +15,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
@@ -32,6 +32,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import locale as py_locale
 import os
+from pathlib import Path
 import platform
 import shutil
 import sys
@@ -97,7 +98,6 @@ try:
 except Exception as e:
     print(e)
 
-qualcoder_version = "QualCoder 4.0 in development"
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
 if not os.path.exists(home + '/.qualcoder'):
@@ -186,18 +186,6 @@ class App(object):
     Savable settings does not contain project name, project path or db connection.
     """
 
-    version = qualcoder_version
-    conn = None
-    project_path = ""
-    project_name = ""
-    # Can delete the most current back up if the project has not been altered
-    delete_backup_path_name = ""
-    delete_backup = True
-    # Used as a default export location, which may be different from the working directory
-    last_export_directory = ""
-    # Used across app to have a consistent look of expanded and contracted categories in the codes tree. Visual appeal.
-    collapsed_categories = []
-
     ai = None
     ai_models = []
     # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
@@ -208,9 +196,9 @@ class App(object):
         self.conn = None
         self.project_path = ""
         self.project_name = ""
-        self.collapsed_categories = []
-        self.last_export_directory = ""
-        self.delete_backup = True
+        self.collapsed_categories = []  # Used across app for consistent expanded/contracted categories in codes tree.
+        self.last_export_directory = ""  # Default export location, which may be different from the working directory
+        self.delete_backup = True  # Can delete the most current back up if the project has not been altered
         self.delete_backup_path_name = ""
         self.userhome = os.path.expanduser('~')
         self.confighome = os.path.join(self.userhome, '.qualcoder')
@@ -219,7 +207,9 @@ class App(object):
         self.pending_ai_model_upgrade_offer = None
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
-        self.version = qualcoder_version
+        self.version = "4.0"
+        self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
+        self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
         self.project_events = ProjectEventBus()
 
     def read_previous_project_paths(self):
@@ -1282,8 +1272,8 @@ class App(object):
         for i, sl in enumerate(style_lines):
             print(i + 1, sl)
         style_lines = style_lines[0:15]  # Test bed for parsing
-        style = "\n".join(style_lines)'''
-        # print("\nSTYLE\n", style)
+        style = "\n".join(style_lines)
+        print("\nSTYLE\n", style)'''
         return style
     
     def highlight_color(self):
@@ -3491,7 +3481,7 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null)",
-                    ('v17', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v17', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', self.app.version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -3741,7 +3731,7 @@ Click "Yes" to start now.')
             self.app.conn.commit()
             cur.execute("drop table code_text")
             cur.execute("alter table code_text2 rename to code_text")
-            cur.execute('update project set databaseversion="v4", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v4", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v4")
         # Database version v5
@@ -3753,7 +3743,7 @@ Click "Yes" to start now.')
             cur.execute("ALTER TABLE project ADD codername text")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v5", about=?, codername=?',
-                        [qualcoder_version, self.app.settings['codername']])
+                        [self.app.version, self.app.settings['codername']])
             self.app.conn.commit()
         try:
             cur.execute("select av_text_id from source")
@@ -3838,7 +3828,7 @@ Click "Yes" to start now.')
             cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                         "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
             self.app.conn.commit()
-            cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v6", about=?', [self.app.version])
             self.ui.textEdit.append(_("Updating database to version") + " v6")
         # Database version v7
         db7_update = False
@@ -3861,7 +3851,7 @@ Click "Yes" to start now.')
             self.app.conn.commit()
             db7_update = True
         if db7_update:
-            cur.execute('update project set databaseversion="v7", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v7", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v7")
         # Database version v8
@@ -3869,7 +3859,7 @@ Click "Yes" to start now.')
             cur.execute("select risid from ris")
         except sqlite3.OperationalError:
             cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
-            cur.execute('update project set databaseversion="v8", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v8", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v8")
         try:
@@ -3881,7 +3871,7 @@ Click "Yes" to start now.')
             cur.execute("select recently_used_codes from project")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE project ADD recently_used_codes text')  # code ids list split by a space
-            cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v9", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v9")
         # Database version v10
@@ -3889,7 +3879,7 @@ Click "Yes" to start now.')
             cur.execute("select pdf_page from code_image")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE code_image ADD pdf_page integer')  #
-            cur.execute('update project set databaseversion="v10", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v10", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v10")
         # Database version v11
@@ -3897,7 +3887,7 @@ Click "Yes" to start now.')
             cur.execute("select pdf_page from gr_pix_item")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE gr_pix_item ADD pdf_page integer')  #
-            cur.execute('update project set databaseversion="v11", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v11", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v11")
 
@@ -3906,7 +3896,7 @@ Click "Yes" to start now.')
             cur.execute("select name from manage_files_display")
         except sqlite3.OperationalError:
             cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
-            cur.execute('update project set databaseversion="v12", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v12", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v12")
         # Database version v13
@@ -3914,7 +3904,7 @@ Click "Yes" to start now.')
             cur.execute("select name from files_filter")
         except sqlite3.OperationalError:
             cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
-            cur.execute('update project set databaseversion="v13", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v13", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v13")
         # Database version v14
@@ -3922,7 +3912,7 @@ Click "Yes" to start now.')
             cur.execute("select name from coder_names")
         except sqlite3.OperationalError:
             self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
-            cur.execute('update project set databaseversion="v14", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v14", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v14")
         # Database version v15
@@ -3932,15 +3922,15 @@ Click "Yes" to start now.')
             cur.execute("alter table project add avbookmarkfile integer")
             cur.execute("alter table project add avbookmarkmsec integer")
             cur.execute("alter table project add avbookmarktextpos integer")
-            cur.execute('update project set databaseversion="v15", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v15", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v15")
-        # Database version v16 - sub-codes: a code can be nested under another code (supercid) <- L
+        # Database version v16 - sub-codes: a code can be nested under another code (supercid)
         try:
             cur.execute("select supercid from code_name")
         except sqlite3.OperationalError:
             cur.execute("alter table code_name add supercid integer")
-            cur.execute('update project set databaseversion="v16", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v16", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v16")
         # Database version v17. Graph memo nodes and relation line label/arrow persistence
@@ -3954,7 +3944,7 @@ Click "Yes" to start now.')
             cur.execute("CREATE TABLE IF NOT EXISTS gr_memo_item (gmemoid integer primary key, grid integer, "
                         "memo_source_type text, memo_source_id integer, x integer, y integer, "
                         "color text, font_size integer);")
-            cur.execute('update project set databaseversion="v17", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v17", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v17")
         # Delete codings (fid, id) that do not have a matching source id
@@ -4323,13 +4313,18 @@ Click "Yes" to start now.')
         Some issues on some platforms, so all in try except clause
         """
 
-        self.ui.textEdit.append(_("This version: ") + qualcoder_version)
+        self.ui.textEdit.append(_("This version: ") + self.app.version)
         try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
             )).read())
-            if _json['name'] > qualcoder_version:
+            tmp_num = _json['name'].split('.')
+            release_num = float(tmp_num[0] + '.'.join(tmp_num[1:]))
+            tmp_num = self.app.version.split('.')
+            version_num = float(tmp_num[0] + '.'.join(tmp_num[1:]))
+            #if _json['name'] > self.app.version:
+            if release_num > version_num:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
                 html = f'<span style="color:red">{_json["html_url"]}</span><br />'
@@ -4340,11 +4335,7 @@ Click "Yes" to start now.')
         except Exception as err:
             print(err)
             logger.warning(str(err))
-
-        tag = self.app.version.split("QualCoder ")[1]
-        citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.app.version} [Computer software].\n"
-        citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{tag}\n"
-        self.ui.textEdit.append(citation)
+        self.ui.textEdit.append(self.app.citation)
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
@@ -4359,7 +4350,8 @@ def gui():
     app._qc_installed_translators = []
     # Noto Sans - for general application
     install_noto_sans()
-    QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
+    #QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
+    QtGui.QFontDatabase.addApplicationFont(str(Path(home) / ".qualcoder" / "NotoSans-Regular.ttf"))
     # DroidSandMono - for wordcloud
     install_droid_sans_mono()
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
@@ -4386,7 +4378,6 @@ def gui():
             print(err)
             logger.error(err)
             zip_sync_error = err
-
         qm_path = qual_app.get_language_file_path(lang, 'qm')
         mo_path = qual_app.get_language_file_path(lang, 'mo')
         try:
@@ -4460,7 +4451,7 @@ def gui():
 def install_droid_sans_mono():
     """ Install DroidSansMono ttf font for wordclouds into .qualcoder folder """
 
-    qc_folder = os.path.join(home, '.qualcoder', 'DroidSansMono.ttf')
+    qc_folder = Path(home) /'.qualcoder' / 'DroidSansMono.ttf'
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(DroidSansMono)
         file_.write(decoded_data)
@@ -4469,7 +4460,7 @@ def install_droid_sans_mono():
 def install_noto_sans():
     """ Install NotoSans ttf font for general application into .qualcoder folder """
 
-    qc_folder = os.path.join(home, '.qualcoder', 'NotoSans-Regular.ttf')
+    qc_folder = Path(home) / '.qualcoder' / 'NotoSans-Regular.ttf'
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(NotoSans)
         file_.write(decoded_data)
