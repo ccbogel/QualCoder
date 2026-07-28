@@ -1679,6 +1679,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.app = app
             self.ai_mcp_server = AiMcpServer(self.app)
             self.load_ai_permissions()
+        self._close_chat_history_connection()
         # init chat history
         self.chat_history_folder = self.app.project_path + '/ai_data'
         if not os.path.exists(self.chat_history_folder):
@@ -1718,12 +1719,72 @@ class DialogAIChat(QtWidgets.QDialog):
         self.current_chat_idx = -1
         self.fill_chat_list()
         self._update_undo_button_state()
-    
+
+    def _close_chat_history_connection(self) -> None:
+        """Close the project-bound chat history connection, if any."""
+
+        if self.chat_history_conn is None:
+            return
+        try:
+            self.chat_history_conn.close()
+        except Exception as e_:
+            logger.warning(e_)
+        finally:
+            self.chat_history_conn = None
+
+    def reset_for_project_close(self) -> None:
+        """Clear project-bound AI chat state after a project is closed."""
+
+        self._dismiss_prompt_completion(accept=False)
+        self._cancel_pending_stream_render()
+        self.ai_stream_render_pending = False
+        if self._chat_window_refresh_timer.isActive():
+            self._chat_window_refresh_timer.stop()
+        self._chat_window_refresh_pending = False
+        self._close_chat_history_connection()
+        self.chat_history_folder = ""
+        self.chat_history_path = ""
+        self.current_chat_idx = -1
+        self.current_streaming_chat_idx = -1
+        self.current_streaming_run_id = ''
+        self.chat_list = []
+        self.chat_msg_list = []
+        self.ai_semantic_search_chunks = []
+        self.curr_codings = None
+        self.ai_search_code_name = None
+        self.ai_search_code_memo = None
+        self.ai_search_file_ids = []
+        self.ai_search_code_ids = []
+        self.ai_text_doc_id = None
+        self.ai_text_doc_name = ''
+        self.ai_text_text = ''
+        self.ai_text_start_pos = -1
+        self._chat_ai_profile_snapshots.clear()
+        self._multi_chat_selection_active = False
+
+        selection_model = self.ui.treeView_chat_list.selectionModel()
+        blockers = [QtCore.QSignalBlocker(self.ui.comboBox_ai_chats)]
+        if selection_model is not None:
+            blockers.append(QtCore.QSignalBlocker(selection_model))
+        try:
+            self.chat_list_model.clear()
+            self.ui.treeView_chat_list.setCurrentIndex(QtCore.QModelIndex())
+            self.ui.comboBox_ai_chats.setCurrentIndex(-1)
+        finally:
+            del blockers
+
+        self.ui.plainTextEdit_question.clear()
+        self.ui.progressBar_ai.setRange(0, 100)
+        self.ui.progressBar_ai.setValue(0)
+        self.ui.pushButton_delete.setEnabled(False)
+        self.ui.pushButton_undo.setEnabled(False)
+        self.update_chat_window(scroll_to_bottom=False)
+        self._hide_transient_chat_overlays()
+
     def close(self):
         self.ai_output_splitter_save_timer.stop()
         self.persist_ai_output_splitter_setting()
-        if self.chat_history_conn is not None:
-            self.chat_history_conn.close()
+        self.reset_for_project_close()
             
     def help(self):
         """ Open help in browser. """
