@@ -263,16 +263,14 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2025) QualCoder 3.8.2 [Computer software]. Retrieved from
+Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2026) QualCoder 3.8.2 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.8.2
 
 ## Authors 
 
 **Creator**
 
-**Dr. Colin Curtain** BPharm GradDipComp PhD Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilise with some Masters's and Ph.D. students whom I supervise.
-
-https://www.utas.edu.au/profiles/staff/umore/colin-curtain
+**Dr. Colin Curtain** BPharm GradDipComp PhD Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilise with some Masters's and Ph.D. students whom I supervise. https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
 https://discover.utas.edu.au/Colin.Curtain/publications
 
@@ -281,10 +279,10 @@ https://discover.utas.edu.au/Colin.Curtain/publications
 **Dr. rer. soc. Kai Dröge,** [University for Applied Science](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), Lucerne, Switzerland and [Institute for Social Research](https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html) Frankfurt, Germany. Kai is an experienced researcher and teacher of qualitative methods. His research interests are wide-ranging and include the sociology of emotions and intimate relationships, digital life and new media, and questions of economic and labor sociology. Recently, he has focused on the methodological challenges and opportunities of integrating AI into qualitative research. He is also the creator of [noScribe](https://github.com/kaixxx/noScribe#readme), a popular open-source transcription tool aimed especially at qualitative interviews.
 
 **Dr. Justin Missaghieh--Poncet**
-
+[Université de Pau et des Pays de l'Adour](https://www.univ-pau.fr/fr/index.html), République française. Justin is a geography researcher, who works on the relationship between societies and their environment, with particular attention to energy and ecological transitions. 
 
 **Dr. Lorenzo Salomón**
-
+[Universidad Autónoma de Sinaloa](https://www.uas.edu.mx/), Mexico. 
 
 ## Leave a review
 
@@ -296,9 +294,9 @@ https://alternativeto.net/software/qualcoder
 
 Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
 
-## Warnings about other sources of information about QualCoder 
+## Other sources of information about QualCoder 
 
-A book _Qualitative Data Analysis With Chatgpt And Qualcoder_. We have been advised the book may contain some incorrect information about QualCoder.
+Literature about QualCoder. Literature from authors not listed above may potneitally be inaccurate.
 
 Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page or the Codeberg equivalent: https://codeberg.org/qualcoder.
 
