@@ -33,12 +33,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import logging
-import sys
-import traceback
 import xml.etree.ElementTree as etree
 import zipfile
-
-from PyQt6 import QtWidgets
 
 
 logger = logging.getLogger(__name__)
