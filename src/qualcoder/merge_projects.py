@@ -23,13 +23,12 @@ https://qualcoder.org/
 
 import datetime
 import logging
-import os
+from pathlib import Path
 import shutil
 import sqlite3
 
 from .helpers import Message
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -48,7 +47,7 @@ class MergeProjects:
     def __init__(self, app, path_s):
         self.app = app
         self.path_s = path_s  # Path to source project folder
-        self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))  # Source project that is to be merged in
+        self.conn_s = sqlite3.connect(Path(self.path_s) / 'data.qda'))  # Source project that is to be merged from
         self.conn_d = self.app.conn  # Destination project - the currently opened project
         self.path_d = self.app.project_path  # Path to destination project folder
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
@@ -82,7 +81,7 @@ class MergeProjects:
             # Update vectorstore
             if self.app.settings['ai_enable'] == 'True':
                 self.app.ai.sources_vectorstore.update_vectorstore()
-            self.summary_msg += "\n" + _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
+            self.summary_msg += "\n" + _("Finished merging ") + f"{self.path_s}  --> {self.path_d}\n"
             self.summary_msg += _(
                 "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
@@ -124,7 +123,7 @@ class MergeProjects:
                     sql = "insert into code_cat (name, memo, owner, date, supercatid) values (?,?,?,?,?)"
                     cur_d.execute(sql, [c['name'], c['memo'], c['owner'], c['date'], res_category[0]])
                     self.conn_d.commit()
-                    self.summary_msg += _("Adding sub-category: " + c['name']) + " --> " + c['supercatname'] + "\n"
+                    self.summary_msg += _("Adding sub-category: ") + f"{c['name']} --> {c['supercatname']}\n"
             for item in remove_list:
                 self.categories_s.remove(item)
             count += 1
@@ -390,17 +389,17 @@ class MergeProjects:
 
         folders = ["audio", "documents", "images", "video"]
         for folder_name in folders:
-            dir_ = self.path_s + "/" + folder_name
-            files = os.listdir(dir_)
-            for f in files:
-                if not os.path.exists(self.app.project_path + "/" + folder_name + "/" + f):
+            source_dir = Path(self.path_s) / folder_name  # self.path_s + "/" + folder_name
+            for file_ in Path(source_dir).iterdir():
+                dest_path = Path(self.app.project_path) / folder_name / file_
+                if not dest_path.exists(): 
                     try:
-                        shutil.copyfile(dir_ + "/" + f, self.app.project_path + "/" + folder_name + "/" + f)
-                        self.summary_msg += _("File copied: ") + f + "\n"
+                        shutil.copyfile(Path(source_dir) / file_, dest_path)
+                        self.summary_msg += _("File copied: ") + f"{file_}\n"
                     except shutil.SameFileError:
                         pass
                     except PermissionError:
-                        self.summary_msg += f + " " + _("NOT copied. Permission error")
+                        self.summary_msg += f"{file_} " + _("NOT copied. Permission error")
 
     def insert_new_attribute_types(self):
         """ Insert new attribute types  for cases and files.
