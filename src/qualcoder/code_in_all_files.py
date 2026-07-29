@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -24,8 +24,9 @@ https://qualcoder.org/
 import datetime
 import fitz
 import logging
-import os
+from pathlib import Path
 import sqlite3
+from typing import Any
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -35,7 +36,6 @@ from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, 
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +53,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     def __init__(self, app, codes_list, case_or_file:str = "File", category_name:str = ""):
         """ Create dialog with textEdit widget to show all codings of this code.
         Called: code_text.coded_media_dialog , code_av.coded_media_dialog , code_image.coded_media_dialog
-        param:
+        Args:
             app : class containing app details such as database connection
             codes_list : dictionary of this one code {name, color, cid, catid, date, owner, memo}, OR
                 list of dictionaries of {name,color, cid, catid,date,owner,memo}
@@ -243,7 +243,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.te.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
         self.te.blockSignals(False)
 
-    def insert_title(self, row):
+    def insert_title(self, row:dict[str,Any]):
         """ Convenience method for a/v, image, text title insertion.
         Args:
             row : Dictionary
@@ -321,8 +321,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
-        imagename = os.path.join(self.app.project_path, "images", f"{counter}-{img['mediapath']}")
-        url = QtCore.QUrl(imagename)
+        image_name = Path(self.app.project_path) / "images" / f"{counter}-{img['mediapath']}"
+        url = QtCore.QUrl(str(image_name))
         document = text_edit.document()
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         # See https://doc.qt.io/qt-6/qtextdocument.html#addResource
@@ -430,7 +430,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         if action == action_remove_important:
             self.remove_important_flag(item)
 
-    def add_important_flag(self, item):
+    def add_important_flag(self, item:dict[str,Any]):
         """ Add flag to item
         Args:
             item : Dictionary
@@ -447,7 +447,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
 
-    def remove_important_flag(self, item):
+    def remove_important_flag(self, item:dict[str, Any]):
 
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
@@ -460,7 +460,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
 
-    def edit_memo(self, item):
+    def edit_memo(self, item:dict[str, Any]):
         """ Edit item memo.
         Args:
             item : Dictionary
@@ -497,7 +497,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         msg = _("Coded text file exported: ") + filepath
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
-    def mark_with_more_codes(self, item):
+    def mark_with_more_codes(self, item: dict[str, Any]):
         """ Select and apply more codes to this coded segment.
         Args:
             item : Dictionary
@@ -555,7 +555,7 @@ class DialogCodedIds(QtWidgets.QDialog):
         DialogReportCodes
     """
 
-    def __init__(self, app, prime_item):
+    def __init__(self, app, prime_item:dict[str, Any]):
         """ Create dialog with textEdit widget to show all code ids.
         Used to show codes that overlaps with another base code.
         Called by: DialogReportCodes
@@ -703,7 +703,7 @@ class DialogCodedIds(QtWidgets.QDialog):
         self.te.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
         self.te.blockSignals(False)
 
-    def insert_title(self, row):
+    def insert_title(self, row:dict[str, Any]):
         """ Convenience method for a/v, image, text title insertion.
         Args:
             row : Dictionary
@@ -778,8 +778,8 @@ class DialogCodedIds(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
-        imagename = os.path.join(self.app.project_path, "images", f"{counter}-{img['mediapath']}")
-        url = QtCore.QUrl(imagename)
+        image_name = Path(self.app.project_path) / "images" / f"{counter}-{img['mediapath']}"
+        url = QtCore.QUrl(str(image_name))
         document = text_edit.document()
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         # See https://doc.qt.io/qt-6/qtextdocument.html#addResource
