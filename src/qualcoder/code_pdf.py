@@ -4303,6 +4303,16 @@ class DialogCodePdf(QtWidgets.QWidget):
             return ""
         return normalized.rsplit("/", 1)[-1]
 
+    @staticmethod
+    def _text_analysis_prompt_menu_label(relative_path: str, scope: str) -> str:
+        """Return the prompt menu label including the prompt scope."""
+
+        leaf = DialogCodePdf._text_analysis_prompt_menu_leaf(relative_path)
+        prompt_scope = str(scope if scope is not None else "").strip()
+        if leaf == "" or prompt_scope == "":
+            return leaf
+        return f"{leaf} ({prompt_scope})"
+
     def _text_analysis_prompt_folder_icon(self):
         """Return the same folder icon used by the prompt library."""
 
@@ -4330,11 +4340,16 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         def populate_branch(parent_menu, branch) -> None:
             for branch_relative_path, prompt_record in branch["prompts"]:
-                action = parent_menu.addAction(self._text_analysis_prompt_menu_leaf(branch_relative_path))
+                action = parent_menu.addAction(
+                    self._text_analysis_prompt_menu_label(branch_relative_path, prompt_record.scope)
+                )
                 action.setToolTip(prompt_record.description)
                 action.setIcon(self._text_analysis_prompt_file_icon(parent_menu))
                 action.setProperty('submenu', 'ai_text_analysis')
-                action.setData(prompt_record)
+                action.setData({
+                    "name": prompt_record.name,
+                    "scope": prompt_record.scope,
+                })
             for folder_name, child_branch in branch["folders"].items():
                 submenu = parent_menu.addMenu(folder_name)
                 submenu.setToolTipsVisible(True)

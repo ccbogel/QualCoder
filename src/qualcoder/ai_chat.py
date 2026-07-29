@@ -5027,6 +5027,45 @@ data collected. This information will accompany every prompt sent to the AI, res
             },
         )
 
+    def _resolve_text_analysis_prompt_payload(self, prompt_payload: Any) -> Optional[AgentPromptRecord]:
+        """Resolve one text-analysis prompt from a menu payload or prompt record."""
+
+        prompt_name = ""
+        prompt_scope = ""
+
+        if isinstance(prompt_payload, AgentPromptRecord):
+            prompt_name = str(prompt_payload.name if prompt_payload.name is not None else "").strip()
+            prompt_scope = str(prompt_payload.scope if prompt_payload.scope is not None else "").strip()
+        elif isinstance(prompt_payload, dict):
+            prompt_name = str(prompt_payload.get("name", "") if prompt_payload.get("name", "") is not None else "").strip()
+            prompt_scope = str(prompt_payload.get("scope", "") if prompt_payload.get("scope", "") is not None else "").strip()
+        elif isinstance(prompt_payload, (tuple, list)) and len(prompt_payload) > 0:
+            prompt_name = str(prompt_payload[0] if prompt_payload[0] is not None else "").strip()
+            if len(prompt_payload) > 1:
+                prompt_scope = str(prompt_payload[1] if prompt_payload[1] is not None else "").strip()
+        elif isinstance(prompt_payload, str):
+            prompt_name = str(prompt_payload).strip()
+        else:
+            prompt_name = str(getattr(prompt_payload, 'name', '') if prompt_payload is not None else '').strip()
+            prompt_scope = str(getattr(prompt_payload, 'scope', '') if prompt_payload is not None else '').strip()
+
+        if prompt_name == "":
+            return None
+        if prompt_scope != "":
+            return self.agent_prompts_catalog.find_prompt_variant(
+                prompt_name,
+                prompt_scope,
+                prompt_type="text_analysis",
+                apply_init=False,
+            )
+
+        prompt_record = self.agent_prompts_catalog.get_prompt(prompt_name)
+        if prompt_record is None:
+            return None
+        if self.agent_prompts_catalog.prompt_type_from_name(prompt_record.name) != "text_analysis":
+            return None
+        return prompt_record
+
     def _mcp_text_analysis_worker(self, messages: List[Any], chat_idx: int,
                                   bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
         """Run the first text analysis turn on top of the normal MCP agent flow."""
@@ -5412,14 +5451,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
-        prompt_name = str(getattr(prompt, 'name', '') if prompt is not None else '').strip()
-        prompt_scope = str(getattr(prompt, 'scope', 'system') if prompt is not None else 'system').strip()
-        prompt_record = self.agent_prompts_catalog.find_prompt_variant(
-            prompt_name,
-            prompt_scope,
-            prompt_type="text_analysis",
-            apply_init=False,
-        )
+        prompt_record = self._resolve_text_analysis_prompt_payload(prompt)
         if prompt_record is None:
             msg = _('The selected text analysis prompt could not be loaded.')
             Message(self.app, _('AI prompts'), msg, "warning").exec()

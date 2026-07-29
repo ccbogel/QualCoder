@@ -7,6 +7,7 @@ import tempfile
 from unittest import TestCase
 
 from qualcoder.__main__ import App
+from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
@@ -590,6 +591,90 @@ class TestAiReferenceResolution(TestCase):
         resolved = DialogAIChat._resolve_ref_quote_to_anchor(resolver, "boring", candidates)
 
         self.assertEqual('(<a href="quote:1_8_6">textfile one: 1</a>)', resolved)
+
+
+class DummyTextAnalysisPromptCatalog:
+    """Minimal prompt catalog stub for text-analysis prompt resolution tests."""
+
+    def __init__(self):
+        self.project_prompt = AgentPromptRecord(
+            scope="project",
+            root_path="",
+            name="text-analysis/project-prompt",
+            file_path="",
+            content="Prompt body",
+            description="",
+            is_internal=False,
+        )
+        self.system_prompt = AgentPromptRecord(
+            scope="system",
+            root_path="",
+            name="text-analysis/system-prompt",
+            file_path="",
+            content="System prompt body",
+            description="",
+            is_internal=False,
+        )
+
+    def find_prompt_variant(self, name: str, scope: str, prompt_type=None, apply_init: bool = True):
+        del prompt_type, apply_init
+        if name == self.project_prompt.name and scope == self.project_prompt.scope:
+            return self.project_prompt
+        if name == self.system_prompt.name and scope == self.system_prompt.scope:
+            return self.system_prompt
+        return None
+
+    def get_prompt(self, name: str, include_internal: bool = False):
+        del include_internal
+        if name == self.project_prompt.name:
+            return self.project_prompt
+        if name == self.system_prompt.name:
+            return self.system_prompt
+        return None
+
+    @staticmethod
+    def prompt_type_from_name(name: str):
+        if str(name).startswith("text-analysis/"):
+            return "text_analysis"
+        return None
+
+
+class DummyTextAnalysisPromptResolver:
+    """Minimal resolver stub that can call DialogAIChat prompt payload helpers."""
+
+    def __init__(self):
+        self.agent_prompts_catalog = DummyTextAnalysisPromptCatalog()
+
+
+class TestAiTextAnalysisPromptResolution(TestCase):
+    """Regression tests for text-analysis prompt payload resolution."""
+
+    def test_resolve_text_analysis_prompt_payload_accepts_dict(self):
+        resolver = DummyTextAnalysisPromptResolver()
+
+        prompt_record = DialogAIChat._resolve_text_analysis_prompt_payload(
+            resolver,
+            {
+                "name": "text-analysis/project-prompt",
+                "scope": "project",
+            },
+        )
+
+        self.assertIsNotNone(prompt_record)
+        self.assertEqual("project", prompt_record.scope)
+        self.assertEqual("text-analysis/project-prompt", prompt_record.name)
+
+    def test_resolve_text_analysis_prompt_payload_falls_back_to_name_only(self):
+        resolver = DummyTextAnalysisPromptResolver()
+
+        prompt_record = DialogAIChat._resolve_text_analysis_prompt_payload(
+            resolver,
+            "text-analysis/system-prompt",
+        )
+
+        self.assertIsNotNone(prompt_record)
+        self.assertEqual("system", prompt_record.scope)
+        self.assertEqual("text-analysis/system-prompt", prompt_record.name)
 
 
 # TEST_PERSIST_PATH = '/fake/path/'
