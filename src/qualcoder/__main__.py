@@ -4319,19 +4319,21 @@ Click "Yes" to start now.')
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
             )).read())
-            tmp_num = _json['name'].split('.')
-            release_num = float(tmp_num[0] + '.'.join(tmp_num[1:]))
-            tmp_num = self.app.version.split('.')
-            version_num = float(tmp_num[0] + '.'.join(tmp_num[1:]))
-            #if _json['name'] > self.app.version:
-            if release_num > version_num:
+            release_version_number = _json['name'].split()[1]
+            tmp_release_num = release_version_number.split('.', 1)
+            release_num = float(tmp_release_num[0] + '.' + tmp_release_num[1].replace('.', ''))
+            tmp_this_version_num = self.app.version.split('.', 1)
+            this_version_num = float(tmp_this_version_num[0] + '.' + tmp_this_version_num[1].replace('.', ''))
+            if release_num > this_version_num:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
                 html = f'<span style="color:red">{_json["html_url"]}</span><br />'
                 self.ui.textEdit.append(html)
-            else:
+            elif str(release_num) == str(this_version_num):
                 self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
                 self.ui.textEdit.append(_json['html_url'] + "\n")
+            else:
+                self.ui.textEdit.append(_("This version may be a pre-release version."))
         except Exception as err:
             print(err)
             logger.warning(str(err))
