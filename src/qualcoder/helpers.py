@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -43,13 +43,13 @@ import datetime
 import fitz
 from io import BytesIO
 import logging
-import os
+from pathlib import Path
 from PIL import Image, ImageOps, ImageFilter
 import platform
 from random import randint
 import sqlite3
 
-from PyQt6 import QtCore, QtGui, QtWidgets, sip  # <- L sip: detect deleted C++ objects in deferred callbacks
+from PyQt6 import QtCore, QtGui, QtWidgets, sip  # sip: detect deleted C++ objects in deferred callbacks
 
 from .color_selector import TextColor, colors
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
@@ -63,7 +63,6 @@ except Exception as e:
     print(e)
 
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -73,18 +72,18 @@ def get_default_user_directory():
     documents_dir = QtCore.QStandardPaths.writableLocation(
         QtCore.QStandardPaths.StandardLocation.DocumentsLocation
     )
-    if documents_dir and os.path.isdir(documents_dir):
+    if documents_dir and Path(documents_dir).is_dir():
         return documents_dir
 
     home_dir = QtCore.QDir.homePath()
-    if home_dir and os.path.isdir(home_dir):
+    if home_dir and Path(home_dir).is_dir():
         return home_dir
 
-    expanded_home = os.path.expanduser("~")
-    if expanded_home and os.path.isdir(expanded_home):
+    expanded_home = str(Path('~').expanduser()):
+    if expanded_home and Path(expanded_home).is_dir():
         return expanded_home
 
-    return os.getcwd()
+    return Path.cwd()
 
 
 def msecs_to_mins_and_secs(msecs):
@@ -395,7 +394,7 @@ class ExportDirectoryPathDialog:
                 app.last_export_directory = directory
             self.filepath = directory + "/" + filename_only + "." + extension
             counter = 0
-            while os.path.exists(self.filepath):
+            while Path(self.filepath).exists():
                 self.filepath = directory + f"/{filename_only}_{counter}.{extension}"
                 counter += 1
         else:
