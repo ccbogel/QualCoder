@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -23,7 +23,7 @@ https://qualcoder.org/
 
 import fitz
 import logging
-import os
+from pathlib import Path
 from PIL import Image
 from PIL.ExifTags import TAGS
 import qtawesome as qta
@@ -50,7 +50,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -600,7 +599,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
 
         # Get stopwords from user created list or default to stopwords
         stopwords = []
-        stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+        stopwords_file_path = Path('~').expanduser('~') / ".qualcoder" / "stopwords.txt"
         user_created_stopwords = []
         try:
             # Can get UnicodeDecode Error on Windows so using error handler
@@ -681,7 +680,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         # Calculate code statistics
         for r in res:
-            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
+            text_ += r[0] + "  " + _("Count: ") + f"{r[2]}  " + _("Total characters: ") + f"{r[3]:,d}"
             text_ += "  " + _("Percent: ") + f"{round((r[3] / len(fulltext)) * 100, 2)}%"
             text_ += "  " + _("Average characters: ") + f"{int(r[4])}\n"
         return text_
