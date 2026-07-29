@@ -47,7 +47,7 @@ class MergeProjects:
     def __init__(self, app, path_s):
         self.app = app
         self.path_s = path_s  # Path to source project folder
-        self.conn_s = sqlite3.connect(Path(self.path_s) / 'data.qda'))  # Source project that is to be merged from
+        self.conn_s = sqlite3.connect(Path(self.path_s) / 'data.qda')  # Source project that is to be merged from
         self.conn_d = self.app.conn  # Destination project - the currently opened project
         self.path_d = self.app.project_path  # Path to destination project folder
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
