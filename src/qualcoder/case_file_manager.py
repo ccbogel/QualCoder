@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -22,7 +22,7 @@ https://qualcoder.org/
 """
 
 import datetime
-import os
+from pathlib import Path
 import re
 import logging
 
@@ -44,7 +44,7 @@ OWNER = 5
 DATE = 6
 AV_TEXT_ID = 7
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
 
 
@@ -379,33 +379,33 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if self.allfiles[index][MEDIAPATH][:6] in ("/video", "video:"):
             if self.allfiles[index][MEDIAPATH][:6] == "video:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][:6] == "/video":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             ui_av = DialogViewAV(self.app, dictionary)
             ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:6] in ("/audio", "audio:"):
             if self.allfiles[index][MEDIAPATH][0:6] == "audio:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][0:6] == "/audio":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             ui_av = DialogViewAV(self.app, dictionary)
             ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:7] in ("/images", "images:"):
             if self.allfiles[index][MEDIAPATH][0:7] == "images:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not os.path.exists(abs_path):
+                if not path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][0:7] == "/images":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             # Requires {name, mediapath, owner, id, date, memo, fulltext}
             ui_img = DialogViewImage(self.app, dictionary)
