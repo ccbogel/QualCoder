@@ -44,7 +44,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-475</y>
+        <y>0</y>
         <width>806</width>
         <height>1074</height>
        </rect>
@@ -588,8 +588,15 @@ langauge = it</string>
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="1" column="2">
-              <widget class="QComboBox" name="comboBox_style"/>
+             <item row="0" column="1">
+              <widget class="QLabel" name="label_21">
+               <property name="text">
+                <string>Show IDs</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
              </item>
              <item row="2" column="2">
               <widget class="QComboBox" name="comboBox_text_chunk_size">
@@ -605,6 +612,22 @@ langauge = it</string>
                </item>
               </widget>
              </item>
+             <item row="7" column="1">
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
              <item row="4" column="1">
               <widget class="QLabel" name="label_6">
                <property name="toolTip">
@@ -615,6 +638,32 @@ langauge = it</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QComboBox" name="comboBox_speaker"/>
+             </item>
+             <item row="3" column="2">
+              <widget class="QComboBox" name="comboBox_timestamp"/>
+             </item>
+             <item row="1" column="2">
+              <widget class="QComboBox" name="comboBox_style"/>
+             </item>
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="checkBox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
+              <widget class="QCheckBox" name="checkBox_code_stripes">
+               <property name="text">
+                <string/>
                </property>
               </widget>
              </item>
@@ -631,22 +680,6 @@ langauge = it</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="2">
-              <widget class="QComboBox" name="comboBox_speaker"/>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_style">
-               <property name="text">
-                <string>Style</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QComboBox" name="comboBox_timestamp"/>
-             </item>
              <item row="3" column="1">
               <widget class="QLabel" name="label_5">
                <property name="toolTip">
@@ -660,31 +693,49 @@ langauge = it</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1" colspan="2">
-              <widget class="QCheckBox" name="checkBox">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
+             <item row="5" column="1">
+              <widget class="QLabel" name="label_20">
                <property name="text">
-                <string>Show IDs</string>
+                <string>Codesstripe view</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Orientation::Vertical</enum>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_style">
+               <property name="text">
+                <string>Style</string>
                </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Policy::Expanding</enum>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>30</height>
-                </size>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLabel" name="label_22">
+               <property name="text">
+                <string>Code highlight style</string>
                </property>
-              </spacer>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <widget class="QComboBox" name="comboBox_code_highlight_style">
+               <item>
+                <property name="text">
+                 <string>marker</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>underline</string>
+                </property>
+               </item>
+              </widget>
              </item>
             </layout>
            </widget>

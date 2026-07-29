@@ -621,13 +621,13 @@ class DialogCodeText(QtWidgets.QWidget):
         # show_margin_stripes and highlight_style are INDEPENDENT preferences,
         # persisted under separate keys and changed via the margin context menu <- L
         try:
-            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'False')
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'True')
             if isinstance(saved_pref, bool):
                 self.show_margin_stripes = saved_pref
             else:
                 self.show_margin_stripes = str(saved_pref).lower() == 'true'
         except (KeyError, AttributeError):
-            self.show_margin_stripes = False  # (default: margin hidden)
+            self.show_margin_stripes = True
 
         try:
             saved_style = self.app.settings.get('codetext_highlight_style', None)
@@ -637,8 +637,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if saved_style in ('marker', 'underline'):
             self.highlight_style = saved_style
         else:
-            # Backwards-compatible default derived from margin visibility.
-            self.highlight_style = 'underline' if self.show_margin_stripes else 'marker'
+            self.highlight_style = 'marker'
 
         # Variables for Edit mode
         self.text = ""
@@ -1003,6 +1002,16 @@ class DialogCodeText(QtWidgets.QWidget):
             return ""
         return normalized.rsplit("/", 1)[-1]
 
+    @staticmethod
+    def _text_analysis_prompt_menu_label(relative_path: str, scope: str) -> str:
+        """Return the prompt menu label including the prompt scope."""
+
+        leaf = DialogCodeText._text_analysis_prompt_menu_leaf(relative_path)
+        prompt_scope = str(scope if scope is not None else "").strip()
+        if leaf == "" or prompt_scope == "":
+            return leaf
+        return f"{leaf} ({prompt_scope})"
+
     def _text_analysis_prompt_folder_icon(self):
         """Return the same folder icon used by the prompt library."""
 
@@ -1030,11 +1039,16 @@ class DialogCodeText(QtWidgets.QWidget):
 
         def populate_branch(parent_menu, branch) -> None:
             for branch_relative_path, prompt_record in branch["prompts"]:
-                action = parent_menu.addAction(self._text_analysis_prompt_menu_leaf(branch_relative_path))
+                action = parent_menu.addAction(
+                    self._text_analysis_prompt_menu_label(branch_relative_path, prompt_record.scope)
+                )
                 action.setToolTip(prompt_record.description)
                 action.setIcon(self._text_analysis_prompt_file_icon(parent_menu))
                 action.setProperty('submenu', 'ai_text_analysis')
-                action.setData(prompt_record)
+                action.setData({
+                    "name": prompt_record.name,
+                    "scope": prompt_record.scope,
+                })
             for folder_name, child_branch in branch["folders"].items():
                 submenu = parent_menu.addMenu(folder_name)
                 submenu.setToolTipsVisible(True)
@@ -1530,7 +1544,19 @@ class DialogCodeText(QtWidgets.QWidget):
     def _toggle_margin_visibility_only(self):
         """ Independent visibility toggle (does NOT alter highlight_style). """
 
-        self.show_margin_stripes = not self.show_margin_stripes
+        self.apply_margin_stripe_setting(not self.show_margin_stripes)
+
+    def apply_margin_stripe_setting(self, show_margin_stripes: bool | None = None):
+        """Apply and persist the code stripe margin visibility without toggling blindly."""
+
+        if show_margin_stripes is None:
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', True)
+            if isinstance(saved_pref, bool):
+                show_margin_stripes = saved_pref
+            else:
+                show_margin_stripes = str(saved_pref).lower() == 'true'
+
+        self.show_margin_stripes = show_margin_stripes
         try:
             self.app.settings['codetext_show_margin_stripes'] = (
                 'True' if self.show_margin_stripes else 'False')
@@ -1584,6 +1610,15 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is not None and self.ui.plainTextEdit.toPlainText() != "":
             self.unlight()
             self.highlight()
+
+    def apply_highlight_style_setting(self, style: str | None = None):
+        """Apply the saved highlight style without relying on translated UI text."""
+
+        if style is None:
+            style = self.app.settings.get('codetext_highlight_style', 'marker')
+        if style not in ('marker', 'underline'):
+            style = 'marker'
+        self._set_highlight_style(style)
 
     def _code_label_contrast_color(self, color) -> QColor:
         """Return the contrast-adjusted code color used for labels and underlines."""
