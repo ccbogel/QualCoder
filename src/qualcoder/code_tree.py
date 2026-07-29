@@ -270,7 +270,6 @@ class CodeTreeController(QtCore.QObject):
         )
 
     # Context menu
-
     def tree_menu(self, position):
         """
         Context menu for treewidget code/category items.
@@ -310,11 +309,11 @@ class CodeTreeController(QtCore.QObject):
             action_move_category = modify_menu.addAction(_("Move category under category F6"))
         action_delete = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_delete = modify_menu.addAction(_("Delete F4"))
+            action_delete = modify_menu.addAction(_("Delete DEL"))
         action_delete_branch = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             # Cascade deletion of the whole branch, only offered for categories.
-            action_delete_branch = modify_menu.addAction(_("Delete category branch F4"))
+            action_delete_branch = modify_menu.addAction(_("Delete category branch DEL"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
@@ -436,7 +435,7 @@ class CodeTreeController(QtCore.QObject):
 
     def handle_key_press(self, event) -> bool:
         """
-        Tree widget menu item keys F2 - F12. Called from the host keyPressEvent
+        Tree widget menu item keys DEL F2 - F12. Called from the host keyPressEvent
         when the treeWidget has focus. Returns True when the key was handled.
         Args:
             event: QKeyEvent
@@ -455,7 +454,7 @@ class CodeTreeController(QtCore.QObject):
         if key == QtCore.Qt.Key.Key_F3:
             self.add_edit_cat_or_code_memo(selected)
             return True
-        if key == QtCore.Qt.Key.Key_F4:
+        if key == QtCore.Qt.Key.Key_Delete or key == QtCore.Qt.Key.Key_Backspace:
             if selected.text(1)[0:3] == 'cat':
                 self.delete_category_branch(selected)
             else:
@@ -843,9 +842,7 @@ class CodeTreeController(QtCore.QObject):
         if not ok:
             return
         cur = self.app.conn.cursor()
-        ''' Van and Kai think all the sub-codes should be deleted if the root code is deleted.
-        Can move all sub-codes using the menu Move Multiple Codes function.
-        # Re-parent this code's sub-codes so they are not orphaned by the deletion.
+        '''# Re-parent this code's sub-codes so they are not orphaned by the deletion.
         if code_.get('supercid') is not None:
             # Was itself a sub-code: lift its children to the grandparent code.
             cur.execute("update code_name set supercid=? where supercid=?", [code_['supercid'], code_['cid']])
