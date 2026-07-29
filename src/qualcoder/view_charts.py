@@ -625,7 +625,7 @@ class ViewCharts(QDialog):
             Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
                       text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
                       stopwords_filepath2=stopwords_path, save_filepath=str(filepath))
-            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + filepath).exec()
+            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + str(filepath)).exec()
         except Exception as e:
             logger.error(f"Error generating Wordcloud: {str(e)}")
             Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()
