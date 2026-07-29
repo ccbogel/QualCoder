@@ -207,7 +207,7 @@ class App(object):
         self.pending_ai_model_upgrade_offer = None
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
-        self.version = "4.0"
+        self.version = "QualCoder 4.0"
         self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
         self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
         self.project_events = ProjectEventBus()
