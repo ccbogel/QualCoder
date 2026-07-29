@@ -2022,7 +2022,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     except NameError as name_err:
                         # NameError: no function 'libvlc_new'
                         logger.error(f"vlc.Instance: {name_err}")
-                        return icon, f"Cannot use vlc. {name_err}"
+                        return icon, metadata, f"Cannot use vlc. {name_err}"
                     media = instance.media_new(abs_path)
                     media.parse()
                     msecs = media.get_duration()
