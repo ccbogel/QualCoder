@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
@@ -23,10 +23,9 @@ https://qualcoder.org/
 import webbrowser
 from copy import deepcopy
 import logging
-import os
+from pathlib import Path
 from wordcloud import WordCloud
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -108,10 +107,10 @@ class Wordcloud:
         self.reverse_colors = reverse_colors
 
         # Font in ~/.qualcoder
-        self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
+        self.font_path = Path('~').expanduser() / ".qualcoder" / "DroidSansMono.ttf"
 
         # Stopwords: file in ~/.qualcoder or provided path, fallback to built-in list
-        stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+        stopwords_file_path = Path('~').expanduser() / ".qualcoder" / "stopwords.txt"
         if stopwords_filepath2 is not None:
             stopwords_file_path = stopwords_filepath2
 
@@ -191,7 +190,7 @@ class Wordcloud:
             wc.to_file(save_filepath)
             webbrowser.open(save_filepath)
         else:
-            temp_filepath = os.path.join(os.path.expanduser("~"), ".qualcoder", "wordcloud_temp.png")
+            temp_filepath = Path('~').expanduser() / ".qualcoder" / "wordcloud_temp.png"
             wc.to_file(temp_filepath)
             webbrowser.open(temp_filepath)
 
