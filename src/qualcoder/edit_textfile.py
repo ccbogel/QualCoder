@@ -14,8 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -24,7 +26,7 @@ from copy import copy
 # import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
 import diff_match_patch
 import logging
-import os
+from pathlib import Path
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import unicodedata
@@ -32,7 +34,6 @@ import unicodedata
 from .GUI.ui_edit_text import Ui_Dialog_edit_text
 from .helpers import MarkdownHighlighter
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
