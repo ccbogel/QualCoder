@@ -328,7 +328,7 @@ class RefiImport:
             if Path(c).suffix == ".qde":
                 projectqde = c
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(Path(self.folder_name) / projectqde), "r", encoding="utf8") as xml_file:
+        with open(Path(self.folder_name) / projectqde, "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
         '''result = self.xml_validation("project") # dont use
         self.parent_textedit.append(f"Project XML parsing successful: {result}")'''
