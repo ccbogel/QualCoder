@@ -599,7 +599,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
 
         # Get stopwords from user created list or default to stopwords
         stopwords = []
-        stopwords_file_path = Path('~').expanduser('~') / ".qualcoder" / "stopwords.txt"
+        stopwords_file_path = Path('~').expanduser() / ".qualcoder" / "stopwords.txt"
         user_created_stopwords = []
         try:
             # Can get UnicodeDecode Error on Windows so using error handler
