@@ -14,16 +14,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
 https://qualcoder.org/
-
 """
 
 import logging
 import os
+from pathlib import Path
 import time
 
 from PyQt6 import QtCore, QtWidgets, QtGui
@@ -35,7 +35,6 @@ from .helpers import Message
 from .code_av import DialogCodeAV  # for isinstance()
 from .view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -68,7 +67,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.links = self.app.check_bad_file_links()
         for link in self.links:
             link['filepaths'] = []
-        self.home = os.path.expanduser('~')
+        self.home = Path('~').expanduser()
         self.fill_table()
         self.ui.pushButton_search_folders.pressed.connect(self.find_filepaths)
         self.ui.pushButton_bulk.pressed.connect(self.bulk_path_rename)
@@ -129,20 +128,20 @@ class DialogManageLinks(QtWidgets.QDialog):
 
     def find_filepaths(self):
         """ Get file paths of this file name. """
-        pd = QtWidgets.QProgressDialog(labelText=self.home[-30:], minimum=0, maximum=0, parent=self)
+        pd = QtWidgets.QProgressDialog(labelText=str(self.home[-30:]), minimum=0, maximum=0, parent=self)
         pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         pd.setWindowTitle(_('Search folders'))
         pd.show()
         last_msg_update = time.time()
         for link in self.links:
             paths = []
-            for root, dirs, files in os.walk(self.home):
+            for root, dirs, files in Path(self.home).walk:
                 QtWidgets.QApplication.processEvents() # necessary to update the progress dialog
                 if time.time() - last_msg_update > 0.1:  
                     pd.setLabelText(f'...{root[-30:]}')
                     last_msg_update = time.time()
                 if link['name'] in files:
-                    paths.append(os.path.join(root, link['name']))
+                    paths.append(str(Path(root) / link['name']))  # keep as string for now
                 if pd.wasCanceled() or len(paths) > 2:
                     break
             link['filepaths'] = paths
@@ -258,7 +257,7 @@ class DialogManageLinks(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, 1, name_item)
             path_item = QtWidgets.QTableWidgetItem(type_and_path[1])
             path_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            if not os.path.exists(type_and_path[1]):
+            if not Path(type_and_path[1]).exists():
                 path_item.setForeground(QtGui.QBrush(QtGui.QColor("Red")))
             self.ui.tableWidget.setItem(row, 2, path_item)
             if 'filepaths' in item:
