@@ -79,7 +79,7 @@ def get_default_user_directory():
     if home_dir and Path(home_dir).is_dir():
         return home_dir
 
-    expanded_home = str(Path('~').expanduser()):
+    expanded_home = str(Path('~').expanduser())
     if expanded_home and Path(expanded_home).is_dir():
         return expanded_home
 
