@@ -22,9 +22,9 @@ https://qualcoder.org/
 """
 
 import datetime
+import logging
 from pathlib import Path
 import re
-import logging
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
@@ -44,7 +44,6 @@ OWNER = 5
 DATE = 6
 AV_TEXT_ID = 7
 
-path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +52,6 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     Add files to case, add all text or text portions from a text file.
     Remove file from a case. View file.
     """
-
 
     def __init__(self, app_, parent_text_edit, case):
 
