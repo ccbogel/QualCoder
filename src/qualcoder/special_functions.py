@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -22,7 +22,7 @@ https://qualcoder.org/
 """
 
 import logging
-import os
+from pathlib import Path
 
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
@@ -36,7 +36,6 @@ from .merge_projects import MergeProjects
 from .select_items import DialogSelectItems
 from .text_file_replacement import ReplaceTextFile
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -102,7 +101,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.merge_project_path = ""
         default_directory = self.app.settings['directory']
         if default_directory == "":
-            default_directory = os.path.expanduser('~')
+            default_directory = Path('~').expanduser()
         self.merge_project_path = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                                              _('Open project directory'),
                                                                              default_directory)
