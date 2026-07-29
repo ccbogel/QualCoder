@@ -332,7 +332,7 @@ code_tree_shortcuts = f'<h2>Code tree</h2>\
 When coding. Click on codes / categories in code tree to activate these options<br />\
 F2 {_("Rename code or category")}<br />\
 F3 {_("Edit memo")}<br />\
-F4 {_("Delete code or category")}<br />\
+DEL {_("Delete code or category")}<br />\
 F5 {_("Change code coloury")}<br />\
 F6 {_("Move code or category")}<br />\
 F7 {_("Move multiple codes")}<br />\
