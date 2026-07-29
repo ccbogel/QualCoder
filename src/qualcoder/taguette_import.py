@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
@@ -23,7 +23,6 @@ https://qualcoder.org/
 import datetime
 import html
 import logging
-import os
 import re
 import sqlite3
 
@@ -31,7 +30,6 @@ from PyQt6 import QtWidgets
 
 from .helpers import Message
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -229,7 +227,7 @@ class TaguetteImport:
             if doc_id not in codings_by_doc:
                 codings_by_doc[doc_id] = []
             codings_by_doc[doc_id].append((tag_id, start, end, snippet))
-        # print("Migrando documentos y anclando fragmentos...")
+        # print("Migrando documentos y anclando fragmentos ...")
         cur_tag.execute("select id, name, description, contents from documents")
         documents = cur_tag.fetchall()
         final_codings = []
