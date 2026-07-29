@@ -27,7 +27,7 @@ import html
 import logging
 from operator import itemgetter
 import os
-import pathlib
+from pathlib import Path
 from random import randint
 import re
 import shutil
@@ -51,7 +51,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -326,12 +325,12 @@ class RefiImport:
         # Not all proejcts has a project.qde, it may have another name.qde
         projectqde = "project.qde"
         for c in contents:
-            if pathlib.Path(c).suffix == ".qde":
+            if Path(c).suffix == ".qde":
                 projectqde = c
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(os.path.join(self.folder_name, projectqde), "r", encoding="utf8") as xml_file:
+        with open(Path(self.folder_name) / projectqde), "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
-        '''result = self.xml_validation("project")
+        '''result = self.xml_validation("project") # dont use
         self.parent_textedit.append(f"Project XML parsing successful: {result}")'''
         tree = etree.parse(os.path.join(self.folder_name, projectqde))  # get element tree object
         # Look for xmlns version. Have found 1.0, 0:4
@@ -823,7 +822,7 @@ class RefiImport:
                     if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Transcript":
                         name = el.get("name")
                         # Get, and if needed, add suffix
-                        suffix = pathlib.Path(element.get("path")).suffix
+                        suffix = Path(element.get("path")).suffix
                         if not name.endswith(suffix):
                             name = name + suffix
                         break
@@ -895,7 +894,7 @@ class RefiImport:
         media_path = "/images/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda images folder and rename into original name
-            destination = os.path.join(self.app.project_path, "images", name)
+            destination = Path(self.app.project_path) / "images" / name 
             media_path = "/images/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -907,7 +906,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/images/{name}"
             # Copy file into .qda audio folder and rename into original name
-            destination = os.path.join(self.app.project_path, "images", name)
+            destination = Path(self.app.project_path) / "images" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -997,7 +996,7 @@ class RefiImport:
         media_path = "/audio/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda audio folder and rename into original name
-            destination = os.path.join(self.app.project_path, "audio", name)
+            destination = Path(self.app.project_path) / "audio" / name
             media_path = "/audio/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -1009,7 +1008,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/audio/{name}"
             # Copy file into .qda audio folder and rename into original name
-            destination = os.path.join(self.app.project_path, "audio", name)
+            destination = Path(self.app.project_path) / "audio" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1064,7 +1063,7 @@ class RefiImport:
         media_path = f"/video/{name}"  # Default
         if path_type == "internal":
             # Copy file into .qda video folder and rename into original name
-            destination = os.path.join(self.app.project_path, "video", name)
+            destination = Path(self.app.project_path) / "video" / name
             media_path = f"/video/{name}"
             try:
                 shutil.copyfile(source_path, destination)
@@ -1076,7 +1075,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/video/{name}"
             # Copy file into .qda video folder and rename into original name
-            destination = os.path.join(self.app.project_path, "video", name)
+            destination = Path(self.app.project_path) /  "video" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1162,6 +1161,7 @@ class RefiImport:
             return
 
         # Copy plain text file into documents folder, or if .srt into audio or video folder.
+        # TODO use Path object
         name = element.get("name")
         destination = self.app.project_path + "/documents/" + name
         if name[-4:] == ".srt" and av_name[-4] in ("mp4", "ogg", "mov"):
@@ -1171,7 +1171,6 @@ class RefiImport:
         else:
             destination = self.app.project_path + "/documents/" + name
         # Sources folder name can be capital or lower case, check and get the correct one
-        # Not Used: contents = os.listdir(self.folder_name)
         source_path = self.folder_name + self.sources_name
         if source_path[-1] != "/":
             source_path += "/"
@@ -1350,8 +1349,7 @@ class RefiImport:
         media_path = f"/docs/{name}"  # Default
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, "documents", name)
-            # print("destination: ", destination)
+            destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
                 # print("PDF IMPORT", source_path, destination)
@@ -1363,7 +1361,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/docs/{name}"
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, "documents", name)
+            destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1555,7 +1553,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/docs/{name}"  # Note not used
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, "documents", name)
+            destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -2131,11 +2129,11 @@ class RefiExport(QtWidgets.QDialog):
 
         # Clear any existing, identically named .zip and .qdpx files. Avoids File Exists error
         try:
-            os.remove(f"{prep_path}.zip")
+            Path(f"{prep_path}.zip").unlink()
         except FileNotFoundError:
             pass
         try:
-            os.remove(f"{prep_path}.qdpx")
+            Path(f"{prep_path}.qdpx").unlink()
         except FileNotFoundError:
             pass
 
@@ -2156,7 +2154,7 @@ class RefiExport(QtWidgets.QDialog):
         try:
             if prep_path != '':
                 shutil.rmtree(prep_path)
-            os.remove(f"{prep_path}.qdpx")
+            Path(f"{prep_path}.qdpx").unlink()
         except FileNotFoundError as err:
             logger.warning(str(err))
         msg = export_path + ".qpdx\n"
@@ -2178,14 +2176,14 @@ class RefiExport(QtWidgets.QDialog):
                                                                self.app.settings['directory'], options)
         if directory == "":
             return
-        filename = os.path.join(directory, filename)
+        filename = Path(directory) / filename
         try:
             with open(filename, 'w', encoding='utf-8-sig') as f:
                 f.write(self.xml)
             msg = _("Codebook has been exported to ")
-            msg += filename
+            msg += str(filename)
             Message(self.app, _("Codebook exported"), _(msg)).exec()
-            self.parent_textedit.append(_("Codebook exported") + "\n" + _(msg))
+            self.parent_textedit.append(_("Codebook exported") + "\n" + msg)
         except Exception as err:
             logger.warning(str(err))
             Message(self.app, _("Codebook NOT exported"), str(err)).exec()
