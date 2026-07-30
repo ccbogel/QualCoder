@@ -6436,7 +6436,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 
                 pdf_doc = None
                 filepath = self._resolve_filepath(self.file_)
-                if filepath and Path(filpath).exists():
+                if filepath and Path(filepath).exists():
                     pdf_doc = fitz.open(filepath)
 
                 areas_sorted = sorted(self.code_areas, key=lambda x: x.get('pdf_page', 0))
