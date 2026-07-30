@@ -4320,7 +4320,7 @@ Click "Yes" to start now.')
         """ Get latest github release. Some issues on some platforms, so in try except. """
 
         self.ui.textEdit.append(_("This version: ") + self.app.version)
-        if True: #try:
+        try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
@@ -4341,9 +4341,9 @@ Click "Yes" to start now.')
                 self.ui.textEdit.append(_json['html_url'] + "\n")
             else:
                 self.ui.textEdit.append(_("This version may be a pre-release version."))
-        '''except Exception as err:
+        except Exception as err:
             print(err)
-            logger.warning(str(err))'''
+            logger.warning(str(err))
         self.ui.textEdit.append(self.app.citation)
 
 def gui():
