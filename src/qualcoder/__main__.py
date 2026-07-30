@@ -98,15 +98,15 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
-home = os.path.expanduser('~')
-if not os.path.exists(home + '/.qualcoder'):
+qc_config_folder = Path('~').expanduser() / '.qualcoder'
+
+if not qc_config_folder.exists():
     try:
-        os.mkdir(home + '/.qualcoder')
+        qc_config_folder.mkdir(exist_ok=True)
     except Exception as e:
-        print(f"Cannot add .qualcoder folder to home folder\n{e}")
+        print(f"Cannot create .qualcoder folder.\n{e}")
         raise
-logfile = home + '/.qualcoder/QualCoder.log'
+logfile = qc_config_folder / 'QualCoder.log'
 log_maxBytes = 500000  # 500 KB: max length of the logfile before old entries are discarded
 # Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
 try:
@@ -114,7 +114,7 @@ try:
     data = log_file.read()
     log_file.close()
     if len(data) > log_maxBytes:
-        os.remove(logfile)
+        logfile.unlink()
         log_file = open(logfile, "w")
         log_file.write(data[len(data) - (log_maxBytes // 2):])  # frees up half of log_maxBytes
         log_file.close()
@@ -200,14 +200,14 @@ class App(object):
         self.last_export_directory = ""  # Default export location, which may be different from the working directory
         self.delete_backup = True  # Can delete the most current back up if the project has not been altered
         self.delete_backup_path_name = ""
-        self.userhome = os.path.expanduser('~')
-        self.confighome = os.path.join(self.userhome, '.qualcoder')
-        self.configpath = os.path.join(self.confighome, 'config.ini')
-        self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
+        self.userhome = str(Path('~').expanduser())
+        self.confighome = str(qc_config_folder)
+        self.configpath = str(qc_config_folder / 'config.ini')
+        self.persist_path = str(qc_config_folder / 'recent_projects.txt')
         self.pending_ai_model_upgrade_offer = None
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
-        self.version = "QualCoder 4.0"
+        self.version = "QualCoder 4.0"  # Must start with 'QualCoder '
         self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
         self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
         self.project_events = ProjectEventBus()
@@ -239,7 +239,7 @@ class App(object):
                 proj_path = splt[0]
             if len(splt) == 2:
                 proj_path = splt[1]
-            if os.path.exists(proj_path):
+            if Path(proj_path).exists():
                 interim_result.append(p)
 
         # Remove duplicate project names, keep the most recent
@@ -308,20 +308,20 @@ class App(object):
     def get_builtin_i18n_dir(self):
         """Return the directory that contains bundled translation files."""
 
-        i18n_dir = os.path.join(path, 'i18n')
+        i18n_dir = str(Path(__file__).resolve().parent / 'i18n')
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-            i18n_dir = os.path.join(sys._MEIPASS, 'qualcoder', 'i18n')
+            i18n_dir = str(Path(sys._MEIPASS) / 'qualcoder'/ 'i18n')
         return i18n_dir
 
     def get_user_i18n_dir(self):
         """Return the user directory for additional translations."""
 
-        return os.path.join(self.confighome, 'i18n')
+        return str(Path(self.confighome) / 'i18n')
 
     def get_user_language_zip_path(self, lang_code):
         """Return the expected zip package path for one user language."""
 
-        return os.path.join(self.get_user_i18n_dir(), f'{lang_code}.zip')
+        return str(Path(self.get_user_i18n_dir()) / f'{lang_code}.zip')
 
     def get_builtin_language_labels(self):
         """Return the language labels shown in the settings dialog."""
@@ -378,7 +378,7 @@ class App(object):
         return all(char in allowed for char in code)
 
     def _find_available_language_codes(self, directory, extension):
-        if not os.path.isdir(directory):
+        if not Path(directory).is_dir():
             return set()
         codes = set()
         suffix = f".{extension.lower()}"
@@ -397,7 +397,7 @@ class App(object):
         """Return language codes from user zip packages."""
 
         user_i18n_dir = self.get_user_i18n_dir()
-        if not os.path.isdir(user_i18n_dir):
+        if not Path(user_i18n_dir).is_dir():
             return []
 
         codes = []
@@ -423,14 +423,14 @@ class App(object):
         """Extract one current-language zip package when it is new or files are missing."""
 
         zip_path = self.get_user_language_zip_path(lang_code)
-        if not os.path.exists(zip_path):
+        if not Path(zip_path).exists():
             return False
 
         required_names = (f'{lang_code}.qm', f'{lang_code}.mo')
         optional_name = f'{lang_code}.txt'
 
         user_i18n_dir = self.get_user_i18n_dir()
-        os.makedirs(user_i18n_dir, exist_ok=True)
+        Path(user_i18n_dir).mkdir(exist_ok=True)
         zip_mtime = os.path.getmtime(zip_path)
         target_paths = {
             'qm': os.path.join(user_i18n_dir, f'{lang_code}.qm'),
@@ -438,7 +438,7 @@ class App(object):
         }
         needs_update = False
         for extension, target_path in target_paths.items():
-            if not os.path.exists(target_path) or os.path.getmtime(target_path) < zip_mtime:
+            if not Path(target_path).exists() or os.path.getmtime(target_path) < zip_mtime:
                 needs_update = True
                 break
         if not needs_update:
@@ -459,7 +459,7 @@ class App(object):
                     file_.write(lang_data)
             try:
                 lang_data = zip_file.read(optional_name)
-                txt_path = os.path.join(user_i18n_dir, f'{lang_code}.txt')
+                txt_path = Path(user_i18n_dir) / f'{lang_code}.txt'
                 with open(txt_path, 'wb') as file_:
                     file_.write(lang_data)
             except KeyError:
@@ -491,12 +491,12 @@ class App(object):
         """
 
         self.project_path = project_path
-        self.project_name = project_path.split('/')[-1]
-        self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
+        self.project_name = Path(project_path).name
+        self.conn = sqlite3.connect(Path(project_path) / 'data.qda')
         
     def get_project_memo(self) -> str:
         # Might be called from a different thread (ai asynch operations), so have to create a new database connection
-        conn = sqlite3.connect(os.path.join(self.project_path, 'data.qda'))
+        conn = sqlite3.connect(Path(self.project_path) / 'data.qda')
         cur = conn.cursor()
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
@@ -581,10 +581,8 @@ class App(object):
 
     def get_text_filenames(self, ids:list[int]|None = None):
         """ Get filenames, id, memo and mediapath of text files.
-
         Args:
             ids: list of Integer ids for a restricted list of files.
-
         Returns:
             List of dictionaries of id, name memo, mediapath, date, risid
         """
@@ -608,12 +606,10 @@ class App(object):
     
     def get_text_fulltext(self, id_, start_pos=None, length=None) -> str:
         """Extracts text from the database in the document with the given id_.
-
         Args:
             id_ (int): document id
             start_pos (int): position of the first character, 0 if None
             length (int): number of characters to retrieve, all if None
-
         Returns:
             str: text
         """
@@ -1708,7 +1704,7 @@ class App(object):
         backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
         # USED IN 3.8 - 3.8.2 CAUSED CONFUSION backup = os.path.join(self.settings['directory'], f"{self.project_name[:-4]}_BKUP_{nowdate}{suffix}.qda")
         # Do not try and create another backup with same date and hour, unless suffix present
-        result = os.path.exists(backup)
+        result = Path(backup).exists()
         if result and suffix == "":
             return f"Backup exists already with this name: {backup}", backup
         msg = ""
@@ -1747,7 +1743,7 @@ class App(object):
             except shutil.Error as err:
                 msg = _("Project backup could not be fully created.") + " " + str(err)
                 logger.warning(msg)
-        if not os.path.exists(backup):
+        if not Path(backup).exists():
             return msg, backup
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
@@ -3409,11 +3405,15 @@ Click "Yes" to start now.')
             counter += 1
         self.app.project_path = project_path + extension + ".qda"
         try:
-            os.mkdir(self.app.project_path)
-            os.mkdir(os.path.join(self.app.project_path, "images"))
-            os.mkdir(os.path.join(self.app.project_path, "audio"))
-            os.mkdir(os.path.join(self.app.project_path, "video"))
-            os.mkdir(os.path.join(self.app.project_path, "documents"))
+            Path(self.app.project_path).mkdir()
+            i = Path(self.app.project_path) / "images"
+            i.mkdir()
+            a = Path(self.app.project_path) / "audio"
+            a.mkdir()
+            v = Path(self.app.project_path) / "video"
+            v.mkdir()
+            d = Path(self.app.project_path) / "documents"
+            d.mkdir()
         except Exception as err:
             logger.critical(_("Project creation error ") + str(err))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
@@ -3628,7 +3628,7 @@ Click "Yes" to start now.')
             proj_path = path_split[0]
         if len(path_split) == 2:
             proj_path = path_split[1]
-        if len(path) > 3 and proj_path[-4:] == ".qda":
+        if len(proj_path) > 3 and proj_path[-4:] == ".qda":
             try:
                 self.app.create_connection(proj_path)
             except Exception as err:
@@ -3636,7 +3636,7 @@ Click "Yes" to start now.')
                 msg += " " + str(err)
                 logger.debug(msg)
         if self.app.conn is None:
-            msg += "\n" + proj_path
+            msg += f"\n{proj_path}"
             Message(self.app, _("Cannot open file"), msg, "critical").exec()
             self.app.project_path = ""
             self.app.project_name = ""
@@ -4051,25 +4051,14 @@ Click "Yes" to start now.')
         # Fix missing folders within QualCoder project. Otherwise, will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
-        missing_folders = False
-        if not os.path.exists(os.path.join(self.app.project_path, "documents")):
-            os.makedirs(os.path.join(self.app.project_path, "documents"))
-            self.ui.textEdit.append(f"{span}No documents folder. Created empty folder{end_span}")
-            missing_folders = True
-        if not os.path.exists(os.path.join(self.app.project_path, "audio")):
-            os.makedirs(os.path.join(self.app.project_path, "audio"))
-            self.ui.textEdit.append(f"{span}No audio folder. Created empty folder{end_span}")
-            missing_folders = True
-        if not os.path.exists(os.path.join(self.app.project_path, "images")):
-            os.makedirs(os.path.join(self.app.project_path, "images"))
-            self.ui.textEdit.append(f"{span}No images folder. Created empty folder{end_span}")
-            missing_folders = True
-        if not os.path.exists(os.path.join(self.app.project_path, "video")):
-            os.makedirs(os.path.join(self.app.project_path, "video"))
-            self.ui.textEdit.append(f"{span}No video folder. Created empty folder{end_span}")
-            missing_folders = True
-        if missing_folders:
-            Message(self.app, _("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
+        documents_folder = Path(self.app.project_path) / "documents"
+        documents_folder.mkdir(exist_ok=True)
+        audio_folder = Path(self.app.project_path) / "audio"
+        audio_folder.mkdir(exist_ok=True)
+        images_folder = Path(self.app.project_path) / "images"
+        images_folder.mkdir(exist_ok=True)
+        video_folder = Path(self.app.project_path) / "video"
+        video_folder.mkdir(exist_ok=True)
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
@@ -4200,7 +4189,7 @@ Click "Yes" to start now.')
         Backup name format: directories/projectname_BKUP_yyyymmdd_hh.qda
         Requires: self.settings['backup_num'] """
 
-        if self.app.project_path == "" or not os.path.exists(self.app.project_path):
+        if self.app.project_path == "" or not Path(self.app.project_path).exists():
             return
         if self.app.delete_backup_path_name != "" and self.app.delete_backup:
             try:
@@ -4328,15 +4317,10 @@ Click "Yes" to start now.')
         self.text_coding(task='ai_search')
 
     def get_latest_github_release(self):
-        """ Get latest github release.
-        https://stackoverflow.com/questions/24987542/is-there-a-link-to-github-for-downloading-a-file-in-the-latest-release-of-a-repo
-        Dated May 2018
-
-        Some issues on some platforms, so all in try except clause
-        """
+        """ Get latest github release. Some issues on some platforms, so in try except. """
 
         self.ui.textEdit.append(_("This version: ") + self.app.version)
-        try:
+        if True: #try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
@@ -4344,7 +4328,8 @@ Click "Yes" to start now.')
             release_version_number = _json['name'].split()[1]
             tmp_release_num = release_version_number.split('.', 1)
             release_num = float(tmp_release_num[0] + '.' + tmp_release_num[1].replace('.', ''))
-            tmp_this_version_num = self.app.version.split('.', 1)
+            temp_this_version = self.app.version.replace("QualCoder", "")
+            tmp_this_version_num = temp_this_version.split('.', 1)
             this_version_num = float(tmp_this_version_num[0] + '.' + tmp_this_version_num[1].replace('.', ''))
             if release_num > this_version_num:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
@@ -4356,9 +4341,9 @@ Click "Yes" to start now.')
                 self.ui.textEdit.append(_json['html_url'] + "\n")
             else:
                 self.ui.textEdit.append(_("This version may be a pre-release version."))
-        except Exception as err:
+        '''except Exception as err:
             print(err)
-            logger.warning(str(err))
+            logger.warning(str(err))'''
         self.ui.textEdit.append(self.app.citation)
 
 def gui():
@@ -4374,8 +4359,7 @@ def gui():
     app._qc_installed_translators = []
     # Noto Sans - for general application
     install_noto_sans()
-    #QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
-    QtGui.QFontDatabase.addApplicationFont(str(Path(home) / ".qualcoder" / "NotoSans-Regular.ttf"))
+    QtGui.QFontDatabase.addApplicationFont(str(qc_config_folder / "NotoSans-Regular.ttf"))
     # DroidSandMono - for wordcloud
     install_droid_sans_mono()
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
@@ -4475,7 +4459,7 @@ def gui():
 def install_droid_sans_mono():
     """ Install DroidSansMono ttf font for wordclouds into .qualcoder folder """
 
-    qc_folder = Path(home) /'.qualcoder' / 'DroidSansMono.ttf'
+    qc_folder = qc_config_folder / 'DroidSansMono.ttf'
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(DroidSansMono)
         file_.write(decoded_data)
@@ -4484,7 +4468,7 @@ def install_droid_sans_mono():
 def install_noto_sans():
     """ Install NotoSans ttf font for general application into .qualcoder folder """
 
-    qc_folder = Path(home) / '.qualcoder' / 'NotoSans-Regular.ttf'
+    qc_folder = qc_config_folder / 'NotoSans-Regular.ttf'
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(NotoSans)
         file_.write(decoded_data)
