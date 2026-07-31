@@ -461,7 +461,7 @@ msgstr "Codeur·euse :"
 
 #: src/qualcoder/code_pdf.py:1908
 msgid "Coder visibility"
-msgstr "Visibilité du codeur⋅euse"
+msgstr "Visibilité du codeur⋅se"
 
 #: src/qualcoder/code_pdf.py:1942
 msgid "Code text  (T)"
@@ -673,7 +673,7 @@ msgid ""
 "Coder \"{}\" is currently hidden. Do you want to make it visible, to see the "
 "speaker codings?"
 msgstr ""
-"Le codeur⋅euse « {} » est actuellement masqué. Souhaitez-vous le rendre "
+"Le codeur⋅se « {} » est actuellement masqué. Souhaitez-vous le rendre "
 "visible afin de pouvoir voir les codes des intervenant⋅es ?"
 
 #: src/qualcoder/code_pdf.py:3455 src/qualcoder/code_text.py:4519
@@ -1305,7 +1305,7 @@ msgid ""
 "The stored text will be updated. The codings (all coders), annotations and "
 "case assignments will be adjusted to the new text method."
 msgstr ""
-"Le texte stocké sera mis à jour. Les codes (tous les codeur⋅euses), les "
+"Le texte stocké sera mis à jour. Les codes (tous les codeur⋅ses), les "
 "annotations et les attributions de cas seront ajustés à la nouvelle méthode "
 "de texte."
 
@@ -1344,7 +1344,7 @@ msgid ""
 "and case assignments will be relocated in the new text. Segments that cannot "
 "be located exactly keep their original quote and are reported for review."
 msgstr ""
-"Le texte stocké sera réécrit et ses codes (tous les codeur⋅euses), "
+"Le texte stocké sera réécrit et ses codes (tous les codeur⋅ses), "
 "annotations et attributions de cas seront déplacés dans le nouveau texte. "
 "Les segments qui ne peuvent pas être localisés conservent exactement leur "
 "citation d’origine et sont signalés pour examen."
@@ -3099,7 +3099,7 @@ msgstr "Codes et catégories"
 
 #: src/qualcoder/ai_search_dialog.py:529
 msgid "Coder selection"
-msgstr "Sélection du codeur⋅euse"
+msgstr "Sélection du codeur⋅se"
 
 #: src/qualcoder/ai_search_dialog.py:611 src/qualcoder/report_attributes.py:443
 #: src/qualcoder/view_charts.py:379
@@ -3371,11 +3371,11 @@ msgstr "caché"
 
 #: src/qualcoder/coder_names.py:202
 msgid "One coder must be selected. Choose another one if you want to change."
-msgstr "Choisissez un⋅e codeur⋅euse parmi ceux proposés."
+msgstr "Choisissez un⋅e codeur⋅se parmi ceux proposés."
 
 #: src/qualcoder/coder_names.py:213
 msgid "You cannot hide the current coder."
-msgstr "Vous ne pouvez pas cacher le codeur⋅euse actuel."
+msgstr "Vous ne pouvez pas cacher le codeur⋅se actuel."
 
 #: src/qualcoder/coder_names.py:229
 msgid "New coder name:"
@@ -3415,15 +3415,15 @@ msgstr "L’ancien et nouveau nom sont identiques."
 
 #: src/qualcoder/coder_names.py:368
 msgid "Coder name cannot be empty."
-msgstr "Le nom du codeur⋅euse ne peut pas être vide."
+msgstr "Le nom du codeur⋅se ne peut pas être vide."
 
 #: src/qualcoder/coder_names.py:377
 msgid "The coder name you want to merge into does not exist."
-msgstr "Le nom du codeur⋅euse à fusionner n’existe pas."
+msgstr "Le nom du codeur⋅se à fusionner n’existe pas."
 
 #: src/qualcoder/coder_names.py:380
 msgid "The new coder name already exists."
-msgstr "Le nom de codeur⋅euse existe déjà."
+msgstr "Le nom de codeur⋅se existe déjà."
 
 #: src/qualcoder/coder_names.py:384
 msgid ""
@@ -3436,7 +3436,7 @@ msgid ""
 "changes by canceling the Coders dialog."
 msgstr ""
 "« La fusion/renommage est terminée. Pour annuler, fermez la boite de "
-"dialogue « Codeur⋅euses »."
+"dialogue « Codeur⋅ses »."
 
 #: src/qualcoder/attributes.py:97 src/qualcoder/attributes.py:267
 #: src/qualcoder/view_charts.py:445 src/qualcoder/view_charts.py:550
@@ -5520,7 +5520,7 @@ msgstr "Impossible de copier le fichier Text Source de : "
 #: src/qualcoder/refi.py:1705
 msgid "Duplicated text coding for code and coder. Only one loaded."
 msgstr ""
-"Codage de texte dupliqué pour le code et le codeur⋅euse. Un seul chargé."
+"Codage de texte dupliqué pour le code et le codeur⋅se. Un seul chargé."
 
 #: src/qualcoder/refi.py:1706
 msgid " Positions:"
@@ -5811,7 +5811,7 @@ msgstr "COMPARAISON DES CODEURS POUR LE FICHIER"
 
 #: src/qualcoder/report_compare_coder_file.py:432
 msgid "(YELLOW CODER 0)"
-msgstr "(CODEUR⋅EUSE JAUNE 0)"
+msgstr "(codeur⋅se JAUNE 0)"
 
 #: src/qualcoder/report_compare_coder_file.py:434
 msgid "(BLUE CODER 1)"
@@ -8482,7 +8482,7 @@ msgstr "Codeurs visibles ; "
 
 #: src/qualcoder/ai_chat.py:4024
 msgid "Coders: {}; "
-msgstr "Codeur⋅euses : {}; "
+msgstr "Codeur⋅ses : {}; "
 
 #: src/qualcoder/ai_chat.py:4133
 msgid "(no memo provided)"
@@ -8525,7 +8525,7 @@ msgstr ""
 "une première analyse significative du code en une seule étape de bootstrap. "
 "Seuls {loaded} des {total} segments codés ({coverage:.1f} %) ont pu être "
 "chargés avant que la limite de caractères ne soit atteinte. Veuillez "
-"restreindre la portée par code, fichiers, cas, attributs ou codeur⋅euses. Si "
+"restreindre la portée par code, fichiers, cas, attributs ou codeur⋅ses. Si "
 "vous souhaitez tout de même continuer, envoyez un message de suivi tel que "
 "« Analyser quand même »."
 
@@ -8548,7 +8548,7 @@ msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
 msgstr ""
-"Aucun codage trouvé pour cette combinaison de codeur⋅euse, filtre de "
+"Aucun codage trouvé pour cette combinaison de codeur⋅se, filtre de "
 "document et code."
 
 #: src/qualcoder/ai_chat.py:4698
@@ -11477,13 +11477,13 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
-"Votre nom de codeur⋅euse actuel (« {} ») diffère de celui utilisé en dernier "
+"Votre nom de codeur⋅se actuel (« {} ») diffère de celui utilisé en dernier "
 "dans le projet (« {} »). Souhaitez-vous conserver votre nom actuel ou "
 "changer à celui du projet ?"
 
 #: src/qualcoder/__main__.py:2033
 msgid "Coder name"
-msgstr "Nom du codeur⋅euse"
+msgstr "Nom du codeur⋅se"
 
 #: src/qualcoder/__main__.py:2035
 msgid "Keep"
@@ -13094,15 +13094,15 @@ msgstr "Exporter Excel"
 
 #: src/qualcoder/reports.py:966
 msgid "Coder comparisons report exported: "
-msgstr "Rapport de comparaison des codeur⋅euses exporté : "
+msgstr "Rapport de comparaison des codeur⋅ses exporté : "
 
 #: src/qualcoder/reports.py:990
 msgid "CODER COMPARISON"
-msgstr "COMPARAISON DES CODEUR⋅EUSES"
+msgstr "COMPARAISON DES codeur⋅seS"
 
 #: src/qualcoder/reports.py:990
 msgid "Selected coders: "
-msgstr "Codeur⋅euses sélectionnés : "
+msgstr "Codeur⋅ses sélectionnés : "
 
 #: src/qualcoder/reports.py:1008
 msgid "agreement: "
@@ -13202,7 +13202,7 @@ msgid ""
 "Based on coder_names visibility"
 msgstr ""
 "Affichage sous forme de tableau\n"
-"Fondé sur la visibilité des noms de codeur⋅euses"
+"Fondé sur la visibilité des noms de codeur⋅ses"
 
 #: src/qualcoder/report_sql.py:368
 msgid "Default Queries"

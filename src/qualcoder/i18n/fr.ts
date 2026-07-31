@@ -559,7 +559,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="114"/>
         <source>Coder</source>
-        <translation>Codeur⋅euse</translation>
+        <translation>Codeur⋅ses</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="117"/>
@@ -713,7 +713,7 @@ Coché : Un code parmi ceux sélectionnés suffit.</translation>
     <message>
         <location filename="../GUI/ui_report_codes_by_segments.py" line="97"/>
         <source>Coder:</source>
-        <translation>Codeur⋅euse :</translation>
+        <translation>Codeur⋅se :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_codes_by_segments.py" line="98"/>
@@ -944,7 +944,7 @@ Coché : Un code parmi ceux sélectionnés suffit.</translation>
     <message>
         <location filename="../GUI/ui_ai_search.py" line="216"/>
         <source>Select coders</source>
-        <translation>Sélectionner un⋅e codeur⋅euse</translation>
+        <translation>Sélectionner un⋅e codeur⋅se</translation>
     </message>
 </context>
 <context>
@@ -1944,7 +1944,7 @@ Pour créer un signet, appuyez sur B</translation>
     <message>
         <location filename="../GUI/ui_dialog_code_image.py" line="239"/>
         <source>Coder visibility</source>
-        <translation>Visibilité du codeur⋅euse</translation>
+        <translation>Visibilité du codeur⋅se</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_image.py" line="240"/>
@@ -1997,7 +1997,7 @@ Pour créer un signet, appuyez sur B</translation>
     <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="331"/>
         <source>Coder visibility</source>
-        <translation>Visibilité du codeur⋅euse</translation>
+        <translation>Visibilité du codeur⋅se</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="332"/>
@@ -2027,7 +2027,7 @@ Pour créer un signet, appuyez sur B</translation>
     <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="330"/>
         <source>Codername</source>
-        <translation>Nom du codeur⋅euse</translation>
+        <translation>Nom du codeur⋅se</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="333"/>
@@ -2600,7 +2600,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="../GUI/ui_dialog_code_text.py" line="535"/>
         <source>Coder visibility</source>
-        <translation>Visibilité du codeur⋅euse</translation>
+        <translation>Visibilité du codeur⋅se</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_text.py" line="536"/>
@@ -2673,7 +2673,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="86"/>
         <source>Add a new coder name</source>
-        <translation>Ajouter un nouveau nom de codeur⋅euse</translation>
+        <translation>Ajouter un nouveau nom de codeur⋅se</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="87"/>
@@ -2698,7 +2698,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="88"/>
         <source>Rename the selected coder. Note that this will affect the entire project.</source>
-        <translation>Renommez le codeur⋅euse sélectionné. Notez que cela affecte l’entièreté du projet.</translation>
+        <translation>Renommez le codeur⋅se sélectionné. Notez que cela affecte l’entièreté du projet.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="92"/>
@@ -2708,7 +2708,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="85"/>
         <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation>Choisissez votre nom de codeur⋅euse. Ajustez la visibilité aux autres :</translation>
+        <translation>Choisissez votre nom de codeur⋅se. Ajustez la visibilité aux autres :</translation>
     </message>
 </context>
 <context>
@@ -3709,7 +3709,7 @@ Modifiez les paramètres du nombre de caractères et du style d&apos;affichage.<
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
         <source>Coders:</source>
-        <translation>Codeur⋅euses :</translation>
+        <translation>Codeur⋅ses :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="99"/>
@@ -3764,7 +3764,7 @@ Sélectionnez deux codeur·euses, un fichier, un code.</translation>
     <message>
         <location filename="../GUI/ui_dialog_report_comparisons.py" line="82"/>
         <source>Coders:</source>
-        <translation>Codeur⋅euses :</translation>
+        <translation>Codeur⋅ses :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_comparisons.py" line="86"/>
