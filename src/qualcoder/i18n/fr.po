@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 09:57+0200\n"
-"PO-Revision-Date: 2026-07-31 10:50+0200\n"
+"PO-Revision-Date: 2026-07-31 11:06+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -3843,19 +3843,19 @@ msgstr "Vidéo"
 
 #: src/qualcoder/manage_files.py:568
 msgid "All file types"
-msgstr "Tous les types de fichiers"
+msgstr "Tout type fichier"
 
 #: src/qualcoder/manage_files.py:568
 msgid "No file types"
-msgstr "Aucun type de fichier"
+msgstr "Aucun type fichier"
 
 #: src/qualcoder/manage_files.py:570
 msgid "All extensions"
-msgstr "Toutes extensions"
+msgstr "Toutes ext."
 
 #: src/qualcoder/manage_files.py:570
 msgid "No extensions"
-msgstr "Aucune extension"
+msgstr "Aucune ext."
 
 #: src/qualcoder/manage_files.py:581
 msgid "Plain text"

@@ -34,7 +34,7 @@
     <message>
         <location filename="../GUI/ui_dialog_charts.py" line="289"/>
         <source>Charts displayed in the default web browser</source>
-        <translation>Graphiques affichés dans le navigateur web par défaut</translation>
+        <translation>Graphiques affichés dans le navigateur par défaut</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_charts.py" line="290"/>
@@ -49,7 +49,7 @@
     <message>
         <location filename="../GUI/ui_dialog_charts.py" line="292"/>
         <source>Sunburst and treemap charts</source>
-        <translation>Diagramme radial hiérarchique et Treemap</translation>
+        <translation>Diagramme radial et Treemap</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_charts.py" line="294"/>
@@ -574,14 +574,14 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="119"/>
         <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
-        <translation>Sélectionner de(s) fichier(s), le codeur·euse, 2 codes ou plus. Possibilité d&apos;exclure des résultats en excluant un code (clic droit sur le code).</translation>
+        <translation>Sélectionner fichier(s), codeur·euse, 2+ codes. Exclure un code (clic droit).</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="120"/>
         <source>Unchecked - all selected codes must match exactly.
 Checked - any selected codes must match exactly.</source>
-        <translation>Non coché - tous les codes sélectionnés doivent correspondre exactement.
-Coché - tous les codes sélectionnés doivent correspondre exactement.</translation>
+        <translation>Non coché : Tous les codes doivent correspondre.
+Coché : Un code parmi ceux sélectionnés suffit.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="122"/>
@@ -1092,7 +1092,7 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="../GUI/ui_comparison_table.py" line="100"/>
         <source>Code counts table</source>
-        <translation>Tableau des occurrences des codes</translation>
+        <translation>Occurrences des codes</translation>
     </message>
     <message>
         <location filename="../GUI/ui_comparison_table.py" line="101"/>
