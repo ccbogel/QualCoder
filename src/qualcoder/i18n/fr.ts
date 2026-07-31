@@ -639,7 +639,7 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="../GUI/ui_dialog_organiser.py" line="77"/>
         <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
-        <translation type="unfinished">Organisateur de codes. Clic-droit sur les codes et les catégories pour les lier et les fusionner. Ajouter de nouvelles catégories. Restructurer l&apos;arborescence des codes.</translation>
+        <translation>Organisateur de codes. Clic-droit sur les codes et les catégories pour les lier et les fusionner. Ajouter de nouvelles catégories. Restructurer l&apos;arborescence des codes.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_organiser.py" line="78"/>
@@ -1607,7 +1607,7 @@ Clic-droit pour  les options de formatage
     <message>
         <location filename="../GUI/ui_dialog_code_av.py" line="217"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsqu&apos;un segment audio ou vidéo est créé, choisissez un code dans l&apos;arborescence des codes, cliquez dessus avec le bouton droit de la souris et assignez le segment au code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsqu&apos;un segment audio ou vidéo est créé, choisissez un code dans l&apos;arborescence des codes, clic-droit et assignez le segment au code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_av.py" line="218"/>
@@ -2426,7 +2426,7 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
         <location filename="../GUI/ui_dialog_code_text.py" line="489"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Recherchez le texte. Sensible à la casse, Tous les fichiers. Cliquez avec le bouton droit de la souris pour modifier les options de recherche automatique</translation>
+        <translation>Recherchez le texte. Sensible à la casse, Tous les fichiers. Clic-droit pour modifier les options de recherche automatique</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_text.py" line="507"/>
