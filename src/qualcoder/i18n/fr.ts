@@ -2668,7 +2668,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="84"/>
         <source>Coders</source>
-        <translation>Codeur⋅euses</translation>
+        <translation>Codeur⋅ses</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_coder_names.py" line="86"/>
