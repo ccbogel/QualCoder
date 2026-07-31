@@ -2315,7 +2315,7 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
     <message>
         <location filename="../GUI/ui_dialog_code_text.py" line="534"/>
         <source>Coder:</source>
-        <translation>Codeur:</translation>
+        <translation>Codeur⋅se :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_text.py" line="560"/>
