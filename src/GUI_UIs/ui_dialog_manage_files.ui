@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>805</width>
+    <width>901</width>
     <height>538</height>
    </rect>
   </property>
@@ -362,6 +362,18 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
    </item>
    <item row="2" column="0">
     <widget class="QWidget" name="widget_filter" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>30</height>
+      </size>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_filter">
       <property name="spacing">
        <number>4</number>
@@ -401,7 +413,7 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
        <widget class="QComboBox" name="comboBox_file_type">
         <property name="minimumSize">
          <size>
-          <width>140</width>
+          <width>200</width>
           <height>28</height>
          </size>
         </property>
@@ -414,7 +426,7 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
        <widget class="QComboBox" name="comboBox_file_ext">
         <property name="minimumSize">
          <size>
-          <width>140</width>
+          <width>200</width>
           <height>28</height>
          </size>
         </property>
@@ -448,11 +460,11 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
       <item>
        <spacer name="horizontalSpacer_filter">
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>20</width>
           <height>20</height>
          </size>
         </property>
@@ -500,4 +512,3 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
  <resources/>
  <connections/>
 </ui>
-
