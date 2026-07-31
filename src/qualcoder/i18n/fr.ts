@@ -54,7 +54,7 @@
     <message>
         <location filename="../GUI/ui_dialog_charts.py" line="294"/>
         <source>Select coder</source>
-        <translation type="unfinished">Sélectionner un codeur·se</translation>
+        <translation>Sélectionner un codeur·se</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_charts.py" line="296"/>
@@ -1617,7 +1617,7 @@ Clic-droit pour  les options de formatage
     <message>
         <location filename="../GUI/ui_dialog_code_av.py" line="219"/>
         <source>Coder:</source>
-        <translation>Codeur :</translation>
+        <translation>Codeur⋅se :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_av.py" line="223"/>
@@ -1829,7 +1829,7 @@ Pour créer un signet, appuyez sur B</translation>
     <message>
         <location filename="../GUI/ui_dialog_code_image.py" line="238"/>
         <source>Coder:</source>
-        <translation>Codeur :</translation>
+        <translation>Codeur⋅se :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_image.py" line="243"/>
@@ -1972,7 +1972,7 @@ Pour créer un signet, appuyez sur B</translation>
     <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="329"/>
         <source>Coder:</source>
-        <translation>Codeur :</translation>
+        <translation>Codeur⋅se :</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="356"/>
@@ -3974,7 +3974,7 @@ Les caractères génériques pour&apos;like&apos; are % and _</translation>
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="585"/>
         <source>Current coder: </source>
-        <translation>Codeur actuel : </translation>
+        <translation>Codeur⋅se actuel : </translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_settings.py" line="582"/>
