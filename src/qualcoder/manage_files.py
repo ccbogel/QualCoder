@@ -367,7 +367,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_import.setIcon(qta.icon('mdi6.file-document-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_import.clicked.connect(self.import_files)
         self.ui.pushButton_import_survey.setIcon(qta.icon('mdi6.clipboard-text-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_import_survey.clicked.connect(self.import_survey)        
+        self.ui.pushButton_import_survey.clicked.connect(self.import_survey) 
+        self.ui.pushButton_import_survey.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.pushButton_import_survey.customContextMenuRequested.connect(self.button_import_survey_menu)       
         self.ui.pushButton_link.setIcon(qta.icon('mdi6.link-variant', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_link.clicked.connect(self.link_files)
         self.ui.pushButton_import_from_linked.setIcon(
@@ -2583,6 +2585,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append("<h2>" + _("Survey Import") + "</h2>")
         self.parent_text_edit.append(msg)
         Message(self.app, _("Import successful."), popup_msg + "\n" + _("{} rows imported.").format(count)).exec()
+
+    def button_import_survey_menu(self, position):
+        print("TODO Add or update file attributes")
 
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
