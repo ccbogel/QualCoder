@@ -1146,9 +1146,9 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
             brush = QtGui.QBrush(QtGui.QColor("#00BFFF"), QtCore.Qt.BrushStyle.SolidPattern)
         ul_format.setForeground(brush)
         # HTTP HTTPS protocol
-        self.highlighting_rules += [(QtCore.QRegularExpression(r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$"), ul_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression(r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"), ul_format)]
         # Protocol optional
-        self.highlighting_rules += [(QtCore.QRegularExpression(r"^[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$"), ul_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression(r"www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"), ul_format)]
 
     def highlightBlock(self, text):
         for pattern, format_ in self.highlighting_rules:

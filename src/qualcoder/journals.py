@@ -329,7 +329,7 @@ class DialogJournals(QtWidgets.QDialog):
             # Regex HTTP HTTPS protocol
             regex_http = QtCore.QRegularExpression(r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
             # Regex Protocol optional
-            regex_no_protocol = QtCore.QRegularExpression(r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
+            regex_no_protocol = QtCore.QRegularExpression(r"www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
             matches = []
             all_matches = []
             text = self.ui.textEdit.toPlainText()
