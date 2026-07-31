@@ -639,7 +639,7 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="../GUI/ui_dialog_organiser.py" line="77"/>
         <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
-        <translation type="unfinished">Organiser les codes. Clic-droit pour lier/fusionner. Ajouter des catégories. Restructurer l&apos;arborescence.</translation>
+        <translation>Organiser les codes. Clic-droit pour lier/fusionner. Ajouter des catégories. Restructurer l&apos;arborescence.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_organiser.py" line="78"/>
@@ -5143,7 +5143,7 @@ N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avan
     <message>
         <location filename="../GUI/ui_main.py" line="445"/>
         <source>Code organiser</source>
-        <translation>Organisateur des codes</translation>
+        <translation>Organiser les codes</translation>
     </message>
     <message>
         <location filename="../GUI/ui_main.py" line="446"/>

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 09:57+0200\n"
-"PO-Revision-Date: 2026-07-31 10:44+0200\n"
+"PO-Revision-Date: 2026-07-31 10:50+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -4673,7 +4673,7 @@ msgstr "Affichage ajusté et centré"
 #: src/qualcoder/code_organiser.py:1714 src/qualcoder/code_organiser.py:2366
 #: src/qualcoder/code_organiser.py:2405 src/qualcoder/code_organiser.py:2444
 msgid "Code organiser"
-msgstr "Organisateur de code"
+msgstr "Organiser les codes"
 
 #: src/qualcoder/code_organiser.py:808
 msgid "A category cannot be nested under a code."
