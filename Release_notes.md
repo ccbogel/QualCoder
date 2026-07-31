@@ -187,7 +187,7 @@ A new menu option Analysis has been added. Menu items have been re-organised bet
 ## Journals
 
 Export are now to ODT format. Right-click on a journal name to have an option to convert a journal to a file for coding within the QualCoder project.
-Right-click on a URL to open a URL from the journal text. Some text might appear to be a URL but is not, and will not open.
+Right-click on a URL to open a URL from the journal text. URLs must start with: http, https or www.
 
 ## Manage files
 
