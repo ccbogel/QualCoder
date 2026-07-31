@@ -30,6 +30,7 @@ import logging
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from odf.opendocument import OpenDocumentText  # For ODT export
 from odf.text import P as OdfParagraph  # For ODT export
+import webbrowser
 from .add_item_name import DialogAddItemName
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
@@ -114,7 +115,9 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
         self.ui.textEdit.textChanged.connect(self.text_changed)
-        self.ui.textEdit.installEventFilter(self)
+        #self.ui.textEdit.installEventFilter(self)
+        self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.textEdit.setTabChangesFocus(True)
         # spell = SpellChecker()  # Was testing this out Dont use
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
@@ -300,6 +303,47 @@ class DialogJournals(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
+
+    def text_edit_menu(self, position):
+        """ Context menu for textEdit. """
+
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        cursor = self.ui.textEdit.cursorForPosition(position)
+        url = self.check_if_url(cursor.position())
+        if not url:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"font-size:{self.app.settings['fontsize']}pt")
+        action_url = QtGui.QAction(_("Open URL"))
+        menu.addAction(action_url)
+        action = menu.exec(self.ui.textEdit.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_url:
+            webbrowser.open(url)
+
+    def check_if_url(self, pos):
+            """ Check if the line is a url """
+    
+            # Regex HTTP HTTPS protocol
+            regex_http = QtCore.QRegularExpression(r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
+            # Regex Protocol optional
+            regex_no_protocol = QtCore.QRegularExpression(r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
+            matches = []
+            all_matches = []
+            text = self.ui.textEdit.toPlainText()
+            iterator = regex_http.globalMatch(text)
+            while iterator.hasNext():
+                matches.append(iterator.next())
+            iterator = regex_no_protocol.globalMatch(text)
+            while iterator.hasNext():
+                matches.append(iterator.next())
+            for m in matches:
+                if m.capturedStart() <= pos <= m.capturedEnd():
+                    return m.captured(0)
+            return None
+
 
     def fill_table(self):
         """ Fill journals table. Update journal count label. """
