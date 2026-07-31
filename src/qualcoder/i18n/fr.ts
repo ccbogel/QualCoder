@@ -534,7 +534,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="109"/>
         <source>Report matching text segments</source>
-        <translation>Rapport sur les segments de texte correspondants</translation>
+        <translation>Rapport des segments correspondants</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="110"/>
