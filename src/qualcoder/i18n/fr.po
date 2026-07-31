@@ -457,7 +457,7 @@ msgstr "Aucun code sélectionné"
 #: src/qualcoder/code_pdf.py:1906 src/qualcoder/code_pdf.py:6127
 #: src/qualcoder/__main__.py:1890
 msgid "Coder:"
-msgstr "Codeur·euse :"
+msgstr "Codeur·se :"
 
 #: src/qualcoder/code_pdf.py:1908
 msgid "Coder visibility"
@@ -1695,7 +1695,7 @@ msgstr "Modifié"
 #: src/qualcoder/coder_names.py:386 src/qualcoder/__main__.py:919
 #: src/qualcoder/report_exact_matches.py:533
 msgid "Coder"
-msgstr "Codeur·euse"
+msgstr "Codeur·se"
 
 #: src/qualcoder/journals.py:175
 msgid "jid"
@@ -1755,7 +1755,7 @@ msgstr "Montrer des noms comme"
 
 #: src/qualcoder/journals.py:464
 msgid "Show this coder"
-msgstr "Montrer ce codeur·euse"
+msgstr "Montrer ce codeur·se"
 
 #: src/qualcoder/journals.py:470 src/qualcoder/manage_files.py:1038
 #: src/qualcoder/cases.py:878
@@ -3059,7 +3059,7 @@ msgstr "1) Quel sujet souhaitez-vous approfondir ?"
 
 #: src/qualcoder/ai_search_dialog.py:234 src/qualcoder/ai_search_dialog.py:541
 msgid "Coders: "
-msgstr "Codeur·euse : "
+msgstr "Codeur·se : "
 
 #: src/qualcoder/ai_search_dialog.py:253 src/qualcoder/ai_search_dialog.py:563
 msgid "No prompts available for this analysis type."
@@ -3379,7 +3379,7 @@ msgstr "Vous ne pouvez pas cacher le codeur⋅se actuel."
 
 #: src/qualcoder/coder_names.py:229
 msgid "New coder name:"
-msgstr "Nouveau nom de codeur·euse :"
+msgstr "Nouveau nom de codeur·se :"
 
 #: src/qualcoder/coder_names.py:237
 msgid "Name already exists."
@@ -5077,7 +5077,7 @@ msgstr ""
 #: src/qualcoder/code_av.py:215 src/qualcoder/report_codes.py:1431
 #: src/qualcoder/report_codes.py:2549 src/qualcoder/view_charts.py:544
 msgid "Coder: "
-msgstr "Codeur·euse : "
+msgstr "Codeur·se : "
 
 #: src/qualcoder/code_av.py:216 src/qualcoder/code_av.py:1001
 msgid "Media coding"
@@ -5458,7 +5458,7 @@ msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
 msgstr ""
-"Sélectionnez un codeur·euse dans la liste déroulante des paramètres, sinon "
+"Sélectionnez un codeur·se dans la liste déroulante des paramètres, sinon "
 "le texte et les médias peuvent être non codés."
 
 #: src/qualcoder/refi.py:446
@@ -5802,7 +5802,7 @@ msgstr "Fichier texte\n"
 
 #: src/qualcoder/report_compare_coder_file.py:400 src/qualcoder/reports.py:941
 msgid "No coders selected"
-msgstr "Aucun codeur·euse sélectionné"
+msgstr "Aucun codeur·se sélectionné"
 
 #: src/qualcoder/report_compare_coder_file.py:430
 msgid "CODER COMPARISON FOR FILE"
@@ -5873,13 +5873,13 @@ msgstr "Non codé : "
 #: src/qualcoder/report_compare_coder_file.py:708
 #: src/qualcoder/report_compare_coder_file.py:836
 msgid "Coder 0: "
-msgstr "Codeur·euse  0 : "
+msgstr "Codeur·se  0 : "
 
 #: src/qualcoder/report_compare_coder_file.py:561
 #: src/qualcoder/report_compare_coder_file.py:709
 #: src/qualcoder/report_compare_coder_file.py:837
 msgid "Coder 1: "
-msgstr "Codeur·euse 1 : "
+msgstr "Codeur·se 1 : "
 
 #: src/qualcoder/report_compare_coder_file.py:562
 #: src/qualcoder/report_compare_coder_file.py:710
@@ -6259,7 +6259,7 @@ msgstr "Enregistrer le fichier CSV"
 #: src/qualcoder/report_codes.py:955 src/qualcoder/report_codes.py:1070
 msgid "Each row contains filename, coder, coded, codename and categories."
 msgstr ""
-"Chaque ligne contient le nom du fichier, codeur·euse, codage, nom du code et "
+"Chaque ligne contient le nom du fichier, codeur·se, codage, nom du code et "
 "catégories."
 
 #: src/qualcoder/report_codes.py:957
@@ -6305,7 +6305,7 @@ msgstr "Paramètres de recherche des annotations"
 
 #: src/qualcoder/report_codes.py:1429
 msgid "Coder: All coders"
-msgstr "Codeur·euse : Tous les codeur·euses"
+msgstr "Codeur·se : Tous les codeur·ses"
 
 #: src/qualcoder/report_codes.py:1433
 msgid "Search text: "
@@ -9281,7 +9281,7 @@ msgstr " Fichier : "
 #: src/qualcoder/code_in_all_files.py:717 src/qualcoder/code_text.py:3943
 #: src/qualcoder/code_text.py:4013
 msgid "Code:"
-msgstr "Codeur·euse :"
+msgstr "Codeur·se :"
 
 #: src/qualcoder/code_in_all_files.py:396
 msgid "Apply more codes to this segment"
@@ -11430,7 +11430,7 @@ msgstr "Problème lors de la création de la base de données "
 
 #: src/qualcoder/__main__.py:1938
 msgid "Coder name changed to: "
-msgstr "Nom du codeur·euse changé en : "
+msgstr "Nom du codeur·se changé en : "
 
 #: src/qualcoder/__main__.py:1947
 msgid ""
@@ -11494,7 +11494,7 @@ msgstr "Changer"
 
 #: src/qualcoder/__main__.py:2046
 msgid "Default coder name changed to: "
-msgstr "Le nom du codeur·euse par défaut a été changé en : "
+msgstr "Le nom du codeur·se par défaut a été changé en : "
 
 #: src/qualcoder/__main__.py:2074 src/qualcoder/__main__.py:2103
 #: src/qualcoder/__main__.py:2123 src/qualcoder/__main__.py:2148
@@ -12581,7 +12581,7 @@ msgstr "Fréquence / Couverture"
 
 #: src/qualcoder/code_text.py:3333
 msgid "Coder(s)"
-msgstr "Codeur·euse(s)"
+msgstr "Codeur·se(s)"
 
 #: src/qualcoder/code_text.py:3334
 msgid "First coded"
