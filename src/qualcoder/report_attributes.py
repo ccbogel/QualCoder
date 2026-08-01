@@ -14,22 +14,21 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from PyQt6 import QtCore, QtWidgets
 import logging
-import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
 from .select_items import DialogSelectItems
 from .helpers import Message
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -63,16 +62,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     OPERATOR_COLUMN = 3
     VALUE_LIST_COLUMN = 4
 
-    app = None
-    attribute_type = []
-    parameters = []
-    limiter = "all"  # all for cases and files, file = file attributes, case = case attributes
-
-    result_file_ids = []
-    result_case_ids = []
-    result_tooltip_msg = ""
-
-    def __init__(self, app, limiter="all", parent=None):
+    def __init__(self, app, limiter:str="all", parent=None):
         """ limiter can be 'all', 'file' or 'case' This restricts the attributes to be displayed. """
 
         super(DialogSelectAttributeParameters, self).__init__(parent)
@@ -117,8 +107,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.ui.pushButton_clear.pressed.connect(self.clear_parameters)
 
     def filter_settings_delete(self):
-        """ Delete saved filter settings.
-        """
+        """ Delete saved filter settings. """
 
         cur = self.app.conn.cursor()
         cur.execute("select name, filter from files_filter order by upper(name)")
@@ -214,9 +203,8 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             attribute[4] = attribute[4].replace(", ", ";")  # For in and between operators
             if attribute[2] == 'character':
                 attribute[4] = attribute[4].replace('"', '')
-            # print(attribute)
+            found = False
             for row in range(0, self.ui.tableWidget.rowCount()):
-                found = False
                 if self.ui.tableWidget.item(row, self.NAME_COLUMN).text() == attribute[0]:
                     self.ui.tableWidget.cellWidget(row, self.OPERATOR_COLUMN).setCurrentText(attribute[3])
                     value = attribute[4]
@@ -238,10 +226,14 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
 
     def fill_parameters(self, attribute_list):
         """ Pre-fill attributes in Dialog from a previous selection.
-        Called by parent class. """
+        Called by parent class.
+        Args:
+            attribute_list : List
+        """
 
         if not attribute_list:
             return
+        self.ui.tableWidget.blockSignals(True)
         first_attr = attribute_list.pop(0)
         radio_bool = first_attr[0]
         if radio_bool == "BOOLEAN_OR":
@@ -260,6 +252,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     val_text = val_text.replace("'", "")
                     self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).setText(val_text)
                     self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText(a[3])
+        self.ui.tableWidget.blockSignals(False)
 
     def make_parameter_list(self):
         """ Make a parameter list where operator and value are entered.
@@ -307,7 +300,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                                         operator, values])
 
     def accept(self):
-        """ Make a parameter list and get fiel and case ids. """
+        """ Make a parameter list and get file and case ids. """
 
         self.make_parameter_list()
         self.get_results_case_ids()
@@ -502,10 +495,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             file_sql = "select id from attribute where "
             if len(a) > 1 and a[1] == 'file':
                 attribute_set = set()
-                file_sql += "attribute.name = '" + a[0] + "' "
-                file_sql += " and attribute.value " + a[3] + " "
+                file_sql += f'attribute.name="{a[0]}" and attribute.value {a[3]} '
                 if a[3] == 'between':
-                    file_sql += a[4][0] + " and " + a[4][1] + " "
+                    file_sql += f'{a[4][0]}  and {a[4][1]} '
                 if a[3] in ('in', 'not in'):
                     file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
                 if a[3] not in ('between', 'in', 'not in'):
@@ -670,7 +662,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     self.ui.tableWidget.item(x, y).setText("")
         self.ui.tableWidget.blockSignals(False)
 
-    def get_tooltip_values(self, name, case_or_file, valuetype):
+    def get_tooltip_values(self, name:str, case_or_file, valuetype:str):
         """ Get values to display in tooltips for the value list column. """
 
         tt = ""

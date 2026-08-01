@@ -14,30 +14,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
 from copy import deepcopy, copy
 import logging
-import os
+from pathlib import Path
 import qtawesome as qta
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
-
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
 
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
-
 ROWS = 12
 COLS = 10
 
@@ -140,6 +139,55 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.change_perspective()
         self.ui.treeWidget.clearSelection()
         self.ui.tableWidget.clearSelection()
+
+    def _nest_subcodes_in_tree(self):
+        """ Re-parent code tree items so sub-codes (supercid) nest under their parent
+        code. Runs after fill_tree has placed every code. Preserves item flags,
+        checkboxes, colour and count because the existing item is moved, not rebuilt.
+        No-op for projects without sub-codes. """
+        tree = getattr(getattr(self, 'ui', None), 'treeWidget', None) or getattr(self, 'tree', None)
+        if tree is None:
+            return
+        code_list = getattr(self, 'code_names', None)
+        if code_list is None:
+            code_list = getattr(self, 'codes', [])
+        supercid_of = {c['cid']: c.get('supercid') for c in code_list}
+        if not any(supercid_of.values()):
+            return
+        guard = 0
+        moved = True
+        while moved and guard < 10000:
+            moved = False
+            guard += 1
+            cid_item = {}
+            it = QtWidgets.QTreeWidgetItemIterator(tree)
+            while it.value():
+                node = it.value()
+                t = node.text(1)
+                if t.startswith('cid:'):
+                    try:
+                        cid_item[int(t[4:])] = node
+                    except ValueError:
+                        pass
+                it += 1
+            for cid_, node in cid_item.items():
+                sup = supercid_of.get(cid_)
+                if sup is None:
+                    continue
+                parent_node = cid_item.get(sup)
+                if parent_node is None or node.parent() is parent_node:
+                    continue
+                cur_parent = node.parent()
+                if cur_parent is None:
+                    idx = tree.indexOfTopLevelItem(node)
+                    taken = tree.takeTopLevelItem(idx)
+                else:
+                    taken = cur_parent.takeChild(cur_parent.indexOfChild(node))
+                parent_node.addChild(taken)
+                parent_node.setExpanded(True)  # show the nested sub-code from the start <- L
+                taken.setExpanded(True)
+                moved = True
+                break
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -251,6 +299,9 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
+        
+        self._nest_subcodes_in_tree()
+        
         self.ui.treeWidget.expandAll()
         restore_persistent_tree_widths(self.ui.treeWidget)
 
@@ -271,7 +322,13 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
         # Update code perspective color for filling tree background
         for c in self.codes:
-            color_index = colors.index(c['color'])
+            try:
+                color_index = colors.index(c['color'])
+            except ValueError:
+                # This might rarely occur - maybe from a database edit of the colour, or import from QDPX project?
+                print(f"{c['color']} is not in the list of QualCoder colours")
+                logger.info(f"{c['color']} is not in the list of QualCoder colours")
+                continue
             if self.perspective_idx == 0:
                 c['perspective'] = colors[color_index]
             if self.perspective_idx == 1:

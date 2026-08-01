@@ -16,25 +16,147 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
 https://qualcoder.org/
+
 """
 
 import logging
 import os
+from typing import Any
 from PyQt6 import QtGui, QtWidgets, QtCore
 import qtawesome as qta
 import copy
 import re
+import unicodedata  # <- L normalize localized numerals when reading numeric combos
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .coder_names import DialogCoderNames
-from .helpers import Message
-from .ai_llm import get_available_models, add_new_ai_model
+from .helpers import get_default_user_directory, Message
+from .ai_llm import (
+    add_new_ai_model,
+    ensure_chatgpt_oauth_profile_defaults,
+    get_available_models,
+    get_chatgpt_oauth_status,
+    is_chatgpt_oauth_profile,
+    renew_chatgpt_oauth,
+)
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+USER_I18N_README = """QualCoder additional translations
+
+This folder can contain additional compiled translation files for QualCoder.
+It can also contain a zip package for one language.
+
+How to add a language
+1. Download additional language files from here:
+   https://github.com/ccbogel/QualCoder/tree/master/other_languages/
+   If you want to add your own language, follow the instructions here on 
+   how to translate the software: https://qualcoder.org/doc/en/7.6.-How-to-contribute/   
+2. Put either the zip package or the .qm and .mo files into this folder.
+3. Use the same language code for all filenames, for example:
+   sv.qm
+   sv.mo
+   sv.txt (optional)
+   sv.zip
+4. A zip package should contain both files for the same language.
+   It may also contain an optional text file with extra information.
+5. Restart QualCoder after selecting the language in Settings.
+
+Notes
+- A language is only listed in Settings when a zip package or both the .qm and .mo files are present.
+- The zip package will be unpacked automatically when that language is used.
+- If a language exists both here and inside QualCoder, the newer file is used.
+"""
+
+
+# Canonical values of the numeric combos in Settings, in the SAME order as the items defined in the .ui. The logic uses these values by INDEX, so
+# the translated label (e.g. '۱۰', '十' or even a corrupt label) is presentation only and never alters the stored value.
+FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  
+BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  
+CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
+CHUNK_SIZES = [50000, 30000]                # comboBox_text_chunk_size  
+STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
+HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
+
+
+def _setting_is_true(value: Any) -> bool:
+    """Return True when a stored setting value represents an enabled state."""
+
+    if isinstance(value, bool):
+        return value
+    return str(value).lower() == 'true'
+
+
+def _combo_value(combobox, values, default):  
+    """
+    Return the canonical value of the selected item, by index.
+
+    The combo's visible text goes through the translation function and may be localized
+    (fa: '50،000'; zh: '十') or corrupt (eo: '12 12 12 12'), so the text is NEVER parsed:
+    the item index identifies the value. As a safety net (invalid index), the text is
+    interpreted with _combo_int bounded to the range of 'values' and, ultimately,
+    'default' (the previous valid value) is returned.
+    """
+    idx = combobox.currentIndex()
+    if 0 <= idx < len(values):
+        return values[idx]
+    return _combo_int(combobox.currentText(), default=default,
+                      minimum=min(values), maximum=max(values))
+
+
+def _set_combo_by_value(combobox, values, value):  
+    """
+    Select in the combo the item whose canonical value matches, by index.
+
+    Replaces findText(str(value)): with translated or corrupt labels, findText cannot
+    match the text and the dialog always showed the first item instead of the user's
+    stored selection. By index, the selection is always honoured.
+    """
+    try:
+        combobox.setCurrentIndex(values.index(value))
+    except ValueError:
+        combobox.setCurrentIndex(0)
+
+
+def _combo_choice(combobox, values, default):
+    """Return the canonical selected value by index for non-numeric comboboxes."""
+
+    idx = combobox.currentIndex()
+    if 0 <= idx < len(values):
+        return values[idx]
+    return default
+
+
+def _combo_int(text, default=0, minimum=None, maximum=None):  # <- L
+    """
+    Convert a numeric combo's text to int, tolerating localization and guarding
+    against corrupt translations. Safety net for _combo_value.
+
+    Covers two real problems seen in the translation files:
+    1) Localized numerals: some translations (e.g. fa) use non-ASCII digits or
+       thousands separators (Arabic comma U+060C), so 'currentText()' returns
+       '50،000' and int() fails. We keep only the decimal digits, mapped to ASCII.
+    2) Duplicated or exorbitant numerals: other translations (e.g. eo) duplicate the
+       literal ('12' -> '12 12 12 12'), which would yield 12121212 and break the UI
+       (giant fonts). If 'minimum'/'maximum' are given and the value is out of range,
+       a warning is logged and 'default' (the previous valid value) is returned
+       instead of applying the corrupt number.
+    """
+    
+    digits = ''.join(
+        str(unicodedata.decimal(ch)) for ch in text
+        if unicodedata.decimal(ch, None) is not None
+    )
+    value = int(digits) if digits else default
+    if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
+        logger.warning(
+            "Numeric combo value out of range after translation: %r -> %s "
+            "(allowed %s..%s). Falling back to %s.", text, value, minimum, maximum, default)  # <- L
+        return default
+    return value
 
 
 class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
@@ -78,12 +200,12 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_coderName.setText(self.settings['codername'])
         self.ui.pushButton_set_coder.clicked.connect(self.set_coder)        
         self.ui.fontComboBox.setCurrentFont(new_font)
-        languages = ["Deutsch de", "English en", "Español es", "Français fr",
-                     "Italiano it", "日本語 ja", "Português pt", "Svenska sv", "中国人 zh"]
-        self.ui.comboBox_language.addItems(languages)
-        for index, lang in enumerate(languages):
-            if lang[-2:] == self.settings['language']:
-                self.ui.comboBox_language.setCurrentIndex(index)
+        self.selected_language_index = -1
+        self.populate_language_combo()
+        self.ui.comboBox_language.currentIndexChanged.connect(self.language_index_changed)
+        self.ui.comboBox_language.activated.connect(self.language_activated)
+        self.ui.comboBox_language.installEventFilter(self)
+
         timestampformats = ["[mm.ss]", "[mm:ss]", "[hh.mm.ss]", "[hh:mm:ss]",
                             "{hh:mm:ss}", "#hh:mm:ss.sss#"]
         self.ui.comboBox_timestamp.addItems(timestampformats)
@@ -95,35 +217,19 @@ class DialogSettings(QtWidgets.QDialog):
         for index, snf in enumerate(speakernameformats):
             if snf == self.settings['speakernameformat']:
                 self.ui.comboBox_speaker.setCurrentIndex(index)
-        index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_fontsize.setCurrentIndex(index)
-        index = self.ui.comboBox_codetreefontsize.findText(str(self.settings['treefontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_codetreefontsize.setCurrentIndex(index)
 
-        index = self.ui.comboBox_docfontsize.findText(str(self.settings['docfontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_docfontsize.setCurrentIndex(index)
-
-        index = self.ui.comboBox_text_chunk_size.findText(str(self.settings['codetext_chunksize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_text_chunk_size.setCurrentIndex(index)
+        # Selection by canonical value (index), immune to translated or corrupt labels.
+        _set_combo_by_value(self.ui.comboBox_fontsize, FONT_SIZES, self.settings['fontsize'])
+        _set_combo_by_value(self.ui.comboBox_codetreefontsize, FONT_SIZES, self.settings['treefontsize'])
+        _set_combo_by_value(self.ui.comboBox_docfontsize, FONT_SIZES, self.settings['docfontsize'])
+        _set_combo_by_value(self.ui.comboBox_text_chunk_size, CHUNK_SIZES, self.settings['codetext_chunksize'])
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
         if self.settings['showids'] == 'True':
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
-        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow", "native"]
-        styles_translated = [_("original"), _("dark"), _("blue"), _("green"), _("orange"), _("purple"), _("yellow"), _("rainbow"), _("native")]
+        styles = STYLE_OPTIONS
+        styles_translated = [_(style_name) for style_name in styles]
         self.ui.comboBox_style.addItems(styles_translated)
         for index, style in enumerate(styles):
             if style == self.settings['stylesheet']:
@@ -136,15 +242,17 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
+        self.ui.checkBox_code_stripes.setChecked(
+            _setting_is_true(self.settings.get('codetext_show_margin_stripes', True)))
+        _set_combo_by_value(
+            self.ui.comboBox_code_highlight_style,
+            HIGHLIGHT_STYLE_OPTIONS,
+            self.settings.get('codetext_highlight_style', 'marker'))
 
-        index = self.ui.comboBox_backups.findText(str(self.settings['backup_num']),
-                                                      QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_backups.setCurrentIndex(index)
+        _set_combo_by_value(self.ui.comboBox_backups, BACKUP_COUNTS, self.settings['backup_num'])
 
         if self.settings['directory'] == "":
-            self.settings['directory'] = os.path.expanduser("~")
+            self.settings['directory'] = get_default_user_directory()
         self.ui.label_directory.setText(self.settings['directory'])
         text_styles = [_('Bold'), _('Italic'), _('Bigger')]
         self.ui.comboBox_text_style.addItems(text_styles)
@@ -152,11 +260,8 @@ class DialogSettings(QtWidgets.QDialog):
             if text_style == self.settings['report_text_context_style']:
                 self.ui.comboBox_text_style.setCurrentIndex(index)
 
-        index = self.ui.comboBox_surrounding_chars.findText(str(self.settings['report_text_context_characters']),
-                                                      QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_surrounding_chars.setCurrentIndex(index)
+        _set_combo_by_value(self.ui.comboBox_surrounding_chars, CONTEXT_CHARS,
+                            self.settings['report_text_context_characters'])
         msg = _("Default folder for storing automatic backups and for file outputs.")
         self.ui.pushButton_choose_directory.setToolTip(msg)
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
@@ -176,6 +281,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_ai_api_key.editingFinished.connect(self.ai_api_key_changed)
         self.ui.toolButtonShowApiKey.setIcon(qta.icon('mdi6.eye-outline'))
         self.ui.toolButtonShowApiKey.toggled.connect(self.ai_api_key_show)
+        self.ui.pushButton_renew_auth.clicked.connect(self.renew_ai_authentication)
         # advanced AI options:
         self.ui.pushButton_advanced_AI_options.clicked.connect(self.toggle_ai_advanced_options)
         self.toggle_ai_advanced_options() # hide the advanced AI options panel
@@ -189,7 +295,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_AI_model_fast.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_large.view().setMinimumWidth(500)  # Set a minimum width for the dropdown list
         self.ui.comboBox_AI_model_fast.view().setMinimumWidth(500)
-        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.setChecked(self.settings.get('ai_language_ui', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.stateChanged.connect(self.ai_language_ui_changed)
         self.ui.lineEdit_AI_language.setText(self.settings.get('ai_language', ''))
@@ -219,6 +324,147 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.widget_ai.setStyleSheet('')
 
+        self.load_ai_permissions()
+
+    def load_ai_permissions(self):
+        ai_permissions = self.settings.get('ai_permissions', 1)
+        if ai_permissions not in (0, 1, 2):
+            ai_permissions = 1
+            self.settings['ai_permissions'] = ai_permissions
+        self.ui.comboBox_ai_permissions.setCurrentIndex(ai_permissions)
+
+    def current_ai_permissions(self):
+        index = self.ui.comboBox_ai_permissions.currentIndex()
+        if index not in (0, 1, 2):
+            return 1
+        return index
+
+    def get_selected_language_code(self):
+        """Return the currently selected language code, excluding the action item."""
+
+        current_index = self.ui.comboBox_language.currentIndex()
+        item_type = self.ui.comboBox_language.itemData(current_index, QtCore.Qt.ItemDataRole.UserRole + 1)
+        if item_type == 'language':
+            return self.ui.comboBox_language.itemData(current_index, QtCore.Qt.ItemDataRole.UserRole)
+        if self.selected_language_index >= 0:
+            return self.ui.comboBox_language.itemData(self.selected_language_index, QtCore.Qt.ItemDataRole.UserRole)
+        return 'en'
+
+    def set_language_combo_selection(self, lang_code):
+        """Select a language entry in the combobox by code."""
+
+        for index in range(self.ui.comboBox_language.count()):
+            item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+            if item_type != 'language':
+                continue
+            if self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole) == lang_code:
+                self.ui.comboBox_language.setCurrentIndex(index)
+                self.selected_language_index = index
+                return True
+        return False
+
+    def populate_language_combo(self, preferred_language=None):
+        """Populate built-in languages, user languages and the add-language action."""
+
+        tooltip_lines = [
+            _("Close and open the software for the change in language to occur."),
+            _("Additional community supported languages can be installed by selecting \"Add more languages...\" in the dropdown."),
+        ]
+        self.ui.comboBox_language.clear()
+        builtin_codes = set()
+        for code, label in self.app.get_builtin_language_labels():
+            builtin_codes.add(code)
+            index = self.ui.comboBox_language.count()
+            self.ui.comboBox_language.addItem(f"{label} {code}")
+            self.ui.comboBox_language.setItemData(index, code, QtCore.Qt.ItemDataRole.UserRole)
+            self.ui.comboBox_language.setItemData(index, 'language', QtCore.Qt.ItemDataRole.UserRole + 1)
+
+        for code in self.app.get_complete_user_language_codes():
+            if code in builtin_codes:
+                continue
+            index = self.ui.comboBox_language.count()
+            self.ui.comboBox_language.addItem(f"other - {code}")
+            self.ui.comboBox_language.setItemData(index, code, QtCore.Qt.ItemDataRole.UserRole)
+            self.ui.comboBox_language.setItemData(index, 'language', QtCore.Qt.ItemDataRole.UserRole + 1)
+
+        current_language = preferred_language if preferred_language is not None else self.settings['language']
+        if not self.set_language_combo_selection(current_language):
+            if not self.set_language_combo_selection('en'):
+                for index in range(self.ui.comboBox_language.count()):
+                    item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+                    if item_type == 'language':
+                        self.ui.comboBox_language.setCurrentIndex(index)
+                        self.selected_language_index = index
+                        break
+
+        action_index = self.ui.comboBox_language.count()
+        self.ui.comboBox_language.addItem(_("Add more languages..."))
+        self.ui.comboBox_language.setItemData(action_index, 'add_other_language', QtCore.Qt.ItemDataRole.UserRole)
+        self.ui.comboBox_language.setItemData(action_index, 'action', QtCore.Qt.ItemDataRole.UserRole + 1)
+        self.ui.comboBox_language.setToolTip("\n".join(tooltip_lines))
+
+    def language_index_changed(self, index):
+        """Remember the last selected language entry."""
+
+        item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+        if item_type == 'language':
+            self.selected_language_index = index
+
+    def refresh_language_combo(self):
+        """Reload user languages while preserving the current selection."""
+
+        preferred_language = self.get_selected_language_code()
+        with QtCore.QSignalBlocker(self.ui.comboBox_language):
+            self.populate_language_combo(preferred_language)
+
+    def eventFilter(self, obj, event):
+        if obj == self.ui.comboBox_language:
+            if event.type() == QtCore.QEvent.Type.MouseButtonPress:
+                self.refresh_language_combo()
+            if event.type() == QtCore.QEvent.Type.KeyPress:
+                if event.key() in (QtCore.Qt.Key.Key_F4, QtCore.Qt.Key.Key_Down):
+                    self.refresh_language_combo()
+        return super().eventFilter(obj, event)
+
+    def language_activated(self, index):
+        """Handle the action item in the language combobox."""
+
+        item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
+        if item_type != 'action':
+            return
+        self.open_user_language_folder()
+        if self.selected_language_index >= 0:
+            with QtCore.QSignalBlocker(self.ui.comboBox_language):
+                self.ui.comboBox_language.setCurrentIndex(self.selected_language_index)
+
+    def open_user_language_folder(self):
+        """Create the user i18n folder and readme if needed, then open it."""
+
+        user_i18n_dir = self.app.get_user_i18n_dir()
+        try:
+            os.makedirs(user_i18n_dir, exist_ok=True)
+            readme_path = os.path.join(user_i18n_dir, "README.TXT")
+            if not os.path.exists(readme_path):
+                with open(readme_path, 'w', encoding='utf-8') as file_:
+                    file_.write(USER_I18N_README)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Add more languages..."), str(err), "warning").exec()
+            return
+        opened = QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(user_i18n_dir))
+        if not opened:
+            Message(self.app, _("Add more languages..."),
+                    _("Could not open the user translation folder.") + "\n" + user_i18n_dir,
+                    "warning").exec()
+        msg = _("Download additional language files from here:") + "\n"
+        msg += "https://github.com/ccbogel/QualCoder/tree/master/other_languages/\n"
+        msg += _("Put either the zip file or the .qm and .mo files into the folder") + " .qualcoder/i18n\n"
+        msg += "For example: sv.zip, or both the sv.mo and sv.qm files." + "\n"
+        msg += _("Then select that language in the dropdown box.") + "\n"
+        msg += _("Additional languages may not be the most current translations, and they may contain inaccurate translations.")  + "\n"
+        msg += _("Read the README.txt file in the i18n folder for more information.")
+        Message(self.app, _("Add more languages"), msg, "information").exec()
+
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
 
@@ -226,17 +472,67 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setEnabled(True)
         else:
             self.ui.checkBox_backup_AV_files.setEnabled(False)
-    
+
+    def current_ai_model_index(self) -> int:
+        """Return the currently selected AI profile index, or -1 if none is selected."""
+
+        try:
+            return int(self.settings.get('ai_model_index', -1))
+        except (TypeError, ValueError):
+            return -1
+
+    def current_ai_profile(self):
+        """Return the currently selected AI profile dictionary, or None."""
+
+        ai_model_index = self.current_ai_model_index()
+        if 0 <= ai_model_index < len(self.ai_models):
+            return self.ai_models[ai_model_index]
+        return None
+
+    def current_ai_profile_uses_oauth(self) -> bool:
+        """Return whether the current AI profile uses ChatGPT OAuth."""
+
+        return is_chatgpt_oauth_profile(self.current_ai_profile())
+
+    def refresh_ai_auth_status(self):
+        """Refresh the authentication status label for OAuth profiles."""
+
+        if not self.current_ai_profile_uses_oauth():
+            self.ui.label_auth_result.setText('')
+            return
+        is_authenticated, status_text = get_chatgpt_oauth_status()
+        self.ui.label_auth_result.setText(status_text)
+
+    def update_ai_auth_widgets(self):
+        """Toggle API-key and OAuth widgets according to the current profile type."""
+
+        is_enabled = self.ui.checkBox_AI_enable.isChecked()
+        uses_oauth = self.current_ai_profile_uses_oauth()
+        self.ui.label_ai_api_key.setVisible(not uses_oauth)
+        self.ui.lineEdit_ai_api_key.setVisible(not uses_oauth)
+        self.ui.toolButtonShowApiKey.setVisible(not uses_oauth)
+        self.ui.label_auth.setVisible(uses_oauth)
+        self.ui.label_auth_result.setVisible(uses_oauth)
+        self.ui.pushButton_renew_auth.setVisible(uses_oauth)
+        self.ui.lineEdit_ai_api_key.setEnabled(is_enabled and (not uses_oauth))
+        self.ui.toolButtonShowApiKey.setEnabled(is_enabled and (not uses_oauth))
+        self.ui.label_auth.setEnabled(is_enabled and uses_oauth)
+        self.ui.label_auth_result.setEnabled(is_enabled and uses_oauth)
+        self.ui.pushButton_renew_auth.setEnabled(is_enabled and uses_oauth)
+        if uses_oauth:
+            self.refresh_ai_auth_status()
+        else:
+            self.ui.label_auth_result.setText('')
+
     def ai_enable_state_changed(self):
         self.ui.comboBox_ai_profile.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.lineEdit_ai_api_key.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
+        self.update_ai_auth_widgets()
     
     def load_ai_profiles(self):
         with QtCore.QSignalBlocker(self.ui.comboBox_ai_profile):
@@ -259,9 +555,10 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['ai_model_index'] = self.ui.comboBox_ai_profile.currentIndex()
         if int(self.settings['ai_model_index']) >= 0:
             curr_ai_model = self.ai_models[int(self.settings['ai_model_index'])]
+            ensure_chatgpt_oauth_profile_defaults(curr_ai_model)
             self.ui.label_ai_model_desc.setText(curr_ai_model['desc'])
             self.ui.label_ai_access_info_url.setText(f'<a href="{curr_ai_model["access_info_url"]}">{curr_ai_model["access_info_url"]}</a>')
-            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_available_models() to trigger
                 self.ui.lineEdit_ai_api_key.setText(curr_ai_model['api_key']) 
             with QtCore.QSignalBlocker(self.ui.comboBox_AI_model_large):
                 self.ui.comboBox_AI_model_large.setCurrentText(curr_ai_model['large_model'])
@@ -284,7 +581,7 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
-            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_available_models() to trigger
                 self.ui.lineEdit_ai_api_key.setText('')
             self.ui.comboBox_AI_model_large.setCurrentText('')
             self.ui.comboBox_AI_model_fast.setCurrentText('')
@@ -293,7 +590,8 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_reasoning.setCurrentText('default')
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_base):
                 self.ui.lineEdit_ai_api_base.setText('')    
-        self.ai_update_avaliable_models()     
+        self.update_ai_auth_widgets()
+        self.ai_update_available_models()
         
     def ai_profile_name_edit(self):
         if int(self.settings['ai_model_index']) < 0:
@@ -377,16 +675,21 @@ class DialogSettings(QtWidgets.QDialog):
 
     def ai_api_key_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
+            if self.current_ai_profile_uses_oauth():
+                ensure_chatgpt_oauth_profile_defaults(self.current_ai_profile())
+                with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key):
+                    self.ui.lineEdit_ai_api_key.setText(self.current_ai_profile()['api_key'])
+                return
             api_key = self.ui.lineEdit_ai_api_key.text()
             if not self.validate_ai_api_key(api_key, focus_field=True):
                 return
             self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = api_key
-        self.ai_update_avaliable_models()    
+        self.ai_update_available_models()
         
     def ai_api_key_show(self, checked):
         self.ui.lineEdit_ai_api_key.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal if checked else QtWidgets.QLineEdit.EchoMode.PasswordEchoOnEdit) 
 
-    def ai_update_avaliable_models(self):
+    def ai_update_available_models(self):
         if not self.ui.widget_AI_advanced_options.isVisible():
             return
         model_list = []
@@ -475,11 +778,30 @@ class DialogSettings(QtWidgets.QDialog):
             1.0,
             _("AI top_p parameter must be between 0.0 and 1.0."),
         )
+
+    def renew_ai_authentication(self):
+        """Start or renew ChatGPT OAuth authentication for the current profile."""
+
+        if not self.current_ai_profile_uses_oauth():
+            return
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.CursorShape.WaitCursor)
+        try:
+            is_authenticated, status_text = renew_chatgpt_oauth()
+        finally:
+            QtWidgets.QApplication.restoreOverrideCursor()
+        self.ui.label_auth_result.setText(status_text)
+        if not is_authenticated:
+            Message.warning(self, _('Authentication'), status_text)
             
     def ai_api_base_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
-            self.ai_models[int(self.settings['ai_model_index'])]['api_base'] = self.ui.lineEdit_ai_api_base.text()   
-        self.ai_update_avaliable_models()    
+            curr_ai_model = self.ai_models[int(self.settings['ai_model_index'])]
+            curr_ai_model['api_base'] = self.ui.lineEdit_ai_api_base.text()
+            ensure_chatgpt_oauth_profile_defaults(curr_ai_model)
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key):
+                self.ui.lineEdit_ai_api_key.setText(curr_ai_model['api_key'])
+        self.update_ai_auth_widgets()
+        self.ai_update_available_models()
             
     def set_coder(self):
         """ Edit the coder names and select the current one.
@@ -510,7 +832,7 @@ class DialogSettings(QtWidgets.QDialog):
     def toggle_ai_advanced_options(self):
         if self.ui.pushButton_advanced_AI_options.isChecked():
             self.ui.widget_AI_advanced_options.show()
-            self.ai_update_avaliable_models()
+            self.ai_update_available_models()
             QtCore.QTimer.singleShot(100, lambda: self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum()))
         else:
             self.ui.widget_AI_advanced_options.hide()
@@ -551,23 +873,30 @@ class DialogSettings(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute('update project set codername=?', [self.settings['codername']])
         self.settings['font'] = self.ui.fontComboBox.currentText()
-        self.settings['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
-        self.settings['treefontsize'] = int(self.ui.comboBox_codetreefontsize.currentText())
-        self.settings['docfontsize'] = int(self.ui.comboBox_docfontsize.currentText())
+
+        # Read by index: the translated (or corrupt) label never alters the value
+        self.settings['fontsize'] = _combo_value(self.ui.comboBox_fontsize, FONT_SIZES,
+                                                 self.app.settings['fontsize'])
+        self.settings['treefontsize'] = _combo_value(self.ui.comboBox_codetreefontsize, FONT_SIZES,
+                                                     self.app.settings['treefontsize'])  
+        self.settings['docfontsize'] = _combo_value(self.ui.comboBox_docfontsize, FONT_SIZES,
+                                                    self.app.settings['docfontsize']) 
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
             self.settings['showids'] = 'True'
         else:
             self.settings['showids'] = 'False'
         index = self.ui.comboBox_style.currentIndex()
-        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow", "native"]
+        styles = STYLE_OPTIONS
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
-        if self.settings['language'] != self.ui.comboBox_language.currentText()[-2:]:
+        selected_language = self.get_selected_language_code()
+        if self.settings['language'] != selected_language:
             restart_qualcoder = True
-        self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
-        self.settings['codetext_chunksize'] = int(self.ui.comboBox_text_chunk_size.currentText())
+        self.settings['language'] = selected_language
+        self.settings['codetext_chunksize'] = _combo_value(self.ui.comboBox_text_chunk_size, CHUNK_SIZES,
+                                                           self.app.settings['codetext_chunksize'])  # <- L
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
         if self.ui.checkBox_auto_backup.isChecked():
@@ -578,8 +907,17 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['backup_av_files'] = 'True'
         else:
             self.settings['backup_av_files'] = 'False'
-        self.settings['backup_num'] = int(self.ui.comboBox_backups.currentText())
-        self.settings['report_text_context_characters'] = int(self.ui.comboBox_surrounding_chars.currentText())
+        self.settings['codetext_show_margin_stripes'] = (
+            'True' if self.ui.checkBox_code_stripes.isChecked() else 'False')
+        self.settings['codetext_highlight_style'] = _combo_choice(
+            self.ui.comboBox_code_highlight_style,
+            HIGHLIGHT_STYLE_OPTIONS,
+            self.settings.get('codetext_highlight_style', 'marker'))
+        self.settings['backup_num'] = _combo_value(self.ui.comboBox_backups, BACKUP_COUNTS,
+                                                   self.app.settings['backup_num'])  # <- L
+        self.settings['report_text_context_characters'] = _combo_value(
+            self.ui.comboBox_surrounding_chars, CONTEXT_CHARS,
+            self.app.settings['report_text_context_characters'])  # <- L
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
         # AI settings
@@ -589,13 +927,19 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['ai_enable'] = 'False'
         ai_model_index = self.ui.comboBox_ai_profile.currentIndex() 
         self.settings['ai_model_index'] = ai_model_index
+        self.settings['ai_permissions'] = self.current_ai_permissions()
         if self.settings['ai_enable'] == 'True' and ai_model_index < 0:
             msg = _('Please select an AI profile or disable the AI altogether.')
             Message(self.app, _('AI profile'), msg).exec()
             return
-        if self.settings['ai_enable'] == 'True' and not self.validate_ai_api_key(self.ui.lineEdit_ai_api_key.text(), focus_field=True):
+        uses_oauth = False
+        if 0 <= ai_model_index < len(self.ai_models):
+            ensure_chatgpt_oauth_profile_defaults(self.ai_models[ai_model_index])
+            uses_oauth = is_chatgpt_oauth_profile(self.ai_models[ai_model_index])
+        if self.settings['ai_enable'] == 'True' and (not uses_oauth) and \
+                (not self.validate_ai_api_key(self.ui.lineEdit_ai_api_key.text(), focus_field=True)):
             return
-        if self.settings['ai_enable'] == 'True' and self.ai_models[ai_model_index]['api_key'] == '':
+        if self.settings['ai_enable'] == 'True' and (not uses_oauth) and self.ai_models[ai_model_index]['api_key'] == '':
             msg = _('Please enter a valid API-key for the AI model.')
             Message(self.app, _('AI model'), msg).exec()
             return
@@ -609,10 +953,6 @@ class DialogSettings(QtWidgets.QDialog):
             return
         if self.settings['ai_enable'] == 'True' and not self.validate_ai_top_p():
             return
-        if self.ui.checkBox_ai_project_memo.isChecked():
-            self.settings['ai_send_project_memo'] = 'True'
-        else: 
-            self.settings['ai_send_project_memo'] = 'False'
         self.settings['ai_language_ui'] = 'True' if self.ui.checkBox_AI_language_ui.isChecked() else 'False'
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()

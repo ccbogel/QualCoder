@@ -94,6 +94,9 @@
    <property name="text">
     <string>Sunburst and treemap charts</string>
    </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QLabel" name="label_coder">
    <property name="geometry">
@@ -574,7 +577,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>566</x>
      <y>440</y>
-     <width>121</width>
+     <width>201</width>
      <height>18</height>
     </rect>
    </property>

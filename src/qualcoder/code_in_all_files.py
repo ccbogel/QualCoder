@@ -14,17 +14,19 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import datetime
 import fitz
 import logging
-import os
+from pathlib import Path
 import sqlite3
+from typing import Any
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -34,7 +36,6 @@ from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, 
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -52,7 +53,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     def __init__(self, app, codes_list, case_or_file:str = "File", category_name:str = ""):
         """ Create dialog with textEdit widget to show all codings of this code.
         Called: code_text.coded_media_dialog , code_av.coded_media_dialog , code_image.coded_media_dialog
-        param:
+        Args:
             app : class containing app details such as database connection
             codes_list : dictionary of this one code {name, color, cid, catid, date, owner, memo}, OR
                 list of dictionaries of {name,color, cid, catid,date,owner,memo}
@@ -242,8 +243,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.te.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
         self.te.blockSignals(False)
 
-    def insert_title(self, row):
-        """ Convenience method for a/v, image, text title insertion. """
+    def insert_title(self, row:dict[str,Any]):
+        """ Convenience method for a/v, image, text title insertion.
+        Args:
+            row : Dictionary
+        """
 
         foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
         title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
@@ -259,12 +263,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         title += "</span><br />"
         self.te.insertHtml(title)
 
-    def put_image_into_textedit(self, img, counter, text_edit):
+    def put_image_into_textedit(self, img, counter:int, text_edit):
         """ Scale image, add resource to document, insert image.
         A counter is important as each image slice needs a unique name, counter adds
         the uniqueness to the name.
         Called by: coded_media_dialog
-        param:
+        Args:
             img: image data dictionary with file location and width, height, position data
             counter: a changing counter is needed to make discrete different images
             text_edit:  the widget that shows the data
@@ -279,18 +283,31 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         if not img['mediapath'].lower().endswith(".pdf"):
             image = QtGui.QImage(abs_path)
         else:  # A pdf, must create the image
+            source_path = ""
             if img['mediapath'][:6] == "/docs/":
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 source_path = img['mediapath'][5:]
-            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
-            for page in fitz_pdf:
-                if page.number == img['pdf_page']:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
-            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            image = QtGui.QImage(source_path)
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
+            image = QtGui.QImage()
+            # Areas from older imports may have pdf_page NULL: they belong to page 0
+            # (same normalization as the image coding view).
+            pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
+            try:
+                fitz_pdf = fitz.open(source_path)
+                try:
+                    if 0 <= pdf_page_ < len(fitz_pdf):
+                        page = fitz_pdf.load_page(pdf_page_)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf area image: {source_path} {err}")
+            if image.isNull():
+                return
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
@@ -304,15 +321,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
-        imagename = os.path.join(self.app.project_path, "images", f"{counter}-{img['mediapath']}")
-        url = QtCore.QUrl(imagename)
+        image_name = Path(self.app.project_path) / "images" / f"{counter}-{img['mediapath']}"
+        url = QtCore.QUrl(str(image_name))
         document = text_edit.document()
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         # See https://doc.qt.io/qt-6/qtextdocument.html#addResource
         # The image can be inserted into the document using the QTextCursor API:
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
-        # TODO Look at smoothtransformation scaling
         image_format.setWidth(image.width() * scaler)
         image_format.setHeight(image.height() * scaler)
         image_format.setName(url.toString())
@@ -414,7 +430,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         if action == action_remove_important:
             self.remove_important_flag(item)
 
-    def add_important_flag(self, item):
+    def add_important_flag(self, item:dict[str,Any]):
+        """ Add flag to item
+        Args:
+            item : Dictionary
+        """
 
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
@@ -427,7 +447,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
 
-    def remove_important_flag(self, item):
+    def remove_important_flag(self, item:dict[str, Any]):
 
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
@@ -440,8 +460,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
 
-    def edit_memo(self, item):
-        """ Edit item memo. """
+    def edit_memo(self, item:dict[str, Any]):
+        """ Edit item memo.
+        Args:
+            item : Dictionary
+        """
 
         ui = DialogMemo(self.app, _("Memo for Coded: ") + item['type'], item['res']['memo'], "show")
         ui.exec()
@@ -474,8 +497,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         msg = _("Coded text file exported: ") + filepath
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
-    def mark_with_more_codes(self, item):
-        """ Select and apply more codes to this coded segment. """
+    def mark_with_more_codes(self, item: dict[str, Any]):
+        """ Select and apply more codes to this coded segment.
+        Args:
+            item : Dictionary
+        """
 
         codes = [c for c in self.codes if c['cid'] != item['res']['cid']]
         ui = DialogSelectItems(self.app, codes, _("Select codes"), "multi")
@@ -529,7 +555,7 @@ class DialogCodedIds(QtWidgets.QDialog):
         DialogReportCodes
     """
 
-    def __init__(self, app, prime_item):
+    def __init__(self, app, prime_item:dict[str, Any]):
         """ Create dialog with textEdit widget to show all code ids.
         Used to show codes that overlaps with another base code.
         Called by: DialogReportCodes
@@ -677,8 +703,11 @@ class DialogCodedIds(QtWidgets.QDialog):
         self.te.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
         self.te.blockSignals(False)
 
-    def insert_title(self, row):
-        """ Convenience method for a/v, image, text title insertion. """
+    def insert_title(self, row:dict[str, Any]):
+        """ Convenience method for a/v, image, text title insertion.
+        Args:
+            row : Dictionary
+        """
 
         foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
         title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
@@ -691,12 +720,12 @@ class DialogCodedIds(QtWidgets.QDialog):
         title += "</span><br />"
         self.te.insertHtml(title)
 
-    def put_image_into_textedit(self, img, counter, text_edit):
+    def put_image_into_textedit(self, img, counter: int, text_edit):
         """ Scale image, add resource to document, insert image.
         A counter is important as each image slice needs a unique name, counter adds
         the uniqueness to the name.
         Called by: coded_media_dialog
-        param:
+        Args:
             img: image data dictionary with file location and width, height, position data
             counter: a changing counter is needed to make discrete different images
             text_edit:  the widget that shows the data
@@ -711,18 +740,31 @@ class DialogCodedIds(QtWidgets.QDialog):
         if not img['mediapath'].lower().endswith(".pdf"):
             image = QtGui.QImage(abs_path)
         else:  # A pdf, must create the image
+            source_path = ""
             if img['mediapath'][:6] == "/docs/":
                 source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
             if img['mediapath'][:5] == "docs:":
                 source_path = img['mediapath'][5:]
-            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
-            for page in fitz_pdf:
-                if page.number == img['pdf_page']:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
-            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            image = QtGui.QImage(source_path)
+            # In-memory render of only the needed page, document always closed
+            # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
+            image = QtGui.QImage()
+            # Areas from older imports may have pdf_page NULL: they belong to page 0
+            # (same normalization as the image coding view).
+            pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
+            try:
+                fitz_pdf = fitz.open(source_path)
+                try:
+                    if 0 <= pdf_page_ < len(fitz_pdf):
+                        page = fitz_pdf.load_page(pdf_page_)
+                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
+                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                             QtGui.QImage.Format.Format_RGB888).copy()
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf area image: {source_path} {err}")
+            if image.isNull():
+                return
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 600 wide or high. Add option to change maximum limit?
         scaler_w = 1.0
@@ -736,8 +778,8 @@ class DialogCodedIds(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
-        imagename = os.path.join(self.app.project_path, "images", f"{counter}-{img['mediapath']}")
-        url = QtCore.QUrl(imagename)
+        image_name = Path(self.app.project_path) / "images" / f"{counter}-{img['mediapath']}"
+        url = QtCore.QUrl(str(image_name))
         document = text_edit.document()
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         # See https://doc.qt.io/qt-6/qtextdocument.html#addResource

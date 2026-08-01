@@ -495,7 +495,7 @@
        <widget class="QPushButton" name="pushButton_clear_filter_file">
         <property name="geometry">
          <rect>
-          <x>120</x>
+          <x>150</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -503,6 +503,23 @@
         </property>
         <property name="toolTip">
          <string>Clear file filter</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_goto_bookmark">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>1</y>
+          <width>28</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Go to bookmark (Shift B)
+To set a bookmark press B</string>
         </property>
         <property name="text">
          <string/>

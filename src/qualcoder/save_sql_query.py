@@ -14,19 +14,18 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import logging
-import os
 from PyQt6 import QtWidgets, QtCore
 
 from .GUI.ui_save_query import Ui_DialogSaveQuery
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -37,12 +36,7 @@ class DialogSaveSql(QtWidgets.QDialog):
          report_sql.save_query
     """
 
-    name = ""
-    grouper = ""
-    description = ""
-
     def __init__(self, app_, parent=None):
-        """ """
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogSaveQuery()
@@ -50,6 +44,9 @@ class DialogSaveSql(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
+        self.name = ""
+        self.grouper = ""
+        self.description = ""
 
     def accept(self):
         """ Accept button overridden method """

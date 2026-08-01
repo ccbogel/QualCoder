@@ -14,9 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -25,7 +26,6 @@ from math import isclose
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill
-import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtWidgets, QtGui
@@ -35,7 +35,6 @@ from .helpers import ExportDirectoryPathDialog, Message, DialogCodeInText, Dialo
 from .select_items import DialogSelectItems
 
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -79,24 +78,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.code_selection_mode = "all"
         self.selected_category_ids = []
         self.files = self.app.get_text_filenames()
-        # Get attributes
-        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
         self.attributes = []
-        keys = 'true_name', 'valuetype', 'caseOrFile', 'min', 'max'
-        for row in cur.fetchall():
-            self.attributes.append(dict(zip(keys, row)))
-        for attribute in self.attributes:
-            attribute['name'] = f"{attribute['true_name']} [{attribute['caseOrFile']}]"
-            if attribute['valuetype'] == 'numeric':
-                sql = "select cast(value as real) from attribute where name=? and attr_type=? and value is not null order by cast(value as real) asc"
-                cur.execute(sql, [attribute['true_name'], attribute['caseOrFile']])
-                res = cur.fetchall()
-                range = [r[0] for r in res]
-                if range:
-                    attribute['min'] = range[0]
-                    attribute['max'] = range[-1]
+        self._load_attributes()
 
         self.data = []
         self.max_count = 0
@@ -141,6 +124,28 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         fresh_code_map = {code["cid"]: code for code in fresh_codes}
         self.codes = [fresh_code_map[cid] for cid in previous_selected_ids if cid in fresh_code_map]
 
+    def _load_attributes(self):
+        """Load the cached attribute metadata used for selection."""
+
+        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        attributes = []
+        keys = 'true_name', 'valuetype', 'caseOrFile', 'min', 'max'
+        for row in cur.fetchall():
+            attributes.append(dict(zip(keys, row)))
+        for attribute in attributes:
+            attribute['name'] = f"{attribute['true_name']} [{attribute['caseOrFile']}]"
+            if attribute['valuetype'] == 'numeric':
+                sql = "select cast(value as real) from attribute where name=? and attr_type=? and value is not null order by cast(value as real) asc"
+                cur.execute(sql, [attribute['true_name'], attribute['caseOrFile']])
+                result = cur.fetchall()
+                value_range = [r[0] for r in result]
+                if value_range:
+                    attribute['min'] = value_range[0]
+                    attribute['max'] = value_range[-1]
+        self.attributes = attributes
+
     def _on_project_data_changed(self, tables, source):
         """Handle project change events from other dialogs.
 
@@ -152,6 +157,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        if "attribute" in tables or "attribute_type" in tables:
+            self._load_attributes()
         watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
         if watched_tables.isdisjoint(tables):
             return
@@ -323,14 +330,14 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 # Image results
                 sql = "select source.id,source.name, code_image.cid, code_name.name, code_name.color, x1,y1," \
                       "width,height, ifnull(code_image.memo,''), " \
-                      "code_image.owner, mediapath, 'file', 'image' from code_image " \
+                      "code_image.owner, mediapath, 'file', 'image', pdf_page from code_image " \
                       "join code_name on code_name.cid=code_image.cid " \
                       "join source on code_image.id=source.id " \
                       "where code_image.id=? and code_image.cid=? order by code_image.imid"
                 cur.execute(sql, [file_['id'], code_['cid']])
                 results_image = cur.fetchall()
                 keys_image = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'x1', 'y1', 'width', 'height', \
-                    'memo', 'owner', 'mediapath', 'file_or_case', 'result_type'
+                    'memo', 'owner', 'mediapath', 'file_or_case', 'result_type', 'pdf_page'
                 image_data = []
                 for res in results_image:
                     image_data.append(dict(zip(keys_image, res)))
@@ -444,7 +451,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if not ok:
             return
         category = ui.get_selected()
-        if category['id'] == -1:
+        if not category or category.get('id') == -1:  # <- L (categories carry 'catid', not 'id')
             self.codes, categories = self.app.get_codes_categories()
             Message(self.app, _("Everything selected"), _("All codes selected")).exec()
             return
@@ -495,6 +502,16 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             for code in codes:
                 if code['catid'] == cat['catid']:
                     selected_codes.append(code)
+        # Include descendant sub-codes (supercid) of the selected codes, cascading. <- L
+        selected_cids = {c['cid'] for c in selected_codes}
+        changed = True
+        while changed:
+            changed = False
+            for code in codes:
+                if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                    selected_codes.append(code)
+                    selected_cids.add(code['cid'])
+                    changed = True
         return selected_codes
 
     def export_to_excel(self):

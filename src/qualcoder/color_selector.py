@@ -14,21 +14,20 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import logging
-import os
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 
 from .GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
 
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -164,25 +163,39 @@ def color_matcher(hex_color):
 
 
 def show_codes_of_colour_range(app, code_tree, codes, selected_color):
-    """ Show all codes in colour range in code tree., ir all codes if no selection.
+    """ Show all codes in colour range in code tree, or all codes if no selection.
     Show selected codes that are of a selected colour.
+    Hierarchy-aware: a code stays visible if it or any of its descendant sub-codes matches,
+    so a matching sub-code is never hidden under a non-matching parent code. <- L
     """
 
-    iterator = QtWidgets.QTreeWidgetItemIterator(code_tree)
-    while iterator.value():
-        item = iterator.value()
-        #print(item.text(0), item.text(1))
+    color_by_cid = {c['cid']: c['color'] for c in codes}
+
+    def _matches(cid):
+        color_hex = color_by_cid.get(cid, "")
+        try:
+            idx = colors.index(color_hex)
+        except ValueError:
+            return False
+        return selected_color['min'] <= idx < selected_color['max']
+
+    def _process(item):
+        """ Post-order traversal. Returns True if this code item or any descendant code matches. """
+        any_match = False
+        for i in range(item.childCount()):
+            if _process(item.child(i)):
+                any_match = True
         if item.text(1)[:3] == 'cid':
-            color_hex = ""
-            for c in codes:
-                if c['cid'] == int(item.text(1)[4:]):
-                    color_hex = c['color']
-            #print(item.text(1), color_hex, selected.index(color_hex))
-            if selected_color['min'] <= colors.index(color_hex) < selected_color['max']:
-                item.setHidden(False)
-            else:
-                item.setHidden(True)
-        iterator += 1
+            cid = int(item.text(1)[4:])
+            visible = _matches(cid) or any_match
+            item.setHidden(not visible)
+            return visible
+        # Categories are not hidden here; propagate descendant matches upward.
+        return any_match
+
+    root = code_tree.invisibleRootItem()
+    for i in range(root.childCount()):
+        _process(root.child(i))
 
 
 class DialogColorSelect(QtWidgets.QDialog):

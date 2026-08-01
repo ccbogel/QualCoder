@@ -14,19 +14,18 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from PyQt6 import QtCore, QtWidgets, QtGui
-import os
 import logging
 
 from .GUI.ui_move_resize_rectangle import Ui_Dialog_move_resize_rect
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -34,16 +33,14 @@ class DialogMoveResizeRectangle(QtWidgets.QDialog):
     """ Dialog to obtain integers for move or resize a coded image rectangle.
     """
 
-    app = None
-    move_x = 0
-    move_y = 0
-    resize_x = 0
-    resize_y = 0
-
     def __init__(self, app, parent=None):
         super(DialogMoveResizeRectangle, self).__init__(parent)
 
         self.app = app
+        self.move_x = 0
+        self.move_y = 0
+        self.resize_x = 0
+        self.resize_y = 0
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_move_resize_rect()
         self.ui.setupUi(self)

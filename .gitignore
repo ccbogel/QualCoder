@@ -1,5 +1,7 @@
 .venv/
 venv/
+.env/
+env/
 debian/.debhelper/
 debian/debhelper-build-stamp
 debian/files
@@ -24,4 +26,5 @@ tmp*.*
 .flatpak-*/
 *.flatpak
 AGENTS.md
-windows_run_from_conda_QualCoder_3_8.bat
+windows_run_from_conda_*.bat
+*.code-workspace

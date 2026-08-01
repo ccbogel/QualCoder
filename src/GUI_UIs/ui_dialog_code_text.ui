@@ -770,7 +770,7 @@ Formatted like below for name detection.
         <widget class="QPushButton" name="pushButton_edit_next">
          <property name="geometry">
           <rect>
-           <x>160</x>
+           <x>210</x>
            <y>60</y>
            <width>28</width>
            <height>28</height>
@@ -798,7 +798,7 @@ Formatted like below for name detection.
         <widget class="QPushButton" name="pushButton_edit_prev">
          <property name="geometry">
           <rect>
-           <x>130</x>
+           <x>180</x>
            <y>60</y>
            <width>28</width>
            <height>28</height>
@@ -818,6 +818,59 @@ Formatted like below for name detection.
          </property>
          <property name="toolTip">
           <string>Previous</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_edit_case_sensitive">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>63</y>
+           <width>24</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="checkBox_edit_case_sensitive">
+         <property name="geometry">
+          <rect>
+           <x>130</x>
+           <y>60</y>
+           <width>28</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string/>

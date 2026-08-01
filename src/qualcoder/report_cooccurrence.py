@@ -14,9 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -27,7 +28,7 @@ import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import PatternFill
-import os
+import sqlite3
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtWidgets, QtGui
@@ -37,7 +38,6 @@ from .helpers import ExportDirectoryPathDialog, Message
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 # --- Imports for static image export
@@ -60,15 +60,11 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
      This shows overlapping and edge-connected codes against codes.
     """
 
-    app = None
-    parent_tetEdit = None
-    files = []
-    attributes = []
-
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_textEdit = parent_text_edit
         self.attributes = []
+        self.files = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Coocurrence()
         self.ui.setupUi(self)
@@ -153,7 +149,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def _refresh_selected_codes_from_project(self):
         fresh_codes, fresh_categories = self.app.get_codes_categories()
         self.codes, self.categories = fresh_codes, fresh_categories
-
         if self.code_selection_mode == "all":
             self.selected_codes = deepcopy(self.codes)
             self.selected_categories_string = ""
@@ -199,7 +194,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
-        watched_tables = {"code_cat", "code_name", "code_text"}
+        watched_tables = {"code_cat", "code_name", "code_text", "code_image"}
         if watched_tables.isdisjoint(tables):
             return
 
@@ -431,17 +426,30 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             for code in codes:
                 if code['catid'] == category['catid']:
                     selected_codes.append(code)
+        # Include descendant sub-codes (supercid) of the selected codes, cascading, so a
+        # category selection also analyses the sub-codes nested under its codes. <- L
+        selected_cids = {c['cid'] for c in selected_codes}
+        changed = True
+        while changed:
+            changed = False
+            for code in codes:
+                if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                    selected_codes.append(code)
+                    selected_cids.add(code['cid'])
+                    changed = True
         return selected_codes
 
     def process_data(self):
         """ Calculate the relations for selected codes for ALL coders.
         TODO only THIS coder.
-        For text codings only. """
+        Text codings (code_text) and image-area codings (code_image, including
+        areas on PDF pages) are both included. """
 
         self.ui.checkBox_hide_blanks.setChecked(False)
         self.ui.splitter.setSizes([500, 0])
         self.result_relations = []
         self.calculate_relations(self.code_ids_str)
+        self.calculate_image_relations(self.code_ids_str)
 
         # Create data matrices zeroed, codes are ordered alphabetically by name
         self.data_counts = []
@@ -463,7 +471,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                   r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])'''
             res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'],
                         r['file_name'], r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
-                        r['text_before'], r['text_overlap'], r['text_after'], r['relation']]
+                        r['text_before'], r['text_overlap'], r['text_after'], r['relation'],
+                        r.get('kind', 'text'), r.get('image_merge')]
             if self.data_details[row_pos][col_pos] == ".":
                 self.data_details[row_pos][col_pos] = [res_list]
             else:
@@ -1028,6 +1037,21 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             13 - 16 text_before, text_overlap, text_after, relation
             '''
             for item in data_list:
+                # Image-area relations: the merged coding is the UNION rectangle
+                # stored in code_image.
+                if len(item) > 17 and item[17] == 'image':
+                    fid_, page_, ux, uy, uw, uh = item[18]
+                    try:
+                        cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,"
+                                    "date,owner,important,pdf_page) values(?,?,?,?,?,?,?,?,?,?,?)",
+                                    (fid_, ux, uy, uw, uh, new_code_cid, memo, now_date,
+                                     self.app.settings['codername'], None, page_))
+                        self.app.conn.commit()
+                    except sqlite3.IntegrityError:
+                        self.app.conn.rollback()  # Duplicate union area
+                    except Exception as e_:
+                        logger.debug(e_)
+                    continue
                 pos0 = min(item[9], item[11])
                 pos1 = max(item[10], item[12])
                 # Note substr() function started at 1, not 0, so + 1
@@ -1088,10 +1112,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         # self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
         self.ui.tableWidget.resizeRowsToContents()
 
-    def calculate_relations(self, code_ids_str):
+    def calculate_relations(self, code_ids_str:str):
         """ Calculate the relations for selected codes for all coders.
         For codings in code_text only.
-
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, (Proximity - not used)
         owners is a combination of: owner of ctid0 pipe owner of ctid1
@@ -1149,17 +1172,118 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
 
-    def relation(self, c0, c1):
+    def calculate_image_relations(self, code_ids_str: str):
+        """
+        Image-area co-occurrences: two coded areas of DIFFERENT codes co-occur when
+        their rectangles intersect on the same file (and, for PDF sources, on the
+        same page). Relation mirrors the text logic by geometry:
+        E exact same rectangle, I one rectangle inside the other, O partial overlap.
+        Args:
+            code_ids_str (String): comma separated code ids
+        """
+
+        selected_relations = ['E', 'I', 'O']
+        cur = self.app.conn.cursor()
+        sql = "select code_image.id, code_image.cid, x1, y1, width, height, imid, " \
+              "ifnull(code_image.memo,''), code_image.owner, ifnull(pdf_page,0), " \
+              "code_name.name, source.name from code_image " \
+              "join code_name on code_name.cid=code_image.cid " \
+              "join source on source.id=code_image.id " \
+              "where code_image.cid in (" + code_ids_str + ") " \
+              "order by code_image.id, pdf_page, code_image.cid"
+        cur.execute(sql)
+        groups = {}
+        for row in cur.fetchall():
+            groups.setdefault((row[0], row[9]), []).append(row)
+        fid_i, cid_i, x1_i, y1_i, w_i, h_i, imid_i, memo_i, owner_i, page_i, name_i, fname_i = range(12)
+        for (fid, page), coded in groups.items():
+            file_name = coded[0][fname_i]
+            is_pdf = coded[0][fname_i].lower().endswith(".pdf")
+            coded = list(coded)
+            while len(coded) > 0:
+                c0 = coded.pop()
+                for c1 in coded:
+                    if c0[cid_i] == c1[cid_i]:
+                        continue
+                    rel = self._image_relation(c0, c1)
+                    if rel is None or rel['relation'] not in selected_relations:
+                        continue
+                    overlap_pct = rel.pop('_overlap_pct')
+                    union = rel.pop('_union')
+                    desc = _("Image areas overlap") + f": {overlap_pct}% " + _("of the smaller area")
+                    if is_pdf:
+                        desc += f", {_('page')} {page + 1}"
+                    rel['c0_name'] = c0[name_i]
+                    rel['c1_name'] = c1[name_i]
+                    rel['fid'] = fid
+                    rel['file_name'] = file_name
+                    rel['c0_pos0'] = f"{int(c0[x1_i])},{int(c0[y1_i])}"
+                    rel['c0_pos1'] = f"{int(c0[x1_i] + c0[w_i])},{int(c0[y1_i] + c0[h_i])}"
+                    rel['c1_pos0'] = f"{int(c1[x1_i])},{int(c1[y1_i])}"
+                    rel['c1_pos1'] = f"{int(c1[x1_i] + c1[w_i])},{int(c1[y1_i] + c1[h_i])}"
+                    rel['owners'] = f"{c0[owner_i]}|{c1[owner_i]}"
+                    rel['ctid0'] = f"imid {c0[imid_i]}"
+                    rel['ctid0_text'] = ""
+                    rel['ctid1'] = f"imid {c1[imid_i]}"
+                    rel['ctid1_text'] = ""
+                    rel['coded_memo0'] = c0[memo_i]
+                    rel['coded_memo1'] = c1[memo_i]
+                    rel['text_before'] = ""
+                    rel['text_overlap'] = f"[{desc}]"
+                    rel['text_after'] = ""
+                    rel['kind'] = 'image'
+                    # Data needed if the user merges these codes: the UNION area.
+                    rel['image_merge'] = (fid, page if is_pdf else None,
+                                          union[0], union[1], union[2], union[3])
+                    self.result_relations.append(rel)
+
+    @staticmethod
+    def _image_relation(c0, c1):
+        """
+        Geometric relation of two coded areas (rows of calculate_image_relations).
+        Returns a dict with cid0, cid1, relation E/I/O, _overlap_pct (of the smaller
+        area) and _union rect (x, y, width, height), or None when they do not touch.
+        """
+
+        ax0, ay0 = float(c0[2]), float(c0[3])
+        ax1, ay1 = ax0 + float(c0[4]), ay0 + float(c0[5])
+        bx0, by0 = float(c1[2]), float(c1[3])
+        bx1, by1 = bx0 + float(c1[4]), by0 + float(c1[5])
+        inter_w = min(ax1, bx1) - max(ax0, bx0)
+        inter_h = min(ay1, by1) - max(ay0, by0)
+        if inter_w <= 0 or inter_h <= 0:
+            return None
+        tol = 0.5
+        same = (abs(ax0 - bx0) < tol and abs(ay0 - by0) < tol and
+                abs(ax1 - bx1) < tol and abs(ay1 - by1) < tol)
+        a_in_b = ax0 >= bx0 - tol and ay0 >= by0 - tol and ax1 <= bx1 + tol and ay1 <= by1 + tol
+        b_in_a = bx0 >= ax0 - tol and by0 >= ay0 - tol and bx1 <= ax1 + tol and by1 <= ay1 + tol
+        if same:
+            relation = "E"
+        elif a_in_b or b_in_a:
+            relation = "I"
+        else:
+            relation = "O"
+        inter_area = inter_w * inter_h
+        smaller = min((ax1 - ax0) * (ay1 - ay0), (bx1 - bx0) * (by1 - by0))
+        pct = int(round(100 * inter_area / smaller)) if smaller > 0 else 0
+        union = (min(ax0, bx0), min(ay0, by0),
+                 max(ax1, bx1) - min(ax0, bx0), max(ay1, by1) - min(ay0, by0))
+        return {"cid0": c0[1], "cid1": c1[1], "relation": relation,
+                "_overlap_pct": pct, "_union": union}
+
+    def relation(self, c0:list[int], c1:list[int]):
         """ Relation function as in RQDA
 
         whichmin is the code with the lowest pos0, or None if equal
         whichmax is the code with the highest pos1 or None if equal
         operlapindex is the combined lowest to the highest positions. Only used for E, O, P
         unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
-
         Called by:
             calculate_relations_for_coder_and_selected_codes
-
+        Args:
+            c0 : List
+            c1 : List
         Returns:
         id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
@@ -1175,7 +1299,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                   "text_before": "", "text_overlap": "", "text_after": ""}
 
         cur = self.app.conn.cursor()
-
         # Which min
         if c0[pos0] < c1[pos0]:
             result['whichmin'] = c0[cid]

@@ -14,21 +14,22 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import os
 import logging
+from pathlib import Path
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtGui import QRegularExpressionValidator
 
 from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
 
 
@@ -42,13 +43,13 @@ class DialogAddItemName(QtWidgets.QDialog):
     Returns one item through get_new_name method.
     """
 
-    def __init__(self, app, items, title, text, reg_expression=None, parent=None):
+    def __init__(self, app, items, title:str, text:str, reg_expression=None, parent=None):
         """ Params:
             app : App class
             items: list of dictionaries containing 'name' key
             title: String
             text: String
-            validation: QRegularExpression object
+            reg_expression: QRegularExpression object
             """
 
         super(DialogAddItemName, self).__init__(parent)

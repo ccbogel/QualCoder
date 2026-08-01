@@ -91,7 +91,7 @@
              <bool>false</bool>
             </property>
             <property name="rootIsDecorated">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="itemsExpandable">
              <bool>true</bool>

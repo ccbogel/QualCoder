@@ -14,34 +14,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from PyQt6 import QtWidgets, QtCore
-import os
 import logging
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 from .helpers import MarkdownHighlighter
 
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
 class DialogMemo(QtWidgets.QDialog):
 
-    """ Dialog to view and edit memo text.
-    """
+    """ Dialog to view and edit memo text. """
 
-    app = None
-    title = ""
-    memo = ""
 
-    def __init__(self, app, title="", memo="", clear_button="show", tooltip=""):
+    def __init__(self, app, title:str="", memo:str="", clear_button:str="show", tooltip:str=""):
         super(DialogMemo, self).__init__(parent=None)  # Overrride accept method
 
         self.app = app

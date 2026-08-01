@@ -17,20 +17,18 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import datetime
 import logging
-import os
+from pathlib import Path
 import shutil
 import sqlite3
 
-from PyQt6 import QtWidgets
-
 from .helpers import Message
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -46,34 +44,27 @@ class MergeProjects:
     Existing attribute values in destination are not over-written, unless already blank
      """
 
-    app = None
-    path_d = ""  # Path to destination project folder
-    conn_d = None
-    path_s = ""  # Path to source project folder
-    conn_s = None
-    source_s = []  # source text from Source project
-    code_text_s = []  # coded text segments from Source project
-    annotations_s = []  # annotations from Source project
-    journals_s = []
-    stored_sql_s = []
-    summary_msg = ""
-    code_image_s = []  # coded image areas from Source project
-    code_av_s = []  # coded A/V segments from Source project
-    codes_s = []  # codes from Source project
-    categories_s = []  # code cats from Source project
-    attribute_types_s = []  # For new attributes that are not existing in the destination database
-    attributes_s = []  # values for Case and File attributes
-    cases_s = []  # cases
-    case_text_s = []  # case text and links to non-text files
-    projects_merged = False
-
     def __init__(self, app, path_s):
         self.app = app
-        self.path_s = path_s
-        self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))  # Source project that is to be merged in
+        self.path_s = path_s  # Path to source project folder
+        self.conn_s = sqlite3.connect(Path(self.path_s) / 'data.qda')  # Source project that is to be merged from
         self.conn_d = self.app.conn  # Destination project - the currently opened project
-        self.path_d = self.app.project_path
+        self.path_d = self.app.project_path  # Path to destination project folder
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
+        self.projects_merged = False
+        self.source_s = []  # source text from Source project
+        self.code_text_s = []  # coded text segments from Source project
+        self.annotations_s = []  # annotations from Source project
+        self.journals_s = []
+        self.stored_sql_s = []
+        self.code_image_s = []  # coded image areas from Source project
+        self.code_av_s = []  # coded A/V segments from Source project
+        self.codes_s = []  # codes from Source project
+        self.categories_s = []  # code cats from Source project
+        self.attribute_types_s = []  # For new attributes that are not existing in the destination database
+        self.attributes_s = []  # values for Case and File attributes
+        self.cases_s = []
+        self.case_text_s = []  # case text and links to non-text files
         self.copy_source_files_into_destination()
         loaded = self.get_source_data()
         if loaded:
@@ -90,7 +81,7 @@ class MergeProjects:
             # Update vectorstore
             if self.app.settings['ai_enable'] == 'True':
                 self.app.ai.sources_vectorstore.update_vectorstore()
-            self.summary_msg += "\n" + _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
+            self.summary_msg += "\n" + _("Finished merging ") + f"{self.path_s}  --> {self.path_d}\n"
             self.summary_msg += _(
                 "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
@@ -132,7 +123,7 @@ class MergeProjects:
                     sql = "insert into code_cat (name, memo, owner, date, supercatid) values (?,?,?,?,?)"
                     cur_d.execute(sql, [c['name'], c['memo'], c['owner'], c['date'], res_category[0]])
                     self.conn_d.commit()
-                    self.summary_msg += _("Adding sub-category: " + c['name']) + " --> " + c['supercatname'] + "\n"
+                    self.summary_msg += _("Adding sub-category: ") + f"{c['name']} --> {c['supercatname']}\n"
             for item in remove_list:
                 self.categories_s.remove(item)
             count += 1
@@ -173,7 +164,25 @@ class MergeProjects:
                 cur_d.execute("select last_insert_rowid()")
                 cid = cur_d.fetchone()[0]
                 code_s['newcid'] = cid
+                code_s['inserted'] = True
                 self.summary_msg += _("Adding code name: ") + code_s['name'] + "\n"
+
+        # Resolve sub-code parents (supercid) for newly inserted codes, by parent code name.
+        # Only inserted codes are touched, so the destination's existing hierarchy is preserved.
+        name_to_newcid = {}
+        for code_s in self.codes_s:
+            if code_s['newcid'] != -1:
+                name_to_newcid.setdefault(code_s['name'], code_s['newcid'])
+        cur_d.execute("select cid, name from code_name")
+        for r in cur_d.fetchall():
+            name_to_newcid.setdefault(r[1], r[0])
+        for code_s in self.codes_s:
+            if code_s.get('inserted') and code_s.get('supercodename'):
+                parent_newcid = name_to_newcid.get(code_s['supercodename'])
+                if parent_newcid is not None and parent_newcid != code_s['newcid']:
+                    cur_d.execute("update code_name set supercid=?, catid=null where cid=?",
+                                  [parent_newcid, code_s['newcid']])
+        self.conn_d.commit()
 
         # Update code_text, code_image, code_av cids to destination values
         for code_s in self.codes_s:
@@ -380,17 +389,17 @@ class MergeProjects:
 
         folders = ["audio", "documents", "images", "video"]
         for folder_name in folders:
-            dir_ = self.path_s + "/" + folder_name
-            files = os.listdir(dir_)
-            for f in files:
-                if not os.path.exists(self.app.project_path + "/" + folder_name + "/" + f):
+            source_dir = Path(self.path_s) / folder_name  # self.path_s + "/" + folder_name
+            for file_ in Path(source_dir).iterdir():
+                dest_path = Path(self.app.project_path) / folder_name / file_
+                if not dest_path.exists(): 
                     try:
-                        shutil.copyfile(dir_ + "/" + f, self.app.project_path + "/" + folder_name + "/" + f)
-                        self.summary_msg += _("File copied: ") + f + "\n"
+                        shutil.copyfile(Path(source_dir) / file_, dest_path)
+                        self.summary_msg += _("File copied: ") + f"{file_}\n"
                     except shutil.SameFileError:
                         pass
                     except PermissionError:
-                        self.summary_msg += f + " " + _("NOT copied. Permission error")
+                        self.summary_msg += f"{file_} " + _("NOT copied. Permission error")
 
     def insert_new_attribute_types(self):
         """ Insert new attribute types  for cases and files.
@@ -459,10 +468,9 @@ class MergeProjects:
         if attribute_count > 0:
             self.summary_msg += _("Added attribute values for cases and files: n=") + str(attribute_count) + "\n"
 
-    def get_source_data(self):
+    def get_source_data(self) -> bool:
         """ Load the database data into Lists of Dictionaries.
-
-        return:
+        Return:
             True or False if data could be loaded
         """
 
@@ -545,12 +553,12 @@ class MergeProjects:
             if res is not None:
                 cat['supercatname'] = res[0]
         # Code data
-        sql_codenames = "select cid, name, memo, owner, date, color, catid from code_name"
+        sql_codenames = "select cid, name, memo, owner, date, color, catid, supercid from code_name"
         cur_s.execute(sql_codenames)
         res_codes = cur_s.fetchall()
         for i in res_codes:
             code_s = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
-                      "catid": i[6], "catname": None}
+                      "catid": i[6], "catname": None, "supercid": i[7], "supercodename": None}
             self.codes_s.append(code_s)
         # Get and fill category name if code is in a category
         for code_s in self.codes_s:
@@ -558,6 +566,13 @@ class MergeProjects:
             res = cur_s.fetchone()
             if res is not None:
                 code_s['catname'] = res[0]
+        # Fill parent code name if this is a sub-code (nested under another code via supercid)
+        for code_s in self.codes_s:
+            if code_s['supercid'] is not None:
+                cur_s.execute("select name from code_name where cid=?", [code_s['supercid']])
+                res = cur_s.fetchone()
+                if res is not None:
+                    code_s['supercodename'] = res[0]
         # Code text data
         sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
         cur_s.execute(sql_codetext)

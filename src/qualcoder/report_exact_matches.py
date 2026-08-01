@@ -45,24 +45,11 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
     Show exact match code overlaps.
     This is for text coding only. """
 
-    app = None
-    parent_textEdit = None
-    coder_names = []
-    categories = []
-    codes = []
-    coders = []
-    files = []
-    results_display = []
-    excluded_codes = []
-    excluded_icon = None
-    attributes = []  # File selection by attributes
-
     def __init__(self, app, parent_textedit):
 
         self.results_display = []
         self.app = app
         self.parent_textEdit = parent_textedit
-
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogMatchingTextSegments()
         self.ui.setupUi(self)
@@ -73,6 +60,14 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
         self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.excluded_icon = qta.icon('mdi6.window-close')
+        self.coder_names = []
+        self.categories = []
+        self.codes = []
+        self.coders = []
+        self.files = []
+        self.excluded_codes = []
+        self.excluded_icon = None
+        self.attributes = []  # File selection by attributes
         self.get_data()
 
         try:
@@ -110,8 +105,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_data(self):
-        """ Called from init. gets code_names, categories and owner names.
-        """
+        """ Called from init. gets code_names, categories and owner names. """
 
         current_coder = ""
         if hasattr(self, "ui") and hasattr(self.ui, "comboBox_coders"):
@@ -247,8 +241,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """ Select files based on attribute selections.
         Attribute results are a dictionary of:
         first item is a Boolean AND or OR list item
-        Followed by each attribute list item
-        """
+        Followed by each attribute list item. """
 
         # Clear ui
         self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
@@ -634,9 +627,57 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
 
+    def _nest_subcodes_in_tree(self):
+        """ Re-parent code tree items so sub-codes (supercid) nest under their parent
+        code. Runs after fill_tree has placed every code. Preserves item flags,
+        checkboxes, colour and count because the existing item is moved, not rebuilt.
+        No-op for projects without sub-codes. <- L """
+        tree = getattr(getattr(self, 'ui', None), 'treeWidget', None) or getattr(self, 'tree', None)
+        if tree is None:
+            return
+        code_list = getattr(self, 'code_names', None)
+        if code_list is None:
+            code_list = getattr(self, 'codes', [])
+        supercid_of = {c['cid']: c.get('supercid') for c in code_list}
+        if not any(supercid_of.values()):
+            return
+        guard = 0
+        moved = True
+        while moved and guard < 10000:
+            moved = False
+            guard += 1
+            cid_item = {}
+            it = QtWidgets.QTreeWidgetItemIterator(tree)
+            while it.value():
+                node = it.value()
+                t = node.text(1)
+                if t.startswith('cid:'):
+                    try:
+                        cid_item[int(t[4:])] = node
+                    except ValueError:
+                        pass
+                it += 1
+            for cid_, node in cid_item.items():
+                sup = supercid_of.get(cid_)
+                if sup is None:
+                    continue
+                parent_node = cid_item.get(sup)
+                if parent_node is None or node.parent() is parent_node:
+                    continue
+                cur_parent = node.parent()
+                if cur_parent is None:
+                    idx = tree.indexOfTopLevelItem(node)
+                    taken = tree.takeTopLevelItem(idx)
+                else:
+                    taken = cur_parent.takeChild(cur_parent.indexOfChild(node))
+                parent_node.addChild(taken)
+                parent_node.setExpanded(True)  # show the nested sub-code from the start <- L
+                taken.setExpanded(True)
+                moved = True
+                break
+
     def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes.
-        """
+        """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         self.ui.treeWidget.clear()
         cats = copy(self.categories)
@@ -719,6 +760,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 item = it.value()
         # self.ui.treeWidget.expandAll()
         restore_persistent_tree_widths(self.ui.treeWidget)
+        self._nest_subcodes_in_tree()  # <- L
 
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.

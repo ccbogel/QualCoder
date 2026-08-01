@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -26,11 +27,12 @@ import html
 import logging
 from operator import itemgetter
 import os
-import pathlib
+from pathlib import Path
 from random import randint
 import re
 import shutil
 import sqlite3
+from typing import Any
 import uuid
 import xml.etree.ElementTree as etree
 import zipfile
@@ -49,7 +51,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +63,7 @@ class RefiImport:
     Using: https://docs.python.org/3/library/xml.etree.elementtree.html
     """
 
-    def __init__(self, app, parent_textedit, import_type):
+    def __init__(self, app, parent_textedit, import_type:str):
 
         self.app = app
         self.parent_textedit = parent_textedit
@@ -113,11 +114,6 @@ class RefiImport:
         """ Import REFI-QDA standard codebook into opened project.
         """
 
-        '''if self.import_type == "qdc":
-            with open(self.file_path, encoding="utf8") as xml_file:
-                self.xml = xml_file.read()
-                result = self.xml_validation("codebook")
-                self.parent_textedit.append(f"Codebook XML parsing successful: {result}")'''
         # Get element tree object
         tree = etree.parse(self.file_path)
         # Look for xmlns version. Have found 1.0, 0:4
@@ -147,7 +143,7 @@ class RefiImport:
                 code_elements = list(child)  # list of children of child element
                 for el_ in code_elements:
                     # Recursive search through each Code element
-                    counter += self.sub_codes(child, None)
+                    counter += self.sub_codes(el_, None)  # <(pre-existing: pass each Code, not the <Codes> container)
                 msg = str(counter) + _(" categories and codes imported from ") + self.file_path
                 Message(self.app, _("Codebook imported"), msg).exec()
                 self.parent_textedit.append(msg)
@@ -155,22 +151,28 @@ class RefiImport:
         self.parent_textedit.append(_("Codebook not imported. "))
         Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec()
 
-    def sub_codes(self, parent, cat_id) -> int:
+    def sub_codes(self, parent, cat_id:int|None, super_cid:int|None=None) -> int:
         """ Get subcode elements, if any.
         Determines whether the Code is a Category item or a Code item.
-        Uses the parent entered cat_id ot give a Code a category alignment,
-        or if a category, gives the category alignment to a super_category.
-        Called from: import_project, import_codebook
 
-        Some software e.g. MAXQDA, Nvivo categories are also codes
-        in this case QualCoder will create a category, and also a code with the same name underneath that category.
+        Per the REFI-QDA standard, isCodable defaults to true; a node is treated as a
+        CATEGORY only when it is explicitly isCodable="false". A codable node - even one
+        that contains child Code elements - is a CODE, and its codable children are
+        imported as sub-codes (code_name.supercid), reconstructing the nested-code
+        hierarchy rather than flattening it into a category plus a mirror code.
+
+        Linkage passed down the recursion:
+          - cat_id    : parent category id (code_cat.catid) when the parent is a category
+          - super_cid : parent code id (code_name.cid) when the parent is a code
+        A code is linked to its parent code (super_cid) if present, otherwise to its
+        parent category (cat_id); the two are mutually exclusive.
 
         Recursive, until no more child Codes found.
-        Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
+        Called from: import_project, import_codebook
         Note: urn difference between codebook.qdc and project.qdpx
 
         Args:
-            parent element, cat_id
+            parent element, cat_id, super_cid
         Return:
             counter of inserted codes and categories
         """
@@ -184,22 +186,21 @@ class RefiImport:
                           f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
                 description = el.text
 
-        # Determine if the parent is a code or a category
-        # if parent has Code element children, so must be a category, insert into code_cat table
-        is_category = False
+        # Child Code elements (potential sub-codes or sub-categories)
+        child_code_elements = []
         for el in elements:
             if el.tag in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Code",
                           f"{{urn:QDA-XML:project:{self.xmlns_version}}}Code"):
-                is_category = True
-        # if parent does not have Code element children and isCodable is false, it must be a category
-        if parent.get("isCodable") == "false":
-            is_category = True
+                child_code_elements.append(el)
+
+        # A node is a category only if explicitly non-codable. Everything else is a code.
+        is_category = parent.get("isCodable") == "false"
+
         if is_category:
             last_insert_id = None
             name = parent.get("name")
             if name is not None:
                 cur = self.app.conn.cursor()
-                # Insert this category into code_cat table
                 try:
                     cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)",
                                 [name, description, now_date, cat_id])
@@ -208,83 +209,57 @@ class RefiImport:
                     last_insert_id = cur.fetchone()[0]
                     counter += 1
                 except sqlite3.IntegrityError:
-                    pass
-                # This category may ALSO be a code (e.g. MAXQDA has categories as codes also)
-                # So create a code for this codable category
-                is_codable = parent.get("isCodable")
-                if is_codable == "true":
-                    color = parent.get("color")
-                    if color is None:
-                        color = colors[randint(0, 119)]
-                    else:
-                        # Convert other software hex color to a similar one listed in color_selector.py
-                        color = color_matcher(color)
+                    # Category name already exists - reuse its catid so children still nest
                     try:
-                        # print(is_codable, name, "inserting into code name")
-                        cur = self.app.conn.cursor()
-                        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
-                                    [name, description, now_date, last_insert_id, color])
-                        self.app.conn.commit()
-                        cur.execute("select last_insert_rowid()")
-                        code_last_insert_id = cur.fetchone()[0]
-                        self.codes.append({'guid': parent.get('guid'), 'cid': code_last_insert_id})
-                        counter += 1
-                    except sqlite3.IntegrityError:
+                        cur.execute("select catid from code_cat where name=?", [name])
+                        row = cur.fetchone()
+                        if row is not None:
+                            last_insert_id = row[0]
+                    except sqlite3.Error:
                         pass
-            for el in elements:
-                if el.tag not in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
-                                  f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
-                    counter += self.sub_codes(el, last_insert_id)
-                    # print("tag:", el.tag, el.text, el.get("name"), el.get("color"), el.get("isCodable"))
+            # Children of a category attach to the category (cat_id), never to a code
+            for el in child_code_elements:
+                counter += self.sub_codes(el, last_insert_id, None)
             return counter
 
-        # No children and no Description child element so, insert this code into code_name table
-        if is_category is False and elements == []:
-            name = parent.get("name")
-            # print("No children or description ", name)
-            color = parent.get("color")
-            if color is None:
-                color = colors[randint(0, 119)]
-            else:
-                # Convert other software hex color to a similar one listed in color_selector.py
-                color = color_matcher(color)
+        # Otherwise this is a codable Code (a leaf, or a code with sub-codes)
+        name = parent.get("name")
+        color = parent.get("color")
+        if color is None:
+            color = colors[randint(0, 119)]
+        else:
+            # Convert other software hex color to a similar one listed in color_selector.py
+            color = color_matcher(color)
+        # A code nested under a parent code uses supercid; otherwise it sits in a category.
+        if super_cid is not None:
+            link_catid = None
+            link_supercid = super_cid
+        else:
+            link_catid = cat_id
+            link_supercid = None
+        code_insert_id = None
+        if name is not None:
+            cur = self.app.conn.cursor()
             try:
-                cur = self.app.conn.cursor()
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
-                            [name, description, now_date, cat_id, color])
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,'',?,?,?,?)",
+                            [name, description, now_date, link_catid, color, link_supercid])
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
-                last_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
+                code_insert_id = cur.fetchone()[0]
+                self.codes.append({'guid': parent.get('guid'), 'cid': code_insert_id})
                 counter += 1
             except sqlite3.IntegrityError:
-                pass  # Code name already exists
-            return counter
-
-        # One child, a description so, insert this code into code_name table
-        if is_category is False and len(elements) == 1 and elements[0].tag in (
-                f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
-                f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
-            name = parent.get("name")
-            # print("Only a description child: ", name)
-            color = parent.get("color")
-            if color is None:
-                color = colors[randint(0, 119)]
-            else:
-                # Convert other software hex color to a similar one listed in color_selector.py
-                color = color_matcher(color)
-            try:
-                cur = self.app.conn.cursor()
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
-                            [name, description, now_date, cat_id, color])
-                self.app.conn.commit()
-                cur.execute("select last_insert_rowid()")
-                last_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
-                counter += 1
-            except sqlite3.IntegrityError:
-                pass
-            return counter
+                # Code name already exists - reuse its cid so children can still nest under it
+                try:
+                    cur.execute("select cid from code_name where name=?", [name])
+                    row = cur.fetchone()
+                    if row is not None:
+                        code_insert_id = row[0]
+                except sqlite3.Error:
+                    pass
+        # Child Codes of a codable code become its sub-codes (supercid)
+        for el in child_code_elements:
+            counter += self.sub_codes(el, None, code_insert_id)
         return counter
 
     def import_project(self):
@@ -346,12 +321,18 @@ class RefiImport:
         self.pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         self.pd_value = 0
 
+        contents = os.listdir(self.folder_name)
+        # Not all proejcts has a project.qde, it may have another name.qde
+        projectqde = "project.qde"
+        for c in contents:
+            if Path(c).suffix == ".qde":
+                projectqde = c
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(self.folder_name + "/project.qde", "r", encoding="utf8") as xml_file:
+        with open(Path(self.folder_name) / projectqde, "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
-        '''result = self.xml_validation("project")
+        '''result = self.xml_validation("project") # dont use
         self.parent_textedit.append(f"Project XML parsing successful: {result}")'''
-        tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
+        tree = etree.parse(os.path.join(self.folder_name, projectqde))  # get element tree object
         # Look for xmlns version. Have found 1.0, 0:4
         root = tree.getroot()
         for child in root:
@@ -841,7 +822,7 @@ class RefiImport:
                     if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Transcript":
                         name = el.get("name")
                         # Get, and if needed, add suffix
-                        suffix = pathlib.Path(element.get("path")).suffix
+                        suffix = Path(element.get("path")).suffix
                         if not name.endswith(suffix):
                             name = name + suffix
                         break
@@ -913,7 +894,7 @@ class RefiImport:
         media_path = "/images/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda images folder and rename into original name
-            destination = os.path.join(self.app.project_path, "images", name)
+            destination = Path(self.app.project_path) / "images" / name 
             media_path = "/images/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -925,7 +906,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/images/{name}"
             # Copy file into .qda audio folder and rename into original name
-            destination = os.path.join(self.app.project_path, "images", name)
+            destination = Path(self.app.project_path) / "images" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -952,7 +933,7 @@ class RefiImport:
             if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, id_, creating_user)
 
-    def load_codings_for_picture(self, id_, element):
+    def load_codings_for_picture(self, id_:int, element):
         """ Load coded rectangles for pictures
         Example format:
         <PictureSelection guid="04980e59-b290-4481-8cb6-e732824440a1"
@@ -1015,7 +996,7 @@ class RefiImport:
         media_path = "/audio/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda audio folder and rename into original name
-            destination = os.path.join(self.app.project_path, "audio", name)
+            destination = Path(self.app.project_path) / "audio" / name
             media_path = "/audio/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -1027,7 +1008,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/audio/{name}"
             # Copy file into .qda audio folder and rename into original name
-            destination = os.path.join(self.app.project_path, "audio", name)
+            destination = Path(self.app.project_path) / "audio" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1082,7 +1063,7 @@ class RefiImport:
         media_path = f"/video/{name}"  # Default
         if path_type == "internal":
             # Copy file into .qda video folder and rename into original name
-            destination = os.path.join(self.app.project_path, "video", name)
+            destination = Path(self.app.project_path) / "video" / name
             media_path = f"/video/{name}"
             try:
                 shutil.copyfile(source_path, destination)
@@ -1094,7 +1075,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/video/{name}"
             # Copy file into .qda video folder and rename into original name
-            destination = os.path.join(self.app.project_path, "video", name)
+            destination = Path(self.app.project_path) /  "video" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1135,22 +1116,19 @@ class RefiImport:
             if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, av_id, creating_user)
 
-    def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, element):
+    def parse_transcript_with_codings_and_syncpoints(self, av_name:str, av_id:int, element):
         """ Load the transcript plain text file into source table.
         For now - this file MUST be internal to the project.
         Change transcript filename to match the audio/video name, unless .srt
         Add ".transcribed" suffix so QualCoder can interpret as a transcription for this a/v file.
 
         Transcription file is stored in documents folder or if an .srt then it is stored in audio or video folder.
-
         Load the transcript codings.
-
         Called by: load_audio_source, load_video_source
-
-         Param:
-            av_id     : source id in sqlite, Integer
-            creating_user    : user who created source, String
-            element     : the Transcript element object
+        Args:
+            av_name : String
+            av_id : source id in sqlite, Integer
+            element : the Transcript element object
          """
 
         # Change transcript filename to match the audio/video name, unless .srt
@@ -1183,6 +1161,7 @@ class RefiImport:
             return
 
         # Copy plain text file into documents folder, or if .srt into audio or video folder.
+        # TODO use Path object
         name = element.get("name")
         destination = self.app.project_path + "/documents/" + name
         if name[-4:] == ".srt" and av_name[-4] in ("mp4", "ogg", "mov"):
@@ -1192,7 +1171,6 @@ class RefiImport:
         else:
             destination = self.app.project_path + "/documents/" + name
         # Sources folder name can be capital or lower case, check and get the correct one
-        # Not Used: contents = os.listdir(self.folder_name)
         source_path = self.folder_name + self.sources_name
         if source_path[-1] != "/":
             source_path += "/"
@@ -1297,7 +1275,7 @@ class RefiImport:
             cur.execute(sql, v)
         self.app.conn.commit()
 
-    def load_codings_for_audio_video(self, id_, element):
+    def load_codings_for_audio_video(self, id_:int, element):
         """ Load coded segments for audio and video
         Example format:
         <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100"
@@ -1371,8 +1349,7 @@ class RefiImport:
         media_path = f"/docs/{name}"  # Default
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, "documents", name)
-            # print("destination: ", destination)
+            destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
                 # print("PDF IMPORT", source_path, destination)
@@ -1384,7 +1361,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/docs/{name}"
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, "documents", name)
+            destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1412,8 +1389,79 @@ class RefiImport:
                 # print("PDF Representation element found")
                 self.load_text_source(el, name, create_date, media_path)
                 break
+        # Coded areas over pages (PDFSelection): previously ignored, so area codings
+        # were lost when importing a REFI-QDA project. Loaded after the Representation,
+        # once the source row exists.
+        cur = self.app.conn.cursor()
+        cur.execute("select id from source where name=?", [name])
+        res_id = cur.fetchone()
+        if res_id is not None:
+            for el in element:
+                if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PDFSelection":
+                    self.load_codings_for_pdf_areas(res_id[0], el)
 
-    def load_text_source(self, element, pdf_rep_name="", pdf_rep_date="", mediapath=None):
+    def load_codings_for_pdf_areas(self, id_:int, element):
+        """ Loads coded areas over PDF pages (PDFSelection) into code_image with pdf_page.
+        Coordinates in page points, top-left origin, 0-based page: the
+        pdf_selection_xml convention.
+
+        Example format:
+        <PDFSelection guid="..." page="2" firstX="100" firstY="200" secondX="150"
+        secondY="230" name="memo." creatingUser="..." creationDateTime="...">
+        <Coding guid="..." creatingUser="..."><CodeRef targetGUID="..."/></Coding>
+        </PDFSelection>
+        """
+
+        try:
+            pdf_page = int(element.get("page"))
+            first_x = int(element.get("firstX"))
+            first_y = int(element.get("firstY"))
+            second_x = int(element.get("secondX"))
+            second_y = int(element.get("secondY"))
+        except (TypeError, ValueError) as err:
+            logger.warning(f"PDFSelection attributes: {err}")
+            return
+        width = second_x - first_x
+        height = second_y - first_y
+        if width <= 0 or height <= 0:
+            return
+        memo = element.get("name")
+        if memo is None:
+            memo = ""
+        create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
+        if create_date is None:
+            create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%SZ")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        cur = self.app.conn.cursor()
+        for el in element:
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Coding":
+                # Get the code id from the CodeRef guid
+                cid = None
+                code_ref = list(el)[0]
+                for c in self.codes:
+                    if c['guid'] == code_ref.get("targetGUID"):
+                        cid = c['cid']
+                try:
+                    cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,"
+                                "date,owner,pdf_page) values(?,?,?,?,?,?,?,?,?,?)",
+                                (id_, first_x, first_y, width, height, cid, memo,
+                                 create_date, creating_user, pdf_page))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    # Duplicate area on re-import; roll back the failed insert.
+                    self.app.conn.rollback()
+
+    def load_text_source(self, element, pdf_rep_name:str="", pdf_rep_date:str="", mediapath:str|None=None):
         """ Load this text source into sqlite.
         Add the description and the text codings.
         When testing with Windows Nvivo export: import from docx or txt
@@ -1505,7 +1553,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = f"/docs/{name}"  # Note not used
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, "documents", name)
+            destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
             except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
@@ -1552,15 +1600,13 @@ class RefiImport:
             if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, id_, creating_user)
 
-    def parse_variable_value(self, element, id_, creating_user):
+    def parse_variable_value(self, element, id_:int, creating_user:str):
         """ Parse VariableValue element.
         Needs two parses - one to get the variable name and one to get the value.
         Enter details into attributes table.
         This is for when variables are stored within the Source element.
-
         Called from load_picture_source, load_text_source, load_audio_source, load_video_source
-
-        Params:
+        Args:
             element : VariableValue xml element object
             id_ : File id of source, Integer
             creating_user : The user who created this source, String
@@ -1591,16 +1637,13 @@ class RefiImport:
         cur.execute(insert_sql, placeholders)
         self.app.conn.commit()
 
-    def load_codings_for_text(self, source, element):
+    def load_codings_for_text(self, source:dict[str,Any], element):
         """ These are PlainTextSelection elements.
         These elements contain a Coding element and a Description element.
         The Description element is treated as a coding memo.
-
         NOTE: MAXQDA. Some PlainTextSelection elements DO NOT have a Coding element, but DO HAVE a Description element.
         For these, load the Description text as an annotation.
-
         NOTE: Nvivo some PlainTextSelection elements linkto Link and Note as text annotations
-
         Some Coding guids match a Case guid. This is Case text.
 
         Example format:
@@ -1614,9 +1657,9 @@ class RefiImport:
         < CodeRef targetGUID = "2dfba8c9-59f5-4424-99d6-ea9bce18134b" / >
         < / Coding >
         < / PlainTextSelection >
-
-        :param source - the source text dictionary
-        :param element - the PlainTextSelection element
+        Args:
+            source - the source text dictionary
+            element - the PlainTextSelection element
         """
 
         cur = self.app.conn.cursor()
@@ -1761,7 +1804,7 @@ class RefiImport:
                 journal_count += 1
         return journal_count
 
-    def insert_annotation(self, source_guid, element):
+    def insert_annotation(self, source_guid:str, element):
         """ Insert annotation into database
         Annotation Note:
         <Note guid="0f758eeb-d61d-4e91-b250-79861c3869a6" modifyingUser="df241da2-bca0-4ad9-83c1-b89c98d83567"
@@ -1769,9 +1812,9 @@ class RefiImport:
         <PlainTextContent>Memo for only title coding in regulation</PlainTextContent>
         <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
         </Note>
-
-        param: source_guid : guid of the Text source
-        param: element The Note element
+        Args:
+        source_guid : guid of the Text source
+        element The Note element
         """
 
         user_guid = element.get("modifyingUser")
@@ -1859,12 +1902,13 @@ class RefiImport:
         if set_sources:
             self.insert_set_source_variables(name, memo, set_sources)
 
-    def insert_set_source_variables(self, name, memo, set_sources):
+    def insert_set_source_variables(self, name:str, memo:str, set_sources:list[int]):
         """ Insert the variable name and values for the set source.
-        Assume the variable is a character type
-        param: name : the variable name
-        param: memo : variable memo
-        param: set_sources : list of source ids """
+        Assume the variable is a character type.
+        Args:
+            name : the variable name
+            memo : variable memo
+            set_sources : list of source ids """
 
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
@@ -1967,32 +2011,26 @@ class RefiExport(QtWidgets.QDialog):
     http://infohost.nmt.edu/tcc/help/pubs/pylxml/web/index.html
     """
 
-    categories = []
-    codes = []
-    users = []
-    sources = []
-    guids = []
-    note_files = []  # List of Dictionaries of guid.txt name and note text
-    annotations = []  # List of Dictionaries of anid, fid, pos0, pos1, memo, owner, date
-    variables = []  # List of Dictionaries of variable xml, guid, name
-    xml = ""
-    parent_textedit = None
-    app = None
-    tree = None
-    export_type = ""
-
-    def __init__(self, app, parent_textedit, export_type):
+    def __init__(self, app, parent_textedit, export_type:str):
 
         super().__init__()
         self.app = app
         self.parent_textedit = parent_textedit
         self.export_type = export_type
         self.xml = ""
+        self.tree = None
+        self.guids = []
+        self.note_files = []  # List of Dictionaries of guid.txt name and note text
+        self.variables = []  # List of Dictionaries of variable xml, guid, name
+        self.categories = []
+        self.codes = []
         self.get_categories()
         self.get_codes()
+        self.users = []
         self.get_users()
+        self.sources = []
         self.get_sources()
-        self.annotations = self.app.get_annotations()
+        self.annotations = self.app.get_annotations()  # List of Dictionaries of anid, fid, pos0, pos1, memo, owner, date
         if self.export_type == "codebook":
             self.codebook_exchange_xml()
             self.xml_validation("codebook")
@@ -2004,14 +2042,14 @@ class RefiExport(QtWidgets.QDialog):
 
     def export_project(self):
         """ Create a REFI-QDA project folder project.qdpx zipfile
-        This contains the .qde project xml and a Sources folder.
+        This contains the .qde project xml and a sources folder.
 
         Source types:
         Plain text, PDF,md, odt, docx, md, epub
         Images must be jpeg or png
         mp3, ogg, mp4, mov, wav
 
-        Create an unzipped folder with a /Sources folder and project.qde xml document
+        Create an unzipped folder with a /sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
 
         #TODO put file variables inside Cases.Case elements as with Quirkos
@@ -2025,13 +2063,16 @@ class RefiExport(QtWidgets.QDialog):
             pass
         try:
             os.mkdir(prep_path)
-            os.mkdir(os.path.join(prep_path, "Sources"))
+            # REFI-QDA standard (section 8.1) requires the sources folder to be named
+            # "sources" (lowercase). ZIP entries are case-sensitive, so other software
+            # (e.g. ATLAS.ti) rejects the project if the folder is capitalised.
+            os.mkdir(os.path.join(prep_path, "sources"))
         except Exception as err:
             logger.error(_("Project export error ") + str(err))
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
             return
         try:
-            with open(os.path.join(prep_path, 'project.qde'), 'w', encoding='utf-8-sig') as f:
+            with open(os.path.join(prep_path, 'project.qde'), 'w', encoding='utf-8') as f:  # FIX: era 'utf-8-sig' (anadia BOM antes de <?xml)
                 f.write(self.xml)
         except Exception as err:
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
@@ -2046,7 +2087,7 @@ class RefiExport(QtWidgets.QDialog):
         txt_errors = ""
         for s in self.sources:
             # print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
-            destination = f"/Sources/{s['filename']}"
+            destination = f"/sources/{s['filename']}"
             if s['mediapath'] is not None and s['mediapath'] != "" and s['external'] is None:
                 # print("Source\n", self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"))
                 # print("dest\n", prep_path + destination)
@@ -2067,7 +2108,7 @@ class RefiExport(QtWidgets.QDialog):
             # Also need to export a plain text file as a source
             # plaintext has different guid from richtext, and also might be associated with media - eg transcripts
             if s['plaintext_filename'] is not None:
-                with open(os.path.join(prep_path, 'Sources', s['plaintext_filename']), "w", encoding="utf-8-sig") as f:
+                with open(os.path.join(prep_path, 'sources', s['plaintext_filename']), "w", encoding="utf-8-sig") as f:
                     try:
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
@@ -2078,7 +2119,7 @@ class RefiExport(QtWidgets.QDialog):
                         print(err)
 
         for notefile in self.note_files:
-            with open(os.path.join(prep_path, 'Sources', notefile[0]), "w", encoding="utf-8-sig") as f:
+            with open(os.path.join(prep_path, 'sources', notefile[0]), "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -2088,11 +2129,11 @@ class RefiExport(QtWidgets.QDialog):
 
         # Clear any existing, identically named .zip and .qdpx files. Avoids File Exists error
         try:
-            os.remove(f"{prep_path}.zip")
+            Path(f"{prep_path}.zip").unlink()
         except FileNotFoundError:
             pass
         try:
-            os.remove(f"{prep_path}.qdpx")
+            Path(f"{prep_path}.qdpx").unlink()
         except FileNotFoundError:
             pass
 
@@ -2113,7 +2154,7 @@ class RefiExport(QtWidgets.QDialog):
         try:
             if prep_path != '':
                 shutil.rmtree(prep_path)
-            os.remove(f"{prep_path}.qdpx")
+            Path(f"{prep_path}.qdpx").unlink()
         except FileNotFoundError as err:
             logger.warning(str(err))
         msg = export_path + ".qpdx\n"
@@ -2135,14 +2176,14 @@ class RefiExport(QtWidgets.QDialog):
                                                                self.app.settings['directory'], options)
         if directory == "":
             return
-        filename = os.path.join(directory, filename)
+        filename = Path(directory) / filename
         try:
             with open(filename, 'w', encoding='utf-8-sig') as f:
                 f.write(self.xml)
             msg = _("Codebook has been exported to ")
-            msg += filename
+            msg += str(filename)
             Message(self.app, _("Codebook exported"), _(msg)).exec()
-            self.parent_textedit.append(_("Codebook exported") + "\n" + _(msg))
+            self.parent_textedit.append(_("Codebook exported") + "\n" + msg)
         except Exception as err:
             logger.warning(str(err))
             Message(self.app, _("Codebook NOT exported"), str(err)).exec()
@@ -2298,12 +2339,11 @@ class RefiExport(QtWidgets.QDialog):
         self.note_files.append([f"{guid}.txt", journal[1]])
         return xml
 
-    def create_annotation_note_xml(self, ann) -> str:
+    def create_annotation_note_xml(self, ann: dict[str,Any]) -> str:
         """ Create a Note xml for text source annotations
         Appends xml in notes list.
         Appends to the annotations list
         Called by: notes_xml
-
         Format:
         Annotation Note:
         <Note guid="0f758eeb-d61d-4e91-b250-79861c3869a6" modifyingUser="df241da2-bca0-4ad9-83c1-b89c98d83567"
@@ -2394,7 +2434,7 @@ class RefiExport(QtWidgets.QDialog):
         xml += '</Cases>\n'
         return xml
 
-    def case_variables_xml(self, caseid) -> str:
+    def case_variables_xml(self, caseid:int) -> str:
         """ Get the variables, name, type and value for this case and create xml.
         Case variables are stored like this:
         <VariableValue>
@@ -2540,13 +2580,20 @@ class RefiExport(QtWidgets.QDialog):
             # Text document
             if ((s['mediapath'] is None) and (s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')) or \
                     (s['mediapath'] is not None and s['mediapath'][0:6] == '/docs/' and (
-                            s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
+                            s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')):  # FIX: era 'or' (dejaba pasar PDFs a TextSource)
                 xml += '<TextSource '
-                if s['external'] is None:
-                    # Internal filename is a guid identifier
-                    xml += f'richTextPath="internal://{s["filename"]}" '
-                else:
-                    xml += f'richTextPath="absolute://{html.escape(s["external"])}" '
+                # Only declare a richTextPath for a genuine rich-text file (e.g. docx/odt/rtf).
+                # For a plain-text source the "rich" file would be a .txt, which other software
+                # (e.g. ATLAS.ti) tries to parse as rich text; it fails, loads an empty document
+                # and rejects the whole import ("range start larger than document length").
+                # In that case emit only plainTextPath, exactly as MAXQDA does.
+                rich_name = s['external'] if s['external'] is not None else s['filename']
+                if rich_name is not None and not rich_name.lower().endswith('.txt'):
+                    if s['external'] is None:
+                        # Internal filename is a guid identifier
+                        xml += f'richTextPath="internal://{s["filename"]}" '
+                    else:
+                        xml += f'richTextPath="absolute://{html.escape(s["external"])}" '
                 # Internal filename is a guid identifier
                 xml += f'plainTextPath="internal://{s["plaintext_filename"]}" '
                 xml += f'creatingUser="{self.user_guid(s["owner"])}" '
@@ -2557,17 +2604,19 @@ class RefiExport(QtWidgets.QDialog):
                 if memo != "":
                     xml += f"<Description>{memo}</Description>\n"
                 xml += self.text_selection_xml(s['id'])
-                xml += self.source_variables_xml(s['id'])
+                # REFI-QDA TextSourceType sequence requires NoteRef BEFORE VariableValue
                 for a in self.annotations:
                     if a['fid'] == s['id']:
                         a['NoteRef_guid'] = self.create_guid()
                         xml += f'<NoteRef targetGUID="{a["NoteRef_guid"]}" />\n'
                         break
+                xml += self.source_variables_xml(s['id'])
                 xml += '</TextSource>\n'
             # PDF document
             if (s['mediapath'] is None and s['name'][-4:].lower() == '.pdf') or \
-                    (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and s['name'][
-                                                                                       -4:].lower() == '.pdf'):
+                    (s['mediapath'] is not None
+                     and (s['mediapath'].startswith('/docs/') or s['mediapath'].startswith('docs:'))
+                     and s['name'][-4:].lower() == '.pdf'):  # FIX: antes solo 'docs:', el PDF venia como '/docs/'
                 xml += '<PDFSource '
                 if s['external'] is None:
                     # Internal filename is a guid identifier
@@ -2592,6 +2641,9 @@ class RefiExport(QtWidgets.QDialog):
                         a['NoteRef_guid'] = self.create_guid()
                         break
                 xml += '</Representation>'
+                # Coded areas over pages (code_image with pdf_page): without this they
+                # were silently lost in REFI-QDA interchange.
+                xml += self.pdf_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PDFSource>\n'
             # Images
@@ -2690,14 +2742,13 @@ class RefiExport(QtWidgets.QDialog):
                 xml += '</PlainTextSelection>\n'
         return xml
 
-    def picture_selection_xml(self, id_):
+    def picture_selection_xml(self, id_:int) -> str:
         """ Get and complete picture selection xml.
         Called by: sources_xml
         <PictureSelection><Description></Description><Coding><CodeRef/></Coding></PictureSelection>
-
-        :param id_ is the source id
-
-        :returns xml string
+        Args:
+            id_ is the source id
+        Returns xml string
         """
 
         xml = ""
@@ -2727,7 +2778,46 @@ class RefiExport(QtWidgets.QDialog):
             xml += '</PictureSelection>\n'
         return xml
 
-    def av_selection_xml(self, id_, mediatype):
+    def pdf_selection_xml(self, id_:int) -> str:
+        """
+        Coded areas over PDF pages as PDFSelection elements (REFI-QDA).
+        Coordinates in page points (top-left origin, page already rotated), the same
+        convention QualCoder stores and displays them with; page is 0-based.
+        Called by: sources_xml (PDFSource block).
+
+        :param id_ is the source id
+        :returns xml string
+        """
+
+        xml = ""
+        sql = "select imid, cid, x1, y1, width, height, owner, date, memo, pdf_page " \
+              "from code_image where id=? and pdf_page is not null"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [id_, ])
+        results = cur.fetchall()
+        for r in results:
+            memo_ = r[8] if r[8] is not None else ""
+            xml += f'<PDFSelection guid="{self.create_guid()}" '
+            xml += f'page="{int(r[9])}" '
+            xml += f'firstX="{int(r[2])}" '
+            xml += f'firstY="{int(r[3])}" '
+            xml += f'secondX="{int(r[2] + r[4])}" '
+            xml += f'secondY="{int(r[3] + r[5])}" '
+            xml += f'name="{html.escape(memo_)}" '
+            xml += f'creatingUser="{self.user_guid(r[6])}" '
+            xml += f'creationDateTime="{self.convert_timestamp(r[7])}">\n'
+            if memo_ != "":
+                xml += f"<Description>{html.escape(memo_)}</Description>\n"
+            xml += f'<Coding guid="{self.create_guid()}" '
+            xml += f'creatingUser="{self.user_guid(r[6])}" >\n'
+            code_guid = self.code_guid(r[1])
+            if code_guid != "":
+                xml += f'<CodeRef targetGUID="{code_guid}"/>\n'
+            xml += '</Coding>\n'
+            xml += '</PDFSelection>\n'
+        return xml
+
+    def av_selection_xml(self, id_: int, mediatype:str) -> str:
         """ Get codings and complete av selection xml.
         Called by: sources_xml.
         Video Format:
@@ -2741,10 +2831,10 @@ class RefiExport(QtWidgets.QDialog):
         <CodeRef targetGUID="9F43FE32‐C2CB‐4BA8‐B766‐A0734C826E49"/>
         </Coding>
         </VideoSelection>
-
-        :param id_ is the source id Integer
-        :param mediatype : is the String of Audo or Video
-        :returns xml String Audio or Video
+        Args:
+            id_ is the source id Integer
+            mediatype : is the String of Audo or Video
+        Return: xml String Audio or Video
         """
 
         xml = ""
@@ -2769,10 +2859,10 @@ class RefiExport(QtWidgets.QDialog):
             if code_guid != "":
                 xml += f'<CodeRef targetGUID="{code_guid}"/>\n'
             xml += '</Coding>\n'
-            xml += f"</{mediatype}'Selection>\n"
+            xml += f"</{mediatype}Selection>\n"  # FIX: la etiqueta de cierre llevaba un apostrofo intruso que rompia el XML
         return xml
 
-    def transcript_xml(self, source):
+    def transcript_xml(self, source: dict[str,Any]) -> str:
         """ Find any transcript of media source.
         Need to add timestamp synchpoints.
 
@@ -2786,12 +2876,10 @@ class RefiExport(QtWidgets.QDialog):
             <NoteRef></NoteRef>
             </TranscriptSelection>
         </Transcript>
-
         Called by: sources_xml
-
-        :param source  is this media source dictionary.
-
-        :returns xml String
+        ArgS:
+            source  is this media source dictionary.
+        Returns: xml String
         """
 
         xml = ""
@@ -2813,7 +2901,7 @@ class RefiExport(QtWidgets.QDialog):
                 break
         return xml
 
-    def get_transcript_selections(self, media, sync_list):
+    def get_transcript_selections(self, media: dict[str,Any], sync_list) -> str:
         """ Add transcript selections with syncpoints.
         Cannot accurately match the millisecond transcript selections used here as the
         syncpoint msecs are calculated from transcript textual timestamps.
@@ -2831,12 +2919,10 @@ class RefiExport(QtWidgets.QDialog):
         <CodeRef targetGUID="0bd904ef‐7dff‐47d6‐a94e‐f47e9134a596" />
         </Coding>
         </TranscriptSelection>
-
-        :param media dictionary containing id, name, owner, date, fulltext, memo, mediapath
-
-        :param sync_list  list of guid, xml and char positions
-
-        :return: xml for transcript selections
+        Args:
+            media dictionary containing id, name, owner, date, fulltext, memo, mediapath
+            sync_list  list of guid, xml and char positions
+        Return: xml for transcript selections
         """
 
         xml = ''
@@ -2868,15 +2954,15 @@ class RefiExport(QtWidgets.QDialog):
             xml += '</TranscriptSelection>\n'
         return xml
 
-    def get_transcript_syncpoints(self, media):
+    def get_transcript_syncpoints(self, media:dict[str,Any]):
         """
         Need to get all the transcription codings, start, end positions, code, coder.
         For each of these and create a syncpoint.
         Look through sll the textual timepoints to find the closest needed to create the syncpoints.
         The milliseconds syncs will be approximate only, based on the start and end media milliseconds and any
         in-text detected timestamps.
-
-        :param media dictionary containing id, name, owner, date, fulltext, memo, mediapath
+        Args:
+            media dictionary containing id, name, owner, date, fulltext, memo, mediapath
 
         :return: list containing guid, syncpoint xml, character position
         """
@@ -2922,22 +3008,18 @@ class RefiExport(QtWidgets.QDialog):
         # print(sync_list)  # tmp
         return sync_list
 
-    def get_transcript_timepoints(self, media):
+    def get_transcript_timepoints(self, media:dict[str,Any]):
         """ Get a list of starting/ending character positions and time in milliseconds
         from transcribed text file.
-
         Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] #00:12:34.567#
         09:33:04,100 --> 09:33:09,600
-
         Converts hh mm ss to milliseconds with text positions for xml SyncPoint
         Format:
         <SyncPoint guid="c32d0ae1‐7f16‐4bbe‐93a1‐537e2dc0fb66"
         position="94" timeStamp="45000" />
-
-        :param media:
-        :type media: Dictionary
-
-        :return list of time points as [character position, milliseconds]
+        Args:
+            media: Dictionary
+        Return: list of time points as [character position, milliseconds]
         """
 
         text = media['fulltext']
@@ -3039,7 +3121,7 @@ class RefiExport(QtWidgets.QDialog):
         return time_pos
 
     @staticmethod
-    def convert_timestamp(time_in):
+    def convert_timestamp(time_in:str) -> str:
         """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ
         I have found one instance of an underscore where the space should be. """
 
@@ -3114,11 +3196,11 @@ class RefiExport(QtWidgets.QDialog):
 
         self.codes = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color, supercid from code_name")
         result = cur.fetchall()
         for row in result:
             c = {'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3].replace(' ', 'T'),
-                 'cid': row[4], 'catid': row[5], 'color': row[6], 'guid': self.create_guid()}
+                 'cid': row[4], 'catid': row[5], 'color': row[6], 'supercid': row[7], 'guid': self.create_guid()}
             xml = f'<Code guid="{c["guid"]}" '
             xml += f'name="{html.escape(c["name"])}" '
             xml += 'isCodable="true" '
@@ -3132,6 +3214,28 @@ class RefiExport(QtWidgets.QDialog):
                 xml += ' />\n'
             c['xml'] = xml
             self.codes.append(c)
+
+    def code_xml(self, code_):
+        """ Recursive XML for a code and any sub-codes nested under it (supercid).
+        A code with children is exported as <Code isCodable="true"> ... </Code>
+        containing its child <Code> elements - valid REFI-QDA understood by other QDA software. """
+
+        children = [c for c in self.codes if c.get('supercid') == code_['cid']]
+        memo = html.escape(code_['memo'])
+        xml = f'<Code guid="{code_["guid"]}" '
+        xml += f'name="{html.escape(code_["name"])}" '
+        xml += 'isCodable="true" '
+        xml += f'color="{code_["color"]}"'
+        if memo == "" and not children:
+            xml += ' />\n'
+            return xml
+        xml += '>\n'
+        if memo != "":
+            xml += f"<Description>{memo}</Description>\n"
+        for child in children:
+            xml += self.code_xml(child)
+        xml += '</Code>\n'
+        return xml
 
     def get_categories(self):
         """ get categories and assign guid.
@@ -3147,12 +3251,12 @@ class RefiExport(QtWidgets.QDialog):
                                     'date': row[3].replace(' ', 'T'), 'memo': row[4], 'supercatid': row[5],
                                     'guid': self.create_guid(), 'examine': True})
 
-    def codebook_xml(self):
+    def codebook_xml(self) -> str:
         """ Top level items are main categories and unlinked codes
         Create xml for codes and categories.
         codes within categories are does like this: <code><code></code></code>
 
-        :returns xml string
+        Returns: xml string
         """
 
         if not self.codes:
@@ -3161,10 +3265,10 @@ class RefiExport(QtWidgets.QDialog):
         xml += '<Codes>\n'
         cats = copy(self.categories)
 
-        # Add unlinked codes as top level items
+        # Add unlinked codes as top level items (codes without a category AND without a parent code)
         for code_ in self.codes:
-            if code_['catid'] is None:
-                xml += code_['xml']
+            if code_['catid'] is None and code_.get('supercid') is None:
+                xml += self.code_xml(code_)
         # Add top level categories
         for ca in cats:
             if ca['supercatid'] is None and ca['examine']:
@@ -3176,24 +3280,23 @@ class RefiExport(QtWidgets.QDialog):
                 memo = html.escape(ca['memo'])
                 if memo != "":
                     xml += f"<Description>{memo}</Description>\n"
-                # Add codes in this category
+                # Add codes in this category (each emits its own sub-codes recursively)
                 for code_ in self.codes:
                     if code_['catid'] == ca['catid']:
-                        xml += code_['xml']
+                        xml += self.code_xml(code_)
                 xml += self.add_sub_categories(ca['catid'], cats)
                 xml += '</Code>\n'
         xml += '</Codes>\n'
         xml += '</CodeBook>\n'
         return xml
 
-    def add_sub_categories(self, cid, cats):
+    def add_sub_categories(self, cid:int, cats) -> str:
         """ Returns recursive xml of category.
         Categories have isCodable=true in exports from other software.
-
-        :param cid  is this cid
-        :param cats  a list of categories
-
-        :returns xml string
+        Args:
+            cid  is this cid
+            cats  a list of categories
+        Returns xml string
         """
 
         xml = ""
@@ -3210,10 +3313,10 @@ class RefiExport(QtWidgets.QDialog):
                     if memo != "":
                         xml += f"<Description>{memo}</Description>\n"
                     xml += self.add_sub_categories(c['catid'], cats)
-                    # add codes
+                    # add codes (each emits its own sub-codes recursively)
                     for co in self.codes:
                         if co['catid'] == c['catid']:
-                            xml += co['xml']
+                            xml += self.code_xml(co)
                     xml += '</Code>\n'
 
             # Are there any categories remaining to examine
@@ -3224,7 +3327,7 @@ class RefiExport(QtWidgets.QDialog):
             counter += 1
         return xml
 
-    def create_guid(self):
+    def create_guid(self) -> str:
         """ Create globally unique guid for each component. 128-bit integer, 32 chars
         Format:
         ([0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12})|(backslash{[0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12}backslash})
@@ -3272,5 +3375,4 @@ class RefiExport(QtWidgets.QDialog):
         Return:
             No return value
         """
-
         return True

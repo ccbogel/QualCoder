@@ -14,8 +14,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
@@ -29,9 +30,8 @@ import emoji
 import html
 import logging
 from operator import itemgetter
-import os
+from pathlib import Path
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-from random import randint
 import re
 import sqlite3
 import unicodedata
@@ -45,15 +45,18 @@ from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean 
 from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Need for _export_odt_clean
 from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
-from .add_item_name import DialogAddItemName
+from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
+from .ai_prompt_library import DialogAiEditPrompts
 from .ai_search_dialog import DialogAiSearch
-from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
-from .color_selector import DialogColorSelect, colour_ranges, colors, TextColor, show_codes_of_colour_range
+from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH, MINIMUM_CODING_MARGIN_WIDTH,
+                                      MINIMUM_CODING_MARGIN_LABEL_WIDTH)
+from .code_tree import CodeTreeController
+from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
-    ToolTipEventFilter, init_persistent_tree_header, restore_persistent_tree_widths
+    ToolTipEventFilter, init_persistent_tree_header
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -64,373 +67,7 @@ from .coder_names import DialogCoderNames
 
 ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the second stage
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-
-class CodingMargin(QtWidgets.QWidget):
-    """ Draws side bars adjacent to the text and code names.
-    Uses a track-packing algorithm so that overlapping codes occupy distinct
-    vertical lanes. Embedded in a container widget (widget_code_margin_left /
-    widget_code_margin_right). Scroll synchronization
-    with the editor is handled via signal-slot from the editor's vertical
-    scrollbar.
-
-    The 'side' parameter controls visual layout:
-    - 'left':  lanes stack right-to-left (lane 0 nearest text), names at far left.
-    - 'right': lanes stack left-to-right (lane 0 nearest text), names at far right.
-    """
-
-    def __init__(self, editor, dialog_code_text, side='left'):
-        super().__init__()
-        self.editor = editor
-        self.dialog = dialog_code_text
-        self.side = side  # 'left' or 'right'
-        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.customContextMenuRequested.connect(self._emit_context_menu_to_dialog)
-        self.setMouseTracking(True)
-        self.setMinimumWidth(120)
-
-    def _emit_context_menu_to_dialog(self, position):
-        if hasattr(self.dialog, 'coding_margin_context_menu'):
-            self.dialog.coding_margin_context_menu(position, self)
-
-    def _compute_lane_layout(self):
-        """ Track-packing algorithm. Returns (ctid_columns, sorted_codes,
-        current_fid), or (None, [], None) if the layout cannot be computed. """
-
-        if not self.dialog.file_ or not self.dialog.code_text:
-            return None, [], None
-
-        current_fid = self.dialog.file_['id']
-        important_only = getattr(self.dialog, 'important', False)
-
-        sorted_codes = sorted(
-            [c for c in self.dialog.code_text
-             if c.get('fid') == current_fid
-             and (not important_only or c.get('important') == 1)],
-            key=lambda x: x.get('pos0', 0)
-        )
-
-        ctid_columns = {}
-        tracks = []
-        for code in sorted_codes:
-            ctid = code.get('ctid')
-            if ctid is None:
-                continue
-            placed = False
-            for i, track_end in enumerate(tracks):
-                if track_end <= code['pos0']:
-                    tracks[i] = code['pos1']
-                    ctid_columns[ctid] = i
-                    placed = True
-                    break
-            if not placed:
-                tracks.append(code['pos1'])
-                ctid_columns[ctid] = len(tracks) - 1
-
-        return ctid_columns, sorted_codes, current_fid
-
-    def paintEvent(self, event):
-        if not self.dialog.file_ or not self.dialog.code_text:
-            return
-        try:
-            painter = QtGui.QPainter(self)
-            font = QtGui.QFont(self.dialog.app.settings['font'], 9)
-            painter.setFont(font)
-            offset = self.editor.contentOffset()
-            block = self.editor.firstVisibleBlock()
-
-            ctid_columns, _sorted_codes, current_fid = self._compute_lane_layout()
-            if current_fid is None:
-                return
-
-            drawn_ctids = set()
-
-            while block.isValid():
-                rect = self.editor.blockBoundingGeometry(block).translated(offset)
-                if rect.top() > self.height():
-                    break
-                if rect.bottom() >= 0:
-                    self.draw_code_bars(painter, block, rect, drawn_ctids, current_fid, ctid_columns)
-                block = block.next()
-        except Exception as e:
-            logger.debug(f"CodingMargin paintEvent error: {e}")
-
-    def draw_code_bars(self, painter, block, rect, drawn_ctids, current_fid, ctid_columns):
-        """ Draw a coloured vertical bar per overlapping code on this block,
-        plus the code name at the appropriate edge (only once per segment) """
-
-        file_start = self.dialog.file_.get('start', 0)
-        block_start = block.position() + file_start
-        block_end = block_start + block.length()
-
-        names_drawn_by_line = {}
-        margin_width = self.width()
-
-        important_only = getattr(self.dialog, 'important', False)
-        layout = block.layout()
-
-        bar_w = 3
-        lane_step = 10
-
-        for code in self.dialog.code_text:
-            if code.get('fid') != current_fid:
-                continue
-            if important_only and code.get('important') != 1:
-                continue
-            ctid = code.get('ctid')
-            if ctid is None:
-                continue
-
-            if code['pos0'] < block_end and code['pos1'] > block_start:
-                col_index = ctid_columns.get(ctid, 0)
-
-                if self.side == 'right':
-                    offset_x = 12 + (col_index * lane_step)
-                else:  # 'left'
-                    offset_x = margin_width - 15 - (col_index * lane_step)
-
-                color_hex = code.get('color', '#cccccc')
-                color = QtGui.QColor(color_hex)
-                painter.setPen(QtCore.Qt.PenStyle.NoPen)
-                painter.setBrush(color)
-
-                start_rel = max(code['pos0'], block_start) - block_start
-                end_rel = min(code['pos1'], block_end) - block_start
-                start_rel = max(0, min(start_rel, max(0, block.length() - 1)))
-                end_rel = max(start_rel + 1, min(end_rel, block.length()))
-                start_line = layout.lineForTextPosition(start_rel)
-                end_line = layout.lineForTextPosition(max(start_rel, end_rel - 1))
-
-                if start_line.isValid() and end_line.isValid():
-                    first_line = start_line.lineNumber()
-                    last_line = end_line.lineNumber()
-                    for line_number in range(first_line, last_line + 1):
-                        line = layout.lineAt(line_number)
-                        if not line.isValid():
-                            continue
-                        painter.drawRect(
-                            offset_x,
-                            int(rect.top() + line.y()),
-                            bar_w,
-                            max(1, int(line.height()))
-                        )
-                else:
-                    painter.drawRect(offset_x, int(rect.top()), bar_w, int(rect.height()))
-
-                if ctid not in drawn_ctids and code['pos0'] >= block_start:
-                    painter.setPen(color.darker(150))
-                    raw_name = code.get('name', '')
-                    _fm = painter.fontMetrics()
-                    if self.side == 'right':
-                        _lanes_end_x = 12 + (col_index + 1) * lane_step
-                        _available_w = max(0, margin_width - _lanes_end_x - 5)
-                    else:  # 'left'
-                        _lanes_start_x = margin_width - 15 - (col_index + 1) * lane_step
-                        _available_w = max(0, _lanes_start_x - 5 - 5)
-                    name = _fm.elidedText(
-                        raw_name, QtCore.Qt.TextElideMode.ElideRight, _available_w)
-
-                    if start_line.isValid():
-                        line_number = start_line.lineNumber()
-                        names_on_line = names_drawn_by_line.get(line_number, 0)
-                        y_pos = int(rect.top() + start_line.y()
-                                    + painter.fontMetrics().ascent()
-                                    + (names_on_line * 12))
-                        names_drawn_by_line[line_number] = names_on_line + 1
-                    else:
-                        names_on_line = names_drawn_by_line.get(-1, 0)
-                        y_pos = int(rect.top() + painter.fontMetrics().ascent()
-                                    + (names_on_line * 12))
-                        names_drawn_by_line[-1] = names_on_line + 1
-
-                    if self.side == 'right':
-                        name_w = painter.fontMetrics().horizontalAdvance(name)
-                        x_pos = max(margin_width - name_w - 5, 18)
-                    else:  # 'left'
-                        x_pos = 5
-
-                    painter.drawText(x_pos, y_pos, name)
-                    drawn_ctids.add(ctid)
-
-    def _code_at_position(self, pos):
-        """ Return the code_text item under the given QPoint, or None.
-        Matches both the coloured stripe and the code name label"""
-
-        if not self.dialog.file_ or not self.dialog.code_text:
-            return None
-
-        ctid_columns, _sorted, current_fid = self._compute_lane_layout()
-        if current_fid is None:
-            return None
-
-        margin_width = self.width()
-        bar_w = 3
-        lane_step = 10
-
-        offset = self.editor.contentOffset()
-        block = self.editor.firstVisibleBlock()
-        file_start = self.dialog.file_.get('start', 0)
-        important_only = getattr(self.dialog, 'important', False)
-
-        stripe_hit = None
-        label_hit = None
-
-        font = QtGui.QFont(self.dialog.app.settings['font'], 9)
-        fm = QtGui.QFontMetrics(font)
-
-        while block.isValid():
-            rect = self.editor.blockBoundingGeometry(block).translated(offset)
-            if rect.top() > self.height():
-                break
-            if rect.bottom() < 0:
-                block = block.next()
-                continue
-
-            block_start = block.position() + file_start
-            block_end = block_start + block.length()
-            layout = block.layout()
-
-            seen_ctids_in_block = set()
-            names_drawn_by_line = {}
-
-            for code in self.dialog.code_text:
-                if code.get('fid') != current_fid:
-                    continue
-                if important_only and code.get('important') != 1:
-                    continue
-                ctid = code.get('ctid')
-                if ctid is None:
-                    continue
-                if not (code['pos0'] < block_end and code['pos1'] > block_start):
-                    continue
-
-                col_index = ctid_columns.get(ctid, 0)
-                if self.side == 'right':
-                    offset_x = 12 + (col_index * lane_step)
-                else:
-                    offset_x = margin_width - 15 - (col_index * lane_step)
-
-                start_rel = max(code['pos0'], block_start) - block_start
-                end_rel = min(code['pos1'], block_end) - block_start
-                start_rel = max(0, min(start_rel, max(0, block.length() - 1)))
-                end_rel = max(start_rel + 1, min(end_rel, block.length()))
-                start_line = layout.lineForTextPosition(start_rel)
-                end_line = layout.lineForTextPosition(max(start_rel, end_rel - 1))
-
-                if start_line.isValid() and end_line.isValid():
-                    first_line = start_line.lineNumber()
-                    last_line = end_line.lineNumber()
-                    for line_number in range(first_line, last_line + 1):
-                        line = layout.lineAt(line_number)
-                        if not line.isValid():
-                            continue
-                        stripe_rect = QtCore.QRect(
-                            offset_x,
-                            int(rect.top() + line.y()),
-                            bar_w,
-                            max(1, int(line.height())))
-                        if stripe_rect.contains(pos):
-                            stripe_hit = code
-
-                if ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
-                    raw_name = code.get('name', '')
-                    if self.side == 'right':
-                        _lanes_end_x = 12 + (col_index + 1) * lane_step
-                        _available_w = max(0, margin_width - _lanes_end_x - 5)
-                    else:  # 'left'
-                        _lanes_start_x = margin_width - 15 - (col_index + 1) * lane_step
-                        _available_w = max(0, _lanes_start_x - 5 - 5)
-                    name = fm.elidedText(
-                        raw_name, QtCore.Qt.TextElideMode.ElideRight, _available_w)
-                    if start_line.isValid():
-                        line_number = start_line.lineNumber()
-                        names_on_line = names_drawn_by_line.get(line_number, 0)
-                        y_pos = int(rect.top() + start_line.y()
-                                    + fm.ascent()
-                                    + (names_on_line * 12))
-                        names_drawn_by_line[line_number] = names_on_line + 1
-                    else:
-                        names_on_line = names_drawn_by_line.get(-1, 0)
-                        y_pos = int(rect.top() + fm.ascent() + (names_on_line * 12))
-                        names_drawn_by_line[-1] = names_on_line + 1
-
-                    name_w = fm.horizontalAdvance(name)
-                    if self.side == 'right':
-                        x_pos = max(margin_width - name_w - 5, 18)
-                    else:
-                        x_pos = 5
-
-                    label_rect = QtCore.QRect(
-                        x_pos,
-                        y_pos - fm.ascent(),
-                        name_w,
-                        fm.height())
-                    if label_rect.contains(pos):
-                        label_hit = code
-                    seen_ctids_in_block.add(ctid)
-
-            block = block.next()
-
-        return stripe_hit if stripe_hit is not None else label_hit
-
-    def mouseMoveEvent(self, event):
-        """ hover over a code -> show tooltip """
-
-        try:
-            code = self._code_at_position(event.pos())
-        except Exception as e:
-            logger.debug(f"CodingMargin hit-test error: {e}")
-            code = None
-
-        if code is None:
-            QtWidgets.QToolTip.hideText()
-            self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
-            super().mouseMoveEvent(event)
-            return
-
-        try:
-            tooltip_html = self.dialog._build_code_tooltip_html(code)
-        except Exception as e:
-            logger.debug(f"CodingMargin tooltip build error: {e}")
-            tooltip_html = code.get('name', '')
-
-        QtWidgets.QToolTip.showText(event.globalPosition().toPoint(),
-                                    tooltip_html,
-                                    self)
-        self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        super().mouseMoveEvent(event)
-
-    def mousePressEvent(self, event):
-        """ left-click on stripe/label -> select that exact coded segment in editor. """
-
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            try:
-                code = self._code_at_position(event.pos())
-            except Exception as e:
-                logger.debug(f"CodingMargin click hit-test error: {e}")
-                code = None
-            if code is not None and self.dialog.file_ is not None:
-                file_start = self.dialog.file_.get('start', 0)
-                pos0 = code['pos0'] - file_start
-                pos1 = code['pos1'] - file_start
-                text_len = len(self.dialog.ui.plainTextEdit.toPlainText())
-                pos0 = max(0, min(pos0, text_len))
-                pos1 = max(0, min(pos1, text_len))
-                cursor = self.dialog.ui.plainTextEdit.textCursor()
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-                self.dialog.ui.plainTextEdit.setTextCursor(cursor)
-                self.dialog.ui.plainTextEdit.ensureCursorVisible()
-                event.accept()
-                return
-        super().mousePressEvent(event)
-
-    def leaveEvent(self, event):
-        QtWidgets.QToolTip.hideText()
-        self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
-        super().leaveEvent(event)
 
 
 class DialogCodeText(QtWidgets.QWidget):
@@ -456,7 +93,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.code_text = []  # List of coded segments for the curent file
         self.undo_deleted_codes = []  # To restore recently deleted codes
         self.attributes = []  # Show selected files using these attributes in list widget
-        self.tree_sort_option = "all asc"  # all asc, all desc, cat then code asc
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
         self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
 
@@ -466,7 +102,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_recent_codes()  # After codes obtained!
 
         # Search text variables
-        self.search_type = "3"  # Three characters entered before search can begin
+        self.search_threshold = 3  # Three characters entered before search can begin
         self.search_indices = []  # List of file data, start, end, start_line, start char, String len
         self.search_index = 0
         self.search_term = ""
@@ -498,13 +134,13 @@ class DialogCodeText(QtWidgets.QWidget):
         # show_margin_stripes and highlight_style are INDEPENDENT preferences,
         # persisted under separate keys and changed via the margin context menu <- L
         try:
-            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'False')
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'True')
             if isinstance(saved_pref, bool):
                 self.show_margin_stripes = saved_pref
             else:
                 self.show_margin_stripes = str(saved_pref).lower() == 'true'
         except (KeyError, AttributeError):
-            self.show_margin_stripes = False  # (default: margin hidden)
+            self.show_margin_stripes = True
 
         try:
             saved_style = self.app.settings.get('codetext_highlight_style', None)
@@ -514,8 +150,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if saved_style in ('marker', 'underline'):
             self.highlight_style = saved_style
         else:
-            # Backwards-compatible default derived from margin visibility.
-            self.highlight_style = 'underline' if self.show_margin_stripes else 'marker'
+            self.highlight_style = 'marker'
 
         # Variables for Edit mode
         self.text = ""
@@ -543,6 +178,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_edit_next.clicked.connect(lambda pressed: self.edit_mode_find("next"))
         self.ui.pushButton_edit_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_edit_prev.clicked.connect(lambda pressed: self.edit_mode_find("previous"))
+        self.ui.label_edit_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
+        self.ui.checkBox_edit_case_sensitive.stateChanged.connect(self.edit_mode_find)
+        self.ui.lineEdit_edit_search.returnPressed.connect(self.edit_mode_find)
         self.edit_pos = 0
         self.edit_mode = False
         # Revert to original if edit text caused problems
@@ -566,6 +204,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.settings['docfont'] = self.app.settings['font']
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["docfont"]}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self.ui.plainTextEdit.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.plainTextEdit.setPlainText("")
@@ -589,10 +228,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        self.search_type = "3"  # 3 character threshold for text search
+        self.search_threshold = 3  # 3 character threshold for text search
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
-        self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+        self.ui.lineEdit_search.returnPressed.connect(self.move_to_next_search_text)
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
 
@@ -707,7 +346,20 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        # Shared code tree controller: tree loading, common context menu, drag and drop
+        # reparenting, F2-F6 shortcuts and category branch deletion live in code_tree.py,
+        # so the four coding pages no longer duplicate this logic by hand. <- L
+        self.code_tree = CodeTreeController(self.app, self.ui.treeWidget, self)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.code_tree.tree_menu)
+        self.code_tree.fill_counts_callback = self.fill_code_counts_in_tree
+        self.code_tree.coded_files_callback = self.coded_media_dialog
+        self.code_tree.on_codes_deleted = self.remove_deleted_codes_from_recent
+        self.code_tree.on_code_renamed = self.rename_code_in_recent
+        self.code_tree.find_code_callback = self.find_code_in_tree
+        self.code_tree.show_codes_like_callback = self.show_codes_like
+        self.code_tree.show_codes_of_colour_callback = self.show_codes_of_color
+        self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
+
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodetext_tree_widths')
 
@@ -756,6 +408,13 @@ class DialogCodeText(QtWidgets.QWidget):
         except (KeyError, AttributeError):
             self.margin_side = 'left'
         self.coding_margin = CodingMargin(self.ui.plainTextEdit, self, side=self.margin_side)
+        self.coding_margin_width = self._get_saved_coding_margin_width()
+        self._coding_margin_width_is_restoring = False
+        self._coding_margin_restore_attempts = 0
+        self._coding_margin_width_ready = False
+        self.coding_margin_width_save_timer = QtCore.QTimer(self)
+        self.coding_margin_width_save_timer.setSingleShot(True)
+        self.coding_margin_width_save_timer.timeout.connect(self.persist_coding_margin_width_setting)
 
         # Inject the margin widget into the chosen container (mirroring the
         # NumberBar pattern used for self.ui.lineNumbers)
@@ -769,6 +428,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self._text_margins_splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
         self._text_margins_splitter.setHandleWidth(4)
         self._text_margins_splitter.setChildrenCollapsible(False)
+        self._text_margins_splitter.splitterMoved.connect(self.on_coding_margin_splitter_moved)
 
         # Switch margin containers' size policy from Fixed to Preferred so
         # the splitter can resize them. plainTextEdit keeps Expanding
@@ -795,17 +455,20 @@ class DialogCodeText(QtWidgets.QWidget):
             self._text_margins_splitter.indexOf(self.ui.plainTextEdit), 1)
 
         self._install_coding_margin_in_side(self.margin_side)
+        self._sync_coding_margin_background()
 
         # apply initial visibility based on persisted preference <- L
         self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        QtCore.QTimer.singleShot(0, self._apply_coding_margin_width)
+        QtCore.QTimer.singleShot(60, self._apply_coding_margin_width)
         self.ui.lineNumbers.setToolTip(_("Right click for highlighting options"))
 
         # sync margin redraw with editor scroll <- L
         self.ui.plainTextEdit.verticalScrollBar().valueChanged.connect(self.coding_margin.update)
 
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
-        self.fill_tree()
+        self.code_tree.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
@@ -826,6 +489,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_include_coded_segments = None
         self.ai_search_found = False
         self.ai_search_analysis_counter = 0
+        self.ai_search_session_id = 0
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
@@ -840,6 +504,111 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
         self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
+        self.update_ai_menu_options()
+
+    @staticmethod
+    def _text_analysis_prompt_menu_leaf(relative_path: str) -> str:
+        """Return the leaf label for one text-analysis prompt menu item."""
+
+        normalized = str(relative_path if relative_path is not None else "").replace("\\", "/").strip("/")
+        if normalized == "":
+            return ""
+        return normalized.rsplit("/", 1)[-1]
+
+    @staticmethod
+    def _text_analysis_prompt_menu_label(relative_path: str, scope: str) -> str:
+        """Return the prompt menu label including the prompt scope."""
+
+        leaf = DialogCodeText._text_analysis_prompt_menu_leaf(relative_path)
+        prompt_scope = str(scope if scope is not None else "").strip()
+        if leaf == "" or prompt_scope == "":
+            return leaf
+        return f"{leaf} ({prompt_scope})"
+
+    def _text_analysis_prompt_folder_icon(self):
+        """Return the same folder icon used by the prompt library."""
+
+        return qta.icon("mdi.folder-outline", color=self.app.highlight_color())
+
+    def _text_analysis_prompt_file_icon(self, menu):
+        """Return the same prompt file icon used by the prompt library."""
+
+        text_color = menu.palette().color(QtGui.QPalette.ColorRole.Text).name()
+        return qta.icon("mdi6.script-text-outline", color=text_color)
+
+    def _populate_text_analysis_prompt_menu(self, menu, prompts_catalog, prompt_records) -> None:
+        """Populate one prompt menu, mirroring the prompt library folder structure."""
+
+        menu_tree = {"prompts": [], "folders": {}}
+        for prompt in prompt_records:
+            relative_path = prompts_catalog.prompt_name_within_type(prompt.name)
+            parts = [part for part in relative_path.split("/") if part != ""]
+            if len(parts) == 0:
+                continue
+            current_branch = menu_tree
+            for part in parts[:-1]:
+                current_branch = current_branch["folders"].setdefault(part, {"prompts": [], "folders": {}})
+            current_branch["prompts"].append((relative_path, prompt))
+
+        def populate_branch(parent_menu, branch) -> None:
+            for branch_relative_path, prompt_record in branch["prompts"]:
+                action = parent_menu.addAction(
+                    self._text_analysis_prompt_menu_label(branch_relative_path, prompt_record.scope)
+                )
+                action.setToolTip(prompt_record.description)
+                action.setIcon(self._text_analysis_prompt_file_icon(parent_menu))
+                action.setProperty('submenu', 'ai_text_analysis')
+                action.setData({
+                    "name": prompt_record.name,
+                    "scope": prompt_record.scope,
+                })
+            for folder_name, child_branch in branch["folders"].items():
+                submenu = parent_menu.addMenu(folder_name)
+                submenu.setToolTipsVisible(True)
+                submenu.setIcon(self._text_analysis_prompt_folder_icon())
+                populate_branch(submenu, child_branch)
+
+        populate_branch(menu, menu_tree)
+
+    def _ai_menu_options_enabled(self) -> bool:
+        """Return whether AI-specific text-coding actions should be enabled."""
+
+        return self.app.settings.get('ai_enable', 'False') == 'True'
+
+    def update_ai_menu_options(self):
+        """Refresh AI-specific controls inside the text-coding workspace."""
+
+        self.ui.pushButton_ai_search.setEnabled(self._ai_menu_options_enabled())
+
+    def _ai_search_scope_id(self):
+        return id(self)
+
+    def _ai_search_scope_active(self) -> bool:
+        ai = getattr(self.app, 'ai', None)
+        if ai is None or not hasattr(ai, 'has_active_runs'):
+            return False
+        try:
+            return bool(ai.has_active_runs('ai_search', self._ai_search_scope_id()))
+        except Exception as err:
+            logger.warning(err)
+            return False
+
+    def _ai_search_scope_status(self) -> str:
+        ai = getattr(self.app, 'ai', None)
+        if ai is None or not hasattr(ai, 'get_scope_status'):
+            return 'idle'
+        try:
+            return str(ai.get_scope_status('ai_search', self._ai_search_scope_id())).strip() or 'idle'
+        except Exception:
+            return 'idle'
+
+    def _cancel_ai_search_scope(self, wait_ms: int = 5000) -> bool:
+        ai = getattr(self.app, 'ai', None)
+        if ai is None:
+            return True
+        if hasattr(ai, 'cancel_scope'):
+            return bool(ai.cancel_scope('ai_search', self._ai_search_scope_id(), wait_ms=wait_ms))
+        return bool(ai.cancel(ask=False))
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -902,6 +671,99 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.margin_side = side
         self.coding_margin.side = side
+
+    def _sync_coding_margin_background(self):
+        """Keep the coding margin area aligned with the text editor background."""
+
+        editor_palette = self.ui.plainTextEdit.viewport().palette()
+        background_color = editor_palette.color(QtGui.QPalette.ColorRole.Base)
+        background_hex = background_color.name()
+        for widget in (
+                self.ui.widget_code_margin_left,
+                self.ui.widget_code_margin_right,
+                self.coding_margin):
+            palette = widget.palette()
+            palette.setColor(QtGui.QPalette.ColorRole.Window, background_color)
+            palette.setColor(QtGui.QPalette.ColorRole.Base, background_color)
+            widget.setPalette(palette)
+            widget.setAutoFillBackground(True)
+        self._text_margins_splitter.setStyleSheet(
+            "QSplitter::handle {"
+            f" background-color: {background_hex};"
+            " border: 0px;"
+            " margin: 0px;"
+            " padding: 0px;"
+            "}"
+        )
+        self.coding_margin.update()
+
+    def _get_saved_coding_margin_width(self) -> int:
+        """Return the stored coding margin width, or the default width."""
+
+        try:
+            width = int(self.app.settings.get('dialogcodetext_coding_margin_width', DEFAULT_CODING_MARGIN_WIDTH))
+        except (TypeError, ValueError, AttributeError):
+            width = DEFAULT_CODING_MARGIN_WIDTH
+        if width <= 0:
+            return DEFAULT_CODING_MARGIN_WIDTH
+        return max(MINIMUM_CODING_MARGIN_WIDTH, width)
+
+    def _apply_coding_margin_width(self):
+        """Apply the stored coding margin width to the active side of the splitter."""
+
+        if not hasattr(self, '_text_margins_splitter') or self._text_margins_splitter is None:
+            return
+        if not self.show_margin_stripes:
+            return
+        total_width = self._text_margins_splitter.width()
+        if total_width <= 0:
+            sizes = self._text_margins_splitter.sizes()
+            total_width = sum(sizes)
+        if total_width <= 0 or total_width < self.coding_margin_width + 200:
+            if self._coding_margin_restore_attempts < 20:
+                self._coding_margin_restore_attempts += 1
+                QtCore.QTimer.singleShot(30, self._apply_coding_margin_width)
+            return
+        self._coding_margin_restore_attempts = 0
+        margin_width = min(self.coding_margin_width, max(MINIMUM_CODING_MARGIN_WIDTH, total_width - 200))
+        editor_width = max(200, total_width - margin_width)
+        if self.margin_side == 'right':
+            sizes = [0, editor_width, margin_width]
+        else:
+            sizes = [margin_width, editor_width, 0]
+        self._coding_margin_width_is_restoring = True
+        try:
+            with QtCore.QSignalBlocker(self._text_margins_splitter):
+                self._text_margins_splitter.setSizes(sizes)
+        finally:
+            self._coding_margin_width_is_restoring = False
+        self._coding_margin_width_ready = True
+
+    def on_coding_margin_splitter_moved(self, pos=None, index=None):
+        """Track coding margin width changes and persist the active width."""
+
+        if self._coding_margin_width_is_restoring or not self.show_margin_stripes:
+            return
+        if not self._coding_margin_width_ready:
+            return
+        sizes = self._text_margins_splitter.sizes()
+        if len(sizes) < 3:
+            return
+        width = sizes[2] if self.margin_side == 'right' else sizes[0]
+        width = int(width)
+        if width < MINIMUM_CODING_MARGIN_WIDTH:
+            return
+        self.coding_margin_width = width
+        self.app.settings['dialogcodetext_coding_margin_width'] = width
+        self.coding_margin_width_save_timer.start(400)
+
+    def persist_coding_margin_width_setting(self):
+        """Write the coding margin width to config.ini after drag operations settle."""
+
+        try:
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        except Exception as e_:
+            logger.debug(f"Could not persist coding margin width setting: {e_}")
 
     def _set_margin_container_visibility(self, visible):  # <- L
         """ Show or hide the active container so the layout reclaims its space
@@ -1195,7 +1057,19 @@ class DialogCodeText(QtWidgets.QWidget):
     def _toggle_margin_visibility_only(self):
         """ Independent visibility toggle (does NOT alter highlight_style). """
 
-        self.show_margin_stripes = not self.show_margin_stripes
+        self.apply_margin_stripe_setting(not self.show_margin_stripes)
+
+    def apply_margin_stripe_setting(self, show_margin_stripes: bool | None = None):
+        """Apply and persist the code stripe margin visibility without toggling blindly."""
+
+        if show_margin_stripes is None:
+            saved_pref = self.app.settings.get('codetext_show_margin_stripes', True)
+            if isinstance(saved_pref, bool):
+                show_margin_stripes = saved_pref
+            else:
+                show_margin_stripes = str(saved_pref).lower() == 'true'
+
+        self.show_margin_stripes = show_margin_stripes
         try:
             self.app.settings['codetext_show_margin_stripes'] = (
                 'True' if self.show_margin_stripes else 'False')
@@ -1205,6 +1079,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.setVisible(self.show_margin_stripes)
         self._set_margin_container_visibility(self.show_margin_stripes)
+        if self.show_margin_stripes:
+            self._apply_coding_margin_width()
 
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
@@ -1224,6 +1100,8 @@ class DialogCodeText(QtWidgets.QWidget):
             pass
 
         self._set_margin_container_visibility(self.show_margin_stripes)
+        if self.show_margin_stripes:
+            self._apply_coding_margin_width()
 
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
@@ -1245,6 +1123,22 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is not None and self.ui.plainTextEdit.toPlainText() != "":
             self.unlight()
             self.highlight()
+
+    def apply_highlight_style_setting(self, style: str | None = None):
+        """Apply the saved highlight style without relying on translated UI text."""
+
+        if style is None:
+            style = self.app.settings.get('codetext_highlight_style', 'marker')
+        if style not in ('marker', 'underline'):
+            style = 'marker'
+        self._set_highlight_style(style)
+
+    def _code_label_contrast_color(self, color) -> QColor:
+        """Return the contrast-adjusted code color used for labels and underlines."""
+
+        background_color = self.ui.plainTextEdit.viewport().palette().color(
+            QtGui.QPalette.ColorRole.Base)
+        return CodingMargin._label_color_for_background(QColor(color), background_color)
 
     def show_right_side_pane(self):
         """ Toggle visibility of the right side pane (groupBox_info).
@@ -1296,6 +1190,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['docfont'] = font
         doc_font = f'font: {size}pt "{font}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self._sync_coding_margin_background()
         tt = _("Select document font and size.") + "\n"
         tt += f"{size} {font}"
         self.ui.pushButton_font.setToolTip(tt)
@@ -1402,16 +1297,21 @@ class DialogCodeText(QtWidgets.QWidget):
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
 
-    def get_files(self, ids=None, sort="name asc"):
+    def get_files(self, ids=None, sort="name asc", preserve_current_file: bool = False):
         """ Get files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
          Args:
             ids : list, fill with ids to limit file selection.
             sort : String Sort options, name asc, name, desc, case asc, case desc
+            preserve_current_file: Reload the currently displayed file after rebuilding
+                the list when it is still present in the filtered result set.
          """
 
         if ids is None:
             ids = []
+        preserved_file = deepcopy(self.file_) if preserve_current_file and self.file_ is not None else None
+        selection_model = self.ui.listWidget.selectionModel()
+        selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
         self.ui.listWidget.clear()
         self.files = self.app.get_text_filenames(ids)
         # Fill additional details about each file in the memo
@@ -1472,9 +1372,22 @@ class DialogCodeText(QtWidgets.QWidget):
             item = QtWidgets.QListWidgetItem(file_['name'])
             item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
-        self.file_ = None
-        self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
-        self.ui.plainTextEdit.setPlainText("")
+        restored = False
+        if preserved_file is not None:
+            for file_ in self.files:
+                if file_['id'] != preserved_file['id']:
+                    continue
+                for key in ("start", "end", "start_line"):
+                    if key in preserved_file:
+                        file_[key] = preserved_file[key]
+                self.load_file(file_)
+                restored = True
+                break
+        if not restored:
+            self.file_ = None
+            self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
+            self.ui.plainTextEdit.setPlainText("")
+        del selection_blocker
 
     def update_file_tooltip(self):
         """ Create tooltip for file containing characters, codings and from: to: if partially loaded.
@@ -1504,42 +1417,73 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         items[0].setToolTip(tt)
 
-    def get_files_from_attributes(self):
+    def get_files_from_attributes(self, refresh_only: bool = False):
         """ Select files based on attribute selections.
         Attribute results are a dictionary of:
         first item is a Boolean AND or OR list item
         Followed by each attribute list item
+
+        Args:
+            refresh_only: Recompute an already active attribute filter without reopening
+                the selection dialog.
         """
+
+        if refresh_only and len(self.attributes) <= 1:
+            return
 
         # Clear ui
         self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
         ui = DialogSelectAttributeParameters(self.app)
-        ui.fill_parameters(self.attributes)
+        previous_attributes = deepcopy(self.attributes)
+        ui.fill_parameters(deepcopy(self.attributes))
         temp_attributes = deepcopy(self.attributes)
-        self.attributes = []
-        ok = ui.exec()
-        if not ok:
-            self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
-            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
-            if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(
-                    qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
-            return
+        if refresh_only:
+            ui.make_parameter_list()
+            ui.get_results_case_ids()
+            ui.get_results_file_ids()
+            ui.get_results_message()
+        else:
+            self.attributes = []
+            ok = ui.exec()
+            if not ok:
+                self.attributes = temp_attributes
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+                if self.attributes:
+                    self.ui.pushButton_file_attributes.setIcon(
+                        qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
+            if refresh_only and len(previous_attributes) > 1:
+                self.clear_file_filter()
+                return
             self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
-            self.get_files()
+            self.get_files(preserve_current_file=True)
             return
         if not ui.result_file_ids:
-            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
-            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if not refresh_only:
+                Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+                return
+            selection_model = self.ui.listWidget.selectionModel()
+            selection_blocker = QtCore.QSignalBlocker(selection_model) if selection_model is not None else None
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
+            self.ui.listWidget.clear()
+            self.files = []
+            self.file_ = None
+            self.code_text = []
+            self.ui.plainTextEdit.setPlainText("")
+            self.ui.pushButton_clear_filter_file.setVisible(True)
+            self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
+            del selection_blocker
             return
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
-        self.get_files(ui.result_file_ids)
+        self.get_files(ui.result_file_ids, preserve_current_file=True)
         self.ui.pushButton_clear_filter_file.setVisible(True)
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
 
@@ -1605,135 +1549,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
 
-    def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes.
-        The Count column counts the number of times that code has been used by selected coder in selected file.
-        Keep record of non-expanded items, then re-enact these items when treee fill is called again. """
-
-        cats = deepcopy(self.categories)
-        codes = deepcopy(self.codes)
-        self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(4)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
-        if not self.app.settings['showids']:
-            self.ui.treeWidget.setColumnHidden(1, True)
-        else:
-            self.ui.treeWidget.setColumnHidden(1, False)
-
-        # Add top level categories
-        remove_list = []
-        for c in cats:
-            if c['supercatid'] is None:
-                memo = ""
-                if c['memo'] != "":
-                    memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(2, c['memo'])
-                top_item.setToolTip(0, '')
-                if len(c['name']) > 52:
-                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                    top_item.setToolTip(0, c['name'])
-                self.ui.treeWidget.addTopLevelItem(top_item)
-                if f"catid:{c['catid']}" in self.app.collapsed_categories:
-                    top_item.setExpanded(False)
-                else:
-                    top_item.setExpanded(True)
-                remove_list.append(c)
-        for item in remove_list:
-            cats.remove(item)
-        ''' Add child categories. look at each unmatched category, iterate through tree
-         to add as child, then remove matched categories from the list '''
-        count = 0
-        while len(cats) > 0 and count < 10000:
-            remove_list = []
-            for c in cats:
-                it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-                item = it.value()
-                count2 = 0
-                while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == f"catid:{c['supercatid']}":
-                        memo = ""
-                        if c['memo'] != "":
-                            memo = _("Memo")
-                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                        child.setToolTip(2, c['memo'])
-                        child.setToolTip(0, '')
-                        if len(c['name']) > 52:
-                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                            child.setToolTip(0, c['name'])
-                        item.addChild(child)
-                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
-                            child.setExpanded(False)
-                        else:
-                            child.setExpanded(True)
-                        remove_list.append(c)
-                    it += 1
-                    item = it.value()
-                    count2 += 1
-            for item in remove_list:
-                cats.remove(item)
-            count += 1
-        # Add unlinked codes as top level items
-        remove_items = []
-        for c in codes:
-            if c['catid'] is None:
-                memo = ""
-                if c['memo'] != "":
-                    memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
-                top_item.setToolTip(2, c['memo'])
-                top_item.setToolTip(0, c['name'])
-                if len(c['name']) > 52:
-                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                    top_item.setToolTip(0, c['name'])
-                top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
-                color = TextColor(c['color']).recommendation
-                top_item.setForeground(0, QBrush(QColor(color)))
-                top_item.setFlags(
-                    Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
-                    Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
-                self.ui.treeWidget.addTopLevelItem(top_item)
-                remove_items.append(c)
-        for item in remove_items:
-            codes.remove(item)
-        # Add codes as children
-        for c in codes:
-            it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-            item = it.value()
-            count = 0
-            while item and count < 10000:
-                if item.text(1) == f"catid:{c['catid']}":
-                    memo = ""
-                    if c['memo'] != "":
-                        memo = _("Memo")
-                    child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
-                    child.setToolTip(2, c['memo'])
-                    child.setToolTip(0, c['name'])
-                    if len(c['name']) > 52:
-                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                        child.setToolTip(0, c['name'])
-                    child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
-                    color = TextColor(c['color']).recommendation
-                    child.setForeground(0, QBrush(QColor(color)))
-                    child.setFlags(
-                        Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
-                        Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
-                    item.addChild(child)
-                    c['catid'] = -1  # Make unmatchable
-                it += 1
-                item = it.value()
-                count += 1
-        # self.ui.treeWidget.expandAll()
-        if self.tree_sort_option == "all asc":
-            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        if self.tree_sort_option == "all desc":
-            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
-        self.fill_code_counts_in_tree()
-        restore_persistent_tree_widths(
-            self.ui.treeWidget,
-            default_width_factors={0: 0.70, 2: 0.15, 3: 0.15}
-        )
-
     def fill_code_counts_in_tree(self):
         """ Calculate the frequency of each code and category for this coder and the selected file.
         Add a list item to each code that can be used to display in treeWidget.
@@ -1767,20 +1582,65 @@ class DialogCodeText(QtWidgets.QWidget):
             cur.execute(sql, parameters)
             result = cur.fetchone()
             code_counts.append([c['cid'], result[0], result[1]])
+
+        # Sub-code roll-up. Build own counts, the parent/children maps and an effective
+        # category for each code (a sub-code is attributed to its top ancestor's category). <- L
+        own_count = {cc[0]: cc[2] for cc in code_counts}
+        code_by_cid = {c['cid']: c for c in self.codes}
+        children_of = {}
+        for c in self.codes:
+            sup = c.get('supercid')
+            if sup is not None:
+                children_of.setdefault(sup, []).append(c['cid'])
+
+        def _effective_catid(cid):
+            """ Resolve a (possibly nested) code to the catid of its top ancestor code. <- L """
+            seen = set()
+            cur_c = code_by_cid.get(cid)
+            while cur_c is not None and cur_c['cid'] not in seen:
+                seen.add(cur_c['cid'])
+                if cur_c['catid'] is not None:
+                    return cur_c['catid']
+                sup_ = cur_c.get('supercid')
+                if sup_ is None:
+                    return None
+                cur_c = code_by_cid.get(sup_)
+            return None
+
+        eff_catid = {cc[0]: _effective_catid(cc[0]) for cc in code_counts}
+        total_cache = {}
+
+        def _code_total(cid_):
+            """ Code count rolled up with all descendant sub-codes. Memoized, cycle-safe.
+            Args:
+                cid_ : Integer
+            """
+            if cid_ in total_cache:
+                return total_cache[cid_]
+            total_cache[cid_] = own_count.get(cid_, 0)  # Seed guards against cycles
+            total_count = own_count.get(cid_, 0)
+            for child_cid in children_of.get(cid_, []):
+                total_count += _code_total(child_cid)
+            total_cache[cid_] = total_count
+            return total_count
+
         categories = deepcopy(self.categories)
         # Set up category counts
         for category in categories:
             category['count'] = 0
-        # Add the number of codes directly under each category to the category
+        # Add each code's own count to its effective category (sub-codes roll up to the
+        # category of their top ancestor code, not to a raw catid that is None). <- L
         for category in categories:
             for code in code_counts:
-                if code[1] == category['catid']:
+                if eff_catid.get(code[0]) == category['catid']:
                     category['count'] += code[2]
         # Find leaf categories, add to above categories, and gradually remove leaves
         # until only top categories are left
         sub_categories = copy(categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 10000:
+        # 'and', not 'or': with 'or' the 10,000 guard never fires (cycle in code_cat =
+        # infinite loop) and healthy data still spins 10,000 empty passes.
+        while len(sub_categories) > 0 and counter < 10000:
             leaf_list = []
             branch_list = []
             for cat in sub_categories:
@@ -1809,17 +1669,19 @@ class DialogCodeText(QtWidgets.QWidget):
                         item.setText(3, str(category['count']))
             else:
                 cid = int(item.text(1)[4:])
-                for code in code_counts:
-                    if cid == code[0]:
-                        item.setText(3, str(code[2]))
-                        break
+                own_n = own_count.get(cid, 0)
+                if cid in children_of:
+                    total_n = _code_total(cid)
+                    item.setText(3, f"{own_n} ({total_n})" if total_n != own_n else str(own_n))
+                else:
+                    item.setText(3, str(own_n))
             iterator += 1  # Move to the next item
 
     def tree_item_clicked(self, item, column):
         """ Use to quicky open memo. """
 
         if column == 2:
-            self.add_edit_cat_or_code_memo(item)
+            self.code_tree.add_edit_cat_or_code_memo(item)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.
@@ -1918,10 +1780,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
-        if self.search_type == 3 and len(self.search_term) < 3:
+        if self.search_threshold == 3 and len(self.search_term) < 3:
             self.ui.label_search_totals.setText("")
             return
-        if self.search_type == 5 and len(self.search_term) < 5:
+        if self.search_threshold == 5 and len(self.search_term) < 5:
             self.ui.label_search_totals.setText("")
             return
         self.ui.label_search_totals.setText("0 / 0")
@@ -1966,6 +1828,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None or self.search_indices == []:
             return
+        self.search_term = self.ui.lineEdit_search.text()
+        if self.search_threshold == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
+        if self.search_threshold == 5 and len(self.search_term) < 5:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
         self.search_index += 1
         if self.search_index >= len(self.search_indices):
             self.search_index = 0
@@ -1995,6 +1868,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None or self.search_indices == []:
             return
+        self.search_term = self.ui.lineEdit_search.text()
+        if self.search_threshold == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
+        if self.search_threshold == 5 and len(self.search_term) < 5:
+            self.ui.label_search_totals.setText("")
+            self.search_indices = []
+            self.search_index = 0
+            return
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
@@ -2019,19 +1903,19 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_char3 = QtGui.QAction(_("Automatic search 3 or more characters"))
         action_char5 = QtGui.QAction(_("Automatic search 5 or more characters"))
-        if self.search_type != 3:
+        if self.search_threshold != 3:
             menu.addAction(action_char3)
-        if self.search_type != 5:
+        if self.search_threshold != 5:
             menu.addAction(action_char5)
         action = menu.exec(self.ui.lineEdit_search.mapToGlobal(position))
         if action is None:
             return
         if action == action_char3:
-            self.search_type = 3
+            self.search_threshold = 3
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             return
         if action == action_char5:
-            self.search_type = 5
+            self.search_threshold = 5
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             return
 
@@ -2222,15 +2106,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected_text != "":
             submenu_ai_text_analysis = menu.addMenu(_("AI Text Analysis"))
             submenu_ai_text_analysis.setToolTipsVisible(True)
-            if self.app.ai is not None and self.app.ai.is_ready():
+            if self._ai_menu_options_enabled():
                 submenu_ai_text_analysis.setEnabled(True)
-                prompts_list = PromptsList(self.app, 'text_analysis')
-                for prompt in prompts_list.prompts:
-                    ac = submenu_ai_text_analysis.addAction(prompt.name_and_scope())
-                    ac.setToolTip(prompt.description)
-                    ac.setProperty('submenu', 'ai_text_analysis')
-                    ac.setData(prompt)
-                submenu_ai_text_analysis.addSeparator()
+                prompts_catalog = AiAgentPromptsCatalog(self.app)
+                prompt_records = prompts_catalog.list_visible_prompt_variants(prompt_type='text_analysis')
+                self._populate_text_analysis_prompt_menu(submenu_ai_text_analysis, prompts_catalog, prompt_records)
+                if len(prompt_records) > 0:
+                    submenu_ai_text_analysis.addSeparator()
                 ac = submenu_ai_text_analysis.addAction(_('Edit text analysis prompts'))
                 ac.setProperty('submenu', 'ai_text_analysis_prompts')
             else:
@@ -2311,8 +2193,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                                           action.data())
             return
         if action.property('submenu') == 'ai_text_analysis_prompts':
-            ui = DialogAiEditPrompts(self.app, 'text_analysis')
-            ui.exec()
+            DialogAiEditPrompts(self.app, 'text_analysis').exec()
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
@@ -2331,9 +2212,9 @@ class DialogCodeText(QtWidgets.QWidget):
             catid = int(tree_item.text(1)[6:])
         codes_copy = deepcopy(self.codes)
         if not in_vivo:
-            self.add_code(catid)
+            self.code_tree.add_code(catid)
         else:
-            self.add_code(catid, code_name=self.ui.plainTextEdit.textCursor().selectedText())
+            self.code_tree.add_code(catid, code_name=self.ui.plainTextEdit.textCursor().selectedText())
         new_code = None
         for c in self.codes:
             if c not in codes_copy:
@@ -2639,345 +2520,14 @@ class DialogCodeText(QtWidgets.QWidget):
             # Add reference, if any
             cur = self.app.conn.cursor()
             cur.execute("select risid from source where source.id=?", [self.file_['id']])
-            print(self.file_['id'])
             ris_res = cur.fetchone()
-            print("ris_res", ris_res)
-            if ris_res[0]:
+            if ris_res and ris_res[0]:
                 ris = Ris(self.app)
                 ris.get_references(ris_res[0])
                 if ris.refs:
                     text += "\n" + _("Reference: ") + ris.refs[0]['apa']
         cb = QtWidgets.QApplication.clipboard()
         cb.setText(text)
-
-    def tree_menu(self, position):
-        """ Context menu for treewidget code/category items.
-        Add, rename, memo, move or delete code or category. Change code color.
-        Assign selected text to current hovered code. """
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
-        selected = self.ui.treeWidget.currentItem()
-        action_add_code_to_category = None
-        action_add_category_to_category = None
-        action_expand_collapse = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_add_code_to_category = menu.addAction(_("Add new code to category"))
-            action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-        action_add_code = menu.addAction(_("Add a new code"))
-        action_add_category = menu.addAction(_("Add a new category"))
-        action_cat_show_coded_files = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
-            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
-        modify_menu = menu.addMenu(_("Modify"))
-        action_rename = modify_menu.addAction(_("Rename F2"))
-        action_edit_memo = modify_menu.addAction(_("View or edit memo"))
-        action_merge_category = None
-        action_move_category = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_merge_category = modify_menu.addAction(_("Merge category into category"))
-            action_move_category = modify_menu.addAction(_("Move category under category"))
-        action_delete = modify_menu.addAction(_("Delete"))
-        action_color = None
-        action_show_coded_media = None
-        action_move_code = None
-        action_move_multi_codes = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = modify_menu.addAction(_("Change code color"))
-            action_show_coded_media = menu.addAction(_("Show coded files"))
-            action_move_code = modify_menu.addAction(_("Move code to"))
-            action_move_multi_codes = modify_menu.addAction(_("Move multiple codes"))
-        filter_menu = menu.addMenu(_("Filter"))
-        action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
-        action_show_codes_colour = filter_menu.addAction(_("Show codes of colour") + f": {self.show_codes_colour_filter}")
-        sort_menu = menu.addMenu(_("Sort"))
-        action_all_asc = sort_menu.addAction(_("Sort ascending"))
-        action_all_desc = sort_menu.addAction(_("Sort descending"))
-        action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
-
-        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
-        if action is not None:
-            if action == action_all_asc:
-                self.tree_sort_option = "all asc"
-                self.fill_tree()
-                return
-            if action == action_all_desc:
-                self.tree_sort_option = "all desc"
-                self.fill_tree()
-                return
-            if action == action_cat_then_code_asc:
-                self.tree_sort_option = "cat and code asc"
-                self.fill_tree()
-                return
-            if action == action_show_codes_like:
-                self.show_codes_like()
-                return
-            if action == action_show_codes_colour:
-                self.show_codes_of_color()
-                return
-            if selected is not None and action == action_color:
-                self.change_code_color(selected)
-            if action == action_add_category:
-                self.add_category()
-                return
-            if action == action_add_code:
-                self.add_code()
-                return
-            if action == action_merge_category:
-                catid = int(selected.text(1).split(":")[1])
-                self.merge_category(catid)
-                return
-            if action == action_move_category:
-                catid = int(selected.text(1).split(":")[1])
-                self.move_category(catid)
-                return
-            if action == action_add_code_to_category:
-                catid = int(selected.text(1).split(":")[1])
-                self.add_code(catid)
-                return
-            if action == action_add_category_to_category:
-                catid = int(selected.text(1).split(":")[1])
-                self.add_category(catid)
-                return
-            if selected is not None and action == action_move_code:
-                self.move_code(selected)
-                return
-            if action == action_move_multi_codes:
-                self.move_multiple_codes()
-                return
-            if action == action_expand_collapse:
-                expand_toggle = not selected.isExpanded()
-                self.recursive_expand_collapse_branch(selected, expand_toggle)
-                return
-            if selected is not None and action == action_rename:
-                self.rename_category_or_code(selected)
-            if selected is not None and action == action_edit_memo:
-                self.add_edit_cat_or_code_memo(selected)
-            if selected is not None and action == action_delete:
-                self.delete_category_or_code(selected)
-            if action == action_cat_show_coded_files:
-                branch_codes = self.recursive_get_branch_codes(selected, [])
-                DialogCodeInAllFiles(self.app, branch_codes, "File", selected.text(0))
-                self.get_coded_text_update_eventfilter_tooltips()
-                return
-            if selected is not None and action == action_show_coded_media:
-                to_find = int(selected.text(1)[4:])
-                found = next((code for code in self.codes if code['cid'] == to_find), None)
-                if found:
-                    DialogCodeInAllFiles(self.app, found)
-                    self.get_coded_text_update_eventfilter_tooltips()
-
-    def recursive_get_branch_codes(self, item, branch_codes):
-        """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories.
-        Args:
-            item: QTreeWidgetItem
-            branch_codes: List of code dictionaries
-        """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cid":
-                cid = int(item.child(i).text(1)[4:])
-                for code_ in self.codes:
-                    if cid == code_['cid']:
-                        branch_codes.append(code_)
-                        break
-            if item.child(i).text(1)[0:3] == "cat":
-                self.recursive_get_branch_codes(item.child(i), branch_codes)
-        return branch_codes
-
-    def recursive_expand_collapse_branch(self, item, expand_toggle: bool):
-        """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories.
-        Args:
-            item: QTreeWidgetItem
-            expand_toggle: boolean
-        """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            item.setExpanded(expand_toggle)
-            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
-
-    def recursive_non_merge_item(self, item, no_merge_list):
-        """ Find matching item to be the current selected item.
-        Recurse through any child categories.
-        Tried to use QTreeWidget.finditems - but this did not find matching item text
-        Called by: textEdit recent codes menu option
-        Required for: merge_category()
-        Args:
-            item : QTreeWidgetItem
-            no_merge_list : List of child Category ids (as Strings)
-        """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cat":
-                no_merge_list.append(item.child(i).text(1)[6:])
-            self.recursive_non_merge_item(item.child(i), no_merge_list)
-        return no_merge_list
-
-    def move_category(self, catid: int):
-        """ Select another category to move this category underneath.
-        Args:
-            catid : Integer category identifier
-        """
-
-        do_not_merge_list = []
-        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
-        do_not_merge_list.append(str(catid))
-        do_not_merge_ids_string = f"({','.join(do_not_merge_list)})"
-        sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += do_not_merge_ids_string + " order by name"
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        current_cat_name = self.ui.treeWidget.currentItem().text(0)
-        if category['name'] == '':
-            cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
-        else:
-            cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
-        self.update_dialog_codes_and_categories()
-
-    def merge_category(self, catid: int):
-        """ Select another category to merge this category into.
-        Args:
-            catid : Integer category identifier
-        """
-
-        do_not_merge_list = []
-        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
-        do_not_merge_list.append(str(catid))
-        do_not_merge_ids_string = "(" + ",".join(do_not_merge_list) + ")"
-        sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += do_not_merge_ids_string + " order by name"
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        try:
-            # Always record merge info in target category memo  <- L
-            source_cat = None
-            for c in self.categories:
-                if c['catid'] == catid:
-                    source_cat = c
-                    break
-            if source_cat is not None and category['catid'] is not None:
-                target_cat = None
-                for c in self.categories:
-                    if c['catid'] == category['catid']:
-                        target_cat = c
-                        break
-                if target_cat is not None:
-                    merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-                    source_memo = (source_cat.get('memo', '') or '').strip()
-                    source_owner = source_cat.get('owner', self.app.settings['codername'])
-                    merged_block = f"\n\n[{_('Merged from category:')} {source_cat['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"  
-                    if source_memo:
-                        merged_block += f"\n{source_memo}"
-                    target_memo = target_cat.get('memo', '') or ''
-                    new_memo = (target_memo + merged_block).strip()
-                    cur.execute("update code_cat set memo=? where catid=?", [new_memo, category['catid']])
-                    target_cat['memo'] = new_memo 
-            for code in self.codes:
-                if code['catid'] == catid:
-                    cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
-            cur.execute("delete from code_cat where catid=?", [catid])
-            for cat in self.categories:
-                if cat['supercatid'] == catid:
-                    cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
-            # Clear any orphan supercatids
-            sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
-            cur.execute(sql)
-            orphans = cur.fetchall()
-            sql = "update code_cat set supercatid=Null where supercatid=?"
-            for orphan in orphans:
-                cur.execute(sql, [orphan[0]])
-            self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
-            self.app.conn.rollback()  # Revert all changes
-            self.update_dialog_codes_and_categories()
-            raise
-        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
-
-    def move_multiple_codes(self):
-        """ Move multiple codes to another category. """
-
-        cur = self.app.conn.cursor()
-        cur.execute("select code_name.name, code_cat.name, cid from code_name left join code_cat on "
-                    "code_cat.catid=code_name.catid order by upper(code_cat.name) asc, upper(code_name.name) asc")
-        res = cur.fetchall()
-        code_list = []
-        for r in res:
-            name = r[0]
-            if r[1] is not None:
-                name = r[1] + " ← " + r[0]
-            code_list.append({'name': name, 'cid': r[2]})
-        ui = DialogSelectItems(self.app, code_list, _("Select codes"), "multi")
-        ok = ui.exec()
-        if not ok:
-            return
-        selected_codes = ui.get_selected()
-        cur.execute("select name, catid from code_cat order by upper(name)")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        for s in selected_codes:
-            cur.execute("update code_name set catid=? where cid=?", [category['catid'], s['cid']])
-            self.app.conn.commit()
-            self.parent_textEdit.append(_("Code moved.") + s['name'].replace(" ← ", "/") + " → " + category['name'])
-        self.update_dialog_codes_and_categories(["code_name"])
-
-    def move_code(self, selected):
-        """ Move code to another category or to no category.
-        Uses a list selection.
-        Args:
-            selected : QTreeWidgetItem
-         """
-
-        cid = int(selected.text(1)[4:])
-        cur = self.app.conn.cursor()
-        cur.execute("select name, catid from code_cat order by name")
-        res = cur.fetchall()
-        category_list = [{'name': "", 'catid': None}]
-        for r in res:
-            category_list.append({'name': r[0], 'catid': r[1]})
-        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        category = ui.get_selected()
-        cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories(["code_name"])
 
     def show_memos(self):
         """ Show all memos for coded text in dialog. """
@@ -3146,7 +2696,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def recursive_traverse(self, item, text_: str = "", case_sensitive: bool = False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
-        Recurse through all child categories.
+        Recurse through all child categories and sub-codes. A code stays visible if it matches or
+        if any of its descendant sub-codes matches, so a match is never hidden under a
+        non-matching parent code. Returns True if this item or any descendant matches. <- L
         Called by: show_codes_like
         Args:
             item: a QTreeWidgetItem
@@ -3155,21 +2707,32 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         child_count = item.childCount()
+        any_visible_descendant = False
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(text_) > 0:
-                cid = int(item.child(i).text(1)[4:])
-                for c in self.codes:
-                    if cid == c['cid']:
-                        if case_sensitive:  # case sensitive: exact match <- L
-                            if text_ not in c['name']:
-                                item.child(i).setHidden(True)
-                        else:  # case insensitive: compare lowercase
-                            if text_.lower() not in c['name'].lower():
-                                item.child(i).setHidden(True)
-                        break
-            if "cid:" in item.child(i).text(1) and text_ == "":
-                item.child(i).setHidden(False)
-            self.recursive_traverse(item.child(i), text_, case_sensitive)  # propagate case_sensitive to child nodes <- L
+            child = item.child(i)
+            is_code = "cid:" in child.text(1)
+            # Recurse first so we know whether any descendant matches. <- L
+            descendant_match = self.recursive_traverse(child, text_, case_sensitive)
+            if text_ == "":
+                if is_code:
+                    child.setHidden(False)
+                any_visible_descendant = True
+                continue
+            self_match = False
+            if is_code:
+                cid = int(child.text(1)[4:])
+                c = next((cc for cc in self.codes if cc['cid'] == cid), None)
+                if c is not None:
+                    if case_sensitive:
+                        self_match = text_ in c['name']
+                    else:
+                        self_match = text_.lower() in c['name'].lower()
+            visible = self_match or descendant_match
+            if is_code:
+                child.setHidden(not visible)
+            if visible:
+                any_visible_descendant = True
+        return any_visible_descendant
 
     def keyPressEvent(self, event):
         """
@@ -3196,7 +2759,12 @@ class DialogCodeText(QtWidgets.QWidget):
         ! Display Clicked character position
         ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
-        F2 Rename code or category
+        Code Tree:
+            F2 Rename code or category
+            F3 Code / Cat Memo
+            F4 Delete
+            F5 Change Colour
+            F6 Move under
         """
 
         key = event.key()
@@ -3259,11 +2827,11 @@ class DialogCodeText(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
-        # Rename code or category
-        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
-            selected = self.ui.treeWidget.currentItem()
-            self.rename_category_or_code(selected)
-            return
+        # Tree widget menu item keys F2 - F6, handled by the shared controller. <- L
+        if self.ui.treeWidget.hasFocus():
+            if self.code_tree.handle_key_press(event):
+                return
+
         if not self.ui.plainTextEdit.hasFocus():
             return
         # Ignore all other key events if edit mode is active
@@ -3308,7 +2876,7 @@ class DialogCodeText(QtWidgets.QWidget):
             selected = self.ui.treeWidget.currentItem()
             if selected is not None and selected.text(1)[0:3] == 'cat':
                 supercatid = int(selected.text(1)[6:])
-            self.add_category(supercatid)
+            self.code_tree.add_category(supercatid)
             return
         # Hide unHide top groupbox
         if key == QtCore.Qt.Key.Key_H:
@@ -3542,7 +3110,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def _export_project_header(self):
         """ Return project name and APA software citation string for export. """  
 
-        project_name = os.path.basename(self.app.project_path).replace(".qda", "")  
+        project_name = Path(self.app.projectpath).stem
         header = f"{_('Project')}: {project_name}"
         apa_cite = ("Curtain, C., & Dröge, K. (2026). QualCoder (Version 4.0) "  
                     "[Computer software]. https://github.com/ccbogel/QualCoder/releases/")
@@ -4156,7 +3724,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Ctrl E Enter and exit Edit Mode
         """
 
-        # request a margin redraw on editor resize so stripes follow text reflow <- L
+        # Request a margin redraw on editor resize so stripes follow text reflow <- L
         if object_ is self.ui.plainTextEdit and event.type() == QtCore.QEvent.Type.Resize:
             if hasattr(self, 'coding_margin') and self.coding_margin is not None:
                 self.coding_margin.update()
@@ -4169,12 +3737,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 item = self.ui.treeWidget.currentItem()
                 # event position is QPointF, itemAt requires toPoint
                 parent = self.ui.treeWidget.itemAt(event.position().toPoint())
-                self.item_moved_update_data(item, parent)
+                self.code_tree.item_moved_update_data(item, parent)
                 return True
             # Scroll the tree when dragged item it as top or bottom edges
             if event.type() == QtCore.QEvent.Type.DragMove:
                 vsb = self.ui.treeWidget.verticalScrollBar()
-                item = self.ui.treeWidget.currentItem()
+                item = self.ui.treeWidget.currentItem()  # Not used
                 top = self.ui.treeWidget.visualRect(self.ui.treeWidget.indexAt(self.ui.treeWidget.rect().topLeft())).bottom()
                 bottom = self.ui.treeWidget.viewport().height()
                 y = event.position().toPoint().y()
@@ -4488,184 +4056,38 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def item_moved_update_data(self, item, parent):
-        """ Called from drop event in treeWidget view port.
-        identify code or category to move.
-        Also merge codes if one code is dropped on another code.
+    def coded_media_dialog(self, code_or_codes, title=""):
+        """ Show all coded files for a code, or for a list of branch codes.
+        Called from the shared code tree controller. <- L
         Args:
-            item : QTreeWidgetItem
-            parent : QTreeWidgetItem
+            code_or_codes: Dictionary of one code, or List of code dictionaries for a category branch
+            title: String, category name when showing a branch
         """
+        if isinstance(code_or_codes, list):
+            DialogCodeInAllFiles(self.app, code_or_codes, "File", title)
+        else:
+            DialogCodeInAllFiles(self.app, code_or_codes)
+        self.get_coded_text_update_eventfilter_tooltips()
 
-        # Find the category in the list
-        if item.text(1)[0:3] == 'cat':
-            found = -1
-            for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(item.text(1)[6:]):
-                    found = i
-            if found == -1:
-                return
-            if parent is None:
-                self.categories[found]['supercatid'] = None
-            else:
-                if parent.text(1).split(':')[0] == 'cid':
-                    # Parent is code (leaf) cannot add child
-                    return
-                supercatid = int(parent.text(1).split(':')[1])
-                if supercatid == self.categories[found]['catid']:
-                    # Something went wrong
-                    return
-                self.categories[found]['supercatid'] = supercatid
-            cur = self.app.conn.cursor()
-            cur.execute("update code_cat set supercatid=? where catid=?",
-                        [self.categories[found]['supercatid'], self.categories[found]['catid']])
-            self.app.conn.commit()
-            self.update_dialog_codes_and_categories(["code_cat"])
-            self.app.delete_backup = False
-            return
-
-        # find the code in the list
-        if item.text(1)[0:3] == 'cid':
-            found = -1
-            for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(item.text(1)[4:]):
-                    found = i
-            if found == -1:
-                return
-            if parent is None:
-                self.codes[found]['catid'] = None
-            else:
-                if parent.text(1).split(':')[0] == 'cid':
-                    # Parent is code (leaf) cannot add child, but can merge
-                    self.merge_codes(self.codes[found], parent)
-                    return
-                catid = int(parent.text(1).split(':')[1])
-                self.codes[found]['catid'] = catid
-
-            cur = self.app.conn.cursor()
-            cur.execute("update code_name set catid=? where cid=?",
-                        [self.codes[found]['catid'], self.codes[found]['cid']])
-            self.app.conn.commit()
-            self.app.delete_backup = False
-            self.update_dialog_codes_and_categories(["code_name"])
-
-    def merge_codes(self, item, parent):
-        """ Merge code with another code.
-        Called by item_moved_update_data when a code is moved onto another code.
-        code text unique(cid,fid,pos0,pos1, owner)
+    def remove_deleted_codes_from_recent(self, cids):
+        """ Drop deleted codes from the recent codes list. Called from the
+        shared code tree controller after code or branch deletion. <- L
         Args:
-            item : Dictionary code item
-            parent : QTreeWidgetItem
+            cids: List of Integer code ids
         """
+        self.recent_codes = [c for c in self.recent_codes if c['cid'] not in cids]
 
-        # Check item dropped on itself, an error can occur on Ubuntu 22.04.
-        if item['name'] == parent.text(0):
-            return
-        msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">'
-        msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
-        reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
-                                               msg, QtWidgets.QMessageBox.StandardButton.Yes,
-                                               QtWidgets.QMessageBox.StandardButton.No)
-        if reply == QtWidgets.QMessageBox.StandardButton.No:
-            return
-        cur = self.app.conn.cursor()
-        old_cid = item['cid']
-        new_cid = int(parent.text(1).split(':')[1])
-        # Always record merge info in target code memo  <- L
-        target_code = None
-        for c in self.codes:
-            if c['cid'] == new_cid:
-                target_code = c
+    def rename_code_in_recent(self, old_name, new_name):
+        """ Rename a code inside the recent codes list. Called from the
+        shared code tree controller after a code rename. <- L
+        Args:
+            old_name: String
+            new_name: String
+        """
+        for item in self.recent_codes:
+            if item['name'] == old_name:
+                item['name'] = new_name
                 break
-        if target_code is not None:
-            merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-            source_memo = item.get('memo', '').strip()
-            source_owner = item.get('owner', self.app.settings['codername'])
-            merged_block = f"\n\n[{_('Merged from code:')} {item['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"  
-            if source_memo:
-                merged_block += f"\n{source_memo}"
-            target_memo = target_code.get('memo', '') or ''
-            new_memo = (target_memo + merged_block).strip()
-            cur.execute("update code_name set memo=? where cid=?", [new_memo, new_cid])
-            target_code['memo'] = new_memo
-        # Update cid for each coded segment in text, av, image. Delete where there is an Integrity error
-        ct_sql = "select ctid from code_text where cid=?"
-        cur.execute(ct_sql, [old_cid])
-        ct_res = cur.fetchall()
-        try:
-            for ct in ct_res:
-                try:
-                    cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
-                except sqlite3.IntegrityError:
-                    cur.execute("delete from code_text where ctid=?", [ct[0]])
-            av_sql = "select avid from code_av where cid=?"
-            cur.execute(av_sql, [old_cid])
-            av_res = cur.fetchall()
-            for av in av_res:
-                try:
-                    cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
-                except sqlite3.IntegrityError:
-                    cur.execute("delete from code_av where avid=?", [av[0]])
-            img_sql = "select imid from code_image where cid=?"
-            cur.execute(img_sql, [old_cid])
-            img_res = cur.fetchall()
-            for img in img_res:
-                try:
-                    cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
-                except sqlite3.IntegrityError:
-                    cur.execute("delete from code_image where imid=?", [img[0]])
-            cur.execute("delete from code_name where cid=?", [old_cid, ])
-            self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
-            self.app.conn.rollback()  # Revert all changes
-            raise
-        self.app.delete_backup = False
-        msg = msg.replace("\n", " ")
-        self.parent_textEdit.append(msg)
-        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
-        self.get_coded_text_update_eventfilter_tooltips()
-
-    def add_code(self, catid:int|None=None, code_name:str=""):
-        """ Use add_item dialog to get new code text. Add_code_name dialog checks for
-        duplicate code name. A random color is selected for the code, or a color has been pre-set by the user.
-        New code is added to data and database.
-        Args:
-            catid : None to add code without category, catid Integer to add to category.
-            code_name : String : Used for 'in vivo' coding where name is preset by in vivo text selection.
-        Returns:
-            True  - new code added, False - code exists or could not be added
-        """
-
-        if code_name == "":
-            ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
-            ui.exec()
-            code_name = ui.get_new_name()
-            if code_name is None:
-                return False
-        code_color = colors[randint(0, len(colors) - 1)]
-        if self.default_new_code_color:
-            code_color = self.default_new_code_color
-        item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
-                'color': code_color}
-        cur = self.app.conn.cursor()
-        try:
-            cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                        (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
-            self.app.conn.commit()
-            self.app.delete_backup = False
-            cur.execute("select last_insert_rowid()")
-            cid = cur.fetchone()[0]
-            item['cid'] = cid
-            self.parent_textEdit.append(_("New code: ") + item['name'])
-        except sqlite3.IntegrityError:
-            # Can occur with in vivo coding
-            print("in vivo coding. Code already exists")
-            return False
-        self.update_dialog_codes_and_categories(["code_name"])
-        self.get_coded_text_update_eventfilter_tooltips()
-        return True
 
     def update_dialog_codes_and_categories(self, tables: list[str]|None = None):
         """Refresh the local dialog after code/category changes and optionally notify other dialogs.
@@ -4676,7 +4098,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         self.get_codes_and_categories()
-        self.fill_tree()
+        self.code_tree.fill_tree()
         self.unlight()
         self.highlight()
         self.get_coded_text_update_eventfilter_tooltips()
@@ -4695,6 +4117,15 @@ class DialogCodeText(QtWidgets.QWidget):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        if ("attribute" in tables or "attribute_type" in tables) and len(self.attributes) > 1:
+            self.get_files_from_attributes(refresh_only=True)
+        # Fulltext edited in another dialog (manage_files or code_pdf via restructuring):
+        # reloading the current file avoids coding over stale in-memory positions,
+        # which would corrupt pos0/pos1 of new codings.
+        if "source" in tables and self.file_ is not None:
+            self.annotations = self.app.get_annotations()
+            self.load_file(self.file_)
+            return
         if "code_cat" not in tables and "code_name" not in tables:
             if "code_text" not in tables:
                 return
@@ -4707,269 +4138,8 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # codes or categories have changed, so refresh all
         self.get_codes_and_categories()
-        self.fill_tree()
+        self.code_tree.fill_tree()
         self.get_coded_text_update_eventfilter_tooltips()
-
-    def add_category(self, supercatid:int|None=None):
-        """ Add a new category.
-        Note: the addItem dialog does the checking for duplicate category names
-        Args:
-            supercatid : None to add without category, supercatid to add to category. """
-
-        ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
-        ui.exec()
-        new_category_name = ui.get_new_name()
-        if new_category_name is None:
-            return
-        item = {'name': new_category_name, 'cid': None, 'memo': "",
-                'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-        cur = self.app.conn.cursor()
-        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
-                    (item['name'], item['memo'], item['owner'], item['date'], supercatid))
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories(["code_cat"])
-        self.app.delete_backup = False
-        self.parent_textEdit.append(_("New category: ") + item['name'])
-
-    def delete_category_or_code(self, selected):
-        """ Determine if selected item is a code or category before deletion.
-        Args:
-            selected: QTreeWidgetItem
-        """
-
-        if selected.text(1)[0:3] == 'cat':
-            self.delete_category(selected)
-            return  # Avoid error as selected is now None
-        if selected.text(1)[0:3] == 'cid':
-            self.delete_code(selected)
-
-    def delete_code(self, selected):
-        """ Find code, remove from database, refresh and code data and fill treeWidget.
-        Args:
-            selected: QTreeWidgetItem
-        """
-
-        # Find the code in the list, check to delete
-        found = -1
-        for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == int(selected.text(1)[4:]):
-                found = i
-        if found == -1:
-            return
-        code_ = self.codes[found]
-        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
-        ok = ui.exec()
-        if not ok:
-            return
-        cur = self.app.conn.cursor()
-        cur.execute("delete from code_name where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_av where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_image where cid=?", [code_['cid'], ])
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
-        # Remove from recent codes
-        for item in self.recent_codes:
-            if item['name'] == code_['name']:
-                self.recent_codes.remove(item)
-                break
-        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
-        self.app.delete_backup = False
-
-    def delete_category(self, selected):
-        """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget.
-        Args:
-            selected: QTreeWidgetItem
-        """
-
-        found = -1
-        for i in range(0, len(self.categories)):
-            if self.categories[i]['catid'] == int(selected.text(1)[6:]):
-                found = i
-        if found == -1:
-            return
-        category = self.categories[found]
-        ui = DialogConfirmDelete(self.app, _("Category: ") + selected.text(0))
-        ok = ui.exec()
-        if not ok:
-            return
-        cur = self.app.conn.cursor()
-        cur.execute("update code_name set catid=null where catid=?", [category['catid'], ])
-        cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
-        cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
-        self.app.conn.commit()
-        # An extra check. Fix 'lost' categories if present.
-        sql = "update code_cat set supercatid=null where supercatid is not null and supercatid not in " \
-              "(select catid from code_cat)"
-        cur.execute(sql)
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
-        self.app.delete_backup = False
-        self.parent_textEdit.append(_("Category deleted: ") + category['name'])
-
-    def add_edit_cat_or_code_memo(self, selected):
-        """ View and edit a memo for a category or code.
-        Args:
-            selected: QTreeWidgetItem
-        """
-
-        changed_tables = []
-
-        if selected.text(1)[0:3] == 'cid':
-            # Find the code in the list
-            found = -1
-            for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(selected.text(1)[4:]):
-                    found = i
-            if found == -1:
-                return
-            ui = DialogMemo(self.app, _("Memo for Code: ") + self.codes[found]['name'], self.codes[found]['memo'])
-            ui.exec()
-            memo = ui.memo
-            if memo != self.codes[found]['memo']:
-                self.codes[found]['memo'] = memo
-                cur = self.app.conn.cursor()
-                cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
-                self.app.conn.commit()
-                self.app.delete_backup = False
-                changed_tables = ["code_name"]
-            if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
-            else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-                self.parent_textEdit.append(_("Memo for code: ") + self.codes[found]['name'])
-
-        if selected.text(1)[0:3] == 'cat':
-            # Find the category in the list
-            found = -1
-            for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(selected.text(1)[6:]):
-                    found = i
-            if found == -1:
-                return
-            ui = DialogMemo(self.app, _("Memo for Category: ") + self.categories[found]['name'],
-                            self.categories[found]['memo'])
-            ui.exec()
-            memo = ui.memo
-            if memo != self.categories[found]['memo']:
-                self.categories[found]['memo'] = memo
-                cur = self.app.conn.cursor()
-                cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
-                self.app.conn.commit()
-                self.app.delete_backup = False
-                changed_tables = ["code_cat"]
-            if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
-            else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-                self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
-        self.update_dialog_codes_and_categories(changed_tables)
-
-    def rename_category_or_code(self, selected):
-        """ Rename a code or category.
-        Check that the code or category name is not currently in use.
-        Args:
-            selected : QTreeWidgetItem """
-
-        if selected.text(1)[0:3] == 'cid':
-            found_code = None
-            check_codes = []
-            for code_ in self.codes:
-                if code_['cid'] == int(selected.text(1)[4:]):
-                    found_code = code_
-                else:
-                    check_codes.append(code_)
-            ui = DialogAddItemName(self.app, check_codes, _("Rename code"), _("Code name"))
-            ui.ui.lineEdit.setText(found_code['name'])
-            ui.exec()
-            new_name = ui.get_new_name()
-            if new_name is None or new_name == found_code['name']:
-                return
-            # Find the code in the list
-            found = -1
-            for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(selected.text(1)[4:]):
-                    found = i
-            if found == -1:
-                return
-            # Rename in recent codes
-            for item in self.recent_codes:
-                if item['name'] == self.codes[found]['name']:
-                    item['name'] = new_name
-                    break
-            # Update codes list and database
-            cur = self.app.conn.cursor()
-            cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
-            self.app.conn.commit()
-            self.app.delete_backup = False
-            old_name = self.codes[found]['name']
-            self.parent_textEdit.append(_("Code renamed from: ") + f"{old_name} --> {new_name}")
-            self.update_dialog_codes_and_categories(["code_name"])
-            return
-
-        if selected.text(1)[0:3] == 'cat':
-            found_cat = None
-            check_categories = []
-            for category in self.categories:
-                if category['catid'] == int(selected.text(1)[6:]):
-                    found_cat = category
-                else:
-                    check_categories.append(category)
-            ui = DialogAddItemName(self.app, check_categories, _("Rename category"), _("Category name"))
-            ui.ui.lineEdit.setText(found_cat['name'])
-            ui.exec()
-            new_name = ui.get_new_name()
-            if new_name is None or new_name == found_cat['name']:
-                return
-
-            # Find the category in the list
-            found = -1
-            for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(selected.text(1)[6:]):
-                    found = i
-            if found == -1:
-                return
-            # Update category list and database
-            cur = self.app.conn.cursor()
-            cur.execute("update code_cat set name=? where catid=?",
-                        (new_name, self.categories[found]['catid']))
-            self.app.conn.commit()
-            self.app.delete_backup = False
-            old_name = self.categories[found]['name']
-            self.update_dialog_codes_and_categories(["code_cat"])
-            self.parent_textEdit.append(_("Category renamed from: ") + f"{old_name} --> {new_name}")
-
-    def change_code_color(self, selected):
-        """ Change the colour of the currently selected code.
-        Args:
-            selected : QTreeWidgetItem """
-
-        cid = int(selected.text(1)[4:])
-        found = -1
-        for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == cid:
-                found = i
-        if found == -1:
-            return
-        ui = DialogColorSelect(self.app, self.codes[found])
-        ok = ui.exec()
-        if not ok:
-            return
-        new_color = ui.get_color()
-        if new_color is None:
-            return
-        selected.setBackground(0, QBrush(QColor(new_color), Qt.BrushStyle.SolidPattern))
-        # Update codes list, database and color markings
-        self.codes[found]['color'] = new_color
-        cur = self.app.conn.cursor()
-        cur.execute("update code_name set color=? where cid=?",
-                    (self.codes[found]['color'], self.codes[found]['cid']))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        self.update_dialog_codes_and_categories(["code_name"])
 
     def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
@@ -5313,29 +4483,49 @@ class DialogCodeText(QtWidgets.QWidget):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def mark_speakers(self):
-        if self.file_ is not None:
-            ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
-            if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-                self.update_dialog_codes_and_categories(["code_name", "code_text"])
-                if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(
-                        only_visible=True):
-                    msg = _(
-                        'Coder "{}" is currently hidden. Do you want to make it visible, to see the speaker codings?').format(
-                        speaker_coder_name)
-                    msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
-                    msg_box.setStandardButtons(
-                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
-                    msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
-                    reply = msg_box.exec()
-                    if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                        cur = self.app.conn
-                        cur.execute('update coder_names set visibility=1 where name=?', (speaker_coder_name,))
-                        cur.commit()
-                        self.update_coder_names()
+    def mark_speakers(self, preselected_ids=None):
+        """ Open the Mark speakers dialog.
+        Preselection:
+        - preselected_ids (multi-selection carried over from Manage files): those
+          files, in the given order.
+        - else the file currently open in the coding pane (previous behaviour).
+        - else all files currently VISIBLE in the file list, which may be filtered
+          by attributes, so an active filter carries over.
+        Args:
+            preselected_ids: optional list of source ids to preselect
+        """
 
+        files_ = []
+        if preselected_ids:
+            all_text_files = {f['id']: f['name'] for f in self.app.get_text_filenames()}
+            files_ = [{'id': fid, 'name': all_text_files[fid]}
+                      for fid in preselected_ids if fid in all_text_files]
+        elif self.file_ is not None:
+            files_ = [{'id': self.file_['id'], 'name': self.file_['name']}]
         else:
+            # all visible files (self.files respects the current attribute filter)
+            files_ = [{'id': f['id'], 'name': f['name']} for f in self.files]
+        if not files_:
             Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
+            return
+        ui_speaker = DialogSpeakers(self.app, files_)
+        if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self.update_dialog_codes_and_categories(["code_name", "code_text"])
+            if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(
+                    only_visible=True):
+                msg = _(
+                    'Coder "{}" is currently hidden. Do you want to make it visible, to see the speaker codings?').format(
+                    speaker_coder_name)
+                msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
+                msg_box.setStandardButtons(
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
+                reply = msg_box.exec()
+                if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                    cur = self.app.conn
+                    cur.execute('update coder_names set visibility=1 where name=?', (speaker_coder_name,))
+                    cur.commit()
+                    self.update_coder_names()
 
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.
@@ -5356,6 +4546,8 @@ class DialogCodeText(QtWidgets.QWidget):
         """ File selection changed. """
 
         row = self.ui.listWidget.currentRow()
+        if row < 0 or row >= len(self.files):
+            return
         if not self.ui.checkBox_search_all_files.isChecked():
             self.ui.lineEdit_search.setText("")
             self.ui.pushButton_next.setEnabled(False)
@@ -5522,7 +4714,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.highlight_style == 'underline':
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
-            fmt.setUnderlineColor(QColor(color))
+            fmt.setUnderlineColor(self._code_label_contrast_color(color))
         else:
             brush = QBrush(QColor(color))
             fmt.setBackground(brush)
@@ -5645,7 +4837,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # choose between underline-only and full background fill <- L
             if self.highlight_style == 'underline':
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
-                fmt.setUnderlineColor(QColor(color))
+                fmt.setUnderlineColor(self._code_label_contrast_color(color))
             else:
                 brush = QBrush(QColor(color))
                 fmt.setBackground(brush)
@@ -5792,7 +4984,7 @@ class DialogCodeText(QtWidgets.QWidget):
             ai_search_result = self.get_overlapping_ai_search_result()
             if ai_search_result is not None:
                 memo = _("AI interpretation: ") + ai_search_result["interpretation"]
-                memo += _("\n\nAI search prompt: ") + self.ai_search_prompt.name_and_scope()
+                memo += _("\n\nAI search prompt: ") + prompt_name_and_scope(self.ai_search_prompt)
                 memo += _("\nAI model: ") + self.ai_search_ai_model
 
                 msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'
@@ -6532,6 +5724,19 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
 
+        # PDF fulltext is not editable anywhere (the PDF coding view depends on
+        # the exact page mapping); PDFs stay listed and codable, editing needs a copy.
+        if not self.edit_mode and self.file_.get('mediapath') is not None and \
+                str(self.file_['mediapath']).lower().endswith(".pdf"):
+            msg = _("This file is a PDF. Its stored text is not editable: it matches, "
+                    "character by character, the text extracted from the PDF pages, and "
+                    "the PDF coding view depends on that mapping.")
+            msg += "\n\n"
+            msg += _("To work with an editable copy of the text use Manage Files > "
+                     "'Extract pdf text to new file'.")
+            Message(self.app, _("PDF file"), msg).exec()
+            return
+
         self.edit_mode = not self.edit_mode
         if self.edit_mode:
             self.edit_mode_on()
@@ -6659,18 +5864,31 @@ class DialogCodeText(QtWidgets.QWidget):
         # above) already restores visibility based on settings <- L
         if hasattr(self, 'coding_margin') and self.coding_margin is not None:
             self.coding_margin.update()
+        # Notify the fulltext edit to the bus: an open DialogCodePdf with this file
+        # must reload and re-verify the page mapping; without this it keeps stale
+        # text and positions in memory.
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(
+                ['source', 'code_text', 'annotation', 'case_text'], source=self)
 
-    def edit_mode_find(self, direction="next"):
+    def edit_mode_find(self, direction:str="next"):
         """  Move forward or backward through the edit document.
-        Uses REGEX. """
+        Uses REGEX.
+        Args:
+            direction: string '', next, previous """
 
+        if direction == "":
+            direction = "next"
         cursor = self.ui.plainTextEdit.textCursor()
         search_term = self.ui.lineEdit_edit_search.text()
         if search_term == "":
             return
         pattern = None
+        flags = 0
+        if not self.ui.checkBox_edit_case_sensitive.isChecked():
+            flags |= re.IGNORECASE
         try:
-            pattern = re.compile(search_term)
+            pattern = re.compile(search_term, flags)
         except re.error as err:
             logger.warning(f're module error Bad escape {err}')
         if pattern is None:
@@ -6692,7 +5910,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
         except re.error:
             logger.exception('Failed searching text for %s', search_term)
-        print("Match position:", result)
         if result is None:
             return
         cursor.setPosition(result)
@@ -7209,7 +6426,8 @@ class DialogCodeText(QtWidgets.QWidget):
             selected_id = int(code_item.text(1).split(':')[1])
             selected_is_code = True
 
-        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code, self.tree_sort_option)
+        # Sort option lives in the shared code tree controller
+        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code, self.code_tree.tree_sort_option)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
             self.ai_search_code_name = ui.selected_code_name
@@ -7233,20 +6451,29 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.plainTextEdit.setPlainText(_('Searching for related data, please wait...'))
 
             # Phase 1: find similar chunks of data from the vectorstore
-            self.app.ai.ai_async_is_canceled = False
+            self.ai_search_session_id += 1
+            current_session_id = int(self.ai_search_session_id)
             self.ai_search_chunks_pos = 0
-            self.app.ai.retrieve_similar_data(self.ai_search_prepare_analysis,
-                                              self.ai_search_code_name, self.ai_search_code_memo,
-                                              self.ai_search_file_ids)
+            self.app.ai.retrieve_similar_data(
+                lambda chunks, session_id=current_session_id: self.ai_search_prepare_analysis(chunks, session_id),
+                self.ai_search_code_name,
+                self.ai_search_code_memo,
+                self.ai_search_file_ids,
+                scope_type='ai_search',
+                scope_id=self._ai_search_scope_id(),
+                group_id=f'ai-search-{self._ai_search_scope_id()}-{current_session_id}',
+            )
 
-    def ai_search_prepare_analysis(self, chunks):
+    def ai_search_prepare_analysis(self, chunks, session_id=None):
         """ Prepare and start the second step of the AI search. 
         
         This will clean up the list of data found in the first stage of the search and then 
         start step 2, the deeper analysis with the choosen search prompt.
         """
 
-        if self.app.ai.ai_async_is_canceled:
+        if session_id is not None and int(session_id) != int(self.ai_search_session_id):
+            return
+        if self._ai_search_scope_status() == 'canceled':
             self.ai_search_running = False
             self.ui.plainTextEdit.setPlainText('')
             return
@@ -7306,9 +6533,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_chunks_pos = 0  # position of the next chunk to be analyzed
         self.ai_search_analysis_counter = 0  # counter to stop analyzing after ai_search_analysis_max_count
         self.ai_search_found = False  # Becomes True if any new data has been found
-        self.ai_search_analyze_next_chunk()
+        self.ai_search_analyze_next_chunk(session_id=session_id)
 
-    def ai_search_analyze_next_chunk(self):
+    def ai_search_analyze_next_chunk(self, session_id=None):
         """Step 2 of the AI search: 
         Selects the next chunk of data found in step 1 of the search and analyzes it closer, 
         using the selected search prompt.
@@ -7323,11 +6550,17 @@ class DialogCodeText(QtWidgets.QWidget):
             if self.ai_search_analysis_counter < ai_search_analysis_max_count:
                 # ai_search_analysis_max_count not reached
                 self.ai_search_running = True
-                self.app.ai.search_analyze_chunk(self.ai_search_analyze_next_chunk_callback,
-                                                 self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
-                                                 self.ai_search_code_name,
-                                                 self.ai_search_code_memo,
-                                                 self.ai_search_prompt)
+                current_session_id = int(self.ai_search_session_id if session_id is None else session_id)
+                self.app.ai.search_analyze_chunk(
+                    lambda doc, session_id=current_session_id: self.ai_search_analyze_next_chunk_callback(doc, session_id),
+                    self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
+                    self.ai_search_code_name,
+                    self.ai_search_code_memo,
+                    self.ai_search_prompt,
+                    scope_type='ai_search',
+                    scope_id=self._ai_search_scope_id(),
+                    group_id=f'ai-search-{self._ai_search_scope_id()}-{current_session_id}',
+                )
             else:  # ai_search_analysis_max_count reached
                 self.ai_search_running = False
                 if len(self.ai_search_results) == 0:  # nothing found
@@ -7349,12 +6582,14 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.ai_search_update_listview_action()
 
-    def ai_search_analyze_next_chunk_callback(self, doc):
+    def ai_search_analyze_next_chunk_callback(self, doc, session_id=None):
         """Callback for ai_search_analyze_next_chunk: 
         If the AI has finished analyzing the chunk of data, this callback function collects the results, 
         updates the UI and starts the analysis of the next chunk. 
         """
 
+        if session_id is not None and int(session_id) != int(self.ai_search_session_id):
+            return
         if not self.ai_search_running:  # Search has been cancelled
             return
         if doc is not None:
@@ -7374,8 +6609,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # analyze next
         self.ai_search_chunks_pos += 1
         self.ai_search_analysis_counter += 1
-        if not self.app.ai.ai_async_is_canceled:
-            self.ai_search_analyze_next_chunk()
+        if self._ai_search_scope_status() != 'canceled':
+            self.ai_search_analyze_next_chunk(session_id=session_id)
         else:
             self.ai_search_running = False
 
@@ -7414,8 +6649,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_listview_action_label.setText('')
             self.ai_search_listview_action_label.setToolTip('')
             self.ai_search_listview_action_label.setVisible(False)
-            if self.app.ai.ai_async_is_errored:
+            if self._ai_search_scope_status() == 'errored':
                 action_item.setText(_('(search aborted due to an error)'))
+            elif self._ai_search_scope_status() == 'canceled':
+                action_item.setText('(search canceled)')
             else:
                 action_item.setText(_('(search finished)'))
 
@@ -7439,7 +6676,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok)
                 ret = msg_box.exec()
                 if ret == QtWidgets.QMessageBox.StandardButton.Ok:
-                    self.app.ai.ai_async_is_canceled = True
+                    self._cancel_ai_search_scope(wait_ms=5000)
                     self.ai_search_running = False
                     self.ai_search_update_listview_action()
             else:  # 'find more' item or "finished search"
@@ -7499,15 +6736,24 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
                     # Set text cursor position
-                    text_cursor = self.ui.plainTextEdit.textCursor()
-                    text_cursor.setPosition(sel_start)
-                    endpos = sel_end
-                    if endpos < 0:
+                    doc_len = len(self.ui.plainTextEdit.toPlainText())
+                    start = max(0, int(sel_start))
+                    endpos = int(sel_end)
+                    if endpos <= start:
+                        endpos = start + 1
+                    if doc_len > 0:
+                        if start >= doc_len:
+                            start = doc_len - 1
+                        endpos = min(max(start + 1, endpos), doc_len)
+                    else:
+                        start = 0
                         endpos = 0
+                    text_cursor = self.ui.plainTextEdit.textCursor()
+                    text_cursor.setPosition(start)
                     text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
                     self.ui.plainTextEdit.setTextCursor(text_cursor)
                     self.ui.plainTextEdit.setFocus()
-                    QtCore.QTimer.singleShot(20, self.scroll_text_into_view)  # scroll into view after window is updated
+                    QtCore.QTimer.singleShot(0, self.scroll_text_into_view)  # scroll into view after window is updated
                 except Exception as e:
                     logger.debug(str(e))
                 break
@@ -7538,7 +6784,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def ai_search_update_spinner(self):
         """ Updating the ai_progressBar and the text spinner in the list view to indicate to the user that 
         an AI search is running in the background. """
-        if self.app.ai.ai_async_is_finished or self.app.ai.ai_async_is_errored or self.app.ai.ai_async_is_canceled:
+        if self._ai_search_scope_status() in ('finished', 'errored', 'canceled', 'idle'):
             self.ai_search_running = False
         if self.ai_search_running:
             self.ui.ai_progressBar.setVisible(True)
@@ -7562,13 +6808,13 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         if self.ui.tabWidget.currentIndex() != 1:  # not in ai search mode
-            return
+            return None
 
         # Get the adjusted start and end positions from the text editor's current selection
         pos0 = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
         pos1 = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
         if pos0 == pos1:
-            return
+            return None
 
         best_doc = None
         max_overlap_length = 0

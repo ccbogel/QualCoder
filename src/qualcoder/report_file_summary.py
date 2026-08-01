@@ -14,15 +14,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import fitz
 import logging
-import os
+from pathlib import Path
 from PIL import Image
 from PIL.ExifTags import TAGS
 import qtawesome as qta
@@ -49,7 +50,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -211,7 +211,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             return
         self.get_files(ui.result_file_ids)
 
-    def get_files(self, ids=None, sort="name asc"):
+    def get_files(self, ids:list[int]|None=None, sort:str="name asc"):
         """ Get source files with additional details and fill list widget.
         Args:
             ids : list, fill with ids to limit file selection list.
@@ -338,10 +338,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += self.video_statistics(file_['id'])
         self.ui.textEdit.setText(text_)
 
-    def get_case_assignment(self, id_):
+    def get_case_assignment(self, id_:int):
         """ Get case or cases associated with this file.
         Show text positions if a text file.
-        param: id : Integer """
+        Args: id_ : Integer """
 
         text_ = "\n" + _("CASE:") + "\n"
         cur = self.app.conn.cursor()
@@ -360,9 +360,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += "\n"
         return text_
 
-    def get_attributes(self, id_):
+    def get_attributes(self, id_:int):
         """ Get attributes and return text representation.
-        param: id : Integer """
+        Args: id_ : Integer """
 
         text_ = _("ATTRIBUTES:") + "\n"
         cur = self.app.conn.cursor()
@@ -378,9 +378,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += "\n"
         return text_
 
-    def video_statistics(self, id_):
+    def video_statistics(self, id_:str):
         """ Get video statistics for image file
-        param: id : Integer """
+        Args: id_ : Integer """
 
         text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
@@ -439,9 +439,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += _("END OF TRANSCRIPT") + "\n"
         return text_
 
-    def audio_statistics(self, id_):
-        """ Get audio statistics for image file
-        param: file_ Dictionary of {name, id, memo} """
+    def audio_statistics(self, id_:int):
+        """ Get audio statistics for audio file
+        Args: id_: int """
 
         text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
@@ -490,7 +490,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += _("END OF TRANSCRIPT") + "\n"
         return text_
 
-    def image_statistics(self, id_):
+    def image_statistics(self, id_:int):
         """ Get image statistics for image file, or from image of pdf page.
         param: id: Integer """
 
@@ -509,45 +509,60 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             pdf_path = f"{self.app.project_path}/documents/{mediapath[6:]}"
         if mediapath[:5] == "docs:":
             pdf_path = mediapath[5:]
+        w, h = 1, 1
         if mediapath[-4:].lower() == ".pdf":
             text_ = "\n\n" + _("PDF IMAGE DETAILS") + ":" + text_
-            fitz_pdf = fitz.open(pdf_path)
-            text_ += _("Pages") + f": {len(fitz_pdf)}\n"
-            pixmap = fitz_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
-            abs_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
-            pixmap.save(abs_path)
+            # In-memory dimensions with the document always closed: the previous code
+            # never closed the handle (blocked PDF deletion on Windows while the
+            # report was open) and wrote a residual tmp_pdf_page.png just to read its
+            # size back with PIL. PIL and EXIF are skipped for pdfs below (the temp
+            # png never had metadata anyway); w and h feed the code counts.
+            try:
+                fitz_pdf = fitz.open(pdf_path)
+                try:
+                    text_ += _("Pages") + f": {len(fitz_pdf)}\n"
+                    if len(fitz_pdf) > 0:
+                        pix = fitz_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
+                        w, h = pix.width, pix.height
+                        text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + \
+                            f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + _(" pixels") + "\n"
+                finally:
+                    fitz_pdf.close()
+            except Exception as err:
+                logger.warning(f"Pdf metadata: {pdf_path} {err}")
 
         # Image size and metadata
-        try:
-            image = Image.open(abs_path)
-            w, h = image.size
-            text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
-                    _(" pixels") + "\n"
-            image_type = abs_path[-3:].lower()
-            # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
-            if image_type in ("jpg", "peg"):
-                exifdata = image.getexif()
-                # iterating over the EXIF data fields
-                for tag_id in exifdata:
-                    # get the tag name, instead of human unreadable tag id
-                    tag = TAGS.get(tag_id, tag_id)
-                    data = exifdata.get(tag_id)
-                    # Decode bytes
-                    if isinstance(data, bytes):
-                        try:
-                            data = data.decode()
-                            text_ += f"{tag:25}: {data}\n"
-                        except UnicodeDecodeError as e_:
-                            logger.debug(e_)
-            # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
-            if image_type == "png":
-                for tag, value in image.info.items():
-                    key = TAGS.get(tag, tag)
-                    text_ += f"{key} {value}\n"
-        except Image.DecompressionBombError:
-            w = 1
-            h = 1
-            Message(self.app, _("Image too large"), _("Cannot open image with PIL module to ge t size and details.\n(DecompressionBombError)")).exec()
+        if mediapath[-4:].lower() != ".pdf":
+            try:
+                image = Image.open(abs_path)
+                w, h = image.size
+                text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
+                        _(" pixels") + "\n"
+                image_type = abs_path[-3:].lower()
+                # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
+                if image_type in ("jpg", "peg"):
+                    exifdata = image.getexif()
+                    # iterating over the EXIF data fields
+                    for tag_id in exifdata:
+                        # get the tag name, instead of human unreadable tag id
+                        tag = TAGS.get(tag_id, tag_id)
+                        data = exifdata.get(tag_id)
+                        # Decode bytes
+                        if isinstance(data, bytes):
+                            try:
+                                data = data.decode()
+                                text_ += f"{tag:25}: {data}\n"
+                            except UnicodeDecodeError as e_:
+                                logger.debug(e_)
+                # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
+                if image_type == "png":
+                    for tag, value in image.info.items():
+                        key = TAGS.get(tag, tag)
+                        text_ += f"{key} {value}\n"
+            except Image.DecompressionBombError:
+                w = 1
+                h = 1
+                Message(self.app, _("Image too large"), _("Cannot open image with PIL module to ge t size and details.\n(DecompressionBombError)")).exec()
 
         # Codes
         sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)), "
@@ -569,9 +584,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text_ += _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
         return text_
 
-    def text_statistics(self, id_):
+    def text_statistics(self, id_:int):
         """ Get details of text file statistics
-        param: id Integer
+        Args: id Integer
         """
 
         text_ = _("STATISTICS:") + "\n"
@@ -584,7 +599,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
 
         # Get stopwords from user created list or default to stopwords
         stopwords = []
-        stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+        stopwords_file_path = Path('~').expanduser() / ".qualcoder" / "stopwords.txt"
         user_created_stopwords = []
         try:
             # Can get UnicodeDecode Error on Windows so using error handler
@@ -665,7 +680,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         # Calculate code statistics
         for r in res:
-            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
+            text_ += r[0] + "  " + _("Count: ") + f"{r[2]}  " + _("Total characters: ") + f"{r[3]:,d}"
             text_ += "  " + _("Percent: ") + f"{round((r[3] / len(fulltext)) * 100, 2)}%"
             text_ += "  " + _("Average characters: ") + f"{int(r[4])}\n"
         return text_

@@ -14,18 +14,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import datetime
-import os
-import re
-import sys
 import logging
-import traceback
+from pathlib import Path
+import re
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
@@ -45,7 +44,6 @@ OWNER = 5
 DATE = 6
 AV_TEXT_ID = 7
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -54,16 +52,6 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     Add files to case, add all text or text portions from a text file.
     Remove file from a case. View file.
     """
-
-    app = None
-    parent_textEdit = None
-    case = None
-    allfiles = []
-    casefiles = []
-    case_text = []
-    selected_text_file = None
-    header_labels = ["id", "File name", "Assigned"]
-    attributes = []
 
     def __init__(self, app_, parent_text_edit, case):
 
@@ -110,7 +98,14 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
+        self.allfiles = []
+        self.casefiles = []
+        self.case_text = []
+        self.selected_text_file = None
         self.get_files()
+        self.header_labels = ["id", "File name", "Assigned"]
+        self.attribute_names = []
+        self.attributes = []
         self.get_attributes()
         self.fill_table()
 
@@ -206,7 +201,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         text_len = 0
         if file_[2] is not None:
-            text_len = len(file_[2]) - 1
+            text_len = len(file_[2])
         link = {'caseid': self.case['caseid'], 'fid': file_[0], 'pos0': 0,
                 'pos1': text_len, 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
@@ -328,10 +323,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     def double_clicked_to_view(self):
         """ Double-click on a row allow viewing of that file.
         rows begin at 0  to n.
-        param:
-            row: signal emitted by doubleclick event """
+        row: signal emitted by doubleclick event """
 
-        # TODO need this method? better in init to go to view_file
         self.view_file()
 
     def row_selection_changed(self):
@@ -384,33 +377,33 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if self.allfiles[index][MEDIAPATH][:6] in ("/video", "video:"):
             if self.allfiles[index][MEDIAPATH][:6] == "video:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][:6] == "/video":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             ui_av = DialogViewAV(self.app, dictionary)
             ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:6] in ("/audio", "audio:"):
             if self.allfiles[index][MEDIAPATH][0:6] == "audio:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][0:6] == "/audio":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             ui_av = DialogViewAV(self.app, dictionary)
             ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:7] in ("/images", "images:"):
             if self.allfiles[index][MEDIAPATH][0:7] == "images:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not os.path.exists(abs_path):
+                if not path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][0:7] == "/images":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
-                if not os.path.exists(abs_path):
+                if not Path(abs_path).exists():
                     return
             # Requires {name, mediapath, owner, id, date, memo, fulltext}
             ui_img = DialogViewImage(self.app, dictionary)

@@ -14,36 +14,33 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
-
 """
 
 import logging
 import os
+from pathlib import Path
 import time
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .code_text import DialogCodeText  # for isinstance()
+from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
 from .helpers import Message
-from .view_av import DialogCodeAV  # for isinstance()
+from .code_av import DialogCodeAV  # for isinstance()
 from .view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
 class DialogManageLinks(QtWidgets.QDialog):
     """ Fix bad file links. Can browse to correct location to set a new file path.
     """
-
-    parent_textEdit = None
-    tab_coding = None  # Tab widget coding tab for updates
-    links = []
 
     def __init__(self, app, parent_text_edit, tab_coding):
 
@@ -70,26 +67,81 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.links = self.app.check_bad_file_links()
         for link in self.links:
             link['filepaths'] = []
-        self.home = os.path.expanduser('~')
+        self.home = Path('~').expanduser()
         self.fill_table()
         self.ui.pushButton_search_folders.pressed.connect(self.find_filepaths)
+        self.ui.pushButton_bulk.pressed.connect(self.bulk_path_rename)
+
+    def bulk_path_rename(self):
+        """ Update all the linked by changing the path.
+        Typically occurs when moving to another computer. """
+
+        msg = _("It is best to save a copy of the project first.\n")
+        msg += _("Select the section of the path you want to replace.\n")
+        msg += _("e.g. C:/Users/olduser/Images  To replace olduser enter: olduser\n")
+        msg += _("The put in the replacement value: newuser\n")
+        msg += _("The result will be: C:/newuser/Images\n")
+        msg += _("NOTE: The original text must occur only once in the path that is being updated.\n")
+        msg += _("NOTE: For Windows use forward slashes to represent backslashes for folder paths")
+        Message(self.app, _("Replace the folder path"), msg).exec()
+        old_text, ok = QtWidgets.QInputDialog.getText(None, "original text", _("Old value:"))
+        old_text = old_text.replace("\\", "/")
+        new_text, ok = QtWidgets.QInputDialog.getText(None, "Replacement text", _("Replace with:"))
+        if not ok or new_text == "":
+            Message(self.app, _("Bulk edit"), _("Aborted")).exec()
+            return
+        new_text = new_text.replace("\\", "/")
+
+        # Must ensure the links only contain old_text ONCE.
+        cur = self.app.conn.cursor()
+        multiples = 0
+        example = ""
+        for link in self.links:
+            type_and_path = link['mediapath'].split(':', 1)
+            instances = type_and_path[1].count(old_text)
+            if instances == 1:
+                example = type_and_path[1] + "\n" + type_and_path[1].replace(old_text, new_text)
+        if example == "":
+            Message(self.app, _("No matches"), old_text).exec()
+            return
+        else:
+            ui = DialogConfirmDelete(self.app, example, _("Confirm this change"))
+            ok = ui.exec()
+            if not ok:
+                return
+
+        for link in self.links:
+            type_and_path = link['mediapath'].split(':', 1)
+            instances = type_and_path[1].count(old_text)
+            if instances == 1:
+                new_path = type_and_path[0] + ":" + type_and_path[1].replace(old_text, new_text)
+                cur.execute("update source set mediapath=? where id=?", [new_path, link['id']])
+                self.app.conn.commit()
+            if instances > 1:
+                multiples += 1
+        if multiples > 0:
+            Message(self.app, _("Multiple occurrences"), _("Multiples of text in path. Some links not updated.") + f"\n{old_text}").exec()
+        self.links = self.app.check_bad_file_links()
+        for link in self.links:
+            link['filepaths'] = []
+        self.fill_table()
 
     def find_filepaths(self):
         """ Get file paths of this file name. """
-        pd = QtWidgets.QProgressDialog(labelText=self.home[-30:], minimum=0, maximum=0, parent=self)
+        pd = QtWidgets.QProgressDialog(labelText=str(self.home[-30:]), minimum=0, maximum=0, parent=self)
         pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         pd.setWindowTitle(_('Search folders'))
         pd.show()
         last_msg_update = time.time()
         for link in self.links:
             paths = []
-            for root, dirs, files in os.walk(self.home):
+            for root, dirs, files in Path(self.home).walk:
                 QtWidgets.QApplication.processEvents() # necessary to update the progress dialog
                 if time.time() - last_msg_update > 0.1:  
                     pd.setLabelText(f'...{root[-30:]}')
                     last_msg_update = time.time()
                 if link['name'] in files:
-                    paths.append(os.path.join(root, link['name']))
+                    paths.append(str(Path(root) / link['name']))  # keep as string for now
                 if pd.wasCanceled() or len(paths) > 2:
                     break
             link['filepaths'] = paths
@@ -108,7 +160,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         menu = QtWidgets.QMenu()
         action_open_file_dialog = menu.addAction(_("Select file"))
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -135,9 +187,13 @@ class DialogManageLinks(QtWidgets.QDialog):
             return
         self.update_database(file_path, row)
 
-    def update_database(self, new_file_path, row):
+    def update_database(self, new_file_path: str, row:int):
         """ Update database and links list.
-         Called by: file_dialog_selection, cell_selected. """
+         Called by: file_dialog_selection, cell_selected.
+         Args:
+             new_file_path: String
+             row : Integer
+        """
 
         new_file_name = new_file_path.split('/')[-1]
         # Use split ':',1 as can have ':' as a part of the file path
@@ -201,7 +257,7 @@ class DialogManageLinks(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, 1, name_item)
             path_item = QtWidgets.QTableWidgetItem(type_and_path[1])
             path_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            if not os.path.exists(type_and_path[1]):
+            if not Path(type_and_path[1]).exists():
                 path_item.setForeground(QtGui.QBrush(QtGui.QColor("Red")))
             self.ui.tableWidget.setItem(row, 2, path_item)
             if 'filepaths' in item:

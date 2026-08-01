@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
@@ -23,7 +23,7 @@ https://qualcoder.org/
 from collections import Counter
 from copy import copy, deepcopy
 import logging
-import os
+from pathlib import Path
 import tempfile  # Create a temporary file
 import pandas as pd
 import plotly.express as px
@@ -39,7 +39,6 @@ from .report_attributes import DialogSelectAttributeParameters
 from .simple_wordcloud import Wordcloud
 from . import stopwords
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -95,12 +94,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_coders.addItems(coders)
 
         self.attributes = []
-        cur.execute("select name, ifnull(memo,''), caseOrFile, valuetype from attribute_type")
-        result = cur.fetchall()
-        self.attributes = []
-        keys = 'name', 'memo', 'caseOrFile', 'valuetype'
-        for row in result:
-            self.attributes.append(dict(zip(keys, row)))
+        self._load_attributes()
         self.fill_combobox_attributes()
         self.ui.radioButton_file.clicked.connect(self.fill_combobox_attributes)
         self.ui.radioButton_case.clicked.connect(self.fill_combobox_attributes)
@@ -199,6 +193,47 @@ class ViewCharts(QDialog):
         if index == -1:
             index = 0
         self.ui.comboBox_stopwords.setCurrentIndex(index)
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+
+    def _load_attributes(self):
+        """Load the cached attribute definitions used by the chart controls."""
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, ifnull(memo,''), caseOrFile, valuetype from attribute_type")
+        result = cur.fetchall()
+        self.attributes = []
+        keys = 'name', 'memo', 'caseOrFile', 'valuetype'
+        for row in result:
+            self.attributes.append(dict(zip(keys, row)))
+
+    def _refresh_attribute_controls(self):
+        """Refresh cached attribute controls without re-rendering charts."""
+
+        selected_char = self.ui.comboBox_char_attributes.currentText()
+        selected_num = self.ui.comboBox_num_attributes.currentText()
+        self._load_attributes()
+        self.fill_combobox_attributes()
+        self.ui.comboBox_char_attributes.blockSignals(True)
+        self.ui.comboBox_num_attributes.blockSignals(True)
+        char_index = self.ui.comboBox_char_attributes.findText(selected_char)
+        if char_index >= 0:
+            self.ui.comboBox_char_attributes.setCurrentIndex(char_index)
+        num_index = self.ui.comboBox_num_attributes.findText(selected_num)
+        if num_index >= 0:
+            self.ui.comboBox_num_attributes.setCurrentIndex(num_index)
+        self.ui.comboBox_char_attributes.blockSignals(False)
+        self.ui.comboBox_num_attributes.blockSignals(False)
+
+    def _on_project_data_changed(self, tables, source):
+        """Refresh chart attribute options when attribute metadata changes elsewhere."""
+
+        if source is self or not isinstance(tables, list):
+            return
+        changed_tables = set(tables)
+        if not changed_tables.intersection({"attribute", "attribute_type"}):
+            return
+        self._refresh_attribute_controls()
 
     def fill_files_combobox(self, text=""):
         files_combobox_list = [""]
@@ -279,7 +314,7 @@ class ViewCharts(QDialog):
             try:
                 words_string = getattr(stopwords, lang_code, None)
                 if words_string:
-                    temp_path = os.path.join(tempfile.gettempdir(), f"qc_stopwords_{lang_code}.txt")
+                    temp_path = Path(tempfile.gettempdir()) / f"qc_stopwords_{lang_code}.txt"
                     with open(temp_path, 'w', encoding='utf-8') as f:
                         f.write("\n".join(words_string.split()))
                     return temp_path
@@ -287,14 +322,15 @@ class ViewCharts(QDialog):
                 pass
                 
             # OPCIÓN B: Buscar en la carpeta Examples como plan de respaldo
-            examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Examples")
-            example_file = os.path.join(examples_dir, f"stopwords_{lang_code}.txt")
-            if os.path.exists(example_file):
+            #examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Examples")
+            examples_dir = Path(__file__).resolve().parent.parent / "Examples"
+            example_file = Path(examples_dir) / f"stopwords_{lang_code}.txt"
+            if Path(example_file).exists():
                 return example_file
 
         # 3. FALLBACK: Prevenir crashes creando un archivo temporal vacío si no hay nada seleccionado
-        fallback_file = os.path.join(tempfile.gettempdir(), "qc_vacio_seguridad.txt")
-        if not os.path.exists(fallback_file):
+        fallback_file = Path(tempfile.gettempdir()) / "qc_vacio_seguridad.txt"  # 
+        if not Path(fallback_file).exisats():
             try:
                 with open(fallback_file, 'w', encoding='utf-8') as f:
                     f.write("") 
@@ -378,7 +414,7 @@ class ViewCharts(QDialog):
          This overrides existing stops words in the simple stopwords,
          and overrides stops words file in .qualcoder configuration folder."""
 
-        default_import_directory = os.path.expanduser("~")
+        default_import_directory = str(Path('~').expanduser())
         response = QtWidgets.QFileDialog.getOpenFileName(None, _('Select stopwords file'),
                                                          default_import_directory,
                                                          "Text Files (*.txt)",
@@ -478,6 +514,17 @@ class ViewCharts(QDialog):
             for code in self.codes:
                 if code['catid'] == cat['catid']:
                     selected_codes.append(code)
+        # Include descendant sub-codes (supercid) of the selected codes, cascading, so a
+        # category selection also charts the sub-codes nested under its codes. <- L
+        selected_cids = {c['cid'] for c in selected_codes}
+        changed = True
+        while changed:
+            changed = False
+            for code in self.codes:
+                if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                    selected_codes.append(code)
+                    selected_cids.add(code['cid'])
+                    changed = True
         self.codes = selected_codes
 
     # CODING CHARTS SECTION
@@ -555,7 +602,7 @@ class ViewCharts(QDialog):
             self.ui.lineEdit_max_words.setText("200")
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         ngrams = int(self.ui.comboBox_ngrams.currentText())
-        stopwords_path = self.get_selected_stopwords_path()
+        stopwords_path = str(self.get_selected_stopwords_path())  # Must be string object fow wordcloud
         export_dir = QtWidgets.QFileDialog.getExistingDirectory(
             None, _('Select folder to save Wordcloud'),
             self.last_wordcloud_dir,
@@ -566,18 +613,19 @@ class ViewCharts(QDialog):
         self.last_wordcloud_dir = export_dir
         base_name = "QualCoder_Wordcloud"
         extension = ".png"
-        filepath = os.path.join(export_dir, base_name + extension)
+        filepath = Path(export_dir) / f"{base_name}{extension}"
         counter = 0
         
-        while os.path.exists(filepath):
-            filepath = os.path.join(export_dir, f"{base_name}_{counter}{extension}")
+        while Path(filepath).exists():
+            filepath = Path(export_dir) / f"{base_name}_{counter}{extension}"
             counter += 1
-        # Ventana de confirmación de guardado. Save confirmation window
+        # Ventana de confirmación de guardado. Save confirmation window. 
         try:
+            # for wordcloud filepaths must be String
             Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
                       text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
-                      stopwords_filepath2=stopwords_path, save_filepath=filepath)
-            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + filepath).exec()
+                      stopwords_filepath2=stopwords_path, save_filepath=str(filepath))
+            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + str(filepath)).exec()
         except Exception as e:
             logger.error(f"Error generating Wordcloud: {str(e)}")
             Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()
@@ -1299,6 +1347,56 @@ class ViewCharts(QDialog):
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
 
+    @staticmethod
+    def _contrast_text(hex_colour):
+        """ Black or white label for readability over a given sector colour. <- L """
+        h = (hex_colour or '').lstrip('#')
+        if len(h) != 6:
+            return '#000000'
+        try:
+            r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        except ValueError:
+            return '#000000'
+        luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        return '#000000' if luminance > 0.5 else '#FFFFFF'
+
+    def _apply_code_colours(self, fig, colours_map):
+        """ Colour each sunburst/treemap sector with its code colour (neutral grey for
+        categories) and set a black or white label per sector for readable contrast.
+        Sectors are matched by name read from the trace, so the order stays correct. <- L """
+        try:
+            labels = list(fig.data[0].labels)
+        except (IndexError, AttributeError, TypeError):
+            return
+        text_colours = [self._contrast_text(colours_map.get(lbl, '#BFBFBF')) for lbl in labels]
+        fig.update_traces(insidetextfont_color=text_colours)
+
+    def _rollup_subcodes_into_parent_codes(self):
+        """ Hierarchy charts: nest sub-codes under their parent code. <- L
+        Sub-codes have a null catid, so the category roll-up leaves them parentless and they
+        float at the root. Here each sub-code count is rolled up the code hierarchy (deepest
+        first) so a parent code total includes its descendants, and each sub-code parentname
+        is set to its parent code name. Run AFTER own counts and BEFORE the category roll-up,
+        so categories receive each top code complete subtree total. Used with
+        branchvalues='total': a parent code arc then spans own + descendants, its own codings
+        shown as the inner remainder and sub-codes as outer ring segments. """
+        code_by_cid = {c['cid']: c for c in self.codes}
+
+        def _depth(c):
+            d, seen, cur = 0, set(), c
+            while cur is not None and cur.get('supercid') is not None and cur['cid'] not in seen:
+                seen.add(cur['cid'])
+                d += 1
+                cur = code_by_cid.get(cur['supercid'])
+            return d
+
+        for code_ in sorted(self.codes, key=_depth, reverse=True):
+            sup = code_.get('supercid')
+            if sup is not None and sup in code_by_cid:
+                parent_code = code_by_cid[sup]
+                parent_code['count'] += code_['count']
+                code_['parentname'] = parent_code['name']
+
     def hierarchy_code_frequency(self, chart="sunburst"):
         """ Count of codes across text, images and A/V.
         Calculates code count and category count and displays in sunburst or treemap chart.
@@ -1336,6 +1434,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += 1
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1370,10 +1469,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1383,13 +1484,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1416,6 +1521,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1450,10 +1556,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1463,13 +1571,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1496,6 +1608,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1530,10 +1643,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1543,13 +1658,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1576,6 +1695,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1610,10 +1730,12 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
             parents.append(sb_combined['parentname'])
+            colors_map[sb_combined['name']] = sb_combined.get('color') or '#BFBFBF'
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
@@ -1623,13 +1745,17 @@ class ViewCharts(QDialog):
             mask = df['value'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
         if chart == "sunburst":
-            fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
+            fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                              color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
-            fig = px.treemap(df[mask], names='item', parents='parent', values='value',
+            fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
+                             color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
             fig.show()
             self.helper_export_html(fig)
 
@@ -1661,6 +1787,11 @@ class ViewCharts(QDialog):
         self.ui.comboBox_num_attributes.addItems(list_num)
         self.ui.comboBox_num_attributes.blockSignals(False)
         self.ui.comboBox_char_attributes.blockSignals(False)
+
+        if self.ui.comboBox_char_attributes.currentIndex() == -1 and len(list_char) > 0:
+            self.ui.comboBox_char_attributes.setCurrentIndex(0)
+        if self.ui.comboBox_num_attributes.currentIndex() == -1 and len(list_num) > 0:
+            self.ui.comboBox_num_attributes.setCurrentIndex(0)
 
     def character_attribute_charts(self):
         """ Character attributes are displayed as counts via bar charts. """
