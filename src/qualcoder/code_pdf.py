@@ -1883,7 +1883,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_mode_text.setIcon(qta.icon('mdi6.cursor-text', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_mode_area.setIcon(qta.icon('mdi6.vector-square', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
-        
+        self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(32, 26))
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(28, 28))
+
         # Buttons below file list and tree
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
         self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
