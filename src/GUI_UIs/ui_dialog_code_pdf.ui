@@ -75,26 +75,29 @@
         <widget class="QLabel" name="label_coder">
          <property name="minimumSize">
           <size>
-           <width>44</width>
+           <width>30</width>
            <height>28</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>16777215</width>
+           <width>30</width>
            <height>28</height>
           </size>
          </property>
          <property name="toolTip">
-          <string>Codername</string>
+          <string>Coder</string>
          </property>
          <property name="text">
-          <string>Coder:</string>
+          <string/>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>6</width>
@@ -113,7 +116,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>170</width>
+           <width>150</width>
            <height>28</height>
           </size>
          </property>
@@ -314,7 +317,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
        <rect>
         <x>630</x>
         <y>0</y>
-        <width>161</width>
+        <width>191</width>
         <height>28</height>
        </rect>
       </property>
@@ -492,24 +495,24 @@ Click to cycle: hidden, code name, code name and memo</string>
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>780</x>
-        <y>43</y>
-        <width>51</width>
-        <height>24</height>
+        <x>794</x>
+        <y>38</y>
+        <width>34</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Export</string>
       </property>
       <property name="text">
-       <string>Exports</string>
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_exports">
       <property name="geometry">
        <rect>
         <x>830</x>
-        <y>40</y>
+        <y>38</y>
         <width>101</width>
         <height>30</height>
        </rect>
@@ -673,7 +676,13 @@ odt report: report of the coded text and areas.</string>
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
      <widget class="QSplitter" name="leftsplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
       <widget class="QWidget" name="widget_files" native="true">
        <layout class="QVBoxLayout" name="verticalLayout_files">
         <property name="spacing">
