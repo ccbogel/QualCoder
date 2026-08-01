@@ -386,6 +386,163 @@ class DialogPdfPagesToImages(QtWidgets.QDialog):
         self.preview.set_page_limits(self.spin_from.value() - 1, self.spin_to.value() - 1)
 
 
+class FilterHeaderView(QtWidgets.QHeaderView):
+    """
+    Horizontal table header with filter funnel per column.
+    Clicking the funnel emits filter_clicked with the column index.
+    """
+
+    filter_clicked = QtCore.pyqtSignal(int)
+    ICON_SIZE = 15
+    ICON_MARGIN = 4
+
+    def __init__(self, parent=None):
+        super().__init__(QtCore.Qt.Orientation.Horizontal, parent)
+        self.filtered_sections = set()
+        self._pressed_section = None
+        self._icon_active = None  # Lazy: qtawesome needs a running QApplication
+        self._icon_inactive = None
+        self.setSectionsClickable(True)
+        self.setHighlightSections(True)
+
+    def set_filtered_sections(self, sections):
+        """
+        Columns with an active filter show a blue funnel.
+        """
+
+        self.filtered_sections = set(sections)
+        self.viewport().update()
+
+    def sectionSizeFromContents(self, logical_index):
+        # Reserve room for the funnel so resizeColumnsToContents does not clip it
+        size = super().sectionSizeFromContents(logical_index)
+        return QtCore.QSize(size.width() + self.ICON_SIZE + self.ICON_MARGIN * 2, size.height())
+
+    def _icon_rect(self, rect):
+        return QtCore.QRect(rect.right() - self.ICON_SIZE - self.ICON_MARGIN,
+                            rect.top() + (rect.height() - self.ICON_SIZE) // 2,
+                            self.ICON_SIZE, self.ICON_SIZE)
+
+    def paintSection(self, painter, rect, logical_index):
+        painter.save()
+        super().paintSection(painter, rect, logical_index)
+        painter.restore()
+        if rect.width() < self.ICON_SIZE * 2 + self.ICON_MARGIN * 2:
+            return
+        if self._icon_active is None:
+            self._icon_active = qta.icon('mdi6.filter', color='#1e90ff')
+            self._icon_inactive = qta.icon('mdi6.filter-outline', color='#909090')
+        if logical_index in self.filtered_sections:
+            self._icon_active.paint(painter, self._icon_rect(rect))
+        else:
+            self._icon_inactive.paint(painter, self._icon_rect(rect))
+
+    def _section_rect(self, logical_index):
+        return QtCore.QRect(self.sectionViewportPosition(logical_index), 0,
+                            self.sectionSize(logical_index), self.height())
+
+    def _icon_hit(self, pos):
+        idx = self.logicalIndexAt(pos)
+        if idx >= 0 and self._icon_rect(self._section_rect(idx)).contains(pos):
+            return idx
+        return None
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            idx = self._icon_hit(event.position().toPoint())
+            if idx is not None:
+                # Swallow so the click does not select the column
+                self._pressed_section = idx
+                return
+        self._pressed_section = None
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton and self._pressed_section is not None:
+            idx = self._icon_hit(event.position().toPoint())
+            if idx == self._pressed_section:
+                self._pressed_section = None
+                self.filter_clicked.emit(idx)
+                return
+        self._pressed_section = None
+        super().mouseReleaseEvent(event)
+
+
+class HeaderFilterPopup(QtWidgets.QFrame):
+    """
+    Value picker for one table column: search box, select all
+    and checkable values. Changes apply immediately via apply_callback(excluded_keys).
+    """
+
+    def __init__(self, parent, keys_labels, excluded, apply_callback):
+        super().__init__(parent, QtCore.Qt.WindowType.Popup)
+        self.apply_callback = apply_callback
+        self._updating = False
+        self.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(4)
+        self.search = QtWidgets.QLineEdit()
+        self.search.setPlaceholderText(_("Search values"))
+        self.search.setClearButtonEnabled(True)
+        self.search.textChanged.connect(self.search_values)
+        layout.addWidget(self.search)
+        self.checkbox_select_all = QtWidgets.QCheckBox(_("(Select all)"))
+        self.checkbox_select_all.clicked.connect(self.select_all_clicked)
+        layout.addWidget(self.checkbox_select_all)
+        self.list_widget = QtWidgets.QListWidget()
+        for key, label in keys_labels:
+            item = QtWidgets.QListWidgetItem(label)
+            item.setData(QtCore.Qt.ItemDataRole.UserRole, key)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
+            item.setCheckState(QtCore.Qt.CheckState.Unchecked if key in excluded
+                               else QtCore.Qt.CheckState.Checked)
+            self.list_widget.addItem(item)
+        self.list_widget.itemChanged.connect(self.item_changed)
+        layout.addWidget(self.list_widget)
+        self.update_select_all_state()
+        self.resize(260, min(420, 92 + self.list_widget.count() * 24))
+
+    def visible_items(self):
+        return [self.list_widget.item(r) for r in range(self.list_widget.count())
+                if not self.list_widget.item(r).isHidden()]
+
+    def search_values(self, text):
+        text = text.lower()
+        for r in range(self.list_widget.count()):
+            item = self.list_widget.item(r)
+            item.setHidden(text != "" and text not in item.text().lower())
+        self.update_select_all_state()
+
+    def select_all_clicked(self, checked):
+        # Applies to the values matching the popup search only
+        state = QtCore.Qt.CheckState.Checked if checked else QtCore.Qt.CheckState.Unchecked
+        self._updating = True
+        for item in self.visible_items():
+            item.setCheckState(state)
+        self._updating = False
+        self.apply_excluded()
+
+    def item_changed(self, item):
+        if self._updating:
+            return
+        self.apply_excluded()
+
+    def update_select_all_state(self):
+        items = self.visible_items()
+        all_checked = bool(items) and all(
+            item.checkState() == QtCore.Qt.CheckState.Checked for item in items)
+        self.checkbox_select_all.blockSignals(True)
+        self.checkbox_select_all.setChecked(all_checked)
+        self.checkbox_select_all.blockSignals(False)
+
+    def apply_excluded(self):
+        self.update_select_all_state()
+        excluded = {self.list_widget.item(r).data(QtCore.Qt.ItemDataRole.UserRole)
+                    for r in range(self.list_widget.count())
+                    if self.list_widget.item(r).checkState() != QtCore.Qt.CheckState.Checked}
+        self.apply_callback(excluded)
+
 
 class DialogManageFiles(QtWidgets.QDialog):
     """ View, import, export, rename and delete text files.
@@ -476,7 +633,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.lineEdit_search_files.setToolTip(_("File name filter"))
         self.ui.lineEdit_search_files.setPlaceholderText(_("Search files"))
         self.ui.lineEdit_search_files.textChanged.connect(self.apply_file_filter)
-        self.setup_filter_combos()
+        self.setup_header_filters()
         self.ui.tableWidget.setTabKeyNavigation(False)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
@@ -545,112 +702,212 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     FILE_TYPE_KEYS = ("text", "pdf", "image", "audio", "video")
     PLAIN_TEXT_KEY = "__plain__"
+    NO_DATE_KEY = "__nodate__"
+    NO_CASE_KEY = "__nocase__"
 
-    def setup_filter_combos(self):
+    def setup_header_filters(self):
         """
-        Prepare the type and extension combos with checkable item models.
-        """
-
-        self.file_type_model = self._setup_checkable_combo(self.ui.comboBox_file_type)
-        labels = {'text': _("Text"), 'pdf': _("PDF"), 'image': _("Image"),
-                  'audio': _("Audio"), 'video': _("Video")}
-        self._set_combo_items(self.file_type_model, [(key, labels[key]) for key in self.FILE_TYPE_KEYS])
-        self.file_ext_model = self._setup_checkable_combo(self.ui.comboBox_file_ext)
-        self.update_filter_captions()
-
-    def _setup_checkable_combo(self, combo):
-        """
-        Configure one combo for checkable items and return its model.
+        Install the filter header on the file table.
         """
 
-        model = QtGui.QStandardItemModel(combo)
-        combo.setModel(model)
-        combo.setEditable(True)
-        combo.lineEdit().setReadOnly(True)
-        combo.lineEdit().installEventFilter(self)
-        combo.view().viewport().installEventFilter(self)
-        model.itemChanged.connect(self.filter_combo_changed)
-        return model
+        self.header_filters = {}  # Header label -> set of excluded value keys
+        self.header_filter_popup = None
+        self.filter_header = FilterHeaderView(self.ui.tableWidget)
+        self.ui.tableWidget.setHorizontalHeader(self.filter_header)
+        self.filter_header.filter_clicked.connect(self.show_header_filter_popup)
+        self.filter_header.setVisible(True)
 
-    def _set_combo_items(self, model, keys_labels, keep_states=False):
-        """
-        Rebuild a combo model, optionally preserving existing check states.
-        """
+    BASE_COLUMN_KEYS = {0: "name", 1: "memo", 2: "date", 3: "id", 4: "case"}
 
-        old_states = {}
-        if keep_states:
-            for r in range(model.rowCount()):
-                item = model.item(r)
-                old_states[item.data(QtCore.Qt.ItemDataRole.UserRole)] = item.checkState()
-        model.blockSignals(True)
-        model.clear()
-        for key, label in keys_labels:
-            item = QtGui.QStandardItem(label)
-            item.setData(key, QtCore.Qt.ItemDataRole.UserRole)
-            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
-            item.setCheckState(old_states.get(key, QtCore.Qt.CheckState.Checked))
-            model.appendRow(item)
-        model.blockSignals(False)
-
-    def filter_combo_changed(self, item):
+    def column_filter_key(self, col):
         """
-        Update captions and re-apply filter when an item is checked or unchecked.
+        Stable key of one column for the header_filters dict.
+        Base columns use fixed keys, attribute columns use 'attr:' + name,
+        so a translated UI or an attribute named like a base column cannot clash.
         """
 
-        self.update_filter_captions()
+        if col in self.BASE_COLUMN_KEYS:
+            return self.BASE_COLUMN_KEYS[col]
+        att_pos = col - self.ATTRIBUTE_START_COLUMN
+        if 0 <= att_pos < len(self.attribute_labels_ordered):
+            return "attr:" + self.attribute_labels_ordered[att_pos]
+        return None
+
+    def column_of_filter_key(self, key):
+        """
+        Column index of one filter key, or None when the column is gone.
+        """
+
+        for col, base_key in self.BASE_COLUMN_KEYS.items():
+            if key == base_key:
+                return col
+        if key.startswith("attr:"):
+            name = key[5:]
+            if name in self.attribute_labels_ordered:
+                return self.ATTRIBUTE_START_COLUMN + self.attribute_labels_ordered.index(name)
+        return None
+
+    def header_filter_keys_of(self, data, col):
+        """
+        Filter keys of one source for one column.
+        The name column filters by file type and extension, matching its icon.
+        """
+
+        if col == self.NAME_COLUMN:
+            return [f"type\t{self.file_type_of(data)}", f"ext\t{self.file_ext_of(data)}"]
+        if col == self.MEMO_COLUMN:
+            return ["memo" if data['memo'] != "" else ""]
+        if col == self.DATE_COLUMN:
+            return [self.file_date_of(data)]
+        if col == self.ID_COLUMN:
+            return [str(data['id'])]
+        if col == self.CASE_COLUMN:
+            return sorted(self.file_cases_of(data))
+        att_pos = col - self.ATTRIBUTE_START_COLUMN
+        if 0 <= att_pos < len(data['attributes']):
+            return [data['attributes'][att_pos]]
+        return []
+
+    def row_matches_column(self, data, col, excluded):
+        """
+        True when the header filter of one column keeps this file visible.
+        """
+
+        keys = self.header_filter_keys_of(data, col)
+        if not keys:
+            return True
+        if col == self.CASE_COLUMN:
+            # A file in several cases stays visible while any of them is checked
+            return not set(keys).issubset(excluded)
+        return not any(key in excluded for key in keys)
+
+    def row_passes_filters(self, row, data, skip_col=None):
+        """
+        True when the search text, the header filters (except skip_col) and
+        the context menu / loaded display criteria keep this row visible.
+        """
+
+        search = self.ui.lineEdit_search_files.text().lower()
+        if search and search not in data['name'].lower():
+            return False
+        for key, excluded in self.header_filters.items():
+            if not excluded:
+                continue
+            col = self.column_of_filter_key(key)
+            if col is None or col == skip_col:
+                continue
+            if not self.row_matches_column(data, col, excluded):
+                return False
+        return not self.row_hidden_by_criteria(row)
+
+    def header_filter_options(self, col):
+        """
+        (key, label) options for one column popup: distinct
+        values from the rows that pass the search and every other column filter.
+        """
+
+        sources = [data for row, data in enumerate(self.source)
+                   if self.row_passes_filters(row, data, skip_col=col)]
+        if col == self.NAME_COLUMN:
+            type_labels = {'text': _("Text"), 'pdf': _("PDF"), 'image': _("Image"),
+                           'audio': _("Audio"), 'video': _("Video")}
+            present = {self.file_type_of(s) for s in sources}
+            options = [(f"type\t{key}", type_labels[key]) for key in self.FILE_TYPE_KEYS
+                       if key in present]
+            exts = {self.file_ext_of(s) for s in sources}
+            if self.PLAIN_TEXT_KEY in exts:
+                options.append((f"ext\t{self.PLAIN_TEXT_KEY}", _("Plain text")))
+            options += [(f"ext\t{ext}", ext) for ext in sorted(exts - {self.PLAIN_TEXT_KEY})]
+            return options
+        if col == self.MEMO_COLUMN:
+            keys = {self.header_filter_keys_of(s, col)[0] for s in sources}
+            options = []
+            if "memo" in keys:
+                options.append(("memo", _("Memo")))
+            if "" in keys:
+                options.append(("", _("No memo")))
+            return options
+        if col == self.DATE_COLUMN:
+            dates = {self.file_date_of(s) for s in sources}
+            options = [(d, d) for d in sorted(dates - {self.NO_DATE_KEY}, reverse=True)]
+            if self.NO_DATE_KEY in dates:
+                options.append((self.NO_DATE_KEY, _("No date")))
+            return options
+        if col == self.ID_COLUMN:
+            ids = {str(s['id']) for s in sources}
+            return [(id_, id_) for id_ in sorted(ids, key=lambda v: int(v) if v.isdigit() else 0)]
+        if col == self.CASE_COLUMN:
+            names = {name for s in sources for name in self.file_cases_of(s)}
+            options = [(name, name) for name in sorted(names - {self.NO_CASE_KEY})]
+            if self.NO_CASE_KEY in names:
+                options.append((self.NO_CASE_KEY, _("No case")))
+            return options
+        att_pos = col - self.ATTRIBUTE_START_COLUMN
+        values = sorted({s['attributes'][att_pos] for s in sources
+                         if 0 <= att_pos < len(s['attributes'])})
+        options = []
+        for value in values:
+            label = value.replace("\n", "; ") if value != "" else _("(no value)")
+            if len(label) > 40:
+                label = label[:40] + "..."
+            options.append((value, label))
+        return options
+
+    def show_header_filter_popup(self, col):
+        """
+        Open the value picker under the clicked header section.
+        """
+
+        filter_key = self.column_filter_key(col)
+        if filter_key is None:
+            return
+        options = self.header_filter_options(col)
+        excluded = self.header_filters.get(filter_key, set())
+        self.header_filter_popup = HeaderFilterPopup(
+            self, options, excluded, lambda excl, key=filter_key: self.set_header_filter(key, excl))
+        x = self.filter_header.sectionViewportPosition(col)
+        pos = self.filter_header.viewport().mapToGlobal(QtCore.QPoint(x, self.filter_header.height()))
+        screen = self.screen().availableGeometry()
+        pos.setX(max(screen.left(), min(pos.x(), screen.right() - self.header_filter_popup.width())))
+        self.header_filter_popup.move(pos)
+        self.header_filter_popup.show()
+
+    def set_header_filter(self, filter_key, excluded):
+        """
+        Store the excluded value keys of one column and re-apply the filter.
+        """
+
+        if excluded:
+            self.header_filters[filter_key] = set(excluded)
+        else:
+            self.header_filters.pop(filter_key, None)
+        self.update_header_filter_icons()
         self.apply_file_filter()
 
-    @staticmethod
-    def _checked_keys(model):
+    def update_header_filter_icons(self):
         """
-        Return the set of checked item keys of a combo model.
-        """
-
-        checked = set()
-        for r in range(model.rowCount()):
-            item = model.item(r)
-            if item.checkState() == QtCore.Qt.CheckState.Checked:
-                checked.add(item.data(QtCore.Qt.ItemDataRole.UserRole))
-        return checked
-
-    @staticmethod
-    def _combo_caption(model, all_text, none_text):
-        """
-        Build the caption from checked item names
+        Blue funnel on the columns with an active filter.
         """
 
-        total = model.rowCount()
-        names = [model.item(r).text() for r in range(total)
-                 if model.item(r).checkState() == QtCore.Qt.CheckState.Checked]
-        if len(names) == total:
-            return all_text
-        if not names:
-            return none_text
-        return ", ".join(names)
+        sections = {self.column_of_filter_key(key) for key in self.header_filters}
+        self.filter_header.set_filtered_sections(sections - {None})
 
-    def update_filter_captions(self):
-        """
-        Show checked names in both combo line edits.
-        """
+    def prune_header_filters(self):
+        """ After a reload, drop filters of removed columns and of values no
+        longer present, so the funnel icons stay truthful. """
 
-        self.ui.comboBox_file_type.lineEdit().setText(
-            self._combo_caption(self.file_type_model, _("All file types"), _("No file types")))
-        self.ui.comboBox_file_ext.lineEdit().setText(
-            self._combo_caption(self.file_ext_model, _("All extensions"), _("No extensions")))
-
-    def update_file_ext_combo(self):
-        """
-        Rebuild extension items from the loaded sources, preserving check states.
-        System created files (survey, internal) have no extension and are shown as Plain text.
-        """
-
-        extensions = sorted({self.file_ext_of(s) for s in self.source} - {self.PLAIN_TEXT_KEY})
-        keys_labels = []
-        if any(self.file_ext_of(s) == self.PLAIN_TEXT_KEY for s in self.source):
-            keys_labels.append((self.PLAIN_TEXT_KEY, _("Plain text")))
-        keys_labels += [(ext, ext) for ext in extensions]
-        self._set_combo_items(self.file_ext_model, keys_labels, keep_states=True)
-        self.update_filter_captions()
+        pruned = {}
+        for filter_key, excluded in self.header_filters.items():
+            col = self.column_of_filter_key(filter_key)
+            if col is None:
+                continue
+            all_keys = {key for data in self.source
+                        for key in self.header_filter_keys_of(data, col)}
+            keep = excluded & all_keys
+            if keep:
+                pruned[filter_key] = keep
+        self.header_filters = pruned
+        self.update_header_filter_icons()
 
     def file_type_of(self, data):
         """
@@ -676,16 +933,31 @@ class DialogManageFiles(QtWidgets.QDialog):
         suffix = Path(data['name']).suffix.lower()
         return suffix if suffix else self.PLAIN_TEXT_KEY
 
+    def file_date_of(self, data):
+        """
+        Date portion (yyyy-mm-dd) of the source date, or the no date key.
+        """
+
+        date_ = (data['date'] or "")[:10]
+        return date_ if date_ else self.NO_DATE_KEY
+
+    def file_cases_of(self, data):
+        """
+        Set of case names the file belongs to, or the no case key.
+        """
+
+        names = {name for name in (data['case'] or "").split(";") if name}
+        return names if names else {self.NO_CASE_KEY}
+
+
     def file_filter_active(self):
         """
-        True when the search text or a combo selection restricts the table.
+        True when the search text or a header column filter restricts the table.
         """
 
         if self.ui.lineEdit_search_files.text() != "":
             return True
-        if len(self._checked_keys(self.file_type_model)) < self.file_type_model.rowCount():
-            return True
-        return len(self._checked_keys(self.file_ext_model)) < self.file_ext_model.rowCount()
+        return any(self.header_filters.values())
 
     def row_hidden_by_criteria(self, row):
         """
@@ -717,29 +989,17 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def apply_file_filter(self):
         """
-        Hide rows not matching the search text, checked types, checked extensions
-        and any context menu / loaded display criteria. Hidden rows are deselected
+        Hide rows not matching the search text, the header column filters and
+        any context menu / loaded display criteria. Hidden rows are deselected
         so selection based actions only act on visible rows.
         """
 
-        search = self.ui.lineEdit_search_files.text().lower()
-        checked_types = self._checked_keys(self.file_type_model)
-        checked_exts = self._checked_keys(self.file_ext_model)
         active = self.file_filter_active()
         selection_model = self.ui.tableWidget.selectionModel()
         for row, data in enumerate(self.source):
             if row >= self.ui.tableWidget.rowCount():
                 break
-            hidden = False
-            if search and search not in data['name'].lower():
-                hidden = True
-            if self.file_type_of(data) not in checked_types:
-                hidden = True
-            if self.file_ext_model.rowCount() > 0 and self.file_ext_of(data) not in checked_exts:
-                hidden = True
-            if not hidden and self.row_hidden_by_criteria(row):
-                hidden = True
-            self.ui.tableWidget.setRowHidden(row, hidden)
+            self.ui.tableWidget.setRowHidden(row, not self.row_passes_filters(row, data))
         if selection_model is not None:
             for index in selection_model.selectedIndexes():
                 if self.ui.tableWidget.isRowHidden(index.row()):
@@ -762,19 +1022,15 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def clear_file_filter(self):
         """
-        Reset search text and combo selections. Context menu criteria in
-        rows_hidden stay applied; Ctrl+A or Show all rows clears those
+        Reset the search text and every header column filter. Context menu
+        criteria in rows_hidden stay applied; Ctrl+A or Show all rows clears those
         """
 
         self.ui.lineEdit_search_files.blockSignals(True)
         self.ui.lineEdit_search_files.clear()
         self.ui.lineEdit_search_files.blockSignals(False)
-        for model in (self.file_type_model, self.file_ext_model):
-            model.blockSignals(True)
-            for r in range(model.rowCount()):
-                model.item(r).setCheckState(QtCore.Qt.CheckState.Checked)
-            model.blockSignals(False)
-        self.update_filter_captions()
+        self.header_filters = {}
+        self.update_header_filter_icons()
         self.apply_file_filter()
 
     def pseudonyms(self):
@@ -972,23 +1228,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         def
         """
 
-        for combo, model in ((self.ui.comboBox_file_type, getattr(self, "file_type_model", None)),
-                             (self.ui.comboBox_file_ext, getattr(self, "file_ext_model", None))):
-            if model is None:
-                continue
-            if object_ is combo.lineEdit() and event.type() == QtCore.QEvent.Type.MouseButtonRelease:
-                combo.showPopup()
-                return True
-            if object_ is combo.view().viewport() and event.type() == QtCore.QEvent.Type.MouseButtonRelease:
-                # Toggle check state and keep the popup open
-                index = combo.view().indexAt(event.position().toPoint())
-                if index.isValid():
-                    item = model.itemFromIndex(index)
-                    if item.checkState() == QtCore.Qt.CheckState.Checked:
-                        item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-                    else:
-                        item.setCheckState(QtCore.Qt.CheckState.Checked)
-                return True
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
@@ -1310,8 +1549,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.blockSignals(True)  # Otherwise, cell_modified() is called
                 self.ui.tableWidget.setItem(row,col, item)
                 self.ui.tableWidget.blockSignals(False)
+                # Keep the loaded sources in sync for the header filters
+                att_pos = col - self.ATTRIBUTE_START_COLUMN
+                if 0 <= att_pos < len(self.source[row]['attributes']):
+                    self.source[row]['attributes'][att_pos] = value
             self.app.conn.commit()
         self._emit_project_table_changes(["attribute"])
+        if self.file_filter_active():
+            # An edited value may now be excluded by a header filter
+            self.apply_file_filter()
         if msg != "":
             Message(self.app, _("Value error"), msg).exec()
 
@@ -1507,9 +1753,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute(sql, (case_['id'], fid, 0, len_text, self.app.settings['codername'],
                                       datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), ""))
                     self.app.conn.commit()
-                # Visual feedback
+                # Visual feedback, keeping the loaded sources in sync for the header filters
                 cases_text = self.get_cases_by_filename(self.ui.tableWidget.item(row, self.NAME_COLUMN).text())
                 self.ui.tableWidget.item(row, self.CASE_COLUMN).setText(cases_text)
+                self.source[row]['case'] = cases_text
+        if self.file_filter_active():
+            self.apply_file_filter()
 
     def rename_database_entry(self):
         """ Rename the database entry of the file. """
@@ -2004,7 +2253,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if att_name == "Ref_authors":
                         tmp = tmp.replace(";", "\n")
                     s['attributes'].append(tmp)
-        self.update_file_ext_combo()
+        self.prune_header_filters()
         self.fill_table()
 
     def get_icon_and_metadata(self, id_:int):
@@ -2230,6 +2479,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Memo"))
+            if self.file_filter_active():
+                # The changed memo may now be excluded by a header filter
+                self.apply_file_filter()
 
     def cell_modified(self):
         """ Attribute values can be changed.  """
@@ -2275,6 +2527,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
             self.app.delete_backup = False
             self.ui.tableWidget.resizeColumnsToContents()
+            if self.file_filter_active():
+                # The edited value may now be excluded by a header filter
+                self.apply_file_filter()
 
     def view(self):
         """ View and edit text file contents.
@@ -3873,7 +4128,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 _("Right click header row to hide columns") + "\n" + tt)
 
         self.update_label_file_count()
-        if getattr(self, "file_type_model", None) is not None and \
+        if getattr(self, "header_filters", None) is not None and \
                 (self.file_filter_active() or self.rows_hidden):
             self.apply_file_filter()
         self.ui.tableWidget.blockSignals(False)
