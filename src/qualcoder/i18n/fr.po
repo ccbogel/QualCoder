@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-01 14:58+0200\n"
-"PO-Revision-Date: 2026-08-01 14:59+0200\n"
+"PO-Revision-Date: 2026-08-01 15:01+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -2864,7 +2864,7 @@ msgstr "Codage des images"
 #: src/qualcoder/view_image.py:124 src/qualcoder/view_image.py:2331
 #: src/qualcoder/helpers.py:788 src/qualcoder/helpers.py:866
 msgid "Key + or W zoom in. Key - or Q zoom out"
-msgstr "Touche + ou W : zoom avant. Touche - ou Q : zoom arrière"
+msgstr "Touche + ou W : zoomer. Touche - ou Q : dézoomer"
 
 #: src/qualcoder/view_image.py:945 src/qualcoder/view_image.py:953
 #: src/qualcoder/view_image.py:987 src/qualcoder/manage_files.py:1417
@@ -3035,7 +3035,7 @@ msgid ""
 msgstr ""
 "L tourner dans le sens des aiguilles d'une montre\n"
 "R rotation dans le sens inverse des aiguilles d'une montre\n"
-"+ - zoom avant et arrière"
+"+ - (dé)zoomer"
 
 #: src/qualcoder/view_image.py:2362
 msgid " Height: "
