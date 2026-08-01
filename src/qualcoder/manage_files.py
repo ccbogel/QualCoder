@@ -85,6 +85,10 @@ class PdfPreviewWidget(QtWidgets.QWidget):
     (converter) and DialogPdfPreview (viewer).
     """
 
+    ZOOM_MIN = 25
+    ZOOM_MAX = 200
+    ZOOM_STEP = 25
+
     def __init__(self, filepath:str, parent=None):
         super().__init__(parent)
         self.filepath = filepath
@@ -92,6 +96,9 @@ class PdfPreviewWidget(QtWidgets.QWidget):
         self.preview_page = 0  # base 0
         self.page_min = 0
         self.page_max = 0
+        self.zoom = 100  # percent of the fitted size
+        self._rendering = False  # re-entrancy guard: setPixmap/resize can trigger nested resize events
+        self._render_key = None  # (page, zoom, scale) of the last render, to skip identical renders
         try:
             doc = fitz.open(filepath)
             self.total_pages = len(doc)
@@ -103,9 +110,12 @@ class PdfPreviewWidget(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.label_preview = QtWidgets.QLabel()
         self.label_preview.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label_preview.setMinimumSize(380, 380)
-        self.label_preview.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
-        layout.addWidget(self.label_preview, stretch=1)
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.scroll_area.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.scroll_area.setMinimumSize(380, 380)
+        self.scroll_area.setWidget(self.label_preview)
+        layout.addWidget(self.scroll_area, stretch=1)
         nav = QtWidgets.QHBoxLayout()
         self.btn_prev = QtWidgets.QPushButton("<")
         self.btn_prev.setMaximumWidth(40)
@@ -119,6 +129,21 @@ class PdfPreviewWidget(QtWidgets.QWidget):
         nav.addWidget(self.btn_prev)
         nav.addWidget(self.label_page)
         nav.addWidget(self.btn_next)
+        nav.addStretch(1)
+        self.btn_zoom_out = QtWidgets.QPushButton("−")
+        self.btn_zoom_out.setMaximumWidth(40)
+        self.btn_zoom_out.setToolTip(_("Zoom out"))
+        self.btn_zoom_out.clicked.connect(lambda: self.change_zoom(-self.ZOOM_STEP))
+        self.label_zoom = QtWidgets.QLabel("100%")
+        self.label_zoom.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_zoom.setMinimumWidth(44)
+        self.btn_zoom_in = QtWidgets.QPushButton("+")
+        self.btn_zoom_in.setMaximumWidth(40)
+        self.btn_zoom_in.setToolTip(_("Zoom in"))
+        self.btn_zoom_in.clicked.connect(lambda: self.change_zoom(self.ZOOM_STEP))
+        nav.addWidget(self.btn_zoom_out)
+        nav.addWidget(self.label_zoom)
+        nav.addWidget(self.btn_zoom_in)
         nav.addStretch(1)
         layout.addLayout(nav)
         self.render_preview()
@@ -139,39 +164,83 @@ class PdfPreviewWidget(QtWidgets.QWidget):
             self.preview_page = nueva
             self.render_preview()
 
-    def render_preview(self):
+    def change_zoom(self, delta:int):
         """
-        Renders the previewed page in memory, fitted to the area, and always closes
-        the document (no handle retained).
+        Steps the zoom within ZOOM_MIN..ZOOM_MAX percent of the fitted size.
         """
 
+        new_zoom = min(self.ZOOM_MAX, max(self.ZOOM_MIN, self.zoom + delta))
+        if new_zoom != self.zoom:
+            self.zoom = new_zoom
+            self.render_preview()
+
+    def render_preview(self):
+        """
+        Renders the previewed page in memory at the real zoomed size (no pixmap
+        scaling) and always closes the document (no handle retained).
+        Re-entrancy guard: label resizes can move scrollbars and fire nested
+        resize/layout events; re-entering here recurses at C level and kills the
+        process on Windows.
+        """
+
+        if self._rendering:
+            return
+        self._rendering = True
+        try:
+            self.do_render()
+        finally:
+            self._rendering = False
+
+    def do_render(self):
         if self.total_pages == 0:
             self.label_preview.setText(_("Cannot open: ") + self.filepath)
+            self.label_preview.adjustSize()
             self.label_page.setText("0/0")
-            self.btn_prev.setEnabled(False)
-            self.btn_next.setEnabled(False)
+            self.label_zoom.setText("")
+            for btn in (self.btn_prev, self.btn_next, self.btn_zoom_out, self.btn_zoom_in):
+                btn.setEnabled(False)
             return
+        # maximumViewportSize ignores scrollbar visibility, so the fitted size is
+        # stable and scrollbar toggling cannot re-trigger renders.
+        viewport = self.scroll_area.maximumViewportSize()
         try:
             doc = fitz.open(self.filepath)
             try:
                 page = doc.load_page(self.preview_page)
-                zoom = max(0.1, min(2.0, 370.0 / max(1.0, page.rect.width)))
-                pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False, annots=False)  # PDF highlights/notes not painted in the preview
-                image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                page_w = max(1.0, page.rect.width)
+                page_h = max(1.0, page.rect.height)
+                fit = min((viewport.width() - 4) / page_w, (viewport.height() - 4) / page_h)
+                scale = fit * self.zoom / 100.0
+                # Clamp render size: at least 1 px, at most ~5000 px per side
+                scale = max(1.0 / min(page_w, page_h), min(scale, 5000.0 / max(page_w, page_h)))
+                render_key = (self.preview_page, self.zoom, round(scale, 4))
+                if render_key == self._render_key:
+                    self.update_controls()
+                    return
+                pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False, annots=False)  # PDF highlights/notes not painted in the preview
+                # bytes() detaches the buffer from PyMuPDF before the doc is closed
+                image = QtGui.QImage(bytes(pix.samples), pix.width, pix.height, pix.stride,
                                      QtGui.QImage.Format.Format_RGB888).copy()
             finally:
                 doc.close()
         except Exception as err:
             logger.warning(f"render_preview: {self.filepath} {err}")
             self.label_preview.setText(_("Cannot open: ") + self.filepath)
+            self.label_preview.adjustSize()
             return
         pixmap = QtGui.QPixmap.fromImage(image)
-        self.label_preview.setPixmap(pixmap.scaled(
-            self.label_preview.size(), QtCore.Qt.AspectRatioMode.KeepAspectRatio,
-            QtCore.Qt.TransformationMode.SmoothTransformation))
+        self.label_preview.setPixmap(pixmap)
+        self.label_preview.resize(pixmap.size())
+        self._render_key = render_key
+        self.update_controls()
+
+    def update_controls(self):
         self.label_page.setText(f"{self.preview_page + 1}/{self.total_pages}")
+        self.label_zoom.setText(f"{self.zoom}%")
         self.btn_prev.setEnabled(self.preview_page > self.page_min)
         self.btn_next.setEnabled(self.preview_page < self.page_max)
+        self.btn_zoom_out.setEnabled(self.zoom > self.ZOOM_MIN)
+        self.btn_zoom_in.setEnabled(self.zoom < self.ZOOM_MAX)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
