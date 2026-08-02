@@ -544,7 +544,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="114"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rapport sur les segments de texte en correspondance exacte&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>Rapport de segments de texte correspondants exacts</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="115"/>
@@ -1270,29 +1270,6 @@ Clic-droit pour  les options de formatage
         <location filename="../GUI/ui_dialog_import.py" line="104"/>
         <source>One file per qualitative column</source>
         <translation>Un fichier par colonne qualitative</translation>
-    </message>
-</context>
-<context>
-    <name>Dialog_Import_twitter</name>
-    <message>
-        <location filename="../GUI/ui_import_twitter.py" line="53"/>
-        <source>Twitter data import</source>
-        <translation>Importer des données Twitter</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_import_twitter.py" line="54"/>
-        <source>Import twitter data file</source>
-        <translation>Importer un fichier de données Twitter</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_import_twitter.py" line="55"/>
-        <source>Use the R statistics package to get the twitter data and create a csv file. Then import the csv file.</source>
-        <translation>Utilisez le package statistique R pour obtenir les données Twitter et créer un fichier CSV. Importez ensuite le fichier CSV.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_import_twitter.py" line="56"/>
-        <source>Select file</source>
-        <translation>Sélectionnez un fichier</translation>
     </message>
 </context>
 <context>
@@ -2987,57 +2964,57 @@ Le positionnement risque de ne pas s&apos;ajuster correctement. Effectuez une co
 <context>
     <name>Dialog_manage_files</name>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="167"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="151"/>
         <source>Files</source>
         <translation>Fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="168"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="154"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Voir le fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="169"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="155"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Créer un fichier texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="173"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="159"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Sélectionner des fichiers à supprimer</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="174"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Importer le fichier dans le dossier du projet</translation>
+        <translation>Importer un fichier dans le dossier du projet</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="175"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="161"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Ajouter un attribut</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="176"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="162"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exporter le fichier du dossier du projet sous forme de fichier lié</translation>
+        <translation>Lien vers un fichier en dehors du dossier du projet</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="177"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="163"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Importer le fichier lié dans le dossier du projet</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="180"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="166"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Exporter les attributs sous forme de fichier csv</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="181"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="167"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="170"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="156"/>
         <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
@@ -3046,41 +3023,41 @@ Les fichiers texte (de n&apos;importe quelle source) sont exportés à partir du
 (Vous pouvez ouvrir le dossier du projet et copier/coller le fichier texte original si vous préférez.)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="178"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="164"/>
         <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
         <translation>Exporter un fichier du dossier de projet en tant que fichier lié.
 Impossible d&apos;exporter le fichier de retranscription de texte associé à un fichier audio ou vidéo en tant que fichier lié.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="182"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="168"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Annuler le renommage d&apos;un fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="183"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="169"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Renommer en bloc les entrées du fichier de noms de bases de données.&lt;/p&gt;&lt;p&gt;Ne renommer que les lignes visibles du fichier. Il est possible de ne montrer que certaines lignes en utilisant la sélection d&apos;attributs ou en montrer/masquer les valeurs comme...&lt;/p&gt;&lt;p&gt;Renommer en tant que : Préfixe choisi par l&apos;utilisateur et suffixe numéroté _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="184"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="170"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save table display settings. &lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Sauvegarder les paramètres d&apos;affichage du tableau. 
 (Lignes et colonnes cachées et taille des colonnes)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="185"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Charger les paramètres d&apos;affichage du tableau sauvegardés.
 (Lignes et colonnes cachées et taille des colonnes)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="186"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="172"/>
         <source>Delete saved table display settings. </source>
         <translation>Supprimer les paramètres d&apos;affichage enregistrés pour les tableaux. </translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="187"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="173"/>
         <source>Pseudonymisation (data de-identification)
 Before importing text files, create a list of names or phrases to be replaced.
 Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
@@ -3105,7 +3082,7 @@ Une fois tous les fichiers texte importés, supprimez ce fichier du dossier du p
 </translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="198"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="184"/>
         <source>Select a text transcription to mark the speakers.
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
@@ -3116,35 +3093,25 @@ Formaté comme ci-dessous pour la détection du nom.
 « Nom : », « {Nom} » ou « [Nom] »</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="202"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="188"/>
         <source>Import survey
 
 For csv and tsv files, please avoid using the following in the column names:  , ; |
 
 Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
-        <translation>Importer l’enquête
+        <translation>Importer une enquête
 
 Pour les fichiers CSV et TSV, veuillez éviter d&apos;utiliser les caractères suivants dans les noms de colonnes :  , ; |
 
 Pour les enquêtes comportant un grand nombre d&apos;entrées (par exemple, plus de 1 000), veuillez patienter, car l&apos;import sera lente.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="207"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="152"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fitrer par nom de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="208"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter by file type&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtrer par type de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="209"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter by file extension&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtrer par extension de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_manage_files.py" line="210"/>
+        <location filename="../GUI/ui_dialog_manage_files.py" line="153"/>
         <source>Clear filter</source>
         <translation>Effacer le filtre</translation>
     </message>
@@ -3370,7 +3337,7 @@ Vérifiez après avoir appliqué la fonction.</translation>
     <message>
         <location filename="../GUI/ui_dialog_node_relations.py" line="165"/>
         <source>Import user relations</source>
-        <translation>Importer les relations utilisateur</translation>
+        <translation>Importer des relations utilisateur</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_node_relations.py" line="166"/>
@@ -3711,7 +3678,7 @@ Sélectionnez deux codeur·ses, un fichier, un code.</translation>
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="101"/>
         <source>Coder comparisons by file</source>
-        <translation>Comparaisons de codeur·ses par fichier</translation>
+        <translation>Comparaison de codeur·ses par fichier</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="103"/>

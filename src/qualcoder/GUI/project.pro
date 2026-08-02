@@ -50,7 +50,6 @@ ui_dialog_view_image.py \
 ui_dialog_view_text.py \
 ui_edit_text.py \
 ui_error_dlg.py \
-ui_import_twitter.py \
 ui_main.py \
 ui_manage_references.py \
 ui_move_resize_rectangle.py \
