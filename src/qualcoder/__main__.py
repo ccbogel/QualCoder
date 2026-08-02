@@ -2454,23 +2454,22 @@ Click "Yes" to start now.')
         self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
         msg = f"<p>{self.app.project_name}<br />"
         msg += f'{_("Project path: ")}{self.app.project_path}<br />'
-        msg += f"{_('Project date: ')}{self.project['date']}</p>"
+        msg += f"{_('Project date: ')}{self.project['date']}<br />"
         sql = "select memo from project"
         cur.execute(sql)
         memo_res = cur.fetchone()
         if memo_res[0] != "":
-            msg += "<p>" + _("Project memo: ") + f"<br />---------------------<br />{memo_res[0]}<br />---------------------</p>"
+            msg += _("Project memo: ") + f"<br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />{memo_res[0]}<br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />"
         sql = "select count(id) from source"
         cur.execute(sql)
         files_res = cur.fetchone()
         text_res = self.app.get_text_filenames()
         image_res = self.app.get_image_filenames()
         av_res = self.app.get_av_filenames()
-        msg += "<p>" + _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}</p>"
+        msg += _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}<br />"
         sql = "select count(caseid) from cases"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += "<p>"
         msg += f"{_('Cases: ')}{res[0]}<br />"
         sql = "select count(catid) from code_cat"
         cur.execute(sql)
@@ -2487,25 +2486,26 @@ Click "Yes" to start now.')
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f"{_('Journals: ')}{res[0]}"
-        msg += "</p>"
-        self.ui.textEdit.append(msg)
-        msg = ""
+        msg += f"{_('Journals: ')}{res[0]}<br />"
         cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
-            msg += f"<p>Text Bookmark: {bookmark_filename[0]}, position: {result[5]}</p>"
-        self.ui.textEdit.append(msg)
+            msg += f"Text Bookmark: {bookmark_filename[0]}, position: {result[5]}<br />"
+        # TODO a/v bookmark
+
         bad_links = self.app.check_bad_file_links()
         if bad_links:
             span = '<span style="color:red">'
-            self.ui.textEdit.append(span + _("Bad links to files") + "</span>")
+            #self.ui.textEdit.append(span + _("Bad links to files") + "</span>")
+            msg += span + _("Bad links to files") + "</span>"
             for lnk in bad_links:
-                self.ui.textEdit.append(span + lnk['name'] + "   " + lnk['mediapath'] + '</span>')
+                #self.ui.textEdit.append(span + lnk['name'] + "   " + lnk['mediapath'] + '</span><br />')
+                msg += span + lnk['name'] + "   " + lnk['mediapath'] + '</span><br />'
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
-        self.ui.textEdit.append("< br/>")
+        msg += "▔" * 20 + "</p>"
+        self.ui.textEdit.append(msg)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
