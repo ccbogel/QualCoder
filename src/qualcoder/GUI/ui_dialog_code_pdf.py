@@ -30,12 +30,11 @@ class Ui_Dialog_code_pdf(object):
         self.horizontalLayout_coder.setSpacing(0)
         self.horizontalLayout_coder.setObjectName("horizontalLayout_coder")
         self.label_coder = QtWidgets.QLabel(parent=self.widget_coder)
-        self.label_coder.setMinimumSize(QtCore.QSize(44, 28))
-        self.label_coder.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.label_coder.setMinimumSize(QtCore.QSize(28, 28))
+        self.label_coder.setMaximumSize(QtCore.QSize(28, 28))
+        self.label_coder.setText("")
         self.label_coder.setObjectName("label_coder")
         self.horizontalLayout_coder.addWidget(self.label_coder)
-        spacerItem = QtWidgets.QSpacerItem(6, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_coder.addItem(spacerItem)
         self.lineEdit_coder = QtWidgets.QLineEdit(parent=self.widget_coder)
         self.lineEdit_coder.setMinimumSize(QtCore.QSize(100, 28))
         self.lineEdit_coder.setMaximumSize(QtCore.QSize(170, 28))
@@ -326,8 +325,7 @@ class Ui_Dialog_code_pdf(object):
     def retranslateUi(self, Dialog_code_pdf):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_pdf.setWindowTitle(_translate("Dialog_code_pdf", "Code PDF"))
-        self.label_coder.setToolTip(_translate("Dialog_code_pdf", "Codername"))
-        self.label_coder.setText(_translate("Dialog_code_pdf", "Coder:"))
+        self.label_coder.setToolTip(_translate("Dialog_code_pdf", "Coder"))
         self.lineEdit_coder.setToolTip(_translate("Dialog_code_pdf", "Codername"))
         self.pushButton_coder.setToolTip(_translate("Dialog_code_pdf", "Coder visibility"))
         self.pushButton_coder.setText(_translate("Dialog_code_pdf", "..."))
@@ -389,3 +387,13 @@ class Ui_Dialog_code_pdf(object):
         self.pushButton_important.setToolTip(_translate("Dialog_code_pdf", "Show codings falgged important"))
         self.pushButton_clear_filter_code.setToolTip(_translate("Dialog_code_pdf", "Clear code filter"))
         self.lineEdit_code_filter.setToolTip(_translate("Dialog_code_pdf", "Code name filter"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog_code_pdf = QtWidgets.QDialog()
+    ui = Ui_Dialog_code_pdf()
+    ui.setupUi(Dialog_code_pdf)
+    Dialog_code_pdf.show()
+    sys.exit(app.exec())
