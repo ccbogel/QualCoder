@@ -1654,7 +1654,7 @@ Clic-droit pour  les options de formatage
     <message>
         <location filename="../GUI/ui_dialog_code_av.py" line="221"/>
         <source>Cannot code text when play transcript box is checked.</source>
-        <translation>Impossible de coder le texte lorsque la case jouer la retranscription est cochée.</translation>
+        <translation>Impossible de coder le texte si la case Jouer est cochée.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_code_av.py" line="213"/>
@@ -3019,15 +3019,15 @@ Le positionnement risque de ne pas s&apos;ajuster correctement. Effectuez une co
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
         <translation>Exporter le fichier sélectionné.
-Les fichiers texte (de n&apos;importe quelle source) sont exportés à partir du texte stocké dans la base de données sous forme de fichiers .txt.
-(Vous pouvez ouvrir le dossier du projet et copier/coller le fichier texte original si vous préférez.)</translation>
+Les fichiers texte (de toute source) sont exportés à partir du texte stocké dans la base de données sous forme de fichiers .txt.
+(Vous pouvez ouvrir le dossier du projet et copier/coller le fichier texte original si vous le préférez.)</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="164"/>
         <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
-        <translation>Exporter un fichier du dossier de projet en tant que fichier lié.
-Impossible d&apos;exporter le fichier de retranscription de texte associé à un fichier audio ou vidéo en tant que fichier lié.</translation>
+        <translation>Exporter le fichier du dossier du projet en tant que fichier lié.
+Impossible d&apos;exporter le fichier de transcription texte associé à un audio ou une vidéo en tant que fichier lié.</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="168"/>
