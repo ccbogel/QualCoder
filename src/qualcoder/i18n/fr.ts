@@ -2996,12 +2996,12 @@ Le positionnement risque de ne pas s&apos;ajuster correctement. Effectuez une co
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="162"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exporter le fichier du dossier du projet sous forme de fichier lié</translation>
+        <translation>Lien vers un fichier en dehors du dossier du projet</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="163"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Importer un fichier lié dans le dossier du projet</translation>
+        <translation>Importer le fichier lié dans le dossier du projet</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="166"/>
