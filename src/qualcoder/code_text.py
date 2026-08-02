@@ -307,6 +307,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_default_new_code_color.pressed.connect(self.set_default_new_code_color)
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(26, 26))
 
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
