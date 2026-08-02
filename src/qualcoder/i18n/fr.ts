@@ -3037,7 +3037,7 @@ Impossible d&apos;exporter le fichier de transcription texte associé à un audi
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="169"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Renommer en bloc les entrées du fichier de noms de bases de données.&lt;/p&gt;&lt;p&gt;Ne renommer que les lignes visibles du fichier. Il est possible de ne montrer que certaines lignes en utilisant la sélection d&apos;attributs ou en montrer/masquer les valeurs comme...&lt;/p&gt;&lt;p&gt;Renommer en tant que : Préfixe choisi par l&apos;utilisateur et suffixe numéroté _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Renommage groupé des entrées de fichiers avec nom de base de données.&lt;/p&gt;&lt;p&gt;Ne renommer que les lignes de fichiers visibles. Vous pouvez afficher uniquement certaines lignes en utilisant la sélection d&apos;attributs ou en affichant/masquant des valeurs comme...&lt;/p&gt;&lt;p&gt;Renommé sous la forme : préfixe choisi par l&apos;utilisateur + suffixe numéroté _nnn.&lt;/p&gt;&lt;p&gt;Exemple : entretien_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="170"/>
