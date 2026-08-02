@@ -544,7 +544,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="114"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rapport sur les segments de texte en correspondance exacte&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>Rapport de segments de texte correspondants exacts</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="115"/>
@@ -3678,7 +3678,7 @@ Sélectionnez deux codeur·ses, un fichier, un code.</translation>
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="101"/>
         <source>Coder comparisons by file</source>
-        <translation type="unfinished">Comparaison de codeur·ses par fichier</translation>
+        <translation>Comparaison de codeur·ses par fichier</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="103"/>
