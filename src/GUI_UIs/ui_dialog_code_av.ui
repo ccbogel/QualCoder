@@ -108,7 +108,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment. Key shortcut: Ctrl S
+Open memo and apply segment to currently selected code. Key shortcut: G</string>
       </property>
       <property name="text">
        <string>Start segment</string>
@@ -133,9 +134,9 @@
      <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>40</x>
         <y>50</y>
-        <width>231</width>
+        <width>191</width>
         <height>28</height>
        </rect>
       </property>
@@ -153,7 +154,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Change track, if multiple available.</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -182,7 +183,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Increase play rate to maximum 2x   Key &gt;
+Decrease play rate to minimum 0.1  Key &lt;</string>
       </property>
       <property name="text">
        <string>1.0x</string>
@@ -198,7 +200,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rewind 30 seconds. Alt + Minus</string>
       </property>
       <property name="text">
        <string/>
@@ -214,7 +216,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Forward 30 seconds. Alt + Plus. 
+Forward 5 seconds. Key 5</string>
       </property>
       <property name="text">
        <string/>
@@ -230,7 +233,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Decrease play rate Key &lt;</string>
       </property>
       <property name="text">
        <string/>
@@ -246,7 +249,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Increase play rate Key &gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -310,7 +313,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Button to select a segment. Then a menu of options will open.</string>
       </property>
       <property name="text">
        <string>S</string>
@@ -342,7 +345,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Screenshot</string>
       </property>
       <property name="text">
        <string/>
@@ -358,10 +361,41 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Get screenshot for image coding</string>
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_coder_icon">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>50</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Coder</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
      </widget>
     </widget>

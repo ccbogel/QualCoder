@@ -562,8 +562,23 @@ Formatted like below for name detection.
        </property>
        <item>
         <widget class="QLabel" name="label_coder">
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Coder</string>
+         </property>
          <property name="text">
-          <string>Coder:</string>
+          <string/>
          </property>
         </widget>
        </item>
