@@ -1884,7 +1884,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_mode_area.setIcon(qta.icon('mdi6.vector-square', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(32, 26))
-        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(28, 28))
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(26, 26))
 
         # Buttons below file list and tree
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
@@ -1905,7 +1905,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_search_case.setToolTip(_("Case sensitive search"))
         self.ui.label_code.setToolTip(_("No code selected"))
         
-        self.ui.label_coder.setText(_("Coder:"))  # The name moves to lineEdit_coder
         self.ui.lineEdit_coder.setText(ts.get('codername', ''))
         self.ui.pushButton_coder.setToolTip(_("Coder visibility"))
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)

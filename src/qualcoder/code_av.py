@@ -14,10 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
@@ -26,7 +26,7 @@ from copy import copy, deepcopy
 import datetime
 # import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
 import logging
-import os
+from pathlib import Path
 import platform
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
@@ -55,7 +55,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -159,6 +158,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_screensshot.setEnabled(False)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
+        self.ui.label_coder_icon.setPixmap(qta.icon('mdi6.account').pixmap(26, 26))
 
         # The buttons under the files list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
@@ -1904,7 +1904,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
         image_name = f"{self.file_['name']}_{hms}.png"
-        file_path = os.path.join(self.app.project_path, "images", image_name)
+        file_path = str(Path(self.app.project_path) / "images" / image_name)
         self.mediaplayer.video_take_snapshot(0, file_path, 1280, 720)
         entry = {'name': image_name, 'id': -1, 'fulltext': None,
                  'memo': self.file_['memo'], 'mediapath': f"/images/{image_name}",
@@ -3413,7 +3413,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         filename = self.code_av_dialog.file_['name'][:-4] + "_"
         filename += msecs_from + "_to_" + msecs_to + "_"
         filename += self.code_av_dialog.file_['name'][-4:]
-        filename = os.path.join(self.app.settings['directory'], filename)
+        filename = str(Path(self.app.settings['directory']) / filename)
         file_suffix = self.code_av_dialog.file_['mediapath'][-4:]
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(None,
                                                             _("Export segment"), filename, file_suffix)
