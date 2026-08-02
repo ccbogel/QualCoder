@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-02 09:10+0200\n"
-"PO-Revision-Date: 2026-08-02 09:12+0200\n"
+"PO-Revision-Date: 2026-08-02 09:34+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -4276,7 +4276,7 @@ msgstr "lignes importées."
 
 #: src/qualcoder/manage_files.py:2927
 msgid "Survey Import"
-msgstr "Importer l’enquête"
+msgstr "Importer une enquête"
 
 #: src/qualcoder/manage_files.py:2929
 msgid "{} rows imported."
@@ -10980,7 +10980,7 @@ msgstr "Enregistré automatiquement à partir d'une étiquette personnalisée."
 #: src/qualcoder/view_graph_relations.py:503
 #: src/qualcoder/view_graph_relations.py:1057
 msgid "Import user relations"
-msgstr "Importer les relations utilisateur"
+msgstr "Importer des relations utilisateur"
 
 #: src/qualcoder/view_graph_relations.py:504
 #: src/qualcoder/view_graph_relations.py:1121

@@ -2986,7 +2986,7 @@ Le positionnement risque de ne pas s&apos;ajuster correctement. Effectuez une co
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Importer le fichier dans le dossier du projet</translation>
+        <translation>Importer un fichier dans le dossier du projet</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="161"/>
@@ -3001,7 +3001,7 @@ Le positionnement risque de ne pas s&apos;ajuster correctement. Effectuez une co
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="163"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Importer le fichier lié dans le dossier du projet</translation>
+        <translation>Importer un fichier lié dans le dossier du projet</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_manage_files.py" line="166"/>
@@ -3099,7 +3099,7 @@ Formaté comme ci-dessous pour la détection du nom.
 For csv and tsv files, please avoid using the following in the column names:  , ; |
 
 Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
-        <translation>Importer l’enquête
+        <translation>Importer une enquête
 
 Pour les fichiers CSV et TSV, veuillez éviter d&apos;utiliser les caractères suivants dans les noms de colonnes :  , ; |
 
@@ -3337,7 +3337,7 @@ Vérifiez après avoir appliqué la fonction.</translation>
     <message>
         <location filename="../GUI/ui_dialog_node_relations.py" line="165"/>
         <source>Import user relations</source>
-        <translation>Importer les relations utilisateur</translation>
+        <translation>Importer des relations utilisateur</translation>
     </message>
     <message>
         <location filename="../GUI/ui_dialog_node_relations.py" line="166"/>
