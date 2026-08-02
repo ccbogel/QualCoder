@@ -594,8 +594,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_import.clicked.connect(self.import_files)
         self.ui.pushButton_import_survey.setIcon(qta.icon('mdi6.clipboard-text-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_import_survey.clicked.connect(self.import_survey) 
-        self.ui.pushButton_import_survey.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.pushButton_import_survey.customContextMenuRequested.connect(self.button_import_survey_menu)       
+        #self.ui.pushButton_import_survey.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        #self.ui.pushButton_import_survey.customContextMenuRequested.connect(self.button_import_survey_menu)
         self.ui.pushButton_link.setIcon(qta.icon('mdi6.link-variant', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_link.clicked.connect(self.link_files)
         self.ui.pushButton_import_from_linked.setIcon(
@@ -2714,7 +2714,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def import_survey(self):
         """ Import from CSV/TSV/ODS/XLSX Header row to contain column headings.
-        Process Qual Texts, Cases, Attributes and optional assign autocoding.
+        Process Qualitative Texts, Cases, Attributes and optional assign autocoding.
         Can assign attributes to either files or cases.
         The Case name can be absent. Or can be from one primary column, or can also collate values from additional columns.
         Qualitative texts from multiple columns are collated into one file.
@@ -2781,6 +2781,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         def sanitize_name(name_str:str):
             return re.sub(r'[\\/:*?"<>|]', '-', str(name_str)).strip()
 
+        # Get existing database filenames and source/ids
+        # Needed for matching an updated data set to existing survey rows
+        existing_files = self.app.get_text_filenames()
+
         count = 0
         for index, row in df.iterrows():
             fulltext = ""
@@ -2821,8 +2825,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     break
                 filename = f"{base_filename}_{suffix}"
                 suffix += 1
-            # Wondering if only case and case attributes are imported and no freeetext columns selected, if
-            # the empty 'placeholder' files should be created .. ?
 
             if text_cols:
                 filename_txt = filename + ".txt"
@@ -2850,7 +2852,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if text_cols:
                         cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)",
                                 (cid, file_id, text_chunk, start_pos, end_pos, self.app.settings['codername'], now, ""))
-            #  Correct posiciones de autocodificación (aun sin resolver)
+            #  Correct auto-code positions, posiciones de autocodificación (aun sin resolver)
             case_id = -1
             if case_name:
                 cur.execute("select caseid from cases where name=?", [case_name])
@@ -2866,6 +2868,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                             (case_id, file_id, 0, len(fulltext), self.app.settings['codername'], now, ""))
 
             # Insert file or case attributes from survey, and check if character or numeric
+            updated_data = False
             for i, col in enumerate(attr_cols):
                 val = str(row[col]) if pd.notna(row[col]) else ""
                 if val != "":
@@ -2879,12 +2882,30 @@ class DialogManageFiles(QtWidgets.QDialog):
                 file_or_case_id = file_id
                 if attr_file_or_case == "case":
                     file_or_case_id = case_id
+                # Check if fid is None, try getting from a file name match
+                if attr_file_or_case == "file":
+                    for item in existing_files:
+                        if item['name'] == base_filename:
+                            file_or_case_id = item['id']
+                            break
+
                 try:
+                    # print(f"Insert name:{col}, value:{val}, Fid/Cid:{file_or_case_id}, F/C:{attr_file_or_case}")
                     cur.execute("insert into attribute (name, value, id, attr_type, date, owner) values(?,?,?,?,?,?)",
                                 (col, val, file_or_case_id, attr_file_or_case, now, self.app.settings['codername']))
-                except sqlite3.IntegrityError as err:
-                    print(err, "\n", col,val,file_or_case_id,attr_file_or_case)
-                    logger.error(f"Insert into attribute(name, value, id, attr_type, date, owner) {err} {col},{val},{file_or_case_id},{attr_file_or_case}")
+                except sqlite3.IntegrityError:
+                    # Replace existing file attribute data with new data
+                    if attr_file_or_case == "file":
+                        try:
+                            cur.execute("update attribute set value=?, date=? where name=? and id=? and attr_type=?",
+                                        (val, now, col, file_or_case_id, 'file'))
+                            updated_data = True
+                        except Exception as update_err:
+                            print("Update survey data:", update_err)
+                            logger.error(f"update survey data: {update_err}")
+                    else:
+                        logger.error(f"Insert into attribute(name, value, id, attr_type, date, owner) {err} {col},{val},{file_or_case_id},{attr_file_or_case}")
+
             count += 1
 
         # Update attribute type for new attributes, if values were all numeric, default was character
@@ -2901,6 +2922,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if autocode_enabled:
             changed_tables.update({"code_name", "code_text"})
         self._emit_project_table_changes(sorted(changed_tables))
+        if updated_data:
+            msg += "\n" + _("Some existing data updated.")
         msg += f"\n{count} " + _("rows imported.")
         msg += "\n" + "▔" * 20  # U2594
         self.app.delete_backup = False
@@ -2908,10 +2931,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.parent_text_edit.append("<h2>" + _("Survey Import") + "</h2>")
         self.parent_text_edit.append(msg)
-        Message(self.app, _("Import successful."), popup_msg + "\n" + _("{} rows imported.").format(count)).exec()
-
-    def button_import_survey_menu(self, position):
-        print("TODO Add or update file attributes")
+        dlg_msg = popup_msg + "\n" + _("{} rows imported.").format(count) + " " * 10
+        if updated_data:
+            dlg_msg += "\n" + _("Some existing data updated")
+        Message(self.app, _("Import successful."), dlg_msg).exec()
 
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
@@ -4140,7 +4163,7 @@ class DialogSurveyImport(QtWidgets.QDialog):
     def __init__(self, columns:list[str], parent=None):
         super().__init__(parent)
         self.setWindowTitle(_("Survey Import Assistant"))
-        self.resize(780, 580) 
+        self.resize(780, 500)
         self.setMaximumWidth(850) 
         main_layout = QtWidgets.QVBoxLayout(self)
         
