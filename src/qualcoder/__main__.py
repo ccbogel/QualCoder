@@ -2497,7 +2497,7 @@ Click "Yes" to start now.')
         if bad_links:
             span = '<span style="color:red">'
             #self.ui.textEdit.append(span + _("Bad links to files") + "</span>")
-            msg += span + _("Bad links to files") + "</span>"
+            msg += span + _("Bad links to files") + "</span><br />"
             for lnk in bad_links:
                 #self.ui.textEdit.append(span + lnk['name'] + "   " + lnk['mediapath'] + '</span><br />')
                 msg += span + lnk['name'] + "   " + lnk['mediapath'] + '</span><br />'
