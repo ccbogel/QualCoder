@@ -43,7 +43,7 @@ import qtawesome as qta
 try:
     from torch.testing._internal.opinfo.definitions import fft
 except Exception as error:
-    print(error)
+    print("Error here: from torch.testing._internal.opinfo.definitions import fft", error)
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_prompt_library import DialogAiEditPrompts
 from qualcoder.app import App
@@ -131,8 +131,6 @@ BUILTIN_LANGUAGE_LABELS = [
     ("es", "Español"),
     ("fr", "Français")
 ]
-
-
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -2466,22 +2464,22 @@ Click "Yes" to start now.')
         cur.execute(sql)
         memo_res = cur.fetchone()
         if memo_res[0] != "":
-            msg += _("Project memo: ") + f"<br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br /><i>{memo_res[0]}</i><br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />"
+            msg += _("Project memo: ") + f"<br /><i>{memo_res[0]}</i><br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />"
         sql = "select count(id) from source"
         cur.execute(sql)
         files_res = cur.fetchone()
         text_res = self.app.get_text_filenames()
         image_res = self.app.get_image_filenames()
         av_res = self.app.get_av_filenames()
-        msg += _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}<br />"
+        msg += _("Files: ") + f"{files_res[0]} | Text files: {len(text_res)} | Image files: {len(image_res)} | AV files: {len(av_res)}<br />"
         sql = "select count(caseid) from cases"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f"{_('Cases: ')}{res[0]}<br />"
+        msg += f"{_('Cases: ')}{res[0]} | "
         sql = "select count(catid) from code_cat"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f"{_('Code categories: ')}{res[0]}<br />"
+        msg += f"{_('Code categories: ')}{res[0]} | "
         sql = "select count(cid) from code_name"
         cur.execute(sql)
         res = cur.fetchone()
@@ -2489,7 +2487,7 @@ Click "Yes" to start now.')
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f"{_('Attributes: ')}{res[0]}<br />"
+        msg += f"{_('Attributes: ')}{res[0]} | "
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
