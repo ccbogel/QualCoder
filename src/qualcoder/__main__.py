@@ -40,7 +40,10 @@ import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
-
+try:
+    from torch.testing._internal.opinfo.definitions import fft
+except Exception as error:
+    print(error)
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_prompt_library import DialogAiEditPrompts
 from qualcoder.app import App
@@ -1791,7 +1794,7 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text, avbookmarkfile integer, avbookmarkmsec integer, avbookmarktext integer)")
+            "bookmarkpos integer, codername text, recently_used_codes text, avbookmarkfile integer, avbookmarkmsec integer, avbookmarktextpos integer)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -2308,10 +2311,14 @@ Click "Yes" to start now.')
         except sqlite3.OperationalError:
             cur.execute("alter table project add avbookmarkfile integer")
             cur.execute("alter table project add avbookmarkmsec integer")
-            cur.execute("alter table project add avbookmarktextpos integer")
             cur.execute('update project set databaseversion="v15", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v15")
+        try:
+            cur.execute("select avbookmarktextpos from project")  # Need separate check here, due to error introduced during 2026
+        except sqlite3.OperationalError:
+            cur.execute("alter table project add avbookmarktextpos integer")
+            self.app.conn.commit()
         # Database version v16 - sub-codes: a code can be nested under another code (supercid)
         try:
             cur.execute("select supercid from code_name")
@@ -2445,7 +2452,7 @@ Click "Yes" to start now.')
         if self.app.conn is None:
             return
         cur = self.app.conn.cursor()
-        cur.execute("select databaseversion, date, memo, about, bookmarkfile,bookmarkpos from project")
+        cur.execute("select databaseversion, date, memo, about, bookmarkfile,bookmarkpos,avbookmarkfile,avbookmarkmsec,avbookmarktextpos from project")
         result = cur.fetchall()[-1]
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
@@ -2459,7 +2466,7 @@ Click "Yes" to start now.')
         cur.execute(sql)
         memo_res = cur.fetchone()
         if memo_res[0] != "":
-            msg += _("Project memo: ") + f"<br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />{memo_res[0]}<br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />"
+            msg += _("Project memo: ") + f"<br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br /><i>{memo_res[0]}</i><br />▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br />"
         sql = "select count(id) from source"
         cur.execute(sql)
         files_res = cur.fetchone()
@@ -2491,8 +2498,10 @@ Click "Yes" to start now.')
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
             msg += f"Text Bookmark: {bookmark_filename[0]}, position: {result[5]}<br />"
-        # TODO a/v bookmark
-
+        cur.execute("select name from source where id=?", [result[6]])
+        avbookmark_filename = cur.fetchone()
+        if avbookmark_filename is not None and result[6] is not None:
+            msg += f"A/V Bookmark: {avbookmark_filename[0]}, Milliseconds: {result[7]}, Text position: {result[8]}<br />"
         bad_links = self.app.check_bad_file_links()
         if bad_links:
             span = '<span style="color:red">'
