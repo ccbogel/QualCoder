@@ -40,10 +40,6 @@ import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
-try:
-    from torch.testing._internal.opinfo.definitions import fft
-except Exception as error:
-    print("Error here: from torch.testing._internal.opinfo.definitions import fft", error)
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_prompt_library import DialogAiEditPrompts
 from qualcoder.app import App
@@ -917,30 +913,29 @@ Click "Yes" to start now.')
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}<br />")
-        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}<br />"
+        msg = "<p>" + _("Coder") + f": {self.app.settings['codername']}<br />"
+        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']} | "
         msg += _("Tree font size") + f": {self.app.settings['treefontsize']}<br />"
         msg += _("Working directory") + f": {self.app.settings['directory']}<br />"
+        msg += _("Language") + f": {self.app.settings['language']} | "
         msg += _("Show IDs") + f": {self.app.settings['showids']}<br />"
-        msg += _("Language") + f": {self.app.settings['language']}<br />"
-        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}<br />"
+        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']} | "
         msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}<br />"
-        msg += _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}<br />"
-        msg += _("Report text context style: ") + f"{self.app.settings['report_text_context_style']}<br />"
+        msg += _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}<br /> "
         msg += _("Style") + f": {self.app.settings['stylesheet']}<br />"
-        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}<br />"
+        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']} | "
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}<br />"
         if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI integration is enabled") + "<br />"
+            msg += _("AI integration is enabled")
         else:
-            msg += _("AI integration is disabled") + "<br />"
+            msg += _("AI integration is disabled")
         ai_permissions = self.app.settings.get('ai_permissions', 1)
         ai_permissions_labels = {
             0: 'Read-only',
             1: 'Sandboxed',
             2: 'Full access'
         }
-        msg += _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}</p>"
+        msg += " | " + _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}</p>"
         self.ui.textEdit.append(msg)
         if platform.system() == "Windows":
             self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
