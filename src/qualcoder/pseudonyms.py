@@ -14,15 +14,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 import logging
 import json
-import os
+from pathlib import Path
 import random
 import string
 from PyQt6 import QtCore, QtWidgets
@@ -32,7 +33,6 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_pseudonyms import Ui_Dialog_pseudonyms
 from .helpers import Message
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -61,8 +61,7 @@ class Pseudonyms(QtWidgets.QDialog):
         self.ui.pushButton_add.clicked.connect(self.add_pseudonym)
         self.ui.tableWidget.cellClicked.connect(self.delete_pseudonym)
         self.data = []
-        print(os.path.join(self.app.project_path, "pseudonyms.json"))
-        self.pseudonyms_filepath = os.path.join(self.app.project_path, "pseudonyms.json")
+        self.pseudonyms_filepath = Path(self.app.project_path) / "pseudonyms.json"
         self.fill_table()
 
     def add_pseudonym(self):
@@ -119,9 +118,8 @@ class Pseudonyms(QtWidgets.QDialog):
         """
 
         self.data = []
-        pseudonyms_filepath = os.path.join(self.app.project_path, "pseudonyms.json")
         try:
-            with open(pseudonyms_filepath, "r") as f:
+            with open(self.pseudonyms_filepath, "r") as f:
                 self.data = json.load(f)
         except FileNotFoundError as err:
             print(err)

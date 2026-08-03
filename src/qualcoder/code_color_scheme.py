@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
@@ -23,22 +23,20 @@ https://qualcoder.org/
 
 from copy import deepcopy, copy
 import logging
-import os
+from pathlib import Path
 import qtawesome as qta
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
-
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
 
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
-
 ROWS = 12
 COLS = 10
 

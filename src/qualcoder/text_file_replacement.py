@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -42,7 +42,6 @@ from .helpers import Message
 from .html_parser import *
 
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -346,7 +345,7 @@ class ReplaceTextFile:
         if res[0] is None:  # Internal file
             old_filepath = f"{self.app.project_path}/documents/{self.old_file['name']}"
             try:
-                os.remove(old_filepath)
+                Path(old_filepath).unlink()
             except FileNotFoundError as e:
                 logger.warning(_("Deleting file error: ") + str(e))
         # Insert new file into project folder
@@ -386,7 +385,7 @@ class ReplaceTextFile:
         """
 
         pseudonyms = []
-        pseudonyms_filepath = os.path.join(self.app.project_path, "pseudonyms.json")
+        pseudonyms_filepath = Path(self.app.project_path) /  "pseudonyms.json"
         try:
             with open(pseudonyms_filepath, "r") as f:
                 pseudonyms = json.load(f)

@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
@@ -26,7 +26,7 @@ import datetime
 import fitz
 import logging
 import math
-import os
+from pathlib import Path
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
 
@@ -52,7 +52,6 @@ from odf.table import Table, TableColumn, TableRow, TableCell
 from odf.draw import Frame, Image as OdfImage
 from odf.style import Style, TextProperties, ParagraphProperties, TableCellProperties
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 colors = {"red": QtCore.Qt.GlobalColor.red, "green": QtCore.Qt.GlobalColor.green,
@@ -817,14 +816,14 @@ class GraphSynchronizer:
                         source_path = f"{item.app.project_path}/documents/{item.path_[6:]}"
                     elif item.path_[:5] == "docs:":
                         source_path = item.path_[5:]
-                    if os.path.exists(source_path):
+                    if Path(source_path).exists():
                         fitz_pdf = fitz.open(source_path)
                         page = fitz_pdf[item.pdf_page]
                         pixmap_pdf = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
-                        abs_path_ = os.path.join(item.app.confighome, "tmp_pdf_page.png")
-                        pixmap_pdf.save(abs_path_)
+                        abs_path_ = Path(item.app.confighome) / "tmp_pdf_page.png"
+                        pixmap_pdf.save(str(abs_path_))  # Presume method requires String
                         fitz_pdf.close()
-                if os.path.exists(abs_path_):
+                if Path(abs_path_).exists():
                     image = QtGui.QImageReader(abs_path_).read()
                     image = image.copy(int(item.px), int(item.py), int(item.pwidth), int(item.pheight))
                     scaler_w = 200 / image.width() if image.width() > 200 else 1.0
@@ -4219,7 +4218,7 @@ class ViewGraph(QDialog):
         """
 
         # 1. Choose output path
-        default_dir = getattr(self.app, 'last_export_directory', os.path.expanduser("~"))
+        default_dir = getattr(self.app, 'last_export_directory', str(Path('~').expanduser()))
         filename, ok = QtWidgets.QFileDialog.getSaveFileName(
             self,
             _("Save graph analytical summary"),
@@ -4231,7 +4230,7 @@ class ViewGraph(QDialog):
         if not filename.endswith('.odt'):
             filename += '.odt'
         if hasattr(self.app, 'last_export_directory'):
-            self.app.last_export_directory = os.path.dirname(filename)
+            self.app.last_export_directory = Path(filename).parent
 
         # 2. Build the ODT document and register named styles
         doc = OpenDocumentText()
@@ -4315,10 +4314,10 @@ class ViewGraph(QDialog):
                 painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
                 self.scene.render(painter, QtCore.QRectF(pixmap.rect()), rect)
                 painter.end()
-                temp_img = os.path.join(tempfile.gettempdir(), f"qc_graph_{uuid.uuid4().hex}.png")
-                if pixmap.save(temp_img, "PNG"):
+                temp_img = Path(tempfile.gettempdir()) / f"qc_graph_{uuid.uuid4().hex}.png"
+                if pixmap.save(str(temp_img), "PNG"):
                     try:
-                        href = doc.addPicture(temp_img)
+                        href = doc.addPicture(str(temp_img))
                         # Fit to a 16cm-wide content area, preserving aspect ratio
                         w_cm = 16.0
                         ratio = rect.height() / rect.width()
@@ -4809,9 +4808,9 @@ class ViewGraph(QDialog):
                     _("The file could not be saved:\n") + str(e),
                     "warning").exec()
         finally:
-            if temp_img and os.path.exists(temp_img):
+            if temp_img and temp_img.exists():
                 try:
-                    os.remove(temp_img)
+                    temp_img.unlink()
                 except OSError as err:
                     logger.warning(f"Could not remove temporary graph image: {err}")
 
@@ -6102,8 +6101,8 @@ class DialogGraphPicker(QDialog):
                 fitz_pdf = fitz.open(source_path)
                 page = fitz_pdf[pdf_page]
                 pm = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
-                abs_path_ = os.path.join(self.app.confighome, "tmp_preview_pdf_page.png")
-                pm.save(abs_path_)
+                abs_path_ = Path(self.app.confighome) / "tmp_preview_pdf_page.png"
+                pm.save(str(abs_path_))  # Assume needs String
             image = QtGui.QImageReader(abs_path_).read()
             if image.isNull():
                 raise ValueError("null image")

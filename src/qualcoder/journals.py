@@ -14,15 +14,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 import datetime
-import os
+from pathlib import Path
 import re
 import logging
 # from spellchecker import SpellChecker
@@ -36,7 +37,6 @@ from .GUI.ui_dialog_journals import Ui_Dialog_journals
 from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
 from .memo import DialogMemo
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 NAME_COLUMN = 0
@@ -869,13 +869,13 @@ class DialogJournals(QtWidgets.QDialog):
                 suffix += 1
 
         # Determine the project documents directory
-        docs_dir = os.path.join(self.app.project_path, "documents")
-        if not os.path.exists(docs_dir):
-            os.makedirs(docs_dir)
+        docs_dir = Path(self.app.project_path) / "documents"
+        if not Path(docs_dir).is_dir():
+            Path(docs_dir).mkdir(exist_ok=True)
 
         # Write journal content using the resolved source_name
         source_filename = source_name + ".txt"
-        source_filepath = os.path.join(docs_dir, source_filename)
+        source_filepath = Path(docs_dir) / source_filename
         with open(source_filepath, 'w', encoding='utf-8-sig') as f:
             f.write(journal_text)
 
@@ -903,8 +903,8 @@ class DialogJournals(QtWidgets.QDialog):
                         [attr_name])
             existing = cur.fetchone()
             if existing is None:
-                # Create a new attribute_type for 'file' with a prefixed name to avoid UNIQUE conflict <- L
-                file_attr_name = f"j_{attr_name}"  # prefix to avoid UNIQUE constraint on name <- L
+                # Create a new attribute_type for 'file' with a prefixed name to avoid UNIQUE conflict
+                file_attr_name = f"j_{attr_name}"  # prefix to avoid UNIQUE constraint on name
                 # Also check that the prefixed name doesn't already exist <- L
                 cur.execute("select name from attribute_type where name=?", [file_attr_name])
                 if cur.fetchone() is None:

@@ -13,7 +13,8 @@ See the GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
-Author: Colin Curtain (ccbogel)
+
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -21,14 +22,15 @@ https://qualcoder.org/
 """
 
 from PyQt6 import QtWidgets, QtCore
-import os
+from pathlib import Path
 import logging
 
 from .GUI.ui_attribute import Ui_DialogAddAttribute
 from .helpers import Message
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
+
 
 class DialogAddAttribute(QtWidgets.QDialog):
     """

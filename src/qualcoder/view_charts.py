@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
@@ -23,7 +23,7 @@ https://qualcoder.org/
 from collections import Counter
 from copy import copy, deepcopy
 import logging
-import os
+from pathlib import Path
 import tempfile  # Create a temporary file
 import pandas as pd
 import plotly.express as px
@@ -39,7 +39,6 @@ from .report_attributes import DialogSelectAttributeParameters
 from .simple_wordcloud import Wordcloud
 from . import stopwords
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -315,7 +314,7 @@ class ViewCharts(QDialog):
             try:
                 words_string = getattr(stopwords, lang_code, None)
                 if words_string:
-                    temp_path = os.path.join(tempfile.gettempdir(), f"qc_stopwords_{lang_code}.txt")
+                    temp_path = Path(tempfile.gettempdir()) / f"qc_stopwords_{lang_code}.txt"
                     with open(temp_path, 'w', encoding='utf-8') as f:
                         f.write("\n".join(words_string.split()))
                     return temp_path
@@ -323,14 +322,15 @@ class ViewCharts(QDialog):
                 pass
                 
             # OPCIÓN B: Buscar en la carpeta Examples como plan de respaldo
-            examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Examples")
-            example_file = os.path.join(examples_dir, f"stopwords_{lang_code}.txt")
-            if os.path.exists(example_file):
+            #examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Examples")
+            examples_dir = Path(__file__).resolve().parent.parent / "Examples"
+            example_file = Path(examples_dir) / f"stopwords_{lang_code}.txt"
+            if Path(example_file).exists():
                 return example_file
 
         # 3. FALLBACK: Prevenir crashes creando un archivo temporal vacío si no hay nada seleccionado
-        fallback_file = os.path.join(tempfile.gettempdir(), "qc_vacio_seguridad.txt")
-        if not os.path.exists(fallback_file):
+        fallback_file = Path(tempfile.gettempdir()) / "qc_vacio_seguridad.txt"  # 
+        if not Path(fallback_file).exisats():
             try:
                 with open(fallback_file, 'w', encoding='utf-8') as f:
                     f.write("") 
@@ -414,7 +414,7 @@ class ViewCharts(QDialog):
          This overrides existing stops words in the simple stopwords,
          and overrides stops words file in .qualcoder configuration folder."""
 
-        default_import_directory = os.path.expanduser("~")
+        default_import_directory = str(Path('~').expanduser())
         response = QtWidgets.QFileDialog.getOpenFileName(None, _('Select stopwords file'),
                                                          default_import_directory,
                                                          "Text Files (*.txt)",
@@ -602,7 +602,7 @@ class ViewCharts(QDialog):
             self.ui.lineEdit_max_words.setText("200")
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         ngrams = int(self.ui.comboBox_ngrams.currentText())
-        stopwords_path = self.get_selected_stopwords_path()
+        stopwords_path = str(self.get_selected_stopwords_path())  # Must be string object fow wordcloud
         export_dir = QtWidgets.QFileDialog.getExistingDirectory(
             None, _('Select folder to save Wordcloud'),
             self.last_wordcloud_dir,
@@ -613,18 +613,19 @@ class ViewCharts(QDialog):
         self.last_wordcloud_dir = export_dir
         base_name = "QualCoder_Wordcloud"
         extension = ".png"
-        filepath = os.path.join(export_dir, base_name + extension)
+        filepath = Path(export_dir) / f"{base_name}{extension}"
         counter = 0
         
-        while os.path.exists(filepath):
-            filepath = os.path.join(export_dir, f"{base_name}_{counter}{extension}")
+        while Path(filepath).exists():
+            filepath = Path(export_dir) / f"{base_name}_{counter}{extension}"
             counter += 1
-        # Ventana de confirmación de guardado. Save confirmation window
+        # Ventana de confirmación de guardado. Save confirmation window. 
         try:
+            # for wordcloud filepaths must be String
             Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
                       text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
-                      stopwords_filepath2=stopwords_path, save_filepath=filepath)
-            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + filepath).exec()
+                      stopwords_filepath2=stopwords_path, save_filepath=str(filepath))
+            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + str(filepath)).exec()
         except Exception as e:
             logger.error(f"Error generating Wordcloud: {str(e)}")
             Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()

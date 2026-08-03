@@ -24,14 +24,15 @@ https://qualcoder.org/
 import html
 from markdown_it import MarkdownIt
 from PyQt6 import QtWidgets, QtCore, QtGui
-import os
+from pathlib import Path
 import logging
 import qtawesome as qta
 import re
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = Path(__file__).resolve().parent
+
 logger = logging.getLogger(__name__)
 tab_info_markdown_renderer = MarkdownIt("commonmark")
 help_link_pattern = re.compile(r'(<a href="qualcoder://help/[^"]*">)', re.IGNORECASE)
@@ -71,8 +72,7 @@ def render_tab_info_markdown(
         doc_font_family,
         heading_icon_name=None,
         link_text_color=None):
-    """Render placeholder tab Markdown to HTML, including link decoration, etc.
-    """
+    """Render placeholder tab Markdown to HTML, including link decoration, etc. """
 
     icon_size = round(doc_font_size * 2)
     rendered_html = tab_info_markdown_renderer.render(markdown_text)
@@ -138,7 +138,7 @@ class DialogInformation(QtWidgets.QDialog):
          view_graph_original.ViewGraphOriginal.circular_graph.TextGraphicsItem
     """
 
-    def __init__(self, app, title, html_string=""):
+    def __init__(self, app, title:str, html_string:str=""):
         """Display information text in dialog.
         If no html is given, fill with About html.
         Args:
@@ -157,9 +157,8 @@ class DialogInformation(QtWidgets.QDialog):
         self.information = ""
         self.setWindowTitle(title)
         if html_string == "":
-            qualcoder_tag = app.version.split("QualCoder ")[1]
-            about_modifed = about.replace("QualCoderVersion", app.version)
-            about_modifed = about_modifed.replace("QualCoderTag", qualcoder_tag)
+            about_modifed = about.replace("qualcoder_version", app.version)
+            about_modifed = about_modifed.replace("qualcoder_citation", app.citation)
             self.setHtml(about_modifed)
         else:
             self.setHtml(html_string)
@@ -181,8 +180,7 @@ class DialogInformation(QtWidgets.QDialog):
 
 
 about = f'<h1 class="western">{_("About")} QualCoder</h1>\
-<h2 class="western">Version:</h2>\
-<p>QualCoderVersion</p>\
+<h2 class="western">Version: qualcoder_version</h2>\
 <p>{_("Optional: Install VLC for audio and video coding.")}<br /> \
 {_("Optional: Install ffmpeg for waveform images.")}</p>\
 <p>Tested on: Windows 11.</p>\
@@ -198,8 +196,7 @@ Lorenzo Salomón - {_("Programming and Spanish translations.")}<br /> \
 Jofen Kihlstrom for past Swedish translations.<br /> \
 {_("To the many members on Github for supporting this project.")}</p>\
 <h2>Citation</h2>\
-<p>Curtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) QualCoder Version [Computer software]. \
-Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/QualCoderTag</p>\
+<p>qualcoder_citation</p>\
 <h2 class="western">Other details</h2> \
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.<br /> \

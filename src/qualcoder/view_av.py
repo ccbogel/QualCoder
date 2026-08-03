@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
@@ -26,7 +26,7 @@ import datetime
 # import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
 import diff_match_patch
 import logging
-import os
+from pathlib import Path
 import platform
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
@@ -48,7 +48,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -345,9 +344,9 @@ class DialogViewAV(QtWidgets.QDialog):
         Requires installed ffmpeg
         ffmpeg is much slower on Windows han Ubuntu """
 
-        waveform_path = os.path.join(self.app.project_path, "audio", "waveform.png")
-        if os.path.exists(waveform_path):
-            os.remove(waveform_path)
+        waveform_path = Path(self.app.project_path) / "audio" / "waveform.png"
+        if waveform_path.exists():
+            waveform_path.unlink() 
         wf_command = f'ffmpeg -i "{self.abs_path}" -filter_complex'
         wf_command += ' "aformat=channel_layouts=mono,showwavespic=s=1020x100'
         if self.app.settings['stylesheet'] in ("dark", "rainbow"):
@@ -364,8 +363,8 @@ class DialogViewAV(QtWidgets.QDialog):
             Message(self.app, "ffmpeg error", str(e_))
         '''# https://www.cloudacm.com/?p=3105
         spectrogram_path = self.app.project_path + "/audio/spectrogram.png"
-        if os.path.exists(spectrogram_path):
-            os.remove(spectrogram_path)
+        if Path(spectrogram_path).exists():
+            Path(spectrogram_path.unlink()
         sp_command = 'ffmpeg -i "' + self.abs_path + '"'
         sp_command += ' -lavfi showspectrumpic=s=1020x200:legend=disabled'
         sp_command += ' "' + spectrogram_path + '"'
@@ -376,7 +375,7 @@ class DialogViewAV(QtWidgets.QDialog):
             Message(self.app, "ffmpeg error", str(e_))
             print(str(e_))
             #return'''
-        if not os.path.exists(waveform_path):
+        if not Path(waveform_path).exists():
             self.ui.label_waveform.hide()
             return
         pm = QtGui.QPixmap()

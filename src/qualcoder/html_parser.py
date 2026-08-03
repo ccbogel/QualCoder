@@ -20,18 +20,15 @@ https://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
 from html.parser import HTMLParser
 from html.entities import name2codepoint
 import re
-import os
-import sys
 import logging
-import traceback
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -94,8 +91,7 @@ def html_to_text(html):
 
 
 def text_to_html(text):
-    """
-    Convert the given text to html, wrapping what looks like URLs with <a> tags,
+    """ Convert the given text to html, wrapping what looks like URLs with <a> tags,
     converting newlines to <br> tags and converting confusing chars into html
     entities.
     """

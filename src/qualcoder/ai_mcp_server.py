@@ -42,7 +42,14 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from mcp import types
 from mcp.server.lowlevel import Server
-from mcp.server.lowlevel.server import ReadResourceContents
+try:
+    from mcp.server.lowlevel.server import ReadResourceContents
+except ImportError:  # Quick fix
+    from mcp.server.lowlevel.helper_types import ReadResourceContents
+    """ SDK authors recommend migrating away from low-level server types. Use FastMCP, which manages these complex 
+    structural return types behind the scenes.
+    """
+
 
 from .ai_help_index import AiHelpIndex
 from .ai_memo import extract_ai_memo, merge_public_memo
@@ -131,7 +138,10 @@ class AiMcpServer:
             instructions=self._server_instructions(),
         )
         self.help_index = AiHelpIndex()
-        self._register_sdk_handlers()
+        try:
+            self._register_sdk_handlers()
+        except AttributeError:
+            print("AttributeError: 'Server' object has no attribute 'list_resources'")
 
     def _server_instructions(self) -> str:
         return (

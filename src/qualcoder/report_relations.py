@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -24,7 +24,6 @@ https://qualcoder.org/
 from copy import copy, deepcopy
 import logging
 import openpyxl
-import os
 import pandas as pd
 import plotly.express as px
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
@@ -42,7 +41,6 @@ from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message, init_
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
