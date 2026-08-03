@@ -372,12 +372,20 @@ class DialogCases(QtWidgets.QDialog):
             self.attribute_labels_ordered.append(att_name[0])
         # Add list if attribute values to cases, order matches header columns
         sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? and id=?"
-        for a in self.attribute_labels_ordered:
+        for attribute_name in self.attribute_labels_ordered:
             for i, c in enumerate(self.cases):
-                cur.execute(sql, [a, c['caseid']])
+                cur.execute(sql, [attribute_name, c['caseid']])
                 res = cur.fetchone()
                 if res:
                     c['attributes'].append(res[0])
+                else:
+                    c['attributes'] = ""
+                    # Missing a stored attribute, need to store something
+                    now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
+                    cur.execute("insert into attribute (name,attr_type,value,id,date,owner) values(?,?,?,?,?,?)",
+                                [attribute_name,"case", "", now_date,self.settings['codername']])
+                    self.app.conn.commit()
+
         self.fill_table()
 
     def update_label(self):
