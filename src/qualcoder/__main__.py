@@ -914,7 +914,7 @@ Click "Yes" to start now.')
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
         msg = "<p>" + _("Coder") + f": {self.app.settings['codername']}<br />"
-        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']} | "
+        msg += _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']} | "
         msg += _("Tree font size") + f": {self.app.settings['treefontsize']}<br />"
         msg += _("Working directory") + f": {self.app.settings['directory']}<br />"
         msg += _("Language") + f": {self.app.settings['language']} | "
