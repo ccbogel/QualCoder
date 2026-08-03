@@ -172,6 +172,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(26, 26))
 
         # Widgets under File list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
