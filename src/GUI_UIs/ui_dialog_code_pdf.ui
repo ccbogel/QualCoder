@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>958</width>
+    <width>1216</width>
     <height>756</height>
    </rect>
   </property>
@@ -75,36 +75,23 @@
         <widget class="QLabel" name="label_coder">
          <property name="minimumSize">
           <size>
-           <width>44</width>
+           <width>28</width>
            <height>28</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>16777215</width>
+           <width>28</width>
            <height>28</height>
           </size>
          </property>
          <property name="toolTip">
-          <string>Codername</string>
+          <string>Coder</string>
          </property>
          <property name="text">
-          <string>Coder:</string>
+          <string/>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>6</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QLineEdit" name="lineEdit_coder">
@@ -298,9 +285,9 @@ Right click to change options: all, first, last, code within code</string>
      <widget class="QCheckBox" name="checkBox_auto_regex">
       <property name="geometry">
        <rect>
-        <x>520</x>
+        <x>530</x>
         <y>5</y>
-        <width>71</width>
+        <width>81</width>
         <height>20</height>
        </rect>
       </property>
@@ -315,9 +302,9 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QComboBox" name="comboBox_page_view">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>620</x>
         <y>0</y>
-        <width>141</width>
+        <width>201</width>
         <height>28</height>
        </rect>
       </property>
@@ -338,7 +325,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>900</x>
+        <x>930</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -356,7 +343,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
        <rect>
         <x>9</x>
         <y>38</y>
-        <width>171</width>
+        <width>161</width>
         <height>30</height>
        </rect>
       </property>
@@ -373,9 +360,9 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QCheckBox" name="checkBox_search_case">
       <property name="geometry">
        <rect>
-        <x>188</x>
+        <x>180</x>
         <y>41</y>
-        <width>40</width>
+        <width>61</width>
         <height>24</height>
        </rect>
       </property>
@@ -389,7 +376,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>250</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -405,7 +392,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>280</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -421,9 +408,9 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>310</x>
         <y>44</y>
-        <width>51</width>
+        <width>61</width>
         <height>22</height>
        </rect>
       </property>
@@ -437,7 +424,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QPushButton" name="pushButton_mode_text">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>370</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -459,7 +446,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QPushButton" name="pushButton_mode_area">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>400</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -478,7 +465,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
      <widget class="QPushButton" name="pushButton_captions">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>430</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -495,26 +482,26 @@ Click to cycle: hidden, code name, code name and memo</string>
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>780</x>
-        <y>43</y>
-        <width>51</width>
-        <height>24</height>
+        <x>800</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Export</string>
       </property>
       <property name="text">
-       <string>Exports</string>
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_exports">
       <property name="geometry">
        <rect>
         <x>830</x>
-        <y>40</y>
-        <width>101</width>
-        <height>30</height>
+        <y>38</y>
+        <width>130</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -541,7 +528,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QPushButton" name="pushButton_previous_page">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>490</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -557,7 +544,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QLineEdit" name="lineEdit_page">
       <property name="geometry">
        <rect>
-        <x>500</x>
+        <x>520</x>
         <y>38</y>
         <width>48</width>
         <height>28</height>
@@ -576,9 +563,9 @@ odt report: report of the coded text and areas.</string>
      <widget class="QLabel" name="label_pages">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>570</x>
         <y>41</y>
-        <width>36</width>
+        <width>51</width>
         <height>24</height>
        </rect>
       </property>
@@ -592,7 +579,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QPushButton" name="pushButton_next_page">
       <property name="geometry">
        <rect>
-        <x>580</x>
+        <x>620</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -608,7 +595,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QPushButton" name="pushButton_zoom_out">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>650</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -624,7 +611,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QLabel" name="label_zoom">
       <property name="geometry">
        <rect>
-        <x>660</x>
+        <x>680</x>
         <y>41</y>
         <width>44</width>
         <height>24</height>
@@ -643,7 +630,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QPushButton" name="pushButton_zoom_in">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>730</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -659,7 +646,7 @@ odt report: report of the coded text and areas.</string>
      <widget class="QPushButton" name="pushButton_fit_width">
       <property name="geometry">
        <rect>
-        <x>740</x>
+        <x>760</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>

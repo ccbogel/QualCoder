@@ -151,6 +151,9 @@ class Ui_Dialog_code_text(object):
         self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.label_coder = QtWidgets.QLabel(parent=self.widget_coder)
+        self.label_coder.setMinimumSize(QtCore.QSize(28, 28))
+        self.label_coder.setMaximumSize(QtCore.QSize(28, 28))
+        self.label_coder.setText("")
         self.label_coder.setObjectName("label_coder")
         self.horizontalLayout_3.addWidget(self.label_coder)
         spacerItem = QtWidgets.QSpacerItem(6, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
@@ -531,7 +534,7 @@ class Ui_Dialog_code_text(object):
 "The name must be at the start of a new line.\n"
 "Formatted like below for name detection.\n"
 "\"Name:\", \"{Name}, or \"[Name]\""))
-        self.label_coder.setText(_translate("Dialog_code_text", "Coder:"))
+        self.label_coder.setToolTip(_translate("Dialog_code_text", "Coder"))
         self.pushButton_coder.setToolTip(_translate("Dialog_code_text", "Coder visibility"))
         self.pushButton_coder.setText(_translate("Dialog_code_text", "..."))
         self.pushButton_font.setToolTip(_translate("Dialog_code_text", "Select document font and size"))

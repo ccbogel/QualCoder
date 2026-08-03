@@ -45,20 +45,20 @@
        <rect>
         <x>10</x>
         <y>2</y>
-        <width>211</width>
-        <height>22</height>
+        <width>231</width>
+        <height>40</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>22</height>
+        <height>40</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777213</width>
-        <height>22</height>
+        <height>40</height>
        </size>
       </property>
       <property name="toolTip">
@@ -67,6 +67,9 @@
       <property name="text">
        <string>Code co-occurence</string>
       </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
       <property name="wordWrap">
        <bool>true</bool>
       </property>
@@ -74,7 +77,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>396</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -102,9 +105,9 @@
      <widget class="QCheckBox" name="checkBox_hide_blanks">
       <property name="geometry">
        <rect>
-        <x>12</x>
-        <y>30</y>
-        <width>231</width>
+        <x>572</x>
+        <y>7</y>
+        <width>241</width>
         <height>20</height>
        </rect>
       </property>
@@ -143,7 +146,7 @@
      <widget class="QPushButton" name="pushButton_select_categories">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>359</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -171,7 +174,7 @@
      <widget class="QPushButton" name="pushButton_select_codes">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>323</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -199,7 +202,7 @@
      <widget class="QPushButton" name="pushButton_file_attributes">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>287</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -227,7 +230,7 @@
      <widget class="QPushButton" name="pushButton_export_gephi">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>534</x>
         <y>0</y>
         <width>32</width>
         <height>32</height>
@@ -255,7 +258,7 @@
      <widget class="QPushButton" name="pushButton_export_coocurrence_graph">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>460</x>
         <y>0</y>
         <width>32</width>
         <height>32</height>
@@ -284,7 +287,7 @@ Right-click for format options</string>
      <widget class="QPushButton" name="pushButton_export_cluster_graph">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>496</x>
         <y>0</y>
         <width>32</width>
         <height>32</height>

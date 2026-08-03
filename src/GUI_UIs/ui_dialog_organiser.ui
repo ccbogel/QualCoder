@@ -98,14 +98,17 @@
      <widget class="QLabel" name="label_loaded_graph">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>360</x>
         <y>1</y>
-        <width>561</width>
+        <width>621</width>
         <height>46</height>
        </rect>
       </property>
       <property name="text">
        <string>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</string>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
       </property>
       <property name="wordWrap">
        <bool>true</bool>

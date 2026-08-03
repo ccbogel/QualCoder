@@ -21,24 +21,22 @@ https://qualcoder.org/
 
 import atexit
 import bisect
-import datetime
+from collections import defaultdict
 from copy import copy, deepcopy
+import datetime
+import fitz  # PyMuPDF
 import logging
-import re
 import os
+from pathlib import Path
+import qtawesome as qta  # https://pictogrammers.com/library/mdi/
+import re
 import sqlite3
-
 import weakref
 import webbrowser # For: Open original file
-
-import fitz  # PyMuPDF
-import qtawesome as qta  # https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
-
-from collections import defaultdict
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
@@ -57,7 +55,6 @@ from .ai_agent_prompts import AiAgentPromptsCatalog  # PromptsList removed; new 
 from .ai_prompt_library import DialogAiEditPrompts  # Dialog moved from ai_prompts to ai_prompt_library
 from .ai_chat import ai_chat_signal_emitter
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 # Word tuple indices: (x0, y0, x1, y1, pos0, pos1, line_id)
@@ -1886,7 +1883,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_mode_text.setIcon(qta.icon('mdi6.cursor-text', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_mode_area.setIcon(qta.icon('mdi6.vector-square', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
-        
+        self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(32, 26))
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(26, 26))
+
         # Buttons below file list and tree
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
         self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
@@ -1906,7 +1905,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_search_case.setToolTip(_("Case sensitive search"))
         self.ui.label_code.setToolTip(_("No code selected"))
         
-        self.ui.label_coder.setText(_("Coder:"))  # The name moves to lineEdit_coder
         self.ui.lineEdit_coder.setText(ts.get('codername', ''))
         self.ui.pushButton_coder.setToolTip(_("Coder visibility"))
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
@@ -2375,7 +2373,6 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def _resolve_filepath(self, file_):
         """        mediapath '/docs/x' -> project_path/documents/x; 'docs:x' -> ruta absoluta.
-
         mediapath '/docs/x' -> project_path/documents/x; 'docs:x' -> absolute path.
         """
 
@@ -2395,7 +2392,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self._clear_loaded_state()
         self.file_ = file_
         filepath = self._resolve_filepath(file_)
-        if filepath is None or not os.path.exists(filepath):
+        if filepath is None or not Path(filepath).exists():
             Message(self.app, _("Warning"),
                     _("Cannot open file. Bad file link: ") + str(file_.get('mediapath')),
                     "warning").exec()
@@ -3688,6 +3685,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             name += _("\nWith: ") + find_text
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
+        Message(self.app, _("Auto-code"), _("Finished auto-coding.")).exec()
         self.parent_textEdit.append(msg)
         self._after_autocode_refresh()
 
@@ -3813,6 +3811,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             name += _("\nWith: ") + find_text + _("\nUsing line ending: ") + ending
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
+        Message(self.app, _("Auto-code"), _("Finished auto-coding.")).exec()
         self.parent_textEdit.append(_("Automatic code sentence in files:")
                                     + _("\nCode: ") + item.text(0)
                                     + _("\nWith text fragment: ") + find_text
@@ -3941,8 +3940,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self._after_autocode_refresh()
 
     def show_important_coded(self):
-        """        Toggles the filter to show only important codings.
-        """
+        """ Toggles the filter to show only important codings. """
 
         self.important = not self.important
         try:
@@ -3957,8 +3955,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.rebuild_marks()
 
     def captions_options(self):
-        """        Cycles the caption mode over coded areas: 0 hidden, 1 name, 2 name + memo.
-        """
+        """ Cycles the caption mode over coded areas: 0 hidden, 1 name, 2 name + memo. """
         self.show_code_captions += 1
         if self.show_code_captions > 2:
             self.show_code_captions = 0
@@ -3967,8 +3964,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             it.update()
 
     def set_default_new_code_color(self):
-        """        Sets a default colour for new codes instead of the random one (parity with code_text).
-        """
+        """  Sets a default colour for new codes instead of the random one (parity with code_text). """
         tmp_code = {'name': 'new', 'color': None}
         ui = DialogColorSelect(self.app, tmp_code)
         if not ui.exec():
@@ -3979,8 +3975,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.default_new_code_color = color
 
     def show_annotations(self):
-        """        Shows all annotations for the file in a read-only dialog (parity with code_text).
-        """
+        """ Shows all annotations for the file in a read-only dialog (parity with code_text). """
         if self.file_ is None:
             return
         cur = self.app.conn.cursor()
@@ -4004,14 +3999,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         ui.exec()
 
     def show_memos(self):
-        """        Shows the coding memos for the file in a read-only dialog: text (parity with
+        """ Shows the coding memos for the file in a read-only dialog: text (parity with
         code_text) and areas (PDF specific).
         """
         if self.file_ is None:
             return
         text_ = ""
         cur = self.app.conn.cursor()
-        # Coded-text memos.
+        # Coded-text memos
         sql = "select code_name.name, pos0, pos1, seltext, code_text_visible.memo, code_text_visible.owner "
         sql += "from code_text_visible join code_name on code_text_visible.cid = code_name.cid "
         sql += "where length(code_text_visible.memo)>0 and fid=? order by pos0"
@@ -4039,9 +4034,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Busqueda. Search.
     def search_for_text(self, _text=None, force=False):
-        """        Searches the extracted text (independent of the database, rects come from the word map).
-        3 or more characters, or Enter to force.
-        """
+        """ Searches the extracted text (independent of the database, rects come from the word map).
+        3 or more characters, or Enter to force. """
 
         term = self.ui.lineEdit_search.text()
         self._clear_search_rects()
@@ -4125,7 +4119,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_index = (self.search_index - 1) % len(self.search_indices)
         self._show_current_search()
 
-    # Navegacion, zoom y modos. Navigation, zoom and modes
+    # Navegacion, zoom y mod. Navigation, zoom and modes
     def update_page_indicator(self, page_idx):
         if self.total_pages == 0:
             return
@@ -4182,8 +4176,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.view.viewport().setCursor(Qt.CursorShape.IBeamCursor)
 
     def fill_code_label(self):
-        """        Color chip (under the tree) with the current code; the name goes in the tooltip.
-        """
+        """ Color chip (under the tree) with the current code; the name goes in the tooltip. """
 
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1).split(':')[0] == 'catid':
@@ -4202,12 +4195,11 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
 
     def handle_key(self, event):
-        """        Shortcuts shared by the view and the dialog. Returns True if handled.
-        """
+        """ Shortcuts shared by the view and the dialog. Returns True if handled. """
         key = event.key()
         mods = event.modifiers()
         
-        # codigo in vivo, etc. Plain keys only: before, Ctrl+Q marked, Ctrl+A annotated,
+        # code in vivo, etc. Plain keys only: before, Ctrl+Q marked, Ctrl+A annotated,
         # Ctrl+V created an in vivo code, etc.
         if key == Qt.Key.Key_Q and mods == Qt.KeyboardModifier.NoModifier:
             self.mark()
@@ -4569,8 +4561,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
 
     def export_page_image(self): # Triggers disabled; will be changed to creating a file source from the PDF page image.
-        """        Exports the current page as PNG at 2x.
-        """
+        """ Exports the current page as PNG at 2x."""
 
         if self.file_ is None:
             return
@@ -4596,14 +4587,12 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Tree of codes and categories
     def get_codes_and_categories(self):
-        """        Reload codes and categories from the database.
-        """
+        """ Reload codes and categories from the database. """
 
         self.codes, self.categories = self.app.get_codes_categories()
 
     def get_recent_codes(self):
-        """        Recently used codes, saved as space-separated ids
-        in the project table. Requires self.codes already loaded.
+        """ Recently used codes, saved as space-separated ids in the project table. Requires self.codes already loaded.
         """
 
         self.recent_codes = []
@@ -4625,7 +4614,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     self.recent_codes.append(code_)
 
     def fill_code_counts_in_tree(self):
-        """        Frequency of each code and category for this coder and file.
+        """ Frequency of each code and category for this coder and file.
         Includes both text codings (code_text) and area codings (code_image with pdf_page).
         For subcodes, displays "own (total)" when the values differ.
         """
@@ -4717,9 +4706,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             iterator += 1
 
     def tree_item_clicked(self, item, column):
-        """        The memo column opens the memo. Clicking a code while a text selection or a
-        pending area is active immediately applies the code.
-        """
+        """ The memo column opens the memo. Clicking a code while a text selection or a
+        pending area is active immediately applies the code. """
 
         if item is None:
             return
@@ -4732,8 +4720,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_label()
 
     def get_collapsed(self, item):
-        """        Preserves the expanded/collapsed state of categories across dialogs.
-        """
+        """ Preserves the expanded/collapsed state of categories across dialogs. """
 
         if item.text(1)[0:3] == "cid":
             return
@@ -4743,9 +4730,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.app.collapsed_categories.append(item.text(1))
 
     def coded_media_dialog(self, code_dict, category_name=""):
-        """        Displays all media coded with this code (or category branch) in a
-        separate modal dialog and refreshes the layers when returning.
-        """
+        """ Displays all media coded with this code (or category branch) in a
+        separate modal dialog and refreshes the layers when returning.  """
 
         DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.get_coded_text_update_eventfilter_tooltips()
@@ -4768,7 +4754,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         return False
 
     def update_dialog_codes_and_categories(self, tables=None):
-        """        Refresh this dialog after code/category changes and notify the rest of the dialogs via the project's event bus.
+        """  Refresh this dialog after code/category changes and notify the rest of the dialogs via the project's event bus.
         Args:
             tables : list of changed tables to emit, [] for local refresh only.
         """
@@ -4884,7 +4870,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.pushButton_clear_filter_code.setStyleSheet("")
 
     def show_codes_of_color(self):
-        """        Filters the code tree by color range.
+        """ Filters the code tree by color range.
         """
         from .color_selector import colour_ranges, show_codes_of_colour_range
         ui = DialogSelectItems(self.app, colour_ranges, _("Select code colors"), "single")
@@ -4900,8 +4886,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Implementación centralizada. Centralized implementation
     def clear_code_filter(self):
-        """        Clears the filter and shows the entire tree.
-        """
+        """ Clears the filter and shows the entire tree. """
         self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
@@ -4909,8 +4894,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_code.setStyleSheet("")
 
     def closeEvent(self, event):
-        """        Stops the rendering and extraction threads on close.
-        """
+        """ Stops the rendering and extraction threads on close. """
 
         self.stop_workers()
         event.accept()
@@ -4931,8 +4915,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
 
     def go_to_latest_coded_file(self):
-        """        Opens the PDF with the most recent coding (text or area).
-        """
+        """ Opens the PDF with the most recent coding (text or area). """
 
         sql = ("select fid from ("
                "select code_text_visible.fid as fid, code_text_visible.date as date "
@@ -4953,8 +4936,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.listWidget.setCurrentRow(i)
                 break
 
-    def get_files_from_attributes(self, refresh_only: bool = False):
-        """        Filters the file list by attributes.
+    def get_files_from_attributes(self, refresh_only:bool=False):
+        """ Filters the file list by attributes.
         The result of the dialog is: first item boolean AND/OR and then each attribute.
         Args:
             refresh_only: Recompute an already active attribute filter without reopening
@@ -5035,9 +5018,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def clear_file_filter(self):
-        """
-        Clears the file filter and reloads the complete list.
-        """
+        """ Clears the file filter and reloads the complete list. """
 
         self.attributes = []
         try:
@@ -5051,9 +5032,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Buttons below the code tree.
     def find_code_in_tree(self):
-        """
-        Searches for a code by name in the tree and selects it.
-        """
+        """ Searches for a code by name in the tree and selects it. """
 
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
@@ -5111,9 +5090,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 parent = parent.parent()
         self.fill_code_label()
 
-    def recursive_traverse(self, item, text_="", case_sensitive=False):
-        """
-        Hide or show child codes depending on whether they match 'text'. Recurse through
+    def recursive_traverse(self, item:QtWidgets.QTreeWidgetItem, text_:str="", case_sensitive:bool=False):
+        """ Hide or show child codes depending on whether they match 'text'. Recurse through
         categories and sub-codes: a code stays visible if it matches or if any of its descendant
         sub-codes matches, so a match is never hidden under a non-matching parent code. Categories
         are not hidden (same as the canonical module). Returns True if this item or any descendant matches.
@@ -5149,10 +5127,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         return any_visible_descendant
 
     def _coding_targets(self):
-        """
-        Navigable codings of the file in reading order.
-        If a code is selected in the tree, navigates only its codings.
-        """
+        """  Navigable codings of the file in reading order.
+        If a code is selected in the tree, navigates only its codings. """
 
         targets = []
         cid_filter = self._current_tree_cid()
@@ -5182,9 +5158,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         return targets
 
     def show_next_coding(self):
-        """
-        Scrolls the viewport to the next coding.
-        """
+        """ Scrolls the viewport to the next coding. """
 
         targets = self._coding_targets()
         if not targets:
@@ -5193,8 +5167,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.view.scroll_to_scene_rect(targets[self._coding_nav_idx][2])
 
     def show_previous_coding(self):
-        """        Scrolls the viewport to the previous coding.
-        """
+        """ Scrolls the viewport to the previous coding. """
 
         targets = self._coding_targets()
         if not targets:
@@ -5204,8 +5177,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Bookmark: go to the saved position (key B saves it).
     def go_to_bookmark(self):
-        """
-        Reads the project bookmark (file + position) and jumps to it. If the bookmark is in a
+        """ Reads the project bookmark (file + position) and jumps to it. If the bookmark is in a
         different file from the list, it loads that file and applies the jump once its text is ready.
         """
 
@@ -5236,9 +5208,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             else:
                 self.ui.listWidget.setCurrentRow(target_row)
 
-    def open_doc_selection(self, doc_id, sel_start=0, sel_end=0):
-        """
-        Opens the given document and, once its text is ready, highlights and reveals
+    def open_doc_selection(self, doc_id:int, sel_start:int=0, sel_end:int=0):
+        """ Opens the given document and, once its text is ready, highlights and reveals
         the range [sel_start, sel_end). Signature equivalent to code_text's, so
         __main__ can redirect PDF references here (mark speakers from Manage files,
         AI chat references, qualcoder:// links).
@@ -5268,11 +5239,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.listWidget.setCurrentRow(target_row)
 
     def _apply_pending_selection(self):
-        """
-        If a range is pending for the already-loaded file, highlights it (only when the
+        """ If a range is pending for the already-loaded file, highlights it (only when the
         text matches the DB) and scrolls the viewer to it (to the rect when reliable,
-        or to the page as a fallback).
-        """
+        or to the page as a fallback). """
 
         sel = self._pending_selection
         if sel is None or self.file_ is None:
@@ -5295,10 +5264,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.view.goto_page(page_idx)
 
     def _apply_pending_bookmark(self):
-        """
-        If a bookmark is pending for the already-loaded file, scrolls the viewer to its position
-        (to the word rect when text is reliable, or to the page as a fallback).
-        """
+        """ If a bookmark is pending for the already-loaded file, scrolls the viewer to its position
+        (to the word rect when text is reliable, or to the page as a fallback). """
 
         pos = self._pending_bookmark_pos
         if pos is None or self.file_ is None:
@@ -5318,9 +5285,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Code margin (shared with code_text)
     def _build_code_tooltip_html(self, code):
-        """
-        HTML tooltip of a coded segment (text or image area).
-        """
+        """ HTML tooltip of a coded segment (text or image area). """
 
         is_area = 'pos0' not in code  # las areas no tienen pos0. Areas have no pos0
         color = TextColor(code.get('color', '#cccccc')).recommendation
@@ -5362,9 +5327,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         return text_
 
     def _install_coding_margin_in_side(self, side):
-        """
-        Moves the margin widget to the left or right container.
-        """
+        """ Moves the margin widget to the left or right container. """
 
         if side not in ('left', 'right'):
             side = 'left'
@@ -5613,15 +5576,13 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.toggle_important([target], [])
 
     def _toggle_margin_visibility_only(self):
-        """
-        Toggles ONLY the margin visibility (does not touch highlight_style)
-        and persists the shared preference.
-        """
+        """ Toggles ONLY the margin visibility (does not touch highlight_style)
+        and persists the shared preference. """
 
         self.apply_margin_stripe_setting(not self.show_margin_stripes)
 
-    def apply_margin_stripe_setting(self, show_margin_stripes: bool | None = None):
-        """Apply and persist the code stripe margin visibility without toggling blindly."""
+    def apply_margin_stripe_setting(self, show_margin_stripes:bool | None = None):
+        """ Apply and persist the code stripe margin visibility without toggling blindly."""
 
         if show_margin_stripes is None:
             saved_pref = self.app.settings.get('codetext_show_margin_stripes', True)
@@ -5645,9 +5606,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.coding_margin.update()
 
     def _set_margin_side(self, side):
-        """
-        Moves the margin to the requested side and persists the preference.
-        """
+        """ Moves the margin to the requested side and persists the preference. """
 
         if side not in ('left', 'right') or side == self.margin_side:
             return
@@ -5677,7 +5636,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             pass
         self.rebuild_marks()
 
-    def apply_highlight_style_setting(self, style: str | None = None):
+    def apply_highlight_style_setting(self, style:str|None=None):
         """Apply the saved highlight style without relying on translated UI text."""
 
         if style is None:
@@ -5688,8 +5647,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     # Resizing of codings (text and areas)
     def _select_single(self, entries, title):
-        """
-        Returns the chosen 'ref' when there are multiple options (name only), or the only one directly.
+        """ Returns the chosen 'ref' when there are multiple options (name only), or the only one directly.
         """
 
         if not entries:
@@ -5706,10 +5664,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         return selected['ref']
 
     def _text_handle_anchor(self, code_item, is_start):
-        """
-        Viewport point (word edge, bottom of the line) where to anchor the
-        tip of the teardrop, or None if it is not projectable.
-        """
+        """ Viewport point (word edge, bottom of the line) where to anchor the
+        tip of the teardrop, or None if it is not projectable. """
 
         if not (self.pages and self.extracted_ok and self.view.items_):
             return None
@@ -5732,10 +5688,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         return self.view.mapFromScene(item.mapToScene(point))
 
     def show_resize_handles(self, code_item):
-        """
-        Creates the two teardrops (start and end) for the exact segment,
-        like _margin_resize_ctid of code_text.
-        """
+        """ Creates the two teardrops (start and end) for the exact segment,
+        like _margin_resize_ctid of code_text. """
 
         if code_item is None or code_item.get('ctid') is None:
             return
@@ -5762,9 +5716,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.active_handles.append(h_end)
 
     def hide_resize_handles(self):
-        """
-        Removes all active resize handles.
-        """
+        """ Removes all active resize handles. """
 
         for h in getattr(self, 'active_handles', []):
             h.hide()
@@ -5772,8 +5724,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.active_handles = []
 
     def reposition_resize_handles(self):
-        """
-        Relocates the teardrops after scroll, zoom, or position changes.
+        """ Relocates the teardrops after scroll, zoom, or position changes.
         If the segment no longer exists or the text is no longer available, they are hidden.
         """
 
@@ -5798,8 +5749,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             h.raise_()
 
     def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
-        """
-        Receives the final position of the teardrop and updates the database.
+        """ Receives the final position of the teardrop and updates the database.
         Ported from code_text (same validations and revert).
         """
 
@@ -6161,21 +6111,20 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.load_file(self.file_)
 
     def _save_restructure_report_to_journal(self, ct_rows, an_rows, cs_rows, approx):
-        """
-        Saves the restructure report to a new journal, including ALL approximately relocated
+        """ Saves the restructure report to a new journal, including ALL approximately relocated
         citations (not just the 12 shown in the dialog), leaving a permanent, reviewable record.
         """
 
         if self.file_ is None:
             return
         now = datetime.datetime.now().astimezone()
-        fecha = now.strftime("%Y-%m-%d %H:%M:%S")
+        date = now.strftime("%Y-%m-%d %H:%M:%S")
         owner = self.app.settings['codername']
         # Full report body (not truncated).
-        lineas = [
+        lines = [
             _("PDF restructure report"),
             _("File:") + f" {self.file_['name']}",
-            _("Date:") + f" {fecha}",
+            _("Date:") + f" {date}",
             _("Coder:") + f" {owner}",
             "",
             _("Codings:") + f" {len(ct_rows)}, " + _("annotations:") + f" {len(an_rows)}, "
@@ -6185,33 +6134,31 @@ class DialogCodePdf(QtWidgets.QWidget):
         ]
         for kind, name, owner_seg, frag in approx:
             frag_limpio = " ".join(frag.split())[:500]
-            lineas.append(f"- {kind} [{name}] ({owner_seg}): {frag_limpio}")
-        jentry = "\n".join(lineas)
+            lines.append(f"- {kind} [{name}] ({owner_seg}): {frag_limpio}")
+        jentry = "\n".join(lines)
         # Valid journal name: only letters, digits, underscore, hyphen and space (no dots or
         # colons), and unique (the journal table requires it).
-        base = os.path.splitext(self.file_['name'])[0]
-        nombre = re.sub(r"[^\w -]", "_", f"Restructure {base} {now.strftime('%Y-%m-%d %H%M%S')}")
+        base = Path(self.file_['name']).name  # os.path.splitext(self.file_['name'])[0]
+        name = re.sub(r"[^\w -]", "_", f"Restructure {base} {now.strftime('%Y-%m-%d %H%M%S')}")
         cur = self.app.conn.cursor()
-        intento = nombre
-        sufijo = 2
+        intento = name
+        suffix = 2
         while True:
             try:
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
-                            (intento, jentry, owner, fecha))
+                            (intento, jentry, owner, date))
                 self.app.conn.commit()
                 break
             except sqlite3.IntegrityError:
                 self.app.conn.rollback()
-                intento = f"{nombre}_{sufijo}"
-                sufijo += 1
-                if sufijo > 50:
-                    Message(self.app, _("Journal"),
-                            _("Could not create the journal entry."), "warning").exec()
+                intento = f"{name}_{suffix}"
+                suffix += 1
+                if suffix > 50:
+                    Message(self.app, _("Journal"), _("Could not create the journal entry."), "warning").exec()
                     return
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Restructure report saved to journal: ") + intento)
-        Message(self.app, _("Journal"),
-                _("Report saved to journal:") + f"\n{intento}").exec()
+        Message(self.app, _("Journal"), _("Report saved to journal:") + f"\n{intento}").exec()
 
     def export_option_selected(self):
         """
@@ -6234,7 +6181,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.file_ is None:
             return
         filepath = self._resolve_filepath(self.file_)
-        if filepath is None or not os.path.exists(filepath):
+        if filepath is None or not Path(filepath).exists():
             Message(self.app, _("Warning"), _("Cannot open original file."), "warning").exec()
             return
 
@@ -6255,15 +6202,12 @@ class DialogCodePdf(QtWidgets.QWidget):
                       "exported."), "warning").exec()
         try:
             doc = fitz.open(filepath)
-
             for coding in (self.code_text if include_text else []):
                 c_name = coding.get('name', '')
                 c_color = coding.get('color', '#cccccc')
                 c_memo = coding.get('memo', '')
                 c_owner = coding.get('owner', '')
-
                 rgb = (int(c_color[1:3], 16)/255.0, int(c_color[3:5], 16)/255.0, int(c_color[5:7], 16)/255.0)
-
                 content_str = f"Code: {c_name}"
                 if c_memo:
                     content_str += f"\nMemo: {c_memo}"
@@ -6363,7 +6307,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
             # Cabecera
             try:
-                project_name = os.path.basename(self.app.project_path).replace(".qda", "")
+                project_name = Path(self.app.project_path).stem
             except AttributeError:
                 project_name = "Project"
 
@@ -6493,7 +6437,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 
                 pdf_doc = None
                 filepath = self._resolve_filepath(self.file_)
-                if filepath and os.path.exists(filepath):
+                if filepath and Path(filepath).exists():
                     pdf_doc = fitz.open(filepath)
 
                 areas_sorted = sorted(self.code_areas, key=lambda x: x.get('pdf_page', 0))
@@ -6511,7 +6455,6 @@ class DialogCodePdf(QtWidgets.QWidget):
 
                     cursor.insertText(f"[Page {page}] ", a_header_bold)
                     cursor.insertText(f"Code: {a.get('name', '')}, Coder: {a.get('owner', '')}\n\n", a_header_fmt)
-                    
                     coords = f"Coordinates: X:{a.get('x1')}, Y:{a.get('y1')}, Width:{a.get('width')}, Height:{a.get('height')}\n\n"
                     cursor.insertText(coords, norm_fmt)
 
@@ -6551,11 +6494,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     pdf_doc.close()
 
             # 5. Software Citation
-            apa_cite = ("Curtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) "
-                        "QualCoder 4.0 [Computer software]. Retrieved from "
-                        "https://github.com/ccbogel/QualCoder/releases")
             cursor.insertText("\nSoftware citation\n", title_fmt)
-            cursor.insertText(apa_cite + "\n", norm_fmt)
+            cursor.insertText(self.app.citation + "\n", norm_fmt)
 
             tw = QtGui.QTextDocumentWriter()
             tw.setFileName(out_path)

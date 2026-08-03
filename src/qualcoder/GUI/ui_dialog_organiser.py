@@ -37,7 +37,8 @@ class Ui_DialogOrganiser(object):
         self.pushButton_selectbranch.setText("")
         self.pushButton_selectbranch.setObjectName("pushButton_selectbranch")
         self.label_loaded_graph = QtWidgets.QLabel(parent=self.groupBox_header)
-        self.label_loaded_graph.setGeometry(QtCore.QRect(420, 1, 561, 46))
+        self.label_loaded_graph.setGeometry(QtCore.QRect(360, 1, 621, 46))
+        self.label_loaded_graph.setScaledContents(True)
         self.label_loaded_graph.setWordWrap(True)
         self.label_loaded_graph.setObjectName("label_loaded_graph")
         self.pushButton_apply = QtWidgets.QPushButton(parent=self.groupBox_header)
@@ -79,3 +80,13 @@ class Ui_DialogOrganiser(object):
         self.pushButton_apply.setText(_translate("DialogOrganiser", "Apply"))
         self.pushButton_create_code.setToolTip(_translate("DialogOrganiser", "Add code"))
         self.pushButton_import_codebook.setToolTip(_translate("DialogOrganiser", "Import and edit codebook"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    DialogOrganiser = QtWidgets.QDialog()
+    ui = Ui_DialogOrganiser()
+    ui.setupUi(DialogOrganiser)
+    DialogOrganiser.show()
+    sys.exit(app.exec())
