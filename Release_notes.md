@@ -195,6 +195,8 @@ There is an 'Import survey' button for importing surveys from Excel and csv file
 
 PDFs with highlights can be imported and their highlighted segments coded automatically, one code per highlight colour under a 'PDF Highlights' category, using the closest QualCoder palette colours.
 
+LaTeX import, converts LaTeX content to readable plain text. Complex presentations may not import perfectly, |input and |include files are not resolved.
+
 ## The Codes Tree in all coding screens
 
 Added sub-menus for Modify (Code or categories selected), Filter, Sort. Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour). Added a code names text filter underneath the codes tree. Add a move category underneath category function. Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll. Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
