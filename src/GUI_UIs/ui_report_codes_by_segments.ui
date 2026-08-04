@@ -49,6 +49,9 @@
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Text filter</string>
+      </property>
      </widget>
      <widget class="QLabel" name="label_text_limiter">
       <property name="geometry">
@@ -70,6 +73,9 @@
         <width>30</width>
         <height>28</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>Text filter</string>
       </property>
       <property name="text">
        <string/>
@@ -168,7 +174,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select files by attributes</string>
       </property>
       <property name="text">
        <string/>
