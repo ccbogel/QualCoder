@@ -14,8 +14,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
@@ -23,12 +24,10 @@ https://qualcoder.org/
 from copy import deepcopy
 import logging
 import openpyxl
-import os
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
@@ -36,8 +35,6 @@ from .GUI.ui_report_codes_by_segments import Ui_DialogSegmentCodings
 from .helpers import Message, init_persistent_tree_header, restore_persistent_tree_widths
 from .report_attributes import DialogSelectAttributeParameters
 
-
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -82,6 +79,8 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.pushButton_export_xlsx.clicked.connect(self.export_xlsx_file)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(26, 28))
+        self.ui.label_text_limiter.setPixmap(qta.icon('mdi6.text-search').pixmap(26, 28))
         self.files, self.cases = [], []
         self.get_files_and_cases()
         self.ui.listWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
