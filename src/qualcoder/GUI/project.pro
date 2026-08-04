@@ -39,7 +39,6 @@ ui_dialog_report_code_frequencies.py \
 ui_dialog_report_code_summary.py \
 ui_dialog_report_codings.py \
 ui_dialog_report_compare_coder_file.py \
-ui_dialog_report_comparisons.py \
 ui_dialog_report_file_summary.py \
 ui_dialog_select_items.py \
 ui_dialog_settings.py \
@@ -57,6 +56,7 @@ ui_queryDetails.py \
 ui_reference_editor.py \
 ui_report_attribute_parameters.py \
 ui_report_codes_by_segments.py \
+ui_report_comparisons.py \
 ui_report_matching_segments.py \
 ui_save_query.py \
 ui_special_functions.py

@@ -3724,49 +3724,49 @@ Sélectionnez deux codeur·ses, un fichier, un code.</translation>
 <context>
     <name>Dialog_reportComparisons</name>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="79"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="82"/>
         <source>Coder Comparisons</source>
         <translation>Comparaison des codeur·ses</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="82"/>
-        <source>Coders:</source>
-        <translation>Codeur⋅ses :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="86"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="89"/>
         <source>Coders selected:</source>
         <translation>Codeurs sélectionnés:</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="80"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exporter un fichier Excel</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="81"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exécuter la comparaison</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="84"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Effacer la sélection</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="85"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="88"/>
         <source>Coder comparisons - text files</source>
         <translation>Comparaisons de codeur·ses - fichiers texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="87"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="90"/>
         <source>Statistics help</source>
         <translation>Aide aux statistiques</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="83"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Sélectionner deux codeur·ses</translation>
+        <location filename="../GUI/ui_report_comparisons.py" line="83"/>
+        <source>Export Excel</source>
+        <translation>Exporter en Excel</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="84"/>
+        <source>Run comparison</source>
+        <translation>Lancer la comparaison</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="85"/>
+        <source>Coder</source>
+        <translation>Codeur⋅se</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="86"/>
+        <source>Select two coders</source>
+        <translation>Sélectionner deux codeur⋅ses</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="87"/>
+        <source>Clear selection</source>
+        <translation>Effacer la sélection</translation>
     </message>
 </context>
 <context>
