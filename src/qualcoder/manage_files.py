@@ -21,7 +21,6 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 from PyQt6.QtWidgets import QProgressDialog
-from charset_normalizer import from_bytes
 import datetime
 import ebooklib
 from ebooklib import epub
@@ -56,6 +55,7 @@ from .edit_textfile import DialogEditTextFile
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
 from .html_parser import *
+from .latex_import import LatexImportError, tex_file_to_plain_text
 from .memo import DialogMemo
 from .pseudonyms import Pseudonyms
 from .report_codes import DialogReportCodes  # for isInstance()
@@ -64,6 +64,7 @@ from .select_items import DialogSelectItems
 from .view_av import DialogViewAV
 from .code_av import DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
+from .text_decoding import decode_text_with_best_encoding as decode_text_with_best_encoding_helper
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -2934,9 +2935,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
-        Can import from plain text files, also import from html, odt, docx, rtf, and md.
+        Can import from plain text files, also import from html, odt, docx, rtf, tex, and md.
         md is text Markdown format.
-        Note importing from html, odt, docx, rtf all formatting is lost.
+        Note importing from html, odt, docx, rtf, tex all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as flac, mp3, wav, ogg, m4a which are stored in an audio directory.
         Imports video as mp4, mov, wmv, webm, m4v which are stored in a video directory.
@@ -2970,13 +2971,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         progress.setAutoReset(False)
         progress.setAutoClose(False)
         progress.show()
-        known_file_type = False
         self.default_import_directory = str(Path(imports[0]).parent)
         pdf_msg = ""
         # Highlight coding option, asked ONCE per batch and only when the first PDF
         # with highlight annotations is detected (tri-state: None = not asked yet).
         self.pdf_import_code_highlights = None
         for import_path in imports:
+            known_file_type = False
             link_path = ""
             if link:
                 link_path = import_path
@@ -2996,8 +2997,23 @@ class DialogManageFiles(QtWidgets.QDialog):
                                               _("Duplicate filename.\nFile not imported") + f"\n{filename}")
                 file_number += 1
                 continue
-            destination = self.app.project_path
-            if Path(import_path).suffix.lower() in ('.docx', '.odt', '.rtf', '.tex','.txt', '.htm', '.html', '.epub', '.md'):
+            suffix = Path(import_path).suffix.lower()
+            if suffix in ('.docx', '.odt', '.rtf', '.tex', '.txt', '.htm', '.html', '.epub', '.md'):
+                if suffix == '.tex':
+                    try:
+                        imported_ok = self.load_file_text(import_path, f"docs:{import_path}")
+                    except LatexImportError as err:
+                        logger.warning(f"LaTeX import error: {filename} {err}")
+                        Message(self.app, _("Cannot import LaTeX file"),
+                                _("Could not convert LaTeX to readable text") + f":\n{filename}",
+                                "warning").exec()
+                        continue
+                    if not imported_ok:
+                        continue
+                    known_file_type = True
+                    file_number += 1
+                    continue
+                destination = self.app.project_path
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
@@ -3019,7 +3035,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 else:
                     self.load_file_text(import_path, f"docs:{link_path}")
                 known_file_type = True
-            if Path(import_path).suffix.lower() == '.pdf':
+            if suffix == '.pdf':
+                destination = self.app.project_path
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
@@ -3211,32 +3228,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def decode_text_with_best_encoding(self, import_file:str):
         """ Decode text file bytes using robust encoding detection and fallbacks. """
 
-        with open(import_file, "rb") as sourcefile:
-            raw_bytes = sourcefile.read()
-        if not raw_bytes:
-            return "", "empty"
-
-        # try Unicode first, with and without BOM
-        decode_order = ("utf-8-sig", "utf-8")
-        for encoding in decode_order:
-            try:
-                return raw_bytes.decode(encoding), encoding
-            except UnicodeDecodeError:
-                pass
-
-        # no Unicode, try to detect charset with charset-normalizer, then fall back to common encodings
-        best_match = from_bytes(raw_bytes).best()
-        if best_match is not None:
-            detected_encoding = best_match.encoding if best_match.encoding else "unknown"
-            return str(best_match), detected_encoding
-
-        for encoding in ("cp1252", "latin-1"):
-            try:
-                return raw_bytes.decode(encoding), encoding
-            except UnicodeDecodeError:
-                pass
-
-        return raw_bytes.decode("utf-8", errors="backslashreplace"), "utf-8(backslashreplace)"
+        return decode_text_with_best_encoding_helper(import_file)
 
     def load_file_text(self, import_file:str, link_path:str="", progress_:QProgressDialog|None=None):
         """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
@@ -3261,17 +3253,18 @@ class DialogManageFiles(QtWidgets.QDialog):
                                           _("Duplicate filename.\nFile not imported"))
             return False
         text_ = ""
+        suffix = Path(import_file).suffix.lower()
         # Import from odt
-        if Path(import_file).suffix.lower() == ".odt":
+        if suffix == ".odt":
             text_ = self.convert_odt_to_text(import_file)
             text_ = text_.replace("\n", "\n\n")  # add line to paragraph spacing for visual format
         # Import from docx
-        if Path(import_file).suffix.lower() == ".docx":
+        if suffix == ".docx":
             document = opendocx(import_file)
             list_ = getdocumenttext(document)
             text_ = "\n\n".join(list_)  # add line to paragraph spacing for visual format
         # Import from rtf
-        if Path(import_file).suffix.lower() == ".rtf":
+        if suffix == ".rtf":
             # text_ = rtf_to_text(import_file, encoding="latin-1", errors="replace")
             with open(import_file, "r", encoding="latin-1") as sourcefile:
                 text_ = ""
@@ -3283,7 +3276,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     logger.debug(f"rtf_to_text error Not Latin-1: {err}")
                     Message(self.app, "rtf to text error", msg).exec()
         # Import from epub
-        if Path(import_file).suffix.lower() == ".epub":
+        if suffix == ".epub":
             book = epub.read_epub(import_file)
             for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
                 try:
@@ -3293,7 +3286,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 except TypeError as err:
                     logger.debug(f"ebooklib get_body_content error: {err}")
         # Import from html
-        if Path(import_file).suffix.lower() in (".html", ".htm"):
+        if suffix in (".html", ".htm"):
             import_errors = 0
             with open(import_file, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
                 html_text = ""
@@ -3306,7 +3299,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if import_errors > 0:
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
-        if Path(import_file).suffix.lower() == '.pdf':
+        if suffix == '.pdf':
             # Extraction with the SAME extractor as the viewer (code_pdf.extract_pdf_fulltext),
             # otherwise coding positions do not map onto the PDF pages.
             def pdf_progress(current_page, total_pages):
@@ -3336,11 +3329,20 @@ class DialogManageFiles(QtWidgets.QDialog):
                          "but text coding and text search will not.")
                 Message(self.app, _("PDF without text"),
                         f"{Path(import_file).name}\n{msg}", "warning").exec()
+        if suffix == ".tex":
+            try:
+                text_ = tex_file_to_plain_text(import_file)
+            except LatexImportError as err:
+                logger.warning(f"LaTeX import error: {Path(import_file).name} {err}")
+                Message(self.app, _("Cannot import LaTeX file"),
+                        _("Could not convert LaTeX to readable text") + f":\n{Path(import_file).name}",
+                        "warning").exec()
+                return False
         # Try importing as a plain text file.
         # Never decode a PDF as plain text (it would produce unreadable binary).
-        if text_ == "" and Path(import_file).suffix.lower() != '.pdf':
+        if text_ == "" and suffix not in ('.pdf', '.tex'):
             try:
-                text_, detected_encoding = self.decode_text_with_best_encoding(import_file)
+                text_, detected_encoding = decode_text_with_best_encoding_helper(import_file)
                 logger.debug(f"Importing plain text file: {import_file} decoded as {detected_encoding}")
                 if text_ and text_[0] == "\ufeff":  # associated with notepad files
                     text_ = text_[1:]
@@ -3356,7 +3358,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return False
         # Normalise line endings and strip BOM: Qt converts \r\n/\r to \n on
         # setPlainText, so mismatches make stored positions drift. <- L
-        if Path(import_file).suffix.lower() != '.pdf': # skip PDF
+        if suffix != '.pdf': # skip PDF
             text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
             if text_ and text_[0] == "\ufeff":
                 text_ = text_[1:]
@@ -3364,7 +3366,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Apply pseudonym text replacement
         pseudonyms = self.load_pseudonyms()
-        if Path(import_file).suffix.lower() != '.pdf':
+        if suffix != '.pdf':
             for pseudonym in pseudonyms:
                 pseudonymised = re.sub(rf"\b{pseudonym['original']}\b", pseudonym['pseudonym'], text_)
                 text_ = pseudonymised
@@ -3409,7 +3411,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source.append(entry)
         # Offer (once per batch) to code highlight annotations; they are not
         # painted in the coding view (annots=False).
-        if Path(import_file).suffix.lower() == '.pdf':
+        if suffix == '.pdf':
             # Non-highlight annotations with text are appended to the file memo.
             try:
                 notes = extract_pdf_annotations(import_file)
