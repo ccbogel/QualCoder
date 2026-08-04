@@ -98,10 +98,12 @@ class Ui_DialogSegmentCodings(object):
     def retranslateUi(self, DialogSegmentCodings):
         _translate = QtCore.QCoreApplication.translate
         DialogSegmentCodings.setWindowTitle(_translate("DialogSegmentCodings", "Report Segment Codings"))
+        self.lineEdit.setToolTip(_translate("DialogSegmentCodings", "Text filter"))
+        self.label_text_limiter.setToolTip(_translate("DialogSegmentCodings", "Text filter"))
         self.pushButton_run_report.setToolTip(_translate("DialogSegmentCodings", "Run report"))
         self.label_title.setText(_translate("DialogSegmentCodings", "Codes by text segments table. 1 = code present, 0 = not coded."))
         self.pushButton_export_xlsx.setToolTip(_translate("DialogSegmentCodings", "Export to Excel"))
-        self.pushButton_file_attributes.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Select files by attributes</p></body></html>"))
+        self.pushButton_file_attributes.setToolTip(_translate("DialogSegmentCodings", "Select files by attributes"))
         self.listWidget_files.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Files. Right click for selection options.</p></body></html>"))
         self.listWidget_cases.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Cases. Right click for selection options.</p></body></html>"))
         self.treeWidget.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Codes. Right click for options</p></body></html>"))
