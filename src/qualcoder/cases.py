@@ -383,7 +383,7 @@ class DialogCases(QtWidgets.QDialog):
                     # Missing a stored attribute, need to store something
                     now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
                     cur.execute("insert into attribute (name,attr_type,value,id,date,owner) values(?,?,?,?,?,?)",
-                                [attribute_name,"case", "", now_date,self.app.settings['codername']])
+                                [attribute_name, "case", "", c['caseid'],  now_date, self.app.settings['codername']])
                     self.app.conn.commit()
 
         self.fill_table()
