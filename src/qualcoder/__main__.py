@@ -2686,6 +2686,9 @@ Click "Yes" to start now.')
         """ Get latest github release. Some issues on some platforms, so in try except. """
 
         self.ui.textEdit.append(_("This version: ") + self.app.version)
+        if "beta" in self.app.version.lower():
+            self.ui.textEdit.append(self.app.citation.split('Retrieved')[0])
+            return
         try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
