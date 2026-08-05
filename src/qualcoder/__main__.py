@@ -1742,6 +1742,7 @@ Click "Yes" to start now.')
         v14 has coder_names table added to store codernames and their visibility status
         """
 
+        self.close_project()
         self.journal_display = None
         previous_app = self.app
         self.app = App()
@@ -1750,7 +1751,6 @@ Click "Yes" to start now.')
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         project_path, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'])
-        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if project_path == "":
             self.app = previous_app
             Message(self.app, _("Project"), _("No project created."), "critical").exec()
@@ -1890,6 +1890,7 @@ Click "Yes" to start now.')
             logger.warning(f"{msg}{self.app.project_path} Exception: {err}")
             self.ui.textEdit.append(f"\n{msg}\n{self.app.project_path}")
             self.ui.textEdit.append(str(err))
+            print(err)
             self.close_project()
             return
         # New project, so tell open project NOT to back up, as there will be nothing in there to back up
@@ -1979,7 +1980,7 @@ Click "Yes" to start now.')
                                                                _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
             return
-        self.close_project()
+        # self.close_project()
         msg = ""
         # New path variable from recent_projects.txt contains time | path
         # Older variable only listed the project path
