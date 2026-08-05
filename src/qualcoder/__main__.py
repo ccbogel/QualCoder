@@ -141,9 +141,6 @@ class MainWindow(QtWidgets.QMainWindow):
     app.project_name and app.project_path contain these.
     """
 
-    project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
-    recent_projects = []  # a list of recent projects for the qmenu
-
     @staticmethod
     def _find_ai_model_index_by_name(ai_models: list, model_name: str) -> int:
         """Return the index of a named AI profile, or -1 if it is not present."""
@@ -211,6 +208,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_chat_tab_label = None
         self.ai_chat_tab_sidebar_button = None
         self.last_non_ai_chat_tab = None
+        self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
+        self.recent_projects = []  # a list of recent projects for the qmenu
 
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
             # Make 'Fusion' the standard native style on Windows https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
@@ -1759,8 +1758,7 @@ Click "Yes" to start now.')
         # Add suffix to project name if it already exists
         counter = 0
         extension = ""
-        while os.path.exists(project_path + extension + ".qda"):
-            # print("C", counter, project_path + extension + ".qda")
+        while Path(f"{project_path}{extension}.qda").exists():
             if counter > 0:
                 extension = f"_{counter}"
             counter += 1
@@ -1956,8 +1954,8 @@ Click "Yes" to start now.')
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    def open_project(self, path_:str|bool="", newproject:str="no"):
-        """ Open an existing project. TODO: WHY IS PATH TYPE AS str AND bool ? should be only str
+    def open_project(self, path_:str="", newproject:str="no"):
+        """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not back up on a newly created project, as it will not contain data.
         A backup is created if settings backup is True.
