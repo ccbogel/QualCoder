@@ -379,7 +379,7 @@ class DialogCases(QtWidgets.QDialog):
                 if res:
                     c['attributes'].append(res[0])
                 else:
-                    c['attributes'] = ""
+                    c['attributes'].append("")
                     # Missing a stored attribute, need to store something
                     now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
                     cur.execute("insert into attribute (name,attr_type,value,id,date,owner) values(?,?,?,?,?,?)",
