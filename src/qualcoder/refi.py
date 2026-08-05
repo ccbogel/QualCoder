@@ -296,6 +296,7 @@ class RefiImport:
 
         # Create temporary extract folder
         self.folder_name = self.file_path[:-4] + "_temporary"
+        self.parent_textedit.append("<h2>REFI-QDA Project Import</h2>")
         self.parent_textedit.append(_("Reading from: ") + self.file_path)
         self.parent_textedit.append(_("Creating temporary directory: ") + self.folder_name)
         # Unzip qpdx folder
