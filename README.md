@@ -46,7 +46,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.8.2 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-4.0 folder). e.g. 
 
 ```bash
 cd Downloads\QualCoder-master
@@ -132,7 +132,7 @@ Use a virtual environment (commands in point 6 below). Not using a virtual envir
 
 4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
 
-5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-3.8.2 folder). e.g. 
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-4.0 folder). e.g. 
 
 ```bash
 cd Downloads/QualCoder-master
@@ -205,7 +205,7 @@ Depending on your operating system, you will need to download Python and its dep
 
 For example, you may now be in this folder, where you unzipped QualCoder: 
 
-yourcomputer:~Downloads/QualCoder-3.8.2
+yourcomputer:~Downloads/QualCoder-4.0
 
 3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and go to Properties), then type the below command and press Enter: 
 
@@ -262,6 +262,11 @@ If you want to use the AI-enhanced features in QualCoder, additional setup is ne
 QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
+
+Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2026) QualCoder 4.0 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/4.0
+
+Previous version
 
 Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2026) QualCoder 3.8.2 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.8.2
