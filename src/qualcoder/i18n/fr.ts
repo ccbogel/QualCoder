@@ -530,6 +530,64 @@ Clic droit pour les options</translation>
     </message>
 </context>
 <context>
+    <name>DialogImportReferences</name>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="78"/>
+        <source>Import references</source>
+        <translation>Importer les réferences</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="79"/>
+        <source>Select the references to import. Items already in the project (duplicates) are unchecked by default.</source>
+        <translation>Sélectionner les références à importer : celles déjà dans le projet (dupliquées) sont décochées par défaut.</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="80"/>
+        <source>Select all</source>
+        <translation>Sélectionner tout</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="81"/>
+        <source>Deselect all</source>
+        <translation>Déselectionner tout</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="82"/>
+        <source>Only New</source>
+        <translation>Seulement les nouvelles</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="83"/>
+        <source>Import attachments (PDF/EPUB)</source>
+        <translation>Importer les pièces jointes (PDF/EPUB)</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="86"/>
+        <source>Import</source>
+        <translation>Importer</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="88"/>
+        <source>Reference</source>
+        <translation>Référence</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="90"/>
+        <source>Status</source>
+        <translation>Statut</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="92"/>
+        <source>Attachment</source>
+        <translation>Pièce jointe</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="94"/>
+        <source>Attachment status</source>
+        <translation>Statut de pièce jointe</translation>
+    </message>
+</context>
+<context>
     <name>DialogMatchingTextSegments</name>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="113"/>

@@ -30,6 +30,7 @@ ui_dialog_journals.py \
 ui_dialog_manage_attributes.py \
 ui_dialog_manage_files.py \
 ui_dialog_manage_links.py \
+ui_dialog_manage_references_import.py \
 ui_dialog_memo.py \
 ui_dialog_node_relations.py \
 ui_dialog_organiser.py \
