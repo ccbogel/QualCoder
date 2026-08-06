@@ -1025,7 +1025,8 @@ class CodeTreeController(QtCore.QObject):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.app, _("Memo for Code: ") + self.codes[found]['name'], self.codes[found]['memo'])
+            ui = DialogMemo(self.app, _("Memo for Code: ") + self.codes[found]['name'], self.codes[found]['memo'],
+                            entity_type="code", entity_id=self.codes[found]['cid'])
             ui.exec()
             memo = ui.memo
             if memo != self.codes[found]['memo']:
@@ -1050,7 +1051,8 @@ class CodeTreeController(QtCore.QObject):
             if found == -1:
                 return
             ui = DialogMemo(self.app, _("Memo for Category: ") + self.categories[found]['name'],
-                            self.categories[found]['memo'])
+                            self.categories[found]['memo'], entity_type="category",
+                            entity_id=self.categories[found]['catid'])
             ui.exec()
             memo = ui.memo
             if memo != self.categories[found]['memo']:
