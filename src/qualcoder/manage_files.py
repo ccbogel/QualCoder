@@ -36,7 +36,6 @@ import sqlite3
 from typing import Any
 from shutil import copyfile, move
 from striprtf.striprtf import rtf_to_text
-from urllib.parse import urlparse
 import webbrowser
 import zipfile
 
@@ -1083,9 +1082,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
-        url_test = urlparse(item_text)
-        if all([url_test.scheme, url_test.netloc]):
+        # Regex HTTP HTTPS protocol
+        regex_http = QtCore.QRegularExpression(
+            r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        # Regex Protocol optional
+        regex_no_protocol = QtCore.QRegularExpression(r"^www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        if bool(regex_no_protocol.match(item_text)) or bool(regex_http.match(item_text)):
             action_url = menu.addAction(_("Open URL"))
+
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -1169,6 +1173,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.pushButton_display_load.setToolTip(_("Load table display settings"))
             return
         if action == action_url:
+            print("URL open", item_text)
             webbrowser.open(item_text)
             return
         if action == action_date_picker:

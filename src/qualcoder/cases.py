@@ -29,7 +29,6 @@ from openpyxl import load_workbook
 from pathlib import Path
 import qtawesome as qta
 import sqlite3
-from urllib.parse import urlparse
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -895,8 +894,12 @@ class DialogCases(QtWidgets.QDialog):
                 action_multiple_cells_value = menu.addAction(_("Set value of selected cells"))
         action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
-        url_test = urlparse(item_text)
-        if all([url_test.scheme, url_test.netloc]):
+        # Regex HTTP HTTPS protocol
+        regex_http = QtCore.QRegularExpression(
+            r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        # Regex Protocol optional
+        regex_no_protocol = QtCore.QRegularExpression(r"^www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        if bool(regex_no_protocol.match(item_text)) or bool(regex_http.match(item_text)):
             action_url = menu.addAction(_("Open URL"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
