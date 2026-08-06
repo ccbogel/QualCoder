@@ -63,6 +63,38 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_insert_reference">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>2</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Insert a bibliographic reference linked to this item</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_odt">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>2</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export memo as ODT file</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="1" column="0">
