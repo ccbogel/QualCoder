@@ -5215,7 +5215,7 @@ N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avan
     <message>
         <location filename="../GUI/ui_main.py" line="429"/>
         <source>References</source>
-        <translation>Citations</translation>
+        <translation>Références</translation>
     </message>
     <message>
         <location filename="../GUI/ui_main.py" line="433"/>
