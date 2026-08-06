@@ -1945,7 +1945,7 @@ Click "Yes" to start now.')
                      '#####\n'
                      '(Everything below this mark is a personal note and will never be sent to the AI.)')
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
-                        memo)
+                        memo, entity_type="project")
         ui.exec()
         if memo != ui.memo:
             cur = self.app.conn.cursor()

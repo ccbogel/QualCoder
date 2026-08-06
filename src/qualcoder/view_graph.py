@@ -113,7 +113,7 @@ def compute_edge_point(center_source, center_target, rect, is_ellipse):
 # date/quote/memo-link, export linked), which makes no sense on a node text.
 # Tolerant to older DialogMemo builds that lack some of these buttons.
 def configure_plain_text_editor(dialog):
-    for btn_name in ('pushButton_clear', 'pushButton_insert_datetime',
+    for btn_name in ('pushButton_clear', 'groupBox_toolbar', 'pushButton_insert_datetime',
                      'pushButton_insert_coded_segment',
                      'pushButton_insert_memo_link', 'pushButton_export_linked'):
         btn = getattr(dialog.ui, btn_name, None)
@@ -9098,14 +9098,16 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if self.code_or_cat['cid'] is not None:
-            ui = DialogMemo(self.app, _("Memo for Code ") + self.code_or_cat['name'], self.code_or_cat['memo'])
+            ui = DialogMemo(self.app, _("Memo for Code ") + self.code_or_cat['name'], self.code_or_cat['memo'],
+                            entity_type="code", entity_id=self.code_or_cat['cid'])
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
             self.conn.commit()
         if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
-            ui = DialogMemo(self.app, _("Memo for Category ") + self.code_or_cat['name'], self.code_or_cat['memo'])
+            ui = DialogMemo(self.app, _("Memo for Category ") + self.code_or_cat['name'], self.code_or_cat['memo'],
+                            entity_type="category", entity_id=self.code_or_cat['catid'])
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()

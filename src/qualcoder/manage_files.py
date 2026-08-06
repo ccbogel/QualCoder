@@ -2155,14 +2155,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.source[x]['memo'] = cur.fetchone()[0]
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
-                                self.source[x]['memo'])
+                                self.source[x]['memo'], entity_type="file", entity_id=self.source[x]['id'])
                 ui.exec()
                 self.source[x]['memo'] = ui.memo
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
                 self.app.conn.commit()
             else:
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
-                                self.source[x]['memo'])
+                                self.source[x]['memo'], entity_type="file", entity_id=self.source[x]['id'])
                 ui.exec()
                 self.source[x]['memo'] = ui.memo
                 cur = self.app.conn.cursor()

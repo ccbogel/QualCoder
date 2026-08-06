@@ -2376,7 +2376,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if file_ is None:
             return
-        ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'])
+        ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'],
+                        entity_type="file", entity_id=file_['id'])
         ui.exec()
         memo = ui.memo
         if memo == file_['memo']:
