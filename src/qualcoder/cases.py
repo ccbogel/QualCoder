@@ -786,7 +786,7 @@ class DialogCases(QtWidgets.QDialog):
 
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
-                            self.cases[x]['memo'])
+                            self.cases[x]['memo'], entity_type="case", entity_id=self.cases[x]['caseid'])
             ui.exec()
             self.cases[x]['memo'] = ui.memo
             cur = self.app.conn.cursor()
