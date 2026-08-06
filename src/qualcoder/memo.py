@@ -23,16 +23,52 @@ https://qualcoder.org/
 
 import datetime
 import logging
+import re
 
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PyQt6 import QtWidgets, QtCore
+from odf.opendocument import OpenDocumentText  # For ODT export
+from odf.style import Style, TextProperties  # For ODT export
+from odf.text import H as OdfHeading, P as OdfParagraph, Span as OdfSpan  # For ODT export
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 from .GUI.ui_dialog_select_quote import Ui_Dialog_select_quote
-from .helpers import MarkdownHighlighter, msecs_to_hours_mins_secs
+from .helpers import ExportDirectoryPathDialog, MarkdownHighlighter, Message, msecs_to_hours_mins_secs
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_code_descendant_ids(codes, cid):
+    """ A code plus all its sub-code (supercid) descendants. Cycle safe.
+    codes: rows (cid, name, catid, supercid) """
+
+    code_ids = {cid}
+    for _i in range(50):
+        added = {c[0] for c in codes if c[3] in code_ids and c[0] not in code_ids}
+        if not added:
+            break
+        code_ids |= added
+    return code_ids
+
+
+def get_category_code_ids(cats, codes, catid):
+    """ Code ids under a category: sub-categories recursively, their codes,
+    and sub-code descendants. cats: rows (catid, name, supercatid) """
+
+    cat_ids = {catid}
+    for _i in range(50):
+        added = {c[0] for c in cats if c[2] in cat_ids and c[0] not in cat_ids}
+        if not added:
+            break
+        cat_ids |= added
+    code_ids = {c[0] for c in codes if c[2] in cat_ids}
+    for _i in range(50):
+        added = {c[0] for c in codes if c[3] in code_ids and c[0] not in code_ids}
+        if not added:
+            break
+        code_ids |= added
+    return code_ids
 
 
 class DialogMemo(QtWidgets.QDialog):
@@ -69,10 +105,16 @@ class DialogMemo(QtWidgets.QDialog):
         self.ui.pushButton_insert_datetime.pressed.connect(self.insert_date)
         self.ui.pushButton_insert_coded_segment.setIcon(
             qta.icon('mdi6.format-quote-close', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_insert_reference.setIcon(
+            qta.icon('mdi6.book-open-variant', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_export_odt.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_export_odt.pressed.connect(self.export_odt)
         if self.entity_type == "":
             self.ui.pushButton_insert_coded_segment.hide()
+            self.ui.pushButton_insert_reference.hide()
         else:
             self.ui.pushButton_insert_coded_segment.pressed.connect(self.insert_quote)
+            self.ui.pushButton_insert_reference.pressed.connect(self.insert_reference)
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
 
     def clear_contents(self):
@@ -82,7 +124,7 @@ class DialogMemo(QtWidgets.QDialog):
     def insert_date(self):
         """ Insert current date and time at the cursor position. """
 
-        now = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
+        now = f'**{datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")}**'
         cursor = self.ui.textEdit.textCursor()
         if cursor.positionInBlock() > 0:
             cursor.insertText("\n")
@@ -99,7 +141,25 @@ class DialogMemo(QtWidgets.QDialog):
             return
         if ui.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
-        selected = ui.get_selected()
+        self.insert_lines(ui.get_selected())
+
+    def insert_reference(self):
+        """ Select bibliographic references (scoped to the memo owner, or all
+        for cross-referencing) and insert them at the cursor. """
+
+        ui = DialogSelectReference(self.app, self.entity_type, self.entity_id)
+        if not ui.all_refs:
+            QtWidgets.QMessageBox.information(self, _("Insert reference"),
+                                              _("No references found in this project."))
+            return
+        if ui.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+            return
+        self.insert_lines(ui.get_selected())
+
+    def insert_lines(self, selected):
+        """ Insert lines at the cursor: own line, blank line between items,
+        cursor left on the next line. """
+
         if not selected:
             return
         cursor = self.ui.textEdit.textCursor()
@@ -107,6 +167,44 @@ class DialogMemo(QtWidgets.QDialog):
             cursor.insertText("\n")
         cursor.insertText("\n\n".join(selected) + "\n")
         self.ui.textEdit.setFocus()
+
+    def export_odt(self):
+        """ Export the memo as ODT, converting markdown conventions:
+        #, ##, ### headings; **bold**; *italic*. """
+
+        title = self.windowTitle() if self.windowTitle() != "" else _("Memo")
+        filename = re.sub(r'[^\w \-]', '', title).strip().replace(' ', '_') or "Memo"
+        export_dlg = ExportDirectoryPathDialog(self.app, filename + ".odt")
+        filepath = export_dlg.filepath
+        if filepath is None:
+            return
+        doc = OpenDocumentText()
+        bold_style = Style(name="MemoBold", family="text")
+        bold_style.addElement(TextProperties(fontweight="bold"))
+        doc.automaticstyles.addElement(bold_style)
+        italic_style = Style(name="MemoItalic", family="text")
+        italic_style.addElement(TextProperties(fontstyle="italic"))
+        doc.automaticstyles.addElement(italic_style)
+        for line in self.ui.textEdit.toPlainText().split("\n"):
+            heading = re.match(r'^(#{1,3}) +(.*)$', line)
+            if heading:
+                doc.text.addElement(OdfHeading(outlinelevel=len(heading.group(1)),
+                                               text=heading.group(2)))
+                continue
+            p = OdfParagraph()
+            # Tokenize **bold** and *italic* spans
+            for token in re.split(r'(\*\*[^*]+\*\*|\*[^*]+\*)', line):
+                if token == "":
+                    continue
+                if token.startswith("**") and token.endswith("**") and len(token) > 4:
+                    p.addElement(OdfSpan(stylename=bold_style, text=token[2:-2]))
+                elif token.startswith("*") and token.endswith("*") and len(token) > 2:
+                    p.addElement(OdfSpan(stylename=italic_style, text=token[1:-1]))
+                else:
+                    p.addText(token)
+            doc.text.addElement(p)
+        doc.save(filepath)
+        Message(self.app, _("Memo export"), f'{_("Memo exported to:")} {filepath}', "information").exec()
 
     def accept(self):
         """ Accepted button overridden method. """
@@ -149,33 +247,10 @@ class DialogSelectQuote(QtWidgets.QDialog):
         self.ui.comboBox_type.currentIndexChanged.connect(self.apply_filters)
 
     def category_code_ids(self):
-        """ Collect code ids under a category: sub-categories recursively,
-        their codes, and sub-code (supercid) descendants. """
-
-        cat_ids = {self.entity_id}
-        for _i in range(50):
-            added = {c[0] for c in self.cats if c[2] in cat_ids and c[0] not in cat_ids}
-            if not added:
-                break
-            cat_ids |= added
-        code_ids = {c[0] for c in self.codes if c[2] in cat_ids}
-        for _i in range(50):
-            added = {c[0] for c in self.codes if c[3] in code_ids and c[0] not in code_ids}
-            if not added:
-                break
-            code_ids |= added
-        return code_ids
+        return get_category_code_ids(self.cats, self.codes, self.entity_id)
 
     def code_descendant_ids(self, cid):
-        """ The code plus all its sub-code (supercid) descendants. Cycle safe. """
-
-        code_ids = {cid}
-        for _i in range(50):
-            added = {c[0] for c in self.codes if c[3] in code_ids and c[0] not in code_ids}
-            if not added:
-                break
-            code_ids |= added
-        return code_ids
+        return get_code_descendant_ids(self.codes, cid)
 
     def code_path(self, cid):
         """ Full hierarchy path: Category > ... > Code > ... > Sub-code. Cycle safe. """
@@ -272,9 +347,9 @@ class DialogSelectQuote(QtWidgets.QDialog):
         for r in cur.fetchall():
             pos = f"{r[2]}-{r[3]}"
             text_ = r[4] if r[4] is not None else ""
-            insert = f'{_("CODED SEGMENT")}: "{text_}"\n'
+            insert = f'**{_("CODED SEGMENT")}:** "{text_}"\n'
             if r[8] != "":
-                insert += f'{_("CODED MEMO")}: "{r[8]}"\n'
+                insert += f'**{_("CODED MEMO")}:** "{r[8]}"\n'
             insert += self.detail_line(f"[{pos}]", r[5], r[6], r[1], r[7],
                                        self.segment_cases(r[6], r[2], r[3]))
             self.quotes.append({"type": _("Text"), "code": r[0], "file": r[1], "pos": pos,
@@ -282,7 +357,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
         cur.execute(image_sql + where_i + order_i, params_i)
         for r in cur.fetchall():
             pos = f"x:{r[2]} y:{r[3]} w:{r[4]} h:{r[5]}"
-            insert = f'{_("CODED MEMO")}: "{r[6]}"\n' if r[6] != "" else ""
+            insert = f'**{_("CODED MEMO")}:** "{r[6]}"\n' if r[6] != "" else ""
             insert += self.detail_line(f'[{_("Image")} {pos}]', r[7], r[8], r[1], r[9],
                                        self.segment_cases(r[8]))
             self.quotes.append({"type": _("Image"), "code": r[0], "file": r[1], "pos": pos,
@@ -290,7 +365,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
         cur.execute(av_sql + where_a + order_a, params_a)
         for r in cur.fetchall():
             pos = f"{msecs_to_hours_mins_secs(r[2])} - {msecs_to_hours_mins_secs(r[3])}"
-            insert = f'{_("CODED MEMO")}: "{r[4]}"\n' if r[4] != "" else ""
+            insert = f'**{_("CODED MEMO")}:** "{r[4]}"\n' if r[4] != "" else ""
             insert += self.detail_line(f"[A/V {pos}]", r[5], r[6], r[1], r[7],
                                        self.segment_cases(r[6]))
             self.quotes.append({"type": "A/V", "code": r[0], "file": r[1], "pos": pos,
@@ -371,3 +446,124 @@ class DialogSelectQuote(QtWidgets.QDialog):
 
         rows = sorted({i.row() for i in self.ui.tableWidget.selectedIndexes()})
         return [self.quotes[r]["insert"] for r in rows if r < len(self.quotes)]
+
+
+class DialogSelectReference(QtWidgets.QDialog):
+
+    """ List bibliographic references for insertion into a memo. The combobox
+    switches between references linked to the memo owner ("This file", "This
+    case", ...) and all project references, for cross-referencing. """
+
+    ID_COL = 0
+    REF_COL = 1
+    FILES_COL = 2
+
+    def __init__(self, app, entity_type:str, entity_id=None):
+        super(DialogSelectReference, self).__init__(parent=None)
+
+        self.app = app
+        self.entity_type = entity_type
+        self.entity_id = entity_id
+        self.ui = Ui_Dialog_select_quote()
+        self.ui.setupUi(self)
+        self.setWindowTitle(_("Select references"))
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
+        self.setStyleSheet(font)
+        self.ui.label_scope.setText(_("References"))
+        from .ris import Ris
+        ris = Ris(self.app)
+        ris.get_references()
+        self.all_refs = ris.refs
+        cur = self.app.conn.cursor()
+        cur.execute("select id, name, risid from source")
+        self.sources = cur.fetchall()
+        self.scoped_risids = self.get_scoped_risids()
+        self.rows = []
+        scope_labels = {"file": _("This file"), "case": _("This case"),
+                        "code": _("This code"), "category": _("This category")}
+        self.scope_label = scope_labels.get(entity_type, "")
+        if self.scope_label != "":
+            self.ui.comboBox_type.addItem(self.scope_label)
+        self.ui.comboBox_type.addItem(_("All references"))
+        if self.scope_label == "" or not self.scoped_risids:
+            # Project memo, or owner without linked references: start at All
+            self.ui.comboBox_type.setCurrentText(_("All references"))
+        if self.ui.comboBox_type.count() < 2:
+            self.ui.comboBox_type.hide()
+        self.fill_table()
+        self.ui.comboBox_type.currentIndexChanged.connect(self.fill_table)
+        self.ui.lineEdit_filter.textChanged.connect(self.apply_filter)
+        self.ui.tableWidget.doubleClicked.connect(self.accept)
+
+    def get_scoped_risids(self):
+        """ risids linked to the memo owner: the file's reference, files of the
+        case, or files with codings of the code/category (with descendants). """
+
+        cur = self.app.conn.cursor()
+        fids = set()
+        if self.entity_type == "file":
+            fids = {self.entity_id}
+        if self.entity_type == "case":
+            cur.execute("select distinct fid from case_text where caseid=?", [self.entity_id])
+            fids = {r[0] for r in cur.fetchall()}
+        if self.entity_type in ("code", "category"):
+            cur.execute("select catid, name, supercatid from code_cat")
+            cats = cur.fetchall()
+            cur.execute("select cid, name, catid, supercid from code_name")
+            codes = cur.fetchall()
+            if self.entity_type == "code":
+                ids = list(get_code_descendant_ids(codes, self.entity_id))
+            else:
+                ids = list(get_category_code_ids(cats, codes, self.entity_id))
+            if not ids:
+                return set()
+            placeholders = ",".join(["?"] * len(ids))
+            fids = set()
+            for table, col in (("code_text", "fid"), ("code_image", "id"), ("code_av", "id")):
+                cur.execute(f"select distinct {col} from {table} where cid in ({placeholders})", ids)
+                fids |= {r[0] for r in cur.fetchall()}
+        return {s[2] for s in self.sources if s[0] in fids and s[2] is not None}
+
+    def fill_table(self):
+        """ Fill rows: scoped references or all, per the combobox. """
+
+        scoped = self.ui.comboBox_type.currentText() == self.scope_label and self.scope_label != ""
+        self.rows = []
+        for ref in self.all_refs:
+            if scoped and ref['risid'] not in self.scoped_risids:
+                continue
+            files_ = "; ".join(sorted(s[1] for s in self.sources if s[2] == ref['risid']))
+            self.rows.append({"risid": ref['risid'], "apa": ref['apa'], "files": files_,
+                              "insert": f"**{_('REFERENCE')}:** {ref['apa']}"})
+        tw = self.ui.tableWidget
+        tw.setRowCount(0)
+        tw.setColumnCount(3)
+        tw.setHorizontalHeaderLabels([_("Ref id"), _("Reference (APA)"), _("Files")])
+        tw.setRowCount(len(self.rows))
+        for row, r in enumerate(self.rows):
+            tw.setItem(row, self.ID_COL, QtWidgets.QTableWidgetItem(str(r["risid"])))
+            item = QtWidgets.QTableWidgetItem(r["apa"])
+            item.setToolTip(r["apa"])
+            tw.setItem(row, self.REF_COL, item)
+            tw.setItem(row, self.FILES_COL, QtWidgets.QTableWidgetItem(r["files"]))
+        tw.resizeColumnsToContents()
+        if tw.columnWidth(self.REF_COL) > 500:
+            tw.setColumnWidth(self.REF_COL, 500)
+        self.apply_filter()
+
+    def apply_filter(self):
+        """ Hide rows not matching the filter text in any column. """
+
+        text_ = self.ui.lineEdit_filter.text().lower()
+        tw = self.ui.tableWidget
+        for row in range(tw.rowCount()):
+            match = text_ == "" or any(text_ in tw.item(row, col).text().lower()
+                                       for col in range(tw.columnCount()))
+            tw.setRowHidden(row, not match)
+
+    def get_selected(self):
+        """ Return the insert strings of the selected rows, in table order. """
+
+        rows = sorted({i.row() for i in self.ui.tableWidget.selectedIndexes()})
+        return [self.rows[r]["insert"] for r in rows if r < len(self.rows)]
