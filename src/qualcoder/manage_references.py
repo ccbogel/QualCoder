@@ -37,6 +37,7 @@ from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
 from .information import DialogInformation
 from .helpers import Message, extract_epub_fulltext
+from .pdf_preview import DialogPdfPreview
 from .manage_references_import import ATTACHMENT_EXTENSIONS, existing_reference_signatures, \
     reference_signature
 from .ris import Ris, RisImport
@@ -289,6 +290,22 @@ class DialogReferenceManager(QtWidgets.QDialog):
             if len(self.files[row]['mediapath']) > 5 and self.files[row]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(row)
                 return
+        # PDF attachments open in the page viewer (as in Manage files), without the
+        # txt copy button: converted copies are created from Manage files.
+        mediapath_ = self.files[row]['mediapath']
+        if mediapath_ is not None and mediapath_.lower().endswith(".pdf") and \
+                (mediapath_[0:6] == '/docs/' or mediapath_[0:5] == 'docs:'):
+            if mediapath_[0:6] == '/docs/':
+                pdf_filepath = os.path.join(self.app.project_path, "documents", mediapath_[6:])
+            else:
+                pdf_filepath = mediapath_[5:]
+            if not os.path.exists(pdf_filepath):
+                self.parent_text_edit.append(_("Bad link or non-existent file ") + str(pdf_filepath))
+                return
+            preview = DialogPdfPreview(self.app, pdf_filepath, self.files[row]['name'], self,
+                                       show_convert_txt=False)
+            preview.exec()
+            return
         ui = DialogInformation(self.app, self.files[row]['name'], self.files[row]['fulltext'])
         ui.ui.textEdit.setReadOnly(True)
         ui.exec()
