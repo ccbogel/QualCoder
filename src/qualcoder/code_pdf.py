@@ -42,6 +42,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
 from .color_selector import DialogColorSelect
 from .color_selector import TextColor
+from .color_selector import colour_ranges, colors
 from .coder_names import DialogCoderNames  # Coder change as in code_text
 from .speakers import DialogSpeakers, speaker_coder_name  # Mark speakers
 from .helpers import Message, init_persistent_tree_header, \
@@ -369,6 +370,217 @@ def _register_pdf_worker(worker):
             app_.aboutToQuit.connect(stop_all_pdf_workers)
             atexit.register(stop_all_pdf_workers)
             _QUIT_HOOK_INSTALLED = True
+
+
+def closest_qualcoder_color(hex_color):
+    """
+    Closest colour of the QualCoder palette (color_selector.colors) by RGB
+    distance, with its family name from colour_ranges.
+    Returns (hex of the palette colour, family name).
+    """
+
+    try:
+        r = int(hex_color[1:3], 16)
+        g = int(hex_color[3:5], 16)
+        b = int(hex_color[5:7], 16)
+    except (ValueError, IndexError):
+        r, g, b = 247, 254, 46  # default highlight yellow
+    # Achromatic highlights (white/black/grays) map to the gray family;
+    # plain RGB distance lands them on odd hues.
+    candidate_indexes = range(len(colors))
+    if max(r, g, b) - min(r, g, b) < 32:
+        for rng in colour_ranges:
+            if rng['name'] == 'gray':
+                candidate_indexes = range(rng['min'], min(rng['max'] + 1, len(colors)))
+                break
+    best_idx = 0
+    best_dist = None
+    for idx in candidate_indexes:
+        c = colors[idx]
+        cr = int(c[1:3], 16)
+        cg = int(c[3:5], 16)
+        cb = int(c[5:7], 16)
+        dist = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2
+        if best_dist is None or dist < best_dist:
+            best_dist = dist
+            best_idx = idx
+    family = "colour"
+    for rng in colour_ranges:
+        if rng['name'] != 'all' and rng['min'] <= best_idx <= rng['max']:
+            family = rng['name']
+            break
+    return colors[best_idx], family
+
+
+def pdf_annotations_to_file_memo(app, parent_text_edit, fid, filepath, existing_memo=""):
+    """
+    Appends the PDF's non-highlight annotations (the ones carrying text) to the
+    file memo. Shared by manage_files and the reference attachment import.
+    Args:
+        fid: source id, Integer
+        filepath: PDF path
+        existing_memo: current memo of the source row, String
+    Returns:
+        String, the memo of the source row after the call (unchanged if no annotations)
+    """
+
+    try:
+        notes = extract_pdf_annotations(filepath)
+    except Exception as err:
+        logger.warning(f"Annotation detection: {filepath} {err}")
+        return existing_memo
+    if not notes:
+        return existing_memo
+    memo_lines = [_("PDF annotations:")]
+    for n in notes:
+        memo_lines.append(f"[p. {n['page']}] {n['content']}")
+    memo_text = "\n".join(memo_lines)
+    if existing_memo:
+        memo_text = existing_memo + "\n\n" + memo_text
+    cur = app.conn.cursor()
+    cur.execute("update source set memo=? where id=?", [memo_text, fid])
+    app.conn.commit()
+    if parent_text_edit is not None:
+        parent_text_edit.append(_("PDF annotations added to file memo: ") + f"{len(notes)}")
+    return memo_text
+
+
+def code_pdf_highlights(app, parent_text_edit, fid, filepath, fulltext, highlights,
+                        progress_=None, parent_widget=None):
+    """
+    Codes the PDF's highlighted segments: creates (or reuses) the
+    'PDF Highlights' category and one code per distinct highlight colour,
+    named and coloured after the closest QualCoder palette colour, then
+    inserts code_text rows over the exact highlighted positions.
+    Progress is shown INSIDE the batch import dialog when one is passed
+    (single progress view); a standalone dialog is only created when called
+    without one. Headless-safe: with no QApplication, runs silently.
+    Args:
+        fid: source id, Integer
+        filepath: PDF path
+        fulltext: the imported fulltext (paragraph layout)
+        highlights: output of extract_pdf_highlights
+        progress_: the batch QProgressDialog from import_files, or None
+        parent_widget: parent for a standalone progress dialog, or None
+    """
+
+    filename_ = os.path.basename(filepath)
+    external = progress_ is not None
+    progress = progress_
+    if progress is None and QtWidgets.QApplication.instance() is not None:
+        progress = QtWidgets.QProgressDialog("", "", 0, 100, parent_widget)
+        progress.setCancelButton(None)  # Partial runs are safe, but avoid them
+        progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(500)  # Only appears if it takes a while
+        progress.setAutoReset(False)
+        progress.setAutoClose(False)
+
+    def _show_phase(phase_label, pct):
+        if progress is None:
+            return
+        progress.setLabelText(f"{filename_}\n{phase_label} {pct}%")
+        if not external:
+            progress.setValue(pct)
+        QtWidgets.QApplication.processEvents()
+
+    def _map_progress(step, total):
+        if total > 0:
+            _show_phase(_("Mapping highlighted segments"), int(step * 60 / total))
+
+    positions = pdf_highlights_to_positions(filepath, highlights, _map_progress)
+    if not positions:
+        if progress is not None and not external:
+            progress.close()
+        elif external and progress is not None:
+            progress.setLabelText(filename_)
+        return
+    now_ = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+    owner = app.settings['codername']
+    cur = app.conn.cursor()
+    # Category, created once and reused across batches and projects re-runs.
+    cat_name = "PDF Highlights"
+    cur.execute("select catid from code_cat where name=?", [cat_name])
+    res = cur.fetchone()
+    if res is None:
+        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
+                    (cat_name, _("Codes created from PDF highlight annotations"), owner, now_, None))
+        app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        catid = cur.fetchone()[0]
+    else:
+        catid = res[0]
+    # One code per distinct colour, named by family ("Highlight yellow",
+    # "_2" suffix for further shades); reused if the palette colour exists.
+    cids_by_color = {}
+    for hl_color in sorted({p['color'] for p in positions}):
+        qc_hex, family = closest_qualcoder_color(hl_color)
+        base_name = f"Highlight {family}"
+        cur.execute("select cid, name, color from code_name where name=? or name like ?",
+                    [base_name, base_name + "_%"])
+        existing = [row for row in cur.fetchall()
+                    if row[1] == base_name or
+                    (row[1].startswith(base_name + "_") and row[1][len(base_name) + 1:].isdigit())]
+        reuse = next((row for row in existing if row[2] == qc_hex), None)
+        if reuse is not None:
+            cids_by_color[hl_color] = reuse[0]
+            continue
+        taken = {row[1] for row in existing}
+        code_name = base_name
+        n = 2
+        while code_name in taken:
+            code_name = f"{base_name}_{n}"
+            n += 1
+        try:
+            cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                        (code_name, "", owner, now_, catid, qc_hex))
+            app.conn.commit()
+            cur.execute("select last_insert_rowid()")
+            cids_by_color[hl_color] = cur.fetchone()[0]
+            if parent_text_edit is not None:
+                parent_text_edit.append(_("New code: ") + code_name)
+        except sqlite3.IntegrityError:
+            # Roll back the failed insert so no implicit transaction stays open.
+            app.conn.rollback()
+            cur.execute("select cid from code_name where name=?", [code_name])
+            res2 = cur.fetchone()
+            if res2 is not None:
+                cids_by_color[hl_color] = res2[0]
+    # Codings over the highlighted positions. Insertion: 60-100 % of the bar.
+    count = 0
+    for seq, pos in enumerate(positions, start=1):
+        cid = cids_by_color.get(pos['color'])
+        if cid is None:
+            continue
+        seltext = fulltext[pos['pos0']:pos['pos1']]
+        if seltext.strip() == "":
+            continue
+        try:
+            # The comment attached to the highlight (if any) becomes the memo of
+            # this coded segment.
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important) "
+                        "values(?,?,?,?,?,?,?,?,?)",
+                        (cid, fid, seltext, pos['pos0'], pos['pos1'], owner,
+                         pos.get('memo', ''), now_, None))
+            app.conn.commit()
+            count += 1
+        except sqlite3.IntegrityError:
+            # Same segment already coded with this code (re-import). Roll back so
+            # no implicit transaction stays open behind the failed insert.
+            app.conn.rollback()
+        _show_phase(_("Coding highlighted segments"), 60 + int(seq * 40 / len(positions)))
+    if progress is not None:
+        if external:
+            progress.setLabelText(filename_)  # Back to the batch label
+        else:
+            progress.setValue(100)
+            progress.close()
+    if count > 0:
+        if parent_text_edit is not None:
+            parent_text_edit.append(
+                _("PDF highlights coded: ") + f"{count}" + _(" segments in ") + os.path.basename(filepath))
+        if getattr(app, "project_events", None) is not None:
+            app.project_events.emit_table_changes(
+                ['code_cat', 'code_name', 'code_text'], source=parent_widget)
 
 
 class PdfTextWorker(QtCore.QThread):
