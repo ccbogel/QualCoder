@@ -3282,14 +3282,34 @@ Vérifiez après avoir appliqué la fonction.</translation>
 <context>
     <name>Dialog_memo</name>
     <message>
-        <location filename="../GUI/ui_dialog_memo.py" line="43"/>
+        <location filename="../GUI/ui_dialog_memo.py" line="65"/>
         <source>Memo</source>
         <translation>Mémo</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_memo.py" line="44"/>
+        <location filename="../GUI/ui_dialog_memo.py" line="70"/>
         <source>Clear</source>
         <translation>Vider</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="66"/>
+        <source>Insert current date and time at the cursor position</source>
+        <translation>Insérer la date et l&apos;heure actuelles à la position du curseur</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="67"/>
+        <source>Insert coded segments linked to this item</source>
+        <translation>Insérer des segments codés liés à cet élément</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="68"/>
+        <source>Insert a bibliographic reference linked to this item</source>
+        <translation>Insérer une référence bibliographique liée à cet élément</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="69"/>
+        <source>Export memo as ODT file</source>
+        <translation>Exporter un mémo comme fichier ODT</translation>
     </message>
 </context>
 <context>
@@ -3901,6 +3921,34 @@ Les caractères génériques pour&apos;like&apos; are % and _</translation>
         <location filename="../GUI/ui_report_attribute_parameters.py" line="94"/>
         <source>Delete saved filter settings</source>
         <translation>Supprimer les paramètres de filtre enregistrés</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_select_quote</name>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="51"/>
+        <source>Select quotes</source>
+        <translation>Sélectionner des citations</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="52"/>
+        <source>Coded segments</source>
+        <translation>Segments codés</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="53"/>
+        <source>Filter by segment type</source>
+        <translation>Filtrer par type de segment</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="54"/>
+        <source>Filter rows by any text</source>
+        <translation>Filtrer les lignes selon n&apos;importe quel texte</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="55"/>
+        <source>Filter</source>
+        <translation>Filtrer</translation>
     </message>
 </context>
 <context>

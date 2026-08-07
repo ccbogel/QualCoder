@@ -323,6 +323,18 @@ def recompile_translation(language: str | None = None):
                         print(f"{qm_file} has been updated.")
                     else:
                         print(f'Skipping "{qm_file}".')
+    # Delete po~ files
+    for directory in [i18n_directory, other_languages_directory]:
+        if os.path.exists(directory):
+            for root, dirs, files in os.walk(directory):
+                for file in files:
+                    if file.endswith('.po~'):
+                        try:
+                            os.remove(os.path.join(root, file))
+                            print(f"Delete {file}")
+                        except FileNotFoundError:
+                            pass
+                            
     print("Finished")
 
 def generate_progress_bar(translated_percent: float, partial_percent: float) -> str:
