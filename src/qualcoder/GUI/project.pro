@@ -41,6 +41,7 @@ ui_dialog_report_code_summary.py \
 ui_dialog_report_codings.py \
 ui_dialog_report_file_summary.py \
 ui_dialog_select_items.py \
+ui_dialog_select_quote.py \
 ui_dialog_settings.py \
 ui_dialog_speakers.py \
 ui_dialog_start_and_end_marks.py \
