@@ -2697,6 +2697,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 file_number += 1
                 continue
             suffix = Path(import_path).suffix.lower()
+            # Base destination path, extended per file type below
+            destination = self.app.project_path
             if suffix in ('.docx', '.odt', '.rtf', '.tex', '.txt', '.htm', '.html', '.epub', '.md'):
                 if suffix == '.tex':
                     try:
@@ -2712,7 +2714,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     known_file_type = True
                     file_number += 1
                     continue
-                destination = self.app.project_path
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
@@ -2735,7 +2736,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.load_file_text(import_path, f"docs:{link_path}")
                 known_file_type = True
             if suffix == '.pdf':
-                destination = self.app.project_path
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
