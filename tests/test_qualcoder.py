@@ -1,10 +1,12 @@
 import datetime
 import json
 import os
+from pathlib import Path
 import shutil
 import sqlite3
 import tempfile
 from unittest import TestCase
+from unittest.mock import patch
 
 from qualcoder.__main__ import App
 from qualcoder.ai_agent_prompts import AgentPromptRecord
@@ -154,7 +156,6 @@ class TestApp(TestCase):
         for ai_model in ai_models:
             self.assertEqual(tuple(ai_model.keys()), CONFIG_INI_AI_MODEL_KEYS)
 
-
     def test_get_casenames(self):
         result = App.get_casenames(self)
         self.assertEqual(2, len(result))
@@ -211,6 +212,29 @@ class TestApp(TestCase):
         result = App.load_settings(self)
         print(result)
         self.fail()'''
+
+
+class TestAppStartup(TestCase):
+    """Regression tests for application startup settings."""
+
+    def setUp(self):
+        self.confighome = tempfile.mkdtemp()
+        self.configpath = os.path.join(self.confighome, 'config.ini')
+        shutil.copy(
+            os.path.join(os.path.dirname(__file__), "fixtures", "config-ai-ec4c0559.ini"),
+            self.configpath,
+        )
+
+    def tearDown(self):
+        shutil.rmtree(self.confighome, ignore_errors=True)
+
+    def test_app_init_keeps_loaded_ai_models(self):
+        """App startup must preserve AI profiles loaded from config.ini."""
+
+        with patch('qualcoder.app.qc_config_folder', Path(self.confighome)):
+            app = App()
+        self.assertGreater(len(app.ai_models), 0)
+        self.assertLess(int(app.settings['ai_model_index']), len(app.ai_models))
 
 
 class TestMainWindow(TestCase):
