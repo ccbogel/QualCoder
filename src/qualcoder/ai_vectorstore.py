@@ -20,6 +20,7 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+import atexit
 import hashlib
 import logging
 import math
@@ -28,6 +29,7 @@ import re
 import sqlite3
 import time
 import traceback
+import weakref
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
@@ -228,6 +230,26 @@ class _CompatFaissStore:
         )
 
 
+# Registry of live vectorstores, cancelled on application quit (aboutToQuit + atexit).
+# QRunnables cannot be terminated, so the work has to give up by itself: without this,
+# close() gives up after 5 seconds but the QThreadPool destructor waits with no cap and
+# the Python process stays alive.
+_ACTIVE_VECTORSTORES = weakref.WeakSet()
+_QUIT_HOOK_INSTALLED = False
+
+
+def cancel_all_vectorstore_workers():
+    """
+    Asks every live vectorstore to give up the work in progress.
+    """
+
+    for store in list(_ACTIVE_VECTORSTORES):
+        try:
+            store.cancel_workers()
+        except RuntimeError:
+            pass  # object already gone
+
+
 class AiVectorstore:
     """Persistent SQLite chunk store plus an in-memory FAISS index."""
 
@@ -258,6 +280,10 @@ class AiVectorstore:
     faiss_db = None
     faiss_db_path = None
     _is_closing = False
+    # Worker cancellation flag. Separate from _is_closing, which close() resets so a new project
+    # can be opened, while a worker that outlived the wait must keep seeing the cancel.
+    # Cleared when new work is queued.
+    _cancel_workers = False
     collection_name = ''
     reading_doc = ''
 
@@ -274,6 +300,7 @@ class AiVectorstore:
         self.collection_name = collection_name
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
+        self._register_quit_hook()
         self._search_db_path = ""
         self._legacy_faiss_path = ""
         self._faiss_index = None
@@ -789,6 +816,11 @@ class AiVectorstore:
         logger.debug(msg)
 
         for doc in docs:
+            if self.cancelled():
+                # Per document checkpoint: the finest unit that can be abandoned, since
+                # embed_documents for one document is a single blocking call
+                logger.debug("AI vectorstore: indexing cancelled, leaving the remaining documents")
+                return
             source_id = int(doc['id'])
             source_name = str(doc['name'])
             text = "" if doc['fulltext'] is None else str(doc['fulltext'])
@@ -1055,6 +1087,7 @@ class AiVectorstore:
         self.reading_doc = ''
 
     def import_document(self, id_, name, text):
+        self._cancel_workers = False  # work deliberately asked for
         worker = Worker(self._import_document, id_, name, text)
         worker.signals.finished.connect(self.finished_import)
         worker.signals.progress.connect(self.progress_import)
@@ -1072,12 +1105,14 @@ class AiVectorstore:
             self._ensure_search_schema(conn)
             self._set_meta_build_state(conn, "building")
             self._refresh_sources(conn)
-            self._rebuild_faiss_index_from_db(conn)
+            if not self.cancelled():  # rebuilding the index while leaving is pointless
+                self._rebuild_faiss_index_from_db(conn)
             self._set_meta_build_state(conn, "ready")
         finally:
             conn.close()
 
     def update_vectorstore(self):
+        self._cancel_workers = False  # work deliberately asked for
         worker = Worker(self._update_vectorstore)
         self.vectorstore_workers_count += 1
         worker.signals.finished.connect(self._finish_vectorstore_worker)
@@ -1094,7 +1129,8 @@ class AiVectorstore:
             self._set_meta_build_state(conn, "building")
             self._reset_search_store(conn)
             self._refresh_sources(conn)
-            self._rebuild_faiss_index_from_db(conn)
+            if not self.cancelled():  # rebuilding the index while leaving is pointless
+                self._rebuild_faiss_index_from_db(conn)
             self._set_meta_build_state(conn, "ready")
         finally:
             conn.close()
@@ -1112,11 +1148,43 @@ class AiVectorstore:
         finally:
             conn.close()
 
+    def _register_quit_hook(self):
+        """
+        Registers this vectorstore and, once, the application quit hooks.
+        """
+
+        global _QUIT_HOOK_INSTALLED
+        _ACTIVE_VECTORSTORES.add(self)
+        if not _QUIT_HOOK_INSTALLED:
+            app_ = QtCore.QCoreApplication.instance()
+            if app_ is not None:
+                app_.aboutToQuit.connect(cancel_all_vectorstore_workers)
+            atexit.register(cancel_all_vectorstore_workers)
+            _QUIT_HOOK_INSTALLED = True
+
+    def cancel_workers(self):
+        """
+        Asks the work in progress to give up and drops whatever has not started. Does not
+        wait: the worker leaves on its own at its next checkpoint.
+        """
+
+        self._cancel_workers = True
+        self.threadpool.clear()
+
+    def cancelled(self):
+        """
+        True when the worker must give up: closing, or cancellation requested.
+        """
+
+        return self._is_closing or self._cancel_workers
+
     def close(self):
         self._is_closing = True
         self.download_model_cancel = True
-        self.threadpool.clear()
-        self.threadpool.waitForDone(5000)
+        self.cancel_workers()
+        if not self.threadpool.waitForDone(5000):
+            # The cancel flag stays set so the worker leaves at its next checkpoint
+            logger.warning("AI vectorstore worker still running after 5s, cancellation left in place")
         self.import_workers_count = 0
         self.vectorstore_workers_count = 0
         self._faiss_index = None

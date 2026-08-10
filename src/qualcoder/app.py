@@ -104,13 +104,10 @@ class App(object):
     Savable settings does not contain project name, project path or db connection.
     """
 
-    ai = None
-    ai_models = []
-    # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
-    ai_embedding_function = None
-    project_events = None
-
     def __init__(self):
+        self.version = "QualCoder 4.0 Beta"  # Must start with 'QualCoder '
+        self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
+        self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
         self.conn = None
         self.project_path = ""
         self.project_name = ""
@@ -125,9 +122,10 @@ class App(object):
         self.pending_ai_model_upgrade_offer = None
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
-        self.version = "QualCoder 4.0"  # Must start with 'QualCoder '
-        self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
-        self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
+        self.ai = None
+        self.ai_models = []
+        # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
+        self.ai_embedding_function = None
         self.project_events = ProjectEventBus()
 
     def read_previous_project_paths(self):
@@ -337,13 +335,12 @@ class App(object):
         zip_codes = set(self.get_user_language_zip_codes())
         return sorted((qm_codes & mo_codes) | zip_codes)
 
-    def sync_current_language_zip(self, lang_code):
+    def sync_current_language_zip(self, lang_code:str):
         """Extract one current-language zip package when it is new or files are missing."""
 
         zip_path = self.get_user_language_zip_path(lang_code)
         if not Path(zip_path).exists():
             return False
-
         required_names = (f'{lang_code}.qm', f'{lang_code}.mo')
         optional_name = f'{lang_code}.txt'
 
@@ -351,8 +348,8 @@ class App(object):
         Path(user_i18n_dir).mkdir(exist_ok=True)
         zip_mtime = os.path.getmtime(zip_path)
         target_paths = {
-            'qm': os.path.join(user_i18n_dir, f'{lang_code}.qm'),
-            'mo': os.path.join(user_i18n_dir, f'{lang_code}.mo'),
+            'qm': str(Path(user_i18n_dir) / f'{lang_code}.qm'),
+            'mo': str(Path(user_i18n_dir) / f'{lang_code}.mo')
         }
         needs_update = False
         for extension, target_path in target_paths.items():
@@ -368,7 +365,7 @@ class App(object):
                     zip_file.getinfo(required_name)
                 except KeyError as err:
                     raise FileNotFoundError(
-                        f'Language package "{os.path.basename(zip_path)}" must contain '
+                        f'Language package "{Path(zip_path).name}" must contain '
                         f'"{required_names[0]}" and "{required_names[1]}" in the zip root.'
                     ) from err
             for extension, target_path in target_paths.items():
@@ -389,9 +386,9 @@ class App(object):
 
         candidates = []
         for directory in (self.get_builtin_i18n_dir(), self.get_user_i18n_dir()):
-            candidate = os.path.join(directory, f"{lang_code}.{extension}")
-            if os.path.exists(candidate):
-                candidates.append(candidate)
+            candidate = Path(directory) / f"{lang_code}.{extension}"
+            if Path(candidate).exists():
+                candidates.append(str(candidate))
         if not candidates:
             return None
         return max(candidates, key=os.path.getmtime)
@@ -744,13 +741,13 @@ class App(object):
         for r in result:
             if r[2] is None:  # Internally created text file
                 continue
-            if r[2][0:5] == "docs:" and not os.path.exists(r[2][5:]):
+            if r[2][0:5] == "docs:" and not Path(r[2][5:]).exists():
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
-            if r[2][0:7] == "images:" and not os.path.exists(r[2][7:]):
+            if r[2][0:7] == "images:" and not Path(r[2][7:]).exists():
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
-            if r[2][0:6] == "video:" and not os.path.exists(r[2][6:]):
+            if r[2][0:6] == "video:" and not Path(r[2][6:]).exists():
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
-            if r[2][0:6] == "audio:" and not os.path.exists(r[2][6:]):
+            if r[2][0:6] == "audio:" and not Path(r[2][6:]).exists():
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
         return bad_links
 

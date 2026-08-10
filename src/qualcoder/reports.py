@@ -35,7 +35,7 @@ from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
-from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
+from .GUI.ui_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from .helpers import Message, ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
 from .information import DialogInformation
@@ -848,6 +848,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
+        self.ui.label_coders.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 28))
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'

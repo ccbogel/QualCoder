@@ -113,7 +113,7 @@ def compute_edge_point(center_source, center_target, rect, is_ellipse):
 # date/quote/memo-link, export linked), which makes no sense on a node text.
 # Tolerant to older DialogMemo builds that lack some of these buttons.
 def configure_plain_text_editor(dialog):
-    for btn_name in ('pushButton_clear', 'pushButton_insert_datetime',
+    for btn_name in ('pushButton_clear', 'groupBox_toolbar', 'pushButton_insert_datetime',
                      'pushButton_insert_coded_segment',
                      'pushButton_insert_memo_link', 'pushButton_export_linked'):
         btn = getattr(dialog.ui, btn_name, None)
@@ -2076,12 +2076,21 @@ class ViewGraph(QDialog):
         refined_model = [node]
         i = 0  # Ensure an exit from while loop
         model_changed = True
-        while model != [] and model_changed and i < 20:
+        while model != [] and model_changed and i < 50:
             model_changed = False
             append_list = []
             for refined_item in refined_model:
                 for model_item in model:
-                    if model_item['supercatid'] == refined_item['catid']:
+                    if model_item in append_list:
+                        continue
+                    # category/code hanging from a category in the branch
+                    if model_item['supercatid'] is not None and \
+                            model_item['supercatid'] == refined_item['catid']:
+                        append_list.append(model_item)
+                    # (sub-codes): code hanging from a code in the branch (supercid)
+                    elif refined_item['cid'] is not None and \
+                            model_item.get('supercid') is not None and \
+                            model_item['supercid'] == refined_item['cid']:
                         append_list.append(model_item)
             for append_item in append_list:
                 refined_model.append(append_item)
@@ -8786,7 +8795,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # Hierarchy convention: child -> parent (same as the reactive synchronizer)
         line_item = LinkGraphicsItem(self, new_node, 2, "solid", "gray", True)
         scene.addItem(line_item)
-        scene.update()
+        # Rebuild any other missing hierarchical lines (e.g. other codes of this
+        # category already in the scene) without waiting for a manual refresh
+        if hasattr(scene.parent, 'finalize_graph_operation'):
+            scene.parent.finalize_graph_operation(fit_view=False)
+        else:
+            scene.update()
 
     # (sub-codes): mirror of add_parent_category_to_scene for a sub-code,
     # bringing its parent CODE (supercid) into the scene, or recovering it if hidden.
@@ -8818,7 +8832,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # Hierarchy convention: child -> parent (sub-code -> parent code)
         line_item = LinkGraphicsItem(self, new_node, 2, "solid", "gray", True)
         scene.addItem(line_item)
-        scene.update()
+        # Rebuild the remaining missing lines: the parent's own line up to its
+        # category and lines from other sub-codes already in the scene
+        if hasattr(scene.parent, 'finalize_graph_operation'):
+            scene.parent.finalize_graph_operation(fit_view=False)
+        else:
+            scene.update()
 
     # import the child codes of this category that are not yet in the scene
     def add_child_codes_to_scene(self):
@@ -8864,7 +8883,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             # Hierarchy convention: child -> parent
             line_item = LinkGraphicsItem(new_node, self, 2, "solid", "gray", True)
             scene.addItem(line_item)
-        scene.update()
+        # Immediate sync: fills the real supercid from the database and rebuilds
+        # missing lines (sub-codes of the re-added codes already in the scene)
+        if hasattr(scene.parent, 'finalize_graph_operation'):
+            scene.parent.finalize_graph_operation(fit_view=False)
+        else:
+            scene.update()
 
     def add_coded_segments(self):
         """ Window to import coded segments from text, image, and A/V associated with this code.
@@ -9074,14 +9098,16 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if self.code_or_cat['cid'] is not None:
-            ui = DialogMemo(self.app, _("Memo for Code ") + self.code_or_cat['name'], self.code_or_cat['memo'])
+            ui = DialogMemo(self.app, _("Memo for Code ") + self.code_or_cat['name'], self.code_or_cat['memo'],
+                            entity_type="code", entity_id=self.code_or_cat['cid'])
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
             self.conn.commit()
         if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
-            ui = DialogMemo(self.app, _("Memo for Category ") + self.code_or_cat['name'], self.code_or_cat['memo'])
+            ui = DialogMemo(self.app, _("Memo for Category ") + self.code_or_cat['name'], self.code_or_cat['memo'],
+                            entity_type="category", entity_id=self.code_or_cat['catid'])
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()

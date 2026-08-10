@@ -14,16 +14,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
 from copy import copy
 import logging
-import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from typing import Any
 
@@ -33,7 +32,7 @@ from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
-from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
+from .GUI.ui_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
 from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog, init_persistent_tree_header, \
     restore_persistent_tree_widths
 from .information import DialogInformation
@@ -47,7 +46,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -86,6 +84,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.pushButton_export_odt.pressed.connect(self.export_odt_file)
         self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
+        self.ui.label_coders.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 28))
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'

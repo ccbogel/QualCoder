@@ -14,8 +14,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
@@ -23,12 +24,10 @@ https://qualcoder.org/
 from copy import copy, deepcopy
 import logging
 import openpyxl
-import os
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
@@ -36,7 +35,6 @@ from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
 from .helpers import DialogCodeInText, Message, init_persistent_tree_header, restore_persistent_tree_widths
 from .report_attributes import DialogSelectAttributeParameters
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
@@ -59,6 +57,9 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
         self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.label_coder.setPixmap(qta.icon('mdi6.account').pixmap(26, 28))
+        self.ui.label_include.setPixmap(qta.icon('mdi6.text-search').pixmap(26, 28))
+
         self.excluded_icon = qta.icon('mdi6.window-close')
         self.coder_names = []
         self.categories = []

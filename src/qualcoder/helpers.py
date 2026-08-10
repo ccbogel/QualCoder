@@ -355,6 +355,49 @@ def restore_persistent_tree_widths(tree_widget, minimum_widths=None, default_wid
         tree_widget._qc_restoring_tree_widths = False
 
 
+def extract_epub_fulltext(filepath):
+    """
+    Fulltext of an EPUB, in reading (spine) order and without the navigation document.
+    Shared by manage_files and the reference attachment import, so an EPUB entered through
+    either route produces the same text.
+    Args:
+        filepath: path of the .epub file, String
+    Returns:
+        String fulltext
+    """
+
+    import ebooklib
+    from ebooklib import epub
+    from .html_parser import html_to_text
+
+    book = epub.read_epub(filepath)
+    documents = [d for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT)
+                 if not isinstance(d, epub.EpubNav)]
+    by_id = {}
+    for d in documents:
+        by_id[d.get_id()] = d
+    ordered = []
+    for entry in (book.spine or []):
+        idref = entry[0] if isinstance(entry, (tuple, list)) else entry
+        item = by_id.get(idref)
+        if item is not None and item not in ordered:
+            ordered.append(item)
+    for d in documents:  # anything outside the spine goes last
+        if d not in ordered:
+            ordered.append(d)
+    text_ = ""
+    for d in ordered:
+        try:
+            # Paragraph spacing for visual format, as in manage_files.
+            text_ += html_to_text(d.get_body_content().decode("utf-8")) + "\n\n"
+        except TypeError as err:
+            logger.debug(f"ebooklib get_body_content error: {err}")
+    text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
+    if text_ and text_[0] == "\ufeff":
+        text_ = text_[1:]
+    return text_
+
+
 class Message(QtWidgets.QMessageBox):
     """ This is called a lot , but is styled to font size """
 

@@ -21,7 +21,6 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from charset_normalizer import from_bytes
 import datetime
 import ebooklib
 from ebooklib import epub
@@ -40,6 +39,8 @@ import zipfile
 from .docx import opendocx, getdocumenttext
 from .helpers import Message
 from .html_parser import *
+from .latex_import import LatexImportError, tex_file_to_plain_text
+from .text_decoding import decode_text_with_best_encoding as decode_text_with_best_encoding_helper
 
 
 logger = logging.getLogger(__name__)
@@ -242,17 +243,18 @@ class ReplaceTextFile:
         """
 
         text = ""
+        suffix = Path(self.new_file_path).suffix.lower()
         # Import from odt
-        if Path(self.new_file_path).suffix.lower() == ".odt":
+        if suffix == ".odt":
             text = self.convert_odt_to_text(self.new_file_path)
             text = text.replace("\n", "\n\n")  # Add line to paragraph spacing for visual format
         # Import from docx
-        if Path(self.new_file_path).suffix.lower() == ".docx":
+        if suffix == ".docx":
             document = opendocx(self.new_file_path)
             list_ = getdocumenttext(document)
             text = "\n\n".join(list_)  # Add line to paragraph spacing for visual format
         # Import from rtf
-        if Path(self.new_file_path).suffix.lower() == ".rtf":
+        if suffix == ".rtf":
             # text_ = rtf_to_text(import_file, encoding="latin-1", errors="replace")
             with open(self.new_file_path, "r", encoding="latin-1") as sourcefile:
                 text = ""
@@ -264,7 +266,7 @@ class ReplaceTextFile:
                     logger.debug(f"rtf_to_text error Not Latin-1: {err}")
                     Message(self.app, "rtf to text error", msg).exec()
         # Import from epub
-        if Path(self.new_file_path).suffix.lower() == ".epub":
+        if suffix == ".epub":
             book = epub.read_epub(self.new_file_path)
             for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
                 try:
@@ -274,7 +276,7 @@ class ReplaceTextFile:
                 except TypeError as e:
                     logger.debug("ebooklib get_body_content error " + str(e))
         # Import from html
-        if Path(self.new_file_path).suffix.lower() in (".html", ".htm"):
+        if suffix in (".html", ".htm"):
             import_errors = 0
             with open(self.new_file_path, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
                 html_text = ""
@@ -287,7 +289,7 @@ class ReplaceTextFile:
                 if import_errors > 0:
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
-        if Path(self.new_file_path).suffix.lower() == '.pdf':
+        if suffix == '.pdf':
             pdf_file = open(self.new_file_path, 'rb')
             resource_manager = PDFResourceManager()
             laparams = LAParams()
@@ -304,10 +306,19 @@ class ReplaceTextFile:
                 for lobj in layout:
                     self.get_item_and_hierarchy(page, lobj)
                 text += self.pdf_page_text
+        if suffix == ".tex":
+            try:
+                text = tex_file_to_plain_text(self.new_file_path)
+            except LatexImportError as err:
+                logger.warning(f"LaTeX import error: {self.new_file_path} {err}")
+                Message(self.app, _("Cannot import LaTeX file"),
+                        _("Could not convert LaTeX to readable text") + f":\n{self.new_file_path}",
+                        "warning").exec()
+                return
         # Try importing as a plain text file.
         if text == "":
             try:
-                text_, detected_encoding = self.decode_text_with_best_encoding(self.new_file_path)
+                text_, detected_encoding = decode_text_with_best_encoding_helper(self.new_file_path)
                 logger.debug(f"Importing plain text file: {self.new_file_path} decoded as {detected_encoding}")
                 if text_ and text_[0] == "\ufeff":  # associated with notepad files
                     text = text_[1:]
@@ -323,7 +334,7 @@ class ReplaceTextFile:
             return
         # Normalise line endings and strip BOM: Qt converts \r\n/\r to \n on
         # setPlainText, so mismatches make stored positions drift.
-        if Path(self.new_file_path).suffix.lower() != '.pdf':  # skip PDF
+        if suffix != '.pdf':  # skip PDF
             text = text.replace("\r\n", "\n").replace("\r", "\n")
             if text and text[0] == "\ufeff":
                 text = text[1:]
@@ -333,7 +344,7 @@ class ReplaceTextFile:
 
         # Apply pseudonym text replacement
         pseudonyms = self.load_pseudonyms()
-        if Path(self.new_file_path).suffix.lower() != '.pdf':
+        if suffix != '.pdf':
             for pseudonym in pseudonyms:
                 pseudonymised = re.sub(rf"\b{pseudonym['original']}\b", pseudonym['pseudonym'], text)
                 text = pseudonymised
@@ -397,28 +408,7 @@ class ReplaceTextFile:
     def decode_text_with_best_encoding(import_file:str):
         """ Decode text file bytes using robust encoding detection and fallbacks. """
 
-        with open(import_file, "rb") as sourcefile:
-            raw_bytes = sourcefile.read()
-        if not raw_bytes:
-            return "", "empty"
-        # Try Unicode first, with and without BOM
-        decode_order = ("utf-8-sig", "utf-8")
-        for encoding in decode_order:
-            try:
-                return raw_bytes.decode(encoding), encoding
-            except UnicodeDecodeError:
-                pass
-        # no Unicode, try to detect charset with charset-normalizer, then fall back to common encodings
-        best_match = from_bytes(raw_bytes).best()
-        if best_match is not None:
-            detected_encoding = best_match.encoding if best_match.encoding else "unknown"
-            return str(best_match), detected_encoding
-        for encoding in ("cp1252", "latin-1"):
-            try:
-                return raw_bytes.decode(encoding), encoding
-            except UnicodeDecodeError:
-                pass
-        return raw_bytes.decode("utf-8", errors="backslashreplace"), "utf-8(backslashreplace)"
+        return decode_text_with_best_encoding_helper(import_file)
 
     @staticmethod
     def convert_odt_to_text(import_file:str) -> str:

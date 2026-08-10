@@ -101,6 +101,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.attribute_file_ids = []
         self.attribute_case_ids = []
         self.attributes_msg = ""
+        # Citation style, asked when the references checkbox is ticked
+        self.reference_style = 'apa'
 
         self.get_codes_categories_coders()
         QtWidgets.QDialog.__init__(self)
@@ -134,6 +136,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
+        self.ui.checkBox_show_refs.toggled.connect(self.select_reference_style)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
                    _("Categories by file"), _("Codes by case"), _("Codes by file")]
         self.ui.comboBox_matrix.addItems(options)
@@ -2345,6 +2348,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             if row['result_type'] == 'av' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.ui.textEdit.insertPlainText(f"\n{row['text']}\n")
 
+            # File reference, below the coded memo
+            self.insert_reference(row)
+
             # Show co-ocurrences after coded memo (skip on memo-only modes for consistency)
             if memo_choice_index not in (4, 5):  # hide co-occurrences in "Only memos" / "Only coded memos"
                 overlaps = self.get_cooccurring_codes(row)  # Adds ctids, imids, avids of the overlaps as Dict{[list]}
@@ -2521,7 +2527,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             ris = Ris(self.app)
             ris.get_references(risid)
             if ris.refs:
-                reference = ris.refs[0]['apa']
+                reference = ris.refs[0].get(self.reference_style) or ris.refs[0].get('apa', '')
                 reference = reference.replace("\n", " ") + "\n"
         head = "\n"
         if item['result_type'] == 'text':
@@ -2534,7 +2540,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
         if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "":
-            head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
+            # A real newline, not <br />: head starts with "\n", so mightBeRichText stops there,
+            # append treats it as plain text and the tag would show literally
+            head += _("CODE MEMO: ") + item['codename_memo'] + "\n"
         head += _("File: ") + filename + ", "
         if memo_choice in (_("Also all memos"), _("Only memos")) and item['source_memo'] != "":
             head += _(" FILE MEMO: ") + item['source_memo']
@@ -2574,9 +2582,45 @@ class DialogReportCodes(QtWidgets.QDialog):
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
-        if self.ui.checkBox_show_refs.isChecked() and reference:
-            self.ui.textEdit.append(reference)
+        # Kept on the item; insert_reference prints it below the coded memo
+        item['reference'] = reference
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
+
+    def select_reference_style(self, checked):
+        """
+        When the references checkbox is ticked, ask for the citation style: APA or Vancouver.
+        Both are prepared by ris.format_vancouver_and_apa, so this only chooses which one is used.
+        Args:
+            checked: Boolean, the new state of the checkbox
+        """
+
+        if not checked:
+            return
+        msg_box = QtWidgets.QMessageBox(self)
+        msg_box.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
+        msg_box.setWindowTitle(_("References"))
+        msg_box.setText(_("Citation style for the references:"))
+        msg_box.setIcon(QtWidgets.QMessageBox.Icon.Question)
+        button_apa = msg_box.addButton(_("APA"), QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+        button_vancouver = msg_box.addButton(_("Vancouver"), QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+        msg_box.setDefaultButton(button_apa if self.reference_style == 'apa' else button_vancouver)
+        msg_box.exec()
+        self.reference_style = 'vancouver' if msg_box.clickedButton() == button_vancouver else 'apa'
+
+    def insert_reference(self, item):
+        """
+        Inserts the file reference below the coded memo, if the file has a reference assigned
+        and the show references checkbox is ticked. Prepared by heading().
+        Args:
+            item: dictionary of the result row
+        """
+
+        if not self.ui.checkBox_show_refs.isChecked():
+            return
+        reference = item.get('reference')
+        if reference:
+            # Upper case label, as the report's memo labels
+            self.ui.textEdit.insertPlainText(_("REFERENCE: ") + reference)
 
     def text_edit_menu(self, position):
         """ Context menu for textEdit.
@@ -2954,7 +2998,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         memo_choice = self.ui.comboBox_memos.currentText()
         head = f"\n{item['codename']}, "
         if memo_choice in (_("Also all memos"), _("Also code memos"), _("Only memos")) and item['codename_memo'] != "":
-            head += _("CODE MEMO: ") + f"{item['codename_memo']}<br />"  # removed leftover 'All memo' literal <- L
+            # A real newline, not <br />: inserted with append as plain text
+            head += _("CODE MEMO: ") + f"{item['codename_memo']}\n"
         head += f"{_('File:')} {filename}, "
         if memo_choice in (_("Also all memos"), _("Only memos")) and item['source_memo'] != "":  # typo 'alll' -> 'all' <- L
             head += f" {_('FILE MEMO:')} {item['source_memo']}"

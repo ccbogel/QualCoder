@@ -21,10 +21,7 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 from PyQt6.QtWidgets import QProgressDialog
-from charset_normalizer import from_bytes
 import datetime
-import ebooklib
-from ebooklib import epub
 import fitz
 import json
 import openpyxl
@@ -39,7 +36,6 @@ import sqlite3
 from typing import Any
 from shutil import copyfile, move
 from striprtf.striprtf import rtf_to_text
-from urllib.parse import urlparse
 import webbrowser
 import zipfile
 
@@ -47,16 +43,20 @@ import zipfile
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
 from .code_pdf import DialogCodePdf, extract_pdf_fulltext, extract_pdf_highlights, \
-    pdf_highlights_to_positions, extract_pdf_annotations  # Same extractor and word map as the PDF viewer
+    closest_qualcoder_color, pdf_annotations_to_file_memo, \
+    code_pdf_highlights as code_pdf_highlights_shared  # Same extractor and word map as the PDF viewer
 from .code_text import DialogCodeText  # for isinstance()
 from .color_selector import colour_ranges, colors
 from .confirm_delete import DialogConfirmDelete
 from .docx import opendocx, getdocumenttext
 from .edit_textfile import DialogEditTextFile
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
-from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
+from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs, \
+    extract_epub_fulltext
 from .html_parser import *
+from .latex_import import LatexImportError, tex_file_to_plain_text
 from .memo import DialogMemo
+from .pdf_preview import DialogPdfPagesToImages, DialogPdfPreview
 from .pseudonyms import Pseudonyms
 from .report_codes import DialogReportCodes  # for isInstance()
 from .ris import Ris
@@ -64,6 +64,7 @@ from .select_items import DialogSelectItems
 from .view_av import DialogViewAV
 from .code_av import DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
+from .text_decoding import decode_text_with_best_encoding as decode_text_with_best_encoding_helper
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -77,313 +78,6 @@ path = Path(__file__).resolve().parent
 
 logger = logging.getLogger(__name__)
 
-
-class PdfPreviewWidget(QtWidgets.QWidget):
-    """
-    Shared PDF preview widget: rendered page in the centre, boundable < > navigation
-    and in-memory rendering with document closing. Used by DialogPdfPagesToImages
-    (converter) and DialogPdfPreview (viewer).
-    """
-
-    ZOOM_MIN = 25
-    ZOOM_MAX = 200
-    ZOOM_STEP = 25
-
-    def __init__(self, filepath:str, parent=None):
-        super().__init__(parent)
-        self.filepath = filepath
-        self.total_pages = 0
-        self.preview_page = 0  # base 0
-        self.page_min = 0
-        self.page_max = 0
-        self.zoom = 100  # percent of the fitted size
-        self._rendering = False  # re-entrancy guard: setPixmap/resize can trigger nested resize events
-        self._render_key = None  # (page, zoom, scale) of the last render, to skip identical renders
-        try:
-            doc = fitz.open(filepath)
-            self.total_pages = len(doc)
-            doc.close()
-        except Exception as err:
-            logger.warning(f"PdfPreviewWidget: {filepath} {err}")
-        self.page_max = max(0, self.total_pages - 1)
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.label_preview = QtWidgets.QLabel()
-        self.label_preview.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.scroll_area = QtWidgets.QScrollArea()
-        self.scroll_area.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.scroll_area.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
-        self.scroll_area.setMinimumSize(380, 380)
-        self.scroll_area.setWidget(self.label_preview)
-        layout.addWidget(self.scroll_area, stretch=1)
-        nav = QtWidgets.QHBoxLayout()
-        self.btn_prev = QtWidgets.QPushButton("<")
-        self.btn_prev.setMaximumWidth(40)
-        self.btn_prev.clicked.connect(lambda: self.change_preview_page(-1))
-        self.label_page = QtWidgets.QLabel("")
-        self.label_page.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.btn_next = QtWidgets.QPushButton(">")
-        self.btn_next.setMaximumWidth(40)
-        self.btn_next.clicked.connect(lambda: self.change_preview_page(1))
-        nav.addStretch(1)
-        nav.addWidget(self.btn_prev)
-        nav.addWidget(self.label_page)
-        nav.addWidget(self.btn_next)
-        nav.addStretch(1)
-        self.btn_zoom_out = QtWidgets.QPushButton("−")
-        self.btn_zoom_out.setMaximumWidth(40)
-        self.btn_zoom_out.setToolTip(_("Zoom out"))
-        self.btn_zoom_out.clicked.connect(lambda: self.change_zoom(-self.ZOOM_STEP))
-        self.label_zoom = QtWidgets.QLabel("100%")
-        self.label_zoom.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label_zoom.setMinimumWidth(44)
-        self.btn_zoom_in = QtWidgets.QPushButton("+")
-        self.btn_zoom_in.setMaximumWidth(40)
-        self.btn_zoom_in.setToolTip(_("Zoom in"))
-        self.btn_zoom_in.clicked.connect(lambda: self.change_zoom(self.ZOOM_STEP))
-        nav.addWidget(self.btn_zoom_out)
-        nav.addWidget(self.label_zoom)
-        nav.addWidget(self.btn_zoom_in)
-        nav.addStretch(1)
-        layout.addLayout(nav)
-        self.render_preview()
-
-    def set_page_limits(self, page_min:int, page_max:int):
-        """
-        Bounds navigation (0-based) and repositions the previewed page.
-        """
-
-        self.page_min = max(0, page_min)
-        self.page_max = min(max(0, self.total_pages - 1), max(self.page_min, page_max))
-        self.preview_page = min(max(self.preview_page, self.page_min), self.page_max)
-        self.render_preview()
-
-    def change_preview_page(self, delta:int):
-        nueva = self.preview_page + delta
-        if self.page_min <= nueva <= self.page_max:
-            self.preview_page = nueva
-            self.render_preview()
-
-    def change_zoom(self, delta:int):
-        """
-        Steps the zoom within ZOOM_MIN..ZOOM_MAX percent of the fitted size.
-        """
-
-        new_zoom = min(self.ZOOM_MAX, max(self.ZOOM_MIN, self.zoom + delta))
-        if new_zoom != self.zoom:
-            self.zoom = new_zoom
-            self.render_preview()
-
-    def render_preview(self):
-        """
-        Renders the previewed page in memory at the real zoomed size (no pixmap
-        scaling) and always closes the document (no handle retained).
-        Re-entrancy guard: label resizes can move scrollbars and fire nested
-        resize/layout events; re-entering here recurses at C level and kills the
-        process on Windows.
-        """
-
-        if self._rendering:
-            return
-        self._rendering = True
-        try:
-            self.do_render()
-        finally:
-            self._rendering = False
-
-    def do_render(self):
-        if self.total_pages == 0:
-            self.label_preview.setText(_("Cannot open: ") + self.filepath)
-            self.label_preview.adjustSize()
-            self.label_page.setText("0/0")
-            self.label_zoom.setText("")
-            for btn in (self.btn_prev, self.btn_next, self.btn_zoom_out, self.btn_zoom_in):
-                btn.setEnabled(False)
-            return
-        # maximumViewportSize ignores scrollbar visibility, so the fitted size is
-        # stable and scrollbar toggling cannot re-trigger renders.
-        viewport = self.scroll_area.maximumViewportSize()
-        try:
-            doc = fitz.open(self.filepath)
-            try:
-                page = doc.load_page(self.preview_page)
-                page_w = max(1.0, page.rect.width)
-                page_h = max(1.0, page.rect.height)
-                fit = min((viewport.width() - 4) / page_w, (viewport.height() - 4) / page_h)
-                scale = fit * self.zoom / 100.0
-                # Clamp render size: at least 1 px, at most ~5000 px per side
-                scale = max(1.0 / min(page_w, page_h), min(scale, 5000.0 / max(page_w, page_h)))
-                render_key = (self.preview_page, self.zoom, round(scale, 4))
-                if render_key == self._render_key:
-                    self.update_controls()
-                    return
-                pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False, annots=False)  # PDF highlights/notes not painted in the preview
-                # bytes() detaches the buffer from PyMuPDF before the doc is closed
-                image = QtGui.QImage(bytes(pix.samples), pix.width, pix.height, pix.stride,
-                                     QtGui.QImage.Format.Format_RGB888).copy()
-            finally:
-                doc.close()
-        except Exception as err:
-            logger.warning(f"render_preview: {self.filepath} {err}")
-            self.label_preview.setText(_("Cannot open: ") + self.filepath)
-            self.label_preview.adjustSize()
-            return
-        pixmap = QtGui.QPixmap.fromImage(image)
-        self.label_preview.setPixmap(pixmap)
-        self.label_preview.resize(pixmap.size())
-        self._render_key = render_key
-        self.update_controls()
-
-    def update_controls(self):
-        self.label_page.setText(f"{self.preview_page + 1}/{self.total_pages}")
-        self.label_zoom.setText(f"{self.zoom}%")
-        self.btn_prev.setEnabled(self.preview_page > self.page_min)
-        self.btn_next.setEnabled(self.preview_page < self.page_max)
-        self.btn_zoom_out.setEnabled(self.zoom > self.ZOOM_MIN)
-        self.btn_zoom_in.setEnabled(self.zoom < self.ZOOM_MAX)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.render_preview()
-
-
-class DialogPdfPreview(QtWidgets.QDialog):
-    """
-    PDF viewer for Manage files, in the style of the image converter: navigable
-    preview of all pages, no editing. The stored fulltext of a PDF is NOT
-    editable: it must match, character by character, the text extracted from
-    the pages. To work with an editable text, "Convert to txt" creates a new
-    text source with a copy of the PDF's text.
-    """
-
-    def __init__(self, app, filepath:str, filename:str, parent=None):
-        super().__init__(parent)
-        self.app = app
-        self.convert_txt_requested = False
-        self.setWindowTitle(_("View PDF") + f" - {filename}")
-        self.setMinimumSize(520, 560)
-        layout = QtWidgets.QVBoxLayout(self)
-        self.preview = PdfPreviewWidget(filepath, self)
-        layout.addWidget(self.preview, stretch=1)
-        buttons = QtWidgets.QHBoxLayout()
-        self.btn_convert_txt = QtWidgets.QPushButton(_("Convert to txt"))
-        self.btn_convert_txt.setToolTip(
-            _("Create a new editable text file with a copy of this PDF's text"))
-        self.btn_convert_txt.clicked.connect(self.request_convert_txt)
-        btn_close = QtWidgets.QPushButton(_("Close"))
-        btn_close.clicked.connect(self.reject)
-        buttons.addWidget(self.btn_convert_txt)
-        buttons.addStretch(1)
-        buttons.addWidget(btn_close)
-        layout.addLayout(buttons)
-
-    def request_convert_txt(self):
-        """
-        Flags the txt copy request; the caller (view) runs extract_pdf_text_copy,
-        which already validates scanned PDFs and duplicate names.
-        """
-
-        self.convert_txt_requested = True
-        self.accept()
-
-    @property
-    def total_pages(self):
-        return self.preview.total_pages
-
-
-class DialogPdfPagesToImages(QtWidgets.QDialog):
-    """
-    Dialog to convert PDF pages into images, print-preview style: navigable page
-    preview, page range selection (1-based) and output resolution. Returns the chosen
-    range and resolution; the caller (pdf_to_images) performs the conversion.
-    """
-
-    def __init__(self, app, filepath:str, filename:str, parent=None):
-        super().__init__(parent)
-        self.app = app
-        self.setWindowTitle(_("Pdf pages to images") + f" - {filename}")
-        self.setMinimumSize(520, 560)
-        layout = QtWidgets.QVBoxLayout(self)
-        self.preview = PdfPreviewWidget(filepath, self)
-        layout.addWidget(self.preview, stretch=1)
-        # Range and resolution
-        form = QtWidgets.QHBoxLayout()
-        form.addWidget(QtWidgets.QLabel(_("From page")))
-        self.spin_from = QtWidgets.QSpinBox()
-        self.spin_from.setRange(1, max(1, self.preview.total_pages))
-        self.spin_from.setValue(1)
-        self.spin_from.valueChanged.connect(self.range_changed)
-        form.addWidget(self.spin_from)
-        form.addWidget(QtWidgets.QLabel(_("To page")))
-        self.spin_to = QtWidgets.QSpinBox()
-        self.spin_to.setRange(1, max(1, self.preview.total_pages))
-        self.spin_to.setValue(max(1, self.preview.total_pages))
-        self.spin_to.valueChanged.connect(self.range_changed)
-        form.addWidget(self.spin_to)
-        form.addStretch(1)
-        form.addWidget(QtWidgets.QLabel(_("Resolution")))
-        self.combo_dpi = QtWidgets.QComboBox()
-        # 72 dpi reproduces the previous behaviour; higher resolution gives sharper
-        # images for coding (larger files).
-        self.combo_dpi.addItems(["72", "150", "300"])
-        form.addWidget(self.combo_dpi)
-        form.addWidget(QtWidgets.QLabel(_("dpi")))
-        layout.addLayout(form)
-        # Botones. Buttons
-        # Manual button row instead of QDialogButtonBox: guarantees the layout on
-        # every platform style. "Convert current page" left-aligned; "Convert" and
-        # "Cancel" right-aligned.
-        buttons = QtWidgets.QHBoxLayout()
-        self.btn_current_page = QtWidgets.QPushButton(_("Convert current page"))
-        self.btn_current_page.setToolTip(_("Convert only the page shown in the preview"))
-        # Pins the range to the previewed page and accepts, reusing the whole
-        # conversion pipeline unchanged (dpi, duplicates, progress).
-        self.btn_current_page.clicked.connect(self.convert_current_page)
-        buttons.addWidget(self.btn_current_page)
-        buttons.addStretch(1)
-        self.btn_convert = QtWidgets.QPushButton(_("Convert"))
-        self.btn_convert.setDefault(True)
-        self.btn_convert.clicked.connect(self.accept)
-        buttons.addWidget(self.btn_convert)
-        btn_cancel = QtWidgets.QPushButton(_("Cancel"))
-        btn_cancel.clicked.connect(self.reject)
-        buttons.addWidget(btn_cancel)
-        layout.addLayout(buttons)
-
-    @property
-    def total_pages(self):
-        return self.preview.total_pages
-
-    def convert_current_page(self):
-        """
-        Pins the range to the previewed page and accepts. Order matters: spin_to
-        first (if the page is below the range, range_changed pulls spin_from down
-        with it), then spin_from; the from <= to invariant holds both ways.
-        """
-
-        page = self.preview.preview_page + 1  # a base 1. To 1-based.
-        self.spin_to.setValue(page)
-        self.spin_from.setValue(page)
-        self.accept()
-
-    def get_range_and_dpi(self):
-        """ 
-        return: (0-based first page, 0-based last page inclusive, dpi Integer). 
-        """
-
-        return self.spin_from.value() - 1, self.spin_to.value() - 1, int(self.combo_dpi.currentText())
-
-    def range_changed(self):
-        """ 
-        Keeps from <= to and the previewed page inside the range. 
-        """
-
-        if self.spin_from.value() > self.spin_to.value():
-            if self.sender() is self.spin_from:
-                self.spin_to.setValue(self.spin_from.value())
-            else:
-                self.spin_from.setValue(self.spin_to.value())
-        self.preview.set_page_limits(self.spin_from.value() - 1, self.spin_to.value() - 1)
 
 
 class FilterHeaderView(QtWidgets.QHeaderView):
@@ -1388,9 +1082,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
-        url_test = urlparse(item_text)
-        if all([url_test.scheme, url_test.netloc]):
+        # Regex HTTP HTTPS protocol
+        regex_http = QtCore.QRegularExpression(
+            r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        # Regex Protocol optional
+        regex_no_protocol = QtCore.QRegularExpression(r"^www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        if bool(regex_no_protocol.match(item_text)) or bool(regex_http.match(item_text)):
             action_url = menu.addAction(_("Open URL"))
+
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -1474,6 +1173,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.pushButton_display_load.setToolTip(_("Load table display settings"))
             return
         if action == action_url:
+            print("URL open", item_text)
             webbrowser.open(item_text)
             return
         if action == action_date_picker:
@@ -2460,14 +2160,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.source[x]['memo'] = cur.fetchone()[0]
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
-                                self.source[x]['memo'])
+                                self.source[x]['memo'], entity_type="file", entity_id=self.source[x]['id'])
                 ui.exec()
                 self.source[x]['memo'] = ui.memo
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
                 self.app.conn.commit()
             else:
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
-                                self.source[x]['memo'])
+                                self.source[x]['memo'], entity_type="file", entity_id=self.source[x]['id'])
                 ui.exec()
                 self.source[x]['memo'] = ui.memo
                 cur = self.app.conn.cursor()
@@ -2934,9 +2634,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
-        Can import from plain text files, also import from html, odt, docx, rtf, and md.
+        Can import from plain text files, also import from html, odt, docx, rtf, tex, and md.
         md is text Markdown format.
-        Note importing from html, odt, docx, rtf all formatting is lost.
+        Note importing from html, odt, docx, rtf, tex all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as flac, mp3, wav, ogg, m4a which are stored in an audio directory.
         Imports video as mp4, mov, wmv, webm, m4v which are stored in a video directory.
@@ -2970,13 +2670,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         progress.setAutoReset(False)
         progress.setAutoClose(False)
         progress.show()
-        known_file_type = False
         self.default_import_directory = str(Path(imports[0]).parent)
         pdf_msg = ""
         # Highlight coding option, asked ONCE per batch and only when the first PDF
         # with highlight annotations is detected (tri-state: None = not asked yet).
         self.pdf_import_code_highlights = None
         for import_path in imports:
+            known_file_type = False
             link_path = ""
             if link:
                 link_path = import_path
@@ -2996,8 +2696,24 @@ class DialogManageFiles(QtWidgets.QDialog):
                                               _("Duplicate filename.\nFile not imported") + f"\n{filename}")
                 file_number += 1
                 continue
+            suffix = Path(import_path).suffix.lower()
+            # Base destination path, extended per file type below
             destination = self.app.project_path
-            if Path(import_path).suffix.lower() in ('.docx', '.odt', '.rtf', '.tex','.txt', '.htm', '.html', '.epub', '.md'):
+            if suffix in ('.docx', '.odt', '.rtf', '.tex', '.txt', '.htm', '.html', '.epub', '.md'):
+                if suffix == '.tex':
+                    try:
+                        imported_ok = self.load_file_text(import_path, f"docs:{import_path}")
+                    except LatexImportError as err:
+                        logger.warning(f"LaTeX import error: {filename} {err}")
+                        Message(self.app, _("Cannot import LaTeX file"),
+                                _("Could not convert LaTeX to readable text") + f":\n{filename}",
+                                "warning").exec()
+                        continue
+                    if not imported_ok:
+                        continue
+                    known_file_type = True
+                    file_number += 1
+                    continue
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
@@ -3019,7 +2735,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 else:
                     self.load_file_text(import_path, f"docs:{link_path}")
                 known_file_type = True
-            if Path(import_path).suffix.lower() == '.pdf':
+            if suffix == '.pdf':
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
@@ -3211,32 +2927,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def decode_text_with_best_encoding(self, import_file:str):
         """ Decode text file bytes using robust encoding detection and fallbacks. """
 
-        with open(import_file, "rb") as sourcefile:
-            raw_bytes = sourcefile.read()
-        if not raw_bytes:
-            return "", "empty"
-
-        # try Unicode first, with and without BOM
-        decode_order = ("utf-8-sig", "utf-8")
-        for encoding in decode_order:
-            try:
-                return raw_bytes.decode(encoding), encoding
-            except UnicodeDecodeError:
-                pass
-
-        # no Unicode, try to detect charset with charset-normalizer, then fall back to common encodings
-        best_match = from_bytes(raw_bytes).best()
-        if best_match is not None:
-            detected_encoding = best_match.encoding if best_match.encoding else "unknown"
-            return str(best_match), detected_encoding
-
-        for encoding in ("cp1252", "latin-1"):
-            try:
-                return raw_bytes.decode(encoding), encoding
-            except UnicodeDecodeError:
-                pass
-
-        return raw_bytes.decode("utf-8", errors="backslashreplace"), "utf-8(backslashreplace)"
+        return decode_text_with_best_encoding_helper(import_file)
 
     def load_file_text(self, import_file:str, link_path:str="", progress_:QProgressDialog|None=None):
         """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
@@ -3261,17 +2952,18 @@ class DialogManageFiles(QtWidgets.QDialog):
                                           _("Duplicate filename.\nFile not imported"))
             return False
         text_ = ""
+        suffix = Path(import_file).suffix.lower()
         # Import from odt
-        if Path(import_file).suffix.lower() == ".odt":
+        if suffix == ".odt":
             text_ = self.convert_odt_to_text(import_file)
             text_ = text_.replace("\n", "\n\n")  # add line to paragraph spacing for visual format
         # Import from docx
-        if Path(import_file).suffix.lower() == ".docx":
+        if suffix == ".docx":
             document = opendocx(import_file)
             list_ = getdocumenttext(document)
             text_ = "\n\n".join(list_)  # add line to paragraph spacing for visual format
         # Import from rtf
-        if Path(import_file).suffix.lower() == ".rtf":
+        if suffix == ".rtf":
             # text_ = rtf_to_text(import_file, encoding="latin-1", errors="replace")
             with open(import_file, "r", encoding="latin-1") as sourcefile:
                 text_ = ""
@@ -3283,17 +2975,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                     logger.debug(f"rtf_to_text error Not Latin-1: {err}")
                     Message(self.app, "rtf to text error", msg).exec()
         # Import from epub
-        if Path(import_file).suffix.lower() == ".epub":
-            book = epub.read_epub(import_file)
-            for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-                try:
-                    bytes_ = d.get_body_content()
-                    string = bytes_.decode('utf-8')
-                    text_ += html_to_text(string) + "\n\n"  # Add line to paragraph spacing for visual format
-                except TypeError as err:
-                    logger.debug(f"ebooklib get_body_content error: {err}")
+        if import_file[-5:].lower() == ".epub":
+            # Extraction shared with the reference attachment import.
+            text_ = extract_epub_fulltext(import_file)
         # Import from html
-        if Path(import_file).suffix.lower() in (".html", ".htm"):
+        if suffix in (".html", ".htm"):
             import_errors = 0
             with open(import_file, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
                 html_text = ""
@@ -3306,7 +2992,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if import_errors > 0:
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
-        if Path(import_file).suffix.lower() == '.pdf':
+        if suffix == '.pdf':
             # Extraction with the SAME extractor as the viewer (code_pdf.extract_pdf_fulltext),
             # otherwise coding positions do not map onto the PDF pages.
             def pdf_progress(current_page, total_pages):
@@ -3336,11 +3022,20 @@ class DialogManageFiles(QtWidgets.QDialog):
                          "but text coding and text search will not.")
                 Message(self.app, _("PDF without text"),
                         f"{Path(import_file).name}\n{msg}", "warning").exec()
+        if suffix == ".tex":
+            try:
+                text_ = tex_file_to_plain_text(import_file)
+            except LatexImportError as err:
+                logger.warning(f"LaTeX import error: {Path(import_file).name} {err}")
+                Message(self.app, _("Cannot import LaTeX file"),
+                        _("Could not convert LaTeX to readable text") + f":\n{Path(import_file).name}",
+                        "warning").exec()
+                return False
         # Try importing as a plain text file.
         # Never decode a PDF as plain text (it would produce unreadable binary).
-        if text_ == "" and Path(import_file).suffix.lower() != '.pdf':
+        if text_ == "" and suffix not in ('.pdf', '.tex'):
             try:
-                text_, detected_encoding = self.decode_text_with_best_encoding(import_file)
+                text_, detected_encoding = decode_text_with_best_encoding_helper(import_file)
                 logger.debug(f"Importing plain text file: {import_file} decoded as {detected_encoding}")
                 if text_ and text_[0] == "\ufeff":  # associated with notepad files
                     text_ = text_[1:]
@@ -3356,7 +3051,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return False
         # Normalise line endings and strip BOM: Qt converts \r\n/\r to \n on
         # setPlainText, so mismatches make stored positions drift. <- L
-        if Path(import_file).suffix.lower() != '.pdf': # skip PDF
+        if suffix != '.pdf': # skip PDF
             text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
             if text_ and text_[0] == "\ufeff":
                 text_ = text_[1:]
@@ -3364,7 +3059,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Apply pseudonym text replacement
         pseudonyms = self.load_pseudonyms()
-        if Path(import_file).suffix.lower() != '.pdf':
+        if suffix != '.pdf':
             for pseudonym in pseudonyms:
                 pseudonymised = re.sub(rf"\b{pseudonym['original']}\b", pseudonym['pseudonym'], text_)
                 text_ = pseudonymised
@@ -3409,25 +3104,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source.append(entry)
         # Offer (once per batch) to code highlight annotations; they are not
         # painted in the coding view (annots=False).
-        if Path(import_file).suffix.lower() == '.pdf':
+        if suffix == '.pdf':
             # Non-highlight annotations with text are appended to the file memo.
-            try:
-                notes = extract_pdf_annotations(import_file)
-            except Exception as err:
-                logger.warning(f"Annotation detection: {import_file} {err}")
-                notes = []
-            if notes:
-                memo_lines = [_("PDF annotations:")]
-                for n in notes:
-                    memo_lines.append(f"[p. {n['page']}] {n['content']}")
-                memo_text = "\n".join(memo_lines)
-                if entry['memo']:
-                    memo_text = entry['memo'] + "\n\n" + memo_text
-                cur.execute("update source set memo=? where id=?", [memo_text, entry['id']])
-                self.app.conn.commit()
-                entry['memo'] = memo_text
-                self.parent_text_edit.append(
-                    _("PDF annotations added to file memo: ") + f"{len(notes)}")
+            entry['memo'] = pdf_annotations_to_file_memo(self.app, self.parent_text_edit, entry['id'],
+                                                         import_file, entry['memo'])
             try:
                 highlights = extract_pdf_highlights(import_file)
             except Exception as err:
@@ -3452,56 +3132,14 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     # why not use: color_selector.color_matcher() method
     @staticmethod
-    def _closest_qualcoder_color(hex_color:str):
-        """
-        Closest colour of the QualCoder palette (color_selector.colors) by RGB
-        distance, with its family name from colour_ranges.
-        Returns (hex of the palette colour, family name).
-        Args:
-            hex_color:String
-        """
+    def _closest_qualcoder_color(hex_color):
+        """ Delegates to code_pdf.closest_qualcoder_color.
+        Returns (hex of the palette colour, family name). """
 
-        try:
-            r = int(hex_color[1:3], 16)
-            g = int(hex_color[3:5], 16)
-            b = int(hex_color[5:7], 16)
-        except (ValueError, IndexError):
-            r, g, b = 247, 254, 46  # default highlight yellow
-        # Achromatic highlights (white/black/grays) map to the gray family;
-        # plain RGB distance lands them on odd hues.
-        candidate_indexes = range(len(colors))
-        if max(r, g, b) - min(r, g, b) < 32:
-            for rng in colour_ranges:
-                if rng['name'] == 'gray':
-                    candidate_indexes = range(rng['min'], min(rng['max'] + 1, len(colors)))
-                    break
-        best_idx = 0
-        best_dist = None
-        for idx in candidate_indexes:
-            c = colors[idx]
-            cr = int(c[1:3], 16)
-            cg = int(c[3:5], 16)
-            cb = int(c[5:7], 16)
-            dist = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2
-            if best_dist is None or dist < best_dist:
-                best_dist = dist
-                best_idx = idx
-        family = "colour"
-        for rng in colour_ranges:
-            if rng['name'] != 'all' and rng['min'] <= best_idx <= rng['max']:
-                family = rng['name']
-                break
-        return colors[best_idx], family
+        return closest_qualcoder_color(hex_color)
 
-    def code_pdf_highlights(self, fid:int, filepath:str, fulltext:str, highlights, progress_:QProgressDialog|None=None):
-        """
-        Codes the PDF's highlighted segments: creates (or reuses) the
-        'PDF Highlights' category and one code per distinct highlight colour,
-        named and coloured after the closest QualCoder palette colour, then
-        inserts code_text rows over the exact highlighted positions.
-        Progress is shown INSIDE the batch import dialog when one is passed
-        (single progress view); a standalone dialog is only created when called
-        without one. Headless-safe: with no QApplication, runs silently.
+    def code_pdf_highlights(self, fid, filepath, fulltext, highlights, progress_=None):
+        """ Delegates to code_pdf.code_pdf_highlights.
         Args:
             fid: source id, Integer
             filepath: PDF path
@@ -3510,121 +3148,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             progress_: the batch QProgressDialog from import_files, or None
         """
 
-        filename_ = Path(filepath).name
-        external = progress_ is not None
-        progress = progress_
-        if progress is None and QtWidgets.QApplication.instance() is not None:
-            progress = QtWidgets.QProgressDialog("", "", 0, 100, self)
-            progress.setCancelButton(None)  # Partial runs are safe, but avoid them
-            progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
-            progress.setMinimumDuration(500)  # Only appears if it takes a while
-            progress.setAutoReset(False)
-            progress.setAutoClose(False)
-
-        def _show_phase(phase_label, pct):
-            if progress is None:
-                return
-            progress.setLabelText(f"{filename_}\n{phase_label} {pct}%")
-            if not external:
-                progress.setValue(pct)
-            QtWidgets.QApplication.processEvents()
-
-        def _map_progress(step, total):
-            if total > 0:
-                _show_phase(_("Mapping highlighted segments"), int(step * 60 / total))
-
-        positions = pdf_highlights_to_positions(filepath, highlights, _map_progress)
-        if not positions:
-            if progress is not None and not external:
-                progress.close()
-            elif external and progress is not None:
-                progress.setLabelText(filename_)
-            return
-        now_ = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        owner = self.app.settings['codername']
-        cur = self.app.conn.cursor()
-        # Category, created once and reused across batches and projects re-runs.
-        cat_name = "PDF Highlights"
-        cur.execute("select catid from code_cat where name=?", [cat_name])
-        res = cur.fetchone()
-        if res is None:
-            cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
-                        (cat_name, _("Codes created from PDF highlight annotations"), owner, now_, None))
-            self.app.conn.commit()
-            cur.execute("select last_insert_rowid()")
-            catid = cur.fetchone()[0]
-        else:
-            catid = res[0]
-        # One code per distinct colour, named by family ("Highlight yellow",
-        # "_2" suffix for further shades); reused if the palette colour exists.
-        cids_by_color = {}
-        for hl_color in sorted({p['color'] for p in positions}):
-            qc_hex, family = self._closest_qualcoder_color(hl_color)
-            base_name = f"Highlight {family}"
-            cur.execute("select cid, name, color from code_name where name=? or name like ?",
-                        [base_name, base_name + "_%"])
-            existing = [row for row in cur.fetchall()
-                        if row[1] == base_name or
-                        (row[1].startswith(base_name + "_") and row[1][len(base_name) + 1:].isdigit())]
-            reuse = next((row for row in existing if row[2] == qc_hex), None)
-            if reuse is not None:
-                cids_by_color[hl_color] = reuse[0]
-                continue
-            taken = {row[1] for row in existing}
-            code_name = base_name
-            n = 2
-            while code_name in taken:
-                code_name = f"{base_name}_{n}"
-                n += 1
-            try:
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                            (code_name, "", owner, now_, catid, qc_hex))
-                self.app.conn.commit()
-                cur.execute("select last_insert_rowid()")
-                cids_by_color[hl_color] = cur.fetchone()[0]
-                self.parent_text_edit.append(_("New code: ") + code_name)
-            except sqlite3.IntegrityError:
-                # Roll back the failed insert so no implicit transaction stays open.
-                self.app.conn.rollback()
-                cur.execute("select cid from code_name where name=?", [code_name])
-                res2 = cur.fetchone()
-                if res2 is not None:
-                    cids_by_color[hl_color] = res2[0]
-        # Codings over the highlighted positions. Insertion: 60-100 % of the bar.
-        count = 0
-        for seq, pos in enumerate(positions, start=1):
-            cid = cids_by_color.get(pos['color'])
-            if cid is None:
-                continue
-            seltext = fulltext[pos['pos0']:pos['pos1']]
-            if seltext.strip() == "":
-                continue
-            try:
-                # The comment attached to the highlight (if any) becomes the memo of
-                # this coded segment.
-                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important) "
-                            "values(?,?,?,?,?,?,?,?,?)",
-                            (cid, fid, seltext, pos['pos0'], pos['pos1'], owner,
-                             pos.get('memo', ''), now_, None))
-                self.app.conn.commit()
-                count += 1
-            except sqlite3.IntegrityError:
-                # Same segment already coded with this code (re-import). Roll back so
-                # no implicit transaction stays open behind the failed insert.
-                self.app.conn.rollback()
-            _show_phase(_("Coding highlighted segments"), 60 + int(seq * 40 / len(positions)))
-        if progress is not None:
-            if external:
-                progress.setLabelText(filename_)  # Back to the batch label
-            else:
-                progress.setValue(100)
-                progress.close()
-        if count > 0:
-            self.parent_text_edit.append(
-                _("PDF highlights coded: ") + f"{count}" + _(" segments in ") + Path(filepath).name)
-            if getattr(self.app, "project_events", None) is not None:
-                self.app.project_events.emit_table_changes(
-                    ['code_cat', 'code_name', 'code_text'], source=self)
+        code_pdf_highlights_shared(self.app, self.parent_text_edit, fid, filepath, fulltext,
+                                   highlights, progress_, self)
 
     def convert_odt_to_text(self, import_file:str):
         """ Convert odt to very rough equivalent with headings, list items and tables for

@@ -530,41 +530,79 @@ Clic droit pour les options</translation>
     </message>
 </context>
 <context>
+    <name>DialogImportReferences</name>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="78"/>
+        <source>Import references</source>
+        <translation>Importer les réferences</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="79"/>
+        <source>Select the references to import. Items already in the project (duplicates) are unchecked by default.</source>
+        <translation>Sélectionner les références à importer : celles déjà dans le projet (dupliquées) sont décochées par défaut.</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="80"/>
+        <source>Select all</source>
+        <translation>Sélectionner tout</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="81"/>
+        <source>Deselect all</source>
+        <translation>Déselectionner tout</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="82"/>
+        <source>Only New</source>
+        <translation>Seulement les nouvelles</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="83"/>
+        <source>Import attachments (PDF/EPUB)</source>
+        <translation>Importer les pièces jointes (PDF/EPUB)</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="86"/>
+        <source>Import</source>
+        <translation>Importer</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="88"/>
+        <source>Reference</source>
+        <translation>Référence</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="90"/>
+        <source>Status</source>
+        <translation>Statut</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="92"/>
+        <source>Attachment</source>
+        <translation>Pièce jointe</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_manage_references_import.py" line="94"/>
+        <source>Attachment status</source>
+        <translation>Statut de pièce jointe</translation>
+    </message>
+</context>
+<context>
     <name>DialogMatchingTextSegments</name>
     <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="112"/>
+        <location filename="../GUI/ui_report_matching_segments.py" line="113"/>
         <source>Report matching text segments</source>
         <translation>Rapport des segments correspondants</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="113"/>
+        <location filename="../GUI/ui_report_matching_segments.py" line="114"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur·se. Vide pour tous.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="114"/>
+        <location filename="../GUI/ui_report_matching_segments.py" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Rapport de segments de texte correspondants exacts</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="115"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur·se. Vide pour tous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="116"/>
-        <source>Coder</source>
-        <translation>Codeur⋅ses</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="119"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le texte codé doit contenir le texte saisi ci-dessus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="120"/>
-        <source>Include text</source>
-        <translation>Inclure le texte</translation>
     </message>
     <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="121"/>
@@ -599,9 +637,19 @@ Coché : Un code parmi ceux sélectionnés suffit.</translation>
         <translation>Exécuter</translation>
     </message>
     <message>
+        <location filename="../GUI/ui_report_matching_segments.py" line="116"/>
+        <source>Select coder. Blank for all</source>
+        <translation>Selectionner codeur⋅se. Vide pour tous</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_matching_segments.py" line="120"/>
+        <source>Coded text filter. Must include this text.</source>
+        <translation>Filtre de texte codé. Doit inclure ce texte.</translation>
+    </message>
+    <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="126"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File attributes filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtre sur les attributs des fichiers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>File attributes filter</source>
+        <translation>Filtre d’attributs de fichier</translation>
     </message>
 </context>
 <context>
@@ -691,54 +739,49 @@ Coché : Un code parmi ceux sélectionnés suffit.</translation>
 <context>
     <name>DialogSegmentCodings</name>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="94"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="100"/>
         <source>Report Segment Codings</source>
         <translation>Codages des segments du rapport</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="95"/>
-        <source>Text limiter:</source>
-        <translation>Délimitateur de texte :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="96"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="103"/>
         <source>Run report</source>
         <translation>Executer le rapport</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="97"/>
-        <source>Coder:</source>
-        <translation>Codeur⋅se :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="98"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="104"/>
         <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
         <translation>Codes par segments de texte tableau. 1 = code présent, 0 = non codé.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="99"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="105"/>
         <source>Export to Excel</source>
         <translation>Exporter vers Excel</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="100"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Selectionner des fichiers par attributs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="101"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichiers. Clic-droit pour sélectionner les options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="102"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cas. Clic-droit pour sélectionner les options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="103"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="109"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Clic-droit pour sélectionner les options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="102"/>
+        <source>Text filter</source>
+        <translation>Filtre de texte</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="106"/>
+        <source>Select files by attributes</source>
+        <translation>Sélectionner des fichiers par attributs</translation>
     </message>
 </context>
 <context>
@@ -3239,14 +3282,34 @@ Vérifiez après avoir appliqué la fonction.</translation>
 <context>
     <name>Dialog_memo</name>
     <message>
-        <location filename="../GUI/ui_dialog_memo.py" line="43"/>
+        <location filename="../GUI/ui_dialog_memo.py" line="65"/>
         <source>Memo</source>
         <translation>Mémo</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_memo.py" line="44"/>
+        <location filename="../GUI/ui_dialog_memo.py" line="70"/>
         <source>Clear</source>
         <translation>Vider</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="66"/>
+        <source>Insert current date and time at the cursor position</source>
+        <translation>Insérer la date et l&apos;heure actuelles à la position du curseur</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="67"/>
+        <source>Insert coded segments linked to this item</source>
+        <translation>Insérer des segments codés liés à cet élément</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="68"/>
+        <source>Insert a bibliographic reference linked to this item</source>
+        <translation>Insérer une référence bibliographique liée à cet élément</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_memo.py" line="69"/>
+        <source>Export memo as ODT file</source>
+        <translation>Exporter un mémo comme fichier ODT</translation>
     </message>
 </context>
 <context>
@@ -3669,104 +3732,106 @@ Modifiez les paramètres du nombre de caractères et du style d&apos;affichage.<
 <context>
     <name>Dialog_reportCompareCoderFile</name>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="96"/>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="99"/>
         <source>Reports</source>
         <translation>Rapports</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
-        <source>Coders:</source>
-        <translation>Codeur⋅ses :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="99"/>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="102"/>
         <source>To compare coding.
 Select two coders, one file, one code.</source>
         <translation>Pour comparer les codages.
 Sélectionnez deux codeur·ses, un fichier, un code.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="101"/>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="104"/>
         <source>Coder comparisons by file</source>
         <translation>Comparaison de codeur·ses par fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="103"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Sélection claire</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="102"/>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="105"/>
         <source>Coders selected</source>
         <translation>Codeurs sélectionnés</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="104"/>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="107"/>
         <source>Export ODT file</source>
         <translation>Exporter en fichier ODT</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="98"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Sélectionnez deux codeurs</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="106"/>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="110"/>
         <source>Statistics explanation</source>
         <translation>Explication des statistiques</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_compare_coder_file.py" line="105"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison.&lt;/p&gt;&lt;p&gt;Select 2 coders, 1 file, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exécuter la comparaison.&lt;/p&gt;&lt;p&gt;Sélectionnez 2 codeur·ses, 1 fichier, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="100"/>
+        <source>Coders</source>
+        <translation>Codeur⋅ses</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="101"/>
+        <source>Select two coders</source>
+        <translation>Sélectionner deux codeur⋅ses</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="106"/>
+        <source>Clear selection</source>
+        <translation>Effacer la sélection</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_compare_coder_file.py" line="108"/>
+        <source>Run comparison.
+Select 2 coders, 1 file, 1 code.</source>
+        <translation>Lancer la comparaison.
+Sélectionner 2 codeur⋅ses, 1 fichier, 1 code.</translation>
     </message>
 </context>
 <context>
     <name>Dialog_reportComparisons</name>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="79"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="82"/>
         <source>Coder Comparisons</source>
         <translation>Comparaison des codeur·ses</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="82"/>
-        <source>Coders:</source>
-        <translation>Codeur⋅ses :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="86"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="89"/>
         <source>Coders selected:</source>
         <translation>Codeurs sélectionnés:</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="80"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exporter un fichier Excel</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="81"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exécuter la comparaison</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="84"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Effacer la sélection</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="85"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="88"/>
         <source>Coder comparisons - text files</source>
         <translation>Comparaisons de codeur·ses - fichiers texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="87"/>
+        <location filename="../GUI/ui_report_comparisons.py" line="90"/>
         <source>Statistics help</source>
         <translation>Aide aux statistiques</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_report_comparisons.py" line="83"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Sélectionner deux codeur·ses</translation>
+        <location filename="../GUI/ui_report_comparisons.py" line="83"/>
+        <source>Export Excel</source>
+        <translation>Exporter en Excel</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="84"/>
+        <source>Run comparison</source>
+        <translation>Lancer la comparaison</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="85"/>
+        <source>Coder</source>
+        <translation>Codeur⋅se</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="86"/>
+        <source>Select two coders</source>
+        <translation>Sélectionner deux codeur⋅ses</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_comparisons.py" line="87"/>
+        <source>Clear selection</source>
+        <translation>Effacer la sélection</translation>
     </message>
 </context>
 <context>
@@ -3856,6 +3921,34 @@ Les caractères génériques pour&apos;like&apos; are % and _</translation>
         <location filename="../GUI/ui_report_attribute_parameters.py" line="94"/>
         <source>Delete saved filter settings</source>
         <translation>Supprimer les paramètres de filtre enregistrés</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_select_quote</name>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="51"/>
+        <source>Select quotes</source>
+        <translation>Sélectionner des citations</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="52"/>
+        <source>Coded segments</source>
+        <translation>Segments codés</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="53"/>
+        <source>Filter by segment type</source>
+        <translation>Filtrer par type de segment</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="54"/>
+        <source>Filter rows by any text</source>
+        <translation>Filtrer les lignes selon n&apos;importe quel texte</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_select_quote.py" line="55"/>
+        <source>Filter</source>
+        <translation>Filtrer</translation>
     </message>
 </context>
 <context>
@@ -5170,7 +5263,7 @@ N’utilisez pas la fonction «&#x2009;Codage — Codage du texte&#x2009;» avan
     <message>
         <location filename="../GUI/ui_main.py" line="429"/>
         <source>References</source>
-        <translation>Citations</translation>
+        <translation>Références</translation>
     </message>
     <message>
         <location filename="../GUI/ui_main.py" line="433"/>

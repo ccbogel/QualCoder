@@ -29,7 +29,6 @@ from openpyxl import load_workbook
 from pathlib import Path
 import qtawesome as qta
 import sqlite3
-from urllib.parse import urlparse
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -372,12 +371,20 @@ class DialogCases(QtWidgets.QDialog):
             self.attribute_labels_ordered.append(att_name[0])
         # Add list if attribute values to cases, order matches header columns
         sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? and id=?"
-        for a in self.attribute_labels_ordered:
+        for attribute_name in self.attribute_labels_ordered:
             for i, c in enumerate(self.cases):
-                cur.execute(sql, [a, c['caseid']])
+                cur.execute(sql, [attribute_name, c['caseid']])
                 res = cur.fetchone()
                 if res:
                     c['attributes'].append(res[0])
+                else:
+                    c['attributes'].append("")
+                    # Missing a stored attribute, need to store something
+                    now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
+                    cur.execute("insert into attribute (name,attr_type,value,id,date,owner) values(?,?,?,?,?,?)",
+                                [attribute_name, "case", "", c['caseid'],  now_date, self.app.settings['codername']])
+                    self.app.conn.commit()
+
         self.fill_table()
 
     def update_label(self):
@@ -778,7 +785,7 @@ class DialogCases(QtWidgets.QDialog):
 
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
-                            self.cases[x]['memo'])
+                            self.cases[x]['memo'], entity_type="case", entity_id=self.cases[x]['caseid'])
             ui.exec()
             self.cases[x]['memo'] = ui.memo
             cur = self.app.conn.cursor()
@@ -887,8 +894,12 @@ class DialogCases(QtWidgets.QDialog):
                 action_multiple_cells_value = menu.addAction(_("Set value of selected cells"))
         action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
-        url_test = urlparse(item_text)
-        if all([url_test.scheme, url_test.netloc]):
+        # Regex HTTP HTTPS protocol
+        regex_http = QtCore.QRegularExpression(
+            r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        # Regex Protocol optional
+        regex_no_protocol = QtCore.QRegularExpression(r"^www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+        if bool(regex_no_protocol.match(item_text)) or bool(regex_http.match(item_text)):
             action_url = menu.addAction(_("Open URL"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
