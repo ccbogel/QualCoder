@@ -27,185 +27,185 @@
 <context>
 <name>DialogCharts</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="288"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="289"/>
 <source>Charts</source>
 <translation>图表</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="289"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="290"/>
 <source>Charts displayed in the default web browser</source>
 <translation>在默认网络浏览器中显示图表</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="290"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="291"/>
 <source>Pie charts</source>
 <translation>饼图</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="291"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="292"/>
 <source>Bar charts</source>
 <translation>条形图</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="292"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="293"/>
 <source>Sunburst and treemap charts</source>
 <translation>旭日图和树状地图</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="294"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="295"/>
 <source>Select coder</source>
 <translation>选择编码器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="296"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="297"/>
 <source>Select file</source>
 <translation>选择文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="298"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="299"/>
 <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
 <translation>如果将文本文件的部分内容分配给案件，则代码频率和文本字符总数可能不正确。
 计算时会使用整个文本文件中的编码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="300"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="301"/>
 <source>Select case</source>
 <translation>选择案例</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="301"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="302"/>
 <source>Select attributes</source>
 <translation>选择属性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="302"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="303"/>
 <source>Filter out values below:</source>
 <translation>筛选出以下值：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="303"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="304"/>
 <source>Enter number for filter cut off</source>
 <translation>输入过滤器截流的数字</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="304"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="305"/>
 <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
 <translation>数据过滤器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="305"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="306"/>
 <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
 <translation>编码图表</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="310"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="311"/>
 <source>Select category</source>
 <translation>选择类别</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="311"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="312"/>
 <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
 <translation>&lt;b&gt;属性图表&lt;/b&gt;</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="312"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="313"/>
 <source>Numeric attributes</source>
 <translation>数字属性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="313"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="314"/>
 <source>Character attributes</source>
 <translation>角色属性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="314"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="315"/>
 <source>File</source>
 <translation>文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="315"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="316"/>
 <source>Case</source>
 <translation>案例</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="316"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="317"/>
 <source>Export HTML file</source>
 <translation>导出 HTML 文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="317"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="318"/>
 <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
 <translation>&lt;b&gt;热图图表&lt;/b&gt;</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="318"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="319"/>
 <source>Word cloud</source>
 <translation>词汇云</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="321"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="322"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>制作词云</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="322"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="323"/>
 <source>Width</source>
 <translation>宽度</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="323"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="324"/>
 <source>Height</source>
 <translation>高度</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="324"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="325"/>
 <source>Max words</source>
 <translation>最多字数</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="326"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="327"/>
 <source>Reverse colour range</source>
 <translation>反色范围</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="327"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="328"/>
 <source>Reverse range</source>
 <translation>反向范围</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="328"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="329"/>
 <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
 <translation>短语中连词的数量。Stopwords 仅适用于选择 1 个单词。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="329"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="330"/>
 <source>n-grams</source>
 <translation>n-grams</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="330"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="331"/>
 <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
 <translation>1=一个词，3=3 个词组，4=4 个词组</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="331"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="332"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>这样做是为了在出现极端计数差异时，热图颜色的分布范围更广。
 0 表示无限制。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="332"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="333"/>
 <source>Upper count limiter</source>
 <translation>上限计数限制器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="336"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="337"/>
 <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
 <translation>&lt;b&gt;累积条形图&lt;/b&gt;</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="337"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="338"/>
 <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
@@ -218,22 +218,22 @@ Each word is excluded in the n-grams=1 Word cloud.</source>
 每个单词将在n-grams=1的词云中被排除。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="342"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="343"/>
 <source>Stop words</source>
 <translation>停用词</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="343"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="344"/>
 <source>Select stopwords list by language</source>
 <translation>按语言选择停用词列表</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="306"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="307"/>
 <source>Right-click for text filter</source>
 <translation>右键单击以启用文本过滤器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="307"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="308"/>
 <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
@@ -242,27 +242,27 @@ Codings from the entire text file are used for the calculations.</source>
 计算时将使用整个文本文件的编码数据。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="319"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="320"/>
 <source>Background</source>
 <translation>背景</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="320"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="321"/>
 <source>Foreground</source>
 <translation>前景</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="333"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="334"/>
 <source>Image width</source>
 <translation>图片宽度</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="334"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="335"/>
 <source>Image height</source>
 <translation>图片高度</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="335"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="336"/>
 <source>Maximum words</source>
 <translation>最大字数</translation>
 </message>
@@ -366,67 +366,67 @@ Right-click for options</source>
 <source>Export to Draw.io</source>
 <translation>导出到 Draw.io</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="185"/>
 <source>Show minimap</source>
 <translation type="unfinished">显示小型映射</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="186"/>
 <source>Align horizontal</source>
 <translation type="unfinished">水平对齐</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="187"/>
 <source>Align vertical</source>
 <translation type="unfinished">垂直对齐</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="188"/>
 <source>Distribute vertical</source>
 <translation type="unfinished">垂直分布</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="189"/>
 <source>Distribute horizontal</source>
 <translation type="unfinished">横向分布</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="190"/>
 <source>Compact graph</source>
 <translation type="unfinished">压缩图</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="191"/>
 <source>Expand graph</source>
 <translation type="unfinished">扩展图</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="192"/>
 <source>Organize graph</source>
 <translation type="unfinished">组织图</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="193"/>
 <source>Remove nodes</source>
 <translation type="unfinished">删除节点</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="194"/>
 <source>Undo changes</source>
 <translation type="unfinished">撤消更改</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="205"/>
 <source>Add relationship line</source>
 <translation type="unfinished">添加关系线</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="214"/>
 <source>Graph models</source>
 <translation type="unfinished">图表模型</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="215"/>
 <source>Export Graph Summary</source>
 <translation type="unfinished">导出图摘要</translation>
@@ -434,232 +434,275 @@ Right-click for options</source>
 </context>
 <context>
 <name>DialogGraphModels</name>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="198"/>
 <source>Graph Models</source>
 <translation type="unfinished">图形模型</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="199"/>
 <source>Select graph model:</source>
 <translation type="unfinished">选择图表模型 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="204"/>
 <source>Max coded segments per code (0 = none):</source>
 <translation type="unfinished">每个代码的最大编码区段( 0 = 无) :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="205"/>
 <source>Comparison level:</source>
 <translation type="unfinished">比较级别 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="202"/>
 <source>Case 1:</source>
 <translation type="unfinished">案例1:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="203"/>
 <source>Case 2:</source>
 <translation type="unfinished">案例2:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="206"/>
 <source>File 1:</source>
 <translation type="unfinished">文件1:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="207"/>
 <source>File 2:</source>
 <translation type="unfinished">文件2:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="208"/>
 <source>Co-occurrence types:</source>
 <translation type="unfinished">共发生类型 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="209"/>
 <source>Overlap (partial intersection)</source>
 <translation type="unfinished">重叠( 部分交叉)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="210"/>
 <source>Inclusion (one inside another)</source>
 <translation type="unfinished">包含( 包含在内)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="211"/>
 <source>Exact (identical span)</source>
 <translation type="unfinished">精确( 相同的间距)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="212"/>
 <source>Proximity (within N characters)</source>
 <translation type="unfinished">近距离( N 字符内)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="213"/>
 <source>  Proximity threshold (characters):</source>
 <translation type="unfinished">近似阈值( 特征) :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="214"/>
 <source>Show categories as parent nodes</source>
 <translation type="unfinished">将类别显示为父节点</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="215"/>
 <source>Select 1 or more categories after clicking Generate.</source>
 <translation type="unfinished">点击 Generate 后选择 1 或更多类 。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="216"/>
 <source>Max segments to display  (0 = none):</source>
 <translation type="unfinished">要显示的最大段( 0 = 无) :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="217"/>
 <source>Generate</source>
 <translation type="unfinished">生成</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="218"/>
 <source>Cancel</source>
 <translation type="unfinished">取消</translation>
 </message>
 </context>
 <context>
+<name>DialogImportReferences</name>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="78"/>
+<source>Import references</source>
+<translation type="unfinished">导入参考文献</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="79"/>
+<source>Select the references to import. Items already in the project (duplicates) are unchecked by default.</source>
+<translation type="unfinished">选择要导入的引用。 项目中已经的项目(复制件)默认不受限制。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="80"/>
+<source>Select all</source>
+<translation type="unfinished">全部选择</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="81"/>
+<source>Deselect all</source>
+<translation type="unfinished">全部取消选择</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="82"/>
+<source>Only New</source>
+<translation type="unfinished">仅新建</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="83"/>
+<source>Import attachments (PDF/EPUB)</source>
+<translation type="unfinished">进口附件(PDF/EPUB)</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="86"/>
+<source>Import</source>
+<translation type="unfinished">进口</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="88"/>
+<source>Reference</source>
+<translation type="unfinished">参考</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="90"/>
+<source>Status</source>
+<translation type="unfinished">状态</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="92"/>
+<source>Attachment</source>
+<translation type="unfinished">附录</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="94"/>
+<source>Attachment status</source>
+<translation type="unfinished">附件状态</translation>
+</message>
+</context>
+<context>
 <name>DialogMatchingTextSegments</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="109"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="113"/>
 <source>Report matching text segments</source>
 <translation>报告匹配的文本片段</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="110"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>选择编码器。全部为空。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="111"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>页面存档备份,存于互联网档案馆 p.</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="112"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>精确匹配文本段报告</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="113"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>选择编码器。全部为空</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
-<source>Coder</source>
-<translation>编码器</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="117"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>编码文本必须包括此处的文本。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="118"/>
-<source>Include text</source>
-<translation>包括文本</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="119"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="121"/>
 <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
 <translation>选择文件、编码器、2 个或多个代码。可通过排除代码来排除结果（右键单击代码）。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="120"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="122"/>
 <source>Unchecked - all selected codes must match exactly.
 Checked - any selected codes must match exactly.</source>
 <translation>未选中 - 所有选中的代码必须完全匹配。
 选中 - 所有选中的代码必须完全匹配。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="122"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="124"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>多个编码的精确匹配编码文本被整理成一行。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="123"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="125"/>
 <source>One line results</source>
 <translation>单行结果</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="117"/>
 <source>Export Excel file</source>
 <translation>导出 Excel 文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="116"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="118"/>
 <source>Run</source>
 <translation>运行</translation>
 </message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="124"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File attributes filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>文件属性过滤器</translation>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="116"/>
+<source>Select coder. Blank for all</source>
+<translation type="unfinished">选择编码器。 空白给大家</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="120"/>
+<source>Coded text filter. Must include this text.</source>
+<translation type="unfinished">编码文本过滤器. 必须包含此文本 。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="126"/>
+<source>File attributes filter</source>
+<translation type="unfinished">文件属性过滤器</translation>
 </message>
 </context>
 <context>
 <name>DialogOrganiser</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="72"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="73"/>
 <source>Graph Visualisation</source>
 <translation>图表可视化</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="73"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="74"/>
 <source>Export image</source>
 <translation>导出图像</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="74"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="75"/>
 <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
 <translation>点击图表区域，按 + 或 W 放大。按 - 或 Q 键放大或缩小。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="75"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="76"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>创建类别</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="76"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="77"/>
 <source>Select code branch</source>
 <translation>选择代码分支</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="77"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="78"/>
 <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
 <translation>代码组织器。右键点击代码和类别，进行链接和合并。添加新类别 重新构建代码树。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="78"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>应用更改后的结构。
 警告。无撤消选项。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
 <source>Apply</source>
 <translation>申请</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
 <source>Add code</source>
 <translation type="unfinished">添加代码</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="82"/>
 <source>Import and edit codebook</source>
 <translation type="unfinished">导入和编辑代码簿</translation>
 </message>
@@ -698,54 +741,49 @@ Checked - any selected codes must match exactly.</source>
 <context>
 <name>DialogSegmentCodings</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="94"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="100"/>
 <source>Report Segment Codings</source>
 <translation>报告分段编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="95"/>
-<source>Text limiter:</source>
-<translation>文本限制器：</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="96"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="103"/>
 <source>Run report</source>
 <translation>运行报告</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="97"/>
-<source>Coder:</source>
-<translation>编码器.</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="98"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="104"/>
 <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
 <translation>文本段落编码表。1 = 存在编码，0 = 未编码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="99"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="105"/>
 <source>Export to Excel</source>
 <translation>导出 Excel</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="100"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>按属性选择文件</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="101"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="107"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>文件。右键点击可查看选项。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="102"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="108"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>案例。右键点击可查看选项。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="103"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="109"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>代码。右键点击查看选项</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="102"/>
+<source>Text filter</source>
+<translation type="unfinished">文本过滤器</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="106"/>
+<source>Select files by attributes</source>
+<translation type="unfinished">按属性选择文件</translation>
 </message>
 </context>
 <context>
@@ -1135,64 +1173,64 @@ Ordered by file name and code name.</source>
 <context>
 <name>Dialog_Coocurrence</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="105"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="106"/>
 <source>Code Co-occurence</source>
 <translation>代码协同</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="106"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="107"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>显示重叠的代码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="107"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="108"/>
 <source>Code co-occurence</source>
 <translation>共同编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="109"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="110"/>
 <source>Hide blank lines</source>
 <translation>隐藏空行</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="108"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="109"/>
 <source>Export to file</source>
 <translation>导出到文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="110"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="111"/>
 <source>Select files</source>
 <translation>选择文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="111"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="112"/>
 <source>Select categories</source>
 <translation>选择类别</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="112"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="113"/>
 <source>Select codes</source>
 <translation>选择代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="113"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="114"/>
 <source>Select files by attributes</source>
 <translation>按属性选择文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="114"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="115"/>
 <source>Export to Gephi. GraphML format</source>
 <translation>导出到Gephi。GraphML格式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="115"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="116"/>
 <source>Export Co-occurence Graph Image
 Right-click for format options</source>
 <translation>导出共现图图像
 右键单击查看格式选项</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="117"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="118"/>
 <source>Export Cluster Graph Image
 Right-click for format options
 </source>
@@ -1284,26 +1322,6 @@ ALL '123', 'abc'</translation>
 </context>
 <context>
 <name>Dialog_Import_twitter</name>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="53"/>
-<source>Twitter data import</source>
-<translation>Twitter 数据导入</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="54"/>
-<source>Import twitter data file</source>
-<translation>导入 twitter 数据文件</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="55"/>
-<source>Use the R statistics package to get the twitter data and create a csv file. Then import the csv file.</source>
-<translation>使用 R 统计软件包获取 twitter 数据并创建 csv 文件。然后导入 csv 文件。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="56"/>
-<source>Select file</source>
-<translation>选择文件</translation>
-</message>
 </context>
 <context>
 <name>Dialog_QueryDetails</name>
@@ -1401,17 +1419,17 @@ ALL '123', 'abc'</translation>
 <source>Enter your question here and press Enter to continue the chat</source>
 <translation>在此输入您的问题，然后按回车键继续聊天</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="233"/>
 <source>AI Agent</source>
 <translation type="unfinished">AI探员</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="221"/>
 <source>Selectively undo AI induced changes</source>
 <translation type="unfinished">选择性地取消 AI 诱导的更改</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="225"/>
 <source>Define what the AI agent is allowed to do in your project:
 - Read-only: The AI agent cannot make any changes.
@@ -1422,27 +1440,27 @@ ALL '123', 'abc'</translation>
 - Sandboxed(默认):AI代理无法修改您的代码和备忘,但它可以创建自己的代码和备忘.
 - 完全进入: AI代理可以改变一切,但通常会先要求确认.</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="229"/>
 <source>Read-only</source>
 <translation type="unfinished">只读</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="230"/>
 <source>Sandboxed</source>
 <translation type="unfinished">装沙箱</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="231"/>
 <source>Full access</source>
 <translation type="unfinished">完全进入</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="232"/>
 <source>Enlarge AI Agent</source>
 <translation type="unfinished">扩展AI代理</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_ai_chat.py" line="234"/>
 <source>...</source>
 <translation type="unfinished">. . . .  ....</translation>
@@ -1597,186 +1615,192 @@ ALL '123', 'abc'</translation>
 <context>
 <name>Dialog_code_av</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="212"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
 <source>Code Audio Video</source>
 <translation>音频视频代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="237"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="248"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>带有最新编码的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="238"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="249"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>下一个文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="239"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="250"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>文件备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="240"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="251"/>
 <source>Show files with selected file attributes</source>
 <translation>显示具有选定文件属性的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="246"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="257"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>文字稿</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="213"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
 <source>Ctrl P or Ctrl D Play/Pause</source>
 <translation>Ctrl P 或 Ctrl D 播放/暂停</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="214"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="221"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>卷数</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="216"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
 <source>Start segment</source>
 <translation>起始分段</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="217"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>制作音频或视频片段时，从代码树中选择一个代码，右击代码并将片段分配给该代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="218"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="226"/>
 <source>Segment:</source>
 <translation>分段：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="227"/>
 <source>Coder:</source>
 <translation>编码器:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>如果有多条轨道，则更换轨道：</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="221"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="229"/>
 <source>Cannot code text when play transcript box is checked.</source>
 <translation>选中播放文字记录框时无法编码文本。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="222"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="230"/>
 <source>Scroll transcript while playing.</source>
 <translation>播放时滚动文字记录。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="223"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>Ctrl + Shift + &gt; 将播放速率提高到最大 2 倍
-Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="233"/>
 <source>1.0x</source>
 <translation>1.0x 单曲</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>倒带 30 秒。Alt + 减</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="227"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>降低播放速度 Ctrl Shift &lt;</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="228"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>提高播放速度 Ctrl Shift &gt;</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="229"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="239"/>
 <source>Rewind 5 seconds. Ctrl + R</source>
 <translation>倒带 5 秒 Ctrl + R</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="230"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="240"/>
 <source>Help</source>
 <translation>帮助</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="231"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="241"/>
 <source>Show codings flagged important</source>
 <translation>显示标记为重要的编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="233"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="243"/>
 <source>S</source>
 <translation>页:1</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="258"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>左键单击滑块按钮，向左或向右拖动即可更改视频位置。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="215"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>按下开始片段按钮开始编码音频/视频片段。按 “结束片段 ”按钮结束编码片段。
-快捷键：Ctrl S Ctrl S
-快捷键： G - 打开备忘录并将片段应用到当前选定的代码。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="226"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>前进 30 秒。Alt + Plus
-按 5 - 前进 5 秒</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="232"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>按钮选择一个片段。
-然后会打开一个选项菜单。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="234"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="244"/>
 <source>Find code</source>
 <translation>查找代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="235"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>截图</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="236"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>截图中的项目图像</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="241"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="252"/>
 <source>Clear file filter</source>
 <translation>清除文件筛选条件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="244"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="255"/>
 <source>Clear code filter</source>
 <translation>清除代码筛选器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="245"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="256"/>
 <source>Code name filter</source>
 <translation type="unfinished">代码名称过滤器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="242"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="253"/>
 <source>Go to bookmark (Shift B)
 To set a bookmark press B</source>
 <translation type="unfinished">转到书签( Shift B)
 设置书签</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="222"/>
+<source>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment. Key shortcut: Ctrl S
+Open memo and apply segment to currently selected code. Key shortcut: G</source>
+<translation type="unfinished">按下启动段按钮开始编码音频/视频段. 按 End 段按钮结束编码段 。 密钥快捷键: Ctrl S
+打开备忘并应用到当前选中的代码 。 快捷键: G</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="228"/>
+<source>Change track, if multiple available.</source>
+<translation type="unfinished">更改音轨,如果有多个可用的话.</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="231"/>
+<source>Increase play rate to maximum 2x   Key &gt;
+Decrease play rate to minimum 0.1  Key &lt;</source>
+<translation type="unfinished">将播放率提高到最大 2x 键 &gt;
+将播放率降低到最小值 0.1 键 &lt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="234"/>
+<source>Rewind 30 seconds. Alt + Minus</source>
+<translation type="unfinished">倒数30秒 备选案文+减数</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="235"/>
+<source>Forward 30 seconds. Alt + Plus. 
+Forward 5 seconds. Key 5</source>
+<translation type="unfinished">前进30秒。 备选案文 + Plus。
+前进5秒。 关键词 5</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="237"/>
+<source>Decrease play rate Key &lt;</source>
+<translation type="unfinished">降低播放率键 &lt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="238"/>
+<source>Increase play rate Key &gt;</source>
+<translation type="unfinished">提高播放率键 &gt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="242"/>
+<source>Button to select a segment. Then a menu of options will open.</source>
+<translation type="unfinished">按钮来选择一段 。 然后打开一个选项菜单。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="245"/>
+<source>Screenshot</source>
+<translation type="unfinished">截图</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="246"/>
+<source>Get screenshot for image coding</source>
+<translation type="unfinished">获取图像编码截图</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
+<source>Coder</source>
+<translation type="unfinished">编码器</translation>
 </message>
 </context>
 <context>
@@ -1833,358 +1857,449 @@ To set a bookmark press B</source>
 <context>
 <name>Dialog_code_image</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="219"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="222"/>
 <source>View Image</source>
 <translation>查看图片</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="243"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="246"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>文件备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
-<source>Coder:</source>
-<translation>编码器:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="220"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="223"/>
 <source>Image details</source>
 <translation>图片详情</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="221"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="224"/>
 <source>Coded area:</source>
 <translation>编码区域：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="222"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="225"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>页面存档备份,存于互联网档案馆 p. 此编码区域&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="223"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="226"/>
 <source>Show codings flagged important</source>
 <translation>显示标记为重要的编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="224"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="227"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>将图像导出为 html 文件。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="225"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="228"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>显示标题</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="226"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="229"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>放大。W 或 +</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="227"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="230"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>缩小。Q 或 -</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="228"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="231"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>逆时针旋转</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="229"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="232"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>顺时针旋转</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="241"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="244"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>带有最新编码的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="242"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="245"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>下一个文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="244"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="247"/>
 <source>Show files using selected file attributes</source>
 <translation>使用选定的文件属性显示文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="230"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="233"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>上一页</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="231"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="234"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>下一个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="232"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="235"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>页面</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="233"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="236"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>最后一页</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="234"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="237"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>转至页面</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="235"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
 <source>Set default colour for new codes</source>
 <translation>为新代码设置默认颜色</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="236"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
 <source>PDF controls</source>
 <translation>PDF 控制</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="237"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="240"/>
 <source>Find code</source>
 <translation>查找代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="242"/>
 <source>Coder visibility</source>
 <translation>程序员可见性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="240"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="243"/>
 <source>...</source>
 <translation>...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="245"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="248"/>
 <source>Clear file filter</source>
 <translation>清除文件筛选条件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="246"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="249"/>
 <source>Clear code filter</source>
 <translation>清除代码筛选器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="247"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="250"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation type="unfinished">页面存档备份,存于互联网档案馆 p. 代码名过滤器 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="241"/>
+<source>Coder</source>
+<translation type="unfinished">编码器</translation>
 </message>
 </context>
 <context>
 <name>Dialog_code_pdf</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="279"/>
-<source>Code Text</source>
-<translation>代码文本</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="309"/>
-<source>Coder:</source>
-<translation>编码器:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="280"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
-&lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>搜索文本。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="282"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>搜索区分大小写</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="283"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="355"/>
 <source>0 / 0</source>
 <translation>0 / 0 个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="302"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>上一页</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="303"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>下一页</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="286"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>搜索文本。区分大小写</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="287"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>搜索使用 Regex 函数</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="288"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="348"/>
 <source>Help</source>
 <translation>帮助</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="289"/>
-<source>Images</source>
-<translation>图片</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="290"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Useful if font colours are harder to see&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>如果字体颜色较难辨认，则非常有用</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="291"/>
-<source>Black Text</source>
-<translation>黑色文本</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="292"/>
-<source>Text</source>
-<translation>文本</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="293"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pdf font size adjustment&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>调整 Pdf 字体大小</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="294"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>页面</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="295"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PDF object information&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>PDF 对象信息</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="296"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>导出图像</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
-<source>0</source>
-<translation>0 个</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
-<source>-1</source>
-<translation>-1个</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
-<source>-2</source>
-<translation>-2号</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
-<source>-3</source>
-<translation>- 3号</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
-<source>-4</source>
-<translation>-4号</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>最后一页</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="305"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>转至页面</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="306"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in (Shift Plus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>放大（Shift Plus）</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="307"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom Out (Ctrl Minus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>缩小（按住减号键）</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="312"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>带有最新编码的文件</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="313"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>转到书签</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="314"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>下一个文件</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="315"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>文件备忘录</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="316"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="381"/>
 <source>Show files with file attributes</source>
 <translation>显示带有文件属性的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="318"/>
-<source>Show codings flagged important</source>
-<translation>显示标记为重要的编码</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="319"/>
-<source>Right click below to create new codes and categories</source>
-<translation>右键单击下方创建新代码和类别</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="308"/>
-<source>Set default colour for new codes</source>
-<translation>为新代码设置默认颜色</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="320"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="384"/>
 <source>Find code</source>
 <translation>查找代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="310"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="330"/>
 <source>Coder visibility</source>
 <translation>程序员可见性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="311"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="331"/>
 <source>...</source>
 <translation>...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="317"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="382"/>
 <source>Clear file filter</source>
 <translation>清除文件筛选条件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="321"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="388"/>
 <source>Clear code filter</source>
 <translation>清除代码筛选器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="322"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="389"/>
 <source>Code name filter</source>
 <translation type="unfinished">代码名称过滤器</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="327"/>
+<source>Code PDF</source>
+<translation type="unfinished">代码 PDF</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="328"/>
+<source>Coder</source>
+<translation type="unfinished">编码器</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="329"/>
+<source>Codername</source>
+<translation type="unfinished">代码</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="332"/>
+<source>Show all annotations for this file</source>
+<translation type="unfinished">显示此文件的所有注释</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="333"/>
+<source>Show all coding memos for this file</source>
+<translation type="unfinished">显示此文件的所有编码备忘录</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="334"/>
+<source>Mark speakers</source>
+<translation type="unfinished">标出扬声器</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="335"/>
+<source>Set a default colour for new codes, instead of a random colour</source>
+<translation type="unfinished">设置新代码的默认颜色, 而不是随机颜色</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="336"/>
+<source>Auto code with exact text.
+Right click to change options: all, first, last, code within code</source>
+<translation type="unfinished">带有准确文本的自动码 。
+右键单击以更改选项:所有,首先是代码内代码</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="338"/>
+<source>Text fragment to auto code sentences.
+Right click to change options: all, first, last, code within code</source>
+<translation type="unfinished">文本片段为自动码句.
+右键单击以更改选项:所有,首先是代码内代码</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="340"/>
+<source>Auto code using start and end marks</source>
+<translation type="unfinished">使用始末标记的自动代码</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="341"/>
+<source>Undo auto coding</source>
+<translation type="unfinished">取消自动编码</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="342"/>
+<source>Apply REGEX to autocoding for exact text and sentences buttons.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html</source>
+<translation type="unfinished">应用REGEX来自动编码准确的文本和句子按钮.
+Regex 欺骗表: www.rexegg.com/regex- quickstart.html</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="344"/>
+<source>REGEX</source>
+<translation type="unfinished">回复</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="345"/>
+<source>Page display: whole document scroll or one page at a time</source>
+<translation type="unfinished">页面显示: 整个文档滚动或一次一个页面</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="346"/>
+<source>Whole document</source>
+<translation type="unfinished">整份文件</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="347"/>
+<source>Single page</source>
+<translation type="unfinished">单页</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="349"/>
+<source>Search text</source>
+<translation type="unfinished">搜索文本</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="350"/>
+<source>Case sensitive</source>
+<translation type="unfinished">区分大小写</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="351"/>
+<source>Aa</source>
+<translation type="unfinished">页:1</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="352"/>
+<source>Previous</source>
+<translation type="unfinished">上一页</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="353"/>
+<source>Next</source>
+<translation type="unfinished">下一页</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="354"/>
+<source>Search results: current / total</source>
+<translation type="unfinished">搜索结果: 当前/ 总计</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="356"/>
+<source>Code text</source>
+<translation type="unfinished">代码文本</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="357"/>
+<source>Code image</source>
+<translation type="unfinished">代码图像</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="358"/>
+<source>Captions over coded areas.
+Click to cycle: hidden, code name, code name and memo</source>
+<translation type="unfinished">密码区上的说明
+点击循环: 隐藏、 代号、 代号和备忘录</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="360"/>
+<source>Export</source>
+<translation type="unfinished">出口</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="361"/>
+<source>Export options.
+pdf highlight: copy of the pdf with codings as native annotations.
+odt report: report of the coded text and areas.</source>
+<translation type="unfinished">导出选项 。
+pdf亮点:以编码为本地说明的pdf副本.
+odt report:关于编码文本和区域的报告.</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="364"/>
+<source>pdf highlight</source>
+<translation type="unfinished">pdf 突出显示</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="365"/>
+<source>odt report</source>
+<translation type="unfinished">ODT 报告</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="366"/>
+<source>Previous page</source>
+<translation type="unfinished">上一页</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="367"/>
+<source>Go to page number</source>
+<translation type="unfinished">转到页码</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="368"/>
+<source>1</source>
+<translation type="unfinished">页:1</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="369"/>
+<source>Total pages</source>
+<translation type="unfinished">页数共计</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="370"/>
+<source>/ 0</source>
+<translation type="unfinished">/ 0 个</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="371"/>
+<source>Next page</source>
+<translation type="unfinished">下一页</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="372"/>
+<source>Zoom out</source>
+<translation type="unfinished">缩小</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="373"/>
+<source>Zoom level. Ctrl + mouse wheel to zoom</source>
+<translation type="unfinished">缩放水平 。 Ctrl + 鼠标轮以缩放</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="374"/>
+<source>100%</source>
+<translation type="unfinished"/>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="375"/>
+<source>Zoom in</source>
+<translation type="unfinished">缩放</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="376"/>
+<source>Fit view</source>
+<translation type="unfinished">适切视图</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="377"/>
+<source>Next file</source>
+<translation type="unfinished">下一个文件</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="378"/>
+<source>File with latest coding</source>
+<translation type="unfinished">带有最新编码的文件</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="379"/>
+<source>Go to bookmark</source>
+<translation type="unfinished">转到书签</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="380"/>
+<source>File memo</source>
+<translation type="unfinished">文件备忘</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="383"/>
+<source>Text extraction status</source>
+<translation type="unfinished">文本提取状态</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="385"/>
+<source>Show codings prev</source>
+<translation type="unfinished">显示编码预览</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="386"/>
+<source>Show coding next</source>
+<translation type="unfinished">显示下一个编码</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="387"/>
+<source>Show codings falgged important</source>
+<translation type="unfinished">显示重要的编码</translation>
 </message>
 </context>
 <context>
@@ -2223,103 +2338,98 @@ To set a bookmark press B</source>
 <context>
 <name>Dialog_code_text</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="486"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="489"/>
 <source>Code Text</source>
 <translation>代码文本</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="534"/>
-<source>Coder:</source>
-<translation>编码器:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="489"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="492"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>搜索文本</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="543"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="546"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>搜索区分大小写</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="492"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="495"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>搜索所有文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="493"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="496"/>
 <source>0 / 0</source>
 <translation>0 / 0 个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="494"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="497"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>上一页</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="495"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="498"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>下一页</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="496"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="499"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>搜索文本。所有文本文件。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="542"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="545"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>搜索文本。区分大小写</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="501"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="504"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>从文件中删除该编码员的所有编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="502"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="505"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>注释选择</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="500"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="503"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>撤销自动编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="503"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="506"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>该编码部分的备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="504"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="507"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>搜索使用 Regex 函数</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="505"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="508"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>使用开始和结束标记自动编码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="506"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="509"/>
 <source>Help</source>
 <translation>帮助</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="507"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="510"/>
 <source>Show memos</source>
 <translation>显示备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="508"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="511"/>
 <source>Show annotations</source>
 <translation>显示注释</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="509"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="512"/>
 <source>Edit text 
 Click on a position, without selecting text, to type, delete, or paste text. 
 Select text that is not underlined and delete or paste over. 
@@ -2334,160 +2444,160 @@ As all assigned positions may be incorrect. </source>
 因为所有指定的位置都可能不正确。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="516"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
 <source>Export</source>
 <translation>出口</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="524"/>
 <source>html</source>
 <translation>页面存档备份,存于互联网</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="523"/>
 <source>txt</source>
 <translation>页:1</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="523"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="526"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>编辑文本后：
 查看已编辑的文本，确认代码位置是否正确。如果代码位置不正确，按下按钮撤销编辑的文本。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="525"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>显示侧窗格</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="538"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="541"/>
 <source>Exit Edit text </source>
 <translation>退出编辑文本 </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="544"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="547"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>带有最新编码的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="545"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="548"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>转到书签</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="546"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="549"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>下一个文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="547"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="550"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>文件备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="548"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="551"/>
 <source>Show files with file attributes</source>
 <translation>显示带有文件属性的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="550"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
 <source>Documents</source>
 <translation>文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="551"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
 <source>Select a document</source>
 <translation>选择文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="552"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="555"/>
 <source>Click here to define the options for the AI based search</source>
 <translation>显示所有编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="556"/>
 <source>&lt;Start AI Search&gt;</source>
 <translation>&lt;开始人工智能搜索&gt;</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="557"/>
 <source>AI Assistance</source>
 <translation>人工智能援助</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="555"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="558"/>
 <source>Use the AI to find data</source>
 <translation>利用人工智能查找数据</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="559"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="562"/>
 <source>Show codings flagged important</source>
 <translation>显示标记为重要的编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="560"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="563"/>
 <source>Right click below to create new codes and categories</source>
 <translation>右键单击下方创建新代码和类别</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="564"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="567"/>
 <source>Code rule with examples</source>
 <translation>带示例的代码规则</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="565"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="568"/>
 <source>Current journal</source>
 <translation>当前期刊</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="566"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="569"/>
 <source>Project memo</source>
 <translation>项目备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="567"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="570"/>
 <source>.</source>
 <translation>。 。 。 。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="524"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="527"/>
 <source>Set default colour for new codes</source>
 <translation>为新代码设置默认颜色</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="556"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="559"/>
 <source>Show all codings</source>
 <translation>显示所有编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="557"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="560"/>
 <source>Show previous coding of selected code</source>
 <translation>显示所选代码以前的编码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="558"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="561"/>
 <source>Show next coding of selected code.</source>
 <translation>显示所选代码的下一个编码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="561"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="564"/>
 <source>Find code</source>
 <translation>查找代码</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="526"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
 <source>Apply REGEX to autocoding for exact text and sentences buttons.
 https://www.datacamp.com/cheat-sheet/regular-expresso</source>
 <translation>将 REGEX 应用于自动编码，以获得准确的文本和句子按钮。
 https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="531"/>
 <source>REGEX</source>
 <translation>回复</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="532"/>
 <source>Mark speakers.
 Limited to names up to 63 characters long. 
 The name must be at the start of a new line.
@@ -2500,83 +2610,88 @@ Formatted like below for name detection.
 “名称：”、“{名称}” 或 “[名称]”</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="487"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="490"/>
 <source>Auto code with exact text.
 Right click for options: all, first, last, within another code.</source>
 <translation>自动代码匹配精确文本。
 右键点击可选操作：全部匹配、首行匹配、末行匹配、在其他代码内匹配。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="498"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="501"/>
 <source>Text fragment to auto code sentences.
 Right click for options: all (default), first, code within code.</source>
 <translation>文本片段自动编码句子。
 右键点击可选模式：全部（默认）、首段、嵌套代码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="535"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="538"/>
 <source>Coder visibility</source>
 <translation>程序员可见性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="536"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
 <source>...</source>
 <translation>...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="517"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
 <source>odt highlight</source>
 <translation>odt 突出显示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="518"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
 <source>odt comment</source>
 <translation>odt 注释</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
 <source>odt report</source>
 <translation>ODT 报告</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="525"/>
 <source>codebook</source>
 <translation>编码本</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="537"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="540"/>
 <source>Select document font and size</source>
 <translation>选择文档字体和字号</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="549"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="552"/>
 <source>Clear file filter</source>
 <translation>清除文件筛选条件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="562"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="565"/>
 <source>Clear code filter</source>
 <translation>清除代码筛选器</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="542"/>
 <source>Search for text</source>
 <translation type="unfinished">搜索文本</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="540"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="543"/>
 <source>Next</source>
 <translation type="unfinished">下一页</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="541"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="544"/>
 <source>Previous</source>
 <translation type="unfinished">上一页</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="563"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="566"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation type="unfinished">页面存档备份,存于互联网档案馆 p. 代码名过滤器 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="537"/>
+<source>Coder</source>
+<translation type="unfinished">编码器</translation>
 </message>
 </context>
 <context>
@@ -2759,27 +2874,27 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
 </context>
 <context>
 <name>Dialog_graph_picker</name>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="85"/>
 <source>Graphs</source>
 <translation type="unfinished">图表</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="86"/>
 <source>Saved graphs:</source>
 <translation type="unfinished">保存的图表 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="87"/>
 <source>Order:</source>
 <translation type="unfinished">顺序 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="88"/>
 <source>Sort the graph list</source>
 <translation type="unfinished">排序图表列表</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="89"/>
 <source>Preview:</source>
 <translation type="unfinished">预览 :</translation>
@@ -2912,22 +3027,22 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
 <context>
 <name>Dialog_manage_files</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="133"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="151"/>
 <source>Files</source>
 <translation>文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="134"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="154"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>查看文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="135"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="155"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>创建文本文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="136"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="156"/>
 <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
@@ -2936,76 +3051,76 @@ Text files (from any source) are exported from the text stored in the database a
 (如果愿意，可以打开项目文件夹并复制/粘贴原始文本文件）。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="139"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="159"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>选择要删除的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="140"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="160"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>将文件导入项目文件夹</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="141"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="161"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>添加属性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="142"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="162"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>链接到项目文件夹之外的文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="143"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="163"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>将链接文件导入项目文件夹</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="144"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="164"/>
 <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
 <translation>将项目文件夹中的文件导出为链接文件。
 无法将与音频或视频相关联的文本转录文件作为链接文件导出。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="146"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="166"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>将属性导出到文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="147"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="167"/>
 <source>Help</source>
 <translation>帮助</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="148"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="168"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>撤销文件重命名</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="149"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="169"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;批量重命名数据库名称文件条目。&lt;/p&gt;&lt;p&gt;只重命名可见的文件行。&lt;/p&gt;&lt;p&gt; 仅重命名可见的文件行。可通过使用属性选择或显示/隐藏值（如......）只显示某些行： 用户选择的前缀和编号后缀 _nnn.&lt;/p&gt;&lt;p&gt; 例如：interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="150"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="170"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save table display settings. &lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>保存表格显示设置。
 （隐藏行、列和列大小)</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="151"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="171"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>加载已保存的表格显示设置。
 (隐藏行、列和列大小）。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="152"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="172"/>
 <source>Delete saved table display settings. </source>
 <translation>删除已保存的表格显示设置。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="153"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="173"/>
 <source>Pseudonymisation (data de-identification)
 Before importing text files, create a list of names or phrases to be replaced.
 Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
@@ -3029,7 +3144,7 @@ After all text files are imported, remove this file from the project folder and 
 所有文本文件导入完成后，请从项目文件夹移除此文件并妥善保管。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="164"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="184"/>
 <source>Select a text transcription to mark the speakers.
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
@@ -3040,7 +3155,7 @@ Formatted like below for name detection.
 “姓名：”, “{姓名} 或 ”[姓名]"</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="168"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="188"/>
 <source>Import survey
 
 For csv and tsv files, please avoid using the following in the column names:  , ; |
@@ -3051,6 +3166,16 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
 对于 CSV 和 TSV 文件，请避免在列名中使用以下字符：  , ; |
 
 若调查条目较多（例如超过 1,000 条），请耐心等待，因为导入过程会比较缓慢。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="152"/>
+<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+<translation type="unfinished">页面存档备份,存于互联网档案馆 p. 文件名过滤器&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="153"/>
+<source>Clear filter</source>
+<translation type="unfinished">清除过滤器</translation>
 </message>
 </context>
 <context>
@@ -3166,14 +3291,34 @@ Review after applying the function.</source>
 <context>
 <name>Dialog_memo</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="43"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="65"/>
 <source>Memo</source>
 <translation>备忘录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="44"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="70"/>
 <source>Clear</source>
 <translation>清晰</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="66"/>
+<source>Insert current date and time at the cursor position</source>
+<translation type="unfinished">在光标位置插入当前日期和时间</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="67"/>
+<source>Insert coded segments linked to this item</source>
+<translation type="unfinished">插入与本项目相连的编码片段</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="68"/>
+<source>Insert a bibliographic reference linked to this item</source>
+<translation type="unfinished">插入与本项目有关的参考文献</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="69"/>
+<source>Export memo as ODT file</source>
+<translation type="unfinished">导出备忘为 OTT 文件</translation>
 </message>
 </context>
 <context>
@@ -3216,77 +3361,77 @@ Review after applying the function.</source>
 </context>
 <context>
 <name>Dialog_node_relations</name>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="154"/>
 <source>Select relation</source>
 <translation type="unfinished">选择关系</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="155"/>
 <source>Framework:</source>
 <translation type="unfinished">框架 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="156"/>
 <source>Select a theoretical framework</source>
 <translation type="unfinished">选择一个理论框架</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="157"/>
 <source>Search relations...</source>
 <translation type="unfinished">搜索关系...</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="158"/>
 <source>Custom label:</source>
 <translation type="unfinished">自定义标签 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="159"/>
 <source>Override with a custom label...</source>
 <translation type="unfinished">用自定义标签覆盖...</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="160"/>
 <source>Color:</source>
 <translation type="unfinished">颜色 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="161"/>
 <source>Line type:</source>
 <translation type="unfinished">行类型 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="162"/>
 <source>Add a new custom relation type</source>
 <translation type="unfinished">添加新自定义关系类型</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="163"/>
 <source>Edit the selected relation</source>
 <translation type="unfinished">编辑选中的关系</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="164"/>
 <source>Delete the selected custom relation</source>
 <translation type="unfinished">删除选中的自定义关系</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="165"/>
 <source>Import user relations</source>
 <translation type="unfinished">导入用户关系</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="166"/>
 <source>Export user relations</source>
 <translation type="unfinished">导出用户关系</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="167"/>
 <source>Connect</source>
 <translation type="unfinished">连接</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="168"/>
 <source>Cancel</source>
 <translation type="unfinished">取消</translation>
@@ -3597,105 +3742,106 @@ Change Settings for number of characters and display style.</source>
 <context>
 <name>Dialog_reportCompareCoderFile</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="96"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="99"/>
 <source>Reports</source>
 <translation>报告</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
-<source>Coders:</source>
-<translation>编码器:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="98"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>选择两名编码员</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="99"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="102"/>
 <source>To compare coding.
 Select two coders, one file, one code.</source>
 <translation>比较编码。
 选择两个编码员，一个文件，一个编码。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="101"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="104"/>
 <source>Coder comparisons by file</source>
 <translation>按文件进行编码器比较</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="102"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="105"/>
 <source>Coders selected</source>
 <translation>选定的编码员</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="103"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>清除选择</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="104"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="107"/>
 <source>Export ODT file</source>
 <translation>导出 ODT 文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="105"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison.&lt;/p&gt;&lt;p&gt;Select 2 coders, 1 file, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>运行比较。
-选择 2 个编码员、1 个文件、1 个代码。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="106"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="110"/>
 <source>Statistics explanation</source>
 <translation>统计解释</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="100"/>
+<source>Coders</source>
+<translation type="unfinished">程序员</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="101"/>
+<source>Select two coders</source>
+<translation type="unfinished">选择两个编码器</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="106"/>
+<source>Clear selection</source>
+<translation type="unfinished">清除选择</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="108"/>
+<source>Run comparison.
+Select 2 coders, 1 file, 1 code.</source>
+<translation type="unfinished">运行比较。
+选择2个编码器,1个文件,1个代码.</translation>
 </message>
 </context>
 <context>
 <name>Dialog_reportComparisons</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="79"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="82"/>
 <source>Coder Comparisons</source>
 <translation>编码器比较</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="80"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>导出 Excel</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="81"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>运行比较</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="82"/>
-<source>Coders:</source>
-<translation>编码器:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="83"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>选择两名编码员</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="84"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>清除选择</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="85"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="88"/>
 <source>Coder comparisons - text files</source>
 <translation>编码器比较 - 文本文件</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="86"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="89"/>
 <source>Coders selected:</source>
 <translation>选定的编码员:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="87"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="90"/>
 <source>Statistics help</source>
 <translation>统计帮助</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="83"/>
+<source>Export Excel</source>
+<translation type="unfinished">导出 Excel</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="84"/>
+<source>Run comparison</source>
+<translation type="unfinished">运行比较</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="85"/>
+<source>Coder</source>
+<translation type="unfinished">编码器</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="86"/>
+<source>Select two coders</source>
+<translation type="unfinished">选择两个编码器</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="87"/>
+<source>Clear selection</source>
+<translation type="unfinished">清除选择</translation>
 </message>
 </context>
 <context>
@@ -3791,6 +3937,34 @@ like "的通配符是 % 和 _。</translation>
 </message>
 </context>
 <context>
+<name>Dialog_select_quote</name>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="51"/>
+<source>Select quotes</source>
+<translation type="unfinished">选择引用</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="52"/>
+<source>Coded segments</source>
+<translation type="unfinished">编码片段</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="53"/>
+<source>Filter by segment type</source>
+<translation type="unfinished">按分区类型过滤</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="54"/>
+<source>Filter rows by any text</source>
+<translation type="unfinished">由任意文本过滤行</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="55"/>
+<source>Filter</source>
+<translation type="unfinished">过滤器</translation>
+</message>
+</context>
+<context>
 <name>Dialog_selectitems</name>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_select_items.py" line="38"/>
@@ -3801,360 +3975,360 @@ like "的通配符是 % 和 _。</translation>
 <context>
 <name>Dialog_settings</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="570"/>
 <source>Settings</source>
 <translation>设置</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="571"/>
 <source>Backup project folder every time project is opened</source>
 <translation>每次打开项目时备份项目文件夹</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="572"/>
 <source>Default project directory</source>
 <translation>默认项目目录</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
 <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
 <translation>备份视频和音频文件。取消选中可加快备份速度。
 不建议这样做，除非有很多大文件会减慢备份速度。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
 <source>Backups</source>
 <translation>备份</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="554"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
 <source>0</source>
 <translation>0 个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
 <source>1</source>
 <translation>页:1</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
 <source>2</source>
 <translation>2个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="579"/>
 <source>3</source>
 <translation>3个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="580"/>
 <source>4</source>
 <translation>页:1</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
 <source>5</source>
 <translation>页:1</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
 <source>Reports with text context</source>
 <translation>带文本上下文的报告</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="560"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
 <source>Set this name as the current coder.
 </source>
 <translation>将此名称设置为当前编码器。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="563"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
 <source>Current coder: </source>
 <translation>现任编码员： </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="564"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
 <source>/</source>
 <translation>页:1</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="565"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
 <source>Language</source>
 <translation>语言</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
 <source>General font and size</source>
 <translation>一般字体和大小</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="574"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
 <source>Font size for codes tree</source>
 <translation>代码树的字体大小</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
 <source>Font size for documents</source>
 <translation>文件字体大小</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
 <source>Characters before and after</source>
 <translation>前后字符</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
 <source>Text context, coded text style</source>
 <translation>文本上下文、编码文本样式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
 <source>8</source>
 <translation>第8条</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="614"/>
 <source>10</source>
 <translation>10个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
 <source>12</source>
 <translation>第12条</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
 <source>14</source>
 <translation>第 14 条</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
 <source>16</source>
 <translation>第 16 条</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
 <source>18</source>
 <translation>第 18 条</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
 <source>100</source>
 <translation>100个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
 <source>200</source>
 <translation>200个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
 <source>300</source>
 <translation>300个</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>显示档案、案件、代码等的识别编号</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
 <source>Show IDs</source>
 <translation>显示 ID</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
 <source>50000</source>
 <translation>5万块</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
 <source>30000</source>
 <translation>三万块</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="633"/>
 <source>Style</source>
 <translation>风格</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="604"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="628"/>
 <source>Very large text documents. Load text chunks by number of characters.</source>
 <translation>超大文本文档。按字符数加载文本块。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="629"/>
 <source>Code text chunk size</source>
 <translation>代码文本块大小</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>用于在转录中输入时间位置</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
 <source>Time format</source>
 <translation>时间格式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>在转录中输入发言者姓名时使用</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="603"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="626"/>
 <source>Speaker format</source>
 <translation>演讲形式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="637"/>
 <source>AI Integration</source>
 <translation>人工智能集成</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
 <source>enable AI integration</source>
 <translation>实现人工智能集成</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="653"/>
 <source>Description:</source>
 <translation>说明：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="650"/>
 <source>Get Access:</source>
 <translation>获取访问 :</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
 <source>API key</source>
 <translation>API 密钥</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="650"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="676"/>
 <source>Language for AI conversations: </source>
 <translation>人工智能对话语言 </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="641"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="667"/>
 <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
 <translation>如果选中，对话将使用与用户界面其他部分相同的语言。您可以在此窗口顶部选择这种语言。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="642"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="668"/>
 <source>same as UI</source>
 <translation>与用户界面相同</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="645"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="671"/>
 <source>Enter the name of your language here</source>
 <translation>在此处输入您的语言名称</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="662"/>
 <source>Temperature:</source>
 <translation>温度</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="664"/>
 <source>Advanced option. Only change when you know whatr you are doing.</source>
 <translation>高级选项。只有当你知道自己在做什么时，才能进行更改。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="665"/>
 <source>1.0</source>
 <translation>1.0 对</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="657"/>
 <source>   Top_p:</source>
 <translation>顶部( P):</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="656"/>
 <source>Advanced AI Options...</source>
 <translation>高级人工智能选项...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="647"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="673"/>
 <source>Large Model:</source>
 <translation>大号机型：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="648"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="674"/>
 <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
 <translation>选择一个可用的人工智能模型（可以与大型模型相同）。快速模型仅用于简单任务。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="649"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="675"/>
 <source>&lt;select available model&gt;</source>
 <translation>选择可用型号</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="652"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="678"/>
 <source>   Fast Model:</source>
 <translation>   快速模型：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="651"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="677"/>
 <source>context window:</source>
 <translation>上下文窗口：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="633"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="659"/>
 <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
 <translation>选择可用的人工智能模型。大型模型用于 QualCoder 中的大部分人工智能功能。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="641"/>
 <source>AI Profile:</source>
 <translation>AI 简介 :</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="651"/>
 <source>Edit Name</source>
 <translation>编辑名称</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="614"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="640"/>
 <source>...</source>
 <translation>...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="643"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="669"/>
 <source>New AI Profile...</source>
 <translation>新的人工智能档案...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="637"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="663"/>
 <source>General Parameters:</source>
 <translation>通用参数：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="640"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="666"/>
 <source>API Base URL:</source>
 <translation>API 基础 URL：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="644"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="670"/>
 <source>AI Models:</source>
 <translation>人工智能模型：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="658"/>
 <source>Reasoning:</source>
 <translation>推理：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="562"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
 <source>Change</source>
 <translation>变更</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="566"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
 <source>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
@@ -4170,13 +4344,13 @@ langauge = it</source>
 然后更新它。 例如:
 anga =  it</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="649"/>
 <source>Permissions:</source>
 <translation type="unfinished">权限 :</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="642"/>
 <source>Define what the AI agent is allowed to do in your project:
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
@@ -4186,35 +4360,55 @@ anga =  it</translation>
 - Sandboxed(默认):AI代理无法修改您的代码和备忘,但它可以创建自己的代码和备忘.
 - 完全进入: AI代理可以改变一切,但通常会先要求确认.</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="646"/>
 <source>Read-only</source>
 <translation type="unfinished">只读</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="647"/>
 <source>Sandboxed</source>
 <translation type="unfinished">装沙箱</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="648"/>
 <source>Full access</source>
 <translation type="unfinished">完全进入</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="626"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="652"/>
 <source>Authentification:</source>
 <translation type="unfinished">认证 :</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="628"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="654"/>
 <source>Click to open the ChatGPT sign-in page in your default browser. Use it to authorize QualCoder to access AI models through this account.</source>
 <translation type="unfinished">点击打开默认浏览器中的 ChatGPT 登录页面 。 用它授权QualCoder通过这个账户访问AI模型.</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="629"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="655"/>
 <source>Authenticate...</source>
 <translation type="unfinished">认证...</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
+<source>Codesstripe view</source>
+<translation type="unfinished">代码化视图</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="634"/>
+<source>Code highlight style</source>
+<translation type="unfinished">代码突出显示样式</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="635"/>
+<source>marker</source>
+<translation type="unfinished">标记</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
+<source>underline</source>
+<translation type="unfinished">下划线</translation>
 </message>
 </context>
 <context>
@@ -4224,27 +4418,27 @@ anga =  it</translation>
 <source>Mark Speakers</source>
 <translation>马克扬声器</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="87"/>
 <source>Identifier:</source>
 <translation type="unfinished">标识符 :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="88"/>
 <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
 <translation type="unfinished">每个演讲者如何在行首标记: 名称 :, #Name:, @Name:, [Name],{Name},或自定义模式. 自动检测选择最转弯的格式。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="89"/>
 <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
 <translation type="unfinished">自定义正则表达式 。 它必须为扬声器名包含一个捕获组. 示例: ^\s*&gt;&gt;\s *(.+?) :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="90"/>
 <source>regex with one group, e.g. ^\s*(.+?):</source>
 <translation type="unfinished">含有一个组的 regex, 例如 QQs *(.+?) :</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="91"/>
 <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
 <translation type="unfinished">选择要扫描的文本文件 。 您可以同时在多个文件中标记扬声器 。</translation>
@@ -4259,37 +4453,37 @@ anga =  it</translation>
 <source>Help</source>
 <translation type="unfinished">帮助</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="95"/>
 <source>Number of speakers and turns detected with the current identifier and files.</source>
 <translation type="unfinished">使用当前标识符和文件检测到的扬声器和转弯数 。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="96"/>
 <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
 <translation type="unfinished">双击“ 代码为” 单元格以重命名扬声器 。 给予两行相同的"代码与"以合并它们,例如修正一个typo.</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="97"/>
 <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
 <translation type="unfinished">将扬声器标记。 请为“演讲者”类别中的每一人创建代码,</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="98"/>
 <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
 <translation type="unfinished">包括扬声器标签 取消选中以只编码回复文本, 而无需名称 。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="99"/>
 <source>Include speaker name</source>
 <translation type="unfinished">包含扬声器名称</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="100"/>
 <source>Doubleclick a "code as" name to edit</source>
 <translation type="unfinished">双击“ 代码为” 名称以编辑</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
 <source>Files currently selected for the speaker scan. Hover to see the full list; use Select files to adjust it.</source>
 <translation type="unfinished">目前选中用于扬声器扫描的文件 。 Hover 查看完整列表; 使用选择文件来调整它 。</translation>
@@ -5152,17 +5346,17 @@ li. checked:: marker {内容:"\2612";}
 &lt;/style\\/head\body style=”字体-家族:'Segoe UI';字体大小:9pt;字体重量:400;字体风格:正常;'
 &lt;p样式=' 边距- 顶部: 0px; 边距- 底部: 0px; 边距- 左侧: 0px; 边距- 右侧: 0px; - qt- 块- 缩进: 0; 文本- 缩进: 0px;" &gt; 从分析或报表菜单 &lt;/p&gt;&lt;/body&gt;&lt;/html &gt; 中选择一个选项。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_main.py" line="440"/>
 <source>AI Agent</source>
 <translation type="unfinished">AI探员</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_main.py" line="451"/>
 <source>Sidebar Mode</source>
 <translation type="unfinished">侧边栏模式</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_main.py" line="452"/>
 <source>Ask the AI Agent</source>
 <translation type="unfinished">问人工智能特工</translation>

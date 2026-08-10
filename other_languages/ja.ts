@@ -27,184 +27,184 @@
 <context>
 <name>DialogCharts</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="288"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="289"/>
 <source>Charts</source>
 <translation>チャート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="289"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="290"/>
 <source>Charts displayed in the default web browser</source>
 <translation>デフォルトのウェブブラウザで表示されるチャート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="290"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="291"/>
 <source>Pie charts</source>
 <translation>円グラフ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="291"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="292"/>
 <source>Bar charts</source>
 <translation>棒グラフ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="292"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="293"/>
 <source>Sunburst and treemap charts</source>
 <translation>サンバースト・チャートとトレマップ・チャート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="294"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="295"/>
 <source>Select coder</source>
 <translation>コーダーの選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="296"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="297"/>
 <source>Select file</source>
 <translation>ファイルを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="298"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="299"/>
 <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
 <translation>テキストファイルの一部が症例に割り当てられている場合、コード頻度とテキスト文字数の合計が正しくない可能性があります。
 計算には、テキストファイル全体のコードが使用されます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="300"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="301"/>
 <source>Select case</source>
 <translation>ケースを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="301"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="302"/>
 <source>Select attributes</source>
 <translation>属性を選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="302"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="303"/>
 <source>Filter out values below:</source>
 <translation>以下の値を除外する：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="303"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="304"/>
 <source>Enter number for filter cut off</source>
 <translation>フィルターカットオフの数値を入力</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="304"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="305"/>
 <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
 <translation>データフィルター</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="305"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="306"/>
 <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
 <translation>コーディング・チャート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="310"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="311"/>
 <source>Select category</source>
 <translation>カテゴリーを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="311"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="312"/>
 <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
 <translation>属性チャート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="312"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="313"/>
 <source>Numeric attributes</source>
 <translation>数値属性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="313"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="314"/>
 <source>Character attributes</source>
 <translation>キャラクター属性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="314"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="315"/>
 <source>File</source>
 <translation>ファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="315"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="316"/>
 <source>Case</source>
 <translation>事例</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="316"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="317"/>
 <source>Export HTML file</source>
 <translation>HTMLファイルのエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="317"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="318"/>
 <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
 <translation>ヒートマップ・チャート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="318"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="319"/>
 <source>Word cloud</source>
 <translation>ワードクラウド</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="321"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="322"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ワードクラウドを作る</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="322"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="323"/>
 <source>Width</source>
 <translation>幅</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="323"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="324"/>
 <source>Height</source>
 <translation>高さ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="324"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="325"/>
 <source>Max words</source>
 <translation>最大文字数</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="326"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="327"/>
 <source>Reverse colour range</source>
 <translation>リバースカラーレンジ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="327"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="328"/>
 <source>Reverse range</source>
 <translation>リバースレンジ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="328"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="329"/>
 <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
 <translation>フレーズ内の結合語の数。Stopwordsは1語のみの選択に適用されます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="329"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="330"/>
 <source>n-grams</source>
 <translation>エングラム</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="330"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="331"/>
 <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
 <translation>1=1語、3=3語フレーズ、4=4語フレーズ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="331"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="332"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>これは、極端なカウントの差がある場合に、ヒートマップの色の幅を広げることができるようにするためです。0は無制限を表す。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="332"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="333"/>
 <source>Upper count limiter</source>
 <translation>上限カウントリミッター</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="336"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="337"/>
 <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
 <translation>累積棒グラフ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="337"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="338"/>
 <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
@@ -217,22 +217,22 @@ Each word is excluded in the n-grams=1 Word cloud.</source>
 各語はn-grams=1のワードクラウドから除外されます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="342"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="343"/>
 <source>Stop words</source>
 <translation>ストップワード</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="343"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="344"/>
 <source>Select stopwords list by language</source>
 <translation>言語ごとにストップワードリストを選択する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="306"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="307"/>
 <source>Right-click for text filter</source>
 <translation>テキストフィルターを表示するには右クリックしてください</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="307"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="308"/>
 <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
@@ -241,27 +241,27 @@ Codings from the entire text file are used for the calculations.</source>
 計算には、テキストファイル全体のコードデータが使用されます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="319"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="320"/>
 <source>Background</source>
 <translation>背景</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="320"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="321"/>
 <source>Foreground</source>
 <translation>前景</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="333"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="334"/>
 <source>Image width</source>
 <translation>画像の幅</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="334"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="335"/>
 <source>Image height</source>
 <translation>画像の高さ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="335"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_charts.py" line="336"/>
 <source>Maximum words</source>
 <translation>最大文字数</translation>
 </message>
@@ -365,67 +365,67 @@ Right-click for options</source>
 <source>Export to Draw.io</source>
 <translation>Draw.ioにエクスポート</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="185"/>
 <source>Show minimap</source>
 <translation type="unfinished">ミニマップを表示</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="186"/>
 <source>Align horizontal</source>
 <translation type="unfinished">水平なアライナー</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="187"/>
 <source>Align vertical</source>
 <translation type="unfinished">縦に並べる</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="188"/>
 <source>Distribute vertical</source>
 <translation type="unfinished">縦方向の</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="189"/>
 <source>Distribute horizontal</source>
 <translation type="unfinished">水平方向を分散</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="190"/>
 <source>Compact graph</source>
 <translation type="unfinished">コンパクトグラフ</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="191"/>
 <source>Expand graph</source>
 <translation type="unfinished">グラフの拡大</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="192"/>
 <source>Organize graph</source>
 <translation type="unfinished">グラフの整理</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="193"/>
 <source>Remove nodes</source>
 <translation type="unfinished">ノードを削除</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="194"/>
 <source>Undo changes</source>
 <translation type="unfinished">変更なし</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="205"/>
 <source>Add relationship line</source>
 <translation type="unfinished">関係線の追加</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="214"/>
 <source>Graph models</source>
 <translation type="unfinished">グラフモデル</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph.py" line="215"/>
 <source>Export Graph Summary</source>
 <translation type="unfinished">エクスポートグラフの概要</translation>
@@ -433,231 +433,274 @@ Right-click for options</source>
 </context>
 <context>
 <name>DialogGraphModels</name>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="198"/>
 <source>Graph Models</source>
 <translation type="unfinished">グラフモデル</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="199"/>
 <source>Select graph model:</source>
 <translation type="unfinished">グラフモデルを選択します。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="204"/>
 <source>Max coded segments per code (0 = none):</source>
 <translation type="unfinished">コードごとの最大コードされたセグメント (0 = なし):</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="205"/>
 <source>Comparison level:</source>
 <translation type="unfinished">比較レベル:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="202"/>
 <source>Case 1:</source>
 <translation type="unfinished">ケース1:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="203"/>
 <source>Case 2:</source>
 <translation type="unfinished">ケース2:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="206"/>
 <source>File 1:</source>
 <translation type="unfinished">ファイル1:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="207"/>
 <source>File 2:</source>
 <translation type="unfinished">ファイル2:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="208"/>
 <source>Co-occurrence types:</source>
 <translation type="unfinished">共存タイプ:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="209"/>
 <source>Overlap (partial intersection)</source>
 <translation type="unfinished">オーバーラップ(部分交差点)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="210"/>
 <source>Inclusion (one inside another)</source>
 <translation type="unfinished">インクルージョン(別)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="211"/>
 <source>Exact (identical span)</source>
 <translation type="unfinished">正確な(代表的なスパン)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="212"/>
 <source>Proximity (within N characters)</source>
 <translation type="unfinished">近接(N文字以内)</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="213"/>
 <source>  Proximity threshold (characters):</source>
 <translation type="unfinished">近接しきい値(キャラクター):</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="214"/>
 <source>Show categories as parent nodes</source>
 <translation type="unfinished">親ノードとしてカテゴリを表示する</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="215"/>
 <source>Select 1 or more categories after clicking Generate.</source>
 <translation type="unfinished">Generateをクリックした後に1つ以上のカテゴリを選択します。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="216"/>
 <source>Max segments to display  (0 = none):</source>
 <translation type="unfinished">表示する最大セグメント(0 =なし):</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="217"/>
 <source>Generate</source>
 <translation type="unfinished">生成する</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_models.py" line="218"/>
 <source>Cancel</source>
 <translation type="unfinished">キャンセル</translation>
 </message>
 </context>
 <context>
+<name>DialogImportReferences</name>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="78"/>
+<source>Import references</source>
+<translation type="unfinished">インポートリファレンス</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="79"/>
+<source>Select the references to import. Items already in the project (duplicates) are unchecked by default.</source>
+<translation type="unfinished">インポートする参照を選択します。 プロジェクト(重複)に既にある項目はデフォルトでチェックされていない。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="80"/>
+<source>Select all</source>
+<translation type="unfinished">すべてを選択</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="81"/>
+<source>Deselect all</source>
+<translation type="unfinished">すべて選択解除</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="82"/>
+<source>Only New</source>
+<translation type="unfinished">新着情報</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="83"/>
+<source>Import attachments (PDF/EPUB)</source>
+<translation type="unfinished">インポートアタッチメント(PDF/EPUB)</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="86"/>
+<source>Import</source>
+<translation type="unfinished">輸入</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="88"/>
+<source>Reference</source>
+<translation type="unfinished">参考文献</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="90"/>
+<source>Status</source>
+<translation type="unfinished">ステータス</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="92"/>
+<source>Attachment</source>
+<translation type="unfinished">添付ファイル</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_references_import.py" line="94"/>
+<source>Attachment status</source>
+<translation type="unfinished">添付ファイルの状態</translation>
+</message>
+</context>
+<context>
 <name>DialogMatchingTextSegments</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="109"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="113"/>
 <source>Report matching text segments</source>
 <translation>一致するテキストセグメントを報告する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="110"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>コーダーを選択。すべて空欄。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="111"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>エクセルファイルのエクスポート</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="112"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>完全一致テキストセグメントレポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="113"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>コーダーを選択します。すべて空欄</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="114"/>
-<source>Coder</source>
-<translation>コーダー</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="117"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>コード化されたテキストには、以下のテキストを含めなければならない。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="118"/>
-<source>Include text</source>
-<translation>テキストを含む</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="119"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="121"/>
 <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
 <translation>ファイル、コーダー、2つ以上のコードを選択。コードを除外して結果を除外することができます（コードを右クリック）。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="120"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="122"/>
 <source>Unchecked - all selected codes must match exactly.
 Checked - any selected codes must match exactly.</source>
 <translation>チェックなし - 選択されたコードはすべて正確に一致しなければならない。
 チェックあり - 選択されたコードはすべて正確に一致する必要があります。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="122"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="124"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>複数のコードに完全に一致するコード化されたテキストは、1行に集約される。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="123"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="125"/>
 <source>One line results</source>
 <translation>1行の結果</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="115"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="117"/>
 <source>Export Excel file</source>
 <translation>エクセルファイルのエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="116"/>
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="118"/>
 <source>Run</source>
 <translation>実行する</translation>
 </message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="124"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File attributes filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ファイル属性</translation>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="116"/>
+<source>Select coder. Blank for all</source>
+<translation type="unfinished">コーダを選択します。 すべての空白</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="120"/>
+<source>Coded text filter. Must include this text.</source>
+<translation type="unfinished">コードされたテキスト フィルター。 このテキストを含む必要があります。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_matching_segments.py" line="126"/>
+<source>File attributes filter</source>
+<translation type="unfinished">ファイル属性フィルタ</translation>
 </message>
 </context>
 <context>
 <name>DialogOrganiser</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="72"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="73"/>
 <source>Graph Visualisation</source>
 <translation>グラフの視覚化</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="73"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="74"/>
 <source>Export image</source>
 <translation>画像のエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="74"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="75"/>
 <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
 <translation>グラフ領域をクリックし、＋またはWを押してズームインする。またはQを押して拡大または縮小します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="75"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="76"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>カテゴリー作成</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="76"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="77"/>
 <source>Select code branch</source>
 <translation>コードブランチを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="77"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="78"/>
 <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
 <translation>コード・オーガナイザー。コードとカテゴリーを右クリックしてリンクし、マージする。新しいカテゴリを追加します。コードツリーの再構築。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="78"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>変更された構造を適用する。警告 元に戻すオプションはありません。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="79"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
 <source>Apply</source>
 <translation>応募する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="80"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
 <source>Add code</source>
 <translation type="unfinished">コードを追加</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="81"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_organiser.py" line="82"/>
 <source>Import and edit codebook</source>
 <translation type="unfinished">コードブックのインポートと編集</translation>
 </message>
@@ -696,54 +739,49 @@ Checked - any selected codes must match exactly.</source>
 <context>
 <name>DialogSegmentCodings</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="94"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="100"/>
 <source>Report Segment Codings</source>
 <translation>レポートセグメントの符号化</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="95"/>
-<source>Text limiter:</source>
-<translation>テキスト・リミッター：</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="96"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="103"/>
 <source>Run report</source>
 <translation>レポートを実行する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="97"/>
-<source>Coder:</source>
-<translation>コーダー:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="98"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="104"/>
 <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
 <translation>テキストセグメントごとのコード表。1 = コードあり、0 = コードなし。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="99"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="105"/>
 <source>Export to Excel</source>
 <translation>エクセルファイルのエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="100"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>属性でファイルを選択する</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="101"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="107"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイル。選択オプションを表示するには右クリックしてください。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="102"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="108"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ケース。選択オプションを表示するには右クリックしてください。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="103"/>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="109"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>コード。オプションを表示するには右クリック</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="102"/>
+<source>Text filter</source>
+<translation type="unfinished">テキストフィルタ</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_codes_by_segments.py" line="106"/>
+<source>Select files by attributes</source>
+<translation type="unfinished">属性でファイルを選択する</translation>
 </message>
 </context>
 <context>
@@ -1133,64 +1171,64 @@ Ordered by file name and code name.</source>
 <context>
 <name>Dialog_Coocurrence</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="105"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="106"/>
 <source>Code Co-occurence</source>
 <translation>コード共同</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="106"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="107"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>重複コードを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="107"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="108"/>
 <source>Code co-occurence</source>
 <translation>コード共同</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="109"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="110"/>
 <source>Hide blank lines</source>
 <translation>空白行を隠す</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="108"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="109"/>
 <source>Export to file</source>
 <translation>ファイルへのエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="110"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="111"/>
 <source>Select files</source>
 <translation>ファイルを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="111"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="112"/>
 <source>Select categories</source>
 <translation>カテゴリーを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="112"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="113"/>
 <source>Select codes</source>
 <translation>コードを選択</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="113"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="114"/>
 <source>Select files by attributes</source>
 <translation>属性でファイルを選択する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="114"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="115"/>
 <source>Export to Gephi. GraphML format</source>
 <translation>Gephiにエクスポート。GraphML形式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="115"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="116"/>
 <source>Export Co-occurence Graph Image
 Right-click for format options</source>
 <translation>共起グラフの画像をエクスポート
 右クリックでフォーマットオプションを表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="117"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_cooccurrence.py" line="118"/>
 <source>Export Cluster Graph Image
 Right-click for format options
 </source>
@@ -1278,26 +1316,6 @@ Right-click for format options
 </context>
 <context>
 <name>Dialog_Import_twitter</name>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="53"/>
-<source>Twitter data import</source>
-<translation>Twitterのデータインポート</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="54"/>
-<source>Import twitter data file</source>
-<translation>twitterデータファイルのインポート</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="55"/>
-<source>Use the R statistics package to get the twitter data and create a csv file. Then import the csv file.</source>
-<translation>R統計パッケージを使ってtwitterのデータを取得し、csvファイルを作成する。そしてcsvファイルをインポートする。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_import_twitter.py" line="56"/>
-<source>Select file</source>
-<translation>ファイルを選択</translation>
-</message>
 </context>
 <context>
 <name>Dialog_QueryDetails</name>
@@ -1589,187 +1607,193 @@ Right-click for format options
 <context>
 <name>Dialog_code_av</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="212"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
 <source>Code Audio Video</source>
 <translation>コード オーディオ ビデオ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="237"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="248"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>最新のコーディングファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="238"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="249"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>次のファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="239"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="250"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイルメモ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="240"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="251"/>
 <source>Show files with selected file attributes</source>
 <translation>選択したファイル属性のファイルを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="246"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="257"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>トランスクリプト</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="213"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
 <source>Ctrl P or Ctrl D Play/Pause</source>
 <translation>Ctrl P または Ctrl D 再生/一時停止</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="214"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="221"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ボリューム</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="216"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
 <source>Start segment</source>
 <translation>開始セグメント</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="217"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>オーディオまたはビデオのセグメントが作成されたら、コードツリーからコードを選択し、コード上で右クリックして、セグメントをコードに割り当てます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="218"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="226"/>
 <source>Segment:</source>
 <translation>セグメント：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="219"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="227"/>
 <source>Coder:</source>
 <translation>コーダー:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="220"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>トラックを変更する。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="221"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="229"/>
 <source>Cannot code text when play transcript box is checked.</source>
 <translation>トランスクリプトの再生ボックスにチェックが入っていると、テキストをコーディングできない。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="222"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="230"/>
 <source>Scroll transcript while playing.</source>
 <translation>再生中にトランスクリプトをスクロールします。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="223"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>Ctrl Shift &gt; 再生レートを最大2倍まで上げる 
-Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="224"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="233"/>
 <source>1.0x</source>
 <translation>1.0xの</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="225"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>30秒巻き戻し Alt  マイナス</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="227"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>再生速度を下げる Ctrl Shift &lt;</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="228"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>再生速度を上げる Ctrl Shift &gt;</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="229"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="239"/>
 <source>Rewind 5 seconds. Ctrl + R</source>
 <translation>5秒巻き戻す。Ctrl + R</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="230"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="240"/>
 <source>Help</source>
 <translation>ヘルプ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="231"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="241"/>
 <source>Show codings flagged important</source>
 <translation>重要なフラグを付けたコーディングを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="233"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="243"/>
 <source>S</source>
 <translation>ツイート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="258"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>スライダーボタンを左クリックし、左右にドラッグしてビデオの位置を変更します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="215"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;p&gt;Key shortcut: Ctrl S&lt;/p&gt;&lt;p&gt;Key shortcut: G - Open memo and apply segment to currently selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>オーディオ/ビデオセグメントのコーディングを開始するには、セグメント開始ボタンを押します。コード化されたセグメントを終了するには、セグメント終了ボタンを押します。
-ショートカットキー Ctrl S
-キーショートカット： G - メモを開き、現在選択されているコードにセグメントを適用します。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="226"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>30秒進む。Alt + Plus
-キープレス5 - 5秒進む。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="232"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ボタンでセグメントを選択する。
-するとオプションのメニューが開きます。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="234"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="244"/>
 <source>Find code</source>
 <translation>コードを検索
 </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="235"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>スクリーンショット</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="236"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>スクリーンショットからの投影画像</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="241"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="252"/>
 <source>Clear file filter</source>
 <translation>ファイルフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="244"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="255"/>
 <source>Clear code filter</source>
 <translation>コードフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="245"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="256"/>
 <source>Code name filter</source>
 <translation type="unfinished">コード名 フィルター</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="242"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="253"/>
 <source>Go to bookmark (Shift B)
 To set a bookmark press B</source>
 <translation type="unfinished">ブックマークに移動 (シフトB)
 ブックマークプレスBを設定する</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="222"/>
+<source>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment. Key shortcut: Ctrl S
+Open memo and apply segment to currently selected code. Key shortcut: G</source>
+<translation type="unfinished">[スタート] セグメント ボタンを押して、オーディオ/ビデオ セグメントのコーディングを開始します。 エンドセグメントボタンを押して、コードされたセグメントを終了します。 キーショートカット: Ctrl S
+memo を開き、選択したコードにセグメントを適用します。 主ショートカット:G</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="228"/>
+<source>Change track, if multiple available.</source>
+<translation type="unfinished">複数の利用可能な場合は、トラックを変更します。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="231"/>
+<source>Increase play rate to maximum 2x   Key &gt;
+Decrease play rate to minimum 0.1  Key &lt;</source>
+<translation type="unfinished">最大2倍のキーにプレイレートを増加させる&gt;
+プレイ率を最小0.1キーまで下げる &lt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="234"/>
+<source>Rewind 30 seconds. Alt + Minus</source>
+<translation type="unfinished">巻き戻し30秒。 Alt + マイナス</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="235"/>
+<source>Forward 30 seconds. Alt + Plus. 
+Forward 5 seconds. Key 5</source>
+<translation type="unfinished">30秒進む。 Alt +プラス。
+5秒進む。 キー5</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="237"/>
+<source>Decrease play rate Key &lt;</source>
+<translation type="unfinished">プレイ率の低下 キー &lt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="238"/>
+<source>Increase play rate Key &gt;</source>
+<translation type="unfinished">プレイレートキーを増やす &gt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="242"/>
+<source>Button to select a segment. Then a menu of options will open.</source>
+<translation type="unfinished">セグメントを選択するボタン。 オプションのメニューが開きます。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="245"/>
+<source>Screenshot</source>
+<translation type="unfinished">スクリーンショット</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="246"/>
+<source>Get screenshot for image coding</source>
+<translation type="unfinished">画像コーディングのスクリーンショットを入手</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_av.py" line="247"/>
+<source>Coder</source>
+<translation type="unfinished">コーダー</translation>
 </message>
 </context>
 <context>
@@ -1826,358 +1850,449 @@ To set a bookmark press B</source>
 <context>
 <name>Dialog_code_image</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="219"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="222"/>
 <source>View Image</source>
 <translation>画像を見る</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="243"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="246"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイルメモ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
-<source>Coder:</source>
-<translation>コーダー</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="220"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="223"/>
 <source>Image details</source>
 <translation>画像詳細</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="221"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="224"/>
 <source>Coded area:</source>
 <translation>コード化された領域：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="222"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="225"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>このコード化された領域</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="223"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="226"/>
 <source>Show codings flagged important</source>
 <translation>重要なフラグを付けたコーディングを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="224"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="227"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>画像をhtmlファイルとしてエクスポートします。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="225"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="228"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>キャプションの表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="226"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="229"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ズームイン W または +</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="227"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="230"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ズームアウト Q または -</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="228"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="231"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>反時計回りに回転</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="229"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="232"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>時計回りに回転させる</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="241"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="244"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>最新のコーディングファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="242"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="245"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>次のファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="244"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="247"/>
 <source>Show files using selected file attributes</source>
 <translation>選択したファイル属性を使用してファイルを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="230"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="233"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>前へ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="231"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="234"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>次へ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="232"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="235"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ページ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="233"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="236"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>最終ページ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="234"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="237"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ページに戻る</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="235"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="238"/>
 <source>Set default colour for new codes</source>
 <translation>新しいコードのデフォルトの色を設定する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="236"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
 <source>PDF controls</source>
 <translation>PDF コントロール</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="237"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="240"/>
 <source>Find code</source>
 <translation>コードを検索</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="239"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="242"/>
 <source>Coder visibility</source>
 <translation>コーダーの可視性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="240"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="243"/>
 <source>...</source>
 <translation>・・・</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="245"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="248"/>
 <source>Clear file filter</source>
 <translation>ファイルフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="246"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="249"/>
 <source>Clear code filter</source>
 <translation>コードフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="247"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="250"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; コード名 filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_image.py" line="241"/>
+<source>Coder</source>
+<translation type="unfinished">コーダー</translation>
 </message>
 </context>
 <context>
 <name>Dialog_code_pdf</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="279"/>
-<source>Code Text</source>
-<translation>コード・テキスト</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="309"/>
-<source>Coder:</source>
-<translation>コーダー:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="280"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
-&lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>テキストを検索します。大文字と小文字を区別</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="282"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>大文字と小文字を区別</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="283"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="355"/>
 <source>0 / 0</source>
 <translation/>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="302"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>前へ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="303"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>次へ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="286"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>検索テキスト 大文字と小文字を区別する</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="287"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>検索には Regex 関数を使用します。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="288"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="348"/>
 <source>Help</source>
 <translation>ヘルプ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="289"/>
-<source>Images</source>
-<translation>画像</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="290"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Useful if font colours are harder to see&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>フォントカラーが見づらい場合に便利</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="291"/>
-<source>Black Text</source>
-<translation>ブラックテキスト</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="292"/>
-<source>Text</source>
-<translation>テキスト</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="293"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pdf font size adjustment&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>Pdfフォントサイズ調整</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="294"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ページ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="295"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PDF object information&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>PDFオブジェクト情報</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="296"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>画像のエクスポート</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="297"/>
-<source>0</source>
-<translation>0 の 0</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="298"/>
-<source>-1</source>
-<translation/>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="299"/>
-<source>-2</source>
-<translation>・2</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="300"/>
-<source>-3</source>
-<translation>3</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="301"/>
-<source>-4</source>
-<translation/>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="304"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>最終ページ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="305"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ページに戻る</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="306"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in (Shift Plus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ズームイン (シフトプラス)</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="307"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom Out (Ctrl Minus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ズームアウト（Ctrlマイナス）</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="312"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>最新のコーディングファイル</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="313"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ブックマークへ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="314"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>次のファイル</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="315"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>ファイルメモ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="316"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="381"/>
 <source>Show files with file attributes</source>
 <translation>ファイル属性を持つファイルを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="318"/>
-<source>Show codings flagged important</source>
-<translation>重要なフラグを付けたコーディングを表示する</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="319"/>
-<source>Right click below to create new codes and categories</source>
-<translation>新しいコードとカテゴリーを作成するには、以下を右クリックしてください。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="308"/>
-<source>Set default colour for new codes</source>
-<translation>新しいコードのデフォルトの色を設定する</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="320"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="384"/>
 <source>Find code</source>
 <translation>コードを検索</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="310"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="330"/>
 <source>Coder visibility</source>
 <translation>コーダーの可視性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="311"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="331"/>
 <source>...</source>
 <translation>・・・</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="317"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="382"/>
 <source>Clear file filter</source>
 <translation>ファイルフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="321"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="388"/>
 <source>Clear code filter</source>
 <translation>コードフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="322"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="389"/>
 <source>Code name filter</source>
 <translation type="unfinished">コード名 フィルター</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="327"/>
+<source>Code PDF</source>
+<translation type="unfinished">コード PDF</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="328"/>
+<source>Coder</source>
+<translation type="unfinished">コーダー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="329"/>
+<source>Codername</source>
+<translation type="unfinished">コード名</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="332"/>
+<source>Show all annotations for this file</source>
+<translation type="unfinished">このファイルのすべての注釈を表示</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="333"/>
+<source>Show all coding memos for this file</source>
+<translation type="unfinished">このファイルのすべてのコーディングメモを表示する</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="334"/>
+<source>Mark speakers</source>
+<translation type="unfinished">マークスピーカー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="335"/>
+<source>Set a default colour for new codes, instead of a random colour</source>
+<translation type="unfinished">ランダムな色の代わりに、新しいコードのデフォルト色を設定します</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="336"/>
+<source>Auto code with exact text.
+Right click to change options: all, first, last, code within code</source>
+<translation type="unfinished">正確なテキストと自動コード。
+右クリックして、オプションを変更します。まず、最後に、コード内のコード</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="338"/>
+<source>Text fragment to auto code sentences.
+Right click to change options: all, first, last, code within code</source>
+<translation type="unfinished">テキストを自動コード文にフラグメントします。
+右クリックして、オプションを変更します。まず、最後に、コード内のコード</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="340"/>
+<source>Auto code using start and end marks</source>
+<translation type="unfinished">開始および端の印を使用して自動コード</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="341"/>
+<source>Undo auto coding</source>
+<translation type="unfinished">Undo 自動コーディング</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="342"/>
+<source>Apply REGEX to autocoding for exact text and sentences buttons.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html</source>
+<translation type="unfinished">REGEX を適用して、正確なテキストと文のボタンを自動コーディングします。
+Regexチートシート:www.rexegg.com/regex-quickstart.html</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="344"/>
+<source>REGEX</source>
+<translation type="unfinished">リベックス</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="345"/>
+<source>Page display: whole document scroll or one page at a time</source>
+<translation type="unfinished">ページの表示:文書全体スクロールか1ページを一度に</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="346"/>
+<source>Whole document</source>
+<translation type="unfinished">全文書</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="347"/>
+<source>Single page</source>
+<translation type="unfinished">シングルページ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="349"/>
+<source>Search text</source>
+<translation type="unfinished">テキスト検索</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="350"/>
+<source>Case sensitive</source>
+<translation type="unfinished">場合の敏感</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="351"/>
+<source>Aa</source>
+<translation type="unfinished">アオア</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="352"/>
+<source>Previous</source>
+<translation type="unfinished">前へ</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="353"/>
+<source>Next</source>
+<translation type="unfinished">次へ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="354"/>
+<source>Search results: current / total</source>
+<translation type="unfinished">検索結果: 現在の/合計</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="356"/>
+<source>Code text</source>
+<translation type="unfinished">コード・テキスト</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="357"/>
+<source>Code image</source>
+<translation type="unfinished">コード画像</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="358"/>
+<source>Captions over coded areas.
+Click to cycle: hidden, code name, code name and memo</source>
+<translation type="unfinished">コードされた領域上のキャプション。
+クリックしてサイクル: 隠される、コード名、コード名、メモ</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="360"/>
+<source>Export</source>
+<translation type="unfinished">輸出</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="361"/>
+<source>Export options.
+pdf highlight: copy of the pdf with codings as native annotations.
+odt report: report of the coded text and areas.</source>
+<translation type="unfinished">エクスポートオプション。
+pdfのハイライト: ネイティブアノテーションとしてコーディングとPDFのコピー。
+odt レポート: コードされたテキストと領域のレポート。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="364"/>
+<source>pdf highlight</source>
+<translation type="unfinished">pdfのハイライト</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="365"/>
+<source>odt report</source>
+<translation type="unfinished">ODTレポート</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="366"/>
+<source>Previous page</source>
+<translation type="unfinished">前のページ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="367"/>
+<source>Go to page number</source>
+<translation type="unfinished">ページ番号に移動</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="368"/>
+<source>1</source>
+<translation type="unfinished">8月1日</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="369"/>
+<source>Total pages</source>
+<translation type="unfinished">総ページ</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="370"/>
+<source>/ 0</source>
+<translation type="unfinished"/>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="371"/>
+<source>Next page</source>
+<translation type="unfinished">次のページ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="372"/>
+<source>Zoom out</source>
+<translation type="unfinished">ズームアウト</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="373"/>
+<source>Zoom level. Ctrl + mouse wheel to zoom</source>
+<translation type="unfinished">ズームレベル。 Ctrl + マウス ホイールをズームする</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="374"/>
+<source>100%</source>
+<translation type="unfinished">100%の</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="375"/>
+<source>Zoom in</source>
+<translation type="unfinished">ズームイン</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="376"/>
+<source>Fit view</source>
+<translation type="unfinished">フィットビュー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="377"/>
+<source>Next file</source>
+<translation type="unfinished">次のファイル</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="378"/>
+<source>File with latest coding</source>
+<translation type="unfinished">最新のコーディングファイル</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="379"/>
+<source>Go to bookmark</source>
+<translation type="unfinished">ブックマークへ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="380"/>
+<source>File memo</source>
+<translation type="unfinished">ファイルメモ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="383"/>
+<source>Text extraction status</source>
+<translation type="unfinished">テキスト抽出ステータス</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="385"/>
+<source>Show codings prev</source>
+<translation type="unfinished">プログラミングの prev を表示</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="386"/>
+<source>Show coding next</source>
+<translation type="unfinished">次回のコーディングを表示</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_code_pdf.py" line="387"/>
+<source>Show codings falgged important</source>
+<translation type="unfinished">コーディングを強制的に表示する</translation>
 </message>
 </context>
 <context>
@@ -2216,103 +2331,98 @@ To set a bookmark press B</source>
 <context>
 <name>Dialog_code_text</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="486"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="489"/>
 <source>Code Text</source>
 <translation>コード・テキスト</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="534"/>
-<source>Coder:</source>
-<translation>コーダー</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="489"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="492"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=" font-weight:600;"&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>テキストを検索します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="543"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="546"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>大文字と小文字を区別する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="492"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="495"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>すべてのファイルを検索</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="493"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="496"/>
 <source>0 / 0</source>
 <translation/>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="494"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="497"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>前へ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="495"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="498"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>次へ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="496"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="499"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>検索テキスト すべてのテキストファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="542"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="545"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>検索テキスト 大文字と小文字を区別する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="501"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="504"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>このコーダーによるすべてのコードをこのファイルから削除する。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="502"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="505"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>選択範囲に注釈を付ける</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="500"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="503"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>自動コーディングの取り消し</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="503"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="506"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>このコード化されたセクションのメモ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="504"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="507"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>検索には Regex 関数を使用します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="505"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="508"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>開始記号と終了記号を使ったオートコード。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="506"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="509"/>
 <source>Help</source>
 <translation>ヘルプ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="507"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="510"/>
 <source>Show memos</source>
 <translation>メモを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="508"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="511"/>
 <source>Show annotations</source>
 <translation>注釈の表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="509"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="512"/>
 <source>Edit text 
 Click on a position, without selecting text, to type, delete, or paste text. 
 Select text that is not underlined and delete or paste over. 
@@ -2327,159 +2437,159 @@ As all assigned positions may be incorrect. </source>
 割り当てられた位置がすべて正しくない可能性があるためです。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="516"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
 <source>Export</source>
 <translation>輸出</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="524"/>
 <source>html</source>
 <translation>ツイート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="523"/>
 <source>txt</source>
 <translation>ログイン</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="523"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="526"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>テキストを編集した後 &gt;編集したテキストを見直して、コードの位置が正しいことを確認する。コード位置が正しくない場合は、ボタンを押して編集したテキストを元に戻す。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="525"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>サイドペインの表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="538"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="541"/>
 <source>Exit Edit text </source>
 <translation>テキストの編集を終了する </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="544"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="547"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>最新のコーディングファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="545"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="548"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ブックマークへ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="546"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="549"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>次のファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="547"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="550"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイルメモ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="548"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="551"/>
 <source>Show files with file attributes</source>
 <translation>ファイル属性を持つファイルを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="550"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
 <source>Documents</source>
 <translation>書類</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="551"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
 <source>Select a document</source>
 <translation>ドキュメントを選択する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="552"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="555"/>
 <source>Click here to define the options for the AI based search</source>
 <translation>すべてのコーディングを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="553"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="556"/>
 <source>&lt;Start AI Search&gt;</source>
 <translation>人工知能の検索を開始する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="554"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="557"/>
 <source>AI Assistance</source>
 <translation>人工知能による支援</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="555"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="558"/>
 <source>Use the AI to find data</source>
 <translation>人工知能を使ってデータを見つける</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="559"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="562"/>
 <source>Show codings flagged important</source>
 <translation>重要なフラグを付けたコーディングを表示する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="560"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="563"/>
 <source>Right click below to create new codes and categories</source>
 <translation>新しいコードとカテゴリーを作成するには、以下を右クリックしてください。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="564"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="567"/>
 <source>Code rule with examples</source>
 <translation>コード・ルールとその例</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="565"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="568"/>
 <source>Current journal</source>
 <translation>現在のジャーナル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="566"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="569"/>
 <source>Project memo</source>
 <translation>プロジェクトメモ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="567"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="570"/>
 <source>.</source>
 <translation>お問い合わせ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="524"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="527"/>
 <source>Set default colour for new codes</source>
 <translation>新しいコードのデフォルトの色を設定する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="556"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="559"/>
 <source>Show all codings</source>
 <translation>すべてのコーディングを表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="557"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="560"/>
 <source>Show previous coding of selected code</source>
 <translation>選択したコードの前のコーディングを表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="558"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="561"/>
 <source>Show next coding of selected code.</source>
 <translation>選択したコードの次のコーディングを表示します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="561"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="564"/>
 <source>Find code</source>
 <translation>コードを検索</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="526"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
 <source>Apply REGEX to autocoding for exact text and sentences buttons.
 https://www.datacamp.com/cheat-sheet/regular-expresso</source>
 <translation>REGEX をオートコーディングに適用して、正確なテキストとセンテンス・ボタンを作成する。
 https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="528"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="531"/>
 <source>REGEX</source>
 <translation>リベックス</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="529"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="532"/>
 <source>Mark speakers.
 Limited to names up to 63 characters long. 
 The name must be at the start of a new line.
@@ -2492,83 +2602,88 @@ Formatted like below for name detection.
 「Name:」, 「{Name}」, または 「[Name]」</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="487"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="490"/>
 <source>Auto code with exact text.
 Right click for options: all, first, last, within another code.</source>
 <translation>正確なテキストで自動コード化。
 オプションを表示するには右クリック：すべて、最初、最後、別のコード内。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="498"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="501"/>
 <source>Text fragment to auto code sentences.
 Right click for options: all (default), first, code within code.</source>
 <translation>テキスト断片を自動コード化します。
 右クリックでオプション選択：すべて（デフォルト）、最初のみ、コード内コード。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="535"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="538"/>
 <source>Coder visibility</source>
 <translation>コーダーの可視性</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="536"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
 <source>...</source>
 <translation>・・・</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="517"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="520"/>
 <source>odt highlight</source>
 <translation>odtのハイライト</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="518"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="521"/>
 <source>odt comment</source>
 <translation>odt コメント</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="519"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
 <source>odt report</source>
 <translation>ODTレポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="522"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="525"/>
 <source>codebook</source>
 <translation>コードブック</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="537"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="540"/>
 <source>Select document font and size</source>
 <translation>文書用のフォントとサイズを選択してください</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="549"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="552"/>
 <source>Clear file filter</source>
 <translation>ファイルフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="562"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="565"/>
 <source>Clear code filter</source>
 <translation>コードフィルターをクリアする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="539"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="542"/>
 <source>Search for text</source>
 <translation type="unfinished">テキスト検索</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="540"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="543"/>
 <source>Next</source>
 <translation type="unfinished">次へ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="541"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="544"/>
 <source>Previous</source>
 <translation type="unfinished">前へ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="563"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="566"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; コード名 filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_code_text.py" line="537"/>
+<source>Coder</source>
+<translation type="unfinished">コーダー</translation>
 </message>
 </context>
 <context>
@@ -2751,27 +2866,27 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
 </context>
 <context>
 <name>Dialog_graph_picker</name>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="85"/>
 <source>Graphs</source>
 <translation type="unfinished">グラフ</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="86"/>
 <source>Saved graphs:</source>
 <translation type="unfinished">保存されたグラフ:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="87"/>
 <source>Order:</source>
 <translation type="unfinished">注文:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="88"/>
 <source>Sort the graph list</source>
 <translation type="unfinished">グラフリストをソートする</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_graph_picker.py" line="89"/>
 <source>Preview:</source>
 <translation type="unfinished">プレビュー:</translation>
@@ -2904,22 +3019,22 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
 <context>
 <name>Dialog_manage_files</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="133"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="151"/>
 <source>Files</source>
 <translation>ファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="134"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="154"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイルを見る</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="135"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="155"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>テキストファイルの作成</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="136"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="156"/>
 <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
@@ -2928,76 +3043,76 @@ Text files (from any source) are exported from the text stored in the database a
 (必要であれば、プロジェクトフォルダを開き、元のテキストファイルをコピー/ペーストすることもできます)。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="139"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="159"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>削除するファイルを選択する</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="140"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="160"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイルをプロジェクトフォルダにインポートする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="141"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="161"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>属性の追加</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="142"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="162"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>プロジェクトフォルダ外のファイルへのリンク</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="143"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="163"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>リンクされたファイルをプロジェクトフォルダにインポートする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="144"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="164"/>
 <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
 <translation>プロジェクトフォルダからファイルをリンクファイルとして書き出すことができません。
 オーディオまたはビデオに関連付けられたテキスト書き起こしファイルを、リンクファイルとして書き出すことができません。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="146"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="166"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>属性をファイルにエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="147"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="167"/>
 <source>Help</source>
 <translation>ヘルプ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="148"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="168"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイル名変更の取り消し</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="149"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="169"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;データベース名ファイルエントリの一括リネーム&lt;/p&gt;&lt;p&gt;表示されているファイル行のリネームのみ行います。&lt;/p&gt;&lt;p&gt; &lt;/p&gt;&lt;p&gt;名前の変更： &lt;/p&gt;&lt;p&gt;例: interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="150"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="170"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save table display settings. &lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>テーブルの表示設定を保存します。 
 (非表示の行と列、および列のサイズ変更)</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="151"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="171"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>保存したテーブル表示設定を読み込みます。
 (非表示の行と列、および列のサイズ変更)</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="152"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="172"/>
 <source>Delete saved table display settings. </source>
 <translation>保存されたテーブル表示設定を削除します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="153"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="173"/>
 <source>Pseudonymisation (data de-identification)
 Before importing text files, create a list of names or phrases to be replaced.
 Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
@@ -3021,7 +3136,7 @@ PDFファイルでは機能しません。代わりにPDFからプレーンテ�
 全テキストファイルのインポート完了後、このファイルをプロジェクトフォルダから削除し、安全に保管してください。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="164"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="184"/>
 <source>Select a text transcription to mark the speakers.
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
@@ -3032,7 +3147,7 @@ Formatted like below for name detection.
 「名前:」, 「{名前} または 」[名前]"</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="168"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="188"/>
 <source>Import survey
 
 For csv and tsv files, please avoid using the following in the column names:  , ; |
@@ -3043,6 +3158,16 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
 CSVおよびTSVファイルの場合、列名には以下の文字を使用しないでください：  , ; |
 
 エントリ数が非常に多いアンケート（例：1,000件以上）については、インポートに時間がかかるため、しばらくお待ちください。</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="152"/>
+<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+<translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; ファイル名 filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_manage_files.py" line="153"/>
+<source>Clear filter</source>
+<translation type="unfinished">明確なフィルター</translation>
 </message>
 </context>
 <context>
@@ -3154,14 +3279,34 @@ Review after applying the function.</source>
 <context>
 <name>Dialog_memo</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="43"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="65"/>
 <source>Memo</source>
 <translation>メモ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="44"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="70"/>
 <source>Clear</source>
 <translation>クリア</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="66"/>
+<source>Insert current date and time at the cursor position</source>
+<translation type="unfinished">カーソル位置の現在の日付と時刻を入力</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="67"/>
+<source>Insert coded segments linked to this item</source>
+<translation type="unfinished">この項目にリンクされているインサートコードされたセグメント</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="68"/>
+<source>Insert a bibliographic reference linked to this item</source>
+<translation type="unfinished">この項目にリンクされているバイブリグラフ参照をインサートする</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_memo.py" line="69"/>
+<source>Export memo as ODT file</source>
+<translation type="unfinished">ODTファイルとしてメモをエクスポートする</translation>
 </message>
 </context>
 <context>
@@ -3204,77 +3349,77 @@ Review after applying the function.</source>
 </context>
 <context>
 <name>Dialog_node_relations</name>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="154"/>
 <source>Select relation</source>
 <translation type="unfinished">関係の選択</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="155"/>
 <source>Framework:</source>
 <translation type="unfinished">フレームワーク:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="156"/>
 <source>Select a theoretical framework</source>
 <translation type="unfinished">理論的なフレームワークを選択</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="157"/>
 <source>Search relations...</source>
 <translation type="unfinished">検索関係...</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="158"/>
 <source>Custom label:</source>
 <translation type="unfinished">カスタムラベル:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="159"/>
 <source>Override with a custom label...</source>
 <translation type="unfinished">カスタムラベルでオーバーライド...</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="160"/>
 <source>Color:</source>
 <translation type="unfinished">色:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="161"/>
 <source>Line type:</source>
 <translation type="unfinished">ライン タイプ:</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="162"/>
 <source>Add a new custom relation type</source>
 <translation type="unfinished">新しいカスタムリレーションタイプを追加</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="163"/>
 <source>Edit the selected relation</source>
 <translation type="unfinished">選択した関係を編集する</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="164"/>
 <source>Delete the selected custom relation</source>
 <translation type="unfinished">選択したカスタム関係を削除します。</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="165"/>
 <source>Import user relations</source>
 <translation type="unfinished">インポートユーザーリレーション</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="166"/>
 <source>Export user relations</source>
 <translation type="unfinished">ユーザリレーションのエクスポート</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="167"/>
 <source>Connect</source>
 <translation type="unfinished">ログイン</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_node_relations.py" line="168"/>
 <source>Cancel</source>
 <translation type="unfinished">キャンセル</translation>
@@ -3584,105 +3729,106 @@ Change Settings for number of characters and display style.</source>
 <context>
 <name>Dialog_reportCompareCoderFile</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="96"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="99"/>
 <source>Reports</source>
 <translation>レポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="97"/>
-<source>Coders:</source>
-<translation>コーダー:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="98"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>コーダーを2人選ぶ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="99"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="102"/>
 <source>To compare coding.
 Select two coders, one file, one code.</source>
 <translation>コーディングの比較
 2人のコーダー、1つのファイル、1つのコードを選択します。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="101"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="104"/>
 <source>Coder comparisons by file</source>
 <translation>ファイルごとのコーダー比較</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="102"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="105"/>
 <source>Coders selected</source>
 <translation>選ばれたコーダー</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="103"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>クリアセレクション</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="104"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="107"/>
 <source>Export ODT file</source>
 <translation>ODTファイルのエクスポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="105"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison.&lt;/p&gt;&lt;p&gt;Select 2 coders, 1 file, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>比較を実行する。
-2人のコーダー、1ファイル、1コードを選択。</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_compare_coder_file.py" line="106"/>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="110"/>
 <source>Statistics explanation</source>
 <translation>統計の説明</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="100"/>
+<source>Coders</source>
+<translation type="unfinished">コーダー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="101"/>
+<source>Select two coders</source>
+<translation type="unfinished">2つのコーダを選択</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="106"/>
+<source>Clear selection</source>
+<translation type="unfinished">クリアセレクション</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_compare_coder_file.py" line="108"/>
+<source>Run comparison.
+Select 2 coders, 1 file, 1 code.</source>
+<translation type="unfinished">比較を実行します。
+2つのコーダ、1つのファイル、1つのコードを選択します。</translation>
 </message>
 </context>
 <context>
 <name>Dialog_reportComparisons</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="79"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="82"/>
 <source>Coder Comparisons</source>
 <translation>コーダーの比較</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="80"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>エクセルのエクスポート</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="81"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>走行比較</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="82"/>
-<source>Coders:</source>
-<translation>コーダー:</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="83"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>コーダーを2人選ぶ</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="84"/>
-<source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-<translation>クリアセレクション</translation>
-</message>
-<message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="85"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="88"/>
 <source>Coder comparisons - text files</source>
 <translation>コーダーの比較 - テキストファイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="86"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="89"/>
 <source>Coders selected:</source>
 <translation>選ばれたコーダー</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_report_comparisons.py" line="87"/>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="90"/>
 <source>Statistics help</source>
 <translation>統計ヘルプ</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="83"/>
+<source>Export Excel</source>
+<translation type="unfinished">エクセルファイルのエクスポート</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="84"/>
+<source>Run comparison</source>
+<translation type="unfinished">比較を実行</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="85"/>
+<source>Coder</source>
+<translation type="unfinished">コーダー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="86"/>
+<source>Select two coders</source>
+<translation type="unfinished">2つのコーダを選択</translation>
+</message>
+<message>
+<location filename="../src/qualcoder/GUI/ui_report_comparisons.py" line="87"/>
+<source>Clear selection</source>
+<translation type="unfinished">クリアセレクション</translation>
 </message>
 </context>
 <context>
@@ -3777,6 +3923,34 @@ like' のワイルドカードは % と _ です。</translation>
 </message>
 </context>
 <context>
+<name>Dialog_select_quote</name>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="51"/>
+<source>Select quotes</source>
+<translation type="unfinished">引用符の選択</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="52"/>
+<source>Coded segments</source>
+<translation type="unfinished">コードされたセグメント</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="53"/>
+<source>Filter by segment type</source>
+<translation type="unfinished">セグメントタイプによるフィルタ</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="54"/>
+<source>Filter rows by any text</source>
+<translation type="unfinished">任意のテキストで行をフィルタリング</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_select_quote.py" line="55"/>
+<source>Filter</source>
+<translation type="unfinished">フィルター</translation>
+</message>
+</context>
+<context>
 <name>Dialog_selectitems</name>
 <message>
 <location filename="../src/qualcoder/GUI/ui_dialog_select_items.py" line="38"/>
@@ -3787,361 +3961,361 @@ like' のワイルドカードは % と _ です。</translation>
 <context>
 <name>Dialog_settings</name>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="548"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="570"/>
 <source>Settings</source>
 <translation>設定</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="549"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="571"/>
 <source>Backup project folder every time project is opened</source>
 <translation>プロジェクトを開くたびにプロジェクトフォルダをバックアップ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="550"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="572"/>
 <source>Default project directory</source>
 <translation>デフォルトのプロジェクトディレクトリ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="551"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
 <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
 <translation>ビデオファイルとオーディオファイルをバックアップします。チェックを外すとバックアップが高速化されます。
 バックアップに時間がかかる大きなファイルが多数ある場合を除き、お勧めしません。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="553"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
 <source>Backups</source>
 <translation>バックアップ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="554"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
 <source>0</source>
 <translation>0 の 0</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="555"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
 <source>1</source>
 <translation/>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="556"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
 <source>2</source>
 <translation/>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="557"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="579"/>
 <source>3</source>
 <translation/>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="558"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="580"/>
 <source>4</source>
 <translation>3</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="559"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="581"/>
 <source>5</source>
 <translation>5月5日</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="576"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
 <source>Reports with text context</source>
 <translation>テキスト・コンテキスト付きレポート</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="560"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="582"/>
 <source>Set this name as the current coder.
 </source>
 <translation>この名前を現在のコーダーとして設定する。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="563"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="585"/>
 <source>Current coder: </source>
 <translation>現在のコーダー </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="564"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="586"/>
 <source>/</source>
 <translation>・</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="565"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="587"/>
 <source>Language</source>
 <translation>言語</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="573"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
 <source>General font and size</source>
 <translation>一般的なフォントとサイズ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="574"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
 <source>Font size for codes tree</source>
 <translation>コードツリーのフォントサイズ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="575"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
 <source>Font size for documents</source>
 <translation>文書のフォントサイズ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="577"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
 <source>Characters before and after</source>
 <translation>前後の文字</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="578"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
 <source>Text context, coded text style</source>
 <translation>テキストコンテキスト、コード化されたテキストスタイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="591"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
 <source>8</source>
 <translation>8月8日</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="592"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="614"/>
 <source>10</source>
 <translation>10月10日</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="593"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
 <source>12</source>
 <translation>12月12日</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="594"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
 <source>14</source>
 <translation>14 日</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="595"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="617"/>
 <source>16</source>
 <translation>16 日</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="596"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="618"/>
 <source>18</source>
 <translation>18歳</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="597"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="619"/>
 <source>100</source>
 <translation>100円</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="598"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
 <source>200</source>
 <translation>200円</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="599"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
 <source>300</source>
 <translation>300円</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="609"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>ファイル、ケース、コードなどの識別番号を示す。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="610"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
 <source>Show IDs</source>
 <translation>識別子を表示</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="600"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
 <source>50000</source>
 <translation>50000の</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="601"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
 <source>30000</source>
 <translation>30000円</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="606"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="633"/>
 <source>Style</source>
 <translation>スタイル</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="604"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="628"/>
 <source>Very large text documents. Load text chunks by number of characters.</source>
 <translation>非常に大きなテキスト文書。文字数でテキストチャンクを読み込む。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="605"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="629"/>
 <source>Code text chunk size</source>
 <translation>コードテキストのチャンクサイズ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="607"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>トランスクリプションで時間位置を入力する際に使用</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="608"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
 <source>Time format</source>
 <translation>時間形式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="602"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
 <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
 <translation>トランスクリプションでスピーカー名を入力する際に使用</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="603"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="626"/>
 <source>Speaker format</source>
 <translation>スピーカー形式</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="611"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="637"/>
 <source>AI Integration</source>
 <translation>人工知能の統合</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="612"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
 <source>enable AI integration</source>
 <translation>人工知能の統合を可能にする</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="627"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="653"/>
 <source>Description:</source>
 <translation>説明 :</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="624"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="650"/>
 <source>Get Access:</source>
 <translation>アクセス :</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="613"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
 <source>API key</source>
 <translation>APIキー</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="650"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="676"/>
 <source>Language for AI conversations: </source>
 <translation>人工知能の会話のための言語： </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="641"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="667"/>
 <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
 <translation>選択した場合、会話は他のユーザーインターフェイスと同じ言語で表示されます。この言語は、このウィンドウの上部で選択できます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="642"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="668"/>
 <source>same as UI</source>
 <translation>ユーザーインターフェースと同じ</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="645"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="671"/>
 <source>Enter the name of your language here</source>
 <translation>ここに言語名を入力してください</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="662"/>
 <source>Temperature:</source>
 <translation>温度だ：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="638"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="664"/>
 <source>Advanced option. Only change when you know whatr you are doing.</source>
 <translation>高度なオプション。自分が何をしているかわかっているときだけ変更してください。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="639"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="665"/>
 <source>1.0</source>
 <translation>1.0 の</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="631"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="657"/>
 <source>   Top_p:</source>
 <translation>トップ p:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="630"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="656"/>
 <source>Advanced AI Options...</source>
 <translation>高度な人工知能オプション</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="647"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="673"/>
 <source>Large Model:</source>
 <translation>大型モデル:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="648"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="674"/>
 <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
 <translation>利用可能な人工知能モデルを選択します (大規模モデルと同じにすることもできます)。高速モデルは単純なタスクにのみ使用されます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="649"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="675"/>
 <source>&lt;select available model&gt;</source>
 <translation>利用可能なモデルを選択してください</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="652"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="678"/>
 <source>   Fast Model:</source>
 <translation>高速モデル:
 </translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="651"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="677"/>
 <source>context window:</source>
 <translation>コンテキストウィンドウ:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="633"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="659"/>
 <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
 <translation>利用可能な人工知能モデルを選択します。大きなモデルは、QualCoder のほとんどの人工知能機能に使用されます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="615"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="641"/>
 <source>AI Profile:</source>
 <translation>人工知能のプロフィール：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="625"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="651"/>
 <source>Edit Name</source>
 <translation>編集名</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="614"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="640"/>
 <source>...</source>
 <translation>・・・</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="643"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="669"/>
 <source>New AI Profile...</source>
 <translation>新しいAIプロフィール...</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="637"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="663"/>
 <source>General Parameters:</source>
 <translation>一般パラメータ：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="640"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="666"/>
 <source>API Base URL:</source>
 <translation>API ベース URL:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="644"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="670"/>
 <source>AI Models:</source>
 <translation>AIモデル：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="658"/>
 <source>Reasoning:</source>
 <translation>理由:</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="562"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="584"/>
 <source>Change</source>
 <translation>変更</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="566"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="588"/>
 <source>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
@@ -4158,12 +4332,12 @@ src/qualcoder/i18n フォルダにリストされている言語であれば、�
 language = it</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="623"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="649"/>
 <source>Permissions:</source>
 <translation type="unfinished">権限：</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="616"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="642"/>
 <source>Define what the AI agent is allowed to do in your project:
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
@@ -4174,34 +4348,54 @@ language = it</translation>
 - フルアクセス：AIエージェントはすべてを変更できますが、通常はまず確認を求めます。</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="620"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="646"/>
 <source>Read-only</source>
 <translation type="unfinished">読み取り専用</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="621"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="647"/>
 <source>Sandboxed</source>
 <translation type="unfinished">サンドボックス化された</translation>
 </message>
 <message>
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="622"/>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="648"/>
 <source>Full access</source>
 <translation type="unfinished">すべてのコンテンツへのアクセス</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="626"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="652"/>
 <source>Authentification:</source>
 <translation type="unfinished">認証:</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="628"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="654"/>
 <source>Click to open the ChatGPT sign-in page in your default browser. Use it to authorize QualCoder to access AI models through this account.</source>
 <translation type="unfinished">既定のブラウザでChatGPT のサインインページを開くにはクリックします。 このアカウントでQualCoderを認証してAIモデルにアクセスすることができます。</translation>
 </message>
-<message type="unfinished">
-<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="629"/>
+<message>
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="655"/>
 <source>Authenticate...</source>
 <translation type="unfinished">認証...</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="632"/>
+<source>Codesstripe view</source>
+<translation type="unfinished">コードストリップビュー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="634"/>
+<source>Code highlight style</source>
+<translation type="unfinished">コードハイライトスタイル</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="635"/>
+<source>marker</source>
+<translation type="unfinished">マーカー</translation>
+</message>
+<message type="unfinished">
+<location filename="../src/qualcoder/GUI/ui_dialog_settings.py" line="636"/>
+<source>underline</source>
+<translation type="unfinished">サイトマップ</translation>
 </message>
 </context>
 <context>
@@ -4276,7 +4470,7 @@ language = it</translation>
 <source>Doubleclick a "code as" name to edit</source>
 <translation type="unfinished">「コード名」をダブルクリックして編集します</translation>
 </message>
-<message type="unfinished">
+<message>
 <location filename="../src/qualcoder/GUI/ui_dialog_speakers.py" line="93"/>
 <source>Files currently selected for the speaker scan. Hover to see the full list; use Select files to adjust it.</source>
 <translation type="unfinished">スピーカースキャンで現在選択されているファイル。 完全なリストを見るためにHover; それを調節するために選択ファイルを使用して下さい。</translation>
