@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-07 09:47+0200\n"
+"POT-Creation-Date: 2026-08-10 17:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4106,23 +4106,23 @@ msgid ""
 "File not imported"
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2706 src/qualcoder/manage_files.py:3030
+#: src/qualcoder/manage_files.py:2708 src/qualcoder/manage_files.py:3030
 #: src/qualcoder/text_file_replacement.py:314
 msgid "Cannot import LaTeX file"
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2707 src/qualcoder/manage_files.py:3031
+#: src/qualcoder/manage_files.py:2709 src/qualcoder/manage_files.py:3031
 #: src/qualcoder/text_file_replacement.py:315
 msgid "Could not convert LaTeX to readable text"
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2722 src/qualcoder/manage_files.py:2745
+#: src/qualcoder/manage_files.py:2723 src/qualcoder/manage_files.py:2745
 #: src/qualcoder/manage_files.py:2769 src/qualcoder/manage_files.py:2783
 #: src/qualcoder/manage_files.py:2797
 msgid "Cannot copy file: "
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2723 src/qualcoder/manage_files.py:2746
+#: src/qualcoder/manage_files.py:2724 src/qualcoder/manage_files.py:2746
 #: src/qualcoder/manage_files.py:2770 src/qualcoder/manage_files.py:2784
 #: src/qualcoder/manage_files.py:2798
 msgid ""
@@ -4130,13 +4130,13 @@ msgid ""
 "Is there a permission restriction?"
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2724 src/qualcoder/manage_files.py:2747
+#: src/qualcoder/manage_files.py:2725 src/qualcoder/manage_files.py:2747
 #: src/qualcoder/manage_files.py:2771 src/qualcoder/manage_files.py:2785
 #: src/qualcoder/manage_files.py:2799
 msgid "Copy file permission error"
 msgstr ""
 
-#: src/qualcoder/manage_files.py:2732 src/qualcoder/manage_files.py:2755
+#: src/qualcoder/manage_files.py:2733 src/qualcoder/manage_files.py:2755
 msgid "Removing failed import copy: "
 msgstr ""
 
