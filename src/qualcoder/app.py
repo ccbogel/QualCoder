@@ -123,7 +123,6 @@ class App(object):
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
         self.ai = None
-        self.ai_models = []
         # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
         self.ai_embedding_function = None
         self.project_events = ProjectEventBus()
