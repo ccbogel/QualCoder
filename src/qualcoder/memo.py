@@ -352,7 +352,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
                 insert += f'**{_("CODED MEMO")}:** "{r[8]}"\n'
             insert += self.detail_line(f"[{pos}]", r[5], r[6], r[1], r[7],
                                        self.segment_cases(r[6], r[2], r[3]))
-            self.quotes.append({"type": _("Text"), "code": r[0], "file": r[1], "pos": pos,
+            self.quotes.append({"type": "text", "code": r[0], "file": r[1], "pos": pos,
                                 "text": text_, "memo": r[8], "insert": insert})
         cur.execute(image_sql + where_i + order_i, params_i)
         for r in cur.fetchall():
@@ -360,7 +360,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
             insert = f'**{_("CODED MEMO")}:** "{r[6]}"\n' if r[6] != "" else ""
             insert += self.detail_line(f'[{_("Image")} {pos}]', r[7], r[8], r[1], r[9],
                                        self.segment_cases(r[8]))
-            self.quotes.append({"type": _("Image"), "code": r[0], "file": r[1], "pos": pos,
+            self.quotes.append({"type": "image", "code": r[0], "file": r[1], "pos": pos,
                                 "text": r[6], "memo": r[6], "insert": insert})
         cur.execute(av_sql + where_a + order_a, params_a)
         for r in cur.fetchall():
@@ -368,7 +368,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
             insert = f'**{_("CODED MEMO")}:** "{r[4]}"\n' if r[4] != "" else ""
             insert += self.detail_line(f"[A/V {pos}]", r[5], r[6], r[1], r[7],
                                        self.segment_cases(r[6]))
-            self.quotes.append({"type": "A/V", "code": r[0], "file": r[1], "pos": pos,
+            self.quotes.append({"type": "av", "code": r[0], "file": r[1], "pos": pos,
                                 "text": r[4], "memo": r[4], "insert": insert})
 
     def detail_line(self, pos_bracket, cid, fid, file_name, owner, cases_):
@@ -383,6 +383,11 @@ class DialogSelectQuote(QtWidgets.QDialog):
             parts.append(_("Coder: ") + owner)
         return f"{pos_bracket} " + ", ".join(parts) + "."
 
+    @staticmethod
+    def type_label(key):
+        """ Translated label for a canonical segment type key. """
+        return {"text": _("Text"), "image": _("Image"), "av": "A/V"}.get(key, key)
+
     def fill_table(self):
         """ Fill table rows from self.quotes. """
 
@@ -391,7 +396,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
         tw.setHorizontalHeaderLabels([_("Type"), _("Code"), _("File"), _("Position"), _("Text / Memo")])
         tw.setRowCount(len(self.quotes))
         for row, q in enumerate(self.quotes):
-            tw.setItem(row, self.TYPE_COL, QtWidgets.QTableWidgetItem(q["type"]))
+            tw.setItem(row, self.TYPE_COL, QtWidgets.QTableWidgetItem(self.type_label(q["type"])))
             tw.setItem(row, self.CODE_COL, QtWidgets.QTableWidgetItem(q["code"]))
             tw.setItem(row, self.FILE_COL, QtWidgets.QTableWidgetItem(q["file"]))
             tw.setItem(row, self.POS_COL, QtWidgets.QTableWidgetItem(q["pos"]))
@@ -400,7 +405,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
                 text_ = text_[:200] + "..."
             item = QtWidgets.QTableWidgetItem(text_)
             tip = q["text"]
-            if q["type"] == _("Text") and q["memo"] != "":
+            if q["type"] == "text" and q["memo"] != "":
                 tip += "\n\n" + _("CODED MEMO") + ": " + q["memo"]
             item.setToolTip(tip)
             tw.setItem(row, self.TEXT_COL, item)
@@ -416,7 +421,10 @@ class DialogSelectQuote(QtWidgets.QDialog):
         for q in self.quotes:
             if q["type"] not in types:
                 types.append(q["type"])
-        self.ui.comboBox_type.addItems([_("All")] + types)
+        # Canonical keys in userData, labels translatable
+        self.ui.comboBox_type.addItem(_("All"), "all")
+        for t in types:
+            self.ui.comboBox_type.addItem(self.type_label(t), t)
         if len(types) < 2:
             self.ui.comboBox_type.hide()
 
@@ -424,18 +432,18 @@ class DialogSelectQuote(QtWidgets.QDialog):
         """ Hide rows not matching the type combobox and the filter text. """
 
         text_ = self.ui.lineEdit_filter.text().lower()
-        type_ = self.ui.comboBox_type.currentText()
+        type_ = self.ui.comboBox_type.currentData()  # canonical key, translation-safe
         tw = self.ui.tableWidget
         for row in range(tw.rowCount()):
-            match = type_ in (_("All"), "", self.quotes[row]["type"])
+            match = type_ in (None, "all", self.quotes[row]["type"])
             if match and text_ != "":
                 match = any(text_ in tw.item(row, col).text().lower()
                             for col in range(tw.columnCount()))
             tw.setRowHidden(row, not match)
         # Header of the last column follows the selected type
-        if type_ == _("Text"):
+        if type_ == "text":
             header = _("Text")
-        elif type_ in (_("Image"), "A/V"):
+        elif type_ in ("image", "av"):
             header = _("Memo")
         else:
             header = _("Text / Memo")
@@ -483,12 +491,13 @@ class DialogSelectReference(QtWidgets.QDialog):
         scope_labels = {"file": _("This file"), "case": _("This case"),
                         "code": _("This code"), "category": _("This category")}
         self.scope_label = scope_labels.get(entity_type, "")
+        # Canonical keys in userData, labels translatable
         if self.scope_label != "":
-            self.ui.comboBox_type.addItem(self.scope_label)
-        self.ui.comboBox_type.addItem(_("All references"))
+            self.ui.comboBox_type.addItem(self.scope_label, "scoped")
+        self.ui.comboBox_type.addItem(_("All references"), "all")
         if self.scope_label == "" or not self.scoped_risids:
             # Project memo, or owner without linked references: start at All
-            self.ui.comboBox_type.setCurrentText(_("All references"))
+            self.ui.comboBox_type.setCurrentIndex(self.ui.comboBox_type.findData("all"))
         if self.ui.comboBox_type.count() < 2:
             self.ui.comboBox_type.hide()
         self.fill_table()
@@ -528,7 +537,7 @@ class DialogSelectReference(QtWidgets.QDialog):
     def fill_table(self):
         """ Fill rows: scoped references or all, per the combobox. """
 
-        scoped = self.ui.comboBox_type.currentText() == self.scope_label and self.scope_label != ""
+        scoped = self.ui.comboBox_type.currentData() == "scoped"  # canonical key, translation-safe
         self.rows = []
         for ref in self.all_refs:
             if scoped and ref['risid'] not in self.scoped_risids:

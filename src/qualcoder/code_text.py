@@ -132,7 +132,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Visual options for code stripes margin and highlight style.
         # show_margin_stripes and highlight_style are INDEPENDENT preferences,
-        # persisted under separate keys and changed via the margin context menu <- L
+        # persisted under separate keys and changed via the margin context menu
         try:
             saved_pref = self.app.settings.get('codetext_show_margin_stripes', 'True')
             if isinstance(saved_pref, bool):
@@ -340,6 +340,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
         self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
+        # Canonical keys for .ui-defined items, labels may be translated
+        export_keys = ["", "odt_highlight", "odt_comment", "odt_report", "txt", "html", "codebook"]
+        for i, key in enumerate(export_keys):
+            self.ui.comboBox_export.setItemData(i, key)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         # Tree widget
         self.ui.treeWidget.setDragEnabled(True)
@@ -349,7 +353,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         # Shared code tree controller: tree loading, common context menu, drag and drop
         # reparenting, F2-F6 shortcuts and category branch deletion live in code_tree.py,
-        # so the four coding pages no longer duplicate this logic by hand. <- L
+        # so the four coding pages no longer duplicate this logic by hand.
         self.code_tree = CodeTreeController(self.app, self.ui.treeWidget, self)
         self.ui.treeWidget.customContextMenuRequested.connect(self.code_tree.tree_menu)
         self.code_tree.fill_counts_callback = self.fill_code_counts_in_tree
@@ -364,7 +368,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodetext_tree_widths')
 
-        self.ui.splitter.setSizes([150, 400, 0])  # 3 values; right pane starts collapsed <- L
+        self.ui.splitter.setSizes([150, 400, 0])  # 3 values; right pane starts collapsed
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
             s1 = int(self.app.settings['dialogcodetext_splitter1'])
@@ -2992,33 +2996,23 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def export_option_selected(self):
         """ ComboBox export option selected.
-        Routes the expanded comboBox options to their corresponding export methods.
-        indexes:
-        0
-        1 odt highlight
-        2 odt comment
-        3 odt report
-        4 txt
-        5 html
-        6 codebook
+        Routes the option to its export method via the item's canonical key (userData).
         """
 
-        # Must use indexes not names for translations, if there are translations
-        # export_option = self.ui.comboBox_export.currentText()
-        index = self.ui.comboBox_export.currentIndex()
-        if index == 0:
+        key = self.ui.comboBox_export.currentData()  # canonical key, translation-safe
+        if key in (None, ""):
             return
-        if index == 1:
+        if key == "odt_highlight":
             self.export_odt_file("highlight")
-        elif index == 2:
+        elif key == "odt_comment":
             self.export_odt_file("comment")
-        elif index == 3:
+        elif key == "odt_report":
             self.export_odt_file("report")
-        elif index == 4:
+        elif key == "txt":
             self.export_tagged_text()
-        elif index == 5:
+        elif key == "html":
             self.export_html_file()
-        elif index == 6:
+        elif key == "codebook":
             self.export_codebook()
         self.ui.comboBox_export.setCurrentIndex(0)
 
@@ -3112,7 +3106,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def _export_project_header(self):
         """ Return project name and APA software citation string for export. """  
 
-        project_name = Path(self.app.projectpath).stem
+        project_name = Path(self.app.project_path).stem  # attr is project_path
         header = f"{_('Project')}: {project_name}"
         apa_cite = ("Curtain, C., & Dröge, K. (2026). QualCoder (Version 4.0) "  
                     "[Computer software]. https://github.com/ccbogel/QualCoder/releases/")

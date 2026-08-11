@@ -184,8 +184,9 @@ class ViewCharts(QDialog):
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
         self.ui.comboBox_num_attributes.currentIndexChanged.connect(self.numeric_attribute_charts)
         # Heatmaps
-        heatmap_combobox_list = ["", "File", "Case"]
-        self.ui.comboBox_heatmap.addItems(heatmap_combobox_list)
+        # Canonical keys in userData, labels translatable
+        for key, label in [("", ""), ("File", _("File")), ("Case", _("Case"))]:
+            self.ui.comboBox_heatmap.addItem(label, key)
         self.ui.comboBox_heatmap.currentIndexChanged.connect(self.make_heatmap)
         # Word cloud default stopwords based on default language
         index = self.ui.comboBox_stopwords.findText(self.app.settings['language'],
@@ -515,7 +516,7 @@ class ViewCharts(QDialog):
                 if code['catid'] == cat['catid']:
                     selected_codes.append(code)
         # Include descendant sub-codes (supercid) of the selected codes, cascading, so a
-        # category selection also charts the sub-codes nested under its codes. <- L
+        # category selection also charts the sub-codes nested under its codes.
         selected_cids = {c['cid'] for c in selected_codes}
         changed = True
         while changed:
@@ -1349,7 +1350,7 @@ class ViewCharts(QDialog):
 
     @staticmethod
     def _contrast_text(hex_colour):
-        """ Black or white label for readability over a given sector colour. <- L """
+        """ Black or white label for readability over a given sector colour. """
         h = (hex_colour or '').lstrip('#')
         if len(h) != 6:
             return '#000000'
@@ -1363,7 +1364,7 @@ class ViewCharts(QDialog):
     def _apply_code_colours(self, fig, colours_map):
         """ Colour each sunburst/treemap sector with its code colour (neutral grey for
         categories) and set a black or white label per sector for readable contrast.
-        Sectors are matched by name read from the trace, so the order stays correct. <- L """
+        Sectors are matched by name read from the trace, so the order stays correct. """
         try:
             labels = list(fig.data[0].labels)
         except (IndexError, AttributeError, TypeError):
@@ -1372,7 +1373,7 @@ class ViewCharts(QDialog):
         fig.update_traces(insidetextfont_color=text_colours)
 
     def _rollup_subcodes_into_parent_codes(self):
-        """ Hierarchy charts: nest sub-codes under their parent code. <- L
+        """ Hierarchy charts: nest sub-codes under their parent code.
         Sub-codes have a null catid, so the category roll-up leaves them parentless and they
         float at the root. Here each sub-code count is rolled up the code hierarchy (deepest
         first) so a parent code total includes its descendants, and each sub-code parentname
@@ -1434,7 +1435,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += 1
-        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1469,7 +1470,7 @@ class ViewCharts(QDialog):
         items = []
         values = []
         parents = []
-        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories <- L
+        colors_map = {}  # sector colour: the code's own colour, neutral grey for categories
         for sb_combined in combined:
             items.append(sb_combined['name'])
             values.append(sb_combined['count'])
@@ -1487,14 +1488,14 @@ class ViewCharts(QDialog):
             fig = px.sunburst(df[mask], names='item', parents='parent', values='value', branchvalues='total',
                               color='item', color_discrete_map=colors_map,
                               title=title + subtitle)
-            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable
             fig.show()
             self.helper_export_html(fig)
         if chart == "treemap":
             fig = px.treemap(df[mask], names='item', parents='parent', values='value', branchvalues='total',
                              color='item', color_discrete_map=colors_map,
                              title=title + subtitle)
-            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable <- L
+            self._apply_code_colours(fig, colors_map)  # sectors match code colours, labels stay readable
             fig.show()
             self.helper_export_html(fig)
 
@@ -1521,7 +1522,7 @@ class ViewCharts(QDialog):
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
-        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code <- L
+        self._rollup_subcodes_into_parent_codes()  # sub-codes nest under their parent code
         # Add the code count directly to each parent category, add parentname to each code
         for category in self.categories:
             for code_ in self.codes:
@@ -1893,10 +1894,10 @@ class ViewCharts(QDialog):
             codes = codes[:40]
             Message(self.app, _("Too many codes"), _("Too many codes for display. Restricted to 40")).exec()
         # Filters
-        heatmap_type = self.ui.comboBox_heatmap.currentText()
-        if heatmap_type == "":
+        heatmap_type = self.ui.comboBox_heatmap.currentData()  # canonical key, translation-safe
+        if heatmap_type in (None, ""):
             return
-        title = heatmap_type + " " + _("Heatmap")
+        title = self.ui.comboBox_heatmap.currentText() + " " + _("Heatmap")
         self.get_selected_categories_and_codes()
         y_labels = []
         for c in codes:
