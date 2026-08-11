@@ -2193,6 +2193,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             pass
         
         try:
+            # Canonical keys for .ui-defined items, labels may be translated
+            self.ui.comboBox_exports.setItemData(1, "pdf_highlight")
+            self.ui.comboBox_exports.setItemData(2, "odt_report")
             self.ui.comboBox_exports.currentIndexChanged.connect(self.export_option_selected)
         except AttributeError:
             pass
@@ -6378,10 +6381,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         Routes the option chosen in the export combobox to the corresponding method (highlighted
         PDF or ODT report) and resets the combobox to index 0.
         """
-        text = self.ui.comboBox_exports.currentText().lower()
-        if "pdf highlight" in text:
+        key = self.ui.comboBox_exports.currentData()  # canonical key, translation-safe
+        if key == "pdf_highlight":
             self.export_pdf_highlight()
-        elif "odt report" in text:
+        elif key == "odt_report":
             self.export_odt_report()
         self.ui.comboBox_exports.setCurrentIndex(0)
 
