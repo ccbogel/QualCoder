@@ -340,6 +340,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
         self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
+        # Canonical keys for .ui-defined items, labels may be translated
+        export_keys = ["", "odt_highlight", "odt_comment", "odt_report", "txt", "html", "codebook"]
+        for i, key in enumerate(export_keys):
+            self.ui.comboBox_export.setItemData(i, key)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         # Tree widget
         self.ui.treeWidget.setDragEnabled(True)
@@ -2992,33 +2996,23 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def export_option_selected(self):
         """ ComboBox export option selected.
-        Routes the expanded comboBox options to their corresponding export methods.
-        indexes:
-        0
-        1 odt highlight
-        2 odt comment
-        3 odt report
-        4 txt
-        5 html
-        6 codebook
+        Routes the option to its export method via the item's canonical key (userData).
         """
 
-        # Must use indexes not names for translations, if there are translations
-        # export_option = self.ui.comboBox_export.currentText()
-        index = self.ui.comboBox_export.currentIndex()
-        if index == 0:
+        key = self.ui.comboBox_export.currentData()  # canonical key, translation-safe
+        if key in (None, ""):
             return
-        if index == 1:
+        if key == "odt_highlight":
             self.export_odt_file("highlight")
-        elif index == 2:
+        elif key == "odt_comment":
             self.export_odt_file("comment")
-        elif index == 3:
+        elif key == "odt_report":
             self.export_odt_file("report")
-        elif index == 4:
+        elif key == "txt":
             self.export_tagged_text()
-        elif index == 5:
+        elif key == "html":
             self.export_html_file()
-        elif index == 6:
+        elif key == "codebook":
             self.export_codebook()
         self.ui.comboBox_export.setCurrentIndex(0)
 
