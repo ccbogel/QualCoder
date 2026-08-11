@@ -107,10 +107,12 @@ class DialogSelectItems(QtWidgets.QDialog):
         self.ui.comboBox.hide()
         if self.groups:
             self.groups = list(set(self.groups))
-            self.groups.insert(0, _("All"))
             self.ui.comboBox.setEnabled(True)
             self.ui.comboBox.show()
-            self.ui.comboBox.addItems(self.groups)
+            # Canonical key in userData, label translatable
+            self.ui.comboBox.addItem(_("All"), "All")
+            for group in self.groups:
+                self.ui.comboBox.addItem(group, group)
 
         if self.selection_mode == "single":
             self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
@@ -137,8 +139,8 @@ class DialogSelectItems(QtWidgets.QDialog):
         """ Show data items considering comboBox group selection. """
 
         self.data_refined = copy.copy(self.data)
-        grouper = self.ui.comboBox.currentText()
-        if not self.groups or grouper == "All":
+        grouper = self.ui.comboBox.currentData()  # canonical key, translation-safe
+        if not self.groups or grouper in (None, "All"):
             self.model = ListModel(self.data_refined, checkable=self.with_checkboxes,
                                    checked_keys=self._checked_keys, key_func=self._item_key)
             self.ui.listView.setModel(self.model)
