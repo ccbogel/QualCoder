@@ -6527,10 +6527,10 @@ class DialogCodePdf(QtWidgets.QWidget):
             except AttributeError:
                 project_name = "Project"
 
-            cursor.insertText(f"Project: {project_name}\n", header_fmt)
-            cursor.insertText(f"File: {self.file_['name']}\n", header_fmt)
+            cursor.insertText(f"{_('Project')}: {project_name}\n", header_fmt)
+            cursor.insertText(f"{_('File')}: {self.file_['name']}\n", header_fmt)
             report_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-            cursor.insertText(f"Generated report: {report_date}\n\n", header_fmt)
+            cursor.insertText(f"{_('Generated report')}: {report_date}\n\n", header_fmt)
 
             seg_co_occurrences = defaultdict(set)
             area_co_occurrences = defaultdict(set)
@@ -6558,7 +6558,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                             pair = tuple(sorted([a1['name'], a2['name']]))
                             co_occur[pair] += 1
 
-            cursor.insertText("Code Frequency Table\n\n", title_fmt)
+            cursor.insertText(_("Code Frequency Table") + "\n\n", title_fmt)
             code_stats = {}
             all_codings = self.code_text + self.code_areas
             for c in all_codings:
@@ -6575,7 +6575,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             if code_stats:
                 freq_rows = len(code_stats) + 1
                 freq_table = cursor.insertTable(freq_rows, 3, table_fmt)
-                freq_headers = ["Code", "Frequency", "Coder(s)"]
+                freq_headers = [_("Code"), _("Frequency"), _("Coder(s)")]
                 for col, text in enumerate(freq_headers):
                     freq_table.cellAt(0, col).firstCursorPosition().insertText(text, head_fmt)
 
@@ -6596,11 +6596,11 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
                 cursor.insertText("\n\n", norm_fmt)
 
-            cursor.insertText("Code Co-occurrences\n\n", title_fmt)
+            cursor.insertText(_("Code Co-occurrences") + "\n\n", title_fmt)
             if co_occur:
                 co_rows = len(co_occur) + 1
                 co_table = cursor.insertTable(co_rows, 3, table_fmt)
-                co_headers = ["Code A", "Code B", "Co-occurrence frequency"]
+                co_headers = [_("Code A"), _("Code B"), _("Co-occurrence frequency")]
                 for col, text in enumerate(co_headers):
                     co_table.cellAt(0, col).firstCursorPosition().insertText(text, head_fmt)
                 r = 1
@@ -6612,10 +6612,10 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
                 cursor.insertText("\n\n", norm_fmt)
             else:
-                cursor.insertText("No co-occurrences found in this file.\n\n", norm_fmt)
+                cursor.insertText(_("No co-occurrences found in this file.") + "\n\n", norm_fmt)
 
             if self.code_text:
-                cursor.insertText("Coded Text Segments\n\n", title_fmt)
+                cursor.insertText(_("Coded Text Segments") + "\n\n", title_fmt)
                 codes_sorted = sorted(self.code_text, key=lambda x: x.get('pos0', 0))
                 for c in codes_sorted:
                     p0 = c.get('pos0', 0)
@@ -6635,21 +6635,21 @@ class DialogCodePdf(QtWidgets.QWidget):
                     c_header_bold.setFontWeight(QtGui.QFont.Weight.Bold)
 
                     cursor.insertText(f"[{p0}-{p1}] ", c_header_bold)
-                    cursor.insertText(f"Code: {c['name']}, Coder: {c.get('owner', '')}\n\n", c_header_fmt)
+                    cursor.insertText(f"{_('Code')}: {c['name']}, {_('Coder')}: {c.get('owner', '')}\n\n", c_header_fmt)
                     
                     cursor.insertText(seg + "\n\n", it_fmt)
                     
                     co_key = (c['pos0'], c['pos1'], c['cid'])
                     co_codes = seg_co_occurrences.get(co_key, set())
                     if co_codes:
-                        cursor.insertText(f"[Co-occurring codes: {', '.join(sorted(co_codes))}]\n\n", norm_fmt)
+                        cursor.insertText(f"[{_('Co-occurring codes')}: {', '.join(sorted(co_codes))}]\n\n", norm_fmt)
 
                     coded_memo = c.get('memo', '')
                     if coded_memo and str(coded_memo).strip():
-                        cursor.insertText(f"[Coded memo: {coded_memo}]\n\n", norm_fmt)
+                        cursor.insertText(f"[{_('Coded memo')}: {coded_memo}]\n\n", norm_fmt)
 
             if self.code_areas:
-                cursor.insertText("Coded Areas (Pages)\n\n", title_fmt)
+                cursor.insertText(_("Coded Areas (Pages)") + "\n\n", title_fmt)
                 
                 pdf_doc = None
                 filepath = self._resolve_filepath(self.file_)
@@ -6669,8 +6669,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     a_header_bold = QtGui.QTextCharFormat(a_header_fmt)
                     a_header_bold.setFontWeight(QtGui.QFont.Weight.Bold)
 
-                    cursor.insertText(f"[Page {page}] ", a_header_bold)
-                    cursor.insertText(f"Code: {a.get('name', '')}, Coder: {a.get('owner', '')}\n\n", a_header_fmt)
+                    cursor.insertText(f"[{_('Page')} {page}] ", a_header_bold)
+                    cursor.insertText(f"{_('Code')}: {a.get('name', '')}, {_('Coder')}: {a.get('owner', '')}\n\n", a_header_fmt)
                     coords = f"Coordinates: X:{a.get('x1')}, Y:{a.get('y1')}, Width:{a.get('width')}, Height:{a.get('height')}\n\n"
                     cursor.insertText(coords, norm_fmt)
 
@@ -6700,17 +6700,17 @@ class DialogCodePdf(QtWidgets.QWidget):
 
                     co_codes_area = area_co_occurrences.get(a['imid'], set())
                     if co_codes_area:
-                        cursor.insertText(f"[Co-occurring codes: {', '.join(sorted(co_codes_area))}]\n\n", norm_fmt)
+                        cursor.insertText(f"[{_('Co-occurring codes')}: {', '.join(sorted(co_codes_area))}]\n\n", norm_fmt)
 
                     coded_memo = a.get('memo', '')
                     if coded_memo and str(coded_memo).strip():
-                        cursor.insertText(f"[Coded memo: {coded_memo}]\n\n", norm_fmt)
+                        cursor.insertText(f"[{_('Coded memo')}: {coded_memo}]\n\n", norm_fmt)
 
                 if pdf_doc is not None:
                     pdf_doc.close()
 
             # 5. Software Citation
-            cursor.insertText("\nSoftware citation\n", title_fmt)
+            cursor.insertText("\n" + _("Software citation") + "\n", title_fmt)
             cursor.insertText(self.app.citation + "\n", norm_fmt)
 
             tw = QtGui.QTextDocumentWriter()
