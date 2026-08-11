@@ -33,7 +33,7 @@ sentence-transformers
 Bio
 PyYAML 
 json_repair
-mcp>=1.0.0
+mcp>=1.2.1,<2
 markdown-it-py
 pyinstaller<=6.15 
 pylatexenc>=2.10,<3
