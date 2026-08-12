@@ -21,7 +21,7 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import fitz
+import pymupdf
 import logging
 from pathlib import Path
 from PIL import Image
@@ -518,16 +518,16 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             # size back with PIL. PIL and EXIF are skipped for pdfs below (the temp
             # png never had metadata anyway); w and h feed the code counts.
             try:
-                fitz_pdf = fitz.open(pdf_path)
+                pymu_pdf = pymupdf.open(pdf_path)
                 try:
-                    text_ += _("Pages") + f": {len(fitz_pdf)}\n"
-                    if len(fitz_pdf) > 0:
-                        pix = fitz_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
+                    text_ += _("Pages") + f": {len(pymu_pdf)}\n"
+                    if len(pymu_pdf) > 0:
+                        pix = pymu_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
                         w, h = pix.width, pix.height
                         text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + \
                             f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + _(" pixels") + "\n"
                 finally:
-                    fitz_pdf.close()
+                    pymu_pdf.close()
             except Exception as err:
                 logger.warning(f"Pdf metadata: {pdf_path} {err}")
 

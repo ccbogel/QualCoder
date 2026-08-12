@@ -21,7 +21,7 @@ https://qualcoder.org/
 """
 
 from copy import deepcopy
-import fitz
+import pymupdf
 import logging
 import os
 import PIL
@@ -605,15 +605,15 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 # so the previous code leaked one file handle PER PDF per report run
                 # (blocked PDF deletion on Windows while the report stayed open).
                 try:
-                    fitz_pdf = fitz.open(pdf_path)
+                    pymu_pdf = pymupdf.open(pdf_path)
                     try:
-                        if len(fitz_pdf) > 0:
-                            page = fitz_pdf[0]  # Use first page and assume the remainder are the same size
+                        if len(pymu_pdf) > 0:
+                            page = pymu_pdf[0]  # Use first page and assume the remainder are the same size
                             pixmap = page.get_pixmap()
                             pdf_width = pixmap.width
                             pdf_height = pixmap.height
                     finally:
-                        fitz_pdf.close()
+                        pymu_pdf.close()
                 except Exception as err:
                     logger.warning(f"Pdf statistics: {pdf_path} {err}")
 

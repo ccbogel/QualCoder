@@ -22,7 +22,7 @@ https://qualcoder.org/
 """
 from PyQt6.QtWidgets import QProgressDialog
 import datetime
-import fitz
+import pymupdf
 import json
 import openpyxl
 import pandas as pd
@@ -1364,12 +1364,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         page_from, page_to, dpi = ui.get_range_and_dpi()
         existing_names = {s['name'] for s in self.source}
-        matrix = fitz.Matrix(dpi / 72.0, dpi / 72.0)
+        matrix = pymupdf.Matrix(dpi / 72.0, dpi / 72.0)
         progress_ = QtWidgets.QProgressDialog(_("Converting pages"), None, page_from,
                                               page_to + 1, self)
         progress_.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         try:
-            fitz_pdf = fitz.open(filepath)
+            pymu_pdf = pymupdf.open(filepath)
             try:
                 for i in range(page_from, page_to + 1):
                     progress_.setValue(i)
@@ -1379,15 +1379,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                         # No QMessageBox for each repeated page (large ranges).
                         self.parent_text_edit.append(_("Skipped duplicate image: ") + image_filename)
                         continue
-                    fitz_page = fitz_pdf.load_page(i)
-                    pymypdf_pixmap = fitz_page.get_pixmap(matrix=matrix)
+                    pymu_page = pymu_pdf.load_page(i)
+                    pymypdf_pixmap = pymu_page.get_pixmap(matrix=matrix)
                     # Other methods 'might' look for the forward slash. CC - ?
                     destination = Path(self.app.project_path) / "images" / image_filename
                     pymypdf_pixmap.save(destination)
                     self.load_media_reference(f"/images/{image_filename}")
                     self.parent_text_edit.append(_("Image loaded from pdf: ") + image_filename)
             finally:
-                fitz_pdf.close()
+                pymu_pdf.close()
         except Exception as err:
             logger.warning(f"pdf_to_images: {filepath} {err}")
             Message(self.app, _("Image Error"), _("Cannot open: ") + f"{filepath}\n{err}",

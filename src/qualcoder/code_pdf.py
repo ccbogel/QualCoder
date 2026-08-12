@@ -24,7 +24,7 @@ import bisect
 from collections import defaultdict
 from copy import copy, deepcopy
 import datetime
-import fitz  # PyMuPDF
+import pymupdf
 import logging
 import os
 from pathlib import Path
@@ -75,7 +75,7 @@ def _word_flags():
     """
 
     try:
-        return fitz.TEXTFLAGS_WORDS & ~fitz.TEXT_PRESERVE_LIGATURES
+        return pymupdf.TEXTFLAGS_WORDS & ~pymupdf.TEXT_PRESERVE_LIGATURES
     except AttributeError:
         return None
 
@@ -138,7 +138,7 @@ def _build_page_text(raw, rot, offset, join_lines=False):
         if prev_block != bno or prev_line != lno:
             line_id += 1
         parts.append(wtext)
-        rect = fitz.Rect(x0, y0, x1, y1) * rot
+        rect = pymupdf.Rect(x0, y0, x1, y1) * rot
         rect.normalize()
         words.append((float(rect.x0), float(rect.y0), float(rect.x1), float(rect.y1),
                       pos, pos + len(wtext), line_id))
@@ -160,14 +160,14 @@ def _extract_page(page, offset, join_lines=False):
 def extract_pdf_highlights(filepath):
     """
     Detects highlight annotations in a PDF.
-    Returns a list of {'page': page index, 'quads': [fitz.Rect, ...] in ROTATED page
+    Returns a list of {'page': page index, 'quads': [pymupdf.Rect, ...] in ROTATED page
     coordinates (the same space as the extractor's word rects), 'color': '#RRGGBB'}.
     Empty list when the PDF has no highlights or cannot be read.
     """
 
     out = []
     try:
-        doc = fitz.open(filepath)
+        doc = pymupdf.open(filepath)
     except Exception as err:
         logger.warning(f"extract_pdf_highlights: {filepath} {err}")
         return out
@@ -177,7 +177,7 @@ def extract_pdf_highlights(filepath):
             annot = page.first_annot
             while annot is not None:
                 try:
-                    if annot.type[0] == fitz.PDF_ANNOT_HIGHLIGHT:
+                    if annot.type[0] == pymupdf.PDF_ANNOT_HIGHLIGHT:
                         stroke = (annot.colors or {}).get('stroke')
                         if stroke and len(stroke) >= 3:
                             color = "#{:02X}{:02X}{:02X}".format(
@@ -190,12 +190,12 @@ def extract_pdf_highlights(filepath):
                         if vertices:
                             for k in range(0, len(vertices) - 3, 4):
                                 pts = vertices[k:k + 4]
-                                rect = fitz.Rect(min(p[0] for p in pts), min(p[1] for p in pts),
+                                rect = pymupdf.Rect(min(p[0] for p in pts), min(p[1] for p in pts),
                                                  max(p[0] for p in pts), max(p[1] for p in pts)) * rot
                                 rect.normalize()
                                 quads.append(rect)
                         else:
-                            rect = fitz.Rect(annot.rect) * rot
+                            rect = pymupdf.Rect(annot.rect) * rot
                             rect.normalize()
                             quads.append(rect)
                         if quads:
@@ -222,7 +222,7 @@ def extract_pdf_annotations(filepath):
 
     out = []
     try:
-        doc = fitz.open(filepath)
+        doc = pymupdf.open(filepath)
     except Exception as err:
         logger.warning(f"extract_pdf_annotations: {filepath} {err}")
         return out
@@ -231,7 +231,7 @@ def extract_pdf_annotations(filepath):
             annot = page.first_annot
             while annot is not None:
                 try:
-                    if annot.type[0] != fitz.PDF_ANNOT_HIGHLIGHT:
+                    if annot.type[0] != pymupdf.PDF_ANNOT_HIGHLIGHT:
                         content = ((annot.info or {}).get('content', '') or '').strip()
                         if content:
                             out.append({'page': i + 1,
@@ -262,7 +262,7 @@ def pdf_highlights_to_positions(filepath, highlights, progress_callback=None):
     if not highlights:
         return []
     try:
-        doc = fitz.open(filepath)
+        doc = pymupdf.open(filepath)
     except Exception as err:
         logger.warning(f"pdf_highlights_to_positions: {filepath} {err}")
         return []
@@ -289,10 +289,10 @@ def pdf_highlights_to_positions(filepath, highlights, progress_callback=None):
         pos0 = None
         pos1 = None
         for w in words:
-            w_rect = fitz.Rect(w[0], w[1], w[2], w[3])
+            w_rect = pymupdf.Rect(w[0], w[1], w[2], w[3])
             w_area = max(1e-6, w_rect.get_area())
             for quad in hl['quads']:
-                inter = fitz.Rect(w_rect)
+                inter = pymupdf.Rect(w_rect)
                 inter.intersect(quad)
                 if inter.is_empty:
                     continue
@@ -321,7 +321,7 @@ def extract_pdf_fulltext(filepath, progress_callback=None, join_lines=False):
         String fulltext
     """
 
-    doc = fitz.open(filepath)
+    doc = pymupdf.open(filepath)
     try:
         if doc.needs_pass:
             raise ValueError(_("PDF is password protected"))
@@ -586,7 +586,7 @@ def code_pdf_highlights(app, parent_text_edit, fid, filepath, fulltext, highligh
 class PdfTextWorker(QtCore.QThread):
     """
     Extracts the text and word map of all pages in the background.
-    Opens its OWN fitz document (a Document should not be shared
+    Opens its OWN pymupdf document (a Document should not be shared
     between threads). Emits progress and the complete result when finished.
     """
 
@@ -606,7 +606,7 @@ class PdfTextWorker(QtCore.QThread):
     def run(self):
         doc = None
         try:
-            doc = fitz.open(self.filepath)
+            doc = pymupdf.open(self.filepath)
             total = len(doc)
             # Both text variants ('lines' and 'joined' paragraphs) come from one
             # raw read per page; the dialog activates the one matching the fulltext.
@@ -653,8 +653,7 @@ class PdfRenderWorker(QtCore.QThread):
     """
     Renders pages to image in the background with a REPLACEABLE queue:
     each view request replaces the pending ones, so that when scrolling
-    quickly, only what remains visible is rendered. Thread's own fitz
-    document.
+    quickly, only what remains visible is rendered. Thread's own pymupdf document.
     """
 
     image_ready = QtCore.pyqtSignal(int, float, float, QtGui.QImage)  # Page, zoom, dpr, image.
@@ -688,7 +687,7 @@ class PdfRenderWorker(QtCore.QThread):
     def run(self):
         doc = None
         try:
-            doc = fitz.open(self.filepath)
+            doc = pymupdf.open(self.filepath)
         except Exception as err:
             logger.warning(f"PdfRenderWorker open: {err}")
             return
@@ -710,7 +709,7 @@ class PdfRenderWorker(QtCore.QThread):
                     max_side = max(page.rect.width, page.rect.height) * scale
                     if max_side > 5000:
                         scale = 5000 / max(page.rect.width, page.rect.height)
-                    mat = fitz.Matrix(scale, scale)
+                    mat = pymupdf.Matrix(scale, scale)
                     # annots=False: PDF highlights/notes are not painted in the coding view.
                     pix = page.get_pixmap(matrix=mat, alpha=False, annots=False)
                     img = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
@@ -2615,7 +2614,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.file_ = None
             return
         try:
-            doc = fitz.open(filepath)
+            doc = pymupdf.open(filepath)
         except Exception as err:
             Message(self.app, _("Warning"), _("Cannot open file: ") + f"{filepath}\n{err}",
                     "warning").exec()
@@ -4792,9 +4791,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         if not out_path:
             return
         try:
-            doc = fitz.open(filepath)
+            doc = pymupdf.open(filepath)
             page = doc.load_page(page_idx)
-            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
+            pix = page.get_pixmap(matrix=pymupdf.Matrix(2, 2), alpha=False)
             pix.save(out_path)
             doc.close()
             self.parent_textEdit.append(_("Page exported: ") + out_path)
@@ -6417,7 +6416,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                       "does not match the imported text. Only area codings will be "
                       "exported."), "warning").exec()
         try:
-            doc = fitz.open(filepath)
+            doc = pymupdf.open(filepath)
             for coding in (self.code_text if include_text else []):
                 c_name = coding.get('name', '')
                 c_color = coding.get('color', '#cccccc')
@@ -6437,7 +6436,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     if rects:
                         quads_list = []
                         for r in rects:
-                            quads_list.append(fitz.Rect(r.x(), r.y(), r.right(), r.bottom()).quad)
+                            quads_list.append(pymupdf.Rect(r.x(), r.y(), r.right(), r.bottom()).quad)
                         annot = page.add_highlight_annot(quads=quads_list)
                         annot.set_colors(stroke=rgb)
                         annot.set_info(title=c_owner, content=content_str)
@@ -6459,8 +6458,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     content_str += f"\nMemo: {c_memo}"
 
                 page = doc.load_page(page_idx)
-                fitz_rect = fitz.Rect(area['x1'], area['y1'], area['x1'] + area['width'], area['y1'] + area['height'])
-                annot = page.add_rect_annot(fitz_rect)
+                pymu_rect = pymupdf.Rect(area['x1'], area['y1'], area['x1'] + area['width'], area['y1'] + area['height'])
+                annot = page.add_rect_annot(pymu_rect)
                 annot.set_colors(stroke=rgb)
                 annot.set_info(title=c_owner, content=content_str)
                 annot.update()
@@ -6654,7 +6653,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 pdf_doc = None
                 filepath = self._resolve_filepath(self.file_)
                 if filepath and Path(filepath).exists():
-                    pdf_doc = fitz.open(filepath)
+                    pdf_doc = pymupdf.open(filepath)
 
                 areas_sorted = sorted(self.code_areas, key=lambda x: x.get('pdf_page', 0))
                 for a in areas_sorted:
@@ -6679,9 +6678,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                         h = a.get('height', 0)
                         if w > 0 and h > 0:
                             pdf_page = pdf_doc.load_page(page_idx)
-                            rect = fitz.Rect(a.get('x1'), a.get('y1'), a.get('x1') + w, a.get('y1') + h)
+                            rect = pymupdf.Rect(a.get('x1'), a.get('y1'), a.get('x1') + w, a.get('y1') + h)
                             # Render at 2x for sharpness.
-                            pix = pdf_page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=rect, alpha=False)
+                            pix = pdf_page.get_pixmap(matrix=pymupdf.Matrix(2, 2), clip=rect, alpha=False)
                             qimg = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                                 QtGui.QImage.Format.Format_RGB888).copy()
                             # Register the image as a named resource (so the ODF writer embeds it) and cap
