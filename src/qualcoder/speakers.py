@@ -35,6 +35,58 @@ from .helpers import Message
 from .select_items import DialogSelectItems  # for the select-files button
 
 logger = logging.getLogger(__name__)
+
+# Timestamp patterns (same set code_av parses): speaker codings must exclude them
+# and split around them. <- L
+TIMESTAMP_PATTERNS = [
+    r"\[[0-9]{1,3}:[0-9][0-9]\]",
+    r"\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]",
+    r"\[[0-9]{1,3}\.[0-9][0-9]\]",
+    r"\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]",
+    r"\{[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\}",
+    r"#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#",
+    r"[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]",
+]
+
+
+def timestamp_spans(text):
+    """ Sorted, merged (start, end) ranges of every timestamp in the text. <- L """
+    spans = []
+    for pat in TIMESTAMP_PATTERNS:
+        for m in re.finditer(pat, text):
+            spans.append((m.start(), m.end()))
+    spans.sort()
+    merged = []
+    for s, e in spans:
+        if merged and s <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], e))
+        else:
+            merged.append((s, e))
+    return merged
+
+
+def split_span_excluding_timestamps(text, pos0, pos1, ts_spans):
+    """ Split [pos0, pos1) into sub-spans excluding timestamps, whitespace-trimmed;
+    every sub-span keeps the same code as the turn. <- L """
+    pieces = []
+    cursor = pos0
+    for s, e in ts_spans:
+        if e <= pos0 or s >= pos1:
+            continue
+        if s > cursor:
+            pieces.append((cursor, min(s, pos1)))
+        cursor = max(cursor, e)
+    if cursor < pos1:
+        pieces.append((cursor, pos1))
+    out = []
+    for s, e in pieces:
+        chunk = text[s:e]
+        lead = len(chunk) - len(chunk.lstrip())
+        trail = len(chunk) - len(chunk.rstrip())
+        s2, e2 = s + lead, e - trail
+        if e2 > s2:
+            out.append((s2, e2))
+    return out
 max_name_len: int = 63
 # Letras mayusculas (ASCII + Latin-1 acentuadas: incluye A-Z y Á É Í Ó Ú Ñ Ü, etc.)
 # para detectar "Nombre:" a mitad de parrafo. El modulo re no soporta \p{Lu}, de ahi el rango.
@@ -150,8 +202,11 @@ def iter_speaker_turns(pattern, line: str, anywhere: bool = False):
         # With a custom regex, group 1 may not participate (e.g. alternations) and be None.
         raw = m.group(1) if m.re.groups >= 1 else m.group(0)  # m.re: patron que caso. sin grupo: todo el match
         code_as = re.sub(r"\s+", " ", raw or "").strip()
-        # Evita falsos positivos tipo "https://..." # avoid URL false positives.
-        if code_as and not _looks_like_url(code_as, line, m.end()):
+        # Avoid false positives like URLs, and clock times like "17:30": a name ending in a
+        # digit followed by digits after the colon is not a speaker. <- L
+        looks_like_time = (code_as and code_as[-1].isdigit()
+                           and line[m.end():].lstrip()[:1].isdigit())
+        if code_as and not looks_like_time and not _looks_like_url(code_as, line, m.end()):
             yield code_as, m.start(), m.end()
         pos = m.end()
         if not scan_anywhere:
@@ -273,11 +328,8 @@ class DialogSpeakers(QtWidgets.QDialog):
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.buttonBox.accepted.connect(self.ok)
-        # Enter/Return no debe activar OK: se desactiva el boton por defecto y (mas abajo) se  # <- L
-        # ignora Enter en keyPressEvent, para evitar aplicaciones accidentales al confirmar la
-        # edicion de un codigo con Enter. OK solo con clic manual.
         # Enter/Return must not trigger OK: no default button, and Enter is swallowed in
-        # keyPressEvent, to avoid accidental application when confirming a code edit with Enter.
+        # keyPressEvent, to avoid accidental application when editing a code. <- L
         for button in self.ui.buttonBox.buttons():  # <- L
             button.setAutoDefault(False)  # <- L
             button.setDefault(False)  # <- L
@@ -602,20 +654,20 @@ class DialogSpeakers(QtWidgets.QDialog):
         """
         
         mlen = str(max_name_len)
-        # El nombre de inicio de linea NO incluye punto ni coma: asi, si antes de los dos puntos
+        # El nombre de inicio de linea NO incluye punto, coma, ")" ni "]": asi, si antes de los dos puntos
         # hay una frase (con punto/coma), este patron no matchea y cede al de mitad de parrafo,
         # que extrae solo el nombre en mayuscula tras el separador.
         # The line-start name excludes period and comma: if there is a phrase (with a period/comma)
         # before the colon, this pattern does not match and defers to the mid-paragraph one, which
         # extracts only the capitalised name after the separator.
         if delimiter_safe:  # combinado: ademas excluye # @ [ {. combined: also excludes # @ [ {
-            line_start = re.compile(r"^\s*([^.,#@\[{\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
+            line_start = re.compile(r"^\s*([^.,)\]#@\[{\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
         else:  # Nombre: solo. Name: alone
-            line_start = re.compile(r"^\s*([^.,\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
-        # Tras un punto o coma y espacios: palabra(s) que empiezan en mayuscula, pegadas a ":".
-        # After a period or comma and spaces: word(s) starting with an uppercase letter, glued to ":".
+            line_start = re.compile(r"^\s*([^.,)\]\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
+        # After a period, comma, ")" or "]" plus spaces: capitalised word(s) glued to ":".
+        # ")" and "]" cover parentheticals and preceding timestamps. <- L
         mid_paragraph = re.compile(
-            r"(?<=[.,])\s+([" + _UPPER + r"][^\W\d_]*(?:[ \t]+[^\W\d_]+){0,5}):",
+            r"(?<=[.,)\]])\s+([" + _UPPER + r"][^\W\d_]*(?:[ \t]+[^\W\d_]+){0,5}):",
             flags=re.UNICODE)
         return [line_start, mid_paragraph]
 
@@ -689,8 +741,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         name_example: Dict[str, str] = {}
         name_files: Dict[str, set] = {}  # archivos por hablante. Ffiles per speaker
         name_file_counts: Dict[str, Dict[str, int]] = {}  # turnos por (hablante, archivo). turns per (speaker, file)
-        # Conserva los codigos adicionales por nombre al reanalizar (no se pierden al cambiar  # <- L
-        # identificadores o archivos). Carry over additional codes by name across re-scans.
+        # Carry over additional codes by name across re-scans. <- L
         prev_additional = {sp['name']: list(sp.get('additional_codes', []))  # <- L
                            for sp in getattr(self, 'speaker_summary', [])}  # <- L
         # Lee cada archivo una sola vez
@@ -799,6 +850,12 @@ class DialogSpeakers(QtWidgets.QDialog):
             current_end = None
             current_content_start = None
 
+        if not hasattr(self, '_file_texts'):
+            self._file_texts = {}
+            self._file_ts_spans = {}
+        self._file_texts[fid] = transcript
+        self._file_ts_spans[fid] = timestamp_spans(transcript)
+
         offset = 0
         for line in transcript.splitlines(keepends=True):
             line_start = offset
@@ -888,8 +945,7 @@ class DialogSpeakers(QtWidgets.QDialog):
                 code_as_item.setToolTip(_("Use ';' to code these turns to more than one code, e.g. Ana; woman; migrant"))
                 self.ui.tableWidget.setItem(row, 1, code_as_item)
 
-                # additional codes (combo editable con vocabulario compartido).  # <- L
-                # additional codes (editable combo with the shared vocabulary).
+                # additional codes (editable combo with the shared vocabulary). <- L
                 combo = self._make_additional_combo(row, data)  # <- L
                 self.ui.tableWidget.setCellWidget(row, 2, combo)  # <- L
                 self._additional_combos[row] = combo  # <- L
@@ -1235,11 +1291,8 @@ class DialogSpeakers(QtWidgets.QDialog):
                     continue
                 # Archivos del hablante para el memo del codigo. speaker files for the code memo
                 file_counts = speaker.get('file_counts', {})  # turnos por archivo. turns per file
-                # Codigos a aplicar a los turnos de este hablante: los de "code as" (separados por  # <- L
-                # ';') mas los de "additional codes". Los mismos turnos se codifican a cada uno,
-                # sin vacios ni duplicados. Codes applied to this speaker's turns: those in
-                # "code as" (';'-separated) plus those in "additional codes". The same turns are
-                # coded to each, no empties or duplicates.
+                # Codes applied to this speaker's turns: "code as" (';'-separated) plus "additional
+                # codes". The same turns are coded to each, no empties or duplicates. <- L
                 code_names: List[str] = self._split_codes(speaker['code_as'])  # <- L
                 for extra in speaker.get('additional_codes', []):  # <- L  codigos adicionales de la columna nueva
                     if extra not in code_names:  # <- L
@@ -1262,21 +1315,32 @@ class DialogSpeakers(QtWidgets.QDialog):
                             c_text = coding.get('seltext_response', '')
                             if c_text.strip() == "":  # turno sin respuesta: nada que codificar
                                 continue
-                        try:
-                            cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo, important) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                        (speaker_code_cid,
-                                         coding['fid'],  # fid por segmento. per-segment file id
-                                         c_text,
-                                         c_pos0,
-                                         c_pos1,
-                                         coding['owner'],
-                                         coding['date'],
-                                         coding['memo'],
-                                         None
-                                        ))
-                            inserted_codings += 1
-                        except sqlite3.IntegrityError:  # variable 'e' sin uso eliminada. Unused 'e' removed
-                            pass  # skip duplicates
+                        # Exclude timestamps from the coded span; each sub-span keeps the speaker code. <- L
+                        f_text = getattr(self, '_file_texts', {}).get(coding['fid'])
+                        f_spans = getattr(self, '_file_ts_spans', {}).get(coding['fid'], [])
+                        if f_text is None:
+                            sub_spans = [(c_pos0, c_pos1)]
+                        else:
+                            sub_spans = split_span_excluding_timestamps(f_text, c_pos0, c_pos1, f_spans)
+                        for s_pos0, s_pos1 in sub_spans:
+                            s_text = f_text[s_pos0:s_pos1] if f_text is not None else c_text
+                            if s_text.strip() == "":
+                                continue
+                            try:
+                                cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo, important) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            (speaker_code_cid,
+                                             coding['fid'],  # fid por segmento. per-segment file id
+                                             s_text,
+                                             s_pos0,
+                                             s_pos1,
+                                             coding['owner'],
+                                             coding['date'],
+                                             coding['memo'],
+                                             None
+                                            ))
+                                inserted_codings += 1
+                            except sqlite3.IntegrityError:  # variable 'e' sin uso eliminada. Unused 'e' removed
+                                pass  # skip duplicates
 
             if inserted_codings > 0:  # hubo codificaciones nuevas # new codings were written
                 self.app.delete_backup = False
