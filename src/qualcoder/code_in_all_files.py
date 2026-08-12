@@ -22,7 +22,7 @@ https://qualcoder.org/
 """
 
 import datetime
-import fitz
+import pymupdf
 import logging
 from pathlib import Path
 import sqlite3
@@ -295,15 +295,15 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             # (same normalization as the image coding view).
             pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
             try:
-                fitz_pdf = fitz.open(source_path)
+                pymu_pdf = pymupdf.open(source_path)
                 try:
-                    if 0 <= pdf_page_ < len(fitz_pdf):
-                        page = fitz_pdf.load_page(pdf_page_)
+                    if 0 <= pdf_page_ < len(pymu_pdf):
+                        page = pymu_pdf.load_page(pdf_page_)
                         pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
                         image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                              QtGui.QImage.Format.Format_RGB888).copy()
                 finally:
-                    fitz_pdf.close()
+                    pymu_pdf.close()
             except Exception as err:
                 logger.warning(f"Pdf area image: {source_path} {err}")
             if image.isNull():
@@ -752,15 +752,15 @@ class DialogCodedIds(QtWidgets.QDialog):
             # (same normalization as the image coding view).
             pdf_page_ = img['pdf_page'] if img['pdf_page'] is not None else 0
             try:
-                fitz_pdf = fitz.open(source_path)
+                pymu_pdf = pymupdf.open(source_path)
                 try:
-                    if 0 <= pdf_page_ < len(fitz_pdf):
-                        page = fitz_pdf.load_page(pdf_page_)
+                    if 0 <= pdf_page_ < len(pymu_pdf):
+                        page = pymu_pdf.load_page(pdf_page_)
                         pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
                         image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                              QtGui.QImage.Format.Format_RGB888).copy()
                 finally:
-                    fitz_pdf.close()
+                    pymu_pdf.close()
             except Exception as err:
                 logger.warning(f"Pdf area image: {source_path} {err}")
             if image.isNull():

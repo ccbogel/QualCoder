@@ -23,7 +23,7 @@ https://qualcoder.org/
 
 from copy import deepcopy, copy
 import datetime
-import fitz
+import pymupdf
 import html
 from io import BytesIO
 import logging
@@ -941,14 +941,14 @@ class DialogCodeImage(QtWidgets.QDialog):
             # In-memory render, identity matrix (1 pixel = 1 page point, the same
             # system code_pdf stores); no temp file and the document is closed.
             try:
-                fitz_pdf = fitz.open(source_path)
+                pymu_pdf = pymupdf.open(source_path)
             except Exception as err:
                 self.clear_file()
                 Message(self.app, _("Image Error"), _("Cannot open: ") + f"{source_path}\n{err}").exec()
                 logger.warning(f"Cannot open pdf: {source_path} {err}")
                 return
             try:
-                self.pdf_total_pages = len(fitz_pdf)
+                self.pdf_total_pages = len(pymu_pdf)
                 if self.pdf_total_pages == 0:
                     # PDF with no pages: nothing to display.
                     self.clear_file()
@@ -962,12 +962,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                     self.pdf_page = 0
                 if self.pdf_page > self.pdf_total_pages - 1:
                     self.pdf_page = max(0, self.pdf_total_pages - 1)
-                page = fitz_pdf.load_page(self.pdf_page)
+                page = pymu_pdf.load_page(self.pdf_page)
                 pix = page.get_pixmap(alpha=False, annots=False)  # Identity matrix, do not change: defines the coordinate scale. annots=False: PDF highlights/notes not painted in the coding view.
                 image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                      QtGui.QImage.Format.Format_RGB888).copy()
             finally:
-                fitz_pdf.close()
+                pymu_pdf.close()
             self.pdf_controls_toggle(True)
             self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
             # Legacy areas with NULL pdf_page were invisible in both viewers;

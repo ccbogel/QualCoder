@@ -23,7 +23,7 @@ https://qualcoder.org/
 
 from copy import deepcopy
 import datetime
-import fitz
+import pymupdf
 import logging
 import math
 from pathlib import Path
@@ -817,12 +817,12 @@ class GraphSynchronizer:
                     elif item.path_[:5] == "docs:":
                         source_path = item.path_[5:]
                     if Path(source_path).exists():
-                        fitz_pdf = fitz.open(source_path)
-                        page = fitz_pdf[item.pdf_page]
+                        pymu_pdf = pymupdf.open(source_path)
+                        page = pymu_pdf[item.pdf_page]
                         pixmap_pdf = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
                         abs_path_ = Path(item.app.confighome) / "tmp_pdf_page.png"
                         pixmap_pdf.save(str(abs_path_))  # Presume method requires String
-                        fitz_pdf.close()
+                        pymu_pdf.close()
                 if Path(abs_path_).exists():
                     image = QtGui.QImageReader(abs_path_).read()
                     image = image.copy(int(item.px), int(item.py), int(item.pwidth), int(item.pheight))
@@ -6107,8 +6107,8 @@ class DialogGraphPicker(QDialog):
                     source_path = f"{self.app.project_path}/documents/{filepath[6:]}"
                 if (filepath or "")[:5] == "docs:":
                     source_path = filepath[5:]
-                fitz_pdf = fitz.open(source_path)
-                page = fitz_pdf[pdf_page]
+                pymu_pdf = pymupdf.open(source_path)
+                page = pymu_pdf[pdf_page]
                 pm = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
                 abs_path_ = Path(self.app.confighome) / "tmp_preview_pdf_page.png"
                 pm.save(str(abs_path_))  # Assume needs String
@@ -8361,15 +8361,15 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             # code crashed on out-of-range pages and leaked the handle/temp file).
             image = QtGui.QImage()
             try:
-                fitz_pdf = fitz.open(source_path)
+                pymu_pdf = pymupdf.open(source_path)
                 try:
-                    if 0 <= self.pdf_page < len(fitz_pdf):
-                        page = fitz_pdf.load_page(self.pdf_page)
+                    if 0 <= self.pdf_page < len(pymu_pdf):
+                        page = pymu_pdf.load_page(self.pdf_page)
                         pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
                         image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                              QtGui.QImage.Format.Format_RGB888).copy()
                 finally:
-                    fitz_pdf.close()
+                    pymu_pdf.close()
             except Exception as err:
                 logger.warning(f"Graph pdf area: {source_path} {err}")
         else:

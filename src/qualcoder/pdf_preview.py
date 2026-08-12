@@ -21,7 +21,7 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import fitz
+import pymupdf
 import logging
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -51,7 +51,7 @@ class PdfPreviewWidget(QtWidgets.QWidget):
         self._rendering = False  # re-entrancy guard: setPixmap/resize can trigger nested resize events
         self._render_key = None  # (page, zoom, scale) of the last render, to skip identical renders
         try:
-            doc = fitz.open(filepath)
+            doc = pymupdf.open(filepath)
             self.total_pages = len(doc)
             doc.close()
         except Exception as err:
@@ -155,7 +155,7 @@ class PdfPreviewWidget(QtWidgets.QWidget):
         # stable and scrollbar toggling cannot re-trigger renders.
         viewport = self.scroll_area.maximumViewportSize()
         try:
-            doc = fitz.open(self.filepath)
+            doc = pymupdf.open(self.filepath)
             try:
                 page = doc.load_page(self.preview_page)
                 page_w = max(1.0, page.rect.width)
@@ -168,7 +168,7 @@ class PdfPreviewWidget(QtWidgets.QWidget):
                 if render_key == self._render_key:
                     self.update_controls()
                     return
-                pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False, annots=False)  # PDF highlights/notes not painted in the preview
+                pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False, annots=False)  # PDF highlights/notes not painted in the preview
                 # bytes() detaches the buffer from PyMuPDF before the doc is closed
                 image = QtGui.QImage(bytes(pix.samples), pix.width, pix.height, pix.stride,
                                      QtGui.QImage.Format.Format_RGB888).copy()

@@ -25,7 +25,7 @@ import sqlite3
 from copy import deepcopy
 import csv
 import datetime
-import fitz
+import pymupdf
 import logging
 import openpyxl
 from PyQt6.QtWidgets import QTextEdit
@@ -2086,11 +2086,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 # coded areas are stored in (pdf_page). PIL cannot open PDFs
                 # (uncaught UnidentifiedImageError: report crash).
                 try:
-                    fitz_pdf = fitz.open(abs_path)
+                    pymu_pdf = pymupdf.open(abs_path)
                     try:
-                        area_total = sum(p.rect.width * p.rect.height for p in fitz_pdf)
+                        area_total = sum(p.rect.width * p.rect.height for p in pymu_pdf)
                     finally:
-                        fitz_pdf.close()
+                        pymu_pdf.close()
                 except Exception as err:
                     logger.warning(str(err))
             else:
@@ -2468,15 +2468,15 @@ class DialogReportCodes(QtWidgets.QDialog):
             # In-memory render, identity matrix (1 point = 1 pixel, the stored
             # scale), only the needed page and the document closed.
             try:
-                fitz_pdf = fitz.open(pdf_path)
+                pymu_pdf = pymupdf.open(pdf_path)
                 try:
-                    if 0 <= pdf_page_ < len(fitz_pdf):
-                        page = fitz_pdf.load_page(pdf_page_)
+                    if 0 <= pdf_page_ < len(pymu_pdf):
+                        page = pymu_pdf.load_page(pdf_page_)
                         pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
                         image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                              QtGui.QImage.Format.Format_RGB888).copy()
                 finally:
-                    fitz_pdf.close()
+                    pymu_pdf.close()
             except Exception as err:
                 logger.warning(f"put_image_into_textedit pdf: {pdf_path} {err}")
             if image is None:

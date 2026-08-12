@@ -40,7 +40,7 @@ Code resize handles for text coding
 
 import csv
 import datetime
-import fitz
+import pymupdf
 from io import BytesIO
 import logging
 from pathlib import Path
@@ -798,18 +798,18 @@ class DialogCodeInImage(QtWidgets.QDialog):
             # (the old tmp_pdf_page.png pattern leaked the handle and went stale).
             image = QtGui.QImage()
             try:
-                fitz_pdf = fitz.open(source_path)
+                pymu_pdf = pymupdf.open(source_path)
                 try:
                     # .get(): some callers build the dict by hand; a missing or NULL
                     # pdf_page falls back to page 0 instead of raising KeyError.
                     pdf_page_ = self.data.get('pdf_page') if self.data.get('pdf_page') is not None else 0
-                    if 0 <= pdf_page_ < len(fitz_pdf):
-                        page = fitz_pdf.load_page(pdf_page_)
+                    if 0 <= pdf_page_ < len(pymu_pdf):
+                        page = pymu_pdf.load_page(pdf_page_)
                         pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
                         image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
                                              QtGui.QImage.Format.Format_RGB888).copy()
                 finally:
-                    fitz_pdf.close()
+                    pymu_pdf.close()
             except Exception as err:
                 logger.warning(f"Pdf page image: {source_path} {err}")
 
