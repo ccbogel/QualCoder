@@ -88,8 +88,8 @@ from qualcoder.view_image import DialogCodeImage
 vlc = None
 try:
     import vlc
-except Exception as e:
-    print(e)
+except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise
+    logging.getLogger(__name__).debug(f"python-vlc unavailable: {e}")
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
 
@@ -1260,10 +1260,11 @@ Click "Yes" to start now.')
             msg = _("This project contains no audio/video files.")
             Message(self.app, _('No a/v files'), msg).exec()
             return
-        if not vlc:
-            msg = _("VLC is not installed. Cannot code audio/video files.")
-            Message(self.app, _('Install VLC'), msg).exec()
-            return
+        if not vlc and self.app.settings.get('av_player', 'vlc') != 'qt':
+            # Without python-vlc the Qt Multimedia backend still works: switch to
+            # it instead of blocking A/V coding.
+            self.app.settings['av_player'] = 'qt'
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
         self.ui.textBrowser_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
@@ -1820,7 +1821,7 @@ Click "Yes" to start now.')
             "unique(cid,fid,pos0,pos1, owner))")
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
-            "date text, color text, supercid integer, unique(name))")  # supercid: sub-code (parent code) <- L
+            "date text, color text, supercid integer, unique(name))")  # supercid: sub-code (parent code)
         # Database version v6 - unique name for journal
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text, "
                     "unique(name))")
@@ -2306,11 +2307,18 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v15", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v15")
+        # Repair: projects created with the DDL typo 'avbookmarktext' instead of
+        # 'avbookmarktextpos'. The v15 block never fixes them because avbookmarkfile exists.
         try:
-            cur.execute("select avbookmarktextpos from project")  # Need separate check here, due to error introduced during 2026
+            cur.execute("select avbookmarktextpos from project")
         except sqlite3.OperationalError:
-            cur.execute("alter table project add avbookmarktextpos integer")
+            try:
+                # Rename keeps any stored bookmark position
+                cur.execute("alter table project rename column avbookmarktext to avbookmarktextpos")
+            except sqlite3.OperationalError:
+                cur.execute("alter table project add avbookmarktextpos integer")
             self.app.conn.commit()
+            self.ui.textEdit.append(_("Repaired project table column avbookmarktextpos"))
         # Database version v16 - sub-codes: a code can be nested under another code (supercid)
         try:
             cur.execute("select supercid from code_name")
@@ -2362,14 +2370,14 @@ Click "Yes" to start now.')
         sql += "(select catid from code_cat)"
         cur.execute(sql)
         self.app.conn.commit()
-        # Fix 'lost' sub-codes if present (parent code deleted but supercid not cleared). <- L
+        # Fix 'lost' sub-codes if present (parent code deleted but supercid not cleared).
         sql = "update code_name set supercid=null where supercid is not null and supercid not in "
         sql += "(select cid from code_name)"
         cur.execute(sql)
-        # Mutual exclusivity: if a code somehow has both catid and supercid, supercid wins. <- L
+        # Mutual exclusivity: if a code somehow has both catid and supercid, supercid wins.
         cur.execute("update code_name set catid=null where supercid is not null and catid is not null")
         self.app.conn.commit()
-        # Break hierarchy cycles (a corrupted project could make a branch disappear). <- L
+        # Break hierarchy cycles (a corrupted project could make a branch disappear).
         # Categories: code_cat.supercatid
         cur.execute("select catid, supercatid from code_cat")
         cat_parent = {row[0]: row[1] for row in cur.fetchall()}
