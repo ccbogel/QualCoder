@@ -28,10 +28,10 @@ import tempfile  # Create a temporary file
 import pandas as pd
 import plotly.express as px
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
 from PyQt6.QtGui import QIcon
+import shutil
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 from .helpers import ExportDirectoryPathDialog, Message
@@ -565,7 +565,6 @@ class ViewCharts(QDialog):
         """ Show word cloud.
          Can be by file and/or by category. """
 
-        title = _('Word cloud')
         owner, subtitle = self.owner_and_subtitle_helper()
         self.get_selected_categories_and_codes()
         cur = self.app.conn.cursor()
@@ -603,33 +602,39 @@ class ViewCharts(QDialog):
             self.ui.lineEdit_max_words.setText("200")
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         ngrams = int(self.ui.comboBox_ngrams.currentText())
-        stopwords_path = str(self.get_selected_stopwords_path())  # Must be string object fow wordcloud
+        stopwords_path = str(self.get_selected_stopwords_path())  # Must be string object for wordcloud
+
+        # Ventana de confirmación de guardado. Save confirmation window. 
+        try:
+            # For wordcloud filepaths must be String
+            tmp_path = Path(self.app.confighome) / "wordcloud.png"
+            Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
+                      text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
+                      stopwords_filepath2=stopwords_path, save_filepath=str(tmp_path))
+        except Exception as e:
+            logger.error(f"Error generating Wordcloud: {str(e)}")
+            Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()
+            return
+
+        # Export the wordcloud
         export_dir = QtWidgets.QFileDialog.getExistingDirectory(
             None, _('Select folder to save Wordcloud'),
-            self.last_wordcloud_dir,
-            options=QtWidgets.QFileDialog.Option.ShowDirsOnly
-        )
+            self.last_wordcloud_dir, options=QtWidgets.QFileDialog.Option.ShowDirsOnly)
         if not export_dir:
             return
         self.last_wordcloud_dir = export_dir
         base_name = "QualCoder_Wordcloud"
         extension = ".png"
-        filepath = Path(export_dir) / f"{base_name}{extension}"
+        file_path = Path(export_dir) / f"{base_name}{extension}"
         counter = 0
-        
-        while Path(filepath).exists():
-            filepath = Path(export_dir) / f"{base_name}_{counter}{extension}"
+        while Path(file_path).exists():
+            file_path = Path(export_dir) / f"{base_name}_{counter}{extension}"
             counter += 1
-        # Ventana de confirmación de guardado. Save confirmation window. 
         try:
-            # for wordcloud filepaths must be String
-            Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
-                      text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
-                      stopwords_filepath2=stopwords_path, save_filepath=str(filepath))
-            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + str(filepath)).exec()
-        except Exception as e:
-            logger.error(f"Error generating Wordcloud: {str(e)}")
-            Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()
+            shutil.move(tmp_path, file_path)
+            Message(self.app, _("Image saved"), _("Wordcloud saved successfully to:\n") + str(file_path)).exec()
+        except Exception as err:
+            logger.error(err)
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
@@ -1958,7 +1963,7 @@ class ViewCharts(QDialog):
                     data.append(code_counts)
             else:
                 attr_msg, file_ids_txt = self.get_file_ids()
-                print(self.attribute_case_ids_and_names)
+                # print(self.attribute_case_ids_and_names)
                 for c in self.attribute_case_ids_and_names:
                     x_labels.append(c[1])
                 # Calculate the frequency of each code in each file
