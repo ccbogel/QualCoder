@@ -57,6 +57,7 @@ from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
 # If VLC not installed, it will not crash
 vlc = None
+from .media_player_qt import MediaInstance as QtMediaInstance
 try:
     import vlc
 except Exception as e:
@@ -691,11 +692,17 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
-        if not vlc:
-            return
-        # Create a vlc instance with an empty vlc media player
-        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
-        self.instance = vlc.Instance()
+        self.mediaplayer = None
+        try:
+            if self.app.settings.get('av_player', 'vlc') == 'qt' or vlc is None:
+                # python-vlc missing or Qt chosen: use the Qt Multimedia backend <- L
+                self.instance = QtMediaInstance()
+            else:
+                self.instance = vlc.Instance()
+                if self.instance is None:
+                    raise NameError("libvlc not available")
+        except (NameError, AttributeError):
+            self.instance = QtMediaInstance()
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
@@ -722,7 +729,9 @@ class DialogCodeInAV(QtWidgets.QDialog):
         # video would be displayed in it's own window). This is platform
         # specific, so we must give the ID of the QFrame (or similar object) to
         # vlc. Different platforms have different functions for this
-        if platform.system() == "Linux":  # for Linux using the X Server
+        if hasattr(self.mediaplayer, 'set_video_host'):
+            self.mediaplayer.set_video_host(self.frame)  # Qt backend embeds itself <- L
+        elif platform.system() == "Linux":  # for Linux using the X Server
             # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
             self.mediaplayer.set_xwindow(int(self.frame.winId()))
         elif platform.system() == "Windows":  # for Windows
@@ -731,7 +740,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
             self.mediaplayer.set_nsobject(int(self.winId()))
 
         # The vlc MediaPlayer needs a float value between 0 and 1 for AV position,
-        pos = self.data['pos0'] / self.mediaplayer.get_media().get_duration()
+        duration = self.mediaplayer.get_media().get_duration()
+        pos = self.data['pos0'] / duration if duration > 0 else 0
         self.mediaplayer.play()  # Need to start play first
         self.mediaplayer.set_position(pos)
         self.timer = QtCore.QTimer(self)
@@ -741,6 +751,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
     def update_ui(self):
         """ Checks for end of playing segment. """
 
+        if self.mediaplayer is None:
+            return
         msecs = self.mediaplayer.get_time()
         msg = msecs_to_mins_and_secs(msecs)
         try:
@@ -752,7 +764,9 @@ class DialogCodeInAV(QtWidgets.QDialog):
             self.mediaplayer.stop()
 
     def closeEvent(self, event):
-        self.mediaplayer.stop()
+        # Guard: a build without a media backend leaves mediaplayer unset <- L
+        if getattr(self, 'mediaplayer', None) is not None:
+            self.mediaplayer.stop()
 
 
 class DialogCodeInImage(QtWidgets.QDialog):

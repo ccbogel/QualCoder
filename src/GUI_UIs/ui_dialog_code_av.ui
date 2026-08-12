@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ui version="4.0">
  <class>Dialog_code_av</class>
  <widget class="QDialog" name="Dialog_code_av">
@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
-    <height>641</height>
+    <width>1400</width>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,428 +15,6 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>85</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>85</height>
-      </size>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QPushButton" name="pushButton_play">
-      <property name="geometry">
-       <rect>
-        <x>8</x>
-        <y>10</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Ctrl P or Ctrl D Play/Pause</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QSlider" name="horizontalSlider_vol">
-      <property name="geometry">
-       <rect>
-        <x>667</x>
-        <y>19</y>
-        <width>160</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="value">
-       <number>100</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Orientation::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_volume">
-      <property name="geometry">
-       <rect>
-        <x>636</x>
-        <y>14</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_time">
-      <property name="geometry">
-       <rect>
-        <x>138</x>
-        <y>10</y>
-        <width>181</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_coding">
-      <property name="geometry">
-       <rect>
-        <x>320</x>
-        <y>10</y>
-        <width>181</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment. Key shortcut: Ctrl S
-Open memo and apply segment to currently selected code. Key shortcut: G</string>
-      </property>
-      <property name="text">
-       <string>Start segment</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_segment">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>50</y>
-        <width>221</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>Segment:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_coder">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>50</y>
-        <width>191</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Coder:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_tracks">
-      <property name="geometry">
-       <rect>
-        <x>836</x>
-        <y>13</y>
-        <width>51</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Change track, if multiple available.</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_scroll_transcript">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>51</y>
-        <width>299</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Cannot code text when play transcript box is checked.</string>
-      </property>
-      <property name="text">
-       <string>Scroll transcript while playing.</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_rate">
-      <property name="geometry">
-       <rect>
-        <x>546</x>
-        <y>12</y>
-        <width>48</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Increase play rate to maximum 2x   Key &gt;
-Decrease play rate to minimum 0.1  Key &lt;</string>
-      </property>
-      <property name="text">
-       <string>1.0x</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_rewind_30">
-      <property name="geometry">
-       <rect>
-        <x>71</x>
-        <y>10</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Rewind 30 seconds. Alt + Minus</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_forward_30">
-      <property name="geometry">
-       <rect>
-        <x>101</x>
-        <y>10</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Forward 30 seconds. Alt + Plus. 
-Forward 5 seconds. Key 5</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_rate_down">
-      <property name="geometry">
-       <rect>
-        <x>510</x>
-        <y>10</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Decrease play rate Key &lt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_rate_up">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>10</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Increase play rate Key &gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_rewind_5">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>10</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Rewind 5 seconds. Ctrl + R</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_help">
-      <property name="geometry">
-       <rect>
-        <x>940</x>
-        <y>13</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Help</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_important">
-      <property name="geometry">
-       <rect>
-        <x>900</x>
-        <y>13</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Show codings flagged important</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_segment_menu">
-      <property name="geometry">
-       <rect>
-        <x>238</x>
-        <y>50</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Button to select a segment. Then a menu of options will open.</string>
-      </property>
-      <property name="text">
-       <string>S</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_find_code">
-      <property name="geometry">
-       <rect>
-        <x>900</x>
-        <y>50</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Find code</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_screensshot">
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>50</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Screenshot</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_add_image_to_project">
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>50</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Get screenshot for image coding</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_coder_icon">
-      <property name="geometry">
-       <rect>
-        <x>8</x>
-        <y>50</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>28</width>
-        <height>28</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>28</width>
-        <height>28</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>Coder</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-      </property>
-     </widget>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QGraphicsView" name="graphicsView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>990</width>
-       <height>90</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>990</width>
-       <height>90</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>6</pointsize>
-      </font>
-     </property>
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
     <widget class="QSplitter" name="splitter_2">
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
@@ -445,7 +23,7 @@ Forward 5 seconds. Key 5</string>
       <property name="orientation">
        <enum>Qt::Orientation::Vertical</enum>
       </property>
-      <widget class="QListWidget" name="listWidget"/>
+      <widget class="QListWidget" name="listWidget" />
       <widget class="QGroupBox" name="groupBox_file_buttons">
        <property name="minimumSize">
         <size>
@@ -460,7 +38,7 @@ Forward 5 seconds. Key 5</string>
         </size>
        </property>
        <property name="title">
-        <string/>
+        <string />
        </property>
        <widget class="QPushButton" name="pushButton_latest">
         <property name="geometry">
@@ -475,7 +53,7 @@ Forward 5 seconds. Key 5</string>
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_next_file">
@@ -491,7 +69,7 @@ Forward 5 seconds. Key 5</string>
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_document_memo">
@@ -507,7 +85,7 @@ Forward 5 seconds. Key 5</string>
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_file_attributes">
@@ -523,13 +101,13 @@ Forward 5 seconds. Key 5</string>
          <string>Show files with selected file attributes</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_clear_filter_file">
         <property name="geometry">
          <rect>
-          <x>150</x>
+          <x>120</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -539,14 +117,14 @@ Forward 5 seconds. Key 5</string>
          <string>Clear file filter</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_goto_bookmark">
         <property name="geometry">
          <rect>
-          <x>120</x>
-          <y>1</y>
+          <x>150</x>
+          <y>0</y>
           <width>28</width>
           <height>28</height>
          </rect>
@@ -556,7 +134,7 @@ Forward 5 seconds. Key 5</string>
 To set a bookmark press B</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
       </widget>
@@ -581,12 +159,12 @@ To set a bookmark press B</string>
         </size>
        </property>
        <property name="title">
-        <string/>
+        <string />
        </property>
        <widget class="QPushButton" name="pushButton_clear_filter_code">
         <property name="geometry">
          <rect>
-          <x>0</x>
+          <x>60</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
@@ -596,15 +174,15 @@ To set a bookmark press B</string>
          <string>Clear code filter</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
        <widget class="QLineEdit" name="lineEdit_code_filter">
         <property name="geometry">
          <rect>
-          <x>30</x>
+          <x>90</x>
           <y>1</y>
-          <width>113</width>
+          <width>161</width>
           <height>26</height>
          </rect>
         </property>
@@ -612,58 +190,1218 @@ To set a bookmark press B</string>
          <string>Code name filter</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="pushButton_important">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>0</y>
+          <width>28</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Show codings flagged important</string>
+        </property>
+        <property name="text">
+         <string />
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_find_code">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>28</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Find code</string>
+        </property>
+        <property name="text">
+         <string />
+        </property>
+       </widget>
       </widget>
      </widget>
-     <widget class="QPlainTextEdit" name="plainTextEdit">
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <widget class="QSplitter" name="splitter_right">
+      <property name="orientation">
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
+      <widget class="QWidget" name="topPanel" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>2</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>560</width>
+         <height>0</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="topLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="splitter_media">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="childrenCollapsible">
+           <bool>false</bool>
+          </property>
+          <widget class="QFrame" name="frame_video">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>3</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>320</width>
+             <height>240</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(30, 30, 30);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Plain</enum>
+           </property>
+          </widget>
+          <widget class="QWidget" name="widget_media">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>2</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>420</width>
+             <height>230</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="mediaLayout">
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>44</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>44</height>
+               </size>
+              </property>
+              <property name="title">
+               <string />
+              </property>
+              <widget class="QPushButton" name="pushButton_play">
+               <property name="geometry">
+                <rect>
+                 <x>8</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Ctrl P or Ctrl D Play/Pause</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_rewind_5">
+               <property name="geometry">
+                <rect>
+                 <x>40</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Rewind 5 seconds. Ctrl + R</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_rewind_30">
+               <property name="geometry">
+                <rect>
+                 <x>71</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_forward_30">
+               <property name="geometry">
+                <rect>
+                 <x>101</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_rate_down">
+               <property name="geometry">
+                <rect>
+                 <x>140</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Decrease play rate Key &lt;</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_rate">
+               <property name="geometry">
+                <rect>
+                 <x>172</x>
+                 <y>10</y>
+                 <width>48</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase, Ctrl + Shift + &amp;lt; decrease&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>1.0x</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_rate_up">
+               <property name="geometry">
+                <rect>
+                 <x>222</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Increase play rate Key &gt;</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QComboBox" name="comboBox_tracks">
+               <property name="geometry">
+                <rect>
+                 <x>290</x>
+                 <y>8</y>
+                 <width>51</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="toolTip">
+                <string>Change track, if multiple available.</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_detach">
+               <property name="geometry">
+                <rect>
+                 <x>350</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Detach the video into a floating window. Close the window to dock it back.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+              <widget class="QPushButton" name="pushButton_volume">
+               <property name="geometry">
+                <rect>
+                 <x>255</x>
+                 <y>8</y>
+                 <width>28</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Volume</string>
+               </property>
+               <property name="text">
+                <string />
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_time">
+              <property name="text">
+               <string />
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="horizontalSlider">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change media position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>1000</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TickPosition::TicksBelow</enum>
+              </property>
+              <property name="tickInterval">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="WaveformSeekBar" name="widget_seekbar" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>62</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>80</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QScrollArea" name="scrollArea_tracks">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+              <property name="widgetResizable">
+               <bool>true</bool>
+              </property>
+              <widget class="SegmentTracksView" name="widget_tracks">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>730</width>
+                 <height>136</height>
+                </rect>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="widget_transcript">
+       <layout class="QHBoxLayout" name="transcriptLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QWidget" name="lineNumbers" />
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>260</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QSlider" name="horizontalSlider">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox_top">
      <property name="minimumSize">
       <size>
-       <width>990</width>
-       <height>24</height>
+       <width>0</width>
+       <height>80</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>990</width>
-       <height>20</height>
+       <width>16777215</width>
+       <height>80</height>
       </size>
      </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <property name="title">
+      <string />
      </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>1000</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::TickPosition::TicksBelow</enum>
-     </property>
-     <property name="tickInterval">
-      <number>10</number>
-     </property>
+     <widget class="QWidget" name="widget_coder" native="true">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>0</y>
+        <width>231</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_coder">
+         <property name="text">
+          <string />
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_coder_icon">
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Coder</string>
+         </property>
+         <property name="text">
+          <string />
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Policy::Minimum</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>6</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_coder">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_coder">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Coder visibility</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_annotations">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Show annotations</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_memos">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Show memos</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>334</x>
+        <y>28</y>
+        <width>70</width>
+        <height>8</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Orientation::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Auto code the transcript with exact text.
+Use | to code multiple texts.</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_undo">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>41</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search transcript text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_search">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>38</y>
+        <width>171</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;Check &lt;span style=" font-weight:600;"&gt;Case sensitive&lt;/span&gt; to match case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_search_case">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>38</y>
+        <width>21</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_case_sensitive">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>41</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_previous">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_next">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_totals">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>38</y>
+        <width>58</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0 / 0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_coding">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>0</y>
+        <width>181</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment. Key shortcut: Ctrl S
+Open memo and apply segment to currently selected code. Key shortcut: G</string>
+      </property>
+      <property name="text">
+       <string>Start segment</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_segment_menu">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment.&lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_segment">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>38</y>
+        <width>171</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Drag on the wave to select, then click a code in the tree to assign it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Segment:</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_scroll_transcript">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>38</y>
+        <width>151</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Cannot code text when play transcript box is checked.</string>
+      </property>
+      <property name="text">
+       <string>Scroll transcript</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_text_to_av">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>0</y>
+        <width>115</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When coding text, also create the matching segment on the wave, using the transcript timestamps.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Sync coding</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_help">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Help</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_screensshot">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_add_image_to_project">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>38</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_mark_speakers">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>28</width>
+        <height>28</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark speakers in the transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string />
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_player">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>1</y>
+        <width>70</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Media player backend</string>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WaveformSeekBar</class>
+   <extends>QWidget</extends>
+   <header>qualcoder.view_av_waveform</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SegmentTracksView</class>
+   <extends>QWidget</extends>
+   <header>qualcoder.view_av_waveform</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
+  <tabstop>lineEdit_coder</tabstop>
+  <tabstop>pushButton_coder</tabstop>
+  <tabstop>pushButton_show_annotations</tabstop>
+  <tabstop>pushButton_show_memos</tabstop>
+  <tabstop>pushButton_auto_code</tabstop>
+  <tabstop>pushButton_auto_code_undo</tabstop>
+  <tabstop>lineEdit_search</tabstop>
+  <tabstop>checkBox_search_case</tabstop>
+  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_next</tabstop>
   <tabstop>pushButton_play</tabstop>
   <tabstop>pushButton_rewind_5</tabstop>
   <tabstop>pushButton_rewind_30</tabstop>
@@ -671,13 +1409,12 @@ To set a bookmark press B</string>
   <tabstop>pushButton_coding</tabstop>
   <tabstop>pushButton_rate_down</tabstop>
   <tabstop>pushButton_rate_up</tabstop>
-  <tabstop>horizontalSlider_vol</tabstop>
   <tabstop>comboBox_tracks</tabstop>
   <tabstop>pushButton_important</tabstop>
   <tabstop>pushButton_help</tabstop>
   <tabstop>checkBox_scroll_transcript</tabstop>
   <tabstop>horizontalSlider</tabstop>
-  <tabstop>graphicsView</tabstop>
+  <tabstop>widget_seekbar</tabstop>
   <tabstop>listWidget</tabstop>
   <tabstop>pushButton_next_file</tabstop>
   <tabstop>pushButton_latest</tabstop>
@@ -686,6 +1423,6 @@ To set a bookmark press B</string>
   <tabstop>treeWidget</tabstop>
   <tabstop>plainTextEdit</tabstop>
  </tabstops>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>
