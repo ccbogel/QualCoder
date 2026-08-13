@@ -767,6 +767,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
         # Guard: a build without a media backend leaves mediaplayer unset <- L
         if getattr(self, 'mediaplayer', None) is not None:
             self.mediaplayer.stop()
+            if type(self.mediaplayer).__module__.endswith('media_player_qt'):
+                self.mediaplayer.release()  # free handle for later delete <- L
 
 
 class DialogCodeInImage(QtWidgets.QDialog):
