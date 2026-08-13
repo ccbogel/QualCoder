@@ -243,7 +243,7 @@ class Ui_Dialog_view_av(object):
         self.label_audio.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.label_audio.setObjectName("label_audio")
         self.checkBox_scroll_transcript = QtWidgets.QCheckBox(parent=self.groupBox_2)
-        self.checkBox_scroll_transcript.setGeometry(QtCore.QRect(110, 40, 420, 22))
+        self.checkBox_scroll_transcript.setGeometry(QtCore.QRect(110, 40, 520, 22))
         self.checkBox_scroll_transcript.setObjectName("checkBox_scroll_transcript")
         self.label_rate = QtWidgets.QLabel(parent=self.groupBox_2)
         self.label_rate.setGeometry(QtCore.QRect(204, 10, 48, 20))
