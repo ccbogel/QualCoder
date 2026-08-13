@@ -239,6 +239,18 @@ class MediaPlayer:
         self._target_ms = None
         self.player.stop()
 
+    def release(self):
+        """
+        Free the media file handle: stop() alone keeps it open on Windows and
+        deleting the just-viewed file raises WinError 32. vlc has the same
+        method.
+        """
+        self.stop()
+        self._pending_ms = None
+        self._media = None
+        self.player.setSource(QtCore.QUrl())
+        QtCore.QCoreApplication.processEvents()
+
     def is_playing(self):
         """
         Report playing while the play() intent holds during async startup;
