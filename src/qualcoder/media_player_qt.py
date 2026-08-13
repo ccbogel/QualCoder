@@ -240,10 +240,8 @@ class MediaPlayer:
         self.player.stop()
 
     def release(self):
-        """ Free the media file handle: stop() alone keeps it open on Windows and
-        deleting the just-viewed file raises WinError 32. vlc has the same
-        method. Also tears down the video widget so a later backend switch
-        never leaves a stale surface stacked over the frame. <- L """
+        """ Free the file handle (stop() alone keeps it open on Windows) and
+        tear down the video widget so no stale surface is left. <- L """
         self.stop()
         self._pending_ms = None
         self._media = None
@@ -362,20 +360,13 @@ class MediaPlayer:
             logger.warning(f"Qt snapshot failed: {err}")
             return -1
 
-def make_vlc_instance(vlc_module, override=""):
-    """ VLC instance for embedded playback. Defaults stay as close to a plain
-    desktop VLC as possible (quiet, no title overlay): forcing software
-    decoding or a specific vout made playback slower without fixing the
-    rendering, so decoder and video output are left to VLC. Per-machine
-    troubleshooting goes through settings['av_vlc_args'], which replaces
-    these flags. The applied mode is logged as [vlc-flags]. <- L """
+
+def make_vlc_instance(vlc_module):
+    """ VLC instance for embedded playback: quiet console and no title
+    overlay. Decoder and video output are left to VLC. <- L """
     if vlc_module is None:
         return None
     flags = ["--quiet", "--no-video-title-show"]
-    if override:
-        # settings['av_vlc_args']: space separated libvlc arguments, for
-        # troubleshooting playback on a specific machine <- L
-        flags = override.split()
     try:
         inst = vlc_module.Instance(flags)
         if inst is not None:
