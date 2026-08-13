@@ -2062,7 +2062,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 try:
                     try:
                         from .media_player_qt import metadata_vlc_instance
-                        instance = metadata_vlc_instance(vlc)  # cached: metadata only <- L
+                        instance = metadata_vlc_instance(vlc)  # cached: metadata only
                     except NameError as name_err:
                         # NameError: no function 'libvlc_new'
                         logger.error(f"vlc.Instance: {name_err}")
@@ -3601,7 +3601,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def _unlink_media_with_retry(self, filepath):
         """ Players free the file handle asynchronously, so an immediate unlink
-        can still hit WinError 32: retry briefly, then warn. <- L """
+        can still hit WinError 32: retry briefly, then warn. """
         last_err = None
         for _attempt in range(12):
             try:
@@ -3623,7 +3623,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def _release_media_players_for(self, filepath):
         """ Ask every live player holding this file to let go before unlink
-        (an open handle raises WinError 32 on Windows). <- L """
+        (an open handle raises WinError 32 on Windows). """
         try:
             target = str(Path(filepath).resolve())
         except Exception:
@@ -3642,7 +3642,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if med is not None and target.replace("\\", "/") in \
                             str(med.get_mrl() or "").replace("%20", " "):
                         mp.stop()
-                        mp.set_media(None)  # stop alone may keep the handle a moment <- L
+                        mp.set_media(None)  # stop alone may keep the handle a moment
             except Exception:
                 pass
 
@@ -3658,7 +3658,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if getattr(self.av_dialog_open, 'mediaplayer', None) is not None:
                 self.av_dialog_open.mediaplayer.stop()
                 if type(self.av_dialog_open.mediaplayer).__module__.endswith('media_player_qt'):
-                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink <- L
+                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink
             self.av_dialog_open.close()
             self.av_dialog_open = None
         # Respect active filters: only visible files are offered for deletion
@@ -3710,7 +3710,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 # Clear stale transcript links: SQLite reuses row ids and a later
-                # import could inherit this id, becoming a ghost transcript <- L
+                # import could inherit this id, becoming a ghost transcript
                 cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])
                 self.app.conn.commit()
                 # Delete from vectorstore
@@ -3777,7 +3777,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if getattr(self.av_dialog_open, 'mediaplayer', None) is not None:
                 self.av_dialog_open.mediaplayer.stop()
                 if type(self.av_dialog_open.mediaplayer).__module__.endswith('media_player_qt'):
-                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink <- L
+                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink
             self.av_dialog_open.close()
             self.av_dialog_open = None
         rows = self.visible_selected_rows()
