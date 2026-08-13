@@ -1320,11 +1320,8 @@ def generate_waveform_png_async(media_path, out_path, colour, timeout=30):
     return thread
 
 def keyframe_interval_seconds(media_path, sample_seconds=45):
-    """ Average gap between video keyframes, or None when it cannot be read.
-    Files with widely spaced keyframes (typically downloaded/streaming video)
-    force the player to rebuild several seconds of frames after every seek,
-    which shows as stalls or repeated frames. Needs PyAV; without it the
-    caller simply skips the check. <- L """
+    """ Average gap between video keyframes, or None if unreadable (needs
+    PyAV). Wide gaps mean every seek rebuilds seconds of frames. <- L """
     try:
         import av as _av
     except ImportError:
