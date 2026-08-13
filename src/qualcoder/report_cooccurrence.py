@@ -28,10 +28,9 @@ import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import PatternFill
+from PyQt6 import QtCore, QtWidgets, QtGui
 import sqlite3
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
-from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import ExportDirectoryPathDialog, Message
@@ -47,7 +46,7 @@ from networkx.algorithms.community import louvain_communities, greedy_modularity
 import matplotlib
 matplotlib.use('Agg')  # Static engine to generate PNGs without a graphical interface
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm  # Not used ?
+# import matplotlib.cm as cm  # Not used ?
     
 '''    HAS_NETWORK_LIBS = True
 except Exception as e:
@@ -480,6 +479,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         # Color heat map for spread across 5 colours
         colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # Light to dark red
+        colours_blue = ["#e0f7fa", "#80d8ff", "#40c4ff", "#0091ea", "#01579b"]
         for row, row_data in enumerate(self.data_counts):
             for col, item_data in enumerate(row_data):
                 if self.data_counts[row][col] > 0:
