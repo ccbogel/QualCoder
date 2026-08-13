@@ -698,7 +698,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
                 # python-vlc missing or Qt chosen: use the Qt Multimedia backend <- L
                 self.instance = QtMediaInstance()
             else:
-                self.instance = make_vlc_instance(vlc, self.app.settings.get('av_vlc_args', ''))
+                self.instance = make_vlc_instance(vlc)
                 if self.instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError):
