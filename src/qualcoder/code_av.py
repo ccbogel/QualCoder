@@ -1537,6 +1537,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.widget_tracks.set_code_structure(self.codes, self.categories)
         self.ui.widget_tracks.set_segments(self.segments)
 
+    def _reset_segment_state(self):
+        """ Drop any marked segment: the dict, not the drawn selection, is what
+        'assign to code' uses, so a leftover from another file could code the
+        wrong span. """
+        self.segment = {'start': None, 'end': None, 'start_msecs': None, 'end_msecs': None,
+                        'memo': "", 'important': 0, 'seltext': ""}
+        self.play_segment_end = None
+        self.segment_play_start = None
+        self.segment_play_end = None
+        self.ui.widget_seekbar.clear_selection()
+        self.ui.label_segment.setText(_("Segment:"))
+
     def clear_file(self):
         """ When AV file removed clear all details.
         Called by null file with load_media, ManageFiles.delete, get_files """
@@ -1544,7 +1556,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.stop()
         self.media = None
         self.file_ = None
-        self.ui.widget_seekbar.clear_selection()  # no stale span from the old file
+        self._reset_segment_state()
         self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_play.setEnabled(False)
         self.ui.widget_seekbar.setEnabled(False)
@@ -1631,11 +1643,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.clear_file()
             return
 
-        # A selection belongs to the previous file: keeping it could code the
-        # wrong span in this one
-        self.ui.widget_seekbar.clear_selection()
-        self.segment_play_start = None
-        self.segment_play_end = None
+        self._reset_segment_state()  # nothing from the previous file survives
 
         title = self.file_['name'].split('/')[-1]
         self.setWindowTitle(_("Media coding: ") + title)
@@ -2214,7 +2222,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def _apply_keyframe_hint(self):
         """ Pick up the background keyframe measurement (once) and warn when
-        seeking on this file will be imprecise."""
+        seeking on this file will be imprecise. """
         gap = self._keyframe_gap
         if not gap:
             return
