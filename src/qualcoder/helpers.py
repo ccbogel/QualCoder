@@ -768,7 +768,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
         if getattr(self, 'mediaplayer', None) is not None:
             self.mediaplayer.stop()
             if type(self.mediaplayer).__module__.endswith('media_player_qt'):
-                self.mediaplayer.release()  # free handle for later delete <- L
+                self.mediaplayer.release()  # free handle for later delete
 
 
 class DialogCodeInImage(QtWidgets.QDialog):
