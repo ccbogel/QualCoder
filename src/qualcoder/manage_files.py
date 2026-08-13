@@ -3600,10 +3600,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                   "on the next update."))
 
     def _unlink_media_with_retry(self, filepath):
-        """ Media players release their file handle asynchronously: on Windows an
-        immediate unlink can still hit WinError 32. Retry briefly, sweeping the
-        players each time; if the file stays locked, warn instead of crashing.
-        Returns True when the file is gone (or was already absent). <- L """
+        """ Players free the file handle asynchronously, so an immediate unlink
+        can still hit WinError 32: retry briefly, then warn. <- L """
         last_err = None
         for _attempt in range(12):
             try:
@@ -3624,9 +3622,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         return False
 
     def _release_media_players_for(self, filepath):
-        """ Ask every live A/V player holding this file to let go of it before
-        unlink: on Windows an open handle (e.g. the Code A/V tab) raises
-        WinError 32. Qt players release the source; VLC players stop. <- L """
+        """ Ask every live player holding this file to let go before unlink
+        (an open handle raises WinError 32 on Windows). <- L """
         try:
             target = str(Path(filepath).resolve())
         except Exception:
@@ -3747,7 +3744,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
                 # Just in case, added this line
                 cur.execute("delete from case_text where fid = ?", [s['id']])
-                cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])  # ghost transcript guard <- L
+                cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])
                 self.app.conn.commit()
 
                 # Delete linked transcription text file
@@ -3821,7 +3818,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from annotation where fid = ?", [file_id])
                 cur.execute("delete from case_text where fid = ?", [file_id])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
-                cur.execute("update source set av_text_id=null where av_text_id=?", [file_id])  # ghost transcript guard <- L
+                cur.execute("update source set av_text_id=null where av_text_id=?", [file_id])
                 self.app.conn.commit()
                 # Delete from vectorstore
                 self.vectorstore_delete_document_safe(file_id)
