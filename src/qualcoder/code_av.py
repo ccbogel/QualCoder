@@ -1678,6 +1678,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.file_['av_text_id'] is not None:
             cur.execute("select id, fulltext, name from source where id=?", [self.file_['av_text_id']])
             self.transcription = cur.fetchone()
+            if self.transcription is not None and \
+                    not (self.transcription[2].endswith(".txt")
+                         or self.transcription[2].endswith(".transcribed")):
+                # Stale link after id reuse pointed at a non-transcript file
+                self.transcription = None
+                self.file_['av_text_id'] = None
             if self.transcription is not None and self.transcription[1] is None:
                 # Old projects can hold NULL fulltext; normalise so setPlainText/regex do not crash
                 self.transcription = (self.transcription[0], "", self.transcription[2])
@@ -2451,7 +2457,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if not waveform_backend_available():
             # ffmpeg not installed: cannot build the image. Everything else still works.
             sb.set_waveform_pixmap(None)
-            sb.set_no_waveform_message(_("Waveform unavailable (ffmpeg not found)"))
+            sb.set_no_waveform_message("")  # silent: bar still works for seeking
             if not getattr(self.app, '_ffmpeg_warned', False):
                 logger.warning("ffmpeg not found: waveform images disabled. "
                                "Playback, seeking and coding still work.")
