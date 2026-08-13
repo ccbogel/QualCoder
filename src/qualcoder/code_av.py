@@ -401,7 +401,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 # vlc stays None when python-vlc is missing: use the Qt player
                 self.instance = QtMediaInstance()
             else:
-                self.instance = make_vlc_instance(vlc, self.app.settings.get('av_vlc_args', ''))
+                self.instance = make_vlc_instance(vlc)
                 if self.instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError) as name_err:
@@ -1590,7 +1590,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             else:
                 if vlc is None:
                     raise NameError("python-vlc not installed")
-                new_instance = make_vlc_instance(vlc, self.app.settings.get('av_vlc_args', ''))
+                new_instance = make_vlc_instance(vlc)
                 if new_instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError):
@@ -2191,10 +2191,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 break
 
     def _check_seek_friendliness(self, media_path):
-        """ Long gaps between keyframes (usual in downloaded/streaming video)
-        make every seek rebuild seconds of frames: any player, VLC included,
-        can stall or repeat frames. Warn once through the seek bar tooltip and
-        widen our seek coalescing so a drag does not queue several rebuilds. <- L """
+        """ Widely spaced keyframes make every seek rebuild seconds of frames
+        in any player. Warn in the seek bar tooltip and widen coalescing. <- L """
         self._seek_coalesce_ms = 120
         gap = keyframe_interval_seconds(media_path)
         if gap is None:
@@ -2210,9 +2208,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         logger.info(hint)
 
     def _vlc_apply_seek(self, ms, duration):
-        """ Seek discipline for vlc: coalesce rapid requests (slider drags) into
-        a single seek, so a drag does not queue one keyframe rebuild per
-        step. <- L """
+        """ First request seeks at once; further rapid ones (a drag) coalesce
+        into a single seek. <- L """
         self._vlc_seek_pending = (ms, duration)
         timer = getattr(self, '_vlc_seek_timer', None)
         if timer is None:
@@ -2676,10 +2673,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 logger.exception(f"update_ui tick failed (bar kept alive): {err}")
 
     def _vlc_display_ms(self, msecs):
-        """ Right after a seek, vlc keeps reporting the previous position for a
-        few ticks (and, on long-GOP files, while it rebuilds frames). Show the
-        requested position instead until playback converges, so the playhead
-        does not bounce back to where it was before the click. <- L """
+        """ vlc reports the previous position for a few ticks after a seek:
+        show the requested one until playback converges. <- L """
         target = getattr(self, '_vlc_target_ms', None)
         if target is None:
             return msecs
