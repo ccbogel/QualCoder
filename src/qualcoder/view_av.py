@@ -155,19 +155,6 @@ class DialogViewAV(QtWidgets.QDialog):
             if legacy:
                 self.speaker_list = [s for s in str(legacy).split("|") if s.strip()][:8]
                 self._save_speakers_json()
-        # Predefined elements: symbols only (description in the tooltip); speakers first.
-        self.transcript_snippets = [
-            ("(.)", _("Short pause")),
-            ("(2)", _("Timed pause in seconds")),
-            ("( )", _("Unintelligible")),
-            ("(( ))", _("Uncertain transcription")),
-            ("[ ]", _("Overlap")),
-            ("< >", _("Fast speech")),
-            ("> <", _("Slow speech")),
-            ("(h)", _("Audible breathing")),
-            ("@", _("Laughter")),
-            ("=", _("Latching")),
-        ]
         self.ui.listWidget_snippets.itemDoubleClicked.connect(self.insert_snippet)
         self.ui.listWidget_snippets.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_snippets.customContextMenuRequested.connect(self.snippets_menu)
@@ -201,6 +188,12 @@ class DialogViewAV(QtWidgets.QDialog):
         if self.file_['av_text_id'] is not None:
             cur.execute("select id, fulltext, name from source where id=?", [file_['av_text_id']])
             self.transcription = cur.fetchone()
+            if self.transcription is not None and \
+                    not (self.transcription[2].endswith(".txt")
+                         or self.transcription[2].endswith(".transcribed")):
+                # Stale link after id reuse pointed at a non-transcript file
+                self.transcription = None
+                self.file_['av_text_id'] = None
             if self.transcription is not None and self.transcription[1] is None:
                 # Old projects can hold NULL fulltext; normalise so setText/regex do not crash
                 self.transcription = (self.transcription[0], "", self.transcription[2])
@@ -620,7 +613,7 @@ class DialogViewAV(QtWidgets.QDialog):
             return
         if not waveform_backend_available():
             sb.set_waveform_pixmap(None)
-            sb.set_no_waveform_message(_("Waveform unavailable (ffmpeg not found)"))
+            sb.set_no_waveform_message("")  # silent: bar still works for seeking
             return
         # Worker thread build; a QTimer polls for completion in the GUI thread.
         sb.set_waveform_pixmap(None)
@@ -1281,26 +1274,12 @@ class DialogViewAV(QtWidgets.QDialog):
             logger.warning(f"speakers.json write failed: {err}")
 
     def refresh_snippets_list(self):
-        """ Rebuild the snippets list: speakers always first (bold), then symbols. """
+        """ Rebuild the speakers list. """
         lw = self.ui.listWidget_snippets
         lw.clear()
         bold = QtGui.QFont()
         bold.setBold(True)
 
-        def add_header(text):
-            item = QtWidgets.QListWidgetItem(text)
-            hfont = QtGui.QFont()
-            hfont.setBold(True)
-            hfont.setPointSize(max(lw.font().pointSize() - 1, 7))
-            item.setFont(hfont)
-            item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)  # header row: not interactive
-            fg = item.foreground().color()
-            fg.setAlpha(150)
-            item.setForeground(fg)
-            lw.addItem(item)
-
-        if self.speaker_list:
-            add_header(_("Speakers"))
         for i, speaker in enumerate(self.speaker_list):
             # Show the speaker as it will be inserted; shortcut in the tooltip.
             shown = self._speaker_snippet_text(speaker).strip()
@@ -1313,12 +1292,6 @@ class DialogViewAV(QtWidgets.QDialog):
             item.setToolTip(tip)
             item.setData(QtCore.Qt.ItemDataRole.UserRole, speaker)
             item.setData(QtCore.Qt.ItemDataRole.UserRole + 1, True)  # speaker flag
-            lw.addItem(item)
-        add_header(_("Predefined text"))
-        for snippet, description in self.transcript_snippets:
-            item = QtWidgets.QListWidgetItem(snippet)
-            item.setToolTip(description)
-            item.setData(QtCore.Qt.ItemDataRole.UserRole, snippet)
             lw.addItem(item)
 
     def snippets_menu(self, position):
@@ -1345,6 +1318,7 @@ class DialogViewAV(QtWidgets.QDialog):
             data = self._speaker_snippet_text(str(data))
         cursor = self.ui.textEdit.textCursor()
         cursor.insertText(data)
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
         self.ui.textEdit.setFocus()
 
     def _insert_next_speaker(self):
@@ -1354,6 +1328,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self._alternate_idx = (getattr(self, '_alternate_idx', -1) + 1) % len(self.speaker_list)
         speaker = self.speaker_list[self._alternate_idx]
         self.ui.textEdit.textCursor().insertText(self._speaker_snippet_text(speaker))
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
         self.ui.textEdit.setFocus()
 
     def _speaker_dialog(self, initial_name="", initial_fmt=None, title=None):
@@ -1435,6 +1410,7 @@ class DialogViewAV(QtWidgets.QDialog):
             return False
         # Uses the identifier chosen when the speaker was created.
         self.ui.textEdit.insertPlainText(self._speaker_snippet_text(speaker))
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
 
     def insert_timestamp(self):
         """ Insert a timestamp for the current playback position. """
@@ -1470,6 +1446,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 msecs = tms_str[-3:]
             ts += f'#{hours}:{mins}:{secs}.{msecs}#'
         self.ui.textEdit.insertPlainText(f"{ts}\n")
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
         # Code here makes the current text location visible on the textEdit pane
         text_cursor = self.ui.textEdit.textCursor()
         pos = text_cursor.position()
@@ -1838,6 +1815,8 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_sizes()
         self.ddialog.close()
         self.stop()
+        if type(self.mediaplayer).__module__.endswith('media_player_qt'):
+            self.mediaplayer.release()  # free the file handle (WinError 32 on delete)
         self.textchanged_timer.stop()
         self.timer.stop()
         self.update_database_text()
