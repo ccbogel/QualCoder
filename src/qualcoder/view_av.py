@@ -31,6 +31,7 @@ import os
 import platform
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
+import threading
 import time
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -974,10 +975,24 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Widely spaced keyframes make every seek rebuild seconds of frames
         in any player. Warn in the seek bar tooltip and widen coalescing. <- L """
         self._seek_coalesce_ms = 120
-        gap = keyframe_interval_seconds(media_path)
-        if gap is None:
+        self._keyframe_gap = None
+        self.ui.widget_seekbar.setToolTip("")
+
+        def measure():
+            # Reading keyframes decodes part of the file: off the UI thread so
+            # loading a file never blocks playback controls <- L
+            self._keyframe_gap = keyframe_interval_seconds(media_path) or 0.0
+
+        threading.Thread(target=measure, daemon=True).start()
+
+    def _apply_keyframe_hint(self):
+        """ Pick up the background keyframe measurement (once) and warn when
+        seeking on this file will be imprecise. <- L """
+        gap = self._keyframe_gap
+        if not gap:
             return
-        logger.debug(f"keyframe interval {gap:.2f}s for {media_path}")
+        self._keyframe_gap = None
+        logger.debug(f"keyframe interval {gap:.2f}s")
         if gap < 2.0:
             return
         self._seek_coalesce_ms = 400
@@ -1767,6 +1782,8 @@ class DialogViewAV(QtWidgets.QDialog):
                 if t[0] > 0:
                     self.ui.comboBox_tracks.addItem(str(t[0]))
 
+        if getattr(self, '_keyframe_gap', None):
+            self._apply_keyframe_hint()
         msecs = self._vlc_display_ms(self.mediaplayer.get_time())
         self.ui.widget_seekbar.set_position(msecs)
         media = self.mediaplayer.get_media()
