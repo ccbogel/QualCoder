@@ -3,13 +3,13 @@
  <class>Dialog_Coocurrence</class>
  <widget class="QDialog" name="Dialog_Coocurrence">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>839</width>
+    <width>952</width>
     <height>540</height>
    </rect>
   </property>
@@ -77,7 +77,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>396</x>
+        <x>389</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -105,7 +105,7 @@
      <widget class="QCheckBox" name="checkBox_hide_blanks">
       <property name="geometry">
        <rect>
-        <x>572</x>
+        <x>650</x>
         <y>7</y>
         <width>241</width>
         <height>20</height>
@@ -146,7 +146,7 @@
      <widget class="QPushButton" name="pushButton_select_categories">
       <property name="geometry">
        <rect>
-        <x>359</x>
+        <x>353</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -174,7 +174,7 @@
      <widget class="QPushButton" name="pushButton_select_codes">
       <property name="geometry">
        <rect>
-        <x>323</x>
+        <x>318</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -202,7 +202,7 @@
      <widget class="QPushButton" name="pushButton_file_attributes">
       <property name="geometry">
        <rect>
-        <x>287</x>
+        <x>284</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -230,8 +230,8 @@
      <widget class="QPushButton" name="pushButton_export_gephi">
       <property name="geometry">
        <rect>
-        <x>534</x>
-        <y>0</y>
+        <x>546</x>
+        <y>1</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -258,8 +258,8 @@
      <widget class="QPushButton" name="pushButton_export_coocurrence_graph">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>0</y>
+        <x>476</x>
+        <y>1</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -287,8 +287,8 @@ Right-click for format options</string>
      <widget class="QPushButton" name="pushButton_export_cluster_graph">
       <property name="geometry">
        <rect>
-        <x>496</x>
-        <y>0</y>
+        <x>510</x>
+        <y>1</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -314,6 +314,38 @@ Right-click for format options
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_color">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Highlight colour</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_transpose">
+      <property name="geometry">
+       <rect>
+        <x>425</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Transpose</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
@@ -325,7 +357,7 @@ Right-click for format options
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <widget class="QTableWidget" name="tableWidget"/>
         <widget class="QTextEdit" name="textEdit"/>
