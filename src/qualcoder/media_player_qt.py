@@ -240,15 +240,24 @@ class MediaPlayer:
         self.player.stop()
 
     def release(self):
-        """
-        Free the media file handle: stop() alone keeps it open on Windows and
+        """ Free the media file handle: stop() alone keeps it open on Windows and
         deleting the just-viewed file raises WinError 32. vlc has the same
-        method.
-        """
+        method. Also tears down the video widget so a later backend switch
+        never leaves a stale surface stacked over the frame. <- L """
         self.stop()
         self._pending_ms = None
         self._media = None
         self.player.setSource(QtCore.QUrl())
+        try:
+            self.player.setVideoOutput(None)
+        except Exception:
+            pass
+        if self.video_widget is not None:
+            self.video_widget.hide()
+            self.video_widget.setParent(None)
+            self.video_widget.deleteLater()
+            self.video_widget = None
+        self._host = None
         QtCore.QCoreApplication.processEvents()
 
     def is_playing(self):
@@ -352,3 +361,41 @@ class MediaPlayer:
         except Exception as err:
             logger.warning(f"Qt snapshot failed: {err}")
             return -1
+
+def make_vlc_instance(vlc_module, override=""):
+    """ VLC instance for embedded playback. Defaults stay as close to a plain
+    desktop VLC as possible (quiet, no title overlay): forcing software
+    decoding or a specific vout made playback slower without fixing the
+    rendering, so decoder and video output are left to VLC. Per-machine
+    troubleshooting goes through settings['av_vlc_args'], which replaces
+    these flags. The applied mode is logged as [vlc-flags]. <- L """
+    if vlc_module is None:
+        return None
+    flags = ["--quiet", "--no-video-title-show"]
+    if override:
+        # settings['av_vlc_args']: space separated libvlc arguments, for
+        # troubleshooting playback on a specific machine <- L
+        flags = override.split()
+    try:
+        inst = vlc_module.Instance(flags)
+        if inst is not None:
+            logger.debug(f"vlc instance: {flags}")
+            return inst
+    except Exception as err:
+        logger.debug(f"vlc arguments rejected ({err}); bare instance")
+    logger.debug("vlc bare instance")
+    return vlc_module.Instance()
+
+_metadata_instance = None
+
+
+def metadata_vlc_instance(vlc_module):
+    """ Lightweight cached instance for reading media metadata: no video
+    output is ever attached, so one per session is enough. <- L """
+    global _metadata_instance
+    if _metadata_instance is None and vlc_module is not None:
+        try:
+            _metadata_instance = vlc_module.Instance(["--quiet", "--no-video"])
+        except Exception:
+            _metadata_instance = vlc_module.Instance()
+    return _metadata_instance
