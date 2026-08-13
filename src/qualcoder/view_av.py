@@ -42,11 +42,11 @@ from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ExportDirecto
 from .html_parser import html_to_text  # Homologate transcript formats with Manage files
 from .select_items import DialogSelectItems
 from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
-    waveform_colour  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
+    waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
 
 # If VLC not installed, it will not crash
 vlc = None
-from .media_player_qt import MediaInstance as QtMediaInstance
+from .media_player_qt import MediaInstance as QtMediaInstance, make_vlc_instance
 try:
     import vlc
 except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise
@@ -191,7 +191,7 @@ class DialogViewAV(QtWidgets.QDialog):
             if self.transcription is not None and \
                     not (self.transcription[2].endswith(".txt")
                          or self.transcription[2].endswith(".transcribed")):
-                # Stale link after id reuse pointed at a non-transcript file
+                # Stale link after id reuse pointed at a non-transcript file <- L
                 self.transcription = None
                 self.file_['av_text_id'] = None
             if self.transcription is not None and self.transcription[1] is None:
@@ -331,7 +331,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 # vlc stays None when python-vlc is missing: use the Qt player
                 self.instance = QtMediaInstance()
             else:
-                self.instance = vlc.Instance()
+                self.instance = make_vlc_instance(vlc, self.app.settings.get('av_vlc_args', ''))
                 if self.instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError) as name_err:
@@ -419,6 +419,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.set_media(self.media)
         # Parse the metadata of the file
         self.media.parse()
+        self._check_seek_friendliness(self.abs_path)
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
         # Bind VLC video output to the embedded frame (or the detached window)
@@ -509,13 +510,32 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.stop()
         except Exception:
             pass
+        # Full teardown of the outgoing backend so video surfaces never stack:
+        # a lingering QVideoWidget over the frame splits the screen, and a vout
+        # still attached to the hwnd leaves black or frozen pixels. <- L
+        old_mp = getattr(self, 'mediaplayer', None)
+        try:
+            if old_mp is not None:
+                if type(old_mp).__module__.endswith('media_player_qt'):
+                    old_mp.release()
+                else:
+                    old_mp.set_media(None)
+                    system = platform.system()
+                    if system == "Windows":
+                        old_mp.set_hwnd(0)
+                    elif system == "Darwin":
+                        old_mp.set_nsobject(0)
+                    else:
+                        old_mp.set_xwindow(0)
+        except Exception:
+            pass
         try:
             if wanted == 'qt':
                 new_instance = QtMediaInstance()
             else:
                 if vlc is None:
                     raise NameError("python-vlc not installed")
-                new_instance = vlc.Instance()
+                new_instance = make_vlc_instance(vlc, self.app.settings.get('av_vlc_args', ''))
                 if new_instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError):
@@ -541,6 +561,8 @@ class DialogViewAV(QtWidgets.QDialog):
         self.media.parse()
         self.mediaplayer.set_media(self.media)
         self._retarget_video_output()
+        host = self.ddialog.dframe if getattr(self, 'video_detached', False) else self.ui.frame_video
+        host.repaint()  # clear leftovers from the previous backend surface <- L
         self.mediaplayer.audio_set_volume(int(self.ui.horizontalSlider_vol.value()))
         if pos:
             self.mediaplayer.set_time(pos)
@@ -613,7 +635,7 @@ class DialogViewAV(QtWidgets.QDialog):
             return
         if not waveform_backend_available():
             sb.set_waveform_pixmap(None)
-            sb.set_no_waveform_message("")  # silent: bar still works for seeking
+            sb.set_no_waveform_message("")  # silent: bar still works for seeking <- L
             return
         # Worker thread build; a QTimer polls for completion in the GUI thread.
         sb.set_waveform_pixmap(None)
@@ -948,6 +970,62 @@ class DialogViewAV(QtWidgets.QDialog):
                 self._seek_to_ms(ms)
                 break
 
+    def _check_seek_friendliness(self, media_path):
+        """ Long gaps between keyframes (usual in downloaded/streaming video)
+        make every seek rebuild seconds of frames: any player, VLC included,
+        can stall or repeat frames. Warn once through the seek bar tooltip and
+        widen our seek coalescing so a drag does not queue several rebuilds. <- L """
+        self._seek_coalesce_ms = 120
+        gap = keyframe_interval_seconds(media_path)
+        if gap is None:
+            return
+        logger.debug(f"keyframe interval {gap:.2f}s for {media_path}")
+        if gap < 2.0:
+            return
+        self._seek_coalesce_ms = 400
+        hint = _("Keyframes in this file are about %s seconds apart, so seeking "
+                 "may stall or repeat frames. Re-encoding it with denser "
+                 "keyframes gives precise navigation.") % f"{gap:.1f}"
+        self.ui.widget_seekbar.setToolTip(hint)
+        logger.info(hint)
+
+    def _vlc_apply_seek(self, ms, duration):
+        """ Seek discipline for vlc: coalesce rapid requests (slider drags) into
+        a single seek, so a drag does not queue one keyframe rebuild per
+        step. <- L """
+        self._vlc_seek_pending = (ms, duration)
+        timer = getattr(self, '_vlc_seek_timer', None)
+        if timer is None:
+            timer = QtCore.QTimer(self)
+            timer.setSingleShot(True)
+            timer.timeout.connect(self._vlc_fire_seek)
+            self._vlc_seek_timer = timer
+        if not timer.isActive():
+            self._vlc_fire_seek()  # first request goes straight through <- L
+        timer.setInterval(getattr(self, '_seek_coalesce_ms', 120))
+        timer.start()
+
+    def _vlc_fire_seek(self):
+        pending = getattr(self, '_vlc_seek_pending', None)
+        if pending is None:
+            return
+        ms, duration = pending
+        self._vlc_seek_pending = None
+        mp = self.mediaplayer
+        if mp is None or type(mp).__module__.endswith('media_player_qt'):
+            return
+        self._vlc_target_ms = ms
+        self._vlc_last_seek_at = time.monotonic()
+        try:
+            mp.set_position(ms / duration)
+            if mp.is_playing() == 0:
+                try:
+                    mp.next_frame()  # paused vlc keeps the stale frame <- L
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
     def _seek_to_ms(self, ms):
         """ Seek the media player to an absolute millisecond position. """
         if self.mediaplayer is None or self.mediaplayer.get_media() is None:
@@ -956,7 +1034,10 @@ class DialogViewAV(QtWidgets.QDialog):
         if duration <= 0:
             return
         ms = max(0, min(int(ms), duration - 1))
-        self.mediaplayer.set_position(ms / duration)
+        if type(self.mediaplayer).__module__.endswith('media_player_qt'):
+            self.mediaplayer.set_position(ms / duration)
+        else:
+            self._vlc_apply_seek(ms, duration)
         self.ui.label_time.setText(msecs_to_hours_mins_secs(ms))
         self.sync_position_slider(ms, duration)
         self.update_ui()
@@ -1274,11 +1355,22 @@ class DialogViewAV(QtWidgets.QDialog):
             logger.warning(f"speakers.json write failed: {err}")
 
     def refresh_snippets_list(self):
-        """ Rebuild the speakers list. """
+        """ Rebuild the speakers list with a header row. Predefined symbols
+        removed after review. <- L """
         lw = self.ui.listWidget_snippets
         lw.clear()
         bold = QtGui.QFont()
         bold.setBold(True)
+        header = QtWidgets.QListWidgetItem(_("Speakers"))
+        hfont = QtGui.QFont()
+        hfont.setBold(True)
+        hfont.setPointSize(max(lw.font().pointSize() - 1, 7))
+        header.setFont(hfont)
+        header.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)  # header row: not interactive
+        fg = header.foreground().color()
+        fg.setAlpha(150)
+        header.setForeground(fg)
+        lw.addItem(header)
 
         for i, speaker in enumerate(self.speaker_list):
             # Show the speaker as it will be inserted; shortcut in the tooltip.
@@ -1318,7 +1410,7 @@ class DialogViewAV(QtWidgets.QDialog):
             data = self._speaker_snippet_text(str(data))
         cursor = self.ui.textEdit.textCursor()
         cursor.insertText(data)
-        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point <- L
         self.ui.textEdit.setFocus()
 
     def _insert_next_speaker(self):
@@ -1328,7 +1420,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self._alternate_idx = (getattr(self, '_alternate_idx', -1) + 1) % len(self.speaker_list)
         speaker = self.speaker_list[self._alternate_idx]
         self.ui.textEdit.textCursor().insertText(self._speaker_snippet_text(speaker))
-        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point <- L
         self.ui.textEdit.setFocus()
 
     def _speaker_dialog(self, initial_name="", initial_fmt=None, title=None):
@@ -1410,7 +1502,7 @@ class DialogViewAV(QtWidgets.QDialog):
             return False
         # Uses the identifier chosen when the speaker was created.
         self.ui.textEdit.insertPlainText(self._speaker_snippet_text(speaker))
-        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point <- L
 
     def insert_timestamp(self):
         """ Insert a timestamp for the current playback position. """
@@ -1446,7 +1538,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 msecs = tms_str[-3:]
             ts += f'#{hours}:{mins}:{secs}.{msecs}#'
         self.ui.textEdit.insertPlainText(f"{ts}\n")
-        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point
+        self.ui.textEdit.ensureCursorVisible()  # scroll to the insertion point <- L
         # Code here makes the current text location visible on the textEdit pane
         text_cursor = self.ui.textEdit.textCursor()
         pos = text_cursor.position()
@@ -1655,6 +1747,20 @@ class DialogViewAV(QtWidgets.QDialog):
                 self._update_ui_error_logged = True
                 logger.exception(f"update_ui tick failed (bar kept alive): {err}")
 
+    def _vlc_display_ms(self, msecs):
+        """ Right after a seek, vlc keeps reporting the previous position for a
+        few ticks (and, on long-GOP files, while it rebuilds frames). Show the
+        requested position instead until playback converges, so the playhead
+        does not bounce back to where it was before the click. <- L """
+        target = getattr(self, '_vlc_target_ms', None)
+        if target is None:
+            return msecs
+        if abs(msecs - target) <= 400 or \
+                time.monotonic() - getattr(self, '_vlc_last_seek_at', 0) > 3.0:
+            self._vlc_target_ms = None
+            return msecs
+        return target
+
     def update_ui(self):
         """ Updates the user interface: wave playhead, audio tracks, media time and
         optional transcript scrolling. """
@@ -1666,7 +1772,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 if t[0] > 0:
                     self.ui.comboBox_tracks.addItem(str(t[0]))
 
-        msecs = self.mediaplayer.get_time()
+        msecs = self._vlc_display_ms(self.mediaplayer.get_time())
         self.ui.widget_seekbar.set_position(msecs)
         media = self.mediaplayer.get_media()
         if media is not None:
@@ -1816,7 +1922,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ddialog.close()
         self.stop()
         if type(self.mediaplayer).__module__.endswith('media_player_qt'):
-            self.mediaplayer.release()  # free the file handle (WinError 32 on delete)
+            self.mediaplayer.release()  # free the file handle (WinError 32 on delete) <- L
         self.textchanged_timer.stop()
         self.timer.stop()
         self.update_database_text()
