@@ -32,6 +32,7 @@ import platform
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import subprocess
+import threading
 import time
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -1543,6 +1544,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.stop()
         self.media = None
         self.file_ = None
+        self.ui.widget_seekbar.clear_selection()  # no stale span from the old file
         self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_play.setEnabled(False)
         self.ui.widget_seekbar.setEnabled(False)
@@ -1567,7 +1569,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             pass
         # Full teardown of the outgoing backend so video surfaces never stack:
         # a lingering QVideoWidget over the frame splits the screen, and a vout
-        # still attached to the hwnd leaves black or frozen pixels. <- L
+        # still attached to the hwnd leaves black or frozen pixels.
         old_mp = getattr(self, 'mediaplayer', None)
         try:
             if old_mp is not None:
@@ -1628,6 +1630,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                     "warning").exec()
             self.clear_file()
             return
+
+        # A selection belongs to the previous file: keeping it could code the
+        # wrong span in this one
+        self.ui.widget_seekbar.clear_selection()
+        self.segment_play_start = None
+        self.segment_play_end = None
 
         title = self.file_['name'].split('/')[-1]
         self.setWindowTitle(_("Media coding: ") + title)
@@ -1703,7 +1711,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if self.transcription is not None and \
                     not (self.transcription[2].endswith(".txt")
                          or self.transcription[2].endswith(".transcribed")):
-                # Stale link after id reuse pointed at a non-transcript file <- L
+                # Stale link after id reuse pointed at a non-transcript file
                 self.transcription = None
                 self.file_['av_text_id'] = None
             if self.transcription is not None and self.transcription[1] is None:
@@ -2192,12 +2200,26 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def _check_seek_friendliness(self, media_path):
         """ Widely spaced keyframes make every seek rebuild seconds of frames
-        in any player. Warn in the seek bar tooltip and widen coalescing. <- L """
+        in any player. Warn in the seek bar tooltip and widen coalescing. """
         self._seek_coalesce_ms = 120
-        gap = keyframe_interval_seconds(media_path)
-        if gap is None:
+        self._keyframe_gap = None
+        self.ui.widget_seekbar.setToolTip("")
+
+        def measure():
+            # Reading keyframes decodes part of the file: off the UI thread so
+            # loading a file never blocks playback controls
+            self._keyframe_gap = keyframe_interval_seconds(media_path) or 0.0
+
+        threading.Thread(target=measure, daemon=True).start()
+
+    def _apply_keyframe_hint(self):
+        """ Pick up the background keyframe measurement (once) and warn when
+        seeking on this file will be imprecise."""
+        gap = self._keyframe_gap
+        if not gap:
             return
-        logger.debug(f"keyframe interval {gap:.2f}s for {media_path}")
+        self._keyframe_gap = None
+        logger.debug(f"keyframe interval {gap:.2f}s")
         if gap < 2.0:
             return
         self._seek_coalesce_ms = 400
@@ -2209,7 +2231,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def _vlc_apply_seek(self, ms, duration):
         """ First request seeks at once; further rapid ones (a drag) coalesce
-        into a single seek. <- L """
+        into a single seek. """
         self._vlc_seek_pending = (ms, duration)
         timer = getattr(self, '_vlc_seek_timer', None)
         if timer is None:
@@ -2218,7 +2240,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             timer.timeout.connect(self._vlc_fire_seek)
             self._vlc_seek_timer = timer
         if not timer.isActive():
-            self._vlc_fire_seek()  # first request goes straight through <- L
+            self._vlc_fire_seek()  # first request goes straight through
         timer.setInterval(getattr(self, '_seek_coalesce_ms', 120))
         timer.start()
 
@@ -2237,7 +2259,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             mp.set_position(ms / duration)
             if mp.is_playing() == 0:
                 try:
-                    mp.next_frame()  # paused vlc keeps the stale frame <- L
+                    mp.next_frame()  # paused vlc keeps the stale frame
                 except Exception:
                     pass
         except Exception:
@@ -2535,7 +2557,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if not waveform_backend_available():
             # ffmpeg not installed: cannot build the image. Everything else still works.
             sb.set_waveform_pixmap(None)
-            sb.set_no_waveform_message("")  # silent: bar still works for seeking <- L
+            sb.set_no_waveform_message("")  # silent: bar still works for seeking
             if not getattr(self.app, '_ffmpeg_warned', False):
                 logger.warning("ffmpeg not found: waveform images disabled. "
                                "Playback, seeking and coding still work.")
@@ -2674,7 +2696,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def _vlc_display_ms(self, msecs):
         """ vlc reports the previous position for a few ticks after a seek:
-        show the requested one until playback converges. <- L """
+        show the requested one until playback converges. """
         target = getattr(self, '_vlc_target_ms', None)
         if target is None:
             return msecs
@@ -2698,6 +2720,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.ui.comboBox_tracks.addItem(str(t[0]))
 
         # Set the seek-bar playhead to the current media position
+        if getattr(self, '_keyframe_gap', None):
+            self._apply_keyframe_hint()
         msecs = self._vlc_display_ms(self.mediaplayer.get_time())
         self.ui.widget_seekbar.set_position(msecs)
         self.ui.widget_tracks.set_position(msecs)
