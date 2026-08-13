@@ -3608,6 +3608,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Guard: a dialog that failed mid-init can leave mediaplayer as None
             if getattr(self.av_dialog_open, 'mediaplayer', None) is not None:
                 self.av_dialog_open.mediaplayer.stop()
+                if type(self.av_dialog_open.mediaplayer).__module__.endswith('media_player_qt'):
+                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink
+            self.av_dialog_open.close()
             self.av_dialog_open = None
         # Respect active filters: only visible files are offered for deletion
         visible_sources = [s for r, s in enumerate(self.source)
@@ -3657,6 +3660,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from annotation where fid = ?", [s['id']])
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
+                # Clear stale transcript links: SQLite reuses row ids and a later
+                # import could inherit this id, becoming a ghost transcript
+                cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])
                 self.app.conn.commit()
                 # Delete from vectorstore
                 self.vectorstore_delete_document_safe(s['id'])
@@ -3691,6 +3697,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
                 # Just in case, added this line
                 cur.execute("delete from case_text where fid = ?", [s['id']])
+                cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])  # ghost transcript guard
                 self.app.conn.commit()
 
                 # Delete linked transcription text file
@@ -3722,6 +3729,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Guard: a dialog that failed mid-init can leave mediaplayer as None
             if getattr(self.av_dialog_open, 'mediaplayer', None) is not None:
                 self.av_dialog_open.mediaplayer.stop()
+                if type(self.av_dialog_open.mediaplayer).__module__.endswith('media_player_qt'):
+                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink
+            self.av_dialog_open.close()
             self.av_dialog_open = None
         rows = self.visible_selected_rows()
         if len(rows) == 0:
@@ -3761,6 +3771,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from annotation where fid = ?", [file_id])
                 cur.execute("delete from case_text where fid = ?", [file_id])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
+                cur.execute("update source set av_text_id=null where av_text_id=?", [file_id])  # ghost transcript guard
                 self.app.conn.commit()
                 # Delete from vectorstore
                 self.vectorstore_delete_document_safe(file_id)
