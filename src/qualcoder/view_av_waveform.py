@@ -33,7 +33,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from .helpers import msecs_to_hours_mins_secs
 
 try:
-    _("")
+    _("-")
 except NameError:
     def _(text):
         return text
