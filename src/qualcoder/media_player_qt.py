@@ -241,7 +241,7 @@ class MediaPlayer:
 
     def release(self):
         """ Free the file handle (stop() alone keeps it open on Windows) and
-        tear down the video widget so no stale surface is left. <- L """
+        tear down the video widget so no stale surface is left. """
         self.stop()
         self._pending_ms = None
         self._media = None
@@ -363,7 +363,7 @@ class MediaPlayer:
 
 def make_vlc_instance(vlc_module):
     """ VLC instance for embedded playback: quiet console and no title
-    overlay. Decoder and video output are left to VLC. <- L """
+    overlay. Decoder and video output are left to VLC. """
     if vlc_module is None:
         return None
     flags = ["--quiet", "--no-video-title-show"]
@@ -382,7 +382,7 @@ _metadata_instance = None
 
 def metadata_vlc_instance(vlc_module):
     """ Lightweight cached instance for reading media metadata: no video
-    output is ever attached, so one per session is enough. <- L """
+    output is ever attached, so one per session is enough. """
     global _metadata_instance
     if _metadata_instance is None and vlc_module is not None:
         try:
