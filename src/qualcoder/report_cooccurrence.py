@@ -28,10 +28,9 @@ import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import PatternFill
+from PyQt6 import QtCore, QtWidgets, QtGui
 import sqlite3
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
-from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import ExportDirectoryPathDialog, Message
@@ -47,7 +46,7 @@ from networkx.algorithms.community import louvain_communities, greedy_modularity
 import matplotlib
 matplotlib.use('Agg')  # Static engine to generate PNGs without a graphical interface
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm  # Not used ?
+# import matplotlib.cm as cm  # Not used ?
     
 '''    HAS_NETWORK_LIBS = True
 except Exception as e:
@@ -65,6 +64,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.parent_textEdit = parent_text_edit
         self.attributes = []
         self.files = []
+        self.color_choice = 0 
+        self.colours = [
+            ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"],
+            ["#e0f7fa", "#80d8ff", "#40c4ff", "#0091ea", "#01579b"],
+            ["#D2F2D4", "#7BE382", "#26CC00", "#22B600", "#009C1A"]
+        ]
+        
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Coocurrence()
         self.ui.setupUi(self)
@@ -84,6 +90,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
+        self.ui.pushButton_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_color.pressed.connect(self.change_highlight_color)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # Should be smaller
@@ -439,6 +447,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     changed = True
         return selected_codes
 
+    def change_highlight_color(self):
+        """ Button to change the highlight colour. for Reds, blues, greens. """
+
+        self.color_choice += 1
+        if self.color_choice > 2:
+            self.color_choice = 0
+        self.process_data()
+
     def process_data(self):
         """ Calculate the relations for selected codes for ALL coders.
         TODO only THIS coder.
@@ -479,7 +495,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 self.data_details[row_pos][col_pos].append(res_list)
 
         # Color heat map for spread across 5 colours
-        colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # Light to dark red
+        #colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # Light to dark red
+        #colours_blue = ["#e0f7fa", "#80d8ff", "#40c4ff", "#0091ea", "#01579b"]
+        colors = self.colours[self.color_choice]
         for row, row_data in enumerate(self.data_counts):
             for col, item_data in enumerate(row_data):
                 if self.data_counts[row][col] > 0:
@@ -488,7 +506,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
-
 
     def export_to_graphml(self):
         """ Export co-occurrence data to GraphML format for network analysis in Gephi. """
@@ -1073,23 +1090,23 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
 
+        # Setup
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         cols = self.ui.tableWidget.columnCount()
         for c in range(0, cols):
             self.ui.tableWidget.removeColumn(0)
-
         header_labels = []
-        # Wrong for selected codes
-        for code_ in self.selected_codes:  # self.codes:
+
+        for code_ in self.selected_codes: 
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
             header_labels.append("\n".join(name_split_50))
         self.ui.tableWidget.setColumnCount(len(header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
         self.ui.tableWidget.setRowCount(len(header_labels))
         self.ui.tableWidget.setVerticalHeaderLabels(header_labels)
-        # tooltip with the full code name on each header using header items <- L
+        # Tooltip with the full code name on each header using header items
         for i, code_ in enumerate(self.selected_codes):
             h_item = self.ui.tableWidget.horizontalHeaderItem(i)
             if h_item is not None:
@@ -1097,6 +1114,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             v_item = self.ui.tableWidget.verticalHeaderItem(i)
             if v_item is not None:
                 v_item.setToolTip(code_['name'])
+        
         for row, row_data in enumerate(self.data_counts):
             for col, cell_data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem()
