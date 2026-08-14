@@ -145,6 +145,29 @@ def file_typer(mediapath):
     return "text"
 
 
+def doc_end_position(text_edit):
+    """
+    End position of a text edit document, in Qt character units.
+    Qt counts UTF-16 units, so len(toPlainText()) is one short per non-BMP
+    character (emoji) and cursor positions drift left.
+    param:
+        text_edit: QTextEdit or QPlainTextEdit
+    """
+
+    return text_edit.document().characterCount() - 1
+
+
+def doc_position_from_index(plain_text, index):
+    """
+    Convert a Python string index into a Qt document position.
+    param:
+        plain_text: String the index refers to, from toPlainText()
+        index: Integer, Python index into plain_text
+    """
+
+    return index + sum(1 for char in plain_text[:index] if ord(char) > 0xFFFF)
+
+
 def init_persistent_tree_header(tree_widget, app, settings_key):
     """Configure a tree header for interactive widths that persist in config.ini."""
 
@@ -601,6 +624,14 @@ class DialogCodeInText(QtWidgets.QDialog):
                 return True
         return False
 
+    def emit_code_text_change(self):
+        """
+        Notify the event bus that this coding was resized.
+        """
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['code_text'], source=self)
+
     def extend_left(self):
         """ Shift left arrow. """
 
@@ -614,6 +645,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
     def extend_right(self):
@@ -630,6 +662,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         cur.execute(sql,
                     (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
     def shrink_to_left(self):
@@ -645,6 +678,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
     def shrink_to_right(self):
@@ -660,6 +694,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
 
@@ -1087,7 +1122,6 @@ class ImportPlainTextCodes:
             return
         filepath = filepath[0]  # List to string of file path
         self.text_edit.append("\n" + _("Importing codes from: ") + filepath)
-        self.text_edit.append(_("Refresh codes trees via menu options for coding, reports"))
         with open(filepath, 'r', encoding='UTF-8-sig') as file_:
             rows = []
             if filepath[-4:].lower() == ".csv":
@@ -1100,6 +1134,7 @@ class ImportPlainTextCodes:
                     if row:
                         rows.append(row)
         cur = self.app.conn.cursor()
+        imported_tables = set()  # only tables that really got a row
         # Insert categories
         for row in rows:
             categories = row[0].split(">>")
@@ -1118,6 +1153,7 @@ class ImportPlainTextCodes:
                                 (category.strip(), "", self.app.settings['codername'],
                                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), supercatid))
                     self.app.conn.commit()
+                    imported_tables.add('code_cat')
                     self.text_edit.append(_("Imported category: ") + category)
                 except sqlite3.IntegrityError:
                     pass
@@ -1145,9 +1181,13 @@ class ImportPlainTextCodes:
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
                             (code_name, memo, self.app.settings['codername'], date_, catid, color))
                 self.app.conn.commit()
+                imported_tables.add('code_name')
                 self.text_edit.append(_("Imported code: ") + code_name)
             except sqlite3.IntegrityError:
                 self.text_edit.append(_("Duplicate code not imported: ") + code_name)
+        # One event for the whole import, not one per row
+        if imported_tables and getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(sorted(imported_tables), source=None)
 
 
 class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
