@@ -145,6 +145,29 @@ def file_typer(mediapath):
     return "text"
 
 
+def doc_end_position(text_edit):
+    """
+    End position of a text edit document, in Qt character units.
+    Qt counts UTF-16 units, so len(toPlainText()) is one short per non-BMP
+    character (emoji) and cursor positions drift left.
+    param:
+        text_edit: QTextEdit or QPlainTextEdit
+    """
+
+    return text_edit.document().characterCount() - 1
+
+
+def doc_position_from_index(plain_text, index):
+    """
+    Convert a Python string index into a Qt document position.
+    param:
+        plain_text: String the index refers to, from toPlainText()
+        index: Integer, Python index into plain_text
+    """
+
+    return index + sum(1 for char in plain_text[:index] if ord(char) > 0xFFFF)
+
+
 def init_persistent_tree_header(tree_widget, app, settings_key):
     """Configure a tree header for interactive widths that persist in config.ini."""
 
