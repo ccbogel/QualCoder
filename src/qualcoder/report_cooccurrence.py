@@ -92,9 +92,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
         self.ui.pushButton_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_color.pressed.connect(self.change_highlight_color)
-        self.ui.pushButton_transpose.setIcon(qta.icon('mdi6.rotate-right', options=[{'scale_factor': 1.4}]))
-        #self.ui.pushButton_transpose.pressed.connect(self.transpose)
-
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # Should be smaller
@@ -509,7 +506,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
-
 
     def export_to_graphml(self):
         """ Export co-occurrence data to GraphML format for network analysis in Gephi. """
@@ -1094,23 +1090,23 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
 
+        # Setup
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         cols = self.ui.tableWidget.columnCount()
         for c in range(0, cols):
             self.ui.tableWidget.removeColumn(0)
-
         header_labels = []
-        # Wrong for selected codes
-        for code_ in self.selected_codes:  # self.codes:
+
+        for code_ in self.selected_codes: 
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
             header_labels.append("\n".join(name_split_50))
         self.ui.tableWidget.setColumnCount(len(header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
         self.ui.tableWidget.setRowCount(len(header_labels))
         self.ui.tableWidget.setVerticalHeaderLabels(header_labels)
-        # tooltip with the full code name on each header using header items <- L
+        # Tooltip with the full code name on each header using header items
         for i, code_ in enumerate(self.selected_codes):
             h_item = self.ui.tableWidget.horizontalHeaderItem(i)
             if h_item is not None:
@@ -1118,6 +1114,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             v_item = self.ui.tableWidget.verticalHeaderItem(i)
             if v_item is not None:
                 v_item.setToolTip(code_['name'])
+        
         for row, row_data in enumerate(self.data_counts):
             for col, cell_data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem()
