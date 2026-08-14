@@ -669,7 +669,7 @@ odt report: report of the coded text and areas.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Rotate left (view only)</string>
+       <string>Rotate page 90° left</string>
       </property>
       <property name="text">
        <string/>
@@ -685,7 +685,7 @@ odt report: report of the coded text and areas.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Rotate right (view only)</string>
+       <string>Rotate page 90° right</string>
       </property>
       <property name="text">
        <string/>
