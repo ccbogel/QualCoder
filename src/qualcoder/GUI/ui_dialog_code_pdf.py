@@ -172,6 +172,14 @@ class Ui_Dialog_code_pdf(object):
         self.pushButton_fit_width.setGeometry(QtCore.QRect(760, 38, 28, 28))
         self.pushButton_fit_width.setText("")
         self.pushButton_fit_width.setObjectName("pushButton_fit_width")
+        self.pushButton_rotate_page_ccw = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_rotate_page_ccw.setGeometry(QtCore.QRect(830, 0, 28, 28))
+        self.pushButton_rotate_page_ccw.setText("")
+        self.pushButton_rotate_page_ccw.setObjectName("pushButton_rotate_page_ccw")
+        self.pushButton_rotate_page = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_rotate_page.setGeometry(QtCore.QRect(860, 0, 28, 28))
+        self.pushButton_rotate_page.setText("")
+        self.pushButton_rotate_page.setObjectName("pushButton_rotate_page")
         self.verticalLayout.addWidget(self.groupBox)
         self.splitter = QtWidgets.QSplitter(parent=Dialog_code_pdf)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
@@ -374,6 +382,8 @@ class Ui_Dialog_code_pdf(object):
         self.label_zoom.setText(_translate("Dialog_code_pdf", "100%"))
         self.pushButton_zoom_in.setToolTip(_translate("Dialog_code_pdf", "Zoom in"))
         self.pushButton_fit_width.setToolTip(_translate("Dialog_code_pdf", "Fit view"))
+        self.pushButton_rotate_page_ccw.setToolTip(_translate("Dialog_code_pdf", "Rotate left (view only)"))
+        self.pushButton_rotate_page.setToolTip(_translate("Dialog_code_pdf", "Rotate right (view only)"))
         self.pushButton_next_file.setToolTip(_translate("Dialog_code_pdf", "Next file"))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_pdf", "File with latest coding"))
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_pdf", "Go to bookmark"))
@@ -387,13 +397,3 @@ class Ui_Dialog_code_pdf(object):
         self.pushButton_important.setToolTip(_translate("Dialog_code_pdf", "Show codings falgged important"))
         self.pushButton_clear_filter_code.setToolTip(_translate("Dialog_code_pdf", "Clear code filter"))
         self.lineEdit_code_filter.setToolTip(_translate("Dialog_code_pdf", "Code name filter"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_code_pdf = QtWidgets.QDialog()
-    ui = Ui_Dialog_code_pdf()
-    ui.setupUi(Dialog_code_pdf)
-    Dialog_code_pdf.show()
-    sys.exit(app.exec())
