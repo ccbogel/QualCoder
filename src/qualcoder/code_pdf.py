@@ -4497,7 +4497,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_rotate_page_ccw.setEnabled(enabled)
 
     def rotate_current_page(self):
-        """ Rotate the current page 90 deg clockwise (view only, single-page mode)
+        """ Rotate the current page 90 deg clockwise (view only, single-page mode).
         File, text and coding coordinates untouched. """
 
         self._rotate_current(90)
@@ -4805,8 +4805,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         action_rotate_cw = None
         action_rotate_ccw = None
         if self.view.single_page_mode:  # rotation is a single-page reading aid
-            action_rotate_cw = menu.addAction(_("Rotate page clockwise"))
-            action_rotate_ccw = menu.addAction(_("Rotate page counter-clockwise"))
+            action_rotate_ccw = menu.addAction(_("Rotate page 90° left"))
+            action_rotate_cw = menu.addAction(_("Rotate page 90° right"))
         action = menu.exec(global_pos)
         if action is None:
             return
