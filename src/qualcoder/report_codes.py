@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -48,7 +48,8 @@ from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
-    ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
+    ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths, \
+    doc_end_position, doc_position_from_index
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
@@ -219,6 +220,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Called from : init, manage_files.delete manage_files.delete_button_multiple_files
         """
 
+        self.file_sort = file_sort  # remembered, so a bus refresh keeps the chosen order
         self.ui.listWidget_files.clear()
         self.files = self.app.get_filenames()
         # Fill additional details about each file in the memo
@@ -317,10 +319,43 @@ class DialogReportCodes(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
-        if "code_cat" not in tables and "code_name" not in tables:
+        if "code_cat" in tables or "code_name" in tables:
+            self.code_names, self.categories = self.app.get_codes_categories()
+            self.fill_tree()
+        elif tables & {"code_text", "code_image", "code_av"}:
+            self.fill_code_counts_in_tree()  # tree unchanged, only the Count column
+        if tables & {"source", "cases", "case_text"}:
+            self.refresh_files_and_cases()
+
+    def refresh_files_and_cases(self):
+        """
+        Refill the file and case lists, keeping the current selection.
+        """
+
+        selected_files = [i.text() for i in self.ui.listWidget_files.selectedItems()]
+        selected_cases = [i.text() for i in self.ui.listWidget_cases.selectedItems()]
+        self.get_files_and_cases(self.file_sort)
+        for i in range(self.ui.listWidget_files.count()):
+            item = self.ui.listWidget_files.item(i)
+            if item.text() in selected_files:
+                item.setSelected(True)
+        for i in range(self.ui.listWidget_cases.count()):
+            item = self.ui.listWidget_cases.item(i)
+            if item.text() in selected_cases:
+                item.setSelected(True)
+
+    def emit_coding_change(self, result_type):
+        """
+        Notify the event bus of a change in the coding table for this result type.
+        param:
+            result_type: String, text, image or av
+        """
+
+        table = {'text': 'code_text', 'image': 'code_image', 'av': 'code_av'}.get(result_type)
+        if table is None:
             return
-        self.code_names, self.categories = self.app.get_codes_categories()
-        self.fill_tree()
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes([table], source=self)
 
     def get_selected_files_and_cases(self):
         """ Fill file_ids and case_ids Strings used in the search.
@@ -1380,10 +1415,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 cursor = self.ui.textEdit.textCursor()
                 fmt = QtGui.QTextCharFormat()
-                pos0 = len(self.ui.textEdit.toPlainText())
+                pos0 = doc_end_position(self.ui.textEdit)
                 self.ui.textEdit.append(r[0] + r[1])
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                pos1 = len(self.ui.textEdit.toPlainText())
+                pos1 = doc_end_position(self.ui.textEdit)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 brush = QBrush(QtGui.QColor(r[3]))
                 fmt.setBackground(brush)
@@ -2260,7 +2295,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         if self.ui.textEdit.toPlainText() == "":
             return
-        if self.ui.textEdit.textCursor().position() >= len(self.ui.textEdit.toPlainText()):
+        if self.ui.textEdit.textCursor().position() >= doc_end_position(self.ui.textEdit):
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
             self.ui.textEdit.setTextCursor(cursor)
@@ -2274,10 +2309,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         if pattern is None:
             return
         for match in pattern.finditer(te_text):
-            if match.start() > self.ui.textEdit.textCursor().position():
+            # Python indexes by code point, Qt by UTF-16 unit
+            start = doc_position_from_index(te_text, match.start())
+            end = doc_position_from_index(te_text, match.end())
+            if start > self.ui.textEdit.textCursor().position():
                 cursor = self.ui.textEdit.textCursor()
-                cursor.setPosition(match.start(), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(start, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(end, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.ui.textEdit.setTextCursor(cursor)
                 break
 
@@ -2321,17 +2359,17 @@ class DialogReportCodes(QtWidgets.QDialog):
 
             if row['result_type'] == 'text' and memo_key not in ("only_memos", "only_coded"):
                 cursor = self.ui.textEdit.textCursor()
-                pos0 = len(self.ui.textEdit.toPlainText())
+                pos0 = doc_end_position(self.ui.textEdit)
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['pretext'])
-                pos1 = len(self.ui.textEdit.toPlainText())
+                pos1 = doc_end_position(self.ui.textEdit)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(fmt_normal)
                 self.ui.textEdit.insertPlainText("\n")  # separator before coded segment
-                pos0 = len(self.ui.textEdit.toPlainText())
+                pos0 = doc_end_position(self.ui.textEdit)
                 self.ui.textEdit.insertPlainText(row['text'])
-                pos1 = len(self.ui.textEdit.toPlainText())
+                pos1 = doc_end_position(self.ui.textEdit)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 if self.ui.checkBox_text_context.isChecked() and self.app.settings[
@@ -2344,9 +2382,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                     'report_text_context_style'] == 'Bigger':
                     cursor.setCharFormat(fmt_larger)
                 self.ui.textEdit.insertPlainText("\n")  # separator after coded segment
-                pos0 = len(self.ui.textEdit.toPlainText())
+                pos0 = doc_end_position(self.ui.textEdit)
                 self.ui.textEdit.insertPlainText(row['posttext'])
-                pos1 = len(self.ui.textEdit.toPlainText())
+                pos1 = doc_end_position(self.ui.textEdit)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 if self.ui.checkBox_text_context.isChecked():
@@ -2583,11 +2621,11 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
-        pos0 = len(self.ui.textEdit.toPlainText())
+        pos0 = doc_end_position(self.ui.textEdit)
         item['textedit_start'] = pos0
         self.ui.textEdit.append(head)
         cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        pos1 = len(self.ui.textEdit.toPlainText())
+        pos1 = doc_end_position(self.ui.textEdit)
         cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         brush = QBrush(QtGui.QColor(item['color']))
         fmt.setBackground(brush)
@@ -2596,7 +2634,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         # Kept on the item; insert_reference prints it below the coded memo
         item['reference'] = reference
-        item['textedit_end'] = len(self.ui.textEdit.toPlainText())
+        item['textedit_end'] = doc_end_position(self.ui.textEdit)
 
     def select_reference_style(self, checked):
         """
@@ -2752,6 +2790,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if code['result_type'] == 'av':
             cur.execute("update code_av set important=1 where avid=?", [code['avid']])
         self.app.conn.commit()
+        self.emit_coding_change(code['result_type'])
         self.app.delete_backup = False
         # Remove widgets from coding layout, reload to update
         contents = self.tab_coding.layout()
@@ -2786,6 +2825,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute("update code_av set memo=? where avid=?", [new_memo, code['avid']])
             self.parent_textEdit.append(_("AV memo updated for avid: ") + str(code['avid']))
         self.app.conn.commit()
+        self.emit_coding_change(code['result_type'])
         self.app.delete_backup = False
         # Remove widgets from coding layout, reload to update
         contents = self.tab_coding.layout()
@@ -2825,6 +2865,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         except sqlite3.IntegrityError:
             Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
             return
+        self.emit_coding_change(existing_code['result_type'])
         Message(self.app, "Changed code", "Run report again to update display").exec()
         self.app.delete_backup = False
         # Remove widgets from coding layout
@@ -2882,6 +2923,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         except sqlite3.IntegrityError:
             Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
             return
+        self.emit_coding_change(existing_code['result_type'])
         Message(self.app, "Changed code", "Run report again to update display").exec()
         self.app.delete_backup = False
         # Remove widgets from coding layout
@@ -2909,7 +2951,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if code['result_type'] == 'av':
             cur.execute("delete from code_av where avid=?", [code['avid']])
         self.app.conn.commit()
-
+        self.emit_coding_change(code['result_type'])  # before result_type is overwritten
         self.app.delete_backup = False
         code['result_type'] = "deleted"
 
@@ -3026,18 +3068,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         head += item['coder']
         cursor = text_edit.textCursor()
         fmt = QtGui.QTextCharFormat()
-        pos0 = len(text_edit.toPlainText())
+        pos0 = doc_end_position(text_edit)
         item['textedit_start'] = pos0
         text_edit.append(head)
         cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        pos1 = len(text_edit.toPlainText())
+        pos1 = doc_end_position(text_edit)
         cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         brush = QBrush(QtGui.QColor(item['color']))
         fmt.setBackground(brush)
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
-        item['textedit_end'] = len(text_edit.toPlainText())
+        item['textedit_end'] = doc_end_position(text_edit)
 
     def matrix_by_codes(self, results_:list[dict[str, Any]], ids:str, type_:str="file"):
         """ Fill a tableWidget with rows of cases and columns of codes.
