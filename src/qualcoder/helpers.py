@@ -57,7 +57,7 @@ from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
 # If VLC not installed, it will not crash
 vlc = None
-from .media_player_qt import MediaInstance as QtMediaInstance
+from .media_player_qt import MediaInstance as QtMediaInstance, make_vlc_instance
 try:
     import vlc
 except Exception as e:
@@ -698,7 +698,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
                 # python-vlc missing or Qt chosen: use the Qt Multimedia backend <- L
                 self.instance = QtMediaInstance()
             else:
-                self.instance = vlc.Instance()
+                self.instance = make_vlc_instance(vlc)
                 if self.instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError):
@@ -767,6 +767,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
         # Guard: a build without a media backend leaves mediaplayer unset <- L
         if getattr(self, 'mediaplayer', None) is not None:
             self.mediaplayer.stop()
+            if type(self.mediaplayer).__module__.endswith('media_player_qt'):
+                self.mediaplayer.release()  # free handle for later delete
 
 
 class DialogCodeInImage(QtWidgets.QDialog):

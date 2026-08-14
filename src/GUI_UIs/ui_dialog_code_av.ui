@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Dialog_code_av</class>
  <widget class="QDialog" name="Dialog_code_av">
@@ -23,7 +23,7 @@
       <property name="orientation">
        <enum>Qt::Orientation::Vertical</enum>
       </property>
-      <widget class="QListWidget" name="listWidget" />
+      <widget class="QListWidget" name="listWidget"/>
       <widget class="QGroupBox" name="groupBox_file_buttons">
        <property name="minimumSize">
         <size>
@@ -38,7 +38,7 @@
         </size>
        </property>
        <property name="title">
-        <string />
+        <string/>
        </property>
        <widget class="QPushButton" name="pushButton_latest">
         <property name="geometry">
@@ -53,7 +53,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_next_file">
@@ -69,7 +69,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_document_memo">
@@ -85,7 +85,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_file_attributes">
@@ -101,7 +101,7 @@
          <string>Show files with selected file attributes</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_clear_filter_file">
@@ -117,7 +117,7 @@
          <string>Clear file filter</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_goto_bookmark">
@@ -134,7 +134,7 @@
 To set a bookmark press B</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
       </widget>
@@ -159,7 +159,7 @@ To set a bookmark press B</string>
         </size>
        </property>
        <property name="title">
-        <string />
+        <string/>
        </property>
        <widget class="QPushButton" name="pushButton_clear_filter_code">
         <property name="geometry">
@@ -174,7 +174,7 @@ To set a bookmark press B</string>
          <string>Clear code filter</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QLineEdit" name="lineEdit_code_filter">
@@ -215,7 +215,7 @@ To set a bookmark press B</string>
          <string>Show codings flagged important</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton_find_code">
@@ -243,7 +243,7 @@ To set a bookmark press B</string>
          <string>Find code</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
       </widget>
@@ -356,7 +356,7 @@ To set a bookmark press B</string>
                </size>
               </property>
               <property name="title">
-               <string />
+               <string/>
               </property>
               <widget class="QPushButton" name="pushButton_play">
                <property name="geometry">
@@ -383,7 +383,7 @@ To set a bookmark press B</string>
                 <string>Ctrl P or Ctrl D Play/Pause</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QPushButton" name="pushButton_rewind_5">
@@ -411,7 +411,7 @@ To set a bookmark press B</string>
                 <string>Rewind 5 seconds. Ctrl + R</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QPushButton" name="pushButton_rewind_30">
@@ -439,7 +439,7 @@ To set a bookmark press B</string>
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QPushButton" name="pushButton_forward_30">
@@ -467,7 +467,7 @@ To set a bookmark press B</string>
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QPushButton" name="pushButton_rate_down">
@@ -495,7 +495,7 @@ To set a bookmark press B</string>
                 <string>Decrease play rate Key &lt;</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QLabel" name="label_rate">
@@ -542,7 +542,7 @@ To set a bookmark press B</string>
                 <string>Increase play rate Key &gt;</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QComboBox" name="comboBox_tracks">
@@ -583,7 +583,7 @@ To set a bookmark press B</string>
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Detach the video into a floating window. Close the window to dock it back.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
               <widget class="QPushButton" name="pushButton_volume">
@@ -611,7 +611,7 @@ To set a bookmark press B</string>
                 <string>Volume</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </widget>
@@ -619,7 +619,7 @@ To set a bookmark press B</string>
             <item>
              <widget class="QLabel" name="label_time">
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -707,7 +707,7 @@ To set a bookmark press B</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>730</width>
+                 <width>724</width>
                  <height>136</height>
                 </rect>
                </property>
@@ -738,7 +738,7 @@ To set a bookmark press B</string>
          <number>0</number>
         </property>
         <item>
-         <widget class="QWidget" name="lineNumbers" />
+         <widget class="QWidget" name="lineNumbers" native="true"/>
         </item>
         <item>
          <widget class="QPlainTextEdit" name="plainTextEdit">
@@ -779,7 +779,7 @@ To set a bookmark press B</string>
       </size>
      </property>
      <property name="title">
-      <string />
+      <string/>
      </property>
      <widget class="QWidget" name="widget_coder" native="true">
       <property name="geometry">
@@ -809,7 +809,7 @@ To set a bookmark press B</string>
        <item>
         <widget class="QLabel" name="label_coder">
          <property name="text">
-          <string />
+          <string/>
          </property>
         </widget>
        </item>
@@ -831,7 +831,7 @@ To set a bookmark press B</string>
           <string>Coder</string>
          </property>
          <property name="text">
-          <string />
+          <string/>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -925,7 +925,7 @@ To set a bookmark press B</string>
        <string>Show annotations</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_show_memos">
@@ -953,7 +953,7 @@ To set a bookmark press B</string>
        <string>Show memos</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="Line" name="line">
@@ -995,7 +995,7 @@ To set a bookmark press B</string>
 Use | to code multiple texts.</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_auto_code_undo">
@@ -1023,7 +1023,7 @@ Use | to code multiple texts.</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_search">
@@ -1039,7 +1039,7 @@ Use | to code multiple texts.</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search transcript text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_search">
@@ -1052,7 +1052,7 @@ Use | to code multiple texts.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;Check &lt;span style=" font-weight:600;"&gt;Case sensitive&lt;/span&gt; to match case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;Check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; to match case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_search_case">
@@ -1068,7 +1068,7 @@ Use | to code multiple texts.</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_search_case_sensitive">
@@ -1084,7 +1084,7 @@ Use | to code multiple texts.</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_previous">
@@ -1112,7 +1112,7 @@ Use | to code multiple texts.</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_next">
@@ -1140,7 +1140,7 @@ Use | to code multiple texts.</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_search_totals">
@@ -1161,7 +1161,7 @@ Use | to code multiple texts.</string>
        <rect>
         <x>410</x>
         <y>0</y>
-        <width>181</width>
+        <width>221</width>
         <height>28</height>
        </rect>
       </property>
@@ -1198,7 +1198,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment.&lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_segment">
@@ -1206,7 +1206,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        <rect>
         <x>440</x>
         <y>38</y>
-        <width>171</width>
+        <width>221</width>
         <height>28</height>
        </rect>
       </property>
@@ -1220,7 +1220,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>740</x>
         <y>38</y>
         <width>151</width>
         <height>28</height>
@@ -1236,7 +1236,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
      <widget class="QCheckBox" name="checkBox_text_to_av">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>740</x>
         <y>0</y>
         <width>115</width>
         <height>28</height>
@@ -1252,7 +1252,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>830</x>
+        <x>890</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -1274,13 +1274,13 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        <string>Help</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_screensshot">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>670</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -1302,13 +1302,13 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_add_image_to_project">
       <property name="geometry">
        <rect>
-        <x>660</x>
+        <x>700</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -1330,7 +1330,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_mark_speakers">
@@ -1358,13 +1358,13 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark speakers in the transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string />
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_player">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>660</x>
         <y>1</y>
         <width>70</width>
         <height>28</height>
@@ -1423,6 +1423,6 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
   <tabstop>treeWidget</tabstop>
   <tabstop>plainTextEdit</tabstop>
  </tabstops>
- <resources />
- <connections />
+ <resources/>
+ <connections/>
 </ui>

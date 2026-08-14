@@ -239,6 +239,25 @@ class MediaPlayer:
         self._target_ms = None
         self.player.stop()
 
+    def release(self):
+        """ Free the file handle (stop() alone keeps it open on Windows) and
+        tear down the video widget so no stale surface is left. """
+        self.stop()
+        self._pending_ms = None
+        self._media = None
+        self.player.setSource(QtCore.QUrl())
+        try:
+            self.player.setVideoOutput(None)
+        except Exception:
+            pass
+        if self.video_widget is not None:
+            self.video_widget.hide()
+            self.video_widget.setParent(None)
+            self.video_widget.deleteLater()
+            self.video_widget = None
+        self._host = None
+        QtCore.QCoreApplication.processEvents()
+
     def is_playing(self):
         """
         Report playing while the play() intent holds during async startup;
@@ -340,3 +359,34 @@ class MediaPlayer:
         except Exception as err:
             logger.warning(f"Qt snapshot failed: {err}")
             return -1
+
+
+def make_vlc_instance(vlc_module):
+    """ VLC instance for embedded playback: quiet console and no title
+    overlay. Decoder and video output are left to VLC. """
+    if vlc_module is None:
+        return None
+    flags = ["--quiet", "--no-video-title-show"]
+    try:
+        inst = vlc_module.Instance(flags)
+        if inst is not None:
+            logger.debug(f"vlc instance: {flags}")
+            return inst
+    except Exception as err:
+        logger.debug(f"vlc arguments rejected ({err}); bare instance")
+    logger.debug("vlc bare instance")
+    return vlc_module.Instance()
+
+_metadata_instance = None
+
+
+def metadata_vlc_instance(vlc_module):
+    """ Lightweight cached instance for reading media metadata: no video
+    output is ever attached, so one per session is enough. """
+    global _metadata_instance
+    if _metadata_instance is None and vlc_module is not None:
+        try:
+            _metadata_instance = vlc_module.Instance(["--quiet", "--no-video"])
+        except Exception:
+            _metadata_instance = vlc_module.Instance()
+    return _metadata_instance

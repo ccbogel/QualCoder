@@ -1318,3 +1318,32 @@ def generate_waveform_png_async(media_path, out_path, colour, timeout=30):
                               args=(media_path, out_path, colour, timeout), daemon=True)
     thread.start()
     return thread
+
+def keyframe_interval_seconds(media_path, sample_seconds=45):
+    """ Average gap between video keyframes, or None if unreadable (needs
+    PyAV). Wide gaps mean every seek rebuilds seconds of frames. """
+    try:
+        import av as _av
+    except ImportError:
+        return None
+    try:
+        with _av.open(str(media_path)) as container:
+            streams = [st for st in container.streams if st.type == 'video']
+            if not streams:
+                return None
+            stream = streams[0]
+            times = []
+            for packet in container.demux(stream):
+                if packet.pts is None:
+                    continue
+                seconds = float(packet.pts * stream.time_base)
+                if packet.is_keyframe:
+                    times.append(seconds)
+                if seconds > sample_seconds or len(times) > 40:
+                    break
+            if len(times) < 2:
+                return None
+            return (times[-1] - times[0]) / (len(times) - 1)
+    except Exception as err:
+        logger.debug(f"keyframe_interval_seconds: {err}")
+        return None

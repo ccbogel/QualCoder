@@ -34,6 +34,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
+import time
 from typing import Any
 from shutil import copyfile, move
 from striprtf.striprtf import rtf_to_text
@@ -2060,7 +2061,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             if vlc:
                 try:
                     try:
-                        instance = vlc.Instance()
+                        from .media_player_qt import metadata_vlc_instance
+                        instance = metadata_vlc_instance(vlc)  # cached: metadata only
                     except NameError as name_err:
                         # NameError: no function 'libvlc_new'
                         logger.error(f"vlc.Instance: {name_err}")
@@ -3597,6 +3599,53 @@ class DialogManageFiles(QtWidgets.QDialog):
                 _("AI index is busy; the deleted file will be removed from the index "
                   "on the next update."))
 
+    def _unlink_media_with_retry(self, filepath):
+        """ Players free the file handle asynchronously, so an immediate unlink
+        can still hit WinError 32: retry briefly, then warn. """
+        last_err = None
+        for _attempt in range(12):
+            try:
+                Path(filepath).unlink()
+                return True
+            except FileNotFoundError as err:
+                logger.warning(_("Deleting file error: ") + str(err))
+                return True
+            except PermissionError as err:
+                last_err = err
+                self._release_media_players_for(filepath)
+                QtWidgets.QApplication.processEvents()
+                time.sleep(0.15)
+        logger.warning(f"Locked media file, could not delete: {filepath} {last_err}")
+        Message(self.app, _("Cannot delete file"),
+                _("The file is in use by another program and was not deleted:") +
+                f"\n{filepath}", "warning").exec()
+        return False
+
+    def _release_media_players_for(self, filepath):
+        """ Ask every live player holding this file to let go before unlink
+        (an open handle raises WinError 32 on Windows). """
+        try:
+            target = str(Path(filepath).resolve())
+        except Exception:
+            target = str(filepath)
+        for w in QtWidgets.QApplication.allWidgets():
+            mp = getattr(w, 'mediaplayer', None)
+            if mp is None:
+                continue
+            try:
+                if type(mp).__module__.endswith('media_player_qt'):
+                    src = mp.player.source().toLocalFile()
+                    if src and str(Path(src).resolve()) == target:
+                        mp.release()
+                else:
+                    med = mp.get_media()
+                    if med is not None and target.replace("\\", "/") in \
+                            str(med.get_mrl() or "").replace("%20", " "):
+                        mp.stop()
+                        mp.set_media(None)  # stop alone may keep the handle a moment
+            except Exception:
+                pass
+
     def delete_button_multiple_files(self):
         """ Delete files from database and update model and widget.
         Also, delete files from sub-directories, if not externally linked.
@@ -3608,6 +3657,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Guard: a dialog that failed mid-init can leave mediaplayer as None
             if getattr(self.av_dialog_open, 'mediaplayer', None) is not None:
                 self.av_dialog_open.mediaplayer.stop()
+                if type(self.av_dialog_open.mediaplayer).__module__.endswith('media_player_qt'):
+                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink
+            self.av_dialog_open.close()
             self.av_dialog_open = None
         # Respect active filters: only visible files are offered for deletion
         visible_sources = [s for r, s in enumerate(self.source)
@@ -3657,6 +3709,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from annotation where fid = ?", [s['id']])
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
+                # Clear stale transcript links: SQLite reuses row ids and a later
+                # import could inherit this id, becoming a ghost transcript
+                cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])
                 self.app.conn.commit()
                 # Delete from vectorstore
                 self.vectorstore_delete_document_safe(s['id'])
@@ -3678,10 +3733,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 # Remove project folder file, if internally stored
                 if ':' not in s['mediapath']:
                     filepath = self.app.project_path + s['mediapath']
-                    try:
-                        Path(filepath).unlink()
-                    except FileNotFoundError as err:
-                        logger.warning(_("Deleting file error: ") + str(err))
+                    self._release_media_players_for(filepath)
+                    self._unlink_media_with_retry(filepath)
                 # Remove the cached waveform image, if any
                 self.remove_waveform_png(s['id'])
                 # Delete stored coded sections and source details
@@ -3691,6 +3744,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
                 # Just in case, added this line
                 cur.execute("delete from case_text where fid = ?", [s['id']])
+                cur.execute("update source set av_text_id=null where av_text_id=?", [s['id']])
                 self.app.conn.commit()
 
                 # Delete linked transcription text file
@@ -3722,6 +3776,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Guard: a dialog that failed mid-init can leave mediaplayer as None
             if getattr(self.av_dialog_open, 'mediaplayer', None) is not None:
                 self.av_dialog_open.mediaplayer.stop()
+                if type(self.av_dialog_open.mediaplayer).__module__.endswith('media_player_qt'):
+                    self.av_dialog_open.mediaplayer.release()  # free handle before unlink
+            self.av_dialog_open.close()
             self.av_dialog_open = None
         rows = self.visible_selected_rows()
         if len(rows) == 0:
@@ -3761,6 +3818,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from annotation where fid = ?", [file_id])
                 cur.execute("delete from case_text where fid = ?", [file_id])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
+                cur.execute("update source set av_text_id=null where av_text_id=?", [file_id])
                 self.app.conn.commit()
                 # Delete from vectorstore
                 self.vectorstore_delete_document_safe(file_id)
@@ -3781,10 +3839,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 # Remove folder file, if internally stored
                 if ':' not in self.source[row]['mediapath']:
                     filepath = self.app.project_path + self.source[row]['mediapath']
-                    try:
-                        p = Path(filepath).unlink()
-                    except FileNotFoundError as err:
-                        logger.warning(_("Deleting file error: ") + str(err))
+                    self._release_media_players_for(filepath)
+                    self._unlink_media_with_retry(filepath)
                 # Remove the cached waveform image, if any
                 self.remove_waveform_png(file_id)
                 # Delete stored coded sections and source details

@@ -32,6 +32,7 @@ import platform
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import subprocess
+import threading
 import time
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -55,11 +56,11 @@ from .ai_agent_prompts import AiAgentPromptsCatalog
 from .ai_chat import ai_chat_signal_emitter
 from .ai_prompt_library import DialogAiEditPrompts
 from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
-    waveform_colour  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
+    waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
 
 # If VLC not installed, it will not crash
 vlc = None
-from .media_player_qt import MediaInstance as QtMediaInstance
+from .media_player_qt import MediaInstance as QtMediaInstance, make_vlc_instance
 try:
     import vlc
 except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise
@@ -401,7 +402,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 # vlc stays None when python-vlc is missing: use the Qt player
                 self.instance = QtMediaInstance()
             else:
-                self.instance = vlc.Instance()
+                self.instance = make_vlc_instance(vlc)
                 if self.instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError) as name_err:
@@ -1536,6 +1537,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.widget_tracks.set_code_structure(self.codes, self.categories)
         self.ui.widget_tracks.set_segments(self.segments)
 
+    def _reset_segment_state(self):
+        """ Drop any marked segment: the dict, not the drawn selection, is what
+        'assign to code' uses, so a leftover from another file could code the
+        wrong span. """
+        self.segment = {'start': None, 'end': None, 'start_msecs': None, 'end_msecs': None,
+                        'memo': "", 'important': 0, 'seltext': ""}
+        self.play_segment_end = None
+        self.segment_play_start = None
+        self.segment_play_end = None
+        self.ui.widget_seekbar.clear_selection()
+        self.ui.label_segment.setText(_("Segment:"))
+
     def clear_file(self):
         """ When AV file removed clear all details.
         Called by null file with load_media, ManageFiles.delete, get_files """
@@ -1543,6 +1556,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.stop()
         self.media = None
         self.file_ = None
+        self._reset_segment_state()
         self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_play.setEnabled(False)
         self.ui.widget_seekbar.setEnabled(False)
@@ -1565,13 +1579,32 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.mediaplayer.stop()
         except Exception:
             pass
+        # Full teardown of the outgoing backend so video surfaces never stack:
+        # a lingering QVideoWidget over the frame splits the screen, and a vout
+        # still attached to the hwnd leaves black or frozen pixels.
+        old_mp = getattr(self, 'mediaplayer', None)
+        try:
+            if old_mp is not None:
+                if type(old_mp).__module__.endswith('media_player_qt'):
+                    old_mp.release()
+                else:
+                    old_mp.set_media(None)
+                    system = platform.system()
+                    if system == "Windows":
+                        old_mp.set_hwnd(0)
+                    elif system == "Darwin":
+                        old_mp.set_nsobject(0)
+                    else:
+                        old_mp.set_xwindow(0)
+        except Exception:
+            pass
         try:
             if wanted == 'qt':
                 new_instance = QtMediaInstance()
             else:
                 if vlc is None:
                     raise NameError("python-vlc not installed")
-                new_instance = vlc.Instance()
+                new_instance = make_vlc_instance(vlc)
                 if new_instance is None:
                     raise NameError("libvlc not available")
         except (NameError, AttributeError):
@@ -1591,6 +1624,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
+        self.mediaplayer.audio_set_volume(self.volume_slider.value())  # keep level across backends
         self.app.settings['av_player'] = wanted
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
         if self.file_ is not None:
@@ -1609,6 +1643,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                     "warning").exec()
             self.clear_file()
             return
+
+        self._reset_segment_state()  # nothing from the previous file survives
 
         title = self.file_['name'].split('/')[-1]
         self.setWindowTitle(_("Media coding: ") + title)
@@ -1632,6 +1668,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.set_media(self.media)
         # Parse the metadata of the file
         self.media.parse()
+        self._check_seek_friendliness(self.app.project_path + self.file_['mediapath']
+                                      if ':' not in self.file_['mediapath'][:6]
+                                      else self.file_['mediapath'][6:])
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
         # The media player has to be connected to the QFrame (otherwise the
@@ -1671,13 +1710,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         if len(good_tracks) < 2:
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.pause()
-        self.mediaplayer.audio_set_volume(100)
+        # Track probing muted then restored the volume: apply the user's level,
+        # not a hardcoded 100 (setValue alone will not fire when unchanged)
+        self.mediaplayer.audio_set_volume(self.volume_slider.value())
         # Get the transcription text
         self.transcription = None
         cur = self.app.conn.cursor()
         if self.file_['av_text_id'] is not None:
             cur.execute("select id, fulltext, name from source where id=?", [self.file_['av_text_id']])
             self.transcription = cur.fetchone()
+            if self.transcription is not None and \
+                    not (self.transcription[2].endswith(".txt")
+                         or self.transcription[2].endswith(".transcribed")):
+                # Stale link after id reuse pointed at a non-transcript file
+                self.transcription = None
+                self.file_['av_text_id'] = None
             if self.transcription is not None and self.transcription[1] is None:
                 # Old projects can hold NULL fulltext; normalise so setPlainText/regex do not crash
                 self.transcription = (self.transcription[0], "", self.transcription[2])
@@ -2162,6 +2209,73 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.seek_to_ms(ms)
                 break
 
+    def _check_seek_friendliness(self, media_path):
+        """ Widely spaced keyframes make every seek rebuild seconds of frames
+        in any player. Warn in the seek bar tooltip and widen coalescing. """
+        self._seek_coalesce_ms = 120
+        self._keyframe_gap = None
+        self.ui.widget_seekbar.setToolTip("")
+
+        def measure():
+            # Reading keyframes decodes part of the file: off the UI thread so
+            # loading a file never blocks playback controls
+            self._keyframe_gap = keyframe_interval_seconds(media_path) or 0.0
+
+        threading.Thread(target=measure, daemon=True).start()
+
+    def _apply_keyframe_hint(self):
+        """ Pick up the background keyframe measurement (once) and warn when
+        seeking on this file will be imprecise. """
+        gap = self._keyframe_gap
+        if not gap:
+            return
+        self._keyframe_gap = None
+        logger.debug(f"keyframe interval {gap:.2f}s")
+        if gap < 2.0:
+            return
+        self._seek_coalesce_ms = 400
+        hint = _("Keyframes in this file are about %s seconds apart, so seeking "
+                 "may stall or repeat frames. Re-encoding it with denser "
+                 "keyframes gives precise navigation.") % f"{gap:.1f}"
+        self.ui.widget_seekbar.setToolTip(hint)
+        logger.info(hint)
+
+    def _vlc_apply_seek(self, ms, duration):
+        """ First request seeks at once; further rapid ones (a drag) coalesce
+        into a single seek. """
+        self._vlc_seek_pending = (ms, duration)
+        timer = getattr(self, '_vlc_seek_timer', None)
+        if timer is None:
+            timer = QtCore.QTimer(self)
+            timer.setSingleShot(True)
+            timer.timeout.connect(self._vlc_fire_seek)
+            self._vlc_seek_timer = timer
+        if not timer.isActive():
+            self._vlc_fire_seek()  # first request goes straight through
+        timer.setInterval(getattr(self, '_seek_coalesce_ms', 120))
+        timer.start()
+
+    def _vlc_fire_seek(self):
+        pending = getattr(self, '_vlc_seek_pending', None)
+        if pending is None:
+            return
+        ms, duration = pending
+        self._vlc_seek_pending = None
+        mp = self.mediaplayer
+        if mp is None or type(mp).__module__.endswith('media_player_qt'):
+            return
+        self._vlc_target_ms = ms
+        self._vlc_last_seek_at = time.monotonic()
+        try:
+            mp.set_position(ms / duration)
+            if mp.is_playing() == 0:
+                try:
+                    mp.next_frame()  # paused vlc keeps the stale frame
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
     def seek_to_ms(self, ms):
         """ Seek to an absolute position in milliseconds (from the seek bar).
         Fixes the time-label lag of the original slider set_position. """
@@ -2172,7 +2286,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         if duration <= 0:
             return
         ms = max(0, min(int(ms), duration))
-        self.mediaplayer.set_position(ms / duration)
+        if type(self.mediaplayer).__module__.endswith('media_player_qt'):
+            self.mediaplayer.set_position(ms / duration)
+        else:
+            self._vlc_apply_seek(ms, duration)
         self.ui.label_time.setText(msecs_to_hours_mins_secs(ms) + self.media_duration_text)
         self.ui.widget_seekbar.set_position(ms)
         self.ui.widget_tracks.set_position(ms)
@@ -2451,7 +2568,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if not waveform_backend_available():
             # ffmpeg not installed: cannot build the image. Everything else still works.
             sb.set_waveform_pixmap(None)
-            sb.set_no_waveform_message(_("Waveform unavailable (ffmpeg not found)"))
+            sb.set_no_waveform_message("")  # silent: bar still works for seeking
             if not getattr(self.app, '_ffmpeg_warned', False):
                 logger.warning("ffmpeg not found: waveform images disabled. "
                                "Playback, seeking and coding still work.")
@@ -2553,11 +2670,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.volume_menu.exec(pos)
 
     def set_volume(self, volume):
-        """ Set the volume. """
+        """ Set the volume, update the button icon and remember the level. """
 
-        self.mediaplayer.audio_set_volume(volume)
-        # Persistent volume.
-        self.app.settings['dialogcodeav_volume'] = str(volume)
+        if self.mediaplayer is not None:
+            self.mediaplayer.audio_set_volume(volume)
+        self.app.settings['dialogcodeav_volume'] = volume
+        if volume == 0:
+            icon = 'mdi6.volume-off'
+        elif volume < 34:
+            icon = 'mdi6.volume-low'
+        elif volume < 67:
+            icon = 'mdi6.volume-medium'
+        else:
+            icon = 'mdi6.volume-high'
+        self.ui.pushButton_volume.setIcon(qta.icon(icon))
+        self.ui.pushButton_volume.setToolTip(_("Volume") + f": {volume}%")
 
     def audio_track_changed(self):
         """ Audio track changed.
@@ -2588,6 +2715,18 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self._update_ui_error_logged = True
                 logger.exception(f"update_ui tick failed (bar kept alive): {err}")
 
+    def _vlc_display_ms(self, msecs):
+        """ vlc reports the previous position for a few ticks after a seek:
+        show the requested one until playback converges. """
+        target = getattr(self, '_vlc_target_ms', None)
+        if target is None:
+            return msecs
+        if abs(msecs - target) <= 400 or \
+                time.monotonic() - getattr(self, '_vlc_last_seek_at', 0) > 3.0:
+            self._vlc_target_ms = None
+            return msecs
+        return target
+
     def update_ui(self):
         """ Updates the user interface. Update the slider position to match media.
          Adds audio track options to combobox.
@@ -2602,7 +2741,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.ui.comboBox_tracks.addItem(str(t[0]))
 
         # Set the seek-bar playhead to the current media position
-        msecs = self.mediaplayer.get_time()
+        if getattr(self, '_keyframe_gap', None):
+            self._apply_keyframe_hint()
+        msecs = self._vlc_display_ms(self.mediaplayer.get_time())
         self.ui.widget_seekbar.set_position(msecs)
         self.ui.widget_tracks.set_position(msecs)
         media = self.mediaplayer.get_media()
@@ -2653,6 +2794,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.video_window is not None:
             self.reattach_video()
         self.stop()
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)  # persist volume/sizes
 
     def changeEvent(self, event):
         """ When this window regains focus (e.g. returning from another program), clear any
