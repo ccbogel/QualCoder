@@ -1624,6 +1624,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
+        self.mediaplayer.audio_set_volume(self.volume_slider.value())  # keep level across backends
         self.app.settings['av_player'] = wanted
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
         if self.file_ is not None:
@@ -1709,7 +1710,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if len(good_tracks) < 2:
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.pause()
-        self.mediaplayer.audio_set_volume(100)
+        # Track probing muted then restored the volume: apply the user's level,
+        # not a hardcoded 100 (setValue alone will not fire when unchanged)
+        self.mediaplayer.audio_set_volume(self.volume_slider.value())
         # Get the transcription text
         self.transcription = None
         cur = self.app.conn.cursor()
@@ -2667,11 +2670,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.volume_menu.exec(pos)
 
     def set_volume(self, volume):
-        """ Set the volume. """
+        """ Set the volume, update the button icon and remember the level. """
 
-        self.mediaplayer.audio_set_volume(volume)
-        # Persistent volume.
-        self.app.settings['dialogcodeav_volume'] = str(volume)
+        if self.mediaplayer is not None:
+            self.mediaplayer.audio_set_volume(volume)
+        self.app.settings['dialogcodeav_volume'] = volume
+        if volume == 0:
+            icon = 'mdi6.volume-off'
+        elif volume < 34:
+            icon = 'mdi6.volume-low'
+        elif volume < 67:
+            icon = 'mdi6.volume-medium'
+        else:
+            icon = 'mdi6.volume-high'
+        self.ui.pushButton_volume.setIcon(qta.icon(icon))
+        self.ui.pushButton_volume.setToolTip(_("Volume") + f": {volume}%")
 
     def audio_track_changed(self):
         """ Audio track changed.
@@ -2781,6 +2794,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.video_window is not None:
             self.reattach_video()
         self.stop()
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)  # persist volume/sizes
 
     def changeEvent(self, event):
         """ When this window regains focus (e.g. returning from another program), clear any
