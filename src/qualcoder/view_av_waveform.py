@@ -1321,7 +1321,7 @@ def generate_waveform_png_async(media_path, out_path, colour, timeout=30):
 
 def keyframe_interval_seconds(media_path, sample_seconds=45):
     """ Average gap between video keyframes, or None if unreadable (needs
-    PyAV). Wide gaps mean every seek rebuilds seconds of frames. <- L """
+    PyAV). Wide gaps mean every seek rebuilds seconds of frames. """
     try:
         import av as _av
     except ImportError:
