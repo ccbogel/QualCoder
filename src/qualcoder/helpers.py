@@ -1122,7 +1122,6 @@ class ImportPlainTextCodes:
             return
         filepath = filepath[0]  # List to string of file path
         self.text_edit.append("\n" + _("Importing codes from: ") + filepath)
-        self.text_edit.append(_("Refresh codes trees via menu options for coding, reports"))
         with open(filepath, 'r', encoding='UTF-8-sig') as file_:
             rows = []
             if filepath[-4:].lower() == ".csv":
@@ -1135,6 +1134,7 @@ class ImportPlainTextCodes:
                     if row:
                         rows.append(row)
         cur = self.app.conn.cursor()
+        imported_tables = set()  # only tables that really got a row
         # Insert categories
         for row in rows:
             categories = row[0].split(">>")
@@ -1153,6 +1153,7 @@ class ImportPlainTextCodes:
                                 (category.strip(), "", self.app.settings['codername'],
                                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), supercatid))
                     self.app.conn.commit()
+                    imported_tables.add('code_cat')
                     self.text_edit.append(_("Imported category: ") + category)
                 except sqlite3.IntegrityError:
                     pass
@@ -1180,9 +1181,13 @@ class ImportPlainTextCodes:
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
                             (code_name, memo, self.app.settings['codername'], date_, catid, color))
                 self.app.conn.commit()
+                imported_tables.add('code_name')
                 self.text_edit.append(_("Imported code: ") + code_name)
             except sqlite3.IntegrityError:
                 self.text_edit.append(_("Duplicate code not imported: ") + code_name)
+        # One event for the whole import, not one per row
+        if imported_tables and getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(sorted(imported_tables), source=None)
 
 
 class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
