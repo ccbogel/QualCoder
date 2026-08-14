@@ -345,7 +345,10 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.video_set_key_input(False)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
-        self.ui.horizontalSlider_vol.setValue(99)
+        try:
+            self.ui.horizontalSlider_vol.setValue(int(self.app.settings.get('viewav_volume', 100)))
+        except (TypeError, ValueError):
+            self.ui.horizontalSlider_vol.setValue(100)
         # Player backend combo (VLC / Qt)
         self.ui.comboBox_player.addItems(["VLC", "Qt"])
         if vlc is None:
@@ -443,8 +446,6 @@ class DialogViewAV(QtWidgets.QDialog):
         # Need this for helping set the slider if user sliding before play begins
         # Detect number of audio tracks in media
         self.mediaplayer.play()
-        # self.mediaplayer.audio_set_volume(0)
-        self.ui.horizontalSlider_vol.setValue(100)
         time.sleep(0.2)
         tracks = self.mediaplayer.audio_get_track_description()
         good_tracks = []  # note where track [0] == -1 is a disabled track
@@ -456,7 +457,8 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.label_audio.setEnabled(False)
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.stop()
-        self.mediaplayer.audio_set_volume(100)
+        # Apply the user's level rather than a hardcoded 100
+        self.mediaplayer.audio_set_volume(self.ui.horizontalSlider_vol.value())
 
         self.ui.textEdit.textChanged.connect(self.update_positions)
         self.textchanged_timer = QtCore.QTimer(self)
@@ -1736,9 +1738,21 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.comboBox_tracks.setCurrentIndex(0)
 
     def set_volume(self, volume):
-        """ Set the volume. The slider ranges from 0 to 100."""
+        """ Set the volume (slider 0-100), update the icon and remember it. """
 
-        self.mediaplayer.audio_set_volume(volume)
+        if self.mediaplayer is not None:
+            self.mediaplayer.audio_set_volume(volume)
+        self.app.settings['viewav_volume'] = volume
+        if volume == 0:
+            icon = 'mdi6.volume-off'
+        elif volume < 34:
+            icon = 'mdi6.volume-low'
+        elif volume < 67:
+            icon = 'mdi6.volume-medium'
+        else:
+            icon = 'mdi6.volume-high'
+        self.ui.label_volume.setPixmap(qta.icon(icon).pixmap(22, 22))
+        self.ui.horizontalSlider_vol.setToolTip(_("Volume") + f": {volume}%")
 
     def _revive_update_timer(self):
         """ Watchdog: revive a dead update timer while media plays. """
@@ -1937,6 +1951,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.release()  # free the file handle (WinError 32 on delete)
         self.textchanged_timer.stop()
         self.timer.stop()
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)  # persist volume/sizes
         self.update_database_text()
         
     def update_database_text(self):
