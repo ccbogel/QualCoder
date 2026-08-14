@@ -624,6 +624,14 @@ class DialogCodeInText(QtWidgets.QDialog):
                 return True
         return False
 
+    def emit_code_text_change(self):
+        """
+        Notify the event bus that this coding was resized.
+        """
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['code_text'], source=self)
+
     def extend_left(self):
         """ Shift left arrow. """
 
@@ -637,6 +645,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
     def extend_right(self):
@@ -653,6 +662,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         cur.execute(sql,
                     (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
     def shrink_to_left(self):
@@ -668,6 +678,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
     def shrink_to_right(self):
@@ -683,6 +694,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.emit_code_text_change()
         self.draw_initial_coded_text()
 
 
