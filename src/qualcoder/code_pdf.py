@@ -69,6 +69,27 @@ CACHE_BUDGET_BYTES = 256 * 1024 * 1024
 ZOOM_MIN, ZOOM_MAX = 0.5, 3.0
 
 
+def _page_rotation_transform(w, h, rot):
+    """ View-only page rotation as an item transform: maps canonical (0,0,w,h) to
+    a footprint at (0,0), (h,w) for 90/270. Painting stays canonical; stored
+    coordinates and the file are never touched.
+    Args:
+        w, h: canonical page size in PDF points. rot: 0/90/180/270 clockwise.
+    """
+
+    t = QtGui.QTransform()
+    if rot == 90:
+        t.translate(h, 0.0)
+        t.rotate(90.0)
+    elif rot == 180:
+        t.translate(w, h)
+        t.rotate(180.0)
+    elif rot == 270:
+        t.translate(0.0, w)
+        t.rotate(270.0)
+    return t
+
+
 def _word_flags():
     """
     Extraction flags: expand ligatures (fi -> f i) so that the text matches.
@@ -440,6 +461,8 @@ def pdf_annotations_to_file_memo(app, parent_text_edit, fid, filepath, existing_
     cur = app.conn.cursor()
     cur.execute("update source set memo=? where id=?", [memo_text, fid])
     app.conn.commit()
+    if getattr(app, "project_events", None) is not None:
+        app.project_events.emit_table_changes(['source'], source=None)
     if parent_text_edit is not None:
         parent_text_edit.append(_("PDF annotations added to file memo: ") + f"{len(notes)}")
     return memo_text
@@ -895,6 +918,9 @@ class PdfView(QtWidgets.QGraphicsView):
         self.items_ = []
         self.page_tops = []
         self.page_sizes = []
+        # View rotation per page {page: deg}; bound per file by the dialog and
+        # rebound by the loader (not reset in clear_document).
+        self.page_rotations = {}
         self.max_page_width = 595.0
         self.zoom = 1.0
         self.mode = "text"  # "text" o "area"
@@ -954,19 +980,60 @@ class PdfView(QtWidgets.QGraphicsView):
         self.page_sizes = list(sizes)
         if not sizes:
             return
-        self.max_page_width = max(w for w, _h in sizes)
-        y = float(PAGE_GAP)
         for i, (w, h) in enumerate(sizes):
             item = PdfPageItem(self, i, w, h)
-            item.setPos(PAGE_GAP + (self.max_page_width - w) / 2.0, y)
             self.scene_.addItem(item)
             self.items_.append(item)
-            self.page_tops.append(y)
-            y += h + PAGE_GAP
-        self.scene_.setSceneRect(0, 0, self.max_page_width + 2 * PAGE_GAP, y)
-        self._full_scene_height = y
+        self._layout_pages()
         if self.single_page_mode:
             self._apply_single_page(0)
+
+    def display_size(self, idx):
+        """ Page footprint in the scene, honouring the view rotation: (h, w) when
+        the page is rotated 90 or 270 degrees, (w, h) otherwise. """
+
+        w, h = self.page_sizes[idx]
+        if self.page_rotations.get(idx, 0) in (90, 270):
+            return h, w
+        return w, h
+
+    def _layout_pages(self):
+        """ Stack pages vertically applying each view rotation as the item
+        transform; re-runs after a rotation without recreating items. """
+
+        if not self.items_:
+            return
+        disp = [self.display_size(i) for i in range(len(self.items_))]
+        self.max_page_width = max(w for w, _h in disp)
+        y = float(PAGE_GAP)
+        self.page_tops = []
+        for i, item in enumerate(self.items_):
+            dw, dh = disp[i]
+            item.setTransform(_page_rotation_transform(item.w, item.h, self.page_rotations.get(i, 0)))
+            item.setPos(PAGE_GAP + (self.max_page_width - dw) / 2.0, y)
+            self.page_tops.append(y)
+            y += dh + PAGE_GAP
+        self.scene_.setSceneRect(0, 0, self.max_page_width + 2 * PAGE_GAP, y)
+        self._full_scene_height = y
+
+    def rotate_page(self, idx, delta=90):
+        """ Rotate the view of page idx by delta degrees and relayout; the pixmap
+        cache stays valid (rendering is canonical). """
+
+        if not self.items_ or not 0 <= idx < len(self.items_):
+            return
+        rot = (self.page_rotations.get(idx, 0) + int(delta)) % 360
+        if rot == 0:
+            self.page_rotations.pop(idx, None)
+        else:
+            self.page_rotations[idx] = rot
+        self._layout_pages()
+        if self.single_page_mode:
+            self._apply_single_page(self.current_single_page)
+        else:
+            self.verticalScrollBar().setValue(int(self.page_tops[idx] * self.zoom) - 4)
+        self.viewport().update()
+        self._schedule_render()
 
     def page_at(self, scene_pos):
         """
@@ -982,7 +1049,8 @@ class PdfView(QtWidgets.QGraphicsView):
         if idx >= len(self.items_):
             idx = len(self.items_) - 1
         item = self.items_[idx]
-        local = scene_pos - item.pos()
+        # mapFromScene honours the rotation: 'local' is always canonical.
+        local = item.mapFromScene(scene_pos)
         if -2 <= local.x() <= item.w + 2 and -PAGE_GAP <= local.y() <= item.h + PAGE_GAP:
             return idx, QtCore.QPointF(local.x(), local.y())
         return None
@@ -1028,16 +1096,21 @@ class PdfView(QtWidgets.QGraphicsView):
             return
         current = self.current_single_page if self.single_page_mode else self.center_page_index()
         self.single_page_mode = single_page
+        self.dialog.update_rotate_button_state()
         if not self.items_:
             return
         if single_page:
             self._apply_single_page(current)
         else:
+            # Leaving single-page mode clears the view rotations.
+            if self.page_rotations:
+                self.page_rotations.clear()
+                self._layout_pages()
             for it in self.items_:
                 it.setVisible(True)
             self.scene_.setSceneRect(0, 0, self.max_page_width + 2 * PAGE_GAP,
                                      getattr(self, '_full_scene_height', 0) or
-                                     (self.page_tops[-1] + self.page_sizes[-1][1] + PAGE_GAP))
+                                     (self.page_tops[-1] + self.display_size(len(self.items_) - 1)[1] + PAGE_GAP))
             self.verticalScrollBar().setValue(int(self.page_tops[current] * self.zoom) - 4)
         self._schedule_render()
 
@@ -1049,12 +1122,15 @@ class PdfView(QtWidgets.QGraphicsView):
         if not self.items_:
             return
         idx = max(0, min(idx, len(self.items_) - 1))
+        if idx != self.current_single_page:
+            # Page change: drop the text selection to avoid accidental codings.
+            self.dialog.clear_selection()
         self.current_single_page = idx
         for i, it in enumerate(self.items_):
             it.setVisible(i == idx)
         self.scene_.setSceneRect(0, self.page_tops[idx] - PAGE_GAP,
                                  self.max_page_width + 2 * PAGE_GAP,
-                                 self.page_sizes[idx][1] + 2 * PAGE_GAP)
+                                 self.display_size(idx)[1] + 2 * PAGE_GAP)
         self.verticalScrollBar().setValue(int((self.page_tops[idx] - PAGE_GAP) * self.zoom))
         self.dialog.update_page_indicator(idx)
 
@@ -1262,7 +1338,7 @@ class PdfView(QtWidgets.QGraphicsView):
             page_idx = area_rs.get('pdf_page')
             if page_idx is not None and page_idx < len(self.items_):
                 item = self.items_[page_idx]
-                local = scene_pos - item.pos()
+                local = item.mapFromScene(scene_pos)  # canonical coords under any view rotation
                 lx = min(max(local.x(), 0.0), item.w)
                 ly = min(max(local.y(), 0.0), item.h)
                 ox, oy, ow, oh = self._area_resize['orig']
@@ -1301,7 +1377,7 @@ class PdfView(QtWidgets.QGraphicsView):
         if self._dragging_area and self._area_page is not None:
             idx = self._area_page
             item = self.items_[idx]
-            local = scene_pos - item.pos()
+            local = item.mapFromScene(scene_pos)  # canonical coords under any view rotation
             lx = min(max(local.x(), 0.0), item.w)
             ly = min(max(local.y(), 0.0), item.h)
             item.drag_rect = QtCore.QRectF(self._area_origin, QtCore.QPointF(lx, ly)).normalized()
@@ -1649,9 +1725,12 @@ class PdfCodingMargin(QtWidgets.QWidget):
             y0 = min(r.top() for r in rects)
             y1 = max(r.bottom() for r in rects)
             x0 = min(r.left() for r in rects)
+            x1 = max(r.right() for r in rects)
             item = self.view.items_[page_idx]
-            scene_pt_top = item.mapToScene(QtCore.QPointF(x0, y0))
-            scene_pt_bot = item.mapToScene(QtCore.QPointF(0.0, y1))
+            # Map the union rect through the item transform (rotation-safe span).
+            mapped = item.mapRectToScene(QtCore.QRectF(x0, y0, max(x1 - x0, 0.001), max(y1 - y0, 0.001)))
+            scene_pt_top = mapped.topLeft()
+            scene_pt_bot = mapped.bottomLeft()
             # Viewport (to paint)
             top_v = self.view.mapFromScene(scene_pt_top).y()
             bot_v = self.view.mapFromScene(scene_pt_bot).y()
@@ -1681,10 +1760,13 @@ class PdfCodingMargin(QtWidgets.QWidget):
             return [], None, 0.0
         x0 = float(area.get('x1', 0) or 0)
         y0 = float(area.get('y1', 0) or 0)
-        y1 = y0 + float(area.get('height', 0) or 0)
+        w = float(area.get('width', 0) or 0)
+        h = float(area.get('height', 0) or 0)
         item = self.view.items_[page_idx]
-        scene_pt_top = item.mapToScene(QtCore.QPointF(x0, y0))
-        scene_pt_bot = item.mapToScene(QtCore.QPointF(x0, y1))
+        # Map through the item transform (rotation-safe).
+        mapped = item.mapRectToScene(QtCore.QRectF(x0, y0, max(w, 0.001), max(h, 0.001)))
+        scene_pt_top = mapped.topLeft()
+        scene_pt_bot = mapped.bottomLeft()
         top_v = self.view.mapFromScene(scene_pt_top).y()
         bot_v = self.view.mapFromScene(scene_pt_bot).y()
         segments = [(top_v, max(2, bot_v - top_v), True)]
@@ -2021,6 +2103,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.graphicsView.deleteLater()
         pdf_layout.insertWidget(idx, self.view)
         # Code margin inside the chosen container (just like code_text)
+        # View rotations per file {fid: {page: deg}}, session only.
+        self.rotations_by_fid = {}
         self.coding_margin = PdfCodingMargin(self.view, self, side=self.margin_side)
         self._coding_margin_layout_left = QtWidgets.QVBoxLayout(self.ui.widget_code_margin_left)
         self._coding_margin_layout_left.setContentsMargins(0, 0, 0, 0)
@@ -2091,6 +2175,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_fit_width.setIcon(qta.icon('mdi6.fit-to-page-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_rotate_page.setIcon(qta.icon('mdi6.rotate-right', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_rotate_page_ccw.setIcon(qta.icon('mdi6.rotate-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_mode_text.setIcon(qta.icon('mdi6.cursor-text', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_mode_area.setIcon(qta.icon('mdi6.vector-square', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
@@ -2148,6 +2234,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_zoom_in.clicked.connect(self.zoom_in)
         self.ui.pushButton_zoom_out.clicked.connect(self.zoom_out)
         self.ui.pushButton_fit_width.clicked.connect(self.view.fit_width)
+        self.ui.pushButton_rotate_page.clicked.connect(self.rotate_current_page)
+        self.ui.pushButton_rotate_page_ccw.clicked.connect(self.rotate_current_page_ccw)
+        self.update_rotate_button_state()
         # Conexiones: modos e importante. Connections: modes and "important" status
         self.ui.pushButton_mode_text.clicked.connect(lambda: self.set_mode("text"))
         self.ui.pushButton_mode_area.clicked.connect(lambda: self.set_mode("area"))
@@ -2554,6 +2643,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute("update source set memo=? where id=?", (memo, file_['id']))
         self.app.conn.commit()
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['source'], source=self)
         self.app.delete_backup = False
         file_['tooltip'] = self._file_tooltip(file_)
         items = self.ui.listWidget.findItems(file_['name'], Qt.MatchFlag.MatchExactly)
@@ -2631,6 +2722,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             sizes.append((float(rect.width), float(rect.height)))
         doc.close()
         self.total_pages = len(sizes)
+        # Shared reference: rotations persist per file within the session.
+        self.view.page_rotations = self.rotations_by_fid.setdefault(file_.get('id'), {})
         self.view.set_document(sizes)
         self.ui.label_pages.setText(f"/ {self.total_pages}")
         self.ui.lineEdit_page.setText("1")
@@ -3313,13 +3406,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         elif not item and ui.memo != "":
             cur.execute("insert into annotation (fid, pos0, pos1, memo, owner, date) values(?,?,?,?,?,?)",
                         (self.file_['id'], pos0, pos1, ui.memo, self.app.settings['codername'], now))
+        else:
+            return  # No changes
         
         self.app.conn.commit()
         self.app.delete_backup = False
         
-        # Refrescar estado
+        # Refresh and notify
         self.annotations = self.app.get_annotations()
         self.get_coded_text_update_eventfilter_tooltips()
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['annotation'], source=self)
 
     def _edit_annotation(self, note):
         """        Edits or deletes an existing annotation with DialogMemo (empty memo =
@@ -3346,6 +3443,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.annotations = self.app.get_annotations()
         self.get_coded_text_update_eventfilter_tooltips()
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['annotation'], source=self)
 
     def _delete_annotation(self, note):
         """        Deletes an existing annotation without going through the dialog.
@@ -3359,6 +3458,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.annotations = self.app.get_annotations()
         self.get_coded_text_update_eventfilter_tooltips()
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['annotation'], source=self)
 
     def coded_memo(self, texts_here=None, areas_here=None):
         """        Views or edits the memo of the coding(s) under the selection (text or area) with
@@ -3372,6 +3473,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if not selected: return
         
         cur = self.app.conn.cursor()
+        changed = set()
         for entry in selected:
             ref = entry['ref']
             # Memo header by type: text -> positions, area -> page and rect.
@@ -3387,10 +3489,14 @@ class DialogCodePdf(QtWidgets.QWidget):
             if ui.exec():
                 if entry['type'] == 'text':
                     cur.execute("update code_text set memo=? where ctid=?", (ui.memo, ref['ctid']))
+                    changed.add('code_text')
                 else:
                     cur.execute("update code_image set memo=? where imid=?", (ui.memo, ref['imid']))
+                    changed.add('code_image')
         self.app.conn.commit()
         self.get_coded_text_update_eventfilter_tooltips()
+        if changed and getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(sorted(changed), source=self)
 
     def _update_recent_codes_menu(self):
         """        Shows a popup menu with the recently used codes and marks the selection with the chosen
@@ -3563,15 +3669,20 @@ class DialogCodePdf(QtWidgets.QWidget):
         if not selected: return
         
         cur = self.app.conn.cursor()
+        changed = set()
         for entry in selected:
             ref = entry['ref']
             new_flag = None if ref['important'] == 1 else 1
             if entry['type'] == 'text':
                 cur.execute("update code_text set important=? where ctid=?", (new_flag, ref['ctid']))
+                changed.add('code_text')
             else:
                 cur.execute("update code_image set important=? where imid=?", (new_flag, ref['imid']))
+                changed.add('code_image')
         self.app.conn.commit()
         self.get_coded_text_update_eventfilter_tooltips()
+        if changed and getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(sorted(changed), source=self)
 
     def change_code_for_segment(self, text_item=None, area_item=None):
         """        Changes the code (cid) of ONE already-coded segment: text (by ctid) or image area
@@ -4314,7 +4425,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self._search_pages.add(page_idx)
                 item.update()
                 if first_scene_rect is None:
-                    first_scene_rect = rects[0].translated(item.pos())
+                    first_scene_rect = item.mapRectToScene(rects[0])
         for idx in self._search_pages:
             if idx < len(self.view.items_):
                 self.view.items_[idx].update()
@@ -4377,6 +4488,37 @@ class DialogCodePdf(QtWidgets.QWidget):
     def zoom_out(self):
         self.view.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorViewCenter)
         self.view.set_zoom(self.view.zoom / 1.2)
+
+    def update_rotate_button_state(self):
+        """ Rotate buttons enabled only in single-page view mode. """
+
+        enabled = self.view.single_page_mode
+        self.ui.pushButton_rotate_page.setEnabled(enabled)
+        self.ui.pushButton_rotate_page_ccw.setEnabled(enabled)
+
+    def rotate_current_page(self):
+        """ Rotate the current page 90 deg clockwise (view only, single-page mode)
+        File, text and coding coordinates untouched. """
+
+        self._rotate_current(90)
+
+    def rotate_current_page_ccw(self):
+        """ Rotate the current page 90 deg counter-clockwise; same rules. """
+
+        self._rotate_current(-90)
+
+    def _rotate_current(self, delta):
+        """ Shared rotation body: only in single-page view mode.
+        Args:
+            delta: degrees, +90 clockwise or -90 counter-clockwise.
+        """
+
+        if not self.view.items_ or not self.view.single_page_mode:
+            return
+        idx = self.view.current_single_page
+        self.view.rotate_page(idx, delta)
+        self.reposition_resize_handles()
+        self.coding_margin.update()
 
     def set_mode(self, mode):
         self.view.mode = mode
@@ -4660,6 +4802,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         menu.addSeparator()
         action_goto = menu.addAction(_("Go to page"))
         action_fit = menu.addAction(_("Fit page width"))
+        action_rotate_cw = None
+        action_rotate_ccw = None
+        if self.view.single_page_mode:  # rotation is a single-page reading aid
+            action_rotate_cw = menu.addAction(_("Rotate page clockwise"))
+            action_rotate_ccw = menu.addAction(_("Rotate page counter-clockwise"))
         action = menu.exec(global_pos)
         if action is None:
             return
@@ -4753,6 +4900,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         if action == action_fit:
             self.view.fit_width()
+            return
+        if action == action_rotate_cw:
+            self.rotate_current_page()
+            return
+        if action == action_rotate_ccw:
+            self.rotate_current_page_ccw()
             return
         # self.export_page_image()
 
@@ -5018,6 +5171,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         if "source" in tables and self.file_ is not None:
             self.load_file(self.file_)
             return
+        if "annotation" in tables and self.file_ is not None:
+            self.annotations = self.app.get_annotations()
+            self.get_coded_text_update_eventfilter_tooltips()
         if ("code_text" in tables or "code_image" in tables) and self.file_ is not None:
             self.get_coded_text_update_eventfilter_tooltips()
             self.fill_code_counts_in_tree()
@@ -6372,6 +6528,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     Message(self.app, _("Journal"), _("Could not create the journal entry."), "warning").exec()
                     return
         self.app.delete_backup = False
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(['journal'], source=self)
         self.parent_textEdit.append(_("Restructure report saved to journal: ") + intento)
         Message(self.app, _("Journal"), _("Report saved to journal:") + f"\n{intento}").exec()
 
