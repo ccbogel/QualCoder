@@ -70,7 +70,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             ["#e0f7fa", "#80d8ff", "#40c4ff", "#0091ea", "#01579b"],
             ["#D2F2D4", "#7BE382", "#26CC00", "#22B600", "#009C1A"]
         ]
-        
+        self.transposed = False
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Coocurrence()
         self.ui.setupUi(self)
@@ -92,6 +92,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
         self.ui.pushButton_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_color.pressed.connect(self.change_highlight_color)
+        self.ui.pushButton_transpose.setIcon(qta.icon('mdi6.rotate-right', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_transpose.pressed.connect(self.transpose_data)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # Should be smaller
@@ -143,12 +145,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.file_ids_names = self.app.get_text_filenames()
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.process_data()
-
-    def _emit_project_table_changes(self, tables):
-        """Notify other open dialogs about changed project tables."""
-
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(tables, source=self)
 
     def _rebuild_selected_code_strings(self):
         self.code_names_list = []
@@ -501,8 +497,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 self.data_details[row_pos][col_pos].append(res_list)
 
         # Color heat map for spread across 5 colours
-        #colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # Light to dark red
-        #colours_blue = ["#e0f7fa", "#80d8ff", "#40c4ff", "#0091ea", "#01579b"]
         colors = self.colours[self.color_choice]
         for row, row_data in enumerate(self.data_counts):
             for col, item_data in enumerate(row_data):
@@ -1092,7 +1086,22 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 except Exception as e_:
                     print(e_)
                     logger.debug(e_)
-            self._emit_project_table_changes(['code_name', 'code_text', 'code_image'])
+
+    def transpose_data(self):
+        """ Reverse code name order for headings and table """
+
+        self.transposed = not(self.transposed)
+        self.selected_codes = sorted(self.selected_codes, key=lambda x: x["name"].lower(), reverse=self.transposed)
+        for r in self.data_details:
+            r.reverse()
+        self.data_details.reverse()
+        for r in self.data_counts:
+            r.reverse()
+        self.data_counts.reverse()
+        for r in self.data_colors:
+            r.reverse()
+        self.data_colors.reverse()
+        self.fill_table()
 
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
