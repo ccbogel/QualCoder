@@ -29,6 +29,7 @@ import csv
 from datetime import datetime
 import logging
 import openpyxl
+import re
 import qtawesome as qta  # https://pictogrammers.com/library/mdi/
 import sqlite3
 
@@ -115,6 +116,30 @@ class DialogSQL(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
+
+    # Tables a free-form query may write. Used when the target cannot be parsed out.
+    PROJECT_TABLES = ['source', 'code_name', 'code_cat', 'code_text', 'code_image', 'code_av',
+                      'cases', 'case_text', 'attribute', 'attribute_type', 'journal', 'annotation']
+
+    @staticmethod
+    def _tables_written_by(sql):
+        """Name the table a user DELETE or UPDATE targets, for the project change event.
+
+        Falls back to every project table when the target cannot be identified, so a
+        hand-written query never leaves open dialogs showing stale data.
+        """
+
+        match = re.search(r"(?:delete\s+from|update)\s+[\"\'`\[]?([a-zA-Z_][a-zA-Z0-9_]*)",
+                          sql, re.IGNORECASE)
+        if match and match.group(1).lower() in DialogSQL.PROJECT_TABLES:
+            return [match.group(1).lower()]
+        return list(DialogSQL.PROJECT_TABLES)
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def update_sizes(self):
         """ Called by splitter resized """
@@ -284,10 +309,12 @@ class DialogSQL(QtWidgets.QDialog):
                 self.ui.label.setText(str(cur.rowcount) + _(" rows deleted"))
                 self.app.delete_backup = False
                 self.app.conn.commit()
+                self._emit_project_table_changes(self._tables_written_by(self.sql))
             if self.sql[0:6].upper() == "UPDATE":
                 self.ui.label.setText(str(cur.rowcount) + _(" rows updated"))
                 self.app.delete_backup = False
                 self.app.conn.commit()
+                self._emit_project_table_changes(self._tables_written_by(self.sql))
             if selected_text != "":
                 text = self.ui.label.text() + "  " + _("Using selected text")
                 self.ui.label.setText(text)
@@ -402,6 +429,7 @@ class DialogSQL(QtWidgets.QDialog):
                 delete_sql = menu.addAction(_("Delete stored sql"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None and action == delete_sql:
+            deleted = False
             for i in range(len(self.stored_sqls)):
                 if self.stored_sqls[i]['index'] == index:
                     title = self.ui.treeWidget.currentItem().text(0)
@@ -409,7 +437,10 @@ class DialogSQL(QtWidgets.QDialog):
                     cur.execute("delete from stored_sql where title=?", [title])
                     self.app.conn.commit()
                     del self.stored_sqls[i]
+                    deleted = True
                     break
+            if deleted:
+                self._emit_project_table_changes(['stored_sql'])
             self.get_schema_update_tree_widget()
 
     def keyPressEvent(self, event):
@@ -505,6 +536,7 @@ class DialogSQL(QtWidgets.QDialog):
         try:
             cur.execute(sql, [title, description, grouper, ssql])
             self.app.conn.commit()
+            self._emit_project_table_changes(['stored_sql'])
         except Exception as e:
             Message(self.app, _("Cannot save"), str(e)).exec()
         self.get_schema_update_tree_widget()
