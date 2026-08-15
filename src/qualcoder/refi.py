@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -110,6 +110,12 @@ class RefiImport:
                 return
             self.import_project()
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def import_codebook(self):
         """ Import REFI-QDA standard codebook into opened project.
         """
@@ -145,6 +151,9 @@ class RefiImport:
                     # Recursive search through each Code element
                     counter += self.sub_codes(el_, None)  # <(pre-existing: pass each Code, not the <Codes> container)
                 msg = str(counter) + _(" categories and codes imported from ") + self.file_path
+                if counter > 0:
+                    # Imported into an open project: one event for the whole codebook
+                    self._emit_project_table_changes(['code_name', 'code_cat'])
                 Message(self.app, _("Codebook imported"), msg).exec()
                 self.parent_textedit.append(msg)
                 return
