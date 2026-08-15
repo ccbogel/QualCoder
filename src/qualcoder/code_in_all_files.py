@@ -97,6 +97,15 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
         self.exec()
 
+    # Coded segment type -> database table, for project change notifications
+    CODED_TABLES = {'text': ['code_text'], 'image': ['code_image'], 'av': ['code_av']}
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def get_coded_segments_all_files(self):
         """ Get coded segments by file for this code. """
 
@@ -422,6 +431,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 self.app.conn.commit()
             self.get_coded_segments_all_files()
             self.app.delete_backup = False
+            self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
             return
         if action == action_memo:
             self.edit_memo(item)
@@ -446,6 +456,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.app.conn.commit()
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
+        self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
 
     def remove_important_flag(self, item:dict[str, Any]):
 
@@ -459,6 +470,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.app.conn.commit()
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
+        self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
 
     def edit_memo(self, item:dict[str, Any]):
         """ Edit item memo.
@@ -481,6 +493,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.app.conn.commit()
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
+        self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
 
     def export_odt(self):
         """ Export all contents to ODT file. """
@@ -546,6 +559,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                     self.app.conn.commit()
                 except sqlite3.IntegrityError:
                     pass
+        self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
 
 
 class DialogCodedIds(QtWidgets.QDialog):
