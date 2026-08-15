@@ -3,7 +3,7 @@
  <class>Dialog_Comparisons</class>
  <widget class="QDialog" name="Dialog_Comparisons">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -74,7 +74,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>520</x>
+        <x>590</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -93,7 +93,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export to file</string>
       </property>
       <property name="text">
        <string/>
@@ -134,7 +134,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select files</string>
       </property>
       <property name="text">
        <string/>
@@ -162,7 +162,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select categories</string>
       </property>
       <property name="text">
        <string/>
@@ -190,7 +190,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select codes</string>
       </property>
       <property name="text">
        <string/>
@@ -218,7 +218,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select attribute</string>
       </property>
       <property name="text">
        <string/>
@@ -246,7 +246,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select cases</string>
       </property>
       <property name="text">
        <string/>
@@ -265,6 +265,62 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_color">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Highlight colour</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_transpose">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Transpose table</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
@@ -276,7 +332,7 @@
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <widget class="QTableWidget" name="tableWidget"/>
         <widget class="QListWidget" name="listWidget">
