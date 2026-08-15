@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
-https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -913,6 +913,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['code_text'])
 
     def _margin_coded_text_memo_ctid(self, code):  # <- L
         """ Add/edit memo for the exact coded segment (by ctid) clicked. """
@@ -934,6 +935,7 @@ class DialogCodeText(QtWidgets.QWidget):
         text_item['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def _margin_change_code_ctid(self, code):  # <- L
         """ Change the exact coded segment (by ctid) clicked to another code. """
@@ -952,13 +954,17 @@ class DialogCodeText(QtWidgets.QWidget):
         if not replacement_code:
             return
         cur = self.app.conn.cursor()
+        changed = False
         try:
             cur.execute("update code_text set cid=? where ctid=?", [replacement_code['cid'], code['ctid']])
             self.app.conn.commit()
+            changed = True
         except sqlite3.IntegrityError:
             pass
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        if changed:
+            self._emit_project_table_changes(['code_text'])
 
     def _margin_annotate_ctid(self, code):  # <- L
         """ Add/edit/remove an annotation over the EXACT range (pos0-pos1) of
@@ -1002,6 +1008,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                             + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ")
                                             + self.file_['name'])
                 self.get_coded_text_update_eventfilter_tooltips()
+                self._emit_project_table_changes(['annotation'])
             return
 
         # Edit existing annotation
@@ -1017,6 +1024,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.delete_backup = False
             self.annotations = self.app.get_annotations()
             self.get_coded_text_update_eventfilter_tooltips()
+            self._emit_project_table_changes(['annotation'])
             return
 
         # Blank memo -> delete the annotation
@@ -1028,6 +1036,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(_("Annotation removed from position ")
                                     + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['annotation'])
 
     def _margin_resize_ctid(self, code):
         """ Show resize handles bound to the EXACT coded segment (by ctid)
@@ -1765,6 +1774,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         msg = _("All codes by ") + self.app.settings['codername'] + _(" deleted from ") + self.file_['name']
         self.parent_textEdit.append(msg)
+        self._emit_project_table_changes(['code_text'])
 
     # Search for text methods
     def search_for_text(self):
@@ -2280,13 +2290,17 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cur = self.app.conn.cursor()
         sql = "update code_text set cid=? where ctid=?"
+        changed = False
         try:
             cur.execute(sql, [replacement_code['cid'], text_item['ctid']])
             self.app.conn.commit()
+            changed = True
         except sqlite3.IntegrityError:
             pass
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        if changed:
+            self._emit_project_table_changes(['code_text'])
 
     def recursive_set_current_item(self, item, text_):
         """ Set matching item to be the current selected item.
@@ -2362,6 +2376,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def active_file_memo(self):
         """ Send active file to file_memo method.
@@ -2397,6 +2412,7 @@ class DialogCodeText(QtWidgets.QWidget):
             new_tt = f"{tt[:memo_pos]} {_('Memo:')} {file_['memo']}"
             items[0].setToolTip(new_tt)
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source'])
 
     def coded_text_memo(self, position:None|int=None):
         """ Add or edit a memo for this coded text.
@@ -2447,6 +2463,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 i['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def shift_code_positions(self, position: int):
         """ After a text file is edited - text added or deleted, code positions may be inaccurate.
@@ -2503,6 +2520,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def copy_selected_text_to_clipboard(self, metadata: bool = False):
         """ Copy text to clipboard for external use.
@@ -3825,6 +3843,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def extend_right(self, code_):
         """ Shift right arrow.
@@ -3847,6 +3866,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def shrink_to_left(self, code_):
         """ Alt left arrow, shrinks code from the right end of the code.
@@ -3868,6 +3888,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def shrink_to_right(self, code_):
         """ Alt right arrow shrinks code from the left end of the code.
@@ -3889,6 +3910,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self._emit_project_table_changes(['code_text'])
 
     def show_selected_code_in_text_next(self):
         """ Highlight only the selected code in the text. Move to next instance in text
@@ -4085,6 +4107,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 item['name'] = new_name
                 break
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def update_dialog_codes_and_categories(self, tables: list[str]|None = None):
         """Refresh the local dialog after code/category changes and optionally notify other dialogs.
 
@@ -4099,8 +4127,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         self.get_coded_text_update_eventfilter_tooltips()
 
-        if self.app.project_events is not None:
-            self.app.project_events.emit_table_changes(tables, source=self)
+        self._emit_project_table_changes(tables)
 
     def _on_project_data_changed(self, tables, source):
         """Handle project change events from other dialogs.
@@ -5032,6 +5059,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
 
         self.update_file_tooltip()  # Number of codes applied
+        self._emit_project_table_changes(['code_text'])
 
     def undo_last_unmarked_code(self):
         """ Restore the last deleted code(s).
@@ -5053,6 +5081,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.undo_deleted_codes = []
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self._emit_project_table_changes(['code_text'])
 
     def unmark(self, location):
         """ Remove code marking by all visible coders from selected text in current file.
@@ -5095,6 +5124,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['code_text'])
 
     def annotate(self, cursor_pos=None):
         """ Add view, or remove an annotation for selected text.
@@ -5164,6 +5194,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                             + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.file_[
                                                 'name'])
                 self.get_coded_text_update_eventfilter_tooltips()
+                self._emit_project_table_changes(['annotation'])
             return
 
         # Edit existing annotation
@@ -5180,6 +5211,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
             self.annotations = self.app.get_annotations()
             self.get_coded_text_update_eventfilter_tooltips()
+            self._emit_project_table_changes(['annotation'])
             return
 
         # If blank delete the annotation
@@ -5191,6 +5223,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.annotations = self.app.get_annotations()
             self.parent_textEdit.append(_("Annotation removed from position ")
                                         + str(item['pos0']) + _(" for: ") + self.file_['name'])
+            self._emit_project_table_changes(['annotation'])
         self.get_coded_text_update_eventfilter_tooltips()
 
     def button_autocode_surround(self):
@@ -5304,6 +5337,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         Message(self.app, "Autocode surround", msg).exec()
         self.app.delete_backup = False
+        if len(undo_list) > 0:
+            self._emit_project_table_changes(['code_text'])
 
     def undo_autocoding(self):
         """ Present a list of choices for the undo operation.
@@ -5485,6 +5520,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # Update tooltip filter and code tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        if len(undo_list) > 0:
+            self._emit_project_table_changes(['code_text'])
 
     def auto_code(self):
         """ Autocode text in one file or all files with currently selected code.
@@ -5660,6 +5697,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        if len(undo_list) > 0:
+            self._emit_project_table_changes(['code_text'])
 
     # Methods for Editing mode
     def undo_edited_text(self):
@@ -5685,6 +5724,9 @@ class DialogCodeText(QtWidgets.QWidget):
         for ca in self.edit_original_case_assignment:
             cursor.execute("update case_text set pos0=?, pos1=? where caseid=?",
                            [ca[1], ca[2], ca[0]])
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         self.clear_edit_variables()
         self.ui.plainTextEdit.installEventFilter(self.eventFilterTT)
         self.annotations = self.app.get_annotations()
@@ -5822,6 +5864,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setEnabled(True)
         self.ui.widget_left.show()
         self.prev_text = ""
+        text_edited = self.edit_mode_has_changed
         if self.edit_mode_has_changed:
             self.text = self.ui.plainTextEdit.toPlainText()
             self.file_['fulltext'] = self.text
@@ -5862,10 +5905,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.coding_margin.update()
         # Notify the fulltext edit to the bus: an open DialogCodePdf with this file
         # must reload and re-verify the page mapping; without this it keeps stale
-        # text and positions in memory.
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(
-                ['source', 'code_text', 'annotation', 'case_text'], source=self)
+        # text and positions in memory. Only when something was actually edited.
+        if text_edited:
+            self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
 
     def edit_mode_find(self, direction:str="next"):
         """  Move forward or backward through the edit document.
@@ -6915,6 +6957,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
             self.app.conn.commit()
             self.app.delete_backup = False
+            self._emit_project_table_changes(['code_text'])
         except sqlite3.IntegrityError:
             self.app.conn.rollback()
             # Revert in-memory positions to undo temporary highlight
