@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -129,6 +129,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.splitter.setSizes([500, 200])
         self.table_files_rows_hidden = False
         self.table_refs_rows_hidden = False
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def get_data(self):
         """ Get data for files and references. """
@@ -392,8 +398,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
             # print(best_match)
             ris_id = best_match[0]
             fid = file_['id']
-            self.link_reference_to_files(ris_id, fid)
+            # Silenced per call: one event covers the whole auto-link run
+            self.link_reference_to_files(ris_id, fid, notify=False)
             files_linked_count += 1
+        if files_linked_count > 0:
+            self._emit_project_table_changes(['source', 'attribute'])
         msg = _("Matches: ") + f"          {files_linked_count} / {len(files_unlinked)}          "
         Message(self.app, _("Files linked to references"), msg).exec()
 
@@ -823,7 +832,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         logger.debug(f"Attachment not found on disk: {value!r} (cleaned: {raw!r})")
         return None
 
-    def _import_attachment_file(self, file_path, progress=None):
+    def _import_attachment_file(self, file_path, progress=None, notify:bool=True):
         """
         Imports an attachment (PDF or EPUB) into the project: copy to documents/,
         extract its text and create the source row with attribute placeholders. Returns the
@@ -895,6 +904,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         # whole FAISS index, and a batch would queue one rebuild per attachment. Counted here only;
         # _update_ai_vectorstore does the single pass when the batch ends.
         self.attachments_imported += 1
+        if notify:
+            self._emit_project_table_changes(['source', 'attribute'])
         self.parent_text_edit.append(filename + _(" imported"))
         if ext == ".pdf":
             self._import_pdf_annotations(fid, file_path, text_, progress)
@@ -973,7 +984,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 return True
         return False
 
-    def unlink_files(self, fid:int|None=None):
+    def unlink_files(self, fid:int|None=None, notify:bool=True):
         """ Remove linked reference from selected files.
         Called by:
             pushButton_unlink: Uses selected rows in files table. Does not use parameters.
@@ -1006,9 +1017,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
             for attribute in attributes:
                 cur.execute(sql, [fid, attribute])
                 self.app.conn.commit()
+        if notify:
+            self._emit_project_table_changes(['source', 'attribute'])
         self.get_data()
 
-    def link_reference_to_files(self, ris_id:int|None=None, fid:int|None=None):
+    def link_reference_to_files(self, ris_id:int|None=None, fid:int|None=None, notify:bool=True):
         """ Link the selected files to the selected reference.
 
         Called by:
@@ -1084,6 +1097,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
             for attribute in attr_values:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
                 self.app.conn.commit()
+        if notify:
+            self._emit_project_table_changes(['source', 'attribute'])
         self.get_data()
 
     def edit_reference(self):
@@ -1137,11 +1152,19 @@ class DialogReferenceManager(QtWidgets.QDialog):
                             [ui_re.tableWidget.item(row, 1).text(), ris_id, key])
                 self.app.conn.commit()
                 ref_edited = True
-        # Update Reference attributes
+        # Update Reference attributes. unlink_files and link_reference_to_files emit
+        # per call, so they are silenced here and one event covers the whole edit.
+        relinked = False
         for file_ in self.files:
             if file_['risid'] == ris_id:
-                self.unlink_files(file_['id'])
-                self.link_reference_to_files(ris_id, file_['id'])
+                self.unlink_files(file_['id'], notify=False)
+                self.link_reference_to_files(ris_id, file_['id'], notify=False)
+                relinked = True
+        if ref_edited or relinked:
+            tables = ['ris'] if ref_edited else []
+            if relinked:
+                tables += ['source', 'attribute']
+            self._emit_project_table_changes(tables)
         if ref_edited:
             self.parent_text_edit.append(_("Reference edited."))
         self.get_data()
@@ -1178,6 +1201,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             for attribute in attributes:
                 cur.execute(sql, [source[0], attribute])
                 self.app.conn.commit()
+        self._emit_project_table_changes(['ris', 'source', 'attribute'])
         self.get_data()
         self.fill_table_refs()
         self.fill_table_files()
