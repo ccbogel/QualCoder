@@ -26,9 +26,8 @@ from math import isclose
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
 from PyQt6 import QtCore, QtWidgets, QtGui
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .GUI.ui_comparison_table import Ui_Dialog_Comparisons
 from .helpers import ExportDirectoryPathDialog, Message, DialogCodeInText, DialogCodeInImage, DialogCodeInAV, msecs_to_hours_mins_secs
@@ -45,6 +44,13 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_textEdit = parent_text_edit
+        self.color_choice = 0
+        self.colours = [
+            ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"],
+            ["#e0f7fa", "#80d8ff", "#40c4ff", "#0091ea", "#01579b"],
+            ["#D2F2D4", "#7BE382", "#26CC00", "#22B600", "#009C1A"]
+        ]
+        self.transposed = False
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Comparisons()
         self.ui.setupUi(self)
@@ -64,6 +70,10 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
+        self.ui.pushButton_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_color.pressed.connect(self.change_highlight_color)
+        self.ui.pushButton_transpose.setIcon(qta.icon('mdi6.rotate-right', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_transpose.pressed.connect(self.transpose_data)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         self.ui.listWidget.itemPressed.connect(self.show_list_item)
         #self.ui.listWidget.setSelectionMode()
@@ -125,7 +135,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.codes = [fresh_code_map[cid] for cid in previous_selected_ids if cid in fresh_code_map]
 
     def _load_attributes(self):
-        """Load the cached attribute metadata used for selection."""
+        """ Load the cached attribute metadata used for selection."""
 
         sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
         cur = self.app.conn.cursor()
@@ -147,7 +157,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.attributes = attributes
 
     def _on_project_data_changed(self, tables, source):
-        """Handle project change events from other dialogs.
+        """ Handle project change events from other dialogs.
 
         Args:
             tables: Changed database table names.
@@ -282,9 +292,24 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             Message(self.app, _("Files selected"), msg).exec()
         self.process_files_data()
 
+    def change_highlight_color(self):
+        """ Button to change the highlight colour. for Reds, blues, greens. """
+
+        self.color_choice += 1
+        if self.color_choice > 2:
+            self.color_choice = 0
+        self.process_files_data()
+
+    def transpose_data(self):
+
+        self.transposed = not(self.transposed)
+        self.data_counts = [[row[i] for row in self.data_counts] for i in range(len(self.data_counts[0]))]
+        self.data_colors = [[row[i] for row in self.data_colors] for i in range(len(self.data_colors[0]))]
+        self.data = [[row[i] for row in self.data] for i in range(len(self.data[0]))]
+        self.fill_table()
+
     def process_files_data(self):
         """ Calculate the relations for selected codes for ALL coders (or only THIS coder - TODO).
-        For text? codings only.
         Rows as codes, columns as files.
 
         Data items:
@@ -365,7 +390,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 self.data[row][col] = text_data + image_data + av_data
 
         # Color heat map for spread across 5 colours
-        colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # light to dark red
+        colors = self.colours[self.color_choice]
         for row, row_data in enumerate(self.data_counts):
             for col, item_data in enumerate(row_data):
                 if self.data_counts[row][col] > 0:
@@ -373,7 +398,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     if color_range_index < 0:
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
-        self.fill_table(self.files)
+        self.fill_table()
 
     def select_cases(self):
         """ Select cases to display relevant files. """
@@ -523,30 +548,49 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if filepath is None:
             return
 
-        # Excel row headers
-        row_header = []
-        for code_ in self.codes:
-            name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
-            row_header.append("\n".join(name_split_50))
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Counts"
         wb.create_sheet("Details")
         ws2 = wb["Details"]
-        for row, row_name in enumerate(row_header):
-            v_cell = ws.cell(row=row + 2, column=1)
-            v_cell.value = row_name
-            v_cell2 = ws2.cell(row=row + 2, column=1)
-            v_cell2.value = row_name
-
-        # Excel column headers
-        for col, file_ in enumerate(self.files):
-            h_cell = ws.cell(row=1, column=col + 2)
-            h_cell.value = file_['name']
-            h_cell2 = ws2.cell(row=1, column=col + 2)
-            h_cell2.value = file_['name']
-            ws.column_dimensions[get_column_letter(col + 1)].width = 20
-            ws2.column_dimensions[get_column_letter(col + 1)].width = 20
+        row_header = []
+        if not self.transposed:
+            # Row header
+            for code_ in self.codes:
+                name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+                row_header.append("\n".join(name_split_50))
+            for row, row_name in enumerate(row_header):
+                v_cell = ws.cell(row=row + 2, column=1)
+                v_cell.value = row_name
+                v_cell2 = ws2.cell(row=row + 2, column=1)
+                v_cell2.value = row_name
+            # Column header
+            for col, file_ in enumerate(self.files):
+                h_cell = ws.cell(row=1, column=col + 2)
+                h_cell.value = file_['name']
+                h_cell2 = ws2.cell(row=1, column=col + 2)
+                h_cell2.value = file_['name']
+                ws.column_dimensions[get_column_letter(col + 1)].width = 20
+                ws2.column_dimensions[get_column_letter(col + 1)].width = 20
+        else: # Transposed
+            # Row header
+            for row, file_ in enumerate(self.files):
+                h_cell = ws.cell(row=row + 2, column=1)
+                h_cell.value = file_['name']
+                h_cell2 = ws2.cell(row=row + 2, column=1)
+                h_cell2.value = file_['name']
+            # Column header
+            column_header = []
+            for code_ in self.codes:
+                name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+                column_header.append("\n".join(name_split_50))
+            for col, col_name in enumerate(column_header):
+                v_cell = ws.cell(row=1, column=col+2)
+                v_cell.value = col_name
+                v_cell2 = ws2.cell(row=1, column=col+2)
+                v_cell2.value = col_name
+                ws.column_dimensions[get_column_letter(col + 1)].width = 20
+                ws2.column_dimensions[get_column_letter(col + 1)].width = 20
 
         # Co-occurrence counts
         for row, row_data in enumerate(self.data_counts):
@@ -580,30 +624,40 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         Message(self.app, _('Co-occurrence exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    def fill_table(self, column_header):
+    def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive) as rows
-        header columns can be files, or ... MORE ?
-        using self.data
-
-        Args:
-            column_header: List of dictionary items containing 'name' for the table columns header
+        header columns can be files
+        using self.files and self.codes for headers
+            self.data, self.data_counts, self.data_colors for cells
         """
 
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        column_header_labels = []
-        for item in column_header:
-            column_header_labels.append(item['name'])
-        self.ui.tableWidget.setColumnCount(len(column_header_labels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(column_header_labels)
+        column_header = []
         row_header = []
-        for code_ in self.codes:
-            # row_header.append(code_['name'])  # original
-            name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
-            row_header.append("\n".join(name_split_50))
-        self.ui.tableWidget.setRowCount(len(row_header))
-        self.ui.tableWidget.setVerticalHeaderLabels(row_header)
+
+        if not self.transposed:
+            for item in self.files:
+                column_header.append(item['name'])
+            self.ui.tableWidget.setColumnCount(len(column_header))
+            self.ui.tableWidget.setHorizontalHeaderLabels(column_header)
+            for code_ in self.codes:
+                name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+                row_header.append("\n".join(name_split_50))
+            self.ui.tableWidget.setRowCount(len(row_header))
+            self.ui.tableWidget.setVerticalHeaderLabels(row_header)
+        else:
+            for item in self.files:
+                row_header.append(item['name'])
+            self.ui.tableWidget.setRowCount(len(row_header))
+            self.ui.tableWidget.setVerticalHeaderLabels(row_header)
+            for code_ in self.codes:
+                name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+                column_header.append("\n".join(name_split_50))
+            self.ui.tableWidget.setColumnCount(len(column_header))
+            self.ui.tableWidget.setHorizontalHeaderLabels(column_header)
+
         for row, row_data in enumerate(self.data_counts):
             for col, cell_data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem()
