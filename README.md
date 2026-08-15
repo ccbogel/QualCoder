@@ -287,7 +287,7 @@ https://discover.utas.edu.au/Colin.Curtain/publications
 [Université de Pau et des Pays de l'Adour](https://www.univ-pau.fr/fr/index.html), France. Justin is a geography researcher, who works on the relationship between societies and their environment, with particular attention to energy and ecological transitions. 
 
 **Dr. Lorenzo Salomón**
-[Universidad Autónoma de Sinaloa](https://www.uas.edu.mx/), Mexico. 
+Psic. Lorenzo Salomón Cárdenas. [Universidad Autónoma de Sinaloa](https://www.uas.edu.mx/), Mexico. Testing, software development enthusiast, translations into Spanish. Freelance Researcher and Human Rights Activist.
 
 ## Leave a review
 
