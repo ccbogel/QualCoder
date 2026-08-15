@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -137,6 +137,12 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.app.settings['dialogcasefilemanager_splitter0'] = sizes[0]
         self.app.settings['dialogcasefilemanager_splitter1'] = sizes[1]
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def get_files(self):
         """ Get files for this case. """
 
@@ -218,6 +224,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cur.execute(sql, (link['caseid'], link['fid'], link['pos0'], link['pos1'],
                           link['owner'], link['date'], link['memo']))
         self.app.conn.commit()
+        self._emit_project_table_changes(['case_text'])
         msg = f'{file_[1]} {_("added to case.")}\n'
 
         # Update table entry assigned to Yes
@@ -263,6 +270,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.get_files()
         self.fill_table()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['case_text'])
 
     def show_or_hide_rows(self):
         """ Show or hide table rows if check box hide is checked or not. """
@@ -552,6 +560,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.get_files()
         self.fill_table()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['case_text'])
 
     def unmark(self, position):
         """ Remove case marking from selected text in selected file. """
@@ -584,6 +593,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.get_files()
         self.fill_table()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['case_text'])
 
     def automark(self):
         """ Automark text in one or more files with selected case.
@@ -655,6 +665,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     else:
                         already_assigned = _("\nAlready assigned.")
         # Update messages and table widget
+        if entries > 0:
+            self._emit_project_table_changes(['case_text'])
         self.get_files()
         self.fill_table()
         # Text file is loaded in browser then update the highlights
