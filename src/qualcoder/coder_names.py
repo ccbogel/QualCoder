@@ -14,9 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -93,6 +94,12 @@ class DialogCoderNames(QtWidgets.QDialog):
         self.ui.buttonBox.accepted.connect(self.ok)
         self.ui.buttonBox.rejected.connect(self.cancel) 
         self.ui.buttonBox.helpRequested.connect(self.help)
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def read_coder_names(self):
         """
@@ -405,6 +412,10 @@ class DialogCoderNames(QtWidgets.QDialog):
         
         if self.do_commit and self.app.conn is not None:
             self.app.conn.commit()  # this writes all the changes finally to the database
+            if self.coder_names_changed:
+                # Renaming or merging a coder rewrites owner across the coded tables
+                self._emit_project_table_changes(
+                    ['coder_names', 'code_text', 'code_image', 'code_av', 'annotation'])
 
     def cancel(self):
         if self.app.conn is not None:
