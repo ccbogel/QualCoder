@@ -14,9 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -338,6 +339,12 @@ class DialogSpeakers(QtWidgets.QDialog):
         # Help button top-right, icon-only, consistent with the other modules.
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def _setup_identifier_combo(self):
         """ 
@@ -1345,6 +1352,7 @@ class DialogSpeakers(QtWidgets.QDialog):
             if inserted_codings > 0:  # hubo codificaciones nuevas # new codings were written
                 self.app.delete_backup = False
             self.app.conn.commit()
+            self._emit_project_table_changes(['code_cat', 'code_name', 'code_text'])
         except Exception as e_:
             logger.exception(e_)  # antes print(); registra el traceback.  Was print(); logs the traceback
             self.app.conn.rollback()  # Revert all changes

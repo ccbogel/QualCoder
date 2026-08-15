@@ -131,6 +131,12 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.hide()
         self.attribute_names = []  # For AddAttribute dialog
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def load_journals(self, order="name asc"):
         """ Load journals.
         Order by Name asc/desc date asc/desc.
@@ -239,6 +245,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.load_journals()
         self.fill_table()
         self.parent_text_edit.append(f'{_("Attribute added to journals:")} {name}, {_("type")}: {value_type}')
+        self._emit_project_table_changes(['attribute_type', 'attribute'])
 
     def check_attribute_placeholders(self):
         """ Journals can be added after attributes are in the project.
@@ -246,6 +253,7 @@ class DialogJournals(QtWidgets.QDialog):
          Also,if a journal is deleted, check and remove any isolated attribute values. """
 
         cur = self.app.conn.cursor()
+        changed = False
         sql = "select jid from journal "
         cur.execute(sql)
         journal_jids_res = cur.fetchall()
@@ -262,6 +270,7 @@ class DialogJournals(QtWidgets.QDialog):
                     placeholders = [attribute[0], jid[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                     self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
+                    changed = True
         self.app.conn.commit()
 
         # Check and delete attribute values where journal has been deleted
@@ -272,6 +281,9 @@ class DialogJournals(QtWidgets.QDialog):
         for r in res:
             cur.execute("delete from attribute where attr_type='journal' and id=?", [r[0], ])
             self.app.conn.commit()
+            changed = True
+        if changed:
+            self._emit_project_table_changes(['attribute'])
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -627,6 +639,7 @@ class DialogJournals(QtWidgets.QDialog):
                     (self.journals[self.ui.tableWidget.currentRow()]['jentry'], now_date, self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['journal'])
 
     def text_changed(self):
         """ Used in combination with timer to update database entry. """
@@ -659,6 +672,7 @@ class DialogJournals(QtWidgets.QDialog):
         cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
                     (journal['name'], journal['jentry'], journal['owner'], journal['date']))
         self.app.conn.commit()
+        self._emit_project_table_changes(['journal'])
         cur.execute("select last_insert_rowid()")
         jid = cur.fetchone()[0]
         journal['jid'] = jid
@@ -721,6 +735,7 @@ class DialogJournals(QtWidgets.QDialog):
                     self.journals.remove(item)
             self.fill_table()
             self.parent_text_edit.append(_("Journal deleted: ") + journal_name)
+            self._emit_project_table_changes(['journal'])
         self.check_attribute_placeholders()
         self.app.delete_backup = False
 
@@ -784,6 +799,7 @@ class DialogJournals(QtWidgets.QDialog):
                     _("Journal name changed from: ") + f"{self.journals[row]['name']} -> {new_name}")
                 self.journals[row]['name'] = new_name
                 self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
+                self._emit_project_table_changes(['journal'])
             else:  # Put the original text in the cell
                 self.ui.tableWidget.item(row, y).setText(self.journals[row]['name'])
 
@@ -811,6 +827,7 @@ class DialogJournals(QtWidgets.QDialog):
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='journal'",
                         (value, self.journals[row]['jid'], attribute_name))
             self.app.conn.commit()
+            self._emit_project_table_changes(['attribute'])
 
             # Update self.journals[attributes]
             # Add list of attribute values to journals, order matches header columns
@@ -993,6 +1010,7 @@ class DialogJournals(QtWidgets.QDialog):
             except Exception as e:
                 logger.warning(_("Could not insert attribute: "), file_attr_name, str(e))
         self.app.conn.commit()
+        self._emit_project_table_changes(['source', 'attribute_type', 'attribute'])
 
         if self.app.settings['ai_enable'] == 'True' and getattr(self.app, 'ai', None) is not None:
             self.app.ai.sources_vectorstore.import_document(new_source_id, source_name, journal_text)

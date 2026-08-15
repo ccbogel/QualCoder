@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
-https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -6882,6 +6882,12 @@ class MemoGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(safe_color("blue"))
         self._refresh_memo()
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     # Map source type -> (select SQL, update SQL, params)
     def _get_sql_and_params(self):
         type_map = {
@@ -6962,7 +6968,7 @@ class MemoGraphicsItem(QtWidgets.QGraphicsTextItem):
                 }
                 changed = table_map.get(self.memo_source_type)
                 if changed:
-                    self.app.project_events.emit_table_changes([changed], source=self)
+                    self._emit_project_table_changes([changed])
         self._refresh_memo()
 
     def mouseDoubleClickEvent(self, event):
@@ -8533,6 +8539,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.code_or_cat['memo'] = ""
         self.get_memo()
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def __repr__(self):
         txt = f"TextGraphicsItem CodeOrCat:{self.code_or_cat} Font:{self.font_size} Bold:{self.bold}\n"
         txt += f"Ellipse:{self.is_ellipse} Collapse:{self.is_collapsed}\n"
@@ -9098,6 +9110,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if self.code_or_cat['cid'] is not None:
+            previous_memo = self.code_or_cat['memo']
             ui = DialogMemo(self.app, _("Memo for Code ") + self.code_or_cat['name'], self.code_or_cat['memo'],
                             entity_type="code", entity_id=self.code_or_cat['cid'])
             ui.exec()
@@ -9105,7 +9118,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
             self.conn.commit()
+            if self.code_or_cat['memo'] != previous_memo:
+                self._emit_project_table_changes(['code_name'])
         if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
+            previous_memo = self.code_or_cat['memo']
             ui = DialogMemo(self.app, _("Memo for Category ") + self.code_or_cat['name'], self.code_or_cat['memo'],
                             entity_type="category", entity_id=self.code_or_cat['catid'])
             ui.exec()
@@ -9114,6 +9130,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             cur.execute("update code_cat set memo=? where catid=?",
                         (self.code_or_cat['memo'], self.code_or_cat['catid']))
             self.conn.commit()
+            if self.code_or_cat['memo'] != previous_memo:
+                self._emit_project_table_changes(['code_cat'])
 
     def toggle_collapse(self):
         """ Oculta o muestra todos los nodos descendientes y actualiza las líneas.

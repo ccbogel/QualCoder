@@ -14,8 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -2343,6 +2345,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         if getattr(self.app, "project_events", None) is not None:
             self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def update_sizes(self):
         """
         Saves the splitter sizes to settings when the user drags them (parity with
@@ -2643,8 +2651,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute("update source set memo=? where id=?", (memo, file_['id']))
         self.app.conn.commit()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['source'], source=self)
+        self._emit_project_table_changes(['source'])
         self.app.delete_backup = False
         file_['tooltip'] = self._file_tooltip(file_)
         items = self.ui.listWidget.findItems(file_['name'], Qt.MatchFlag.MatchExactly)
@@ -3281,8 +3288,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     (coded['cid'], coded['fid'], coded['seltext'], coded['pos0'], coded['pos1'],
                      coded['owner'], coded['memo'], coded['date'], coded['important']))
         self.app.conn.commit()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['code_text'], source=self)
+        self._emit_project_table_changes(['code_text'])
         self.app.delete_backup = False
         self._update_recent_codes(cid)
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3313,8 +3319,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                      item['cid'], item['memo'], item['date'], item['owner'],
                      item['important'], item['pdf_page']))
         self.app.conn.commit()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['code_image'], source=self)
+        self._emit_project_table_changes(['code_image'])
         self.app.delete_backup = False
         self._update_recent_codes(cid)
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3415,8 +3420,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Refresh and notify
         self.annotations = self.app.get_annotations()
         self.get_coded_text_update_eventfilter_tooltips()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['annotation'], source=self)
+        self._emit_project_table_changes(['annotation'])
 
     def _edit_annotation(self, note):
         """        Edits or deletes an existing annotation with DialogMemo (empty memo =
@@ -3443,8 +3447,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.annotations = self.app.get_annotations()
         self.get_coded_text_update_eventfilter_tooltips()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['annotation'], source=self)
+        self._emit_project_table_changes(['annotation'])
 
     def _delete_annotation(self, note):
         """        Deletes an existing annotation without going through the dialog.
@@ -3458,8 +3461,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.annotations = self.app.get_annotations()
         self.get_coded_text_update_eventfilter_tooltips()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['annotation'], source=self)
+        self._emit_project_table_changes(['annotation'])
 
     def coded_memo(self, texts_here=None, areas_here=None):
         """        Views or edits the memo of the coding(s) under the selection (text or area) with
@@ -3495,8 +3497,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     changed.add('code_image')
         self.app.conn.commit()
         self.get_coded_text_update_eventfilter_tooltips()
-        if changed and getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(sorted(changed), source=self)
+        if changed:
+            self._emit_project_table_changes(sorted(changed))
 
     def _update_recent_codes_menu(self):
         """        Shows a popup menu with the recently used codes and marks the selection with the chosen
@@ -3621,8 +3623,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cur.execute("delete from code_image where imid=?", [entry['ref']['imid']])
                 changed.add('code_image')
         self.app.conn.commit()
-        if changed and getattr(self.app, "project_events", None):
-            self.app.project_events.emit_table_changes(sorted(changed), source=self)
+        if changed:
+            self._emit_project_table_changes(sorted(changed))
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
@@ -3651,8 +3653,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                          item['owner'], item['important'], item['pdf_page']))
             changed.add('code_image')
         self.app.conn.commit()
-        if changed and getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(sorted(changed), source=self)
+        if changed:
+            self._emit_project_table_changes(sorted(changed))
         self.undo_deleted_codes = []
         self.undo_deleted_areas = []
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3681,8 +3683,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 changed.add('code_image')
         self.app.conn.commit()
         self.get_coded_text_update_eventfilter_tooltips()
-        if changed and getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(sorted(changed), source=self)
+        if changed:
+            self._emit_project_table_changes(sorted(changed))
 
     def change_code_for_segment(self, text_item=None, area_item=None):
         """        Changes the code (cid) of ONE already-coded segment: text (by ctid) or image area
@@ -3731,8 +3733,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
             changed = 'code_text'
         self.app.delete_backup = False
-        if changed and getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes([changed], source=self)
+        if changed:
+            self._emit_project_table_changes([changed])
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
@@ -3793,8 +3795,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def _after_autocode_refresh(self):
         """Notify other dialogs and refresh this view after autocoding changes."""
 
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['code_text'], source=self)
+        self._emit_project_table_changes(['code_text'])
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
@@ -5139,8 +5140,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.get_codes_and_categories()
             self.code_tree.fill_tree()
             self.get_coded_text_update_eventfilter_tooltips()
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(tables, source=self)
+        self._emit_project_table_changes(tables)
 
     def _on_project_data_changed(self, tables, source):
         """        Handles change events emitted by other dialogs.
@@ -6153,8 +6153,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             cur.execute("update code_text set pos0=?, pos1=?, seltext=? where ctid=?",
                         [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
             self.app.conn.commit()
-            if getattr(self.app, "project_events", None) is not None:
-                self.app.project_events.emit_table_changes(['code_text'], source=self)
+            self._emit_project_table_changes(['code_text'])
             self.app.delete_backup = False
         except sqlite3.IntegrityError:
             self.app.conn.rollback()
@@ -6244,8 +6243,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             cur.execute("update code_image set x1=?, y1=?, width=?, height=? where imid=?",
                         (x, y, w, h, area['imid']))
             self.app.conn.commit()
-            if getattr(self.app, "project_events", None) is not None:
-                self.app.project_events.emit_table_changes(['code_image'], source=self)
+            self._emit_project_table_changes(['code_image'])
             self.app.delete_backup = False
         except sqlite3.IntegrityError:
             self.app.conn.rollback()
@@ -6447,9 +6445,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     "warning").exec()
             return
         self.app.delete_backup = False
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(
-                ['source', 'code_text', 'annotation', 'case_text'], source=self)
+        self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         # Report
         msg = _("File restructured to the new method.") + "\n"
         msg += _("Codings:") + f" {len(ct_rows)}, " + _("annotations:") + f" {len(an_rows)}, "
@@ -6528,8 +6524,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     Message(self.app, _("Journal"), _("Could not create the journal entry."), "warning").exec()
                     return
         self.app.delete_backup = False
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['journal'], source=self)
+        self._emit_project_table_changes(['journal'])
         self.parent_textEdit.append(_("Restructure report saved to journal: ") + intento)
         Message(self.app, _("Journal"), _("Report saved to journal:") + f"\n{intento}").exec()
 

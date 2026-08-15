@@ -203,6 +203,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
 
@@ -354,8 +360,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         table = {'text': 'code_text', 'image': 'code_image', 'av': 'code_av'}.get(result_type)
         if table is None:
             return
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes([table], source=self)
+        self._emit_project_table_changes([table])
 
     def get_selected_files_and_cases(self):
         """ Fill file_ids and case_ids Strings used in the search.

@@ -548,6 +548,12 @@ class DialogCodeInText(QtWidgets.QDialog):
             tt = _("Resize coding\nAlt+Left Arrow, Alt+Right Arrow\nShift+LeftArrow, Shift+Right Arrow")
             self.te.setToolTip(tt)
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def draw_initial_coded_text(self):
         """ Can be called multiple times via keystrokes, so  initally set formatting to none. """
 
@@ -629,8 +635,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         Notify the event bus that this coding was resized.
         """
 
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['code_text'], source=self)
+        self._emit_project_table_changes(['code_text'])
 
     def extend_left(self):
         """ Shift left arrow. """
@@ -1186,8 +1191,14 @@ class ImportPlainTextCodes:
             except sqlite3.IntegrityError:
                 self.text_edit.append(_("Duplicate code not imported: ") + code_name)
         # One event for the whole import, not one per row
-        if imported_tables and getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(sorted(imported_tables), source=None)
+        if imported_tables:
+            self._emit_project_table_changes(sorted(imported_tables))
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
 
 
 class MarkdownHighlighter(QtGui.QSyntaxHighlighter):

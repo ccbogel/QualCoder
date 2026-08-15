@@ -14,9 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 import csv  # codebook import
@@ -138,6 +139,12 @@ class CodeOrganiser(QDialog):
                   "Potential for unexpected errors could occur.\n"
                   "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON.")
         Message(self.app, "Code organiser", text_).exec()
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def create_category(self):
         """ Create a new category, via push button. """
@@ -1705,7 +1712,7 @@ class CodeOrganiser(QDialog):
             tables = ['code_cat', 'code_name']
             if code_merges_present or code_deletes_present:
                 tables += ['code_text', 'code_image', 'code_av']
-            self.app.project_events.emit_table_changes(tables, source=self)
+            self._emit_project_table_changes(tables)
 
         # Wrap up
         self.app.delete_backup = False

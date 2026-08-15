@@ -106,6 +106,12 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.pushButton_clear.pressed.connect(self.clear_parameters)
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def filter_settings_delete(self):
         """ Delete saved filter settings. """
 
@@ -127,6 +133,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         selection = ui.get_selected()
         cur.execute("delete from files_filter where name=?", [selection['name']])
         self.app.conn.commit()
+        self._emit_project_table_changes(['files_filter'])
         Message(self.app, _("Filter deleted"), selection['name']).exec()
 
     def filter_settings_save(self):
@@ -151,6 +158,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             return
         cur.execute("insert into files_filter (name, filter, owner) values(?,?,?)", [filter_name, parameters_str, self.app.settings['codername']])
         self.app.conn.commit()
+        self._emit_project_table_changes(['files_filter'])
 
     def filter_settings_load(self):
         """ Load filter settings String.

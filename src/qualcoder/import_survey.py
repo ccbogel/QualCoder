@@ -14,9 +14,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
@@ -347,6 +348,12 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.insert_data()
         super(DialogImportSurvey, self).accept()
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def insert_data(self):
         """ Insert case, attributes, attribute values and qualitative text. """
 
@@ -532,6 +539,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))
+        # One event for the whole survey, not one per row
+        self._emit_project_table_changes(['source', 'cases', 'case_text', 'attribute',
+                                          'attribute_type', 'code_name', 'code_text'])
         Message(self.app, _("Survey imported"), _("Survey imported")).exec()
         self.app.delete_backup = False
 

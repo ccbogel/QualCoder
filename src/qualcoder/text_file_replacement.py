@@ -95,10 +95,17 @@ class ReplaceTextFile:
         errs = self.update_annotation_positions()
         errs += self.update_code_positions()
         errs += self.update_case_positions()
+        self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.\n")
         msg += _("Function works by identifying the first matching text segment for each coding and annotation.")
         msg += f"\n{errs}"
         Message(self.app, _("File replaced"), msg).exec()
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def update_case_positions(self):
         """ Update case if all file is assigned to case or portions assigned to case. """

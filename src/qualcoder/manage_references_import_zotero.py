@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain (ccbogel)
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -73,6 +73,12 @@ class ZoteroImport:
         self.refs_dialog = refs_dialog
 
     # local API
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def _get(self, path, want_json=True):
         """
@@ -258,6 +264,7 @@ class ZoteroImport:
                         [risid, tag, longtag, str(value)])
         if commit:
             self.app.conn.commit()
+        self._emit_project_table_changes(['ris'])
 
     def _ensure_ref_attributes(self):
         """
@@ -275,6 +282,7 @@ class ZoteroImport:
                             (key, now_date, self.app.settings['codername'], "", 'file', ref_vars[key]))
         self.app.conn.commit()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['attribute_type'])
 
     # PDF attachments
 
@@ -523,11 +531,13 @@ class ZoteroImport:
                                 not_retrieved += 1
                                 continue
                             progress.setLabelText(os.path.basename(path_.replace("\\", "/")))
-                            fid = self.refs_dialog._import_attachment_file(path_, progress)
+                            fid = self.refs_dialog._import_attachment_file(path_, progress,
+                                                                           notify=False)
                             if fid is None:
                                 not_retrieved += 1
                                 continue
-                            self.refs_dialog.link_reference_to_files(risid, fid)
+                            # Silenced per attachment: one event after the batch
+                            self.refs_dialog.link_reference_to_files(risid, fid, notify=False)
                             linked += 1
                 finally:
                     # In a finally: a failure midway must leave neither the bar stuck
@@ -535,6 +545,9 @@ class ZoteroImport:
                     progress.close()
                     progress.deleteLater()
                     shutil.rmtree(tmp_dir, ignore_errors=True)
+                if linked > 0 and getattr(self.app, "project_events", None) is not None:
+                    # One event for the whole attachment batch, not one per file
+                    self.app.project_events.emit_table_changes(['source', 'attribute'], source=None)
         self.refs_dialog.get_data()
 
         msg = _("References imported: ") + f"{len(pairs)}"
