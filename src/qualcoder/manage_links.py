@@ -72,6 +72,12 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.ui.pushButton_search_folders.pressed.connect(self.find_filepaths)
         self.ui.pushButton_bulk.pressed.connect(self.bulk_path_rename)
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def bulk_path_rename(self):
         """ Update all the linked by changing the path.
         Typically occurs when moving to another computer. """
@@ -119,6 +125,7 @@ class DialogManageLinks(QtWidgets.QDialog):
                 self.app.conn.commit()
             if instances > 1:
                 multiples += 1
+        self._emit_project_table_changes(['source'])
         if multiples > 0:
             Message(self.app, _("Multiple occurrences"), _("Multiples of text in path. Some links not updated.") + f"\n{old_text}").exec()
         self.links = self.app.check_bad_file_links()
@@ -202,6 +209,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         sql = "update source set mediapath=? where id=?"
         cur.execute(sql, [self.links[row]['mediapath'], self.links[row]['id']])
         self.app.conn.commit()
+        self._emit_project_table_changes(['source'])
         self.fill_table()
         # Update file in file list in any opened coding dialog
         contents = self.tab_coding.layout()
