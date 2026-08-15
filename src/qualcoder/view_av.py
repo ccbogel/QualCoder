@@ -17,8 +17,8 @@ If not, see <https://www.gnu.org/licenses/>.
 Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-https://qualcoder.org/
 https://qualcoder-org.github.io
+https://qualcoder.org/
 """
 
 from copy import copy
@@ -225,6 +225,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
                 self.app.conn.commit()  # was a 'conmmit' typo silently swallowed; the
                 # av_text_id link could be lost, recreating duplicate .txt transcripts
+            self._emit_project_table_changes(['source'])
             cur.execute("select id, fulltext, name from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
             if self.transcription is not None and self.transcription[1] is None:
@@ -729,6 +730,8 @@ class DialogViewAV(QtWidgets.QDialog):
         cur.execute("update source set fulltext=?, date=? where id=?", [text, now, self.transcription[0]])
         self.app.conn.commit()
         self.app.delete_backup = False
+        # Only source.fulltext is rewritten here; subscribers reload the file on 'source'
+        self._emit_project_table_changes(['source'])
         cur.execute("select id, fulltext, name from source where id=?", [self.transcription[0]])
         self.transcription = cur.fetchone()
         if self.transcription is not None and self.transcription[1] is None:
@@ -1987,6 +1990,13 @@ class DialogViewAV(QtWidgets.QDialog):
         self.text = current_text
         self.prev_text = copy(self.text)
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
