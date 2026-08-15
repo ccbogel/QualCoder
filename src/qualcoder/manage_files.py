@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -1298,6 +1298,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.load_file_data()
             self.app.delete_backup = False
             self.update_files_in_dialogs()
+            self._emit_project_table_changes(['source'])
 
     def extract_pdf_text_copy(self, row:int):
         """ Creates a new TEXT source with a copy of the PDF's fulltext (the one already
@@ -1351,6 +1352,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        self._emit_project_table_changes(['source', 'attribute'])
 
     def pdf_to_images(self, mediapath:str):
         """ Turn pdf pages into an image for each page.
@@ -1363,6 +1365,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         filepath = ""
         filename = ""
+        pages_imported = 0
         if mediapath[:6] == '/docs/':
             filepath = Path(self.app.project_path) / "documents" / mediapath[6:]
             filename = mediapath[6:]
@@ -1399,7 +1402,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     # Other methods 'might' look for the forward slash. CC - ?
                     destination = Path(self.app.project_path) / "images" / image_filename
                     pymypdf_pixmap.save(destination)
-                    self.load_media_reference(f"/images/{image_filename}")
+                    # Silenced per page: one event after the whole page range
+                    self.load_media_reference(f"/images/{image_filename}", notify=False)
+                    pages_imported += 1
                     self.parent_text_edit.append(_("Image loaded from pdf: ") + image_filename)
             finally:
                 pymu_pdf.close()
@@ -1412,6 +1417,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        if pages_imported > 0:
+            # One event for the whole page range, not one per page
+            self._emit_project_table_changes(['source', 'attribute'])
 
     def view_original_text_file(self, mediapath: str):
         """ View original text file.
@@ -1470,6 +1478,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cases_text = self.get_cases_by_filename(self.ui.tableWidget.item(row, self.NAME_COLUMN).text())
                 self.ui.tableWidget.item(row, self.CASE_COLUMN).setText(cases_text)
                 self.source[row]['case'] = cases_text
+        self._emit_project_table_changes(['case_text'])
         if self.file_filter_active():
             self.apply_file_filter()
 
@@ -1500,6 +1509,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        self._emit_project_table_changes(['source'])
         # update doc in vectorstore
         id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         if self.app.settings['ai_enable'] == 'True':
@@ -1537,6 +1547,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.app.settings['ai_enable'] == 'True':
             self.app.ai.sources_vectorstore.update_vectorstore()
         self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
+        self._emit_project_table_changes(['source'])
         if len(self.files_renamed) == 0:
             self.ui.pushButton_undo.setEnabled(False)
 
@@ -1585,6 +1596,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             entry = {'old_name': existing_name, 'name': new_name, 'fid': fid}
             self.files_renamed.append(entry)
         self.parent_text_edit.append(msg + err_msg)
+        self._emit_project_table_changes(['source'])
         # Updating vectorstore
         if self.app.settings['ai_enable'] == 'True':
             self.app.ai.sources_vectorstore.update_vectorstore()
@@ -1677,6 +1689,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.update_files_in_dialogs()
         self.load_file_data()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source'])
 
     def button_import_linked_file(self):
         """ User presses button to import a linked file into the project folder.
@@ -1733,6 +1746,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.update_files_in_dialogs()
         self.load_file_data()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source'])
 
     def mark_speakers(self):
         """ Mark the speakers in text files.
@@ -1809,6 +1823,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         for r in res:
             cur.execute("delete from attribute where attr_type='file' and id=?", [r[0], ])
             self.app.conn.commit()
+        # No event here: the callers that reach this on a user action (delete,
+        # delete_button_multiple_files) already include 'attribute' in their payload.
 
     def export_attributes(self):
         """ Export attributes from table to an Excel file. """
@@ -1953,6 +1969,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.app.conn.commit()
                 self.parent_text_edit.append(_("Auto-renamed invalid file: ") + f"'{s['name']}' -> {new_name}")
                 s['name'] = new_name
+        # No event here: this runs on every refresh and sort, including refreshes
+        # triggered by the bus itself. The user actions that write source emit.
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
         # Attributes
         sql = "select name from attribute_type where caseOrFile='file' order by upper(name)"
@@ -2186,6 +2204,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Need to dynamically get the memo text in case it has been changed in a coding dialog
             cur.execute('select memo from source where id=?', [self.source[x]['id']])
             self.source[x]['memo'] = cur.fetchone()[0]
+            previous_memo = self.source[x]['memo']
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
                                 self.source[x]['memo'], entity_type="file", entity_id=self.source[x]['id'])
@@ -2201,6 +2220,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
                 self.app.conn.commit()
+            if self.source[x]['memo'] != previous_memo:
+                # Opening a memo to read it must not wake up the other dialogs
+                self._emit_project_table_changes(['source'])
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
@@ -2295,7 +2317,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.extract_pdf_text_copy(x)
             return
         ui = DialogEditTextFile(self.app, self.source[x]['id'])
-        result = ui.exec()
+        ui.exec()
         # Get fulltext if changed (for metadata)
         cur = self.app.conn.cursor()
         cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
@@ -2304,12 +2326,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res is not None:
             fulltext = res[0]
         self.source[x]['fulltext'] = fulltext
-        # The editor saved changes: notify the bus so open coding dialogs
-        # (code_text, code_pdf) reload and do not keep stale positions.
-        if result == QtWidgets.QDialog.DialogCode.Accepted and \
-                getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(
-                ['source', 'code_text', 'annotation', 'case_text'], source=self)
+        # DialogEditTextFile.accept() notifies the bus itself, so open coding dialogs
+        # (code_text, code_pdf) reload and do not keep stale positions. Emitting again
+        # here would dispatch the same change twice.
 
     def view_av(self, x: int):
         """ View an audio or video file. Edit the memo. Edit the transcript file.
@@ -2552,6 +2571,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
                                                                 self.source[x]['id']))
             self.app.conn.commit()
+            self._emit_project_table_changes(['source'])
         if self.source[x]['memo'] == "":
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
         else:
@@ -2614,6 +2634,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source.append(item)
         self.fill_table()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source', 'attribute'])
 
     def link_files(self):
         """ Trigger to link to file location. """
@@ -2919,7 +2940,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if suffix in ('.docx', '.odt', '.rtf', '.tex', '.txt', '.htm', '.html', '.epub', '.md'):
                 if suffix == '.tex':
                     try:
-                        imported_ok = self.load_file_text(import_path, f"docs:{import_path}")
+                        imported_ok = self.load_file_text(import_path, f"docs:{import_path}", notify=False)
                     except LatexImportError as err:
                         logger.warning(f"LaTeX import error: {filename} {err}")
                         Message(self.app, _("Cannot import LaTeX file"),
@@ -2935,7 +2956,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if link_path == "":
                     try:
                         copyfile(import_path, destination)
-                        imported_ok = self.load_file_text(import_path)
+                        imported_ok = self.load_file_text(import_path, notify=False)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
@@ -2950,14 +2971,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                             logger.warning(_("Removing failed import copy: ") + str(err))
                         continue
                 else:
-                    self.load_file_text(import_path, f"docs:{link_path}")
+                    self.load_file_text(import_path, f"docs:{link_path}", notify=False)
                 known_file_type = True
             if suffix == '.pdf':
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
                         copyfile(import_path, destination)
-                        imported_ok = self.load_file_text(import_path, "", progress)
+                        imported_ok = self.load_file_text(import_path, "", progress, notify=False)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
@@ -2973,7 +2994,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         continue
                 else:
                     # Progress also applies to linked PDFs (extraction takes just as long).
-                    self.load_file_text(import_path, f"docs:{link_path}", progress)
+                    self.load_file_text(import_path, f"docs:{link_path}", progress, notify=False)
                 known_file_type = True
             # Media files
             if Path(import_path).suffix.lower() in ('.jpg', '.jpeg', '.png'):
@@ -2981,42 +3002,42 @@ class DialogManageFiles(QtWidgets.QDialog):
                     destination += f"/images/{filename}"
                     try:
                         copyfile(import_path, destination)
-                        self.load_media_reference(f"/images/{filename}")
+                        self.load_media_reference(f"/images/{filename}", notify=False)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
                 else:
-                    self.load_media_reference(f"images:{link_path}")
+                    self.load_media_reference(f"images:{link_path}", notify=False)
                 known_file_type = True
             if Path(import_path).suffix.lower() in ('.flac', '.m4a', '.mp3',  '.ogg', '.wav'):
                 if link_path == "":
                     destination += f"/audio/{filename}"
                     try:
                         copyfile(import_path, destination)
-                        self.load_media_reference(f"/audio/{filename}")
+                        self.load_media_reference(f"/audio/{filename}", notify=False)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
                 else:
-                    self.load_media_reference(f"audio:{link_path}")
+                    self.load_media_reference(f"audio:{link_path}", notify=False)
                 known_file_type = True
             if Path(import_path).suffix.lower() in ('.mkv', '.mov', '.mp4', '.m4v', '.wmv', '.webm'):
                 if link_path == "":
                     destination += f"/video/{filename}"
                     try:
                         copyfile(import_path, destination)
-                        self.load_media_reference(f"/video/{filename}")
+                        self.load_media_reference(f"/video/{filename}", notify=False)
                     except PermissionError as e_:
                         msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
                 else:
-                    self.load_media_reference(f"video:{link_path}")
+                    self.load_media_reference(f"video:{link_path}", notify=False)
                 known_file_type = True
             if not known_file_type:
                 Message(self.app, _('Not supported file type'),
@@ -3032,6 +3053,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        if file_number > 0:
+            # One event for the whole batch, not one per imported file
+            self._emit_project_table_changes(['source', 'attribute'])
 
     def update_files_in_dialogs(self):
         """ Update files list in any opened dialogs:
@@ -3091,7 +3115,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         except OSError as err:
             logger.warning(_("Deleting waveform error: ") + str(err))
 
-    def load_media_reference(self, mediapath:str):
+    def load_media_reference(self, mediapath:str, notify:bool=True):
         """ Load media reference information for all file types.
 
         Args:
@@ -3164,6 +3188,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
             self.parent_text_edit.append(entry['name'] + _(" created."))
             self.source.append(entry)
+        if notify:
+            self._emit_project_table_changes(['source', 'attribute'])
 
     def load_pseudonyms(self):
         """ Pseudonyms stored in pseudonyms.json in qda data folder.
@@ -3184,7 +3210,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         return decode_text_with_best_encoding_helper(import_file)
 
-    def load_file_text(self, import_file:str, link_path:str="", progress_:QProgressDialog|None=None):
+    def load_file_text(self, import_file:str, link_path:str="", progress_:QProgressDialog|None=None,
+                       notify:bool=True):
         """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
         Loading pdf text. I have removed additional line breaks. See commented sections below.
@@ -3359,6 +3386,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _(" linked")
         self.parent_text_edit.append(msg)
         self.source.append(entry)
+        if notify:
+            self._emit_project_table_changes(['source', 'attribute'])
         # Offer (once per batch) to code highlight annotations; they are not
         # painted in the coding view (annots=False).
         if suffix == '.pdf':
@@ -3765,6 +3794,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source', 'code_text', 'code_image', 'code_av', 'annotation', 'case_text', 'attribute'])
 
     def delete(self):
         """ Delete files from database and update model and widget.
@@ -3871,6 +3901,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(_("Deleted: ") + filenames)
         self.load_file_data()
         self.app.delete_backup = False
+        self._emit_project_table_changes(['source', 'code_text', 'code_image', 'code_av', 'annotation', 'case_text', 'attribute'])
 
     def get_tooltip_values(self, attribute_name:str):
         """ Get values to display in tooltips for the value list column.
