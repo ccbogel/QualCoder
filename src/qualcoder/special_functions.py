@@ -86,6 +86,12 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         # Text positions, is here in case it is needed, but hidden for users as dangerous, Key Tilde to activate
         self.ui.groupBox_text_positions.hide()
 
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
     def keyPressEvent(self, event):
         """ Tilde ~ to show the existing start and end text positions in coded text. """
 
@@ -215,6 +221,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 pass
             cur.execute(update_sql, [new_pos0, seltext, r[2], r[3], r[0], r[1], r[4]])
             self.app.conn.commit()
+        self._emit_project_table_changes(['code_text'])
         self.parent_text_edit.append(
             _("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(
                 " characters."))
@@ -261,6 +268,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 pass
             cur.execute(update_sql, [new_pos1, seltext, r[2], r[3], r[0], r[1], r[4]])
             self.app.conn.commit()
+        self._emit_project_table_changes(['code_text'])
         self.parent_text_edit.append(
             _("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(
                 " characters."))
