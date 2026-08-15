@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -225,6 +225,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+
+    def _emit_project_table_changes(self, tables):
+        """Notify other open dialogs about changed project tables."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
     def update_sizes(self):
         """ Called by changed splitter sizes """
@@ -678,6 +684,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set memo=? where id=?", (memo, file_['id']))
         self.app.conn.commit()
+        self._emit_project_table_changes(['source'])
         self.get_files()
         self.ui.listWidget.clear()
         for f in self.files:
@@ -1030,8 +1037,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.get_coded_areas()
         self.draw_coded_areas()
 
-        if self.app.project_events is not None:
-            self.app.project_events.emit_table_changes(tables, source=self)
+        self._emit_project_table_changes(tables)
 
     def _on_project_data_changed(self, tables, source):
         """Handle project change events from other dialogs.
@@ -1922,8 +1928,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         (e.g. the PDF coding viewer) refresh live.
         """
 
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(['code_image'], source=self)
+        self._emit_project_table_changes(['code_image'])
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for all visible coders.
