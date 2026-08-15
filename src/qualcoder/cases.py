@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -221,7 +221,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.clear()
 
     def _emit_project_table_changes(self, tables):
-        """ Notify other open dialogs about changed project tables."""
+        """Notify other open dialogs about changed project tables."""
 
         if getattr(self.app, "project_events", None) is not None:
             self.app.project_events.emit_table_changes(tables, source=self)
@@ -237,6 +237,7 @@ class DialogCases(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select name from attribute_type where caseOrFile='case'")
         attribute_names = cur.fetchall()
+        inserted = False
         for c in self.cases:
             for att_name in attribute_names:
                 cur.execute("select value from attribute where id=? and name=? and attr_type='case'",
@@ -246,6 +247,9 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("insert into attribute (value,id,name,attr_type, date,owner) values(?,?,?,'case',?,?)",
                                 ("", c['caseid'], att_name[0], now_date, self.app.settings['codername']))
                     self.app.conn.commit()
+                    inserted = True
+        if inserted:
+            self._emit_project_table_changes(['attribute'])
     def help(self):
         """ Open help for transcribe section in browser. """
         self.app.help_wiki("3.3.-Cases")
@@ -384,6 +388,8 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("insert into attribute (name,attr_type,value,id,date,owner) values(?,?,?,?,?,?)",
                                 [attribute_name, "case", "", c['caseid'],  now_date, self.app.settings['codername']])
                     self.app.conn.commit()
+        # No event here: this runs on every refresh and sort, including refreshes
+        # triggered by the bus itself. The user actions that write attributes emit.
 
         self.fill_table()
 
@@ -655,6 +661,7 @@ class DialogCases(QtWidgets.QDialog):
         self.fill_table()
         self.parent_text_edit.append(_("Case added: ") + item['name'])
         self.app.delete_backup = False
+        self._emit_project_table_changes(['cases', 'attribute'])
 
     def delete_case(self):
         """ When delete button pressed, case is deleted from model and database. """
@@ -688,6 +695,7 @@ class DialogCases(QtWidgets.QDialog):
         self.load_cases_data()
         self.app.delete_backup = False
         self.fill_table()
+        self._emit_project_table_changes(['cases', 'case_text', 'attribute'])
 
     def cell_modified(self):
         """ If the case name has been changed in the table widget update the database.
@@ -696,6 +704,7 @@ class DialogCases(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
         value = str(self.ui.tableWidget.item(row, col).text()).strip()
+        changed_tables = []
         if col == self.NAME_COLUMN:  # update case name
             # Check that no other case name has this text and this is not empty
             update = True
@@ -709,6 +718,7 @@ class DialogCases(QtWidgets.QDialog):
                 cur.execute("update cases set name=? where caseid=?", (value, self.cases[row]['caseid']))
                 self.app.conn.commit()
                 self.cases[row]['name'] = value
+                changed_tables.append("cases")
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(row, col).setText(self.cases[row]['name'])
         if col >= self.ATTRIBUTE_START_COLUMN:  # Update attribute value
@@ -739,7 +749,8 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute("update attribute set value=?, date=?, owner=? where id=? and name=? and attr_type='case'",
                         (value, now_date, self.app.settings['codername'], self.cases[row]['caseid'], attribute_name))
             self.app.conn.commit()
-        self._emit_project_table_changes(["attribute"])
+            changed_tables.append("attribute")
+        self._emit_project_table_changes(changed_tables)
 
         # Update self.cases[attributes]
         # Add list of attribute values to cases, order matches header columns
@@ -784,6 +795,7 @@ class DialogCases(QtWidgets.QDialog):
                                        'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
 
         if y == self.MEMO_COLUMN:
+            previous_memo = self.cases[x]['memo']
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
                             self.cases[x]['memo'], entity_type="case", entity_id=self.cases[x]['caseid'])
             ui.exec()
@@ -791,6 +803,9 @@ class DialogCases(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute('update cases set memo=? where caseid=?', (self.cases[x]['memo'], self.cases[x]['caseid']))
             self.app.conn.commit()
+            if self.cases[x]['memo'] != previous_memo:
+                # Opening a memo to read it must not wake up the other dialogs
+                self._emit_project_table_changes(['cases'])
             if self.cases[x]['memo'] == "" or self.cases[x]['memo'] is None:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
