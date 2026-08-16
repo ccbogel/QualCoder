@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_install:
+	install -D -m 755 src/qualcoder debian/qualcoder/usr/bin/qualcoder
+	install -D -m 644 usr/share/applications/QualCoder.desktop debian/qualcoder/usr/share/applications/QualCoder.desktop
+	install -D -m 644 usr/share/icons/qualcoder.xpm debian/qualcoder/usr/share/icons/qualcoder.xpm

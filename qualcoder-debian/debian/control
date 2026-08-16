@@ -1,0 +1,20 @@
+Source: qualcoder
+Section: science
+Priority: optional
+Maintainer: QualCoder Team <contact@qualcoder.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 3.6.2
+Rules-Requires-Root: no
+
+Package: qualcoder
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, vlc, ffmpeg
+Description: Qualitative Data Analysis Tool
+ QualCoder is a free and open-source CAQDAS (Computer Assisted Qualitative
+ Data Analysis Software) for coding qualitative data such as text, images,
+ and audio/video.
+ .
+ Features:
+  * Code text, images, and multimedia
+  * Thematic analysis support
+  * Multi-language interface
