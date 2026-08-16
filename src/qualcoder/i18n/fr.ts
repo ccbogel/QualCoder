@@ -1118,54 +1118,64 @@ Classement par nom de fichier et nom de code.</translation>
 <context>
     <name>Dialog_Comparisons</name>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="98"/>
+        <location filename="../GUI/ui_comparison_table.py" line="110"/>
         <source>Code Counts by file or case</source>
         <translation>Nombre de codes par fichier ou par dossier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="99"/>
+        <location filename="../GUI/ui_comparison_table.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Montrer les codes qui se chevauchent.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="100"/>
+        <location filename="../GUI/ui_comparison_table.py" line="112"/>
         <source>Code counts table</source>
         <translation>Occurrences des codes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="101"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exporter le fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_comparison_table.py" line="102"/>
+        <location filename="../GUI/ui_comparison_table.py" line="114"/>
         <source>Hide blank lines</source>
         <translation>Masquer les lignes vides</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="103"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner des fichiers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="../GUI/ui_comparison_table.py" line="113"/>
+        <source>Export to file</source>
+        <translation>Exporter vers un fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="104"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner les categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="../GUI/ui_comparison_table.py" line="115"/>
+        <source>Select files</source>
+        <translation>Sélectionner des fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="105"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Selectionner les codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="../GUI/ui_comparison_table.py" line="116"/>
+        <source>Select categories</source>
+        <translation>Sélectionner des catégories</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="106"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Selectionner l’attribut&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="../GUI/ui_comparison_table.py" line="117"/>
+        <source>Select codes</source>
+        <translation>Sélectionner des codes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="107"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner les cas&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="../GUI/ui_comparison_table.py" line="118"/>
+        <source>Select attribute</source>
+        <translation>Sélectionner un attribut</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_comparison_table.py" line="119"/>
+        <source>Select cases</source>
+        <translation>Sélectionner des cas</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_comparison_table.py" line="120"/>
+        <source>Highlight colour</source>
+        <translation>Couleur de surlignage</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_comparison_table.py" line="121"/>
+        <source>Transpose table</source>
+        <translation>Transposer un tableau</translation>
     </message>
 </context>
 <context>
