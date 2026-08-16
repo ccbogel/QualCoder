@@ -1,3 +1,4 @@
+
 We have jumped to version 4.0 as there are quite a few changes in this release.
 
 # Installation
@@ -42,7 +43,7 @@ From now on, QualCoder should start without issues.
 
 Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. Please use Python 3.12 on Windows. Other versions may cause issues  [Python3](https://www.python.org/downloads/macos/). Download the latest "macOS 64-bit universal2 installer" for one of the above-mentioned Python versions and open it to install Python.
+1. Download and install the Python programming language. Please use recent Python versions, e.g. 3.13 or newer. Older versions may cause issues  [Python3](https://www.python.org/downloads/macos/). Download the latest "macOS 64-bit universal2 installer" for one of the above-mentioned Python versions and open it to install Python.
 
 2. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip. See the right-hand side of this page for the link to Releases.
 
@@ -58,7 +59,7 @@ cd Downloads/QualCoder-4.0
 
 6. Install the virtual environment and required python modules. 
 
-The `python3` command uses the most recent installed version of Python. You can use a specific version on your macOS, if you have many Python versions installed, e.g. `python3.12`. To verify you are using the correct Python version type `which python3`, which should output: `/Library/Frameworks/Python.framework/Versions/3.<version>/bin/python3`. If the output is `/usr/bin/python3`, don't continue, since this is your system's Python and it is discouraged to use.
+The `python3` command uses the most recent installed version of Python. You can use a specific version on your macOS, if you have many Python versions installed, e.g. `python3.13`. To verify you are using the correct Python version type `which python3`, which should output: `/Library/Frameworks/Python.framework/Versions/3.<version>/bin/python3`. If the output is `/usr/bin/python3`, don't continue, since this is your system's Python and it is discouraged to use.
 
 The install may take up to 10 minutes. 
 
