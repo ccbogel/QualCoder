@@ -6,25 +6,25 @@ QualCoder is released under the LGPL v3 license
 
 ## Windows
 
-Attached to the end of release page you will find two options:
+Attached to the end of the release page, you will find two options:
 
 Executables will be available when a release is made.
 
-QualCoder_4_0_Win_setup.exe: a Windows installer, will set up QualCoder like any normal app, with entries in the start menu, etc.
+QualCoder_4_0_Win_setup.exe: a Windows installer will set up QualCoder like any normal app, with entries in the start menu, etc.
 QualCoder_4_0_Win_Portable.exe: A portable binary. Double-click to run and wait for 15 seconds.
 
 On first use of the exe, Windows will ask you to allow to run QualCoder. This is because it is from an unknown publisher. It costs a lot of money to get a trusted publisher certificate - so that will not be possible for the foreseeable future.
 
-The executable files are large downloads. Occasionally you might get a CRDOWNLOAD issue. First, check the file is fully downloaded. If not then Resume downloads in your browser. If it seems to be fully downloaded then rename it to the name that was expected and double-click to run. (e.g. From CRDOWNLOAD to QualCoder_4_0_Win_Setup.exe)
+The executable files are large downloads. Occasionally you might get a CRDOWNLOAD issue. First, check the file is fully downloaded. If not, then Resume downloads in your browser. If it seems to be fully downloaded, then rename it to the name that was expected and double-click to run. (e.g. From CRDOWNLOAD to QualCoder_4_0_Win_Setup.exe)
 
 ## MacOS
 
-Attached to the end of release page you will find two options:
+Attached to the end of the release page, you will find two options:
 
-Executables will be aviaable when a release is made.
+Executables will be available when a release is made.
 
 QualCoder_4_0_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
-We are not able to compile a binary for Intel based Macs right now due to incompatibilities in the libraries we use.
+We are not able to compile a binary for Intel-based Macs right now due to incompatibilities in the libraries we use.
 The app bundles are compiled on macOS Sequoia. They might also work on Sonoma and Ventura.
 
 If you do not have admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr - d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
@@ -42,9 +42,9 @@ From now on, QualCoder should start without issues.
 
 Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. Please use Python 3.12 on Windows, other versions may cause issues  [Python3](https://www.python.org/downloads/macos/). Download the latest "macOS 64-bit universal2 installer" for one of the above mentioned Python versions and open it to install Python.
+1. Download and install the Python programming language. Please use Python 3.12 on Windows. Other versions may cause issues  [Python3](https://www.python.org/downloads/macos/). Download the latest "macOS 64-bit universal2 installer" for one of the above-mentioned Python versions and open it to install Python.
 
-2. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases.
+2. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip. See the right-hand side of this page for the link to Releases.
 
 3. Unzip the folder to a location (e.g. downloads) by double-clicking it. 
 
@@ -171,9 +171,9 @@ One major change is to allow codes to have sub-codes. This makes it possible to 
 
 ## Backups
 
-Project backups are now located in the same folder as the proejct path.
+Project backups are now located in the same folder as the project path.
 
-## Artificial Inteligence changes
+## Artificial Intelligence changes
 
 Agentic restructure of AI features. Turns the AI chat into an agent that can not only talk, but also do things in QualCoder.
 * Read-only gives the AI agent read access to the complete code tree, all the memos and codings, as well as the empirical data through a diverse set of search tools (text only).
@@ -191,7 +191,7 @@ Right-click on a URL to open a URL from the journal text. URLs must start with: 
 
 ## Manage files
 
-There is an 'Import survey' button for importing surveys from Excel and csv files. Multiple rows selection. For context menu Delete and Export. When in the file name column pressing delete will delete the file(s).
+There is an 'Import survey' button for importing surveys from Excel and csv files. Multiple rows selection. For context menu Delete and Export. When in the file name column, pressing delete will delete the file(s).
 
 PDFs with highlights can be imported and their highlighted segments coded automatically, one code per highlight colour under a 'PDF Highlights' category, using the closest QualCoder palette colours.
 
@@ -221,7 +221,7 @@ Can resize coded areas using rightclick menu option and resize using handles.
 
 ## Code Audio / Video
 
-A bookmark option has been added. So after it is aplied, in code A/V and view A/V (from mamage files) the ime position in the A/V will be restored and the text postiion will be restored. Key presses are B (make bookmark) and Shift B (go to bookmark).
+A bookmark option has been added. So after it is applied, in code A/V and view A/V (from manage files) the ime position in the A/V will be restored and the text position will be restored. Key presses are B (make bookmark) and Shift B (go to bookmark).
 
 ## Co-occurrence report
 
@@ -229,7 +229,7 @@ Proximity graphs. Export format for Gephi import.
 
 ## Graph (mind map)
 
-Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus. A mini map for scrolling. Dfferent node styles are available - box, oval, more. Mutlipe selection options are available.
+Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus. A mini map for scrolling. Different node styles are available - box, oval, more. Multiple selection options are available.
 
 ## Report codes
 
@@ -244,9 +244,9 @@ Improved manipulation of objects. Export format for draw.io import. Ability to e
 
 -Matrix headers: Fixed four issues that prevented code, file, and case memos from displaying correctly in the matrix view (including an "alll" typo, a comparison with an extra colon 'Case:', an incorrect tuple validation, and a misplaced "All memo" literal).
 
--"Also all memos" option: Now correctly displays the coded segment memo, a behavior that was previously missing despite being implied by the label.
+-"Also all memos" option: Now correctly displays the coded segment memo, a behaviour that was previously missing despite being implied by the label.
 
--Fix merge projects error. Occured sometimes when projects with audio, video or image files are merged.
+-Fix merge projects error. Occurred sometimes when projects with audio, video or image files are merged.
 
 **New functions**
 
