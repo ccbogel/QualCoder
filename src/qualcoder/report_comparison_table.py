@@ -21,6 +21,7 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
+from datetime import datetime
 import logging
 from math import isclose
 import openpyxl
@@ -28,6 +29,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill
 from PyQt6 import QtCore, QtWidgets, QtGui
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from sqlite3 import IntegrityError
 
 from .GUI.ui_comparison_table import Ui_Dialog_Comparisons
 from .helpers import ExportDirectoryPathDialog, Message, DialogCodeInText, DialogCodeInImage, DialogCodeInAV, msecs_to_hours_mins_secs
@@ -76,12 +78,11 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_transpose.pressed.connect(self.transpose_data)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         self.ui.listWidget.itemPressed.connect(self.show_list_item)
-        #self.ui.listWidget.setSelectionMode()
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        #self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        #self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.splitter.setSizes([500, 0])
 
         self.codes, self.categories = self.app.get_codes_categories()
@@ -624,6 +625,85 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         Message(self.app, _('Co-occurrence exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
+    def table_menu(self, position):
+        """ Context menu for creating a new code by merging existing codes,
+        exporting to Gephi, viewing graph, and cluster analysis.
+        """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        action_merge = None
+
+        # Merge option is only available when a cell with data is clicked
+        if row >= 0 and col >= 0:
+            item = self.ui.tableWidget.item(row, col)
+            if item is not None and item.text() != "":
+                action_merge = menu.addAction(_("Merge into new code"))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_merge:
+            new_code_name = self.ui.tableWidget.horizontalHeaderItem(col).text() + " | "
+            new_code_name += self.ui.tableWidget.verticalHeaderItem(row).text()
+            new_code_name = new_code_name.replace("\n", "")
+            new_code_name, ok = QtWidgets.QInputDialog.getText(self, _("New code"),
+                                                               " " * 30 + _("Edit name:") + " " * 30,
+                                                               QtWidgets.QLineEdit.EchoMode.Normal, new_code_name)
+            memo = _("Merged: ") + new_code_name
+            if not ok or new_code_name == '':
+                return
+            # Insert new code name
+            codes = self.app.get_code_names()
+            if any(code['name'] == new_code_name for code in codes):
+                Message(self.app, _("Code name exists"), _("Choose another code name")).exec()
+                return
+            cur = self.app.conn.cursor()
+            now_date = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                        (new_code_name, memo, self.app.settings['codername'], now_date,
+                         None, "#DDE600"))  # Vibrant yellow colour
+            self.app.conn.commit()
+            self.app.delete_backup = False
+            cur.execute("select last_insert_rowid()")
+            new_code_cid = cur.fetchone()[0]
+            self.parent_textEdit.append(_("New code: ") + new_code_name)
+
+            # Create new coded segments
+            for i in self.data[row][col]:
+                if i['result_type'] == 'image':
+                    try:
+                        cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,"
+                                    "date,owner,important,pdf_page) values(?,?,?,?,?,?,?,?,?,?,?)",
+                                    (i['fid'], i['x1'], i['y1'], i['width'], i['height'], new_code_cid, i['memo'], now_date,
+                                     self.app.settings['codername'], None, i['pdf_page']))
+                        self.app.conn.commit()
+                    except IntegrityError:
+                        self.app.conn.rollback()  # Duplicate union area
+                    except Exception as e_:
+                        logger.debug(e_)
+                    continue
+                if i['result_type'] == 'text':
+                    try:
+                        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                                    memo,date, important) values(?,?,?,?,?,?,?,?,?)", (new_code_cid, i['fid'], i['text'],
+                                    i['pos0'], i['pos1'], self.app.settings['codername'], i['memo'], now_date, None))
+                        self.app.conn.commit()
+                    except Exception as e_:
+                        print(e_)
+                        logger.debug(e_)
+                    continue
+                if i['result_type'] == 'av':
+                    try:
+                        cur.execute("insert into code_av (cid,id,pos0,pos1,owner,memo,date, important) values(?,?,?,?,?,?,?,?)",
+                                    (new_code_cid, i['fid'], i['pos0'], i['pos1'], self.app.settings['codername'], i['memo'], now_date, None))
+                        self.app.conn.commit()
+                    except Exception as e_:
+                        print(e_)
+                        logger.debug(e_)
+                    continue
+
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive) as rows
         header columns can be files
@@ -666,7 +746,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
                 if cell_data > 0:
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
-                    item.setToolTip(_("Click for details."))
+                    item.setToolTip(_("Left-click for details.\nRight-click to crate merged code"))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
