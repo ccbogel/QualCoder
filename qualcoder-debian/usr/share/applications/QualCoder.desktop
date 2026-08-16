@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=QualCoder
+GenericName=qualcoder
+Icon=/usr/share/icons/qualcoder.xpm
+Comment=Qualitative data analysis for text, images, audio, video.
+Exec=/usr/bin/qualcoder
+
+# Should this app run in terminal ?
+Terminal=false
+
+Type=Application
+Categories=Science;Education;
