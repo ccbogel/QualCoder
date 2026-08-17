@@ -1,17 +1,19 @@
 #
+# Auto-translated via Argostranslate (EN - < ES)>, 2026.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-17 08:11+0200\n"
-"PO-Revision-Date: 2026-08-15 00:43-0700\n"
+"PO-Revision-Date: 2026-08-17 08:19+0200\n"
 "Last-Translator: Auto-translated via Argostranslate (EN - < ES)>\n"
 "Language-Team: ES <LL@li.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.9\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:663
 #: src/qualcoder/case_file_manager.py:453 src/qualcoder/cases.py:1233
@@ -3929,7 +3931,7 @@ msgstr ""
 #: src/qualcoder/ai_prompt_library.py:1443
 #, python-brace-format
 msgid "You must select a {self.prompt_type} prompt."
-msgstr ""
+msgstr "Debes seleccionar un prompt de tipo {self.prompt_type}."
 
 #: src/qualcoder/ai_prompt_library.py:1471
 msgid "Could not determine a target path for one prompt."
@@ -5895,7 +5897,6 @@ msgid "Project Import"
 msgstr "Importación del proyecto"
 
 #: src/qualcoder/refi.py:368
-#, fuzzy
 msgid "Parse users. Loaded: "
 msgstr "Analizando casos. Cargados: "
 
@@ -5916,7 +5917,6 @@ msgid "Parsed cases for file variables. Loaded: "
 msgstr "Casos analizados para las variables de archivo. Cargados: "
 
 #: src/qualcoder/refi.py:402
-#, fuzzy
 msgid "Parsing sources. Loaded: "
 msgstr "Analizando casos. Cargados: "
 
@@ -6350,7 +6350,6 @@ msgid "Choose another code name"
 msgstr "Elija otro nombre de código"
 
 #: src/qualcoder/report_comparison_table.py:749
-#, fuzzy
 msgid ""
 "Left-click for details.\n"
 "Right-click to crate merged code"
@@ -9386,7 +9385,6 @@ msgstr ""
 "respuesta parcial."
 
 #: src/qualcoder/ai_chat.py:9289
-#, fuzzy
 msgid "Error communicating with "
 msgstr "Mostrar columnas que empiecen por"
 
@@ -12140,6 +12138,9 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"Tu nombre de programador actual («{}») difiere del último utilizado en el "
+"proyecto («{}»). ¿Quieres conservar tu nombre actual o cambiar al del "
+"proyecto?"
 
 # Nombre de código
 #: src/qualcoder/__main__.py:2029
@@ -14002,7 +14003,6 @@ msgid " starts with: "
 msgstr " comienza con: "
 
 #: src/qualcoder/GUI/special_functions.py:54
-#, fuzzy
 msgid "Uncaught Exception"
 msgstr "Excepción no capturada: "
 
