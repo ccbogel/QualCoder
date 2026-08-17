@@ -183,7 +183,7 @@ about = f'<h1 class="western">{_("About")} QualCoder</h1>\
 <h2 class="western">Version: qualcoder_version</h2>\
 <p>{_("Optional: Install VLC for audio and video coding.")}<br /> \
 {_("Optional: Install ffmpeg for waveform images.")}</p>\
-<p>Tested on: Windows 11.</p>\
+<p>Tested on: Windows 11, Linux Mint 22.3.</p>\
 <p></p>\
 <h2 class="western">{_("Acknowledgements")}</h2>\
 <p>Ronggui Huang, Zhang Gehao - {_("Created RQDA - inspiration for QualCoder.")}<br /> \
