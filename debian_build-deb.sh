@@ -21,6 +21,7 @@ deactivate
 echo "Copy template ${NEW_DIR}..."
 cp -r "qualcoder-debian" "$NEW_DIR"
 
+mkdir -p "${NEW_DIR}/src"
 cp "dist/QualCoder" "${NEW_DIR}/src/qualcoder"
 chmod +x "${NEW_DIR}/src/qualcoder"
 
@@ -43,4 +44,4 @@ cd "$NEW_DIR"
 debuild -us -uc
 cd ..
 
-echo "Package released : qualcoder_${VERSION}-1_amd64.deb"
+echo "Package released : qualcoder_${VERSION}_amd64.deb"
