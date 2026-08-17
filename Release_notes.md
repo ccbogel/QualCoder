@@ -1,3 +1,6 @@
+# QualCoder 4.0-beta Beta Release version
+
+## Beta release will be released late August and be available for approximately 6 weeks, prior to the final 4.0 repease candidate.
 
 We have jumped to version 4.0 as there are quite a few changes in this release.
 
