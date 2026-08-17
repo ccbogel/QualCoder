@@ -44,7 +44,6 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
 from .color_selector import DialogColorSelect
 from .color_selector import TextColor
-from .color_selector import colour_ranges, colors
 from .coder_names import DialogCoderNames  # Coder change as in code_text
 from .speakers import DialogSpeakers, speaker_coder_name  # Mark speakers
 from .helpers import Message, init_persistent_tree_header, \
@@ -57,11 +56,11 @@ from .select_items import DialogSelectItems
 from .ai_agent_prompts import AiAgentPromptsCatalog  # PromptsList removed; new Markdown-based catalog
 from .ai_prompt_library import DialogAiEditPrompts  # Dialog moved from ai_prompts to ai_prompt_library
 from .ai_chat import ai_chat_signal_emitter
+# Shared PDF helpers live in pdf_utils, so lighter modules do not import this one.
+from .pdf_utils import W_X0, W_Y0, W_X1, W_Y1, W_POS0, W_POS1, W_LINE, \
+    _page_words_raw, _build_page_text
 
 logger = logging.getLogger(__name__)
-
-# Word tuple indices: (x0, y0, x1, y1, pos0, pos1, line_id)
-W_X0, W_Y0, W_X1, W_Y1, W_POS0, W_POS1, W_LINE = 0, 1, 2, 3, 4, 5, 6
 
 # Vertical separation between pages, in PDF points
 PAGE_GAP = 14 
@@ -90,275 +89,6 @@ def _page_rotation_transform(w, h, rot):
         t.translate(0.0, w)
         t.rotate(270.0)
     return t
-
-
-def _word_flags():
-    """
-    Extraction flags: expand ligatures (fi -> f i) so that the text matches.
-    """
-
-    try:
-        return pymupdf.TEXTFLAGS_WORDS & ~pymupdf.TEXT_PRESERVE_LIGATURES
-    except AttributeError:
-        return None
-
-def _page_words_raw(page):
-    """ Reads the raw word tuples of ONE page once, so both text variants
-    (lines and joined paragraphs) can be built from a single extraction.
-    Returns:
-        (raw word tuples, rotation matrix)
-    """
-
-    flags = _word_flags()
-    if flags is not None:
-        raw = page.get_text("words", flags=flags)
-    else:
-        raw = page.get_text("words")
-    return raw, page.rotation_matrix
-
-
-def _build_page_text(raw, rot, offset, join_lines=False):
-    """
-    Deterministic text reconstruction from raw word tuples:
-        "" before the first word, "\n\n" between blocks,
-        "\n" between lines of the same block (or " " when join_lines is True,
-        so each block reads as one whole paragraph),
-        " " between words on the same line, and ALWAYS "\n" at the end of the page.
-    Word rects are transformed with rotation_matrix so that they match
-    the page exactly as it is rendered (get_pixmap applies the rotation).
-    line_id keeps incrementing on every visual line change regardless of
-    join_lines: highlight rectangles are still drawn per visual line.
-    Args:
-        raw: word tuples from _page_words_raw
-        rot: rotation matrix
-        offset: Integer, starting character position of this page in the fulltext
-        join_lines: Boolean, True joins the lines of a block into one paragraph
-    Returns:
-        (page_text: str, words: list[tuple], final_offset: int)
-    """
-
-    parts = []
-    words = []
-    pos = offset
-    prev_block = None
-    prev_line = None
-    line_id = -1
-    for x0, y0, x1, y1, wtext, bno, lno, _wno in raw:
-        wtext = wtext.replace("\x00", "")
-        if wtext == "":
-            continue
-        if prev_block is None:
-            sep = ""
-        elif bno != prev_block:
-            sep = "\n\n"
-        elif lno != prev_line:
-            sep = " " if join_lines else "\n"
-        else:
-            sep = " "
-        if sep:
-            parts.append(sep)
-            pos += len(sep)
-        if prev_block != bno or prev_line != lno:
-            line_id += 1
-        parts.append(wtext)
-        rect = pymupdf.Rect(x0, y0, x1, y1) * rot
-        rect.normalize()
-        words.append((float(rect.x0), float(rect.y0), float(rect.x1), float(rect.y1),
-                      pos, pos + len(wtext), line_id))
-        pos += len(wtext)
-        prev_block, prev_line = bno, lno
-    parts.append("\n")  # Page limit, always present even if the page is empty
-    pos += 1
-    return "".join(parts), words, pos
-
-
-def _extract_page(page, offset, join_lines=False):
-    """ Extracts the words from ONE page in natural reading order (PDF content flow
-    order, which preserves columns in digital documents). See _build_page_text. """
-
-    raw, rot = _page_words_raw(page)
-    return _build_page_text(raw, rot, offset, join_lines)
-
-
-def extract_pdf_highlights(filepath):
-    """
-    Detects highlight annotations in a PDF.
-    Returns a list of {'page': page index, 'quads': [pymupdf.Rect, ...] in ROTATED page
-    coordinates (the same space as the extractor's word rects), 'color': '#RRGGBB'}.
-    Empty list when the PDF has no highlights or cannot be read.
-    """
-
-    out = []
-    try:
-        doc = pymupdf.open(filepath)
-    except Exception as err:
-        logger.warning(f"extract_pdf_highlights: {filepath} {err}")
-        return out
-    try:
-        for i, page in enumerate(doc):
-            rot = page.rotation_matrix
-            annot = page.first_annot
-            while annot is not None:
-                try:
-                    if annot.type[0] == pymupdf.PDF_ANNOT_HIGHLIGHT:
-                        stroke = (annot.colors or {}).get('stroke')
-                        if stroke and len(stroke) >= 3:
-                            color = "#{:02X}{:02X}{:02X}".format(
-                                int(round(stroke[0] * 255)), int(round(stroke[1] * 255)),
-                                int(round(stroke[2] * 255)))
-                        else:
-                            color = "#F7FE2E"  # PDF default highlight yellow
-                        quads = []
-                        vertices = annot.vertices
-                        if vertices:
-                            for k in range(0, len(vertices) - 3, 4):
-                                pts = vertices[k:k + 4]
-                                rect = pymupdf.Rect(min(p[0] for p in pts), min(p[1] for p in pts),
-                                                 max(p[0] for p in pts), max(p[1] for p in pts)) * rot
-                                rect.normalize()
-                                quads.append(rect)
-                        else:
-                            rect = pymupdf.Rect(annot.rect) * rot
-                            rect.normalize()
-                            quads.append(rect)
-                        if quads:
-                            content = (annot.info or {}).get('content', '') or ''
-                            out.append({'page': i, 'quads': quads, 'color': color,
-                                        'memo': content.strip()})
-                except Exception as err:
-                    logger.debug(f"extract_pdf_highlights annot: {err}")
-                annot = annot.next
-    finally:
-        doc.close()
-    return out
-
-
-def extract_pdf_annotations(filepath):
-    """
-    Non-highlight annotations WITH text content (sticky notes, free text, comments
-    on underline/strikeout, etc.), for appending to the file memo on import.
-    Highlight comments are NOT included here: they go to the memo of their coded
-    segment when highlight coding is accepted.
-    Returns a list of {'page': 1-based page number, 'type': annot type name,
-    'content': text} in document order.
-    """
-
-    out = []
-    try:
-        doc = pymupdf.open(filepath)
-    except Exception as err:
-        logger.warning(f"extract_pdf_annotations: {filepath} {err}")
-        return out
-    try:
-        for i, page in enumerate(doc):
-            annot = page.first_annot
-            while annot is not None:
-                try:
-                    if annot.type[0] != pymupdf.PDF_ANNOT_HIGHLIGHT:
-                        content = ((annot.info or {}).get('content', '') or '').strip()
-                        if content:
-                            out.append({'page': i + 1,
-                                        'type': annot.type[1] if len(annot.type) > 1 else '',
-                                        'content': content})
-                except Exception as err:
-                    logger.debug(f"extract_pdf_annotations annot: {err}")
-                annot = annot.next
-    finally:
-        doc.close()
-    return out
-
-
-def pdf_highlights_to_positions(filepath, highlights, progress_callback=None):
-    """
-    Maps highlight quads to character positions of the stored fulltext, using the
-    SAME word map as the paragraph extractor (join_lines=True), so pos0/pos1 land
-    exactly on the imported text.
-    Args:
-        filepath: PDF path
-        highlights: output of extract_pdf_highlights
-        progress_callback: callable(step, total) or None; called per page while
-            building the word map and per highlight while matching.
-    Returns:
-        List of {'pos0': int, 'pos1': int, 'color': '#RRGGBB'}, ordered by pos0.
-    """
-
-    if not highlights:
-        return []
-    try:
-        doc = pymupdf.open(filepath)
-    except Exception as err:
-        logger.warning(f"pdf_highlights_to_positions: {filepath} {err}")
-        return []
-    page_words = []
-    try:
-        total_steps = len(doc) + len(highlights)
-        step = 0
-        offset = 0
-        for page in doc:
-            raw, rot = _page_words_raw(page)
-            _text, words, offset = _build_page_text(raw, rot, offset, join_lines=True)
-            page_words.append(words)
-            step += 1
-            if progress_callback is not None:
-                progress_callback(step, total_steps)
-    finally:
-        doc.close()
-    results = []
-    for hl in highlights:
-        step += 1
-        if progress_callback is not None:
-            progress_callback(step, total_steps)
-        words = page_words[hl['page']] if hl['page'] < len(page_words) else []
-        pos0 = None
-        pos1 = None
-        for w in words:
-            w_rect = pymupdf.Rect(w[0], w[1], w[2], w[3])
-            w_area = max(1e-6, w_rect.get_area())
-            for quad in hl['quads']:
-                inter = pymupdf.Rect(w_rect)
-                inter.intersect(quad)
-                if inter.is_empty:
-                    continue
-                # The word counts as highlighted when at least half of it is covered.
-                if inter.get_area() / w_area >= 0.5:
-                    pos0 = w[4] if pos0 is None else min(pos0, w[4])
-                    pos1 = w[5] if pos1 is None else max(pos1, w[5])
-                    break
-        if pos0 is not None and pos1 is not None and pos1 > pos0:
-            results.append({'pos0': int(pos0), 'pos1': int(pos1), 'color': hl['color'],
-                            'memo': hl.get('memo', '')})
-    results.sort(key=lambda r: r['pos0'])
-    return results
-
-
-def extract_pdf_fulltext(filepath, progress_callback=None, join_lines=False):
-    """
-    Extracts ONLY the fulltext of a PDF, for importing in manage_files.
-    It MUST produce exactly the same text that the viewer reconstructs, otherwise
-    the coding positions cannot be mapped to the page.
-    Args:
-        filepath: PDF path
-        progress_callback: callable(current_page: int, total: int) or None
-        join_lines: Boolean, True joins the lines of each block into one paragraph
-    Returns:
-        String fulltext
-    """
-
-    doc = pymupdf.open(filepath)
-    try:
-        if doc.needs_pass:
-            raise ValueError(_("PDF is password protected"))
-        total = len(doc)
-        parts = []
-        offset = 0
-        for i, page in enumerate(doc):
-            page_text, _words, offset = _extract_page(page, offset, join_lines)
-            parts.append(page_text)
-            if progress_callback is not None:
-                progress_callback(i + 1, total)
-        return "".join(parts)
-    finally:
-        doc.close()
 
 
 # Live PDF worker registry, force-stopped on app quit (aboutToQuit + atexit):
@@ -393,219 +123,6 @@ def _register_pdf_worker(worker):
             app_.aboutToQuit.connect(stop_all_pdf_workers)
             atexit.register(stop_all_pdf_workers)
             _QUIT_HOOK_INSTALLED = True
-
-
-def closest_qualcoder_color(hex_color):
-    """
-    Closest colour of the QualCoder palette (color_selector.colors) by RGB
-    distance, with its family name from colour_ranges.
-    Returns (hex of the palette colour, family name).
-    """
-
-    try:
-        r = int(hex_color[1:3], 16)
-        g = int(hex_color[3:5], 16)
-        b = int(hex_color[5:7], 16)
-    except (ValueError, IndexError):
-        r, g, b = 247, 254, 46  # default highlight yellow
-    # Achromatic highlights (white/black/grays) map to the gray family;
-    # plain RGB distance lands them on odd hues.
-    candidate_indexes = range(len(colors))
-    if max(r, g, b) - min(r, g, b) < 32:
-        for rng in colour_ranges:
-            if rng['name'] == 'gray':
-                candidate_indexes = range(rng['min'], min(rng['max'] + 1, len(colors)))
-                break
-    best_idx = 0
-    best_dist = None
-    for idx in candidate_indexes:
-        c = colors[idx]
-        cr = int(c[1:3], 16)
-        cg = int(c[3:5], 16)
-        cb = int(c[5:7], 16)
-        dist = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2
-        if best_dist is None or dist < best_dist:
-            best_dist = dist
-            best_idx = idx
-    family = "colour"
-    for rng in colour_ranges:
-        if rng['name'] != 'all' and rng['min'] <= best_idx <= rng['max']:
-            family = rng['name']
-            break
-    return colors[best_idx], family
-
-
-def pdf_annotations_to_file_memo(app, parent_text_edit, fid, filepath, existing_memo=""):
-    """
-    Appends the PDF's non-highlight annotations (the ones carrying text) to the
-    file memo. Shared by manage_files and the reference attachment import.
-    Args:
-        fid: source id, Integer
-        filepath: PDF path
-        existing_memo: current memo of the source row, String
-    Returns:
-        String, the memo of the source row after the call (unchanged if no annotations)
-    """
-
-    try:
-        notes = extract_pdf_annotations(filepath)
-    except Exception as err:
-        logger.warning(f"Annotation detection: {filepath} {err}")
-        return existing_memo
-    if not notes:
-        return existing_memo
-    memo_lines = [_("PDF annotations:")]
-    for n in notes:
-        memo_lines.append(f"[p. {n['page']}] {n['content']}")
-    memo_text = "\n".join(memo_lines)
-    if existing_memo:
-        memo_text = existing_memo + "\n\n" + memo_text
-    cur = app.conn.cursor()
-    cur.execute("update source set memo=? where id=?", [memo_text, fid])
-    app.conn.commit()
-    if getattr(app, "project_events", None) is not None:
-        app.project_events.emit_table_changes(['source'], source=None)
-    if parent_text_edit is not None:
-        parent_text_edit.append(_("PDF annotations added to file memo: ") + f"{len(notes)}")
-    return memo_text
-
-
-def code_pdf_highlights(app, parent_text_edit, fid, filepath, fulltext, highlights,
-                        progress_=None, parent_widget=None):
-    """
-    Codes the PDF's highlighted segments: creates (or reuses) the
-    'PDF Highlights' category and one code per distinct highlight colour,
-    named and coloured after the closest QualCoder palette colour, then
-    inserts code_text rows over the exact highlighted positions.
-    Progress is shown INSIDE the batch import dialog when one is passed
-    (single progress view); a standalone dialog is only created when called
-    without one. Headless-safe: with no QApplication, runs silently.
-    Args:
-        fid: source id, Integer
-        filepath: PDF path
-        fulltext: the imported fulltext (paragraph layout)
-        highlights: output of extract_pdf_highlights
-        progress_: the batch QProgressDialog from import_files, or None
-        parent_widget: parent for a standalone progress dialog, or None
-    """
-
-    filename_ = os.path.basename(filepath)
-    external = progress_ is not None
-    progress = progress_
-    if progress is None and QtWidgets.QApplication.instance() is not None:
-        progress = QtWidgets.QProgressDialog("", "", 0, 100, parent_widget)
-        progress.setCancelButton(None)  # Partial runs are safe, but avoid them
-        progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
-        progress.setMinimumDuration(500)  # Only appears if it takes a while
-        progress.setAutoReset(False)
-        progress.setAutoClose(False)
-
-    def _show_phase(phase_label, pct):
-        if progress is None:
-            return
-        progress.setLabelText(f"{filename_}\n{phase_label} {pct}%")
-        if not external:
-            progress.setValue(pct)
-        QtWidgets.QApplication.processEvents()
-
-    def _map_progress(step, total):
-        if total > 0:
-            _show_phase(_("Mapping highlighted segments"), int(step * 60 / total))
-
-    positions = pdf_highlights_to_positions(filepath, highlights, _map_progress)
-    if not positions:
-        if progress is not None and not external:
-            progress.close()
-        elif external and progress is not None:
-            progress.setLabelText(filename_)
-        return
-    now_ = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-    owner = app.settings['codername']
-    cur = app.conn.cursor()
-    # Category, created once and reused across batches and projects re-runs.
-    cat_name = "PDF Highlights"
-    cur.execute("select catid from code_cat where name=?", [cat_name])
-    res = cur.fetchone()
-    if res is None:
-        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
-                    (cat_name, _("Codes created from PDF highlight annotations"), owner, now_, None))
-        app.conn.commit()
-        cur.execute("select last_insert_rowid()")
-        catid = cur.fetchone()[0]
-    else:
-        catid = res[0]
-    # One code per distinct colour, named by family ("Highlight yellow",
-    # "_2" suffix for further shades); reused if the palette colour exists.
-    cids_by_color = {}
-    for hl_color in sorted({p['color'] for p in positions}):
-        qc_hex, family = closest_qualcoder_color(hl_color)
-        base_name = f"Highlight {family}"
-        cur.execute("select cid, name, color from code_name where name=? or name like ?",
-                    [base_name, base_name + "_%"])
-        existing = [row for row in cur.fetchall()
-                    if row[1] == base_name or
-                    (row[1].startswith(base_name + "_") and row[1][len(base_name) + 1:].isdigit())]
-        reuse = next((row for row in existing if row[2] == qc_hex), None)
-        if reuse is not None:
-            cids_by_color[hl_color] = reuse[0]
-            continue
-        taken = {row[1] for row in existing}
-        code_name = base_name
-        n = 2
-        while code_name in taken:
-            code_name = f"{base_name}_{n}"
-            n += 1
-        try:
-            cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                        (code_name, "", owner, now_, catid, qc_hex))
-            app.conn.commit()
-            cur.execute("select last_insert_rowid()")
-            cids_by_color[hl_color] = cur.fetchone()[0]
-            if parent_text_edit is not None:
-                parent_text_edit.append(_("New code: ") + code_name)
-        except sqlite3.IntegrityError:
-            # Roll back the failed insert so no implicit transaction stays open.
-            app.conn.rollback()
-            cur.execute("select cid from code_name where name=?", [code_name])
-            res2 = cur.fetchone()
-            if res2 is not None:
-                cids_by_color[hl_color] = res2[0]
-    # Codings over the highlighted positions. Insertion: 60-100 % of the bar.
-    count = 0
-    for seq, pos in enumerate(positions, start=1):
-        cid = cids_by_color.get(pos['color'])
-        if cid is None:
-            continue
-        seltext = fulltext[pos['pos0']:pos['pos1']]
-        if seltext.strip() == "":
-            continue
-        try:
-            # The comment attached to the highlight (if any) becomes the memo of
-            # this coded segment.
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important) "
-                        "values(?,?,?,?,?,?,?,?,?)",
-                        (cid, fid, seltext, pos['pos0'], pos['pos1'], owner,
-                         pos.get('memo', ''), now_, None))
-            app.conn.commit()
-            count += 1
-        except sqlite3.IntegrityError:
-            # Same segment already coded with this code (re-import). Roll back so
-            # no implicit transaction stays open behind the failed insert.
-            app.conn.rollback()
-        _show_phase(_("Coding highlighted segments"), 60 + int(seq * 40 / len(positions)))
-    if progress is not None:
-        if external:
-            progress.setLabelText(filename_)  # Back to the batch label
-        else:
-            progress.setValue(100)
-            progress.close()
-    if count > 0:
-        if parent_text_edit is not None:
-            parent_text_edit.append(
-                _("PDF highlights coded: ") + f"{count}" + _(" segments in ") + os.path.basename(filepath))
-        if getattr(app, "project_events", None) is not None:
-            app.project_events.emit_table_changes(
-                ['code_cat', 'code_name', 'code_text'], source=parent_widget)
 
 
 class PdfTextWorker(QtCore.QThread):
@@ -5157,19 +4674,26 @@ class DialogCodePdf(QtWidgets.QWidget):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        attr_filter_active = len(self.attributes) > 1
+        attr_refresh_done = False
         # Attributes changed in another dialog: recompute the active filter. Port of upstream 0ce9817
-        if ("attribute" in tables or "attribute_type" in tables) and len(self.attributes) > 1:
+        if ("attribute" in tables or "attribute_type" in tables) and attr_filter_active:
             self.get_files_from_attributes(refresh_only=True)
+            attr_refresh_done = True
         code_tree_changed = "code_cat" in tables or "code_name" in tables
         if code_tree_changed:
             self.get_codes_and_categories()
             self.code_tree.fill_tree()
             self.get_coded_text_update_eventfilter_tooltips()
             return
-        # Fulltext changed elsewhere: reload re-verifies the page mapping and
-        # refreshes text, codings and margins (otherwise positions go stale).
-        if "source" in tables and self.file_ is not None:
-            self.load_file(self.file_)
+        # Files changed elsewhere: rebuild the list, not only the open file.
+        # get_files reloads the open file, or clears the view when it was deleted.
+        if "source" in tables:
+            if attr_filter_active:
+                if not attr_refresh_done:
+                    self.get_files_from_attributes(refresh_only=True)
+            else:
+                self.get_files(preserve_current_file=True)
             return
         if "annotation" in tables and self.file_ is not None:
             self.annotations = self.app.get_annotations()

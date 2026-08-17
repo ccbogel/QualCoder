@@ -864,7 +864,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         text_ = ""
         try:
             if ext == ".pdf":
-                from .code_pdf import extract_pdf_fulltext
+                from .pdf_utils import extract_pdf_fulltext
 
                 def _pdf_progress(page_no, total_pages):  # avance por paginas. Per-page progress.
                     if progress is not None:
@@ -913,29 +913,25 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def _import_pdf_annotations(self, fid, file_path, fulltext, progress=None):
         """
-        Annotations and highlights of an attached PDF, treated exactly as in Manage files: text
-        annotations go to the file memo and, if the user agrees (asked once per import
-        session), highlights are coded under the PDF Highlights category. Uses the shared
-        code_pdf helpers, so a PDF entered through a reference ends up like one entered through
-        Manage files.
+        Annotations and markups of an attached PDF, as in Manage files: text
+        annotations to the file memo; highlights and underlines coded under the
+        PDF Highlights / PDF Underlines categories if the user agrees (asked once
+        per session). Shared pdf_utils helpers: same result through either route.
         """
 
-        from .code_pdf import extract_pdf_highlights, pdf_annotations_to_file_memo, code_pdf_highlights
+        from .pdf_utils import extract_pdf_highlights, pdf_annotations_to_file_memo, \
+            code_pdf_highlights, pdf_markups_question_text
         pdf_annotations_to_file_memo(self.app, self.parent_text_edit, fid, file_path)
         try:
             highlights = extract_pdf_highlights(file_path)
         except Exception as err:
-            logger.warning(f"Highlight detection: {file_path} {err}")
+            logger.warning(f"Markup detection: {file_path} {err}")
             return
         if not highlights:
             return
         if self.pdf_import_code_highlights is None:
-            ask_msg = _("Highlighted segments were detected in the imported PDF(s).") + "\n\n"
-            ask_msg += _("Code those segments? A 'PDF Highlights' category will be "
-                         "created, with one code per highlight colour (named and "
-                         "coloured after the closest QualCoder colour).")
             reply = QtWidgets.QMessageBox.question(
-                self, _("PDF highlights"), ask_msg,
+                self, _("PDF highlights"), pdf_markups_question_text(highlights),
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
                 QtWidgets.QMessageBox.StandardButton.Yes)
             self.pdf_import_code_highlights = reply == QtWidgets.QMessageBox.StandardButton.Yes
