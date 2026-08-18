@@ -1097,11 +1097,16 @@ class GraphSynchronizer:
                     res = cur.fetchone()
                     if not res or res[0] is None or res[0] == 0:
                         self.vg.scene.removeItem(line)
-        # Cases -> Codes
+        # Cases -> Codes. Same three tables as the prune above
         for case_node in case_nodes:
             cur.execute("select distinct ct.cid from code_text ct "
                         "join case_text cas on cas.fid=ct.fid "
-                        "and ct.pos0 >= cas.pos0 and ct.pos1 <= cas.pos1 where cas.caseid=?", [case_node.case_id])
+                        "and ct.pos0 >= cas.pos0 and ct.pos1 <= cas.pos1 where cas.caseid=? "
+                        "union select distinct ci.cid from code_image ci "
+                        "join case_text cas on cas.fid=ci.id where cas.caseid=? "
+                        "union select distinct cav.cid from code_av cav "
+                        "join case_text cas on cas.fid=cav.id where cas.caseid=?",
+                        [case_node.case_id, case_node.case_id, case_node.case_id])
             case_cids = {r[0] for r in cur.fetchall()}
             for code_node in code_nodes:
                 cid = code_node.code_or_cat.get('cid')
@@ -1142,11 +1147,16 @@ class GraphSynchronizer:
                      and n.code_or_cat.get('cid') is None
                      and n.code_or_cat.get('catid') is not None]
         for case_node in case_nodes:
+            # Same three tables as Cases -> Codes above
             cur.execute("select distinct cn.catid from code_name cn where cn.catid is not null and cn.cid in "
                         "(select distinct ct.cid from code_text ct "
                         "join case_text cas on cas.fid=ct.fid "
-                        "and ct.pos0 >= cas.pos0 and ct.pos1 <= cas.pos1 where cas.caseid=?)",
-                        [case_node.case_id])
+                        "and ct.pos0 >= cas.pos0 and ct.pos1 <= cas.pos1 where cas.caseid=? "
+                        "union select distinct ci.cid from code_image ci "
+                        "join case_text cas on cas.fid=ci.id where cas.caseid=? "
+                        "union select distinct cav.cid from code_av cav "
+                        "join case_text cas on cas.fid=cav.id where cas.caseid=?)",
+                        [case_node.case_id, case_node.case_id, case_node.case_id])
             case_catids = {r[0] for r in cur.fetchall()}
             for cat_node in cat_nodes:
                 if cat_node.code_or_cat.get('catid') in case_catids:
@@ -2245,6 +2255,13 @@ class ViewGraph(QDialog):
             if add_to_scene:
                 self.scene.addItem(TextGraphicsItem(self.app, code_or_category))
 
+        # Guard: additive re-imports must not duplicate links
+        def _link_exists(node_a, node_b):
+            return any(isinstance(ln, LinkGraphicsItem) and
+                       ((ln.from_widget is node_a and ln.to_widget is node_b) or
+                        (ln.from_widget is node_b and ln.to_widget is node_a))
+                       for ln in self.scene.items())
+
         # Add link from Category to Category, which includes the scene text items and associated data
         for scene_item in self.scene.items():
             if isinstance(scene_item, TextGraphicsItem):
@@ -2253,6 +2270,8 @@ class ViewGraph(QDialog):
                             scene_item.code_or_cat['supercatid'] is not None and \
                             scene_item.code_or_cat['supercatid'] == scene_item2.code_or_cat['catid'] and \
                             (scene_item.code_or_cat['cid'] is None and scene_item2.code_or_cat['cid'] is None):
+                        if _link_exists(scene_item, scene_item2):
+                            continue
                         item = LinkGraphicsItem(scene_item, scene_item2, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Add links from Codes to Categories
@@ -2264,6 +2283,8 @@ class ViewGraph(QDialog):
                             scene_item2.code_or_cat['cid'] is not None and \
                             scene_item.code_or_cat['cid'] is None and \
                             scene_item.code_or_cat['catid'] == scene_item2.code_or_cat['catid']:
+                        if _link_exists(scene_item, scene_item2):
+                            continue
                         item = LinkGraphicsItem(scene_item, scene_item2, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Add links from sub-codes to their parent code (supercid). Parent -> child.
@@ -2275,6 +2296,8 @@ class ViewGraph(QDialog):
                             scene_item.code_or_cat.get('supercid') is not None and \
                             scene_item2.code_or_cat.get('cid') is not None and \
                             scene_item.code_or_cat['supercid'] == scene_item2.code_or_cat['cid']:
+                        if _link_exists(scene_item2, scene_item):
+                            continue
                         item = LinkGraphicsItem(scene_item2, scene_item, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Expand scene width and height if needed
@@ -4886,13 +4909,12 @@ class ViewGraph(QDialog):
                         return
                 name = self.loaded_graph['name']
                 description = self.loaded_graph['description']
-                # Wipe previous rows for this grid in a single transaction
+                # Wipe previous grid rows; no commit, same transaction as the inserts
                 cur = self.app.conn.cursor()
                 grid_to_delete = self.loaded_graph['grid']
                 try:
                     for tbl in _GRID_TABLES:
                         cur.execute(f"delete from {tbl} where grid = ?", [grid_to_delete])
-                    self.app.conn.commit()
                 except Exception as err:
                     self.app.conn.rollback()
                     Message(self.app, _("Update error"),
@@ -4983,10 +5005,10 @@ class ViewGraph(QDialog):
                                           getattr(i, 'font_size', 9) or 9])
                     cur.execute("select last_insert_rowid()")
                     i.gmemoid = cur.fetchone()[0]
-            self.app.conn.commit()
+            # no commit yet, one transaction for the whole save
         except Exception as err:
             logger.error(str(err))
-            self.app.conn.rollback()  # revert all changes
+            self.app.conn.rollback()
             raise
 
         # Insert the lines - after the freetextids are obtained
@@ -5094,11 +5116,12 @@ class ViewGraph(QDialog):
                                  i.color, i.line_width, self.line_type_to_text(i.line_type),
                                  getattr(i, 'label', '') or '',
                                  getattr(i, 'arrow_mode', 'forward') or 'forward'])
-                self.app.conn.commit()
             except Exception as err:
                 logger.error(str(err))
-                self.app.conn.rollback()  # Revert all changes
+                self.app.conn.rollback()
                 raise
+        # single commit: wipe + nodes + lines land atomically
+        self.app.conn.commit()
 
         self.app.delete_backup = False
         # Track the just-saved graph as the loaded one, so the next Save click
@@ -8562,9 +8585,11 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         sync_handles_with_selection(self)
 
     def get_memo(self):
+        # Lookup by id: the qdpx workaround adds a trailing space to the
+        # in-memory name, so name lookups miss those codes
         cur = self.app.conn.cursor()
         if self.code_or_cat['cid'] is not None:
-            cur.execute("select ifnull(memo,'') from code_name where name=?", [self.code_or_cat['name']])
+            cur.execute("select ifnull(memo,'') from code_name where cid=?", [self.code_or_cat['cid']])
             res = cur.fetchone()
             if res:
                 self.code_or_cat['memo'] = res[0]
@@ -8572,7 +8597,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             else:
                 self.setToolTip(_("Code"))
         else:
-            cur.execute("select ifnull(memo,'') from code_cat where name=?", [self.code_or_cat['name']])
+            cur.execute("select ifnull(memo,'') from code_cat where catid=?", [self.code_or_cat['catid']])
             res = cur.fetchone()
             if res:
                 self.code_or_cat['memo'] = res[0]
@@ -9234,7 +9259,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         if not isvisible:
             self.hide()
         # relation label (v17): top-level text item managed by _create_label_item
-        self.label = str(label)
+        self.label = str(label) if label else ""
         self.text_item = None
         if self.label:
             self._create_label_item()
