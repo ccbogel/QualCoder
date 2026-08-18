@@ -800,8 +800,6 @@ class App(object):
             result['treefontsize'] = default.getint('treefontsize')
         if 'backup_num' in default:
             result['backup_num'] = default.getint('backup_num')
-        if 'codetext_chunksize' in default:
-            result['codetext_chunksize'] = default.getint('codetext_chunksize')
         if 'ai_permissions' in default:
             result['ai_permissions'] = default.getint('ai_permissions')
         if 'showids' in default:
@@ -892,7 +890,7 @@ class App(object):
                 'docfontsize', 'showids',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-                'stylesheet', 'backup_num', 'codetext_chunksize',
+                'stylesheet', 'backup_num',
                 'report_text_context_characters', 'report_text_context_style',
                 'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
                 'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
@@ -910,8 +908,6 @@ class App(object):
                     settings_data[key] = "[]"
                 if key == "backup_num":
                     settings_data[key] = 5
-                if key == "codetext_chunksize":
-                    settings_data[key] = 50000
                 if key == 'showids':
                     settings_data[key] = False
                 if key == 'codetext_show_margin_stripes':
@@ -1352,7 +1348,6 @@ class App(object):
             'stylesheet': 'native',
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',
-            'codetext_chunksize': 50000,
             'ai_enable': 'False',
             'ai_first_startup': 'True',
             'ai_model_index': -1,
