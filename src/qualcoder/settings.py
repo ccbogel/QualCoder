@@ -78,7 +78,6 @@ Notes
 FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  
 BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
-CHUNK_SIZES = [50000, 30000]                # comboBox_text_chunk_size  
 STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
 HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
 
@@ -223,7 +222,6 @@ class DialogSettings(QtWidgets.QDialog):
         _set_combo_by_value(self.ui.comboBox_fontsize, FONT_SIZES, self.settings['fontsize'])
         _set_combo_by_value(self.ui.comboBox_codetreefontsize, FONT_SIZES, self.settings['treefontsize'])
         _set_combo_by_value(self.ui.comboBox_docfontsize, FONT_SIZES, self.settings['docfontsize'])
-        _set_combo_by_value(self.ui.comboBox_text_chunk_size, CHUNK_SIZES, self.settings['codetext_chunksize'])
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
         if self.settings['showids'] == 'True':
             self.ui.checkBox.setChecked(True)
@@ -902,8 +900,6 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['language'] != selected_language:
             restart_qualcoder = True
         self.settings['language'] = selected_language
-        self.settings['codetext_chunksize'] = _combo_value(self.ui.comboBox_text_chunk_size, CHUNK_SIZES,
-                                                           self.app.settings['codetext_chunksize'])  # <- L
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
         if self.ui.checkBox_auto_backup.isChecked():
