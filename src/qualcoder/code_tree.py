@@ -202,7 +202,8 @@ class CodeTreeController(QtCore.QObject):
             code_item.setForeground(0, QBrush(QColor(TextColor(code_dict['color']).recommendation)))
             code_item.setFlags(
                 Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
-                Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
+                Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled |
+                Qt.ItemFlag.ItemIsDropEnabled)
             return code_item
 
         # Index every node already in the tree (categories) by its id text for O(1) lookup.
@@ -445,9 +446,6 @@ class CodeTreeController(QtCore.QObject):
         if selected is None:
             return False
         key = event.key()
-        if key == QtCore.Qt.Key.Key_F1:
-            cid = int(selected.text(1)[4:])
-            self.get_branch_cids(cid)
         if key == QtCore.Qt.Key.Key_F2:
             self.rename_category_or_code(selected)
             return True
@@ -479,11 +477,16 @@ class CodeTreeController(QtCore.QObject):
                 self.merge_code_into_code(selected)
             return True
         if key == QtCore.Qt.Key.Key_F9:
-            self.show_codes_like_callback()
-            return True
+            # Optional callback, hosts without filters ignore the key
+            if self.show_codes_like_callback is not None:
+                self.show_codes_like_callback()
+                return True
+            return False
         if key == QtCore.Qt.Key.Key_F10:
-            self.show_codes_of_colour_callback()
-            return True
+            if self.show_codes_of_colour_callback is not None:
+                self.show_codes_of_colour_callback()
+                return True
+            return False
         if key == QtCore.Qt.Key.Key_F11:
             self.tree_sort_option = "all asc"
             self.fill_tree()
@@ -758,6 +761,7 @@ class CodeTreeController(QtCore.QObject):
             self.parent_textEdit.append(_("New code: ") + item['name'])
         except sqlite3.IntegrityError:
             # Can occur with in vivo coding
+            self.app.conn.rollback()
             logger.debug("in vivo coding. Code already exists")
             return False
         self.codes_changed.emit(["code_name"])
@@ -842,26 +846,38 @@ class CodeTreeController(QtCore.QObject):
         if not ok:
             return
         cur = self.app.conn.cursor()
-        '''# Re-parent this code's sub-codes so they are not orphaned by the deletion.
-        if code_.get('supercid') is not None:
-            # Was itself a sub-code: lift its children to the grandparent code.
-            cur.execute("update code_name set supercid=? where supercid=?", [code_['supercid'], code_['cid']])
-        else:
-            # Was top level (possibly under a category): move children into that category (or top level).
-            cur.execute("update code_name set supercid=null, catid=? where supercid=?",
-                        [code_['catid'], code_['cid']])'''
-        for cid in cids:
-            cur.execute("delete from code_name where cid=?", [cid, ])
-            cur.execute("delete from code_text where cid=?", [cid, ])
-            cur.execute("delete from code_av where cid=?", [cid, ])
-            cur.execute("delete from code_image where cid=?", [cid, ])
+        try:
+            for cid in cids:
+                cur.execute("delete from code_name where cid=?", [cid, ])
+                cur.execute("delete from code_text where cid=?", [cid, ])
+                cur.execute("delete from code_av where cid=?", [cid, ])
+                cur.execute("delete from code_image where cid=?", [cid, ])
+                # Saved graphs: drop rows pointing at this code, as in delete_category_branch
+                cur.execute("delete from gr_cdct_text_item where cid=?", [cid, ])
+                cur.execute("delete from gr_cdct_line_item where fromcid=? or tocid=?", [cid, cid])
+                cur.execute("delete from gr_free_line_item where fromcid=? or tocid=?", [cid, cid])
+            # Drop the deleted codes from the stored recently used codes
+            cur.execute("select recently_used_codes from project")
+            recent_res = cur.fetchone()
+            if recent_res is not None and recent_res[0]:
+                keep = []
+                for token in recent_res[0].split():
+                    try:
+                        if int(token) in cids:
+                            continue
+                    except ValueError:
+                        pass
+                    keep.append(token)
+                cur.execute("update project set recently_used_codes=?", [" ".join(keep), ])
             self.app.conn.commit()
+        except Exception as e_:
+            logger.warning(e_)
+            self.app.conn.rollback()  # Revert all changes
+            self.codes_changed.emit([])
+            raise
         self.app.delete_backup = False
-        #self.parent_textEdit.append(_("Code(s) deleted: ") + code_['name'] + "\n")
         self.parent_textEdit.append(_("Code(s) deleted: ") + names + "\n")
         # Let the host clean its own caches, such as the recent codes list.
-        print(cids)
-
         if self.on_codes_deleted is not None:
             self.on_codes_deleted(cids)
         self.codes_changed.emit(["code_name", "code_text", "code_av", "code_image"])
@@ -1067,7 +1083,8 @@ class CodeTreeController(QtCore.QObject):
             else:
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
-        self.codes_changed.emit(changed_tables)
+        if changed_tables:
+            self.codes_changed.emit(changed_tables)
 
     def rename_category_or_code(self, selected: QtWidgets.QTreeWidgetItem):
         """
@@ -1094,13 +1111,19 @@ class CodeTreeController(QtCore.QObject):
             if new_name is None or new_name == found_code['name']:
                 return
             old_name = found_code['name']
+            # Update codes list and database. code_name has unique(name), so a stale
+            # dialog list can still collide: fail cleanly instead of crashing.
+            cur = self.app.conn.cursor()
+            try:
+                cur.execute("update code_name set name=? where cid=?", (new_name, found_code['cid']))
+                self.app.conn.commit()
+            except sqlite3.IntegrityError:
+                self.app.conn.rollback()
+                Message(self.app, _("Name in use"), new_name + " " + _("is already in use")).exec()
+                return
             # Let the host update its own caches, such as the recent codes list.
             if self.on_code_renamed is not None:
                 self.on_code_renamed(old_name, new_name)
-            # Update codes list and database
-            cur = self.app.conn.cursor()
-            cur.execute("update code_name set name=? where cid=?", (new_name, found_code['cid']))
-            self.app.conn.commit()
             self.app.delete_backup = False
             self.parent_textEdit.append(_("Code renamed from: ") + f"{old_name} --> {new_name}")
             self.codes_changed.emit(["code_name"])
@@ -1289,15 +1312,15 @@ class CodeTreeController(QtCore.QObject):
                 cur.execute("update code_name set catid=null, supercid=null where cid=?", [code_['cid']])
             elif destination['cid'] > 0:  # Move under another code
                 # Belt and braces: never write a supercid cycle, even if the selection list
-                # was built from a stale or corrupted tree.
+                # was built from a stale or corrupted tree. Skip this code, move the rest.
                 if self.code_is_descendant(destination['cid'], code_['cid']):
                     Message(self.app, _("Cannot move code"),
-                            _("Cannot move a code under itself or one of its own sub-codes.")).exec()
-                    return
+                            _("Cannot move a code under itself or one of its own sub-codes.")
+                            + "\n" + code_['name']).exec()
+                    continue
                 cur.execute("update code_name set catid=null, supercid=? where cid=?", [destination['cid'], code_['cid']])
             else:  # Move under a category
                 cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], code_['cid']])
-            self.app.conn.commit()
             self.parent_textEdit.append(_("Code moved.") + destination['name'].replace(" ← ", "/") + " → " + code_['name'])
         self.app.conn.commit()
         self.app.delete_backup = False
@@ -1333,6 +1356,12 @@ class CodeTreeController(QtCore.QObject):
             self.app.conn.commit()
             self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → Top level")
         else:
+            # Belt and braces: never write a supercatid cycle, even if the selection
+            # list was built from a stale tree
+            if self.category_is_descendant(category['catid'], catid):
+                Message(self.app, _("Cannot move category"),
+                        _("Cannot move a category under one of its own sub-categories.")).exec()
+                return
             cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
             self.app.conn.commit()
             self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
@@ -1392,6 +1421,10 @@ class CodeTreeController(QtCore.QObject):
                 if code['catid'] == catid:
                     cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
             cur.execute("delete from code_cat where catid=?", [catid])
+            # Saved graphs: drop rows pointing at the merged-away category
+            cur.execute("delete from gr_cdct_text_item where catid=?", [catid, ])
+            cur.execute("delete from gr_cdct_line_item where fromcatid=? or tocatid=?", [catid, catid])
+            cur.execute("delete from gr_free_line_item where fromcatid=? or tocatid=?", [catid, catid])
             for cat in self.categories:
                 if cat['supercatid'] == catid:
                     cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
@@ -1491,22 +1524,22 @@ class CodeTreeController(QtCore.QObject):
             if c['cid'] == new_cid:
                 target_code = c
                 break
-        if target_code is not None:
-            merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-            source_memo = item.get('memo', '').strip()
-            source_owner = item.get('owner', self.app.settings['codername'])
-            merged_block = f"\n\n[{_('Merged from code:')} {item['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"
-            if source_memo:
-                merged_block += f"\n{source_memo}"
-            target_memo = target_code.get('memo', '') or ''
-            new_memo = (target_memo + merged_block).strip()
-            cur.execute("update code_name set memo=? where cid=?", [new_memo, new_cid])
-            target_code['memo'] = new_memo
-        # Update cid for each coded segment in text, av, image. Delete where there is an Integrity error
-        ct_sql = "select ctid from code_text where cid=?"
-        cur.execute(ct_sql, [old_cid])
-        ct_res = cur.fetchall()
         try:
+            if target_code is not None:
+                merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+                source_memo = item.get('memo', '').strip()
+                source_owner = item.get('owner', self.app.settings['codername'])
+                merged_block = f"\n\n[{_('Merged from code:')} {item['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"
+                if source_memo:
+                    merged_block += f"\n{source_memo}"
+                target_memo = target_code.get('memo', '') or ''
+                new_memo = (target_memo + merged_block).strip()
+                cur.execute("update code_name set memo=? where cid=?", [new_memo, new_cid])
+                target_code['memo'] = new_memo
+            # Update cid for each coded segment in text, av, image. Delete where there is an Integrity error
+            ct_sql = "select ctid from code_text where cid=?"
+            cur.execute(ct_sql, [old_cid])
+            ct_res = cur.fetchall()
             for ct in ct_res:
                 try:
                     cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
@@ -1531,6 +1564,16 @@ class CodeTreeController(QtCore.QObject):
             # Re-parent the merged code's sub-codes onto the target code (no orphans).
             cur.execute("update code_name set supercid=?, catid=null where supercid=?", [new_cid, old_cid])
             cur.execute("delete from code_name where cid=?", [old_cid, ])
+            # Saved graphs: drop rows pointing at the merged-away code, as in delete_category_branch
+            cur.execute("delete from gr_cdct_text_item where cid=?", [old_cid, ])
+            cur.execute("delete from gr_cdct_line_item where fromcid=? or tocid=?", [old_cid, old_cid])
+            cur.execute("delete from gr_free_line_item where fromcid=? or tocid=?", [old_cid, old_cid])
+            # Drop the merged-away code from the stored recently used codes
+            cur.execute("select recently_used_codes from project")
+            recent_res = cur.fetchone()
+            if recent_res is not None and recent_res[0]:
+                keep = [t for t in recent_res[0].split() if not (t.isdigit() and int(t) == old_cid)]
+                cur.execute("update project set recently_used_codes=?", [" ".join(keep), ])
             self.app.conn.commit()
         except Exception as e_:
             logger.warning(e_)
