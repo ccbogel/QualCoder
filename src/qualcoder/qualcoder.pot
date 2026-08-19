@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-19 08:22+0200\n"
+"POT-Creation-Date: 2026-08-19 10:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -134,7 +134,7 @@ msgstr ""
 #: src/qualcoder/view_image.py:509 src/qualcoder/code_av.py:1077
 #: src/qualcoder/report_codes_by_segments.py:251
 #: src/qualcoder/report_compare_coder_file.py:258
-#: src/qualcoder/report_cooccurrence.py:289
+#: src/qualcoder/report_cooccurrence.py:293
 #: src/qualcoder/report_exact_matches.py:270 src/qualcoder/code_text.py:1479
 #: src/qualcoder/report_relations.py:189 src/qualcoder/reports.py:189
 msgid "Nothing found"
@@ -144,7 +144,7 @@ msgstr ""
 #: src/qualcoder/view_image.py:509 src/qualcoder/code_av.py:1077
 #: src/qualcoder/report_codes_by_segments.py:251
 #: src/qualcoder/report_compare_coder_file.py:258
-#: src/qualcoder/report_cooccurrence.py:289
+#: src/qualcoder/report_cooccurrence.py:293
 #: src/qualcoder/report_exact_matches.py:270 src/qualcoder/code_text.py:1479
 #: src/qualcoder/report_relations.py:189 src/qualcoder/reports.py:189
 msgid "No matching files found"
@@ -1180,10 +1180,10 @@ msgstr ""
 #: src/qualcoder/report_codes_by_segments.py:254
 #: src/qualcoder/report_codes.py:1518 src/qualcoder/report_codes.py:1536
 #: src/qualcoder/report_codes.py:1545 src/qualcoder/report_codes.py:1696
-#: src/qualcoder/report_cooccurrence.py:263
-#: src/qualcoder/report_cooccurrence.py:274
-#: src/qualcoder/report_cooccurrence.py:284
-#: src/qualcoder/report_cooccurrence.py:292
+#: src/qualcoder/report_cooccurrence.py:267
+#: src/qualcoder/report_cooccurrence.py:278
+#: src/qualcoder/report_cooccurrence.py:288
+#: src/qualcoder/report_cooccurrence.py:296
 #: src/qualcoder/report_exact_matches.py:248
 #: src/qualcoder/report_exact_matches.py:258
 #: src/qualcoder/report_exact_matches.py:266
@@ -1368,10 +1368,10 @@ msgstr ""
 #: src/qualcoder/view_graph.py:4839 src/qualcoder/view_graph.py:7748
 #: src/qualcoder/view_graph.py:7763 src/qualcoder/view_graph.py:7781
 #: src/qualcoder/view_graph.py:8278 src/qualcoder/view_graph.py:8482
-#: src/qualcoder/view_charts.py:616 src/qualcoder/report_cooccurrence.py:567
-#: src/qualcoder/report_cooccurrence.py:651
-#: src/qualcoder/report_cooccurrence.py:801
-#: src/qualcoder/report_cooccurrence.py:843
+#: src/qualcoder/view_charts.py:616 src/qualcoder/report_cooccurrence.py:578
+#: src/qualcoder/report_cooccurrence.py:663
+#: src/qualcoder/report_cooccurrence.py:814
+#: src/qualcoder/report_cooccurrence.py:857
 #: src/qualcoder/view_graph_models.py:335
 #: src/qualcoder/special_functions.py:115
 #: src/qualcoder/special_functions.py:118
@@ -4630,7 +4630,7 @@ msgstr ""
 
 #: src/qualcoder/code_organiser.py:1452
 #: src/qualcoder/report_comparison_table.py:671 src/qualcoder/pdf_utils.py:552
-#: src/qualcoder/code_tree.py:761 src/qualcoder/report_cooccurrence.py:1046
+#: src/qualcoder/code_tree.py:761 src/qualcoder/report_cooccurrence.py:1065
 msgid "New code: "
 msgstr ""
 
@@ -4892,7 +4892,7 @@ msgid "All codings of this code will also be deleted when changes are applied."
 msgstr ""
 
 #: src/qualcoder/code_organiser.py:2927 src/qualcoder/report_codes.py:1411
-#: src/qualcoder/view_charts.py:547 src/qualcoder/report_cooccurrence.py:379
+#: src/qualcoder/view_charts.py:547 src/qualcoder/report_cooccurrence.py:383
 #: src/qualcoder/reports.py:415
 msgid "Category: "
 msgstr ""
@@ -5201,7 +5201,7 @@ msgstr ""
 #: src/qualcoder/report_comparison_table.py:443
 #: src/qualcoder/view_graph.py:3246 src/qualcoder/view_graph.py:3318
 #: src/qualcoder/view_graph.py:3449 src/qualcoder/code_in_all_files.py:520
-#: src/qualcoder/report_cooccurrence.py:321 src/qualcoder/code_text.py:2269
+#: src/qualcoder/report_cooccurrence.py:325 src/qualcoder/code_text.py:2269
 #: src/qualcoder/code_text.py:2362
 msgid "Select codes"
 msgstr ""
@@ -5662,7 +5662,7 @@ msgid "No case selection"
 msgstr ""
 
 #: src/qualcoder/report_codes_by_segments.py:268
-#: src/qualcoder/report_cooccurrence.py:307
+#: src/qualcoder/report_cooccurrence.py:311
 #: src/qualcoder/report_relations.py:207 src/qualcoder/reports.py:206
 msgid "Files selected by attributes"
 msgstr ""
@@ -5796,8 +5796,8 @@ msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:280
 #: src/qualcoder/view_graph.py:3443 src/qualcoder/view_graph.py:3965
-#: src/qualcoder/report_cooccurrence.py:223
-#: src/qualcoder/report_cooccurrence.py:310
+#: src/qualcoder/report_cooccurrence.py:227
+#: src/qualcoder/report_cooccurrence.py:314
 #: src/qualcoder/view_graph_models.py:1175
 #: src/qualcoder/report_relations.py:129 src/qualcoder/report_relations.py:211
 #: src/qualcoder/reports.py:197
@@ -5806,15 +5806,15 @@ msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:287
 #: src/qualcoder/report_comparison_table.py:293
-#: src/qualcoder/report_cooccurrence.py:231
-#: src/qualcoder/report_cooccurrence.py:242
-#: src/qualcoder/report_cooccurrence.py:248
+#: src/qualcoder/report_cooccurrence.py:235
+#: src/qualcoder/report_cooccurrence.py:246
+#: src/qualcoder/report_cooccurrence.py:252
 msgid "Files selected"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:287
-#: src/qualcoder/report_cooccurrence.py:231
-#: src/qualcoder/report_cooccurrence.py:232
+#: src/qualcoder/report_cooccurrence.py:235
+#: src/qualcoder/report_cooccurrence.py:236
 #: src/qualcoder/report_relations.py:138
 msgid "All files selected"
 msgstr ""
@@ -5830,15 +5830,15 @@ msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:453
 #: src/qualcoder/report_comparison_table.py:462
-#: src/qualcoder/report_cooccurrence.py:330
-#: src/qualcoder/report_cooccurrence.py:339
-#: src/qualcoder/report_cooccurrence.py:340
+#: src/qualcoder/report_cooccurrence.py:334
+#: src/qualcoder/report_cooccurrence.py:343
+#: src/qualcoder/report_cooccurrence.py:344
 msgid "Codes selected"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:453
 #: src/qualcoder/report_comparison_table.py:482
-#: src/qualcoder/report_cooccurrence.py:330
+#: src/qualcoder/report_cooccurrence.py:334
 msgid "All codes selected"
 msgstr ""
 
@@ -5851,42 +5851,42 @@ msgid "Everything selected"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:624
-#: src/qualcoder/report_cooccurrence.py:904
+#: src/qualcoder/report_cooccurrence.py:921
 msgid "Co-occurrence exported: "
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:625
-#: src/qualcoder/report_cooccurrence.py:905
+#: src/qualcoder/report_cooccurrence.py:922
 msgid "Co-occurrence exported"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:643
-#: src/qualcoder/report_cooccurrence.py:1016
+#: src/qualcoder/report_cooccurrence.py:1035
 msgid "Merge into new code"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:651
-#: src/qualcoder/report_cooccurrence.py:1027
+#: src/qualcoder/report_cooccurrence.py:1046
 msgid "New code"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:652
-#: src/qualcoder/report_cooccurrence.py:1027
+#: src/qualcoder/report_cooccurrence.py:1046
 msgid "Edit name:"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:654
-#: src/qualcoder/report_cooccurrence.py:1029
+#: src/qualcoder/report_cooccurrence.py:1048
 msgid "Merged: "
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:660
-#: src/qualcoder/report_cooccurrence.py:1035
+#: src/qualcoder/report_cooccurrence.py:1054
 msgid "Code name exists"
 msgstr ""
 
 #: src/qualcoder/report_comparison_table.py:660
-#: src/qualcoder/report_cooccurrence.py:1035
+#: src/qualcoder/report_cooccurrence.py:1054
 msgid "Choose another code name"
 msgstr ""
 
@@ -11410,111 +11410,116 @@ msgstr ""
 msgid "Convert"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:233
-#: src/qualcoder/report_cooccurrence.py:244
+#: src/qualcoder/report_cooccurrence.py:237
+#: src/qualcoder/report_cooccurrence.py:248
 #: src/qualcoder/report_relations.py:139 src/qualcoder/report_relations.py:149
 msgid "Select files by attributes"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:250
+#: src/qualcoder/report_cooccurrence.py:254
 msgid "File selected"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:313
+#: src/qualcoder/report_cooccurrence.py:317
 msgid "Attributes selected"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:360
+#: src/qualcoder/report_cooccurrence.py:364
 #: src/qualcoder/view_graph_models.py:1642
 msgid "Select categories"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:367
+#: src/qualcoder/report_cooccurrence.py:371
 msgid "All categories selected"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:377
-#: src/qualcoder/report_cooccurrence.py:391
+#: src/qualcoder/report_cooccurrence.py:381
+#: src/qualcoder/report_cooccurrence.py:395
 msgid "Categories selected"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:381
+#: src/qualcoder/report_cooccurrence.py:385
 msgid "Categories selected "
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:524
-#: src/qualcoder/report_cooccurrence.py:607
-#: src/qualcoder/report_cooccurrence.py:620
-#: src/qualcoder/report_cooccurrence.py:820
+#: src/qualcoder/report_cooccurrence.py:534
+#: src/qualcoder/report_cooccurrence.py:618
+#: src/qualcoder/report_cooccurrence.py:632
 #: src/qualcoder/report_cooccurrence.py:833
+#: src/qualcoder/report_cooccurrence.py:847
+#: src/qualcoder/report_cooccurrence.py:873
 msgid "No data"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:524
+#: src/qualcoder/report_cooccurrence.py:534
 msgid "No visible codes to export."
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:562
+#: src/qualcoder/report_cooccurrence.py:573
 msgid "Exported GraphML for Gephi: "
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:563
+#: src/qualcoder/report_cooccurrence.py:574
 msgid "Gephi Export"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:579
-#: src/qualcoder/report_cooccurrence.py:673
+#: src/qualcoder/report_cooccurrence.py:590
+#: src/qualcoder/report_cooccurrence.py:685
 msgid "Label font size 10"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:584
-#: src/qualcoder/report_cooccurrence.py:678
+#: src/qualcoder/report_cooccurrence.py:595
+#: src/qualcoder/report_cooccurrence.py:690
 msgid "Label font size 8 "
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:607
+#: src/qualcoder/report_cooccurrence.py:618
 msgid "There are no visible codes to plot."
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:620
+#: src/qualcoder/report_cooccurrence.py:632
 msgid "There are no co-occurrences to plot."
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:624
+#: src/qualcoder/report_cooccurrence.py:636
 msgid "Code Co-occurrence Graph"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:663
+#: src/qualcoder/report_cooccurrence.py:675
 msgid "Coloured nodes"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:668
+#: src/qualcoder/report_cooccurrence.py:680
 msgid "Coloured labels"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:755
+#: src/qualcoder/report_cooccurrence.py:768
 msgid "Community Clusters Graph"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:820
+#: src/qualcoder/report_cooccurrence.py:833
 msgid "There are no visible codes to export."
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:833
+#: src/qualcoder/report_cooccurrence.py:847
 msgid "There are no co-occurrences to export."
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:1142
+#: src/qualcoder/report_cooccurrence.py:873
+msgid "No visible rows or columns to export."
+msgstr ""
+
+#: src/qualcoder/report_cooccurrence.py:1168
 msgid ""
 "Left click: Show coded text.\n"
 "Right click: merge codes."
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:1247
+#: src/qualcoder/report_cooccurrence.py:1272
 msgid "Image areas overlap"
 msgstr ""
 
-#: src/qualcoder/report_cooccurrence.py:1247
+#: src/qualcoder/report_cooccurrence.py:1272
 msgid "of the smaller area"
 msgstr ""
 
