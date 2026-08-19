@@ -5629,7 +5629,8 @@ class DialogCodeText(QtWidgets.QWidget):
                            [a[1], a[2], a[0]])
         # print("Case assignment", self.edit_original_case_assignment)
         for ca in self.edit_original_case_assignment:
-            cursor.execute("update case_text set pos0=?, pos1=? where caseid=?",
+            # ca[0] is case_text.id (from 'select id, pos0, pos1'), so restore by id, not caseid
+            cursor.execute("update case_text set pos0=?, pos1=? where id=?",
                            [ca[1], ca[2], ca[0]])
         self.app.conn.commit()
         self.app.delete_backup = False
