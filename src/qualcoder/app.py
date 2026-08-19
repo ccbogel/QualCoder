@@ -177,7 +177,7 @@ class App(object):
             for i, line in enumerate(result):
                 if i < 8:
                     f.write(line)
-                    f.write(os.linesep)
+                    f.write("\n")  # text mode: os.linesep would produce \r\r\n on Windows
         return result
 
     def append_recent_project(self, new_path: str):
@@ -192,22 +192,19 @@ class App(object):
         # Result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + new_path
-        if not result:
-            with open(self.persist_path, 'w', encoding='utf-8') as f:
-                f.write(dated_path)
-                f.write(os.linesep)
-            return
-        # Compare first persisted project path to the currently open project path
-        if "|" in result[0]:  # safety check
-            if result[0].split("|")[1] != new_path:
-                result.append(dated_path)
-                result.sort()
-                if len(result) > 8:
-                    result = result[(len(result) - 8):]
+        # The path is the last '|' field; legacy lines are bare paths without a date.
+        # Remove any existing entry for this project and re-add it with a fresh date.
+        # Previously, a legacy-format line at result[0] (no '|') silently skipped the
+        # append forever, so new projects were never saved to the recent list.
+        result = [line for line in result if line.split("|")[-1] != new_path]
+        result.append(dated_path)
+        result.sort()
+        if len(result) > 8:
+            result = result[(len(result) - 8):]
         with open(self.persist_path, 'w', encoding='utf-8') as f:
-            for i, line in enumerate(result):
+            for line in result:
                 f.write(line)
-                f.write(os.linesep)
+                f.write("\n")  # text mode: os.linesep would produce \r\r\n on Windows
 
     def get_most_recent_projectpath(self):
         """ Get most recent project path from .qualcoder/recent_projects.txt
