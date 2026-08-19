@@ -177,7 +177,7 @@ class App(object):
             for i, line in enumerate(result):
                 if i < 8:
                     f.write(line)
-                    f.write(os.linesep)
+                    f.write("\n")  # text mode: os.linesep would produce \r\r\n on Windows
         return result
 
     def append_recent_project(self, new_path: str):
@@ -192,22 +192,19 @@ class App(object):
         # Result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + new_path
-        if not result:
-            with open(self.persist_path, 'w', encoding='utf-8') as f:
-                f.write(dated_path)
-                f.write(os.linesep)
-            return
-        # Compare first persisted project path to the currently open project path
-        if "|" in result[0]:  # safety check
-            if result[0].split("|")[1] != new_path:
-                result.append(dated_path)
-                result.sort()
-                if len(result) > 8:
-                    result = result[(len(result) - 8):]
+        # The path is the last '|' field; legacy lines are bare paths without a date.
+        # Remove any existing entry for this project and re-add it with a fresh date.
+        # Previously, a legacy-format line at result[0] (no '|') silently skipped the
+        # append forever, so new projects were never saved to the recent list.
+        result = [line for line in result if line.split("|")[-1] != new_path]
+        result.append(dated_path)
+        result.sort()
+        if len(result) > 8:
+            result = result[(len(result) - 8):]
         with open(self.persist_path, 'w', encoding='utf-8') as f:
-            for i, line in enumerate(result):
+            for line in result:
                 f.write(line)
-                f.write(os.linesep)
+                f.write("\n")  # text mode: os.linesep would produce \r\r\n on Windows
 
     def get_most_recent_projectpath(self):
         """ Get most recent project path from .qualcoder/recent_projects.txt
@@ -800,8 +797,6 @@ class App(object):
             result['treefontsize'] = default.getint('treefontsize')
         if 'backup_num' in default:
             result['backup_num'] = default.getint('backup_num')
-        if 'codetext_chunksize' in default:
-            result['codetext_chunksize'] = default.getint('codetext_chunksize')
         if 'ai_permissions' in default:
             result['ai_permissions'] = default.getint('ai_permissions')
         if 'showids' in default:
@@ -892,7 +887,7 @@ class App(object):
                 'docfontsize', 'showids',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-                'stylesheet', 'backup_num', 'codetext_chunksize',
+                'stylesheet', 'backup_num',
                 'report_text_context_characters', 'report_text_context_style',
                 'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
                 'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
@@ -910,8 +905,6 @@ class App(object):
                     settings_data[key] = "[]"
                 if key == "backup_num":
                     settings_data[key] = 5
-                if key == "codetext_chunksize":
-                    settings_data[key] = 50000
                 if key == 'showids':
                     settings_data[key] = False
                 if key == 'codetext_show_margin_stripes':
@@ -1352,7 +1345,6 @@ class App(object):
             'stylesheet': 'native',
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',
-            'codetext_chunksize': 50000,
             'ai_enable': 'False',
             'ai_first_startup': 'True',
             'ai_model_index': -1,

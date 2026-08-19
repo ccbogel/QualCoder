@@ -598,20 +598,6 @@ langauge = it</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="2">
-              <widget class="QComboBox" name="comboBox_text_chunk_size">
-               <item>
-                <property name="text">
-                 <string>50000</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>30000</string>
-                </property>
-               </item>
-              </widget>
-             </item>
              <item row="7" column="1">
               <spacer name="verticalSpacer">
                <property name="orientation">
@@ -664,19 +650,6 @@ langauge = it</string>
               <widget class="QCheckBox" name="checkBox_code_stripes">
                <property name="text">
                 <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="2">
-              <widget class="QLabel" name="label_8">
-               <property name="toolTip">
-                <string>Very large text documents. Load text chunks by number of characters.</string>
-               </property>
-               <property name="text">
-                <string>Code text chunk size</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </item>

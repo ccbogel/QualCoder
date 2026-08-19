@@ -254,15 +254,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
         self.ui.pushButton_clear_filter_file.setVisible(False)  # hidden until a filter is active
         # Widgets under codes tree
-        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
+        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
         self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
-        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.text-search'))
-        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
-        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.text-search', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.text-search', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
@@ -278,7 +276,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_journal.hide()
         self.ui.pushButton_project_memo.setIcon(qta.icon('mdi6.file-document-outline'))
         self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
-        self.ui.textEdit_info.tabChangesFocus()
+        self.ui.textEdit_info.setTabChangesFocus(True)
         
         # Header buttons
         self.ui.pushButton_annotate.setIcon(qta.icon('mdi6.text-box-edit-outline', options=[{'scale_factor': 1.3}]))
@@ -1824,14 +1822,13 @@ class DialogCodeText(QtWidgets.QWidget):
                 except re.error:
                     logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)
         else:
-            # print("searching 1 file", self.file_['name'])
+            # Search the FULL file text from the database; positions are
+            # absolute over the fulltext
             try:
-                if self.text:
-                    for match in pattern.finditer(self.text):
-                        # Get result as first dictionary item
-                        source_name = self.app.get_file_texts([self.file_['id'], ])[0]
-                        self.search_indices.append((source_name, match.start(), len(match.group(0))))
-            except re.error:
+                file_result = self.app.get_file_texts([self.file_['id'], ])[0]
+                for match in pattern.finditer(file_result['fulltext']):
+                    self.search_indices.append((file_result, match.start(), len(match.group(0))))
+            except (re.error, IndexError):
                 logger.exception('Failed searching current file for %s', self.search_term)
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
@@ -1867,13 +1864,15 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.listWidget.blockSignals(True)
                     self.ui.listWidget.setCurrentRow(x)
                     self.ui.listWidget.blockSignals(False)
-            self.load_file(next_result[0])
+            # Load the self.files entry (has full metadata, keeps self.file_ identity)
+            file_entry = next((f for f in self.files if f['id'] == next_result[0]['id']),
+                              next_result[0])
+            self.load_file(file_entry)
             self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(cursor.position() + next_result[2])
-        self.ui.plainTextEdit.setTextCursor(cursor)
-        # Highlight selected text
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        view_pos = next_result[1] - self.file_['start']
+        cursor = self.ui.plainTextEdit.textCursor()  # re-acquire after possible reload
+        cursor.setPosition(view_pos)
+        cursor.setPosition(view_pos + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         self.scroll_text_into_view()
@@ -1902,10 +1901,15 @@ class DialogCodeText(QtWidgets.QWidget):
         # prev_result is a tuple containing a dictionary of
         # (name, id, fullltext, memo, owner, date) and char position and search string length
         if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
-            self.load_file(prev_result[0])
+            # Load the self.files entry (has full metadata, keeps self.file_ identity)
+            file_entry = next((f for f in self.files if f['id'] == prev_result[0]['id']),
+                              prev_result[0])
+            self.load_file(file_entry)
             self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(prev_result[1])
-        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        view_pos = prev_result[1] - self.file_['start']
+        cursor = self.ui.plainTextEdit.textCursor()  # re-acquire after possible reload
+        cursor.setPosition(view_pos)
+        cursor.setPosition(view_pos + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         self.scroll_text_into_view()
@@ -1926,12 +1930,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if action is None:
             return
         if action == action_char3:
-            self.search_threshold = 3
-            self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+            self.search_threshold = 3  # already connected in init; re-connecting duplicates searches
             return
         if action == action_char5:
             self.search_threshold = 5
-            self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             return
 
     def button_auto_code_menu(self, position):
@@ -2001,10 +2003,6 @@ class DialogCodeText(QtWidgets.QWidget):
         else:
             msg = ""
         action_first = QtGui.QAction(_("first match in file") + msg)
-        if self.autocode_frag_all_first_within == "last":
-            msg = " *"
-        else:
-            msg = ""
         if self.autocode_frag_all_first_within.startswith("code_within_code "):
             msg = f" * cid:{self.autocode_frag_all_first_within.split(' ')[1]}"
         else:
@@ -2078,7 +2076,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Can have multiple coded text at this position
         for item in self.code_text:
-            if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
+            if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() + self.file_['start'] <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
                 # removed action_start_pos, action_end_pos, action_change_pos <- L
@@ -2243,6 +2241,8 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.codes:
                 if c['name'] == self.ui.plainTextEdit.textCursor().selectedText():
                     new_code = c
+        if new_code is None:  # in vivo add cancelled or selection not found as a code
+            return
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), new_code['name'])
         self.mark()
 
@@ -2408,7 +2408,9 @@ class DialogCodeText(QtWidgets.QWidget):
         items = self.ui.listWidget.findItems(file_['name'], Qt.MatchFlag.MatchExactly)
         if len(items) == 1:
             tt = items[0].toolTip()
-            memo_pos = (tt.find(_("Memo:")))
+            memo_pos = tt.find(_("Memo:"))
+            if memo_pos == -1:  # no memo section yet; append instead of slicing
+                memo_pos = len(tt)
             new_tt = f"{tt[:memo_pos]} {_('Memo:')} {file_['memo']}"
             items[0].setToolTip(new_tt)
         self.app.delete_backup = False
@@ -2469,7 +2471,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ After a text file is edited - text added or deleted, code positions may be inaccurate.
          enter a positive or negative integer to shift code positions for all codes after a click position in the
          document.
-         Activated by ^ At key press
+         Activated by $ key press
          Args:
             position : Integer - location  in text, characters
          """
@@ -2512,7 +2514,8 @@ class DialogCodeText(QtWidgets.QWidget):
             new_pos1 = coded['pos1'] + delta_shift
             # Get seltext and update if coded pos0 and pos1 are within bounds
             if new_pos0 > -1 and new_pos1 < fulltext_length:
-                cur.execute(text_sql, [new_pos0, new_pos1 - new_pos0, self.file_['id']])
+                # substr() is 1-based, so +1 (matches extend_left/extend_right)
+                cur.execute(text_sql, [new_pos0 + 1, new_pos1 - new_pos0, self.file_['id']])
                 seltext = cur.fetchone()[0]
                 # print("len", fulltext_length, seltext)
                 sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
@@ -2781,7 +2784,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         Ctrl 0 to Ctrl 9 - button presses
         ! Display Clicked character position
-        ^ Alt key. Shift code positions. May be needed after the text is edited
+        $ key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
         Code Tree:
             F2 Rename code or category
@@ -2923,7 +2926,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Overlapping codes cycle
         now = datetime.datetime.now()
         overlap_diff = now - self.overlap_timer
-        if key == QtCore.Qt.Key.Key_O and len(self.overlaps_at_pos) > 0 and overlap_diff.microseconds > 150000:
+        if key == QtCore.Qt.Key.Key_O and len(self.overlaps_at_pos) > 0 and overlap_diff.total_seconds() > 0.15:
             self.overlap_timer = datetime.datetime.now()
             self.highlight_selected_overlap()
             return
@@ -3080,7 +3083,7 @@ class DialogCodeText(QtWidgets.QWidget):
             journal_text = None
             cur = self.app.conn.cursor()
             base_name = self.file_['name']
-            cur.execute("select name, jentry from journal where name=? or name like ?",
+            cur.execute("select name, jentry from journal where name=? or name like ? escape '\\'",
                         [base_name, base_name + "\\_%"])
             journal_results = cur.fetchall()
             if journal_results:
@@ -3126,8 +3129,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         project_name = Path(self.app.project_path).stem  # attr is project_path
         header = f"{_('Project')}: {project_name}"
-        apa_cite = ("Curtain, C., & Dröge, K. (2026). QualCoder (Version 4.0) "  
-                    "[Computer software]. https://github.com/ccbogel/QualCoder/releases/")
+        apa_cite = ("Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2026) QualCoder 4.0 "
+                    "[Computer software]. Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/4.0")
         return header, apa_cite
         
     # ODT highlighted mode
@@ -3646,6 +3649,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 if ct['pos1'] == i:
                     tagged_text += "}}" + ct['codename'] + "}}"
             tagged_text += c
+        for ct in code_text2:  # closing tags for codes ending at the end of the file
+            if ct['pos1'] == len(plain_text):
+                tagged_text += "}}" + ct['codename'] + "}}" 
  
         # Add project header
         project_header, apa_cite = self._export_project_header()  # footer
@@ -3774,7 +3780,8 @@ class DialogCodeText(QtWidgets.QWidget):
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
-            if diff.microseconds < 100000:
+            # total_seconds(): .microseconds is only the fractional part and fails past 1s
+            if diff.total_seconds() < 0.1:
                 if mod in (QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
                         and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
                     return True  # consume rapid shift + left clicks, etc. without changing selection
@@ -3853,7 +3860,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if not code_:
             return
-        if code_['pos1'] + 1 >= len(self.ui.plainTextEdit.toPlainText()):
+        if code_['pos1'] + 1 > len(self.ui.plainTextEdit.toPlainText()):
             return
         code_['pos1'] += 1
         cur = self.app.conn.cursor()
@@ -4028,7 +4035,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
             msg = str(len(indexes)) + msg
-        msg += " " + _("Code:") + " " + msg
+        msg = " " + _("Code:") + " " + msg
         self.unlight()
         # Highlight the code in the text
         color = ""
@@ -4127,7 +4134,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         self.get_coded_text_update_eventfilter_tooltips()
 
-        self._emit_project_table_changes(tables)
+        if tables:  # empty list or None = local-only refresh, per docstring
+            self._emit_project_table_changes(tables)
 
     def _on_project_data_changed(self, tables, source):
         """Handle project change events from other dialogs.
@@ -4184,8 +4192,6 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_next = None
         action_latest = None
-        action_next_chars = None
-        action_prev_chars = None
         action_show_files_like = None
         action_show_case_files = None
         action_show_by_attribute = None
@@ -4201,11 +4207,6 @@ class DialogCodeText(QtWidgets.QWidget):
             action_show_files_like = menu.addAction(_("Show files like"))
             action_show_by_attribute = menu.addAction(_("Show files by attributes"))
             action_show_case_files = menu.addAction(_("Show case files"))
-        if file_ is not None and file_['characters'] > self.app.settings['codetext_chunksize']:
-            action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
-            if file_['start'] > 0:
-                action_prev_chars = menu.addAction(
-                    str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action_mark_speakers = menu.addAction(_("Mark speakers"))
         sort_menu = QtWidgets.QMenu(_("Sort"))
@@ -4230,10 +4231,6 @@ class DialogCodeText(QtWidgets.QWidget):
             self.go_to_latest_coded_file()
         if action == action_go_to_bookmark:
             self.go_to_bookmark()
-        if action == action_next_chars:
-            self.next_chars(file_, selected)
-        if action == action_prev_chars:
-            self.prev_chars(file_, selected)
         if action == action_show_files_like:
             self.show_files_like()
         if action == action_show_case_files:
@@ -4326,97 +4323,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_files(file_ids)
         self.ui.pushButton_clear_filter_file.setVisible(True)  # clear filter file <- L
         self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
-
-    def prev_chars(self, file_, selected):
-        """ Load previous text chunk of the text file.
-        params:
-            file_  : selected file, Dictionary
-            selected:  list widget item """
-
-        # Already at start
-        if file_['start'] == 0:
-            return
-        file_['end'] = file_['start']
-        file_['start'] = file_['start'] - self.app.settings['codetext_chunksize']
-        # Forward track to the first line ending for a better start of text chunk
-        line_ending = False
-        i = 0
-        try:
-            while file_['start'] + i < file_['end'] and not line_ending:
-                # ... + i - 1] Want to include the line break in the chunk, text[start:i] would otherwise exclude it
-                if file_['fulltext'][file_['start'] + i - 1] == "\n":
-                    line_ending = True
-                else:
-                    i += 1
-        except IndexError:
-            pass
-        file_['start'] += i
-        # Check displayed text not going before start of characters
-        if file_['start'] < 0:
-            file_['start'] = 0
-        # Update tooltip for listItem
-        tt = selected.toolTip()
-        tt2 = tt.split("From: ")[0]
-        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-        selected.setToolTip(tt2)
-        # Load file section into textEdit
-        self.load_file(file_)
-
-    def next_chars(self, file_, selected):
-        """ Load next text chunk of the text file.
-        params:
-            file_  : selected file, Dictionary
-            selected:  list widget item """
-
-        # First time
-        if file_['start'] == 0 and file_['end'] == file_['characters']:
-            # Backtrack to the first line ending for a better end of text chunk
-            i = self.app.settings['codetext_chunksize']
-            line_ending = False
-            while i > 0 and not line_ending:
-                # [i - 1] Want to include the line break in the chunk, and text[start:i] would otherwise exclude it
-                if file_['fulltext'][i - 1] == "\n":
-                    line_ending = True
-                else:
-                    i -= 1
-            if i <= 0:
-                file_['end'] = self.app.settings['codetext_chunksize']
-            else:
-                file_['end'] = i
-        else:
-            file_['start'] = file_['start'] + self.app.settings['codetext_chunksize']
-            # Backtrack from start to next line ending for a better start of text chunk
-            line_ending = False
-            try:
-                while file_['start'] > 0 and not line_ending:
-                    if file_['fulltext'][file_['start'] - 1] == "\n":
-                        line_ending = True
-                    else:
-                        file_['start'] -= 1
-            except IndexError:
-                pass
-            # Backtrack from end to next line ending for a better end of text chunk
-            i = self.app.settings['codetext_chunksize']
-            if file_['start'] + i >= file_['characters']:
-                i = file_['characters'] - file_['start'] - 1  # To prevent Index out of range error
-            line_ending = False
-            while i > 0 and not line_ending:
-                if file_['fulltext'][file_['start'] + i - 1] == "\n":
-                    line_ending = True
-                else:
-                    i -= 1
-            file_['end'] = file_['start'] + i
-            # Check displayed text going past end of characters
-            if file_['end'] >= file_['characters']:
-                file_['end'] = file_['characters'] - 1
-
-        # Update tooltip for listItem
-        tt = selected.toolTip()
-        tt2 = tt.split("From: ")[0]
-        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-        selected.setToolTip(tt2)
-        # Load file section into textEdit
-        self.load_file(file_)
 
     def go_to_next_file(self):
         """ Go to next file in list. Button. """
@@ -5217,7 +5123,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # If blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
-            cur.execute("delete from annotation where pos0 = ?", (item['pos0'],))
+            # Delete by anid: pos0 alone could match annotations in other files or by other coders
+            cur.execute("delete from annotation where anid=?", (item['anid'],))
             self.app.conn.commit()
             self.app.delete_backup = False
             self.annotations = self.app.get_annotations()
@@ -5722,7 +5629,8 @@ class DialogCodeText(QtWidgets.QWidget):
                            [a[1], a[2], a[0]])
         # print("Case assignment", self.edit_original_case_assignment)
         for ca in self.edit_original_case_assignment:
-            cursor.execute("update case_text set pos0=?, pos1=? where caseid=?",
+            # ca[0] is case_text.id (from 'select id, pos0, pos1'), so restore by id, not caseid
+            cursor.execute("update case_text set pos0=?, pos1=? where id=?",
                            [ca[1], ca[2], ca[0]])
         self.app.conn.commit()
         self.app.delete_backup = False
@@ -5735,7 +5643,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         text_cursor = self.ui.plainTextEdit.textCursor()
         if self.edit_pos > len(self.ui.plainTextEdit.toPlainText()):
-            self.edit_pos = len(self.ui.plainTextEdit.toPlainText()) - 1
+            self.edit_pos = max(0, len(self.ui.plainTextEdit.toPlainText()) - 1)
         text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
         msg = _("Text reverted to prior to edit")
@@ -5829,11 +5737,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox_coding_buttons.setEnabled(False)
         self.ui.treeWidget.setEnabled(False)
         file_result = self.app.get_file_texts([self.file_['id']])[0]
-        if self.file_['end'] != len(file_result['fulltext']) and self.file_['start'] != 0:
-            self.file_['start'] = 0
-            self.file_['end'] = len(file_result['fulltext'])
-            self.text = file_result['fulltext']
-            self.ui.plainTextEdit.setPlainText(self.text)
+        # Always load the DB fulltext into the editor: load_file strips a trailing
+        # newline for display, which would desync the diff against stored positions
+        self.file_['start'] = 0
+        self.file_['end'] = len(file_result['fulltext'])
+        self.text = file_result['fulltext']
+        self.ui.plainTextEdit.setPlainText(self.text)
         self.prev_text = copy(self.text)
         self.ui.plainTextEdit.removeEventFilter(self.eventFilterTT)
         self.get_cases_codings_annotations()
@@ -5869,6 +5778,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.text = self.ui.plainTextEdit.toPlainText()
             self.file_['fulltext'] = self.text
             self.file_['end'] = len(self.text)
+            # Keep 'characters' in sync with the edited text
+            self.file_['characters'] = len(self.text)
             cur = self.app.conn.cursor()
             cur.execute("update source set fulltext=? where id=?", (self.text, self.file_['id']))
             self.app.conn.commit()
@@ -5895,7 +5806,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         text_cursor = self.ui.plainTextEdit.textCursor()
         if self.edit_pos > len(self.ui.plainTextEdit.toPlainText()):
-            self.edit_pos = len(self.ui.plainTextEdit.toPlainText()) - 1
+            self.edit_pos = max(0, len(self.ui.plainTextEdit.toPlainText()) - 1)
         text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
 
@@ -5978,162 +5889,65 @@ class DialogCodeText(QtWidgets.QWidget):
         self.text = self.ui.plainTextEdit.toPlainText()
         diff = diff_match_patch.diff_match_patch()
         diff_list = diff.diff_main(self.prev_text, self.text)
-        # print(diff_list)
-        extending = True
-        preceding_pos = 0
-        chars_len = 0
-        pre_chars_len = 0
-        post_chars_len = 0
-        if len(diff_list) == 2 and diff_list[0][0] == 1:
-            # print("Add at start")
-            chars_len = len(diff_list[0][1])
-            pre_chars_len = 0
-            preceding_pos = 0
-        if len(diff_list) == 2 and diff_list[0][0] == -1:
-            # print("Remove from start")
-            extending = False
-            chars_len = len(diff_list[0][1])
-            pre_chars_len = 0
-            preceding_pos = 0
-            post_chars_len = len(diff_list[1][1])
-        if len(diff_list) == 2 and diff_list[1][0] == 1:
-            # print("Add at end")
-            chars_len = len(diff_list[1][1])
-            pre_chars_len = len(diff_list[0][1])
-            preceding_pos = pre_chars_len - 1
-        if len(diff_list) == 2 and diff_list[1][0] == -1:
-            # print("Remove from end")
-            extending = False
-            chars_len = len(diff_list[1][1])
-            post_chars_len = 0
-            pre_chars_len = len(diff_list[0][1])
-            preceding_pos = pre_chars_len - 1
-        if len(diff_list) == 3 and diff_list[1][0] == 1:
-            # print("Add in middle")
-            chars_len = len(diff_list[1][1])
-            pre_chars_len = len(diff_list[0][1])
-            preceding_pos = pre_chars_len - 1
-        if len(diff_list) == 3 and diff_list[1][0] == -1:
-            # print("Delete from middle")
-            extending = False
-            chars_len = len(diff_list[1][1])
-            pre_chars_len = len(diff_list[0][1])
-            preceding_pos = pre_chars_len - 1
-            post_chars_len = len(diff_list[2][1])
-        # Adding characters
-        if extending:
-            for c in self.ed_codetext:
-                changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
-                        c['newpos0'] >= preceding_pos - pre_chars_len:
-                    c['newpos0'] += chars_len
-                    c['newpos1'] += chars_len
-                    # Also check and apply start of code is at start of text
-                    if c['pos0'] == 0:
-                        c['newpos0'] = 0
-                    changed = True
-                if not changed and c['newpos0'] is not None and c['newpos0'] < preceding_pos < c['newpos1']:
-                    c['newpos1'] += chars_len
 
-            for c in self.ed_annotations:
-                changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
-                        c['newpos0'] >= preceding_pos - pre_chars_len:
-                    c['newpos0'] += chars_len
-                    c['newpos1'] += chars_len
-                    changed = True
-                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
-                    c['newpos1'] += chars_len
+        def apply_insert(items, at, length, keep_start_anchor):
+            """ Shift or extend spans for an insertion of 'length' chars at 'at'. """
+            for c in items:
+                if c['newpos0'] is None:
+                    continue
+                if c['newpos0'] >= at:
+                    c['newpos0'] += length
+                    c['newpos1'] += length
+                    if keep_start_anchor and c['pos0'] == 0:
+                        c['newpos0'] = 0  # span anchored at file start absorbs the insert
+                elif c['newpos0'] < at < c['newpos1']:
+                    c['newpos1'] += length  # insert inside the span extends it
 
-            for c in self.ed_casetext:
-                changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
-                        c['newpos0'] >= preceding_pos - pre_chars_len:
-                    c['newpos0'] += chars_len
-                    # check and apply start of case is included
-                    if c['pos0'] == 0:
-                        c['newpos0'] = 0
-                    c['newpos1'] += chars_len
-                    changed = True
-                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
-                    c['newpos1'] += chars_len
-            self.ed_highlight()
-            self.prev_text = copy(self.text)
-            return
-        # Removing characters
-        if not extending:
-            for c in self.ed_codetext:
-                changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
-                        c['newpos0'] >= preceding_pos - pre_chars_len:
-                    c['newpos0'] -= chars_len
-                    if c['newpos0'] < 0:
-                        c['newpos0'] = 0
-                    c['newpos1'] -= chars_len
-                    changed = True
-                # Remove, as entire text is being removed (e.g. copy replace)
-                if c['newpos0'] is not None and not changed and c['newpos0'] >= preceding_pos and \
-                        c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
-                    c['newpos0'] -= chars_len
-                    if c['newpos0'] < 0:
-                        c['newpos0'] = 0
-                    c['newpos1'] -= chars_len
-                    changed = True
-                    self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
-                    c['newpos0'] = None
-                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos <= c['newpos1']:
-                    c['newpos1'] -= chars_len
-                    if c['newpos1'] < c['newpos0']:
-                        self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
+        def apply_delete(items, at, length, delete_sql):
+            """ Shift, shrink or drop spans for a deletion of [at, at + length). """
+            for c in items:
+                if c['newpos0'] is None:
+                    continue
+                if c['newpos0'] >= at + length:
+                    c['newpos0'] -= length
+                    c['newpos1'] -= length
+                elif c['newpos0'] >= at:
+                    if c['newpos1'] <= at + length:
+                        # Span fully inside the deleted range
+                        self.code_deletions.append(delete_sql(c))
+                        c['newpos0'] = None
+                    else:
+                        c['newpos0'] = at
+                        c['newpos1'] -= length
+                elif c['newpos1'] > at:
+                    # Tail of the span overlaps the deleted range
+                    c['newpos1'] -= min(c['newpos1'], at + length) - at
+                    if c['newpos1'] <= c['newpos0']:
+                        self.code_deletions.append(delete_sql(c))
                         c['newpos0'] = None
 
-            for c in self.ed_annotations:
-                changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
-                        c['newpos0'] >= preceding_pos - pre_chars_len:
-                    c['newpos0'] -= chars_len
-                    if c['newpos0'] < 0:
-                        c['newpos0'] = 0
-                    c['newpos1'] -= chars_len
-                    changed = True
-                    # Remove, as entire text is being removed (e.g. copy replace)
-                    if not changed and c['newpos0'] >= preceding_pos and \
-                            c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
-                        c['newpos0'] -= chars_len
-                        c['newpos1'] -= chars_len
-                        changed = True
-                        self.code_deletions.append(f"delete from annotations where anid={c['anid']}")
-                        c['newpos0'] = None
-                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos <= c['newpos1']:
-                    c['newpos1'] -= chars_len
-                    if c['newpos1'] < c['newpos0']:
-                        self.code_deletions.append(f"delete from annotation where anid={c['anid']}")
-                        c['newpos0'] = None
-
-            for c in self.ed_casetext:
-                changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
-                        c['newpos0'] >= preceding_pos - pre_chars_len:
-                    c['newpos0'] -= chars_len
-                    if c['newpos0'] < 0:
-                        c['newpos0'] = 0
-                    c['newpos1'] -= chars_len
-                    changed = True
-                # Remove, as entire text is being removed (e.g. copy replace)
-                if c['newpos0'] is not None and not changed and c['newpos0'] >= preceding_pos and \
-                        c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
-                    c['newpos0'] -= chars_len
-                    if c['newpos0'] < 0:
-                        c['newpos0'] = 0
-                    c['newpos1'] -= chars_len
-                    changed = True
-                    self.code_deletions.append(f"delete from case_text where id={c['id']}")
-                    c['newpos0'] = None
-                if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos <= c['newpos1']:
-                    c['newpos1'] -= chars_len
-                    if c['newpos1'] < c['newpos0']:
-                        self.code_deletions.append(f"delete from case_text where id={c['id']}")
-                        c['newpos0'] = None
+        # Walk the diff left to right, applying each insert/delete at its running
+        # position. Handles any diff shape (replacements, multiple edits) and avoids
+        # the off-by-one of the old preceding_pos = pre_len - 1 boundary arithmetic,
+        # which shifted/shrank spans adjacent to the edit point
+        pos = 0
+        for op, data in diff_list:
+            if op == 0:
+                pos += len(data)
+                continue
+            length = len(data)
+            if op == 1:
+                apply_insert(self.ed_codetext, pos, length, True)
+                apply_insert(self.ed_annotations, pos, length, False)
+                apply_insert(self.ed_casetext, pos, length, True)
+                pos += length
+            else:
+                apply_delete(self.ed_codetext, pos, length,
+                             lambda c: f"delete from code_text where ctid={c['ctid']}")
+                apply_delete(self.ed_annotations, pos, length,
+                             lambda c: f"delete from annotation where anid={c['anid']}")
+                apply_delete(self.ed_casetext, pos, length,
+                             lambda c: f"delete from case_text where id={c['id']}")
         self.ed_highlight()
         self.prev_text = copy(self.text)
 
@@ -6388,12 +6202,12 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for c in self.ed_casetext:
-            if c['newpos1'] >= len(self.text):
-                c['newpos1'] = len(self.text)
-            if c['newpos0'] is not None:
-                cur.execute(sql, [c['newpos0'], c['newpos1'], c['id'], c['newpos0'], c['newpos1']])
-            else:
+            if c['newpos0'] is None:
                 cur.execute("delete from case_text where id=?", [c['id']])
+                continue
+            if c['newpos1'] > len(self.text):  # '>': pos1 == len is a valid end-spanning case
+                c['newpos1'] = len(self.text)
+            cur.execute(sql, [c['newpos0'], c['newpos1'], c['id'], c['newpos0'], c['newpos1']])
         self.app.conn.commit()
 
     def ed_update_annotations(self):
@@ -6402,10 +6216,9 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for a in self.ed_annotations:
-            if a['newpos0'] is not None:
-                cur.execute(sql, [a['newpos0'], a['newpos1'], a['anid'], a['newpos0'], a['newpos1']])
-            if a['newpos1'] is None:
-                cur.execute("delete from annotation where anid=?", [a['anid']])
+            if a['newpos0'] is None:  # deletion marker; DB delete already queued in code_deletions
+                continue
+            cur.execute(sql, [a['newpos0'], a['newpos1'], a['anid'], a['newpos0'], a['newpos1']])
         self.app.conn.commit()
 
     def ed_update_codings(self):
@@ -6414,11 +6227,12 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
         for c in self.ed_codetext:
-            if c['newpos0'] is not None:
-                seltext = self.text[c['newpos0']:c['newpos1']]
-                cur.execute(sql, [c['newpos0'], c['newpos1'], seltext, c['ctid']])
-            if c['newpos1'] >= len(self.text):
-                cur.execute("delete from code_text where ctid=?", [c['ctid']])
+            if c['newpos0'] is None:  # deletion marker; DB delete already queued in code_deletions
+                continue
+            if c['newpos1'] > len(self.text):  # '>': pos1 == len is a valid end-spanning code
+                c['newpos1'] = len(self.text)  # clamp, never delete a valid code
+            seltext = self.text[c['newpos0']:c['newpos1']]
+            cur.execute(sql, [c['newpos0'], c['newpos1'], seltext, c['ctid']])
         self.app.conn.commit()
 
     # AI functions
@@ -6604,7 +6418,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if len(self.ai_search_results) == 0:  # nothing found
                     self.ai_search_update_listview_action()
                     self.ui.plainTextEdit.setPlainText('')
-                    msg = _('The closer inspection of the first ') + str(self.ai_search_chunks_pos) + \
+                    msg = _('The closer inspection of the first ') + str(self.ai_search_chunks_pos) + ' ' + \
                           _('pieces of data yielded no results. You can continue to inspect more by clicking on "find '
                             'more" in the list on the left.')
                     Message(self.app, _('AI Search'), msg, "warning").exec()
@@ -6690,7 +6504,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if self._ai_search_scope_status() == 'errored':
                 action_item.setText(_('(search aborted due to an error)'))
             elif self._ai_search_scope_status() == 'canceled':
-                action_item.setText('(search canceled)')
+                action_item.setText(_('(search canceled)'))
             else:
                 action_item.setText(_('(search finished)'))
 
