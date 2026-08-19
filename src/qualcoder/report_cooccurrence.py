@@ -161,6 +161,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.codes, self.categories = fresh_codes, fresh_categories
         if self.code_selection_mode == "all":
             self.selected_codes = deepcopy(self.codes)
+            if self.transposed:  # Keep the reversed view across external refreshes
+                self.selected_codes.reverse()
             self.selected_categories_string = ""
             self._rebuild_selected_code_strings()
             return
@@ -174,6 +176,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     if code_ not in refreshed_codes:
                         refreshed_codes.append(code_)
             self.selected_codes = refreshed_codes
+            if self.transposed:  # Keep the reversed view across external refreshes
+                self.selected_codes.reverse()
             self._rebuild_selected_code_strings()
             return
 
@@ -465,6 +469,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         self.ui.checkBox_hide_blanks.setChecked(False)
         self.ui.splitter.setSizes([500, 0])
+        # Keep names/ids strings aligned with selected_codes order
+        self._rebuild_selected_code_strings()
         self.result_relations = []
         self.calculate_relations(self.code_ids_str)
         self.calculate_image_relations(self.code_ids_str)
@@ -479,9 +485,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.data_details.append(["."] * len(self.selected_codes))
 
         self.max_count = 0
+        # Map by cid, code order changes after transpose or category selection
+        cid_positions = {c['cid']: i for i, c in enumerate(self.selected_codes)}
         for r in self.result_relations:
-            row_pos = self.code_names_list.index(r['c0_name'])
-            col_pos = self.code_names_list.index(r['c1_name'])
+            row_pos = cid_positions.get(r['cid0'])
+            col_pos = cid_positions.get(r['cid1'])
+            if row_pos is None or col_pos is None:
+                continue
             self.data_counts[row_pos][col_pos] += 1
             if self.data_counts[row_pos][col_pos] > self.max_count:
                 self.max_count = self.data_counts[row_pos][col_pos]
@@ -542,9 +552,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         # 2. Add Edges (Solo entre nodos visibles)
         edge_id = 0
-        for row in visible_indices:
-            for col in visible_indices:
-                count = self.data_counts[row][col]
+        # Upper triangle, both directions summed (add_edge overwrites weight)
+        for i, row in enumerate(visible_indices):
+            for col in visible_indices[i + 1:]:
+                count = self.data_counts[row][col] + self.data_counts[col][row]
                 if count > 0:
                     source_cid = self.selected_codes[row]['cid']
                     target_cid = self.selected_codes[col]['cid']
@@ -610,12 +621,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         graph = nx.Graph()
         for i in visible_indices:
             graph.add_node(self.selected_codes[i]['name'])
-        for row in visible_indices:
-            for col in visible_indices:
-                count = self.data_counts[row][col]
-                if count > 0 and row != col: 
+        # Upper triangle, both directions summed (add_edge overwrites weight)
+        for i, row in enumerate(visible_indices):
+            for col in visible_indices[i + 1:]:
+                count = self.data_counts[row][col] + self.data_counts[col][row]
+                if count > 0:
                     graph.add_edge(self.selected_codes[row]['name'], self.selected_codes[col]['name'], weight=count)
-                    
+
         if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
             Message(self.app, _("No data"), _("There are no co-occurrences to plot.")).exec()
             return
@@ -717,10 +729,11 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         graph = nx.Graph()
         for i in visible_indices: graph.add_node(self.selected_codes[i]['name'])
-        for row in visible_indices:
-            for col in visible_indices:
-                count = self.data_counts[row][col]
-                if count > 0 and row != col:
+        # Upper triangle, both directions summed (add_edge overwrites weight)
+        for i, row in enumerate(visible_indices):
+            for col in visible_indices[i + 1:]:
+                count = self.data_counts[row][col] + self.data_counts[col][row]
+                if count > 0:
                     source = self.selected_codes[row]['name']
                     target = self.selected_codes[col]['name']
                     graph.add_edge(source, target, weight=count)
@@ -823,10 +836,11 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         graph = nx.Graph()
         for i in visible_indices:
             graph.add_node(self.selected_codes[i]['name'])
-        for row in visible_indices:
-            for col in visible_indices:
-                count = self.data_counts[row][col]
-                if count > 0 and row != col: 
+        # Upper triangle, both directions summed (add_edge overwrites weight)
+        for i, row in enumerate(visible_indices):
+            for col in visible_indices[i + 1:]:
+                count = self.data_counts[row][col] + self.data_counts[col][row]
+                if count > 0:
                     graph.add_edge(self.selected_codes[row]['name'], self.selected_codes[col]['name'], weight=count)
 
         if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
@@ -851,42 +865,46 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if filepath is None:
             return
 
-        # Excel vertical and horizontal headers
-        header = []
-        for code_ in self.selected_codes:  # self.codes:
-            name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
-            # header_labels.append(code_['name'])  # OLD, need line separators
-            header.append("\n".join(name_split_50))
+        # Export matches the current view: same order, hidden rows/columns excluded
+        n_codes = len(self.selected_codes)
+        visible_rows = [i for i in range(n_codes) if not self.ui.tableWidget.isRowHidden(i)]
+        visible_cols = [i for i in range(n_codes) if not self.ui.tableWidget.isColumnHidden(i)]
+        if not visible_rows or not visible_cols:
+            Message(self.app, _("No data"), _("No visible rows or columns to export.")).exec()
+            return
+
+        def wrapped_name(index):
+            # Line separators every 50 chars, as in the table headers
+            name = self.selected_codes[index]['name']
+            return "\n".join(name[y - 50:y] for y in range(50, len(name) + 50, 50))
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Counts"
         wb.create_sheet("Details")
         ws2 = wb["Details"]
-        for col in range(len(self.codes)):
+        for col in range(len(visible_cols) + 1):  # Header column plus visible columns
             ws.column_dimensions[get_column_letter(col + 1)].width = 20
             ws2.column_dimensions[get_column_letter(col + 1)].width = 20
-        for col, col_name in enumerate(header):
-            h_cell = ws.cell(row=1, column=col + 2)
-            h_cell.value = col_name
-            h_cell2 = ws2.cell(row=1, column=col + 2)
-            h_cell2.value = col_name
-            v_cell = ws.cell(row=col + 2, column=1)
-            v_cell.value = col_name
-            v_cell2 = ws2.cell(row=col + 2, column=1)
-            v_cell2.value = col_name
+        for x, col_index in enumerate(visible_cols):
+            ws.cell(row=1, column=x + 2).value = wrapped_name(col_index)
+            ws2.cell(row=1, column=x + 2).value = wrapped_name(col_index)
+        for y, row_index in enumerate(visible_rows):
+            ws.cell(row=y + 2, column=1).value = wrapped_name(row_index)
+            ws2.cell(row=y + 2, column=1).value = wrapped_name(row_index)
         # Co-occurrence counts
-        for row, row_data in enumerate(self.data_counts):
-            for col, col_data in enumerate(row_data):
-                cell = ws.cell(row=row + 2, column=col + 2)
-                cell.value = col_data
-                if self.data_colors[row][col] != "":
-                    cell.fill = PatternFill(start_color=self.data_colors[row][col][1:],
-                                            end_color=self.data_colors[row][col][1:], fill_type="solid")
+        for y, row_index in enumerate(visible_rows):
+            for x, col_index in enumerate(visible_cols):
+                cell = ws.cell(row=y + 2, column=x + 2)
+                cell.value = self.data_counts[row_index][col_index]
+                if self.data_colors[row_index][col_index] != "":
+                    cell.fill = PatternFill(start_color=self.data_colors[row_index][col_index][1:],
+                                            end_color=self.data_colors[row_index][col_index][1:], fill_type="solid")
                 # Details list
-                if self.data_details[row][col] == ".":
+                if self.data_details[row_index][col_index] == ".":
                     continue
                 details = ""
-                for data in self.data_details[row][col]:
+                for data in self.data_details[row_index][col_index]:
                     '''
                     0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
                     6 - 8 r['fid'], r['file_name'], r['owners'], 
@@ -897,8 +915,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     details += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
                     details += f"File (fid {data[6]}): {data[7]}\n"
                     details += f"{data[13]}[[{data[14]}]]{data[15]}\n========\n"
-                d_cell = ws2.cell(row=row + 2, column=col + 2)
-                d_cell.value = details
+                ws2.cell(row=y + 2, column=x + 2).value = details
 
         wb.save(filepath)
         msg = _('Co-occurrence exported: ') + filepath
@@ -961,8 +978,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.ui.textEdit.append(msg)
 
             # Coded text highlights - yellow code 0, green overlap, blue code 1
-            start_pos_yellow = len(self.ui.textEdit.toPlainText())
-            end_pos_yellow = start_pos_yellow + len(data[13]) + 1
+            # +1 skips the newline that append() inserts, so each span is exact
+            # and an empty text_before no longer paints the previous line end
+            start_pos_yellow = len(self.ui.textEdit.toPlainText()) + 1
+            end_pos_yellow = start_pos_yellow + len(data[13])
             start_pos_green = end_pos_yellow
             end_pos_green = start_pos_green + len(data[14])
             start_pos_blue = end_pos_green
@@ -1086,12 +1105,19 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 except Exception as e_:
                     print(e_)
                     logger.debug(e_)
+            # Refresh this table and notify other dialogs of the new code/codings
+            self.app.project_events.emit_table_changes(["code_name", "code_text", "code_image"], source=self)
+            self._refresh_selected_codes_from_project()
+            self.process_data()
 
     def transpose_data(self):
         """ Reverse code name order for headings and table """
 
-        self.transposed = not(self.transposed)
-        self.selected_codes = sorted(self.selected_codes, key=lambda x: x["name"].lower(), reverse=self.transposed)
+        self.transposed = not self.transposed
+        self.ui.checkBox_hide_blanks.setChecked(False)  # fill_table resets row visibility
+        # Reverse, do not re-sort: current order may not be alphabetical
+        self.selected_codes.reverse()
+        self._rebuild_selected_code_strings()
         for r in self.data_details:
             r.reverse()
         self.data_details.reverse()
@@ -1169,8 +1195,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                   "join code_name on code_name.cid=code_text.cid where fid=? " \
                   "and code_text.cid in (" + code_ids_str + ") order by code_text.cid"
             cur.execute(sql, [fid['id']])
-            result = cur.fetchall()
-            coded = [row for row in result if row[0] == fid['id']]
+            coded = cur.fetchall()  # SQL already filters by fid
 
             # Look at each code again other codes, when done remove from list of codes
             cid = 1
@@ -1365,14 +1390,15 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             return result
 
         # Check for Proximity
-        if c0[pos1] < c1[pos0]:
+        # <= so touching segments (0 shared chars) are not counted as Overlap
+        if c0[pos1] <= c1[pos0]:
             result['relation'] = "P"
             result['distance'] = c1[pos0] - c0[pos1]
             result['text_overlap'] = ""
             result['text_before'] = ""
             result['text_after'] = ""
             return result
-        if c0[pos0] > c1[pos1]:
+        if c0[pos0] >= c1[pos1]:  # >= as above
             result['relation'] = "P"
             result['distance'] = c0[pos0] - c1[pos1]
             result['text_overlap'] = ""
