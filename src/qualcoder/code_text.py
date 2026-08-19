@@ -5643,7 +5643,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         text_cursor = self.ui.plainTextEdit.textCursor()
         if self.edit_pos > len(self.ui.plainTextEdit.toPlainText()):
-            self.edit_pos = len(self.ui.plainTextEdit.toPlainText()) - 1
+            self.edit_pos = max(0, len(self.ui.plainTextEdit.toPlainText()) - 1)
         text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
         msg = _("Text reverted to prior to edit")
@@ -5806,7 +5806,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         text_cursor = self.ui.plainTextEdit.textCursor()
         if self.edit_pos > len(self.ui.plainTextEdit.toPlainText()):
-            self.edit_pos = len(self.ui.plainTextEdit.toPlainText()) - 1
+            self.edit_pos = max(0, len(self.ui.plainTextEdit.toPlainText()) - 1)
         text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
 
