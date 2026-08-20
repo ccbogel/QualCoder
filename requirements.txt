@@ -6,7 +6,7 @@ EbookLib
 emoji
 matplotlib
 markdown-it-py
-network
+networkx
 odfpy
 openpyxl
 pandas
