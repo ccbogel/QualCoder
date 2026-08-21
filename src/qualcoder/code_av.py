@@ -329,6 +329,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.frame_video.setPalette(_pal)
         self.ui.frame_video.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.frame_video.customContextMenuRequested.connect(self.video_frame_menu)
+        # Keep winId() from forcing the embedded ancestor chain native
+        self.ui.frame_video.setAttribute(QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors, True)
+        if self.app.settings.get('av_player', 'vlc') != 'qt' and vlc is not None:
+            # VLC backend: realize the native window pre-show so the layout pass positions it
+            self.ui.frame_video.setAttribute(QtCore.Qt.WidgetAttribute.WA_NativeWindow, True)
         # Player backend combo (VLC / Qt), takes effect on the next media load
         self.ui.comboBox_player.addItems(["VLC", "Qt"])
         if vlc is None:
@@ -852,7 +857,14 @@ class DialogCodeAV(QtWidgets.QDialog):
             # Qt backend: a QVideoWidget fills the same frame
             self.mediaplayer.set_video_host(target)
             return
+        # Guard before winId(): ancestors stay alien
+        target.setAttribute(QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors, True)
         winid = int(target.winId())
+        # Sync the HWND to the frame's geometry before VLC binds its video output to it
+        wh = target.windowHandle()
+        if wh is not None and target.isVisible():
+            top_left = target.mapTo(target.window(), QtCore.QPoint(0, 0))
+            wh.setGeometry(QtCore.QRect(top_left, target.size()))
         system = platform.system()
         if system == "Linux":
             self.mediaplayer.set_xwindow(winid)
@@ -915,6 +927,11 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def reattach_video(self):
         """ Dock the floating video back into the embedded frame. """
+        self._dock_video_window(retarget=True)
+
+    def _dock_video_window(self, retarget):
+        """ Close the floating window; retarget=False skips the stop/play
+        cycle when the media is about to be replaced anyway. """
 
         if self.video_window is None:
             return
@@ -925,7 +942,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         except Exception:
             pass
         self.ui.frame_video.setVisible(not getattr(self, 'is_audio', False))
-        self._retarget_video_output()
+        if retarget:
+            self._retarget_video_output()
+        else:
+            self._set_video_output()
         try:
             win.close()
             win.deleteLater()
@@ -1564,6 +1584,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.stop()
         self.media = None
         self.file_ = None
+        self._dock_video_window(retarget=False)  # file gone: no video target left
         self._reset_segment_state()
         self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_play.setEnabled(False)
@@ -1604,6 +1625,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                         old_mp.set_nsobject(0)
                     else:
                         old_mp.set_xwindow(0)
+                    # release() also destroys the vout window (else it lingers frozen on screen)
+                    old_mp.release()
         except Exception:
             pass
         try:
@@ -1666,9 +1689,14 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.volume_slider.setValue(100)
         self.ui.pushButton_coding.setEnabled(True)
         is_audio = self.file_['mediapath'][0:6] in ("/audio", "audio:")
+        self.is_audio = is_audio  # reattach_video reads it
+        if is_audio:
+            # A floating video window is pointless for audio
+            self._dock_video_window(retarget=False)
         self.ui.frame_video.setVisible(not is_audio)
         self.ui.pushButton_add_image_to_project.setEnabled(not is_audio)
         self.ui.pushButton_screensshot.setEnabled(not is_audio)
+        self.ui.pushButton_detach.setEnabled(not is_audio)
 
         # Clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
@@ -2230,13 +2258,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Widely spaced keyframes make every seek rebuild seconds of frames
         in any player. Warn in the seek bar tooltip and widen coalescing. """
         self._seek_coalesce_ms = 120
+        self._kf_token = token = object()
         self._keyframe_gap = None
         self.ui.widget_seekbar.setToolTip("")
 
         def measure():
             # Reading keyframes decodes part of the file: off the UI thread so
             # loading a file never blocks playback controls
-            self._keyframe_gap = keyframe_interval_seconds(media_path) or 0.0
+            gap = keyframe_interval_seconds(media_path) or 0.0
+            if self._kf_token is token:  # drop results for a replaced file
+                self._keyframe_gap = gap
 
         threading.Thread(target=measure, daemon=True).start()
 
@@ -3264,7 +3295,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Overlapping codes cycle
         now = datetime.datetime.now()
         overlap_diff = now - self.overlap_timer
-        if key == QtCore.Qt.Key.Key_O and overlap_diff.microseconds > 150000:
+        if key == QtCore.Qt.Key.Key_O and overlap_diff.total_seconds() > 0.15:
             self.overlap_timer = datetime.datetime.now()
             self.cycle_overlap()
             return
@@ -3462,25 +3493,25 @@ class DialogCodeAV(QtWidgets.QDialog):
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
-                # Key event can be too sensitive, adjusted  for 100 millisecond gap
-                msec_gap = 100000
+                # 100 ms key gap; total_seconds(), .microseconds fails past 1s
+                gap_seconds = 0.1
                 now = datetime.datetime.now()
                 diff = now - self.code_resize_timer
                 self.code_resize_timer = datetime.datetime.now()
                 if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier \
-                        and diff.microseconds > msec_gap:
+                        and diff.total_seconds() > gap_seconds:
                     self.shrink_to_left(codes_here[0])
                     return True
                 if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier \
-                        and diff.microseconds > msec_gap:
+                        and diff.total_seconds() > gap_seconds:
                     self.shrink_to_right(codes_here[0])
                     return True
                 if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier \
-                        and diff.microseconds > msec_gap:
+                        and diff.total_seconds() > gap_seconds:
                     self.extend_left(codes_here[0])
                     return True
                 if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier \
-                        and diff.microseconds > msec_gap:
+                        and diff.total_seconds() > gap_seconds:
                     self.extend_right(codes_here[0])
                     return True
         return False
@@ -4687,7 +4718,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         # If blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
-            cur.execute("delete from annotation where pos0 = ?", (item['pos0'],))
+            # Delete by anid: pos0 alone could match annotations in other files or by other coders
+            cur.execute("delete from annotation where anid=?", (item['anid'],))
             self.app.conn.commit()
             self.annotations = self.app.get_annotations()
             self.parent_textEdit.append(_("Annotation removed from position ")

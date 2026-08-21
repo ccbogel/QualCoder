@@ -179,6 +179,9 @@ class MediaPlayer:
         self._host = frame_widget
         if self.video_widget is None:
             self.video_widget = QVideoWidget(frame_widget)
+            # If its window container goes native, keep ancestors alien
+            self.video_widget.setAttribute(
+                QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors, True)
             self.player.setVideoOutput(self.video_widget)
         else:
             old_lay = self.video_widget.parent().layout() if self.video_widget.parent() else None
