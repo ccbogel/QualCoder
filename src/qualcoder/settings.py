@@ -854,7 +854,8 @@ class DialogSettings(QtWidgets.QDialog):
             # ensure the new name is unique
             existing_names = {model['name'] for model in self.ai_models}
             if new_name in existing_names:
-                Message(_('New AI profile'), _('An AI profile with this name already exists: ') + new_name, 'critical')
+                Message(self.app, _('New AI profile'),
+                        _('An AI profile with this name already exists: ') + new_name, 'critical').exec()
                 return
             
             self.ai_models, self.settings['ai_model_index'] = add_new_ai_model(self.ai_models, new_name)
