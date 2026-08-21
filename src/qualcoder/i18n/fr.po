@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-21 09:38+0200\n"
-"PO-Revision-Date: 2026-08-21 09:25+0200\n"
+"PO-Revision-Date: 2026-08-21 09:41+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 50.0\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/error_dlg.py:44
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/edit_textfile.py:663
@@ -8738,7 +8738,7 @@ msgstr " segments dans "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/pdf_utils.py:595
 msgid "PDF underlines coded: "
-msgstr "Soulignements codés dans le PDF :"
+msgstr "Soulignements codés dans le PDF : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:53
 msgid "Merging: "
@@ -13069,7 +13069,7 @@ msgstr "Mise à jour de la base de données à la version"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2324
 msgid "Repaired project table column avbookmarktextpos"
-msgstr "la colonne avbookmarktextpos de la table project réparé"
+msgstr "La colonne avbookmarktextpos de la table project réparé"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2352
 msgid "Deleting code_text coding to deleted files: "
@@ -13907,7 +13907,7 @@ msgstr "{} fichier(s) ne peuvent pas être scanner (voir journaux) : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1355
 msgid "Inline codes per turn: "
-msgstr "Nombre de codes en ligne par tour :"
+msgstr "Nombre de codes en ligne par tour : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1357
 msgid ""
@@ -13947,7 +13947,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1439
 msgid "Inline ';' codes, applied PER TURN: "
-msgstr "Codes « ; » intégrés, appliqués À CHAQUE TOUR :"
+msgstr "Codes « ; » intégrés, appliqués À CHAQUE TOUR : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1440
 msgid ""
