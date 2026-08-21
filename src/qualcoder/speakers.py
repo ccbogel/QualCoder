@@ -24,6 +24,8 @@ https://qualcoder.org/
 import logging
 import re
 import datetime
+import json
+import os
 from typing import Any, Dict, List, Tuple, Optional
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
@@ -36,58 +38,6 @@ from .helpers import Message
 from .select_items import DialogSelectItems  # for the select-files button
 
 logger = logging.getLogger(__name__)
-
-# Timestamp patterns (same set code_av parses): speaker codings must exclude them
-# and split around them. <- L
-TIMESTAMP_PATTERNS = [
-    r"\[[0-9]{1,3}:[0-9][0-9]\]",
-    r"\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]",
-    r"\[[0-9]{1,3}\.[0-9][0-9]\]",
-    r"\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]",
-    r"\{[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\}",
-    r"#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#",
-    r"[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]",
-]
-
-
-def timestamp_spans(text):
-    """ Sorted, merged (start, end) ranges of every timestamp in the text. <- L """
-    spans = []
-    for pat in TIMESTAMP_PATTERNS:
-        for m in re.finditer(pat, text):
-            spans.append((m.start(), m.end()))
-    spans.sort()
-    merged = []
-    for s, e in spans:
-        if merged and s <= merged[-1][1]:
-            merged[-1] = (merged[-1][0], max(merged[-1][1], e))
-        else:
-            merged.append((s, e))
-    return merged
-
-
-def split_span_excluding_timestamps(text, pos0, pos1, ts_spans):
-    """ Split [pos0, pos1) into sub-spans excluding timestamps, whitespace-trimmed;
-    every sub-span keeps the same code as the turn. <- L """
-    pieces = []
-    cursor = pos0
-    for s, e in ts_spans:
-        if e <= pos0 or s >= pos1:
-            continue
-        if s > cursor:
-            pieces.append((cursor, min(s, pos1)))
-        cursor = max(cursor, e)
-    if cursor < pos1:
-        pieces.append((cursor, pos1))
-    out = []
-    for s, e in pieces:
-        chunk = text[s:e]
-        lead = len(chunk) - len(chunk.lstrip())
-        trail = len(chunk) - len(chunk.rstrip())
-        s2, e2 = s + lead, e - trail
-        if e2 > s2:
-            out.append((s2, e2))
-    return out
 max_name_len: int = 63
 # Letras mayusculas (ASCII + Latin-1 acentuadas: incluye A-Z y Á É Í Ó Ú Ñ Ü, etc.)
 # para detectar "Nombre:" a mitad de parrafo. El modulo re no soporta \p{Lu}, de ahi el rango.
@@ -101,7 +51,63 @@ speaker_colors = colors[gray_range['min']:gray_range['max']+1]
 # Bloquea marcadores http/https en el formato "name:" para evitar falsos positivos
 # (por ejemplo "https://example.com" no debe tratarse como turno de hablante).
 # Block http/https markers to avoid false positives (e.g. a URL is not a speaker turn).
+INSERT_CHUNK_ROWS = 1000  # bulk-apply batch size: cancel/UI granularity vs per-batch overhead
+
 http_scheme_tail_re = re.compile(r"(?:^|\s)https?$", flags=re.IGNORECASE)
+
+# Time stamp formats handled: Code A/V styles, SRT/WebVTT subtitle arrows and bare
+# times. Arrow form first so it is consumed whole; delimited forms before bare.
+_TS_ARROW_STAMP = r"(?:[0-9]{1,2}:)?[0-9][0-9]:[0-9][0-9][.,][0-9]{1,3}"
+_TS_SRT = _TS_ARROW_STAMP + r"\s*-->\s*" + _TS_ARROW_STAMP
+_TS_DELIMITED = (r"\[[0-9]?[0-9]:[0-9][0-9](?::[0-9][0-9])?\]"
+                 r"|\[[0-9]?[0-9]\.[0-9][0-9](?:\.[0-9][0-9])?\]"
+                 r"|\{[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\}"
+                 r"|#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#")
+_TS_BARE = r"(?<![0-9:.])[0-9]?[0-9]:[0-9][0-9](?::[0-9][0-9])?(?:[.,][0-9]{1,3})?(?![0-9:.])"
+timestamp_re = re.compile("|".join([_TS_SRT, _TS_DELIMITED, _TS_BARE]))
+
+
+_subtitle_index_line_re = re.compile(r"(?m)^[ \t]*\d{1,5}[ \t]*$")
+
+
+def split_span_excluding_timestamps(transcript: str, start: int, end: int):
+    """ Split [start, end) into pieces excluding time stamps and subtitle-index
+    lines, trimmed, empties dropped. Returns absolute [(p0, p1), ...]. """
+
+    segment = transcript[start:end]
+    cuts = []
+    for match in timestamp_re.finditer(segment):
+        cuts.append((match.start(), match.end()))
+    for match in _subtitle_index_line_re.finditer(segment):
+        cuts.append((match.start(), match.end()))
+    if not cuts:
+        cuts = []
+    cuts.sort()
+    merged = []
+    for c0, c1 in cuts:
+        if merged and c0 <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], c1))
+        else:
+            merged.append((c0, c1))
+    pieces = []
+    prev = 0
+    bounds = merged + [(len(segment), len(segment))]
+    for c0, c1 in bounds:
+        raw = segment[prev:c0]
+        lead = len(raw) - len(raw.lstrip())
+        p0 = prev + lead
+        p1 = prev + len(raw.rstrip())
+        if p1 > p0:
+            pieces.append((start + p0, start + p1))
+        prev = c1
+    return pieces
+
+
+def blank_timestamps(line: str) -> str:
+    """ Replace time stamps with same-length spaces: detection skips them and
+    every position stays valid on the original text. """
+
+    return timestamp_re.sub(lambda m: " " * len(m.group()), line)
 
 
 def identifier_regex(key: str, anchored: bool = True):
@@ -203,11 +209,8 @@ def iter_speaker_turns(pattern, line: str, anywhere: bool = False):
         # With a custom regex, group 1 may not participate (e.g. alternations) and be None.
         raw = m.group(1) if m.re.groups >= 1 else m.group(0)  # m.re: patron que caso. sin grupo: todo el match
         code_as = re.sub(r"\s+", " ", raw or "").strip()
-        # Avoid false positives like URLs, and clock times like "17:30": a name ending in a
-        # digit followed by digits after the colon is not a speaker. <- L
-        looks_like_time = (code_as and code_as[-1].isdigit()
-                           and line[m.end():].lstrip()[:1].isdigit())
-        if code_as and not looks_like_time and not _looks_like_url(code_as, line, m.end()):
+        # Evita falsos positivos tipo "https://..." # avoid URL false positives.
+        if code_as and not _looks_like_url(code_as, line, m.end()):
             yield code_as, m.start(), m.end()
         pos = m.end()
         if not scan_anywhere:
@@ -255,9 +258,37 @@ class DialogSpeakers(QtWidgets.QDialog):
     marker starts or the file ends. Blank lines do NOT end a turn, so a turn may span several
     paragraphs; trailing blank lines are not included in the coded segment.
 
+    Scanning:
+    - Detection is ON DEMAND ("Detect speakers"): auto only with a single file; with
+    several, settings changes just mark the results stale. The scan shows a cancellable
+    per-file progress (cancel keeps partial results; unreadable files are skipped).
+    - "Filter time stamps": Code A/V formats, SRT/WebVTT arrows and bare times are never
+    taken for markers or names, and coded segments EXCLUDE them entirely: a stamp in the
+    middle of a turn splits it into several segments of the same code.
+
     Coding options:
     - The "code as" cell accepts several code names separated by ';' so the same turns are
     coded to more than one code, e.g. the speaker name plus attribute codes.
+    - Markers CHAINED with ':' ('name1: name2: text') are co-codes: each code gets its
+    own row in the table and its own coding of the SAME shared segment. Chained names
+    are strict (up to three word tokens glued to their colon) to avoid taking sentence
+    text for codes; unwanted rows can simply be left unticked. ';' combinations keep
+    their per-turn behaviour and inconsistency tooltips.
+    - A ';' INSIDE a detected marker adds PER-TURN codes: '[Ana; woman; migrant]' also
+    codes that turn to 'woman' and 'migrant'. Rows group by the first token and each
+    turn keeps its own combination. The name tooltip shows per-turn counts ('mujer
+    (2/2); Alma (1/2)'); Preview segments has an editable Inline codes column with a
+    right-click menu to unify, promote to the row's Additional codes, or clear
+    (changes apply on accept). Additional codes holds the USER's row-level codes.
+    - Codes live in the current 📌 Speakers category: in-category names (including their
+    numbered variants) are reused silently; names colliding OUTSIDE the category raise a
+    dialog before writing (use existing / create 'name (n)' / cancel).
+    - Applying shows a cancellable progress dialog with batched writes; cancel rolls the
+    whole apply back. Successful custom regexes are saved per project
+    (speaker_regex.json) and offered by a completer; the button next to the regex
+    field opens a manager to load, edit or delete the saved patterns.
+    - Mid-paragraph "Name:" supports PDF reflow: digits in names (P02), separators
+    . , ; ! ? ... or closing quotes, optional space.
     - Right-click a row and choose "Preview segments" to review every segment of that speaker
     and untick the ones that should not be coded. The Count column shows ticked/total when
     some segments are unticked. Re-scanning (changing identifiers or files) resets the ticks.
@@ -318,19 +349,37 @@ class DialogSpeakers(QtWidgets.QDialog):
         self.ui.pushButton_select_files.clicked.connect(self.select_files)
         # La seleccion de identificadores es por casillas del modelo (ver _setup_identifier_combo).
         # Identifier selection is via model checkboxes (see _setup_identifier_combo).
-        self.ui.lineEdit_custom.editingFinished.connect(self.reparse)  # reanaliza al terminar de editar
+        # On-demand detection (Van): auto-scan only with one file; with several,
+        # settings changes mark results stale and the button runs the scan.
+        self.ui.pushButton_scan.setIcon(qta.icon('mdi6.account-voice', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_scan.clicked.connect(self.reparse)
+        self.ui.lineEdit_custom.editingFinished.connect(self._auto_rescan)
+        # Per-project saved regexes (speaker_regex.json), offered via completer.
+        self._saved_regexes = self._load_saved_regexes()
+        self._apply_regex_completer()
+        # Manager for the saved regexes: load into the field, edit or delete.
+        self.ui.pushButton_saved_regex.setIcon(qta.icon('mdi6.regex'))
+        self.ui.pushButton_saved_regex.clicked.connect(self.manage_saved_regexes)
+        self.ui.pushButton_saved_regex.setVisible(False)  # shown with the Custom checkbox
+        self.ui.checkBox_filter_timestamps.stateChanged.connect(lambda _state: self._auto_rescan())
         self.codings: List[Dict[str, Any]] = []
         self.speaker_summary: List[Dict[str, Any]] = []
         self._update_title()
         self._update_files_label()
-        self.collect_names()
+        if len(self.files) == 1:
+            self.collect_names()
+        else:
+            self._info_note = _("Press 'Detect speakers' to scan the selected files.")
         self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.on_item_changed)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.buttonBox.accepted.connect(self.ok)
+        # Enter/Return no debe activar OK: se desactiva el boton por defecto y (mas abajo) se  # <- L
+        # ignora Enter en keyPressEvent, para evitar aplicaciones accidentales al confirmar la
+        # edicion de un codigo con Enter. OK solo con clic manual.
         # Enter/Return must not trigger OK: no default button, and Enter is swallowed in
-        # keyPressEvent, to avoid accidental application when editing a code. <- L
+        # keyPressEvent, to avoid accidental application when confirming a code edit with Enter.
         for button in self.ui.buttonBox.buttons():  # <- L
             button.setAutoDefault(False)  # <- L
             button.setDefault(False)  # <- L
@@ -339,12 +388,6 @@ class DialogSpeakers(QtWidgets.QDialog):
         # Help button top-right, icon-only, consistent with the other modules.
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
-
-    def _emit_project_table_changes(self, tables):
-        """Notify other open dialogs about changed project tables."""
-
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(tables, source=self)
 
     def _setup_identifier_combo(self):
         """ 
@@ -420,6 +463,21 @@ class DialogSpeakers(QtWidgets.QDialog):
         Also open the popup when the read-only text field is pressed. 
         """
         
+        # Wheel over an Additional-codes combo: only act when its list is open;
+        # otherwise forward the wheel to the table so scrolling the speakers list
+        # never adds a code by accident.
+        if event.type() == QtCore.QEvent.Type.Wheel and isinstance(obj, QtWidgets.QComboBox) \
+                and obj in getattr(self, '_additional_combos', {}).values():
+            if obj.view().isVisible():
+                return False  # popup open: the combo handles the wheel
+            viewport = self.ui.tableWidget.viewport()
+            global_pos = event.globalPosition()
+            local = QtCore.QPointF(viewport.mapFromGlobal(global_pos.toPoint()))
+            forwarded = QtGui.QWheelEvent(local, global_pos, event.pixelDelta(), event.angleDelta(),
+                                          event.buttons(), event.modifiers(), event.phase(),
+                                          event.inverted())
+            QtWidgets.QApplication.sendEvent(viewport, forwarded)
+            return True
         combo = self.ui.comboBox_identifier
         if event.type() == QtCore.QEvent.Type.MouseButtonRelease:
             view = combo.view()
@@ -477,8 +535,9 @@ class DialogSpeakers(QtWidgets.QDialog):
         """
         
         self.ui.lineEdit_custom.setVisible(self._is_checked('custom'))
+        self.ui.pushButton_saved_regex.setVisible(self._is_checked('custom'))
         self._update_identifier_text()
-        self.reparse()
+        self._auto_rescan()
 
     def _select_single_identifier(self, key: str):
         """ 
@@ -595,7 +654,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         self.files = [{'id': s['id'], 'name': s['name']} for s in selected]
         self._update_title()
         self._update_files_label()
-        self.reparse()
+        self._auto_rescan()
 
     def _update_files_label(self):
         """ 
@@ -623,6 +682,22 @@ class DialogSpeakers(QtWidgets.QDialog):
         label.setText(metrics.elidedText(text, QtCore.Qt.TextElideMode.ElideRight, 420))
         label.setToolTip("\n".join(names))
 
+    def _auto_rescan(self):
+        """ Re-scan only when cheap (one file); otherwise mark results stale. """
+
+        if len(self.files) <= 1:
+            self.reparse()
+            return
+        self._mark_stale()
+
+    def _mark_stale(self):
+        """ Drop results and ask for a manual scan. """
+
+        self.codings = []
+        self.speaker_summary = []
+        self._info_note = _("Settings changed. Press 'Detect speakers' to scan {} files.").format(len(self.files))
+        self.fill_table()
+
     def reparse(self):
         """ 
         Reanaliza los archivos con la configuracion actual y refresca la tabla.
@@ -632,6 +707,151 @@ class DialogSpeakers(QtWidgets.QDialog):
         
         self.collect_names()
         self.fill_table()
+
+    def _regex_store_path(self):
+        """ Per-project regex JSON path, or None. """
+
+        project_path = getattr(self.app, 'project_path', '') or ''
+        if not project_path or not os.path.isdir(project_path):
+            return None
+        return os.path.join(project_path, "speaker_regex.json")
+
+    def _load_saved_regexes(self):
+        """ Load the saved custom regexes for this project (most recent first). """
+
+        path = self._regex_store_path()
+        if path is None or not os.path.exists(path):
+            return []
+        try:
+            with open(path, encoding='utf-8') as f:
+                data = json.load(f)
+            return [r for r in data if isinstance(r, str) and r.strip()][:20]
+        except Exception as err:  # a broken json must never block the dialog
+            logger.warning(f"speaker_regex.json could not be read: {err}")
+            return []
+
+    def _remember_custom_regex(self, text):
+        """ Save a successful regex (recent first, deduped, cap 20); best effort. """
+
+        text = (text or '').strip()
+        if not text:
+            return
+        if text in self._saved_regexes:
+            self._saved_regexes.remove(text)
+        self._saved_regexes.insert(0, text)
+        del self._saved_regexes[20:]
+        self._apply_regex_completer()
+        self._save_regex_store()
+
+    def _save_regex_store(self):
+        """
+        Write the saved regex list to speaker_regex.json; best effort.
+        """
+
+        path = self._regex_store_path()
+        if path is None:
+            return
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(self._saved_regexes, f, ensure_ascii=False, indent=1)
+        except Exception as err:
+            logger.warning(f"speaker_regex.json could not be written: {err}")
+
+    def manage_saved_regexes(self):
+        """
+        Manager for the regexes saved in this project: load one into the field,
+        edit them in place (double click) or delete them. Changes persist on close.
+        """
+
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle(_("Saved regex patterns"))
+        dialog.resize(460, 320)
+        layout = QtWidgets.QVBoxLayout(dialog)
+        info = QtWidgets.QLabel(_("Patterns saved for this project. Double click one to edit it. "
+                                  "'Use' copies the current pattern to the regex field."))
+        info.setWordWrap(True)
+        layout.addWidget(info)
+        list_widget = QtWidgets.QListWidget(dialog)
+        list_widget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        for regex_text in self._saved_regexes:
+            item = QtWidgets.QListWidgetItem(regex_text)
+            item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
+            list_widget.addItem(item)
+        if list_widget.count() > 0:
+            list_widget.setCurrentRow(0)
+        layout.addWidget(list_widget)
+        buttons = QtWidgets.QHBoxLayout()
+        button_use = QtWidgets.QPushButton(_("Use"))
+        button_use.setToolTip(_("Copy the current pattern to the regex field and re-scan."))
+        button_delete = QtWidgets.QPushButton(_("Delete"))
+        button_delete.setToolTip(_("Remove the selected pattern(s) from the saved list."))
+        button_close = QtWidgets.QPushButton(_("Close"))
+        buttons.addWidget(button_use)
+        buttons.addWidget(button_delete)
+        buttons.addStretch()
+        buttons.addWidget(button_close)
+        layout.addLayout(buttons)
+
+        def warn_invalid(pattern_text, err):
+            Message(self.app, _("Mark speakers"),
+                    _("Invalid regex: ") + f"{pattern_text}\n{err}", "warning").exec()
+
+        def on_item_changed(item):
+            # Edits are kept, but an invalid pattern is flagged right away.
+            pattern_text = item.text().strip()
+            if pattern_text == "":
+                return
+            try:
+                re.compile(pattern_text)
+            except re.error as err:
+                warn_invalid(pattern_text, err)
+
+        def collect_and_store():
+            # List order is the store order; empties and duplicates drop, cap 20.
+            seen: List[str] = []
+            for i in range(list_widget.count()):
+                pattern_text = list_widget.item(i).text().strip()
+                if pattern_text and pattern_text not in seen:
+                    seen.append(pattern_text)
+            self._saved_regexes = seen[:20]
+            self._save_regex_store()
+            self._apply_regex_completer()
+
+        def delete_selected():
+            for item in list_widget.selectedItems():
+                list_widget.takeItem(list_widget.row(item))
+
+        def use_current():
+            item = list_widget.currentItem()
+            if item is None:
+                return
+            pattern_text = item.text().strip()
+            if pattern_text == "":
+                return
+            try:
+                re.compile(pattern_text)
+            except re.error as err:
+                warn_invalid(pattern_text, err)
+                return
+            collect_and_store()
+            self.ui.lineEdit_custom.setText(pattern_text)
+            dialog.accept()
+            self._auto_rescan()
+
+        list_widget.itemChanged.connect(on_item_changed)
+        button_use.clicked.connect(use_current)
+        button_delete.clicked.connect(delete_selected)
+        button_close.clicked.connect(dialog.accept)
+        dialog.exec()
+        collect_and_store()  # persist edits and deletions on any way out
+
+    def _apply_regex_completer(self):
+        """ Completer with the saved regexes. """
+
+        completer = QtWidgets.QCompleter(self._saved_regexes, self.ui.lineEdit_custom)
+        completer.setCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseInsensitive)
+        completer.setFilterMode(QtCore.Qt.MatchFlag.MatchContains)
+        self.ui.lineEdit_custom.setCompleter(completer)
 
     def _name_patterns(self, delimiter_safe: bool):
         """ 
@@ -661,22 +881,49 @@ class DialogSpeakers(QtWidgets.QDialog):
         """
         
         mlen = str(max_name_len)
-        # El nombre de inicio de linea NO incluye punto, coma, ")" ni "]": asi, si antes de los dos puntos
+        # El nombre de inicio de linea NO incluye punto ni coma: asi, si antes de los dos puntos
         # hay una frase (con punto/coma), este patron no matchea y cede al de mitad de parrafo,
         # que extrae solo el nombre en mayuscula tras el separador.
         # The line-start name excludes period and comma: if there is a phrase (with a period/comma)
         # before the colon, this pattern does not match and defers to the mid-paragraph one, which
         # extracts only the capitalised name after the separator.
         if delimiter_safe:  # combinado: ademas excluye # @ [ {. combined: also excludes # @ [ {
-            line_start = re.compile(r"^\s*([^.,)\]#@\[{\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
+            line_start = re.compile(r"^\s*([^.,#@\[{\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
         else:  # Nombre: solo. Name: alone
-            line_start = re.compile(r"^\s*([^.,)\]\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
-        # After a period, comma, ")" or "]" plus spaces: capitalised word(s) glued to ":".
-        # ")" and "]" cover parentheticals and preceding timestamps. <- L
+            line_start = re.compile(r"^\s*([^.,\r\n]{1," + mlen + r"}?)\s*:\s*", flags=re.UNICODE)
+        # Mid-paragraph, PDF-reflow friendly: uppercase start, digits allowed (P02),
+        # separators . , ; ! ? ... or closing quotes, optional space ("anterior.P02:").
         mid_paragraph = re.compile(
-            r"(?<=[.,)\]])\s+([" + _UPPER + r"][^\W\d_]*(?:[ \t]+[^\W\d_]+){0,5}):",
+            r"(?<=[.,;!?\u2026)\]\"\u00bb'])[ \t]*([" + _UPPER + r"][^\W_]*(?:[ \t]+[^\W_]+){0,5}):",
             flags=re.UNICODE)
         return [line_start, mid_paragraph]
+
+    def _chain_patterns(self):
+        """
+        Patterns for markers CHAINED right after another marker ('name1: name2: text'):
+        each code in the chain gets its own row and all code the same segment.
+        They are matched at an exact position; the code name is group 1. Built from the
+        checked identifiers; the colon form requires the name glued to its colon.
+        """
+
+        keys = self._checked_keys()
+        patterns = []
+        for key in keys:
+            if key in ('hash', 'at', 'bracket', 'brace'):
+                patterns.append(identifier_regex(key, anchored=False))
+        if 'custom' in keys:
+            text = self.ui.lineEdit_custom.text().strip()
+            if text:
+                try:
+                    patterns.append(re.compile(text, flags=re.UNICODE))
+                except re.error:
+                    pass
+        if 'name' in keys:
+            # Strict on purpose (chains sit where the response text starts): up to three
+            # word tokens glued to the colon, no punctuation; ';' stays allowed as the
+            # separator so a chained code can carry its own inline codes ('mujer; adulta:').
+            patterns.append(re.compile(r"(\w+(?:[ \t;]+\w+){0,2}):\s*", flags=re.UNICODE))
+        return patterns
 
     def _resolve_pattern(self):
         """ 
@@ -748,26 +995,66 @@ class DialogSpeakers(QtWidgets.QDialog):
         name_example: Dict[str, str] = {}
         name_files: Dict[str, set] = {}  # archivos por hablante. Ffiles per speaker
         name_file_counts: Dict[str, Dict[str, int]] = {}  # turnos por (hablante, archivo). turns per (speaker, file)
-        # Carry over additional codes by name across re-scans. <- L
+        # Inline ';' codes per turn; union kept for the name tooltip.
+        name_extra_codes: Dict[str, List[str]] = {}
+        # Conserva los codigos adicionales por nombre al reanalizar (no se pierden al cambiar  # <- L
+        # identificadores o archivos). Carry over additional codes by name across re-scans.
         prev_additional = {sp['name']: list(sp.get('additional_codes', []))  # <- L
                            for sp in getattr(self, 'speaker_summary', [])}  # <- L
-        # Lee cada archivo una sola vez
-        transcripts = [(f['id'], f['name'], self.app.get_text_fulltext(f['id']) or "") for f in self.files]
         pattern, anywhere, note = self._resolve_pattern()
         self._info_note = note
+        filter_ts = self.ui.checkBox_filter_timestamps.isChecked()
+        if pattern is not None and self._is_checked('custom'):
+            regex_text = self.ui.lineEdit_custom.text().strip()
+            if regex_text:
+                try:
+                    re.compile(regex_text)
+                    self._remember_custom_regex(regex_text)  # only valid regexes are saved
+                except re.error:
+                    pass
         if pattern is not None:
-            for fid, filename, transcript in transcripts:
-                self._parse_one_file(fid, filename, transcript, pattern, anywhere, name_counts, name_example, name_files, name_file_counts)
+            # Text fetched inside the loop; modal progress with working Cancel.
+            n_files = len(self.files)
+            progress = QtWidgets.QProgressDialog(_("Scanning files for speakers"), _("Cancel"), 0, n_files, self)
+            progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+            progress.setWindowTitle(_("Mark speakers"))
+            progress.setMinimumDuration(400)  # instant scans (one small file) show no dialog
+            cancelled_at = None
+            failed_files = []
+            for i, file_ in enumerate(self.files):
+                progress.setValue(i)
+                progress.setLabelText(f"{file_['name']}  ({i + 1}/{n_files})")
+                if progress.wasCanceled():
+                    cancelled_at = i
+                    break
+                try:
+                    transcript = self.app.get_text_fulltext(file_['id']) or ""
+                    self._parse_one_file(file_['id'], file_['name'], transcript, pattern, anywhere,
+                                         name_counts, name_example, name_files, name_file_counts,
+                                         name_extra_codes, filter_ts)
+                except Exception as err:  # one bad file must not kill the scan
+                    logger.exception(f"Mark speakers: scan failed for {file_['name']}: {err}")
+                    failed_files.append(file_['name'])
+            progress.setValue(n_files)  # closes the dialog
+            if cancelled_at is not None:  # keep the partial results, say they are partial
+                self._info_note = _("Scan cancelled: partial results for {} of {} files.").format(
+                    cancelled_at, n_files)
+            elif failed_files:
+                shown = ", ".join(failed_files[:3]) + ("..." if len(failed_files) > 3 else "")
+                self._info_note = _("{} file(s) could not be scanned (see log): ").format(
+                    len(failed_files)) + shown
 
         # Build summary for table
         self.speaker_summary = []
         for name, count in name_counts.items():
+            # Additional codes = user's row-level codes; inline ';' codes are per turn.
             self.speaker_summary.append(
                 {
                     "selected": True,
                     "name": name,
                     "code_as": name,
-                    "additional_codes": prev_additional.get(name, []),  # <- L  codigos adicionales conservados
+                    "additional_codes": list(prev_additional.get(name, [])),  # <- L  codigos adicionales conservados
+                    "detected_extras": list(name_extra_codes.get(name, [])),  # union, informative
                     "count": count,
                     "example": name_example.get(name, ''),
                     "files": len(name_files.get(name, set())),
@@ -806,62 +1093,93 @@ class DialogSpeakers(QtWidgets.QDialog):
                 vocab.add(code)
         self._additional_vocab = sorted(vocab, key=str.lower)
 
-    def _parse_one_file(self, fid, filename, transcript, pattern, anywhere, name_counts, name_example, name_files, name_file_counts):
+    def _parse_one_file(self, fid, filename, transcript, pattern, anywhere, name_counts, name_example, name_files, name_file_counts,
+                        name_extra_codes=None, filter_ts=False):
         """ 
         Analiza un archivo con un unico patron y agrega sus turnos a los acumuladores.
         anywhere=True (regex custom): marcadores en cualquier punto de la linea, varios por linea.
         
         Parse one file with a single pattern and append its turns to the accumulators.
-        anywhere=True (custom regex): markers anywhere in the line, several per line. 
+        anywhere=True (custom regex): markers anywhere in the line, several per line.
+        filter_ts=True: time stamps are blanked (same length) in the SCAN text only, so
+        they are never taken for speaker markers or names; positions and the coded text
+        keep coming from the untouched transcript.
+        A ';' inside a detected marker separates the speaker name from PER-TURN
+        complementary codes: 'Ana; woman:' -> speaker 'Ana', and that turn is also
+        coded to 'woman' (stored per coding in extra_codes; name_extra_codes keeps
+        the informative union for the tooltip).
+        Markers CHAINED with ':' ('name1: name2: text') are co-codes: each name gets
+        its own table row and its own coding of the SAME segment (the shared turn).
         """
+
+        chain_patterns = self._chain_patterns()
 
         # State for the currently open speaker turn
         current_name: Optional[str] = None
         current_start: Optional[int] = None      # pos0
         current_end: Optional[int] = None        # pos1 (exclusive)
         current_content_start: Optional[int] = None  # start of the utterance (after marker)
+        current_extras: List[str] = []           # inline ';' codes of THIS turn
+        current_conames: List[Tuple[str, List[str]]] = []  # chained co-codes of THIS turn
 
         def finalize_current_turn():
-            """Store the active turn and reset the state."""
-            nonlocal current_name, current_start, current_end, current_content_start
+            """Store the active turn (one coding per chained co-code) and reset the state."""
+            nonlocal current_name, current_start, current_end, current_content_start, \
+                current_extras, current_conames
             if current_name is None or current_start is None or current_end is None:
                 return
             content_start = current_content_start or current_start  # inicio de la respuesta (tras el marcador)
+            # Marker at EOL: skip whitespace/breaks so the response starts at text.
+            while content_start < current_end and transcript[content_start].isspace():
+                content_start += 1
             seltext_full = transcript[current_start:current_end]        # con el nombre. with the label
             seltext_response = transcript[content_start:current_end]    # solo la respuesta. response only
-            self.codings.append(
-                {
-                    "name": current_name,
-                    "fid": fid,           # fid del archivo actual. current file id
-                    "filename": filename,
-                    "selected": True,      # casilla del previsualizador de segmentos. segment preview tick
-                    "seltext": seltext_full,               # compat: texto con el nombre
-                    "seltext_full": seltext_full,          # con nombre. with label
-                    "seltext_response": seltext_response,  # sin nombre. without label
-                    "pos0": current_start,
-                    "pos1": current_end,
-                    "content_pos0": content_start,         #inicio de la respuesta. Response start
-                    "owner": speaker_coder_name,
-                    "memo": "",
-                    "date": datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                }
-            )
-            name_counts[current_name] = name_counts.get(current_name, 0) + 1
-            name_file_counts.setdefault(current_name, {})  # turnos por (hablante, archivo)
-            name_file_counts[current_name][filename] = name_file_counts[current_name].get(filename, 0) + 1
-            if name_example.get(current_name, "") == "":
-                name_example[current_name] = seltext_response.strip()  # ejemplo = respuesta
-            name_files.setdefault(current_name, set()).add(filename)
+            # Filter on: mid-turn stamps split the turn into pieces of the same code.
+            # Filter off: one piece = whole turn (previous behaviour).
+            if filter_ts:
+                segments_full = [(p0, p1, transcript[p0:p1])
+                                 for p0, p1 in split_span_excluding_timestamps(transcript, current_start, current_end)]
+                segments_response = [(p0, p1, transcript[p0:p1])
+                                     for p0, p1 in split_span_excluding_timestamps(transcript, content_start, current_end)]
+            else:
+                segments_full = [(current_start, current_end, seltext_full)]
+                segments_response = [(content_start, current_end, seltext_response)]
+            # One coding per name: the speaker plus every ':'-chained co-code; each one
+            # is its own table row, all sharing the exact same segment of this turn.
+            for turn_name, turn_extras in [(current_name, current_extras)] + current_conames:
+                self.codings.append(
+                    {
+                        "name": turn_name,
+                        "fid": fid,           # fid del archivo actual. current file id
+                        "filename": filename,
+                        "selected": True,      # casilla del previsualizador de segmentos. segment preview tick
+                        "seltext": seltext_full,               # compat: texto con el nombre
+                        "seltext_full": seltext_full,          # con nombre. with label
+                        "seltext_response": seltext_response,  # sin nombre. without label
+                        "pos0": current_start,
+                        "pos1": current_end,
+                        "content_pos0": content_start,         #inicio de la respuesta. Response start
+                        "segments_full": segments_full,        # pieces excluding time stamps (filter)
+                        "segments_response": segments_response,
+                        "extra_codes": list(turn_extras),   # inline ';' codes of this turn only
+                        "owner": speaker_coder_name,
+                        "memo": "",
+                        "date": datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                    }
+                )
+                name_counts[turn_name] = name_counts.get(turn_name, 0) + 1
+                name_file_counts.setdefault(turn_name, {})  # turnos por (hablante, archivo)
+                name_file_counts[turn_name][filename] = name_file_counts[turn_name].get(filename, 0) + 1
+                if name_example.get(turn_name, "") == "":
+                    first_piece = segments_response[0][2] if segments_response else seltext_response
+                    name_example[turn_name] = first_piece.strip()  # ejemplo = primera pieza limpia
+                name_files.setdefault(turn_name, set()).add(filename)
             current_name = None
             current_start = None
             current_end = None
             current_content_start = None
-
-        if not hasattr(self, '_file_texts'):
-            self._file_texts = {}
-            self._file_ts_spans = {}
-        self._file_texts[fid] = transcript
-        self._file_ts_spans[fid] = timestamp_spans(transcript)
+            current_extras = []
+            current_conames = []
 
         offset = 0
         for line in transcript.splitlines(keepends=True):
@@ -876,7 +1194,12 @@ class DialogSpeakers(QtWidgets.QDialog):
                 eol_len = 0
 
             line_wo_eol = line[:-eol_len] if eol_len else line
-            line_is_blank = (line_wo_eol.strip() == "")
+            # With the filter, boundaries use the blanked line: stamp-only and
+            # subtitle-index lines count as blank (never absorbed into turns).
+            effective = blank_timestamps(line_wo_eol) if filter_ts else line_wo_eol
+            line_is_blank = (effective.strip() == "")
+            if filter_ts and not line_is_blank and re.fullmatch(r"\s*\d{1,5}\s*", effective):
+                line_is_blank = True  # subtitle index line
 
             # Las lineas en blanco YA NO cierran el turno: este continua hasta el proximo
             # marcador valido o el fin del archivo (pedido en la retroalimentacion). No se
@@ -888,29 +1211,104 @@ class DialogSpeakers(QtWidgets.QDialog):
             if line_is_blank:
                 continue
 
-            turns = list(iter_speaker_turns(pattern, line_wo_eol, anywhere))  # nombre normalizado y filtro de URLs. normalized name and URL filter
+            # Blanked copy has the same length: positions stay valid.
+            scan_line = effective
+            turns = list(iter_speaker_turns(pattern, scan_line, anywhere))  # nombre normalizado y filtro de URLs. normalized name and URL filter
             if turns:
-                # Texto antes del primer marcador: continua el turno anterior (solo posible
-                # en modo anywhere). Text before the first marker continues the previous turn
-                # (only possible in anywhere mode).
-                prefix = line_wo_eol[:turns[0][1]]
+                # Text before the first marker continues the previous turn (anywhere
+                # mode); checked on the blanked prefix.
+                prefix = scan_line[:turns[0][1]]
                 if current_name is not None and prefix.strip() != "":
                     current_end = line_start + len(prefix.rstrip())
-                for i, (code_as, marker_start, marker_end) in enumerate(turns):
+                turn_i = 0
+                while turn_i < len(turns):
+                    code_as, marker_start, marker_end = turns[turn_i]
                     finalize_current_turn()
+                    # ';': first token = speaker (row), rest = codes for THIS turn only.
+                    turn_extras: List[str] = []
+                    if ';' in code_as:
+                        tokens = self._split_codes(code_as)
+                        if not tokens:
+                            turn_i += 1
+                            continue
+                        code_as = tokens[0]
+                        turn_extras = tokens[1:]
+                        if name_extra_codes is not None:  # union kept for the tooltip
+                            union = name_extra_codes.setdefault(code_as, [])
+                            for extra in turn_extras:
+                                if extra not in union:
+                                    union.append(extra)
                     current_name = code_as
-                    current_start = line_start + marker_start  # antes line_start fijo. was fixed line_start
-                    current_content_start = line_start + marker_end
-                    if i + 1 < len(turns):  # el turno termina donde inicia el siguiente marcador
+                    current_extras = turn_extras
+                    # ':'-chained co-codes glued after the marker ('name1: name2: text'):
+                    # every chained code gets its own row over the SAME segment.
+                    current_conames = []
+                    seen_names = {code_as}
+                    chain_end = marker_end
+                    while chain_patterns and len(current_conames) < 8:
+                        probe = chain_end
+                        while probe < len(scan_line) and scan_line[probe] in ' \t':
+                            probe += 1
+                        # Anchor after the last real marker char: the marker's \s* may have
+                        # swallowed a blanked stamp, so the gap check covers it too.
+                        anchor = chain_end
+                        while anchor > 0 and scan_line[anchor - 1] in ' \t':
+                            anchor -= 1
+                        if line_wo_eol[anchor:probe].strip() != "":
+                            break  # a blanked stamp sits in the gap: not a chain
+                        chained = None
+                        for chain_pat in chain_patterns:
+                            candidate = chain_pat.match(scan_line, probe)
+                            if candidate is not None and candidate.end() > candidate.start():
+                                chained = candidate
+                                break
+                        if chained is None:
+                            break
+                        raw = chained.group(1) if chained.re.groups >= 1 else chained.group(0)
+                        token = re.sub(r"\s+", " ", raw or "").strip()
+                        # Pure digits look like a bare time (10:30), not a code.
+                        if not token or token.isdigit() or len(token) > max_name_len \
+                                or _looks_like_url(token, scan_line, chained.end()):
+                            break
+                        co_tokens = self._split_codes(token)  # ';' inside a chained code
+                        if co_tokens and co_tokens[0] not in seen_names:
+                            co_name = co_tokens[0]
+                            co_extras = co_tokens[1:]
+                            seen_names.add(co_name)
+                            current_conames.append((co_name, co_extras))
+                            if co_extras and name_extra_codes is not None:
+                                union = name_extra_codes.setdefault(co_name, [])
+                                for extra in co_extras:
+                                    if extra not in union:
+                                        union.append(extra)
+                        chain_end = chained.end()
+                    # Markers swallowed by the chain are not their own turns.
+                    next_i = turn_i + 1
+                    while next_i < len(turns) and turns[next_i][1] < chain_end:
+                        next_i += 1
+                    adj_start = marker_start
+                    if filter_ts:
+                        # Skip blanked leading stamps: the turn starts at the real name.
+                        while adj_start < len(scan_line) and scan_line[adj_start] == " " \
+                                and adj_start < marker_end:
+                            adj_start += 1
+                    current_start = line_start + adj_start  # antes line_start fijo. was fixed line_start
+                    current_content_start = line_start + chain_end  # response starts after the chain
+                    if next_i < len(turns):  # el turno termina donde inicia el siguiente marcador
                         # the turn ends where the next marker on the same line starts
-                        current_end = line_start + len(line_wo_eol[:turns[i + 1][1]].rstrip())
+                        current_end = line_start + len(scan_line[:turns[next_i][1]].rstrip())
                     else:
-                        current_end = line_start + len(line_wo_eol)  # exclude EOL
+                        # Exclude EOL; with the filter also trim trailing blanked stamps.
+                        current_end = line_start + (len(scan_line.rstrip()) if filter_ts
+                                                    else len(line_wo_eol))
+                    turn_i = next_i
                 continue
 
-            # Continuation line: attach only if inside a speaker turn.
+            # Continuation line: attach only if inside a speaker turn. With the filter the
+            # end trims trailing blanked time stamps on the continuation line.
             if current_name is not None and current_start is not None:
-                current_end = line_start + len(line_wo_eol)
+                current_end = line_start + (len(effective.rstrip()) if filter_ts
+                                            else len(line_wo_eol))
 
         # Close a trailing open turn at EOF.
         finalize_current_turn()
@@ -928,6 +1326,17 @@ class DialogSpeakers(QtWidgets.QDialog):
                 self.ui.tableWidget.removeRow(0)
             self._additional_combos = {}  # <- L  se recrean los combos en cada refresco. combos are recreated each refresh
 
+            # Per-inline-code counts for the name tooltip ('mujer (2/2); Alma (1/2)').
+            extras_counts: Dict[str, Dict[str, int]] = {}
+            turns_totals: Dict[str, int] = {}
+            for coding_ in self.codings:
+                turns_totals[coding_['name']] = turns_totals.get(coding_['name'], 0) + 1
+                for extra_ in coding_.get('extra_codes', []):
+                    per = extras_counts.setdefault(coding_['name'], {})
+                    per[extra_] = per.get(extra_, 0) + 1
+            self._extras_counts = extras_counts  # used by the Additional-codes combos
+            self._turns_totals = turns_totals
+
             # update table
             for row, data in enumerate(self.speaker_summary):
                 self.ui.tableWidget.insertRow(row)
@@ -939,6 +1348,15 @@ class DialogSpeakers(QtWidgets.QDialog):
                     QtCore.Qt.ItemFlag.ItemIsEnabled
                 )
                 name_item.setFlags(name_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)  # non editable
+                per_extras = extras_counts.get(data['name'], {})
+                if per_extras:
+                    total_turns = turns_totals.get(data['name'], 0)
+                    parts = [f"{code} ({n}/{total_turns})" for code, n in per_extras.items()]
+                    tip = _("Inline codes per turn: ") + "; ".join(parts)
+                    if any(n < total_turns for n in per_extras.values()):
+                        tip += "\n" + _("The combinations VARY across turns. Edit them per segment "
+                                         "in Preview segments (right click the row).")
+                    name_item.setToolTip(tip)
                 if data['selected']:
                     name_item.setCheckState(QtCore.Qt.CheckState.Checked)
                 else:
@@ -952,7 +1370,8 @@ class DialogSpeakers(QtWidgets.QDialog):
                 code_as_item.setToolTip(_("Use ';' to code these turns to more than one code, e.g. Ana; woman; migrant"))
                 self.ui.tableWidget.setItem(row, 1, code_as_item)
 
-                # additional codes (editable combo with the shared vocabulary). <- L
+                # additional codes (combo editable con vocabulario compartido).  # <- L
+                # additional codes (editable combo with the shared vocabulary).
                 combo = self._make_additional_combo(row, data)  # <- L
                 self.ui.tableWidget.setCellWidget(row, 2, combo)  # <- L
                 self._additional_combos[row] = combo  # <- L
@@ -986,6 +1405,10 @@ class DialogSpeakers(QtWidgets.QDialog):
                 self.ui.tableWidget.resizeColumnToContents(col)
             if self.ui.tableWidget.columnWidth(2) < 200:  # <- L  ancho comodo para Additional codes. comfortable width
                 self.ui.tableWidget.setColumnWidth(2, 200)  # <- L
+            # Example sized to content (capped) so horizontal scrolling engages.
+            self.ui.tableWidget.resizeColumnToContents(5)
+            if self.ui.tableWidget.columnWidth(5) > 600:
+                self.ui.tableWidget.setColumnWidth(5, 600)
         finally:
             self.ui.tableWidget.blockSignals(False)
             QtCore.QTimer.singleShot(0, lambda: self.ui.tableWidget.verticalScrollBar().setValue(vertical_scroll))
@@ -1007,14 +1430,42 @@ class DialogSpeakers(QtWidgets.QDialog):
         combo.setEditable(True)
         combo.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
         combo.lineEdit().setPlaceholderText(_("Attribute codes, ';' separated"))
-        combo.setToolTip(_(
-            "Extra codes applied to this speaker's turns, in addition to 'code as'.\n"
-            "Type new ones (separate several with ';') or pick a previous one from the list to add it."))
+        tip = _("Extra codes applied to this speaker's turns, in addition to 'code as'.\n"
+                "Type new ones (separate several with ';') or pick a previous one from the list to add it.")
+        per_extras = getattr(self, '_extras_counts', {}).get(speaker['name'], {})
+        if per_extras:
+            total = getattr(self, '_turns_totals', {}).get(speaker['name'], 0)
+            parts = [f"{code}{'*' if n < total else ''} ({n}/{total})" for code, n in per_extras.items()]
+            tip += "\n" + _("Inline ';' codes, applied PER TURN: ") + "; ".join(parts) + "\n" + \
+                _("* = not in every turn (inconsistent). Edit them per segment in Preview segments; "
+                  "they cannot be edited here.")
+        combo.setToolTip(tip)
+        # Anti-wheel-accident: no wheel action unless the list is open (see eventFilter).
+        combo.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+        combo.installEventFilter(self)
         self._reload_combo_items(combo)
-        self._set_combo_tokens(combo, list(speaker.get('additional_codes', [])))
+        self._render_additional(combo, speaker)
         combo.activated.connect(lambda idx, r=row, c=combo: self._on_additional_pick(r, c, idx))  # <- L  elegir del desplegable
         combo.lineEdit().editingFinished.connect(lambda r=row, c=combo: self._on_additional_edited(r, c))  # <- L  terminar de escribir
         return combo
+
+    def _row_inline_codes(self, name):
+        """ Detected inline codes for the speaker: {code: count}. """
+
+        return getattr(self, '_extras_counts', {}).get(name, {})
+
+    def _render_additional(self, combo, speaker):
+        """ Cell display: user row-level codes first, then the inline per-turn codes
+        ('*' marks the ones not present in every turn). Inline tokens are display
+        only: commits filter them back out (they stay per turn). """
+
+        tokens = list(speaker.get('additional_codes', []))
+        per_extras = self._row_inline_codes(speaker['name'])
+        total = getattr(self, '_turns_totals', {}).get(speaker['name'], 0)
+        for code, n in per_extras.items():
+            if code not in tokens:
+                tokens.append(code + ("*" if n < total else ""))
+        self._set_combo_tokens(combo, tokens)
 
     def _reload_combo_items(self, combo):  # <- L
         """ 
@@ -1056,12 +1507,13 @@ class DialogSpeakers(QtWidgets.QDialog):
         
         if idx < 0 or not (0 <= row < len(self.speaker_summary)):
             return
+        speaker = self.speaker_summary[row]
         picked = combo.itemText(idx).strip()
-        tokens = list(self.speaker_summary[row].get('additional_codes', []))
-        if picked and picked not in tokens:
+        tokens = list(speaker.get('additional_codes', []))
+        if picked and picked not in tokens and picked not in self._row_inline_codes(speaker['name']):
             tokens.append(picked)
-        self._set_combo_tokens(combo, tokens)
         self._commit_additional(row, tokens)
+        self._render_additional(combo, speaker)
 
     def _on_additional_edited(self, row, combo):  # <- L
         """ 
@@ -1072,9 +1524,15 @@ class DialogSpeakers(QtWidgets.QDialog):
         
         if not (0 <= row < len(self.speaker_summary)):
             return
-        tokens = self._split_codes(combo.lineEdit().text())
-        self._set_combo_tokens(combo, tokens)  # normaliza el texto mostrado. normalise the shown text
+        speaker = self.speaker_summary[row]
+        inline = self._row_inline_codes(speaker['name'])
+        tokens = []
+        for token in self._split_codes(combo.lineEdit().text()):
+            token = token.rstrip("*").strip()
+            if token and token not in inline and token not in tokens:  # inline stays per turn
+                tokens.append(token)
         self._commit_additional(row, tokens)
+        self._render_additional(combo, speaker)  # re-render: user codes + inline decorations
 
     def _commit_additional(self, row, tokens):  # <- L
         """ 
@@ -1158,6 +1616,12 @@ class DialogSpeakers(QtWidgets.QDialog):
         dialog, table = self._build_preview_dialog(speaker, segments)
         if dialog.exec():
             self._apply_preview(segments, table)
+            additional = list(speaker.get('additional_codes', []))
+            for code in getattr(table, "_pending_promotions", []):  # promotion applies on accept
+                if code not in additional:
+                    additional.append(code)
+            speaker['additional_codes'] = additional
+            self._rebuild_additional_vocab()  # promoted codes join the shared vocabulary
             self.fill_table()  # refresca la columna Count (elegidos/total). refresh Count column
 
     def _build_preview_dialog(self, speaker, segments):
@@ -1172,15 +1636,18 @@ class DialogSpeakers(QtWidgets.QDialog):
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         dialog.setStyleSheet(font)
         layout = QtWidgets.QVBoxLayout(dialog)
-        layout.addWidget(QtWidgets.QLabel(_("Ticked segments will be coded. Untick the ones to skip.")))
+        layout.addWidget(QtWidgets.QLabel(_("Ticked segments will be coded. Untick the ones to skip.\n"
+                                             "Inline codes (';' in the marker) apply PER SEGMENT and are editable; "
+                                             "right click one to copy it to all segments or promote it to the whole row.")))
         table = QtWidgets.QTableWidget(dialog)
-        headers = ["#", _("File"), _("Position"), _("Segment")]
+        headers = ["#", _("File"), _("Position"), _("Inline codes"), _("Segment")]
         table.setColumnCount(len(headers))
         table.setHorizontalHeaderLabels(headers)
         table.setRowCount(len(segments))
-        # Sin edicion de celdas; las casillas siguen siendo interactivas
-        # No cell editing; tick boxes remain interactive.
-        table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        # Solo la columna Inline codes es editable; las demas celdas quitan el flag.
+        # Only the Inline codes column is editable; the other cells drop the flag.
+        table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked |
+                              QtWidgets.QAbstractItemView.EditTrigger.EditKeyPressed)
         table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         # La columna Segment ajusta el texto y crece con la ventana; las filas ajustan su alto
         # The Segment column wraps text and grows with the window; rows auto-fit their height.
@@ -1196,10 +1663,17 @@ class DialogSpeakers(QtWidgets.QDialog):
             table.setItem(r, 0, check_item)
             file_item = QtWidgets.QTableWidgetItem(seg.get('filename', ''))
             file_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+            file_item.setFlags(file_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
             table.setItem(r, 1, file_item)
             pos_item = QtWidgets.QTableWidgetItem(f"{seg['pos0']}-{seg['pos1']}")
             pos_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
+            pos_item.setFlags(pos_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
             table.setItem(r, 2, pos_item)
+            inline_item = QtWidgets.QTableWidgetItem("; ".join(seg.get('extra_codes', [])))
+            inline_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+            inline_item.setToolTip(_("Codes applied to THIS segment only, ';'-separated. Edit freely: "
+                                     "the changes are used when the main dialog is accepted."))
+            table.setItem(r, 3, inline_item)
             full_text = seg.get('seltext_full', seg.get('seltext', ''))
             excerpt = re.sub(r"\s+", " ", full_text).strip()
             if len(excerpt) > 300:  # se muestra mas texto; el completo va en el tooltip. show more; full text in tooltip
@@ -1207,12 +1681,18 @@ class DialogSpeakers(QtWidgets.QDialog):
             text_item = QtWidgets.QTableWidgetItem(excerpt)
             text_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
             text_item.setToolTip(full_text[:2000])  # texto completo (acotado) en el tooltip. full (capped) text in the tooltip
-            table.setItem(r, 3, text_item)
+            text_item.setFlags(text_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+            table.setItem(r, 4, text_item)
+        # Normalisation context menu for inconsistent combos.
+        table.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        table.customContextMenuRequested.connect(
+            lambda pos, t=table, sp_=speaker: self._preview_table_menu(t, sp_, pos))
         header = table.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)  # 
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)  # File
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)  # Position
-        header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)  # Segment ocupa el resto. Segment takes the rest
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)  # Inline codes
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)  # Segment ocupa el resto. Segment takes the rest
         header.setStretchLastSection(True)
         # Alto de fila segun el contenido: al reajustar el ancho, el texto se reacomoda.
         # Row height follows content: as the width changes, the text rewraps.
@@ -1242,16 +1722,63 @@ class DialogSpeakers(QtWidgets.QDialog):
         dialog.resize(760, 420)
         return dialog, table
 
-    @staticmethod
-    def _apply_preview(segments, table):
+    def _apply_preview(self, segments, table):
         """ 
-        Copia el estado de las casillas del dialogo a los segmentos.
+        Copia al modelo el estado de las casillas y la columna Inline codes editada.
         
-        Copy the tick states from the dialog back to the segments. 
+        Copy back the tick states and the edited Inline codes column. 
         """
         
         for r, seg in enumerate(segments):
             seg['selected'] = (table.item(r, 0).checkState() == QtCore.Qt.CheckState.Checked)
+            inline_item = table.item(r, 3)
+            if inline_item is not None:
+                seg['extra_codes'] = self._split_codes(inline_item.text())
+
+    def _preview_table_menu(self, table, speaker, position):
+        """ Normalisation menu for inline codes: copy to all segments, promote to
+        the row's Additional codes, or clear. """
+
+        row = table.rowAt(position.y())
+        if row < 0:
+            return
+        inline_text = table.item(row, 3).text() if table.item(row, 3) is not None else ""
+        menu = QtWidgets.QMenu(table)
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_copy_all = menu.addAction(_("Copy these inline codes to ALL segments"))
+        action_promote = menu.addAction(_("Promote to Additional codes (whole row)"))
+        action_clear_all = menu.addAction(_("Clear inline codes on ALL segments"))
+        action = menu.exec(table.viewport().mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_copy_all:
+            self._preview_copy_inline_to_all(table, inline_text)
+        elif action == action_promote:
+            self._preview_promote_inline(table, speaker, inline_text)
+        elif action == action_clear_all:
+            self._preview_copy_inline_to_all(table, "")
+
+    @staticmethod
+    def _preview_copy_inline_to_all(table, inline_text):
+        """ Unify: set the same inline-codes text on every segment row. """
+
+        for r in range(table.rowCount()):
+            item = table.item(r, 3)
+            if item is not None:
+                item.setText(inline_text)
+
+    def _preview_promote_inline(self, table, speaker, inline_text):
+        """ Stage the promotion to the row's Additional codes (applied on accept)
+        and clear the redundant per-segment copies. """
+
+        pending = getattr(table, "_pending_promotions", None)
+        if pending is None:
+            pending = []
+            table._pending_promotions = pending
+        for code in self._split_codes(inline_text):
+            if code not in pending:
+                pending.append(code)
+        self._preview_copy_inline_to_all(table, "")
 
     def select_all(self):
         """ Select all speakers. """
@@ -1270,6 +1797,58 @@ class DialogSpeakers(QtWidgets.QDialog):
     def ok(self):
         cur = self.app.conn.cursor()
         include_name = self.ui.checkBox_include_name.isChecked()  # codificar con nombre o solo la respuesta
+        # Collision pre-check before writing: in-category names reuse silently;
+        # outside collisions ask (use existing / suffix / cancel).
+        reuse_outside = False
+        planned: List[str] = []
+        sel_names = set()
+        for speaker in self.speaker_summary:
+            if not speaker['selected']:
+                continue
+            sel_names.add(speaker['name'])
+            for name in self._split_codes(speaker['code_as']) + list(speaker.get('additional_codes', [])):
+                if name and name not in planned:
+                    planned.append(name)
+        for coding in self.codings:  # inline per-turn codes are also created: check them too
+            if coding['name'] in sel_names and coding.get('selected', True):
+                for name in coding.get('extra_codes', []):
+                    if name and name not in planned:
+                        planned.append(name)
+        cur.execute("select catid from code_cat where name = ? and supercatid is NULL",
+                    (self.speakers_category_name,))
+        row = cur.fetchone()
+        current_catid = row[0] if row is not None else None
+        collisions = []
+        for name in planned:
+            cur.execute("select catid from code_name where name = ?", (name,))
+            existing = cur.fetchone()
+            if existing is None:
+                continue
+            if current_catid is not None and existing[0] == current_catid:
+                continue  # exact match inside Speakers: silent reuse
+            if current_catid is not None and \
+                    self._find_suffixed_in_category(cur, name, current_catid) is not None:
+                continue  # a suffixed variant already lives inside Speakers: silent reuse too
+            collisions.append(name)
+        if collisions:
+            shown = ", ".join(collisions[:8]) + ("..." if len(collisions) > 8 else "")
+            msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setWindowTitle(_("Mark speakers"))
+            msg_box.setText(_("{} code name(s) already exist outside the Speakers category:").format(
+                len(collisions)) + "\n" + shown)
+            msg_box.setInformativeText(_("Use those existing codes, or create new codes under "
+                                         "Speakers with a numeric suffix, e.g. \"{}\"?").format(
+                collisions[0] + " (2)"))
+            btn_use = msg_box.addButton(_("Use existing codes"), QtWidgets.QMessageBox.ButtonRole.YesRole)
+            btn_new = msg_box.addButton(_("Create new (suffix)"), QtWidgets.QMessageBox.ButtonRole.NoRole)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Cancel)
+            msg_box.setDefaultButton(btn_new)
+            msg_box.exec()
+            clicked = msg_box.clickedButton()
+            if clicked is btn_use:
+                reuse_outside = True
+            elif clicked is not btn_new:  # Cancel or closed
+                return
         try:
             # search speakers category or create it
             cur.execute("select name, ifnull(memo,''), owner, date, catid, supercatid from code_cat where name = ? and supercatid is NULL",
@@ -1293,72 +1872,115 @@ class DialogSpeakers(QtWidgets.QDialog):
             # for each speaker name, find a suitable code or add a new
             used_colors = []
             inserted_codings = 0  # para marcar delete_backup solo si hubo cambios. to flag delete_backup only on real changes
+            # Progress over the apply; Cancel rolls everything back.
+            seg_key = 'segments_full' if include_name else 'segments_response'
+            codings_per_name: Dict[str, int] = {}
+            for coding in self.codings:
+                if coding.get('selected', True):
+                    n_pieces = max(len(coding.get(seg_key) or ()), 1)
+                    codings_per_name[coding['name']] = codings_per_name.get(coding['name'], 0) + n_pieces
+            total_work = 0
             for speaker in self.speaker_summary:
+                if not speaker['selected']:
+                    continue
+                n_codes = len(self._split_codes(speaker['code_as'])) + len(speaker.get('additional_codes', []))
+                total_work += max(n_codes, 1) * codings_per_name.get(speaker['name'], 0)
+            for coding in self.codings:  # per-turn inline codes add their own inserts
+                if coding['name'] in sel_names and coding.get('selected', True):
+                    n_pieces = max(len(coding.get(seg_key) or ()), 1)
+                    total_work += len(coding.get('extra_codes', [])) * n_pieces
+            progress = QtWidgets.QProgressDialog(_("Applying speaker codes"), _("Cancel"),
+                                                 0, max(total_work, 1), self)
+            progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+            progress.setWindowTitle(_("Mark speakers"))
+            progress.setMinimumDuration(400)
+            work_done = 0
+            cancelled = False
+            for speaker in self.speaker_summary:
+                if cancelled:
+                    break
                 if not speaker['selected']:
                     continue
                 # Archivos del hablante para el memo del codigo. speaker files for the code memo
                 file_counts = speaker.get('file_counts', {})  # turnos por archivo. turns per file
-                # Codes applied to this speaker's turns: "code as" (';'-separated) plus "additional
-                # codes". The same turns are coded to each, no empties or duplicates. <- L
+                # Codigos a aplicar a los turnos de este hablante: los de "code as" (separados por  # <- L
+                # ';') mas los de "additional codes". Los mismos turnos se codifican a cada uno,
+                # sin vacios ni duplicados. Codes applied to this speaker's turns: those in
+                # "code as" (';'-separated) plus those in "additional codes". The same turns are
+                # coded to each, no empties or duplicates.
                 code_names: List[str] = self._split_codes(speaker['code_as'])  # <- L
                 for extra in speaker.get('additional_codes', []):  # <- L  codigos adicionales de la columna nueva
                     if extra not in code_names:  # <- L
                         code_names.append(extra)  # <- L
-                for code_name in code_names:
+                row_codings = [c for c in self.codings
+                               if c['name'] == speaker['name'] and c.get('selected', True)]
+                # Row codes apply to every turn; inline ';' codes only to their own.
+                turn_specific: Dict[str, List[Dict[str, Any]]] = {}
+                for coding in row_codings:
+                    for extra in coding.get('extra_codes', []):
+                        if extra and extra not in code_names:
+                            turn_specific.setdefault(extra, []).append(coding)
+                targets = [(cn, row_codings) for cn in code_names] + list(turn_specific.items())
+                for code_name, target_codings in targets:
+                    if cancelled:
+                        break
                     speaker_code_cid = self._get_or_create_speaker_code(
-                        cur, code_name, speakers_catid, used_colors, file_counts)
+                        cur, code_name, speakers_catid, used_colors, file_counts,
+                        reuse_outside=reuse_outside)
 
-                    # add all corresponding text segments as codings
-                    for coding in self.codings:
-                        if coding['name'] != speaker['name']:
-                            continue
-                        if not coding.get('selected', True):  # desmarcado en el previsualizador. unticked in the preview
-                            continue
+                    # Chunked bulk insert (executemany + INSERT OR IGNORE): per-row
+                    # executes froze the GUI on huge runs; events/cancel per chunk.
+                    chunk: List[tuple] = []
+                    for coding in target_codings:
+                        # One row per piece (filter may split a turn around stamps).
                         if include_name:  # todo el turno, con el nombre. Whole turn, with label
-                            c_pos0, c_pos1 = coding['pos0'], coding['pos1']
-                            c_text = coding.get('seltext_full', coding.get('seltext', ''))
+                            pieces = coding.get('segments_full') or \
+                                [(coding['pos0'], coding['pos1'], coding.get('seltext_full', coding.get('seltext', '')))]
                         else:  # solo la respuesta, sin el nombre. Response only
-                            c_pos0, c_pos1 = coding.get('content_pos0', coding['pos0']), coding['pos1']
-                            c_text = coding.get('seltext_response', '')
-                            if c_text.strip() == "":  # turno sin respuesta: nada que codificar
+                            pieces = coding.get('segments_response') or \
+                                [(coding.get('content_pos0', coding['pos0']), coding['pos1'], coding.get('seltext_response', ''))]
+                        for c_pos0, c_pos1, c_text in pieces:
+                            if c_text.strip() == "":  # pieza vacia: nada que codificar
+                                work_done += 1  # counted in total_work: keep the bar consistent
                                 continue
-                        # Exclude timestamps from the coded span; each sub-span keeps the speaker code. <- L
-                        f_text = getattr(self, '_file_texts', {}).get(coding['fid'])
-                        f_spans = getattr(self, '_file_ts_spans', {}).get(coding['fid'], [])
-                        if f_text is None:
-                            sub_spans = [(c_pos0, c_pos1)]
-                        else:
-                            sub_spans = split_span_excluding_timestamps(f_text, c_pos0, c_pos1, f_spans)
-                        for s_pos0, s_pos1 in sub_spans:
-                            s_text = f_text[s_pos0:s_pos1] if f_text is not None else c_text
-                            if s_text.strip() == "":
-                                continue
-                            try:
-                                cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo, important) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                            (speaker_code_cid,
-                                             coding['fid'],  # fid por segmento. per-segment file id
-                                             s_text,
-                                             s_pos0,
-                                             s_pos1,
-                                             coding['owner'],
-                                             coding['date'],
-                                             coding['memo'],
-                                             None
-                                            ))
-                                inserted_codings += 1
-                            except sqlite3.IntegrityError:  # variable 'e' sin uso eliminada. Unused 'e' removed
-                                pass  # skip duplicates
+                            chunk.append((speaker_code_cid, coding['fid'], c_text, c_pos0, c_pos1,
+                                          coding['owner'], coding['date'], coding['memo'], None))
+                        if len(chunk) >= INSERT_CHUNK_ROWS:
+                            inserted_codings += self._insert_codings_chunk(cur, chunk)
+                            work_done += len(chunk)
+                            chunk = []
+                            progress.setLabelText(f"{speaker['name']}  ({work_done}/{total_work})")
+                            progress.setValue(min(work_done, total_work))  # processes events (modal)
+                            QtWidgets.QApplication.processEvents()  # defensive: keep the UI live
+                            if progress.wasCanceled():
+                                cancelled = True
+                                break
+                    if chunk and not cancelled:
+                        inserted_codings += self._insert_codings_chunk(cur, chunk)
+                        work_done += len(chunk)
+                        progress.setLabelText(f"{speaker['name']}  ({work_done}/{total_work})")
+                        progress.setValue(min(work_done, total_work))
+                        if progress.wasCanceled():
+                            cancelled = True
 
+            progress.setValue(max(total_work, 1))  # closes the dialog
+            if cancelled:  # nothing is applied on cancel
+                self.app.conn.rollback()
+                msg = QtWidgets.QMessageBox(self)
+                msg.setWindowTitle(_("Mark speakers"))
+                msg.setText(_("Cancelled. No speaker codes were applied."))
+                msg.exec()
+                return
             if inserted_codings > 0:  # hubo codificaciones nuevas # new codings were written
                 self.app.delete_backup = False
             self.app.conn.commit()
-            self._emit_project_table_changes(['code_cat', 'code_name', 'code_text'])
         except Exception as e_:
             logger.exception(e_)  # antes print(); registra el traceback.  Was print(); logs the traceback
             self.app.conn.rollback()  # Revert all changes
             raise
 
-    def _get_or_create_speaker_code(self, cur, code_name, speakers_catid, used_colors, file_counts):
+    def _get_or_create_speaker_code(self, cur, code_name, speakers_catid, used_colors, file_counts,
+                                    reuse_outside=False):
         """ 
         Devuelve el cid del codigo con ese nombre; lo crea en la categoria Speakers si no existe.
         Logica extraida de ok() para reutilizarla con varios codigos por hablante (';').
@@ -1367,9 +1989,18 @@ class DialogSpeakers(QtWidgets.QDialog):
         Logic extracted from ok() so it can be reused with several codes per speaker (';'). 
         """
         
-        cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name where name == ?",
-                    (code_name, ))
+        # Lookup scoped to the current Speakers category (Van's request).
+        cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name "
+                    "where name == ? and catid == ?", (code_name, speakers_catid))
         speaker_code = cur.fetchone()
+        if speaker_code is None:
+            # Suffixed variant in category = this speaker's code; reuse it.
+            speaker_code = self._find_suffixed_in_category(cur, code_name, speakers_catid)
+        if speaker_code is None and reuse_outside:
+            # User chose to reuse outside codes; category, colour and owner kept.
+            cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name "
+                        "where name == ?", (code_name,))
+            speaker_code = cur.fetchone()
         if speaker_code is None:
             # search for unused color if possible
             code_color = None
@@ -1383,11 +2014,22 @@ class DialogSpeakers(QtWidgets.QDialog):
                     'catid': speakers_catid, 'owner': speaker_coder_name,
                     'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                     'color': code_color}
-            cur.execute("insert into code_name (name, memo, catid, owner, date, color) values(?,?,?,?,?,?)",
-                        (item['name'], item['memo'], item['catid'], item['owner'], item['date'], item['color']))
+            # Names are unique project-wide: taken names get a numbered variant.
+            final_name = code_name
+            suffix = 2
+            while True:
+                try:
+                    cur.execute("insert into code_name (name, memo, catid, owner, date, color) values(?,?,?,?,?,?)",
+                                (final_name, item['memo'], item['catid'], item['owner'], item['date'], item['color']))
+                    break
+                except sqlite3.IntegrityError:
+                    final_name = f"{code_name} ({suffix})"
+                    suffix += 1
+                    if suffix > 1000:  # unreachable in practice; avoids an endless loop
+                        raise
             self.app.delete_backup = False
             cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name where catid == ? and name == ?",
-                        (speakers_catid, code_name))
+                        (speakers_catid, final_name))
             speaker_code = cur.fetchone()
             used_colors.append(code_color)
         else:
@@ -1398,6 +2040,32 @@ class DialogSpeakers(QtWidgets.QDialog):
         if speaker_code is None:
             raise ValueError(_('Speaker code could not be found or created.'))  # typo del upstream corregido. upstream typo fixed
         return speaker_code[0]
+
+    def _insert_codings_chunk(self, cur, rows):
+        """ Bulk-insert one chunk with INSERT OR IGNORE (duplicates skipped in C).
+        Returns rows actually inserted. """
+
+        before = self.app.conn.total_changes
+        cur.executemany("insert or ignore into code_text "
+                        "(cid, fid, seltext, pos0, pos1, owner, date, memo, important) "
+                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        return self.app.conn.total_changes - before
+
+    def _find_suffixed_in_category(self, cur, code_name, catid):
+        """ Existing suffixed variant of code_name inside the category ('Rosa (2)'),
+        or None; smallest suffix wins. Ad-infinitum guard. """
+
+        cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name "
+                    "where catid == ? and name like ?", (catid, code_name + " (%"))
+        pattern = re.compile(re.escape(code_name) + r" \((\d+)\)$")
+        best, best_n = None, None
+        for row in cur.fetchall():
+            match = pattern.fullmatch(row[1])
+            if match:
+                n = int(match.group(1))
+                if best is None or n < best_n:
+                    best, best_n = row, n
+        return best
 
     def _memo_blocks(self, file_counts):
         """ 
