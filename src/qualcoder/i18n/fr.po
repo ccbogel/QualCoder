@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-21 09:38+0200\n"
-"PO-Revision-Date: 2026-08-21 09:41+0200\n"
+"PO-Revision-Date: 2026-08-21 11:21+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/error_dlg.py:44
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/edit_textfile.py:663
@@ -9887,8 +9887,8 @@ msgstr ""
 "Seuls {loaded} des {total} segments codés ({coverage:.1f} %) ont pu être "
 "chargés avant que la limite de caractères ne soit atteinte. Veuillez "
 "restreindre la portée par code, fichiers, cas, attributs ou codeur⋅ses. Si "
-"vous souhaitez tout de même continuer, envoyez un message de suivi tel que « "
-"Analyser quand même »."
+"vous souhaitez tout de même continuer, envoyez un message de suivi tel que "
+"« Analyser quand même »."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4633
 msgid "Error during MCP-based code analysis bootstrap: "
@@ -10536,8 +10536,8 @@ msgstr ""
 #, python-brace-format
 msgid "Warning: {count} affected coding(s) are not owned by 'AI Agent'."
 msgstr ""
-"Avertissement : les {count} codes concernés n'appartiennent pas à « AI Agent "
-"»."
+"Avertissement : les {count} codes concernés n'appartiennent pas à « AI "
+"Agent »."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_mcp_server.py:1714
 msgid ""
@@ -13907,7 +13907,7 @@ msgstr "{} fichier(s) ne peuvent pas être scanner (voir journaux) : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1355
 msgid "Inline codes per turn: "
-msgstr "Nombre de codes en ligne par tour : "
+msgstr "Nombre de codes intégrés par tour : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1357
 msgid ""
@@ -13954,8 +13954,8 @@ msgid ""
 "* = not in every turn (inconsistent). Edit them per segment in Preview "
 "segments; they cannot be edited here."
 msgstr ""
-"* = pas à chaque tour (incohérent). Modifiez-les segment par segment dans « "
-"Aperçu des segments » ; ils ne peuvent pas être modifiés ici."
+"* = pas à chaque tour (incohérent). Modifiez-les segment par segment dans "
+"« Aperçu des segments » ; ils ne peuvent pas être modifiés ici."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1564
 msgid "speakers"
@@ -13997,13 +13997,13 @@ msgid ""
 "click one to copy it to all segments or promote it to the whole row."
 msgstr ""
 "Les segments cochés seront codés. Décochez ceux que vous souhaitez ignorer.\n"
-"Les codes en ligne (marqués par « ; ») s'appliquent PAR SEGMENT et sont "
+"Les codes intégrés (marqués par « ; ») s'appliquent PAR SEGMENT et sont "
 "modifiables ; clic-droit sur l'un d'entre eux pour le copier sur tous les "
 "segments ou l'appliquer à toute la ligne."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1643
 msgid "Inline codes"
-msgstr "Codes en ligne"
+msgstr "Codes intégrés"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1643
 msgid "Segment"
@@ -14020,7 +14020,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1748
 msgid "Copy these inline codes to ALL segments"
-msgstr "Copiez ces codes en ligne dans TOUS les segments"
+msgstr "Copiez ces codes intégrés dans TOUS les segments"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1749
 msgid "Promote to Additional codes (whole row)"
@@ -14028,7 +14028,7 @@ msgstr "Promouvoir vers codes additionnels (ligne entière)"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1750
 msgid "Clear inline codes on ALL segments"
-msgstr "Effacer les codes en ligne sur TOUS les segments"
+msgstr "Effacer les codes intégrés sur TOUS les segments"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1837
 msgid "{} code name(s) already exist outside the Speakers category:"
