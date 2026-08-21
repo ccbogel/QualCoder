@@ -2201,7 +2201,7 @@ Mémo Regex : www.rexegg.com/regex-quickstart.html</translation>
     <message>
       <location filename="../GUI/ui_dialog_code_pdf.py" line="352"/>
       <source>REGEX</source>
-      <translation>REGEX</translation>
+      <translation>Expressions régulières</translation>
     </message>
     <message>
       <location filename="../GUI/ui_dialog_code_pdf.py" line="353"/>
@@ -2685,7 +2685,7 @@ car toutes les positions assignées peuvent être incorrectes. </translation>
       <location filename="../GUI/ui_dialog_code_text.py" line="529"/>
       <source>Apply REGEX to autocoding for exact text and sentences buttons.
 https://www.datacamp.com/cheat-sheet/regular-expresso</source>
-      <translation>Appliquer REGEX à l'autocodage pour les boutons de texte et de phrases exactes.
+      <translation>Appliquer EXPRESSIONS RÉGULIÈRES à l'autocodage pour les boutons de texte et de phrases exactes.
 https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
     </message>
     <message>
@@ -4490,79 +4490,99 @@ language = it</translation>
   <context>
     <name>Dialog_speakers</name>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="86"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="115"/>
       <source>Mark Speakers</source>
       <translation>Surligner l’intervenant⋅e</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="87"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="116"/>
       <source>Identifier:</source>
       <translation>Identifiant :</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="88"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="117"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
       <translation>Comment chaque intervenant⋅e est marqué au début d'une ligne: Nom: , #Nom: , @Nom: , [Nom] , {Nom} , ou un motif personnalisé. La détection automatique sélectionne le format comportant le plus grand nombre d’occurences.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="89"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="123"/>
       <source>Custom regular expression. It must contain one capture group for the speaker name. Example: ^\s*&gt;&gt;\s*(.+?):</source>
       <translation>Expression régulière personnalisée. Il doit contenir un groupe de capture pour le nom de l'intervenant⋅e. Exemple: ^\s*&gt;&gt;\s*(.+?):</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="90"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="124"/>
       <source>regex with one group, e.g. ^\s*(.+?):</source>
-      <translation>REGEX avec un groupe, par exemple ^\s*(.+?):</translation>
+      <translation>Expression régulière avec un groupe, par exemple ^\s*(.+?):</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="91"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="119"/>
       <source>Choose which text files to scan for speakers. You can mark speakers across several files at once.</source>
       <translation>Choisissez les fichiers texte à analyser pour les intervenant⋅es. Vous pouvez marquer des intervenant⋅es sur plusieurs fichiers à la fois.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="92"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="120"/>
       <source>Select files</source>
       <translation>Sélectionner des fichiers</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="94"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="122"/>
       <source>Help</source>
       <translation>Aide</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="95"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="126"/>
       <source>Number of speakers and turns detected with the current identifier and files.</source>
       <translation>Nombre d’intervenant⋅es et de tours détectés avec l'identifiant et les fichiers actuels.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="96"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="127"/>
       <source>Double-click a "code as" cell to rename a speaker. Give two rows the same "code as" to merge them, for example to fix a typo.</source>
       <translation>Double-cliquez sur une cellule "code comme" pour renommer un intervenant⋅e. Donnez deux lignes le même "code comme" pour les fusionner, par exemple pour corriger une typo.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="97"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="128"/>
       <source>Tick the speakers to mark. OK creates a code for each one in the “📌 Speakers” category and codes their turns.</source>
       <translation>Cochez les intervenant⋅es pour marquer. OK crée un code pour chacun d'eux dans la catégorie intervenant⋅es et code leurs tours.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="98"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="129"/>
       <source>Code the whole turn including the speaker label. Uncheck to code only the response text, without the name.</source>
       <translation>Codez tout le tour, y compris l'étiquette de l’intervenant⋅e. Décochez pour coder seulement le texte de réponse, sans le nom.</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="99"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="130"/>
       <source>Include speaker name</source>
       <translation>Inclure le nom de l'intervenant⋅e</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="100"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="133"/>
       <source>Doubleclick a "code as" name to edit</source>
       <translation>Double-cliquez sur un nom "code comme" pour modifier</translation>
     </message>
     <message>
-      <location filename="../GUI/ui_dialog_speakers.py" line="93"/>
+      <location filename="../GUI/ui_dialog_speakers.py" line="121"/>
       <source>Files currently selected for the speaker scan. Hover to see the full list; use Select files to adjust it.</source>
       <translation>Fichiers actuellement sélectionnés pour l'analyse des intervenant⋅es. Survolez pour afficher la liste complète ; utilisez « Sélectionner des fichiers » pour la modifier.</translation>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_speakers.py" line="118"/>
+      <source>Detect speakers: scan the selected files with the checked identifiers. Detection only runs when you press this button, so changing identifiers or files with many documents does not freeze the dialog. The scan shows progress and can be cancelled.</source>
+      <translation>Détecter les intervenant⋅es : analyser les fichiers sélectionnés à l'aide des identifiants cochés. La détection ne s'exécute que lorsque vous cliquez sur ce bouton ; ainsi, la modification des identifiants ou le fait de travailler avec de nombreux documents ne bloque pas la boîte de dialogue. La progression de l'analyse s'affiche et celle-ci peut être annulée.</translation>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_speakers.py" line="125"/>
+      <source>Saved regex patterns for this project: load one into the field, edit or delete them.</source>
+      <translation>Modèles d'expressions régulières enregistrés pour ce projet : chargez-en un dans le champ, modifiez-le ou supprimez-le.</translation>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_speakers.py" line="131"/>
+      <source>Ignore time stamps during detection, so they are not mistaken for speaker names. Covers the transcript formats used in Code A/V: [hh:mm:ss] [mm:ss] [hh.mm.ss] [mm.ss] {hh:mm:ss} #hh:mm:ss.sss#, subtitle arrows in SRT (hh:mm:ss,sss --&gt; hh:mm:ss,sss) and WebVTT (hh:mm:ss.sss --&gt; hh:mm:ss.sss, hours optional), and bare hh:mm:ss / mm:ss times.</source>
+      <translation>Ignorer les horodatages lors de la détection, afin qu'ils ne soient pas confondus avec les noms des locuteurs. Couvre les formats de transcription utilisés dans Coder A/V : [hh:mm:ss] [mm:ss] [hh.mm.ss] [mm.ss] {hh:mm:ss} #hh:mm:ss.sss#, les flèches de sous-titres dans SRT (hh:mm:ss,sss --&gt; hh:mm:ss,sss) et WebVTT (hh:mm:ss.sss --&gt; hh:mm:ss.sss, les heures étant facultatives), ainsi que les horaires simples hh:mm:ss / mm:ss.</translation>
+    </message>
+    <message>
+      <location filename="../GUI/ui_dialog_speakers.py" line="132"/>
+      <source>Filter time stamps</source>
+      <translation>Filtrer l’horodatage</translation>
     </message>
   </context>
   <context>
@@ -4961,7 +4981,7 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
     <message>
       <location filename="../GUI/ui_dialog_view_text.py" line="79"/>
       <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » sert de caractère générique ; par exemple, « .ears » correspondra à « bears » et à « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou plusieurs occurrences de ce caractère, par exemple « bears? » correspondra à « bear » et « bears » &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;« &lt;/span&gt;\. » correspondra au point, « \? » correspondra au point d’interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+      <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les expressions régulières. &lt;/p&gt;&lt;p&gt;Le point « . » sert de caractère générique ; par exemple, « .ears » correspondra à « bears » et à « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou plusieurs occurrences de ce caractère, par exemple « bears? » correspondra à « bear » et « bears » &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;« &lt;/span&gt;\. » correspondra au point, « \? » correspondra au point d’interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
   </context>
   <context>

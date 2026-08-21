@@ -1,16 +1,12 @@
 """
-Using --update option
-This script updates translation placeholders in .po and Qt .ts files.
-Using --compile option
-This script compiles .po to .mo files, and .ts to .qm files.
-Using --lang option
-Change only a specific language
-Using --status option
-Check status of translation
-Using --zip option
-Create zip for community languages
+Using --update option: Updates translation placeholders in .po and Qt .ts files.
+Using --compile option: Compiles .po to .mo files, and .ts to .qm files.
+Using --lang option: Change only a specific language.
+Using --status option: Check status of translation.
+Using --zip option: Create zip for community languages.
+Using --check option: Check translation files for errors.
 
-Requires polib and PyQt5
+Requires polib and PyQt5.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +14,7 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-backup
+
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
@@ -32,7 +28,6 @@ THE SOFTWARE.
 
 https://github.com/ccbogel/QualCoder
 https://qualcoder.org/
-https://
 """
 
 from lxml import etree
@@ -42,303 +37,265 @@ import polib
 import subprocess
 import sys
 import zipfile
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Tuple
 
-project_root = os.path.dirname(os.path.abspath(__file__))
-i18n_directory = os.path.join(project_root, "src", "qualcoder", "i18n")
-other_languages_directory = os.path.join(project_root, "other_languages")
+# --- Constants ---
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+I18N_DIR = os.path.join(PROJECT_ROOT, "src", "qualcoder", "i18n")
+OTHER_LANGS_DIR = os.path.join(PROJECT_ROOT, "other_languages")
+GUI_DIR = os.path.join(PROJECT_ROOT, "src", "qualcoder", "GUI")
+PROJECT_PRO_PATH = os.path.join(GUI_DIR, "project.pro")
 
-# Collect languages from both i18n and other_languages directories
-languages = []
-for directory in [i18n_directory, other_languages_directory]:
-    if os.path.exists(directory):
-        for root, dirs, files in os.walk(directory):
+# --- Utility Functions ---
+def get_all_languages() -> List[str]:
+    """Collect all 2-3 letter language codes from i18n and other_languages directories."""
+    languages = []
+    for directory in [I18N_DIR, OTHER_LANGS_DIR]:
+        if not os.path.exists(directory):
+            continue
+        for root, _, files in os.walk(directory):
             for file in files:
                 stem = Path(file).stem
                 if len(stem) in (2, 3) and stem not in languages:
                     languages.append(stem)
+    return languages
 
-def extract_pot_file(directory: str, pot_filename: str):
-    """ Called by: update_translation_placeholders """
-    # List all .py files within the specified directory
-    py_files = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if file.endswith('.py'):
-                py_files.append(os.path.join(root, file))
+def filter_languages(lang: Optional[str], all_langs: List[str]) -> List[str]:
+    """Return filtered list of languages based on `lang` argument."""
+    return [lang] if lang and lang in all_langs else all_langs
 
-    # Run xgettext to create the .pot file
-    if py_files:
-        try:
-            subprocess.run(
-                ['xgettext', '--language=Python', '--keyword=_',
-                 '--output', pot_filename] + py_files,
-                check=True
-            )
-            print(f"Extracted POT file: {pot_filename}")
-        except subprocess.CalledProcessError as exc:
-            print(f"Error creating POT file: {exc}")
-    else:
+def find_files(directory: str, extensions: Tuple[str, ...], lang: Optional[str] = None) -> List[str]:
+    """Find files with given extensions in directory, optionally filtered by language."""
+    files = []
+    if not os.path.exists(directory):
+        return files
+    for root, _, filenames in os.walk(directory):
+        for filename in filenames:
+            if filename.endswith(extensions):
+                if lang is None or Path(filename).stem == lang:
+                    files.append(os.path.join(root, filename))
+    return files
+
+def run_subprocess(command: List[str], **kwargs) -> bool:
+    """Run a subprocess command with error handling."""
+    try:
+        subprocess.run(command, check=True, **kwargs)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error running command: {e}")
+        return False
+
+# --- Translation Placeholder Updates ---
+def extract_pot_file(directory: str, pot_filename: str) -> None:
+    """Extract strings from .py files into a .pot file using xgettext."""
+    py_files = find_files(directory, (".py",))
+    if not py_files:
         print("No Python files found to extract translatable strings from.")
+        return
 
-def update_po_files(directory: str, pot_filename: str, lang_: str | None = None):
-    """List all .po files within the specified directory and other_languages directory.
-    called by: update_translation_placeholders"""
+    run_subprocess(
+        ["xgettext", "--language=Python", "--keyword=_", "--output", pot_filename] + py_files
+    )
+    print(f"Extracted POT file: {pot_filename}")
 
-    directories_to_scan = [directory]
-    if os.path.exists(other_languages_directory):
-        directories_to_scan.append(other_languages_directory)
+def update_po_files(directory: str, pot_filename: str, lang: Optional[str] = None) -> None:
+    """Update .po files using msgmerge with the given .pot file."""
+    for po_file in find_files(directory, (".po",), lang):
+        run_subprocess(["msgmerge", "--update", po_file, pot_filename])
+        print(f"Updated PO file: {po_file}")
 
-    for scan_dir in directories_to_scan:
-        for root, dirs, files in os.walk(scan_dir):
-            for file in files:
-                if lang_ is None or file.startswith(lang_):
-                    if file.endswith('.po'):
-                        po_file = os.path.join(root, file)
-                        try:
-                            # Update each .po file using msgmerge
-                            subprocess.run(
-                                ['msgmerge', '--update', po_file, pot_filename],
-                                check=True
-                            )
-                            print(f"Updated PO file: {po_file}")
-                        except subprocess.CalledProcessError as exc:
-                            print(f"Error updating PO file {po_file}: {exc}")
-                    if file.endswith('.po~'):
-                        try:
-                            os.remove(os.path.join(root, file))
-                        except FileNotFoundError:
-                            pass
+        # Remove backup files created by msgmerge
+        backup_file = po_file + "~"
+        if os.path.exists(backup_file):
+            try:
+                os.remove(backup_file)
+            except FileNotFoundError:
+                pass
 
-def delete_obsolete_ts(file_ts):
+def delete_obsolete_ts(file_ts: str) -> None:
+    """Remove obsolete entries from a .ts file."""
     parser = etree.XMLParser(remove_blank_text=True)
     tree = etree.parse(file_ts, parser)
     root = tree.getroot()
-    obsolete_messages = root.xpath('//message[translation[@type="obsolete"]]')
-    for message in obsolete_messages:
+    for message in root.xpath('//message[translation[@type="obsolete"]]'):
         message.getparent().remove(message)
-    tree.write(file_ts, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    tree.write(file_ts, encoding="utf-8", xml_declaration=True, pretty_print=True)
 
-def update_qt_ts_files(lang_: str | None = None):
-    """Requires pylupdate5
-    pip install pyqt5-tools
-    Run from QualCoder-master folder
-    Warning: pylupdate6 overrides, but does not update, existing ts files.
-    Called by: update_translation_placeholders
-    Args:
-        lang_: String es, fr, etc
-    """
+def build_pro_file(ts_files: List[str], ui_files: List[str]) -> None:
+    """Create/overwrite project.pro for pylupdate5."""
+    text = "SOURCES = \\\n" + " \\\n".join(ui_files) + "\n\n"
+    text += "TRANSLATIONS = \\\n" + " \\\n".join(ts_files) + "\n\n"
+    text += "CODECFORTR = ISO-8859-5\n"
 
-    # Collect all .ts files from i18n and other_languages
-    translation_files = []
-    for directory in [i18n_directory, other_languages_directory]:
+    os.makedirs(os.path.dirname(PROJECT_PRO_PATH), exist_ok=True)
+    with open(PROJECT_PRO_PATH, "w") as f:
+        f.write(text)
+    print("Created project.pro file")
+
+def update_qt_ts_files(lang: Optional[str] = None) -> None:
+    """Update Qt .ts files using pylupdate5."""
+    # Find all .ts files
+    ts_files = []
+    for directory in [I18N_DIR, OTHER_LANGS_DIR]:
         if os.path.exists(directory):
             for file in os.listdir(directory):
-                if file.endswith('.ts'):
+                if file.endswith(".ts"):
                     stem = Path(file).stem
-                    if len(stem) in (2, 3) and f"{stem}.ts" not in translation_files:
-                        translation_files.append(f"{stem}.ts")
+                    if len(stem) in (2, 3) and file not in ts_files:
+                        ts_files.append(file)
 
-    if lang_ is not None:
-        translation_files = [f for f in translation_files if f.startswith(f"{lang_}")]
-    script_path = os.path.dirname(os.path.realpath(__file__))
-    gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
+    if lang:
+        ts_files = [f for f in ts_files if Path(f).stem == lang]
 
-    # Build a .pro file, which can then be used by pylupdate5 to create ts files
-    def rel_for_pro(path):
-        rel_path = os.path.relpath(path, gui_directory)
-        return rel_path.replace(os.path.sep, "/")
-
+    # Find UI files
     ui_files = []
-    for ui_file in os.listdir(gui_directory):
-        if ui_file.startswith("ui_") and ui_file.endswith(".py"):
-            ui_files.append(rel_for_pro(os.path.join(gui_directory, ui_file)))
-    ui_files.sort()
+    if os.path.exists(GUI_DIR):
+        for ui_file in os.listdir(GUI_DIR):
+            if ui_file.startswith("ui_") and ui_file.endswith(".py"):
+                rel_path = os.path.relpath(
+                    os.path.join(GUI_DIR, ui_file), GUI_DIR
+                ).replace(os.path.sep, "/")
+                ui_files.append(rel_path)
+        ui_files.sort()
 
-    ts_files = []
-    for translation_file in translation_files:
-        # Determine the directory for this ts file
-        for directory in [i18n_directory, other_languages_directory]:
-            if os.path.exists(os.path.join(directory, translation_file)):
-                rel_path = os.path.relpath(directory, gui_directory)
-                ts_files.append(rel_path.replace(os.path.sep, "/") + "/" + translation_file)
+    # Prepare .pro file entries
+    pro_ts_files = []
+    for ts_file in ts_files:
+        for directory in [I18N_DIR, OTHER_LANGS_DIR]:
+            if os.path.exists(os.path.join(directory, ts_file)):
+                rel_dir = os.path.relpath(directory, GUI_DIR).replace(os.path.sep, "/")
+                pro_ts_files.append(f"{rel_dir}/{ts_file}")
                 break
 
-    text = "SOURCES = \\\n"
-    text += " \\\n".join(ui_files)
-    text += "\n\nTRANSLATIONS = \\\n"
-    text += " \\\n".join(ts_files)
-    text += "\n\nCODECFORTR = ISO-8859-5\n"
-
-    pro_file_path = os.path.join(gui_directory, "project.pro")
-    with open(pro_file_path, 'w') as pro_file:
-        pro_file.write(text)
-    print("Created project.pro file")
-    # Compile ts files
-    subprocess.call(f'pylupdate5 "{pro_file_path}"', shell=True)
+    build_pro_file(pro_ts_files, ui_files)
+    run_subprocess(['pylupdate5', PROJECT_PRO_PATH], cwd=GUI_DIR)
     print("Updated ts translation files")
 
-    # Delete old .ts files
-    for ts_file in translation_files:
-        for directory in [i18n_directory, other_languages_directory]:
+    # Clean obsolete entries
+    for ts_file in ts_files:
+        for directory in [I18N_DIR, OTHER_LANGS_DIR]:
             ts_path = os.path.join(directory, ts_file)
             if os.path.exists(ts_path):
                 delete_obsolete_ts(ts_path)
                 print(f"Cleaned obsolete entries in {ts_file}")
 
-def update_translation_placeholders(language: str | None = None):
-    """ Update po files, update GUI ts files """
-
-    directory = os.path.join('src', 'qualcoder')
-    pot_filename = os.path.join(directory, 'qualcoder.pot')
-    extract_pot_file(directory, pot_filename)
-    update_po_files(i18n_directory, pot_filename, language)
+def update_translation_placeholders(language: Optional[str] = None) -> None:
+    """Update .pot, .po, and .ts files for all or a specific language."""
+    pot_filename = os.path.join(PROJECT_ROOT, "src", "qualcoder", "qualcoder.pot")
+    extract_pot_file(os.path.join(PROJECT_ROOT, "src", "qualcoder"), pot_filename)
+    update_po_files(I18N_DIR, pot_filename, language)
     update_qt_ts_files(language)
 
-def create_new_language_placeholders(language: str):
-    """Create a new set of .po and .ts files for a new language in other_languages directory."""
- 
+# --- New Language Placeholders ---
+def create_new_language_placeholders(language: str) -> None:
+    """Create empty .po and .ts files for a new language in other_languages."""
     print(f"Creating placeholder files for language: {language}")
 
-    # Create .po file in other_languages
-    new_po_file = os.path.join(other_languages_directory, f'{language}.po')
-    with open(new_po_file, 'w', encoding='utf-8') as po_file:
-        po_file.write("")
+    # Create empty .po file
+    new_po_file = os.path.join(OTHER_LANGS_DIR, f"{language}.po")
+    with open(new_po_file, "w", encoding="utf-8"):
+        pass
     print(f"Created empty .po file: {new_po_file}")
 
-    # Create .ts file using the existing project.pro
-    new_ts_file = os.path.join(other_languages_directory, f'{language}.ts')
-    gui_directory = os.path.join(project_root, "src", "qualcoder", "GUI")
-    project_pro = os.path.join(gui_directory, "project.pro")
-
-    # Check if project.pro exists
-    if not os.path.exists(project_pro):
-        print(f"Error: {project_pro} does not exist. Run --update first to create it.")
+    # Update .ts file via project.pro
+    new_ts_file = os.path.join(OTHER_LANGS_DIR, f"{language}.ts")
+    if not os.path.exists(GUI_DIR):
+        print(f"Error: {GUI_DIR} does not exist.")
         return
 
-    # Read the existing project.pro
-    with open(project_pro, 'r', encoding='utf-8') as f:
-        pro_content = f.read()
+    # Read existing project.pro
+    pro_content = ""
+    if os.path.exists(PROJECT_PRO_PATH):
+        with open(PROJECT_PRO_PATH, "r", encoding="utf-8") as f:
+            pro_content = f.read()
 
-    # Add the new .ts file to TRANSLATIONS
-    rel_ts_path = os.path.relpath(other_languages_directory, gui_directory)
+    # Add new .ts entry
+    rel_ts_path = os.path.relpath(OTHER_LANGS_DIR, GUI_DIR).replace(os.path.sep, "/")
     new_ts_entry = f"{rel_ts_path}/{language}.ts"
 
-    # Check if the new .ts file is already in the project.pro
-    if new_ts_entry in pro_content:
-        print(f"Language {language} already in project.pro")
-    else:
-        # Find the TRANSLATIONS section and add the new entry
-        lines = pro_content.split('\n')
+    if new_ts_entry not in pro_content:
+        lines = pro_content.split("\n")
         new_lines = []
         in_translations = False
-        translations_added = False
+        added = False
 
         for line in lines:
             new_lines.append(line)
             if line.startswith("TRANSLATIONS"):
                 in_translations = True
                 continue
-            if in_translations and line.strip() and not line.strip().startswith('#'):
-                if line.strip().endswith('.ts') and not translations_added:
-                    # Add the new entry after the last .ts file
+            if in_translations and line.strip() and not line.strip().startswith("#"):
+                if line.strip().endswith(".ts") and not added:
                     new_lines.append(new_ts_entry)
-                    translations_added = True
+                    added = True
                     in_translations = False
 
-        # If we didn't find a TRANSLATIONS section or any .ts files, add it at the end
-        if not translations_added:
-            new_lines.append("\nTRANSLATIONS = \\")
-            new_lines.append(new_ts_entry)
+        if not added:
+            new_lines.extend(["", "TRANSLATIONS = \\", new_ts_entry])
 
-        # Write the updated project.pro
-        with open(project_pro, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(new_lines))
+        with open(PROJECT_PRO_PATH, "w", encoding="utf-8") as f:
+            f.write("\n".join(new_lines))
 
-    # Run pylupdate5 to create/update the .ts file
-    try:
-        result = subprocess.run(
-            ['pylupdate5', project_pro],
-            check=True,
-            cwd=gui_directory,
-            capture_output=True,
-            text=True
-        )
-        print(f"Created/updated .ts file: {new_ts_file}")
-        if result.stdout:
-            print(f"pylupdate5 output: {result.stdout}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error creating .ts file: {e}")
-        if e.stdout:
-            print(f"pylupdate5 stdout: {e.stdout}")
-        if e.stderr:
-            print(f"pylupdate5 stderr: {e.stderr}")
+    # Run pylupdate5
+    run_subprocess(["pylupdate5", PROJECT_PRO_PATH], cwd=GUI_DIR)
+    print(f"Created/updated .ts file: {new_ts_file}")
 
-    # Update the language placeholders
+    # Update placeholders
     update_translation_placeholders(language)
     print("New placeholder files created.")
 
-def recompile_translation(language: str | None = None):
-    """Make sure lrelease.exe is in path.
-    e.g. C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
-    This is a user path environment variable"""
+# --- Compilation ---
+def recompile_translation(language: Optional[str] = None) -> None:
+    """Compile .po to .mo and .ts to .qm files."""
+    languages = filter_languages(language, get_all_languages())
 
-    language_list = languages
-    if language in language_list:
-        language_list = [language]
-
-    # GETTEXT TRANSLATION
-    # .po-files and .mo-files
-    for lang_ in language_list:
-        # Check in both i18n and other_languages directories
-        for directory in [i18n_directory, other_languages_directory]:
-            po_file = os.path.join(directory, f'{lang_}.po')
-            mo_file = os.path.join(directory, f'{lang_}.mo')
-
+    # GETTEXT: .po -> .mo
+    for lang in languages:
+        for directory in [I18N_DIR, OTHER_LANGS_DIR]:
+            po_file = os.path.join(directory, f"{lang}.po")
+            mo_file = os.path.join(directory, f"{lang}.mo")
             if os.path.exists(po_file):
-                # Check if po-file has been updated and is newer than the corresponding mo-file
-                if (not os.path.exists(mo_file)) or (os.path.getmtime(po_file) > os.path.getmtime(mo_file)):
+                if not os.path.exists(mo_file) or (
+                    os.path.getmtime(po_file) > os.path.getmtime(mo_file)
+                ):
                     answer = input(f'Do you want to create/update "{mo_file}"? (y/n)')
-                    if answer == 'y':
-                        po = polib.pofile(po_file)
-                        po.save_as_mofile(mo_file)
+                    if answer == "y":
+                        polib.pofile(po_file).save_as_mofile(mo_file)
                         print(f"{mo_file} has been updated.")
                     else:
                         print(f'Skipping "{mo_file}".')
 
-    # Qt TRANSLATIONS
-    # .ts-files and .qm-files
-    for lang_ in language_list:
-        # Check in both i18n and other_languages directories
-        for directory in [i18n_directory, other_languages_directory]:
-            ts_file = os.path.join(directory, f'{lang_}.ts')
-            qm_file = os.path.join(directory, f'{lang_}.qm')
-
+    # QT: .ts -> .qm
+    for lang in languages:
+        for directory in [I18N_DIR, OTHER_LANGS_DIR]:
+            ts_file = os.path.join(directory, f"{lang}.ts")
+            qm_file = os.path.join(directory, f"{lang}.qm")
             if os.path.exists(ts_file):
-                # Check if ts-file has been updated and is newer than the corresponding qm-file
-                if not os.path.exists(qm_file) or (os.path.getmtime(ts_file) > os.path.getmtime(qm_file)):
+                if not os.path.exists(qm_file) or (
+                    os.path.getmtime(ts_file) > os.path.getmtime(qm_file)
+                ):
                     answer = input(f'Do you want to create/update "{qm_file}"? (y/n)')
-                    if answer == 'y':
-                        subprocess.run(['lrelease', ts_file, "-qm", qm_file], check=True)
+                    if answer == "y":
+                        run_subprocess(["lrelease", ts_file, "-qm", qm_file])
                         print(f"{qm_file} has been updated.")
                     else:
                         print(f'Skipping "{qm_file}".')
-    # Delete po~ files
-    for directory in [i18n_directory, other_languages_directory]:
+
+    # Cleanup .po~ files
+    for directory in [I18N_DIR, OTHER_LANGS_DIR]:
         if os.path.exists(directory):
-            for root, dirs, files in os.walk(directory):
+            for root, _, files in os.walk(directory):
                 for file in files:
-                    if file.endswith('.po~'):
+                    if file.endswith(".po~"):
                         try:
                             os.remove(os.path.join(root, file))
-                            print(f"Delete {file}")
+                            print(f"Deleted {file}")
                         except FileNotFoundError:
                             pass
-                            
-    print("Finished")
 
+# --- Translation Status Analysis ---
 def generate_progress_bar(translated_percent: float, partial_percent: float) -> str:
-    """Generate a 10-square progress bar using 🟩 (translated), 🟨 (partial), 🟥 (untranslated)."""
+    """Generate a 10-square progress bar."""
     total_squares = 10
     translated = min(total_squares, int(round(translated_percent / 10)))
     partial = min(total_squares - translated, int(round(partial_percent / 10)))
@@ -346,9 +303,8 @@ def generate_progress_bar(translated_percent: float, partial_percent: float) -> 
     return "🟩" * translated + "🟨" * partial + "🟥" * untranslated
 
 def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
-    """Analyze a single translation file (.po or .ts) and return its statistics."""
+    """Analyze a .po or .ts file and return translation statistics."""
     stats: Dict[str, Any] = {"error": None, "missing": False}
-
     if not os.path.exists(file_path):
         stats["missing"] = True
         return stats
@@ -357,104 +313,59 @@ def analyze_translation_file(file_path: str, file_type: str) -> Dict[str, Any]:
         if file_type == "po":
             po = polib.pofile(file_path)
             total = len(po)
-            translated = sum(1 for entry in po if entry.translated())
-            fuzzy = sum(1 for entry in po if "fuzzy" in entry.flags)
             stats.update({
                 "total": total,
-                "translated": translated,
-                "partial": fuzzy,
-                "untranslated": total - translated - fuzzy,
+                "translated": sum(1 for entry in po if entry.translated()),
+                "partial": sum(1 for entry in po if "fuzzy" in entry.flags),
+                "untranslated": total - stats["translated"] - stats["partial"],
             })
-
         elif file_type == "ts":
             parser = etree.XMLParser(remove_blank_text=True)
             tree = etree.parse(file_path, parser)
             root = tree.getroot()
             messages = root.xpath("//message")
-            total = len(messages)
-            translated = len(root.xpath(
-                '//message[translation and not(translation[@type="unfinished"]) and not(translation[@type="obsolete"])]'
-            ))
-            obsolete = len(root.xpath('//message[translation[@type="obsolete"]]'))
-            untranslated = len(root.xpath('//message[not(translation) or translation[@type="unfinished"]]'))
             stats.update({
-                "total": total,
-                "translated": translated,
-                "partial": obsolete,
-                "untranslated": untranslated,
+                "total": len(messages),
+                "translated": len(root.xpath(
+                    '//message[translation and not(translation[@type="unfinished"]) and not(translation[@type="obsolete"])]'
+                )),
+                "partial": len(root.xpath('//message[translation[@type="obsolete"]]')),
+                "untranslated": len(root.xpath(
+                    '//message[not(translation) or translation[@type="unfinished"]]'
+                )),
             })
     except Exception as e:
         stats["error"] = str(e)
     return stats
 
-def analyze_translation_status(language: str | None = None) -> str:
-    """Analyze translation status for .po and .ts files and generate a LANGUAGES.md report.
-    Includes languages from both i18n (officially maintained) and other_languages (community maintained)."""
-
-    # Mapping language code with language name
+def analyze_translation_status(language: Optional[str] = None) -> str:
+    """Generate a LANGUAGES_REPORT.md with translation status."""
     language_names = {
-        "de": "Deutsch",
-        "en": "English",
-        "es": "Español",
-        "fr": "Français",
-        "it": "Italiano",
-        "ja": "日本語",
-        "pt": "Português",
-        "ro": "Română",
-        "sv": "Svenska",
-        "zh": "中文",
-        "eu": "Euskara",
-        "eo": "Esperanto",
-        "fa": "فارسی"
-        # Add new language here
+        "de": "Deutsch", "en": "English", "es": "Español", "fr": "Français",
+        "it": "Italiano", "ja": "日本語", "pt": "Português", "ro": "Română",
+        "sv": "Svenska", "zh": "中文", "eu": "Euskara", "eo": "Esperanto", "fa": "فارسی",
     }
 
-    # Collect all languages from i18n and other_languages
+    # Collect languages
     all_languages = {}
+    for directory, status in [(I18N_DIR, "officially maintained"), (OTHER_LANGS_DIR, "community maintained")]:
+        if not os.path.exists(directory):
+            continue
+        for root, _, files in os.walk(directory):
+            for file in files:
+                stem = Path(file).stem
+                if len(stem) in (2, 3) and stem not in all_languages:
+                    all_languages[stem] = {"source": directory, "status": status}
 
-    # Add languages from i18n directory (officially maintained)
-    for root, dirs, files in os.walk(i18n_directory):
-        for file in files:
-            stem = Path(file).stem
-            if len(stem) in (2, 3) and stem not in all_languages:
-                all_languages[stem] = {"source": "i18n", "status": "officially maintained"}
+    # Filter by language
+    if language and language in all_languages:
+        all_languages = {language: all_languages[language]}
 
-    # Add languages from other_languages directory (community maintained)
-    if os.path.exists(other_languages_directory):
-        for file in os.listdir(other_languages_directory):
-            stem = Path(file).stem
-            if len(stem) in (2, 3) and stem not in all_languages:
-                all_languages[stem] = {"source": "other_languages", "status": "community maintained"}
-
-    # Filter by language if specified
-    if language:
-        if language in all_languages:
-            all_languages = {language: all_languages[language]}
-        else:
-            print(f"Language {language} not found.")
-            return ""
-
-    # Collect data for all languages
-    report_data: Dict[str, Dict[str, Dict[str, Any]]] = {}
-    for lang, lang_info in all_languages.items():
-        source_dir = i18n_directory if lang_info["source"] == "i18n" else other_languages_directory
-        report_data[lang] = {
-            "gettext": analyze_translation_file(
-                os.path.join(source_dir, f"{lang}.po"),
-                "po",
-            ),
-            "qt": analyze_translation_file(
-                os.path.join(source_dir, f"{lang}.ts"),
-                "ts",
-            ),
-            "status": lang_info["status"],
-        }
-
-    # Generate markdown lines
-    markdown_lines: List[str] = [
+    # Generate report
+    markdown_lines = [
         "# Translation Status Report\n",
         "",
-        "Legend",
+        "Legend:",
         "- 🟩: Fully translated",
         "- 🟨: Partially translated (fuzzy/obsolete)",
         "- 🟥: Untranslated",
@@ -464,190 +375,117 @@ def analyze_translation_status(language: str | None = None) -> str:
         "|----------|----------|--------|",
     ]
 
-    for lang, lang_data in report_data.items():
-        gettext_stats = lang_data["gettext"]
-        qt_stats = lang_data["qt"]
-        status = lang_data["status"]
+    for lang, lang_info in all_languages.items():
+        source_dir = lang_info["source"]
+        gettext_stats = analyze_translation_file(
+            os.path.join(source_dir, f"{lang}.po"), "po"
+        )
+        qt_stats = analyze_translation_file(
+            os.path.join(source_dir, f"{lang}.ts"), "ts"
+        )
+        status = lang_info["status"]
 
-        # Get the full language name or use the code if not found
-        lang_display_name = language_names.get(lang, lang)
-        lang_display = f"{lang_display_name} ({lang})"
+        lang_display = f"{language_names.get(lang, lang)} ({lang})"
 
-        # Handle Gettext data
+        # Handle Gettext
         if gettext_stats.get("missing"):
-            gettext_total = 0
-            gettext_translated = 0
-            gettext_partial = 0
             gettext_str = "❌ Missing"
+            gettext_total = gettext_translated = gettext_partial = 0
         elif gettext_stats.get("error"):
-            gettext_total = 0
-            gettext_translated = 0
-            gettext_partial = 0
             gettext_str = f"❌ Error: {gettext_stats['error']}"
+            gettext_total = gettext_translated = gettext_partial = 0
         else:
             gettext_total = gettext_stats["total"]
             gettext_translated = gettext_stats["translated"]
             gettext_partial = gettext_stats["partial"]
             gettext_str = f"{gettext_translated}/{gettext_total} ({gettext_partial} fuzzy)"
 
-        # Handle Qt data
+        # Handle Qt
         if qt_stats.get("missing"):
-            qt_total = 0
-            qt_translated = 0
-            qt_partial = 0
             qt_str = "❌ Missing"
+            qt_total = qt_translated = qt_partial = 0
         elif qt_stats.get("error"):
-            qt_total = 0
-            qt_translated = 0
-            qt_partial = 0
             qt_str = f"❌ Error: {qt_stats['error']}"
+            qt_total = qt_translated = qt_partial = 0
         else:
             qt_total = qt_stats["total"]
             qt_translated = qt_stats["translated"]
             qt_partial = qt_stats["partial"]
             qt_str = f"{qt_translated}/{qt_total} ({qt_partial} obsolete)"
 
-        # Combined totals
+        # Combined stats
         total_entries = gettext_total + qt_total
         total_translated = gettext_translated + qt_translated
         total_partial = gettext_partial + qt_partial
         percent_complete = (total_translated / total_entries * 100) if total_entries > 0 else 0
         percent_partial = (total_partial / total_entries * 100) if total_entries > 0 else 0
 
-        # Generate combined progress bar
         progress_bar = generate_progress_bar(percent_complete, percent_partial)
         markdown_lines.append(
-            f"| {lang_display} | {progress_bar} {percent_complete:.1f}% ({total_translated} / {total_entries}) | {status} |"
+            f"| {lang_display} | {progress_bar} {percent_complete:.1f}% ({total_translated}/{total_entries}) | {status} |"
         )
-    markdown_lines.extend(
-        ["", "---", "> **Note:** This report is automatically generated. Run `--status` to update it."]
-    )
 
-    # Write to LANGUAGES.md
-    output_path = os.path.join(project_root, "LANGUAGES_REPORT.md")
+    markdown_lines.extend(["", "---", "> **Note:** Run `--status` to update this report."])
+
+    # Write report
+    output_path = os.path.join(PROJECT_ROOT, "LANGUAGES_REPORT.md")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(markdown_lines))
     print(f"Translation status report generated: {output_path}")
     return output_path
 
-def zip_language_files(language: str | None = None):
-    """ Zip .mo, .qm and .txt files for each language in other_languages directory.
-
-    Args:
-        language: Optional language code to zip only that language. If None, zips all languages.
-    """
-    if not os.path.exists(other_languages_directory):
-        print(f"Directory {other_languages_directory} does not exist.")
-        return
-
-    # Get all language codes from files in other_languages directory
-    other_languages = []
-    for file in os.listdir(other_languages_directory):
-        stem = Path(file).stem
-        if len(stem) in (2, 3) and stem not in other_languages:
-            other_languages.append(stem)
-
-    if language is not None:
-        if language in other_languages:
-            other_languages = [language]
-        else:
-            print(f"Language {language} not found in {other_languages_directory}")
-            return
-
-    for lang in other_languages:
-        # Find all files with this language code
-        files_to_zip = []
-        for file in os.listdir(other_languages_directory):
-            if file.startswith(f"{lang}.") and file.endswith(('.mo', '.qm', '.txt')):
-                files_to_zip.append(file)
-
-        if not files_to_zip:
-            print(f"No files found for language {lang}")
-            continue
-
-        # Create zip file
-        zip_filename = os.path.join(other_languages_directory, f"{lang}.zip")
-        with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for file in files_to_zip:
-                file_path = os.path.join(other_languages_directory, file)
-                zipf.write(file_path, file)
-                print(f"Added {file} to {zip_filename}")
-
-        print(f"Created zip file: {zip_filename}")
-
-def check_translations(language: str | None = None) -> str:
-    """
-    Check .po and .ts files for:
-    - Untranslated entries
-    - Empty translations
-    - Syntax errors
-    - Inconsistencies (e.g., unreplaced variables)
-    Generate a report of detected issues.
-    """
+# --- Translation Checks ---
+def check_translations(language: Optional[str] = None) -> str:
+    """Check .po and .ts files for errors and generate a report."""
     print("\n--- Starting translation check ---")
-
-    # Directories to scan
-    directories_to_scan = [i18n_directory]
-    if os.path.exists(other_languages_directory):
-        directories_to_scan.append(other_languages_directory)
-
-    # Filter languages if specified
-    languages_to_check = languages
-    if language is not None:
-        languages_to_check = [language] if language in languages else []
-
     issues = []
+    languages_to_check = filter_languages(language, get_all_languages())
 
     # Check .po files
-    for directory in directories_to_scan:
+    for directory in [I18N_DIR, OTHER_LANGS_DIR]:
         if not os.path.exists(directory):
             continue
-        for root, dirs, files in os.walk(directory):
-            for file in files:
-                if file.endswith('.po'):
-                    lang = Path(file).stem
-                    if lang in languages_to_check:
-                        po_file = os.path.join(root, file)
-                        try:
-                            po = polib.pofile(po_file)
-                            for entry in po:
-                                if not entry.translated():
-                                    issues.append(f"[PO] {lang}: Untranslated entry -> '{entry.msgid}'")
-                                if entry.msgstr == "":
-                                    issues.append(f"[PO] {lang}: Empty translation for -> '{entry.msgid}'")
-                                if "fuzzy" in entry.flags:
-                                    issues.append(f"[PO] {lang}: Fuzzy entry -> '{entry.msgid}'")
-                        except Exception as e:
-                            issues.append(f"[PO] {lang}: Error reading file -> {str(e)}")
+        for po_file in find_files(directory, (".po",)):
+            lang = Path(po_file).stem
+            if lang not in languages_to_check:
+                continue
+            try:
+                po = polib.pofile(po_file)
+                for entry in po:
+                    if not entry.translated():
+                        issues.append(f"[PO] {lang}: Untranslated entry -> '{entry.msgid}'")
+                    if entry.msgstr == "":
+                        issues.append(f"[PO] {lang}: Empty translation for -> '{entry.msgid}'")
+                    if "fuzzy" in entry.flags:
+                        issues.append(f"[PO] {lang}: Fuzzy entry -> '{entry.msgid}'")
+            except Exception as e:
+                issues.append(f"[PO] {lang}: Error reading file -> {str(e)}")
 
     # Check .ts files
-    for directory in directories_to_scan:
+    for directory in [I18N_DIR, OTHER_LANGS_DIR]:
         if not os.path.exists(directory):
             continue
-        for root, dirs, files in os.walk(directory):
-            for file in files:
-                if file.endswith('.ts'):
-                    lang = Path(file).stem
-                    if lang in languages_to_check:
-                        ts_file = os.path.join(root, file)
-                        try:
-                            parser = etree.XMLParser(remove_blank_text=True)
-                            tree = etree.parse(ts_file, parser)
-                            root = tree.getroot()
-                            for message in root.xpath("//message"):
-                                source = message.find("source")
-                                translation = message.find("translation")
-                                if source is not None and translation is None:
-                                    issues.append(f"[TS] {lang}: Missing translation for -> '{source.text}'")
-                                elif translation is not None:
-                                    if translation.text is None or translation.text.strip() == "":
-                                        issues.append(f"[TS] {lang}: Empty translation for -> '{source.text}'")
-                                    if translation.get("type") == "unfinished":
-                                        issues.append(f"[TS] {lang}: Unfinished translation for -> '{source.text}'")
-                        except Exception as e:
-                            issues.append(f"[TS] {lang}: Error reading file -> {str(e)}")
+        for ts_file in find_files(directory, (".ts",)):
+            lang = Path(ts_file).stem
+            if lang not in languages_to_check:
+                continue
+            try:
+                parser = etree.XMLParser(remove_blank_text=True)
+                tree = etree.parse(ts_file, parser)
+                root = tree.getroot()
+                for message in root.xpath("//message"):
+                    source = message.find("source")
+                    translation = message.find("translation")
+                    if source is not None and translation is None:
+                        issues.append(f"[TS] {lang}: Missing translation for -> '{source.text}'")
+                    elif translation is not None:
+                        if not translation.text or not translation.text.strip():
+                            issues.append(f"[TS] {lang}: Empty translation for -> '{source.text}'")
+                        if translation.get("type") == "unfinished":
+                            issues.append(f"[TS] {lang}: Unfinished translation for -> '{source.text}'")
+            except Exception as e:
+                issues.append(f"[TS] {lang}: Error reading file -> {str(e)}")
 
-    # Generate report
     if not issues:
         print("✅ No issues detected in translation files.")
         return ""
@@ -656,58 +494,94 @@ def check_translations(language: str | None = None) -> str:
     for issue in issues:
         print(f"❌ {issue}")
 
-    # Save to file
-    report_path = os.path.join(project_root, "TRANSLATION_CHECK_REPORT.txt")
+    report_path = os.path.join(PROJECT_ROOT, "TRANSLATION_CHECK_REPORT.txt")
     with open(report_path, "w", encoding="utf-8") as f:
         f.write("\n".join(issues))
-    print(f"\n📄 Detailed report saved to: {report_path}")
+    print(f"\n📄 Report saved to: {report_path}")
     return report_path
-    
-def main():
-    print("Run from the QualCoder-master folder")
-    print("Choose option: --update --compile --zip --status")
-    print("--update updates language placeholders for ts and po files (i18n and other_languages).")
-    print("--compile compiles language files ts to qm files and po to mo files (i18n and other_languages)")
-    print("--zip zips .mo, .qm and .txt files in other_languages directory")
-    print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile/zip only that language.")
-    print("e.g. --update --lang fr")
-    print("e.g. --zip --lang ro")
-    print("--status makes LANGUAGES_REPORT.md file which shows translation status of files (i18n and other_languages).")
-    print("--create Creates placeholder files po (NOT YET) ts for a new language. use 2 or 3 letter ISO639 codes.")
 
-def main():
+# --- Zip Creation ---
+def zip_language_files(language: Optional[str] = None) -> None:
+    """Zip .mo, .qm, and .txt files for languages in other_languages."""
+    if not os.path.exists(OTHER_LANGS_DIR):
+        print(f"Directory {OTHER_LANGS_DIR} does not exist.")
+        return
+
+    languages = []
+    for file in os.listdir(OTHER_LANGS_DIR):
+        stem = Path(file).stem
+        if len(stem) in (2, 3) and stem not in languages:
+            languages.append(stem)
+
+    if language:
+        if language in languages:
+            languages = [language]
+        else:
+            print(f"Language {language} not found in {OTHER_LANGS_DIR}")
+            return
+
+    for lang in languages:
+        files_to_zip = [
+            f for f in os.listdir(OTHER_LANGS_DIR)
+            if f.startswith(f"{lang}.") and f.endswith((".mo", ".qm", ".txt"))
+        ]
+        if not files_to_zip:
+            print(f"No files found for language {lang}")
+            continue
+
+        zip_path = os.path.join(OTHER_LANGS_DIR, f"{lang}.zip")
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for file in files_to_zip:
+                file_path = os.path.join(OTHER_LANGS_DIR, file)
+                zipf.write(file_path, file)
+                print(f"Added {file} to {zip_path}")
+        print(f"Created zip file: {zip_path}")
+
+# --- CLI and Main ---
+def print_usage() -> None:
+    """Print script usage instructions."""
     print("Run from the QualCoder-master folder")
-    print("Choose option: --update --compile --zip --status --check")
-    print("--update updates language placeholders for ts and po files (i18n and other_languages).")
-    print("--compile compiles language files ts to qm files and po to mo files (i18n and other_languages)")
-    print("--zip zips .mo, .qm and .txt files in other_languages directory")
-    print("--status makes LANGUAGES_REPORT.md file which shows translation status of files (i18n and other_languages).")
-    print("--check checks translation files for errors (untranslated, empty, syntax).")
-    print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile/zip/check only that language.")
-    print("e.g. --check --lang fr")
+    print("Choose option: --update --compile --zip --status --check --create")
+    print("--update: Update language placeholders for .po and .ts files (i18n and other_languages).")
+    print("--compile: Compile .po to .mo and .ts to .qm files (i18n and other_languages).")
+    print("--zip: Zip .mo, .qm, and .txt files in other_languages directory.")
+    print("--status: Generate LANGUAGES_REPORT.md with translation status.")
+    print("--check: Check translation files for errors.")
+    print("--create: Create placeholder files for a new language (use 2-3 letter ISO639 codes).")
+    print("--lang LANG: Specify a language code (e.g., 'fr', 'es').")
+    print("Examples:")
+    print("  python script.py --update --lang fr")
+    print("  python script.py --check --lang ro")
+
+def main() -> None:
+    if len(sys.argv) < 2:
+        print_usage()
+        return
+
+    lang = None
+    if "--lang" in sys.argv:
+        lang_index = sys.argv.index("--lang") + 1
+        if lang_index < len(sys.argv):
+            lang = sys.argv[lang_index]
+
+    if "--create" in sys.argv:
+        if lang:
+            create_new_language_placeholders(lang)
+        else:
+            print("Error: --create requires --lang LANG")
+    elif "--update" in sys.argv:
+        update_translation_placeholders(lang)
+    elif "--compile" in sys.argv:
+        recompile_translation(lang)
+        zip_language_files(lang)  # Auto-zip after compile
+    elif "--status" in sys.argv:
+        analyze_translation_status(lang)
+    elif "--zip" in sys.argv:
+        zip_language_files(lang)
+    elif "--check" in sys.argv:
+        check_translations(lang)
+    else:
+        print_usage()
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        mode = sys.argv[1]
-        lang = None
-        if "--lang" in sys.argv:
-            lang_index = sys.argv.index("--lang") + 1
-            if lang_index < len(sys.argv):
-                lang = sys.argv[lang_index]
-        if "--create" in sys.argv:
-            create_new_language_placeholders(lang)
-        elif mode == "--update":
-            update_translation_placeholders(lang)
-        elif mode == "--compile":
-            recompile_translation(lang)
-            zip_language_files(lang)
-        elif mode == "--status":
-            analyze_translation_status(lang)
-        elif mode == "--zip":
-            zip_language_files(lang)
-        elif mode == "--check":
-            check_translations(lang)
-        else:
-            main()
-    else:
-        main()
+    main()
