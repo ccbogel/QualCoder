@@ -1979,7 +1979,6 @@ Click "Yes" to start now.')
                                                                _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
             return
-        # self.close_project()
         msg = ""
         # New path variable from recent_projects.txt contains time | path
         # Older variable only listed the project path
@@ -1990,6 +1989,10 @@ Click "Yes" to start now.')
         if len(path_split) == 2:
             proj_path = path_split[1]
         if len(proj_path) > 3 and proj_path[-4:] == ".qda":
+            # Close the current project first: stale tab dialogs show old data and can
+            # write its ids into the new database (newproject flow already closed it)
+            if newproject == "no" and (self.app.project_name != "" or self.app.conn is not None):
+                self.close_project()
             try:
                 self.app.create_connection(proj_path)
             except Exception as err:
@@ -2732,6 +2735,9 @@ def gui():
     if platform.system() == "Windows" and settings.get('stylesheet') == "native":
         # Avoid early native Windows style initialization crashes in Qt before our later Fusion fallback runs.
         os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
+    # Native video frame must not force sibling widgets native
+    QtWidgets.QApplication.setAttribute(
+        QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
     app = QtWidgets.QApplication(sys.argv)
     app._qc_installed_translators = []
     # Noto Sans - for general application
