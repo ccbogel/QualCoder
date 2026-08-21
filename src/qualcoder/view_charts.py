@@ -577,9 +577,11 @@ class ViewCharts(QDialog):
             if file_ids != "":
                 sql = "select seltext from code_text where cid=? and owner like ? and fid" + file_ids
             cur.execute(sql, [c['cid'], owner])
-            res_text = cur.fetchone()
-            if res_text:
-                values.append(res_text[0])
+            # fetchall: include every coded segment, not only the first one per code
+            res_text = cur.fetchall()
+            for row in res_text:
+                if row[0]:
+                    values.append(row[0])
 
         # Create image
         text = " ".join(values)
@@ -730,30 +732,30 @@ class ViewCharts(QDialog):
         cases = []
         counts = []
         for c in self.codes:
-            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                   "join code_text on code_text.fid=case_text.fid" \
                   " where cid=? and code_text.owner like ? order by cases.name asc"
             if file_ids != "":
-                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                       "join code_text on code_text.fid=case_text.fid where" \
                       " cid=? and code_text.owner like ? and code_text.fid" + file_ids + " order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_text = cur.fetchall()
-            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                   " join code_image on code_image.id=case_text.fid where \
              cid=? and code_image.owner like ? order by cases.name asc"
             if file_ids != "":
-                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                       "join code_image on code_image.id=case_text.fid where " \
                       "cid=? and code_image.owner like ? and code_image.id" + file_ids + " order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_image = cur.fetchall()
-            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
             " join code_av on case_text.fid=code_av.id where \
             cid=? and code_av.owner like ? order by cases.name asc"
             if file_ids != "":
-                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
-                "join code_av code_av.id=case_text.fid where " \
+                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
+                "join code_av on code_av.id=case_text.fid where " \
                 "cid=? and code_av.owner like ? and code_av.id" + file_ids + " order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_av = cur.fetchall()
@@ -812,30 +814,30 @@ class ViewCharts(QDialog):
         cases = []
         counts = []
         for c in self.codes:
-            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                   "join code_text on code_text.fid=case_text.fid" \
                   " where cid=? and code_text.owner like ? order by cases.name asc"
             if file_ids != "":
-                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                       "join code_text on code_text.fid=case_text.fid where" \
                       " cid=? and code_text.owner like ? and code_text.fid" + file_ids + " order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_text = cur.fetchall()
-            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                   " join code_image on code_image.id=case_text.fid where \
              cid=? and code_image.owner like ? order by cases.name asc"
             if file_ids != "":
-                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
                       "join code_image on code_image.id=case_text.fid where " \
                       "cid=? and code_image.owner like ? and code_image.id" + file_ids + " order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_image = cur.fetchall()
-            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
             " join code_av on case_text.fid=code_av.id where \
             cid=? and code_av.owner like ? order by cases.name asc"
             if file_ids != "":
-                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
-                "join code_av code_av.id=case_text.fid where " \
+                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
+                "join code_av on code_av.id=case_text.fid where " \
                 "cid=? and code_av.owner like ? and code_av.id" + file_ids + " order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_av = cur.fetchall()
@@ -1089,9 +1091,9 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
+                sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ? and fid" + file_ids
             cur.execute(sql, [c['cid'], owner])
             res = cur.fetchone()
             labels.append(c['name'])
@@ -1118,9 +1120,9 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ?"
+            sql = "select ifnull(sum(cast(width as int) * cast(height as int)), 0) from code_image where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ? and id" + file_ids
+                sql = "select ifnull(sum(cast(width as int) * cast(height as int)), 0) from code_image where cid=? and owner like ? and id" + file_ids
             cur.execute(sql, [c['cid'], owner])
             res = cur.fetchone()
             labels.append(c['name'])
@@ -1147,9 +1149,9 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ?"
+            sql = "select ifnull(sum(pos1 - pos0), 0) from code_av where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ? and id" + file_ids
+                sql = "select ifnull(sum(pos1 - pos0), 0) from code_av where cid=? and owner like ? and id" + file_ids
             cur.execute(sql, [c['cid'], owner])
             res = cur.fetchone()
             labels.append(c['name'])
@@ -1235,9 +1237,9 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
+                sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ? and fid" + file_ids
             cur.execute(sql, [c['cid'], owner])
             res = cur.fetchone()
             labels.append(c['name'])
@@ -1264,9 +1266,9 @@ class ViewCharts(QDialog):
         values = []
         labels = []
         for c in self.codes:
-            sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ?"
+            sql = "select ifnull(sum(cast(width as int) * cast(height as int)), 0) from code_image where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ? and id" + file_ids
+                sql = "select ifnull(sum(cast(width as int) * cast(height as int)), 0) from code_image where cid=? and owner like ? and id" + file_ids
             cur.execute(sql, [c['cid'], owner])
             res = cur.fetchone()
             labels.append(c['name'])
@@ -1293,9 +1295,9 @@ class ViewCharts(QDialog):
         labels = []
         cur = self.app.conn.cursor()
         for c in self.codes:
-            sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ?"
+            sql = "select ifnull(sum(pos1 - pos0), 0) from code_av where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ? and id" + file_ids
+                sql = "select ifnull(sum(pos1 - pos0), 0) from code_av where cid=? and owner like ? and id" + file_ids
             cur.execute(sql, [c['cid'], owner])
             res = cur.fetchone()
             labels.append(c['name'])
@@ -1451,7 +1453,7 @@ class ViewCharts(QDialog):
         # Until only top categories remain
         sub_categories = copy(self.categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 5000:
+        while len(sub_categories) > 0 and counter < 5000:
             # Identify parent categories
             parent_list = []
             for super_cat in sub_categories:
@@ -1517,7 +1519,7 @@ class ViewCharts(QDialog):
         cur = self.app.conn.cursor()
         sql = "select cid, pos1-pos0 from code_text where owner like ?"
         if file_ids != "":
-            sql = "select cid, pos1-pos0 from code_text where owner like ?and fid" + file_ids
+            sql = "select cid, pos1-pos0 from code_text where owner like ? and fid" + file_ids
         cur.execute(sql, [owner])
         result = cur.fetchall()
         for row in result:
@@ -1538,7 +1540,7 @@ class ViewCharts(QDialog):
         # Until only top categories remain
         sub_categories = copy(self.categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 5000:
+        while len(sub_categories) > 0 and counter < 5000:
             # Identify parent categories
             parent_list = []
             for super_cat in sub_categories:
@@ -1625,7 +1627,7 @@ class ViewCharts(QDialog):
         # Until only top categories remain
         sub_categories = copy(self.categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 5000:
+        while len(sub_categories) > 0 and counter < 5000:
             # Identify parent categories
             parent_list = []
             for super_cat in sub_categories:
@@ -1712,7 +1714,7 @@ class ViewCharts(QDialog):
         # Until only top categories remain
         sub_categories = copy(self.categories)
         counter = 0
-        while len(sub_categories) > 0 or counter < 5000:
+        while len(sub_categories) > 0 and counter < 5000:
             # Identify parent categories
             parent_list = []
             for super_cat in sub_categories:
@@ -1954,7 +1956,7 @@ class ViewCharts(QDialog):
                 for code_ in codes:
                     code_counts = []
                     for c in cases:
-                        cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
+                        cur.execute("SELECT distinct fid FROM case_text where caseid=?", [c[0]])
                         fids = cur.fetchall()
                         case_counts = 0
                         for fid in fids:
@@ -1971,7 +1973,7 @@ class ViewCharts(QDialog):
                 for code_ in codes:
                     code_counts = []
                     for c in self.attribute_case_ids_and_names:
-                        cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
+                        cur.execute("SELECT distinct fid FROM case_text where caseid=?", [c[0]])
                         fids = cur.fetchall()
                         case_counts = 0
                         for fid in fids:
