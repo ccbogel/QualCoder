@@ -393,10 +393,12 @@ class DialogViewAV(QtWidgets.QDialog):
             if len(sizes) >= 2 and sizes[0] < 80:
                 total = max(sum(sizes), 400)
                 self.ui.splitter_left.setSizes([max(280, total // 2), total - max(280, total // 2)])
-        # Embed VLC into frame_video without forcing sibling/ancestor widgets (e.g. the
-        # transcript) to become native windows -> silences "must be a top level window" warnings
+        # Frame goes native lazily (winId() in _set_video_output, VLC only);
+        # the guard keeps ancestors alien
         self.ui.frame_video.setAttribute(QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors, True)
-        self.ui.frame_video.setAttribute(QtCore.Qt.WidgetAttribute.WA_NativeWindow, True)
+        if not hasattr(self.mediaplayer, 'set_video_host'):
+            # VLC backend: realize the native window pre-show so the layout pass positions it
+            self.ui.frame_video.setAttribute(QtCore.Qt.WidgetAttribute.WA_NativeWindow, True)
         self.ui.pushButton_detach.setIcon(qta.icon('mdi6.open-in-new'))
         self.ui.pushButton_detach.setToolTip(_("Detach video to a window"))
         self.ui.pushButton_detach.pressed.connect(self.toggle_detach_video)
@@ -490,10 +492,14 @@ class DialogViewAV(QtWidgets.QDialog):
         if hasattr(self.mediaplayer, 'set_video_host'):
             self.mediaplayer.set_video_host(target)  # Qt backend
             return
-        if getattr(self, 'video_detached', False):
-            winid = int(self.ddialog.dframe.winId())
-        else:
-            winid = int(self.ui.frame_video.winId())
+        # Guard before winId(): ancestors stay alien
+        target.setAttribute(QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors, True)
+        winid = int(target.winId())
+        # Sync the HWND to the frame's geometry before VLC binds its video output to it
+        wh = target.windowHandle()
+        if wh is not None and target.isVisible():
+            top_left = target.mapTo(target.window(), QtCore.QPoint(0, 0))
+            wh.setGeometry(QtCore.QRect(top_left, target.size()))
         system = platform.system()
         if system == "Linux":
             self.mediaplayer.set_xwindow(winid)
@@ -531,6 +537,8 @@ class DialogViewAV(QtWidgets.QDialog):
                         old_mp.set_nsobject(0)
                     else:
                         old_mp.set_xwindow(0)
+                    # release() also destroys the vout window (else it lingers frozen on screen)
+                    old_mp.release()
         except Exception:
             pass
         try:
@@ -980,13 +988,16 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Widely spaced keyframes make every seek rebuild seconds of frames
         in any player. Warn in the seek bar tooltip and widen coalescing. """
         self._seek_coalesce_ms = 120
+        self._kf_token = token = object()
         self._keyframe_gap = None
         self.ui.widget_seekbar.setToolTip("")
 
         def measure():
             # Reading keyframes decodes part of the file: off the UI thread so
             # loading a file never blocks playback controls
-            self._keyframe_gap = keyframe_interval_seconds(media_path) or 0.0
+            gap = keyframe_interval_seconds(media_path) or 0.0
+            if self._kf_token is token:  # drop results for a replaced file
+                self._keyframe_gap = gap
 
         threading.Thread(target=measure, daemon=True).start()
 
