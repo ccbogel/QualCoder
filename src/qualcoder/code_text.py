@@ -62,6 +62,7 @@ from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems  # For isinstance()
+from .code_picker import DialogFindAndApplyCode # For command palette style searchable code picker
 from .speakers import DialogSpeakers, speaker_coder_name
 from .coder_names import DialogCoderNames
 
@@ -2768,6 +2769,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Shift B - go to bookmark
         C New category
         Ctrl F jump to search box
+        F Find and apply code to current selection
         H Hide / Unhide top groupbox
         I Tag important
         L Show codes like
@@ -2895,6 +2897,44 @@ class DialogCodeText(QtWidgets.QWidget):
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_pos])
             self.app.conn.commit()
+            return
+        # Find and apply a code to the current text selection
+        if key == QtCore.Qt.Key.Key_F and selected_text != "":
+            picker = DialogFindAndApplyCode(
+                self.app,
+                self.codes,
+                self.categories,
+                parent=self,
+            )
+            if picker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+                selected_code = picker.selected_code
+                if selected_code is not None:
+                    matching_item = None
+                    iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+
+                    while iterator.value():
+                        item = iterator.value()
+                        if item.text(1).startswith("cid:"):
+                            try:
+                                item_cid = int(item.text(1)[4:])
+                            except ValueError:
+                                item_cid = None
+
+                            if item_cid == selected_code["cid"]:
+                                matching_item = item
+                                break
+
+                        iterator += 1
+
+                    if matching_item is not None:
+                        selection_model = self.ui.treeWidget.selectionModel()
+                        if selection_model is not None:
+                            with QtCore.QSignalBlocker(selection_model):
+                                self.ui.treeWidget.setCurrentItem(matching_item)
+                        else:
+                            self.ui.treeWidget.setCurrentItem(matching_item)
+
+                        self.mark()
             return
         # New category
         if key == QtCore.Qt.Key.Key_C:
