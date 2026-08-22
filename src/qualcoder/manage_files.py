@@ -20,7 +20,6 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
 https://qualcoder.org/
 """
-from PyQt6.QtWidgets import QProgressDialog
 import datetime
 import pymupdf
 import json
@@ -31,6 +30,7 @@ from pathlib import Path
 import PIL
 from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtWidgets import QProgressDialog
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
@@ -41,7 +41,7 @@ from striprtf.striprtf import rtf_to_text
 import webbrowser
 import zipfile
 
-#from .__main__ import App
+# from .__main__ import App
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
 from .code_pdf import DialogCodePdf
@@ -1098,7 +1098,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
         # Regex Protocol optional
         regex_no_protocol = QtCore.QRegularExpression(r"^www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
-        if bool(regex_no_protocol.match(item_text)) or bool(regex_http.match(item_text)):
+        if regex_no_protocol.match(item_text).hasMatch() or regex_http.match(item_text).hasMatch():
             action_url = menu.addAction(_("Open URL"))
 
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
@@ -1189,7 +1189,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.pushButton_display_load.setToolTip(_("Load table display settings"))
             return
         if action == action_url:
-            print("URL open", item_text)
             webbrowser.open(item_text)
             return
         if action == action_date_picker:
