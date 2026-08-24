@@ -3,7 +3,7 @@
  <class>Dialog_Comparisons</class>
  <widget class="QDialog" name="Dialog_Comparisons">
   <property name="windowModality">
-   <enum>Qt::WindowModality::NonModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -62,7 +62,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Show the overlapping codes.</string>
       </property>
       <property name="text">
        <string>Code counts table</string>
@@ -331,9 +331,6 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
-        </property>
         <widget class="QTableWidget" name="tableWidget"/>
         <widget class="QListWidget" name="listWidget">
          <property name="wordWrap">
