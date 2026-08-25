@@ -76,7 +76,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Run report</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -115,8 +115,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Attributes.
-Attribute selection will override files or cases selected in the left-hand-side lists.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -132,7 +131,7 @@ Attribute selection will override files or cases selected in the left-hand-side 
        </rect>
       </property>
       <property name="toolTip">
-       <string>Export</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -364,8 +363,7 @@ Change Settings for number of characters and display style.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Code names sort order.
-Set this before running results.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code names sort order.&lt;/p&gt;&lt;p&gt;Set this before running results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <item>
        <property name="text">
@@ -417,7 +415,7 @@ Set this before running results.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Export file  or case variables in columns for CSV or XLSX export</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file  or case variables in columns for CSV or XLSX export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Variables CSV / XLSX</string>
@@ -446,7 +444,7 @@ Set this before running results.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Show references</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>References</string>

@@ -45,7 +45,7 @@
       </size>
      </property>
      <property name="toolTip">
-      <string>Memo</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

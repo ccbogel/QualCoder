@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ui version="4.0">
  <class>Dialog_view_av</class>
  <widget class="QDialog" name="Dialog_view_av">
@@ -62,7 +62,7 @@
          </size>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -87,7 +87,7 @@
          <string>Help</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
       </item>
@@ -96,6 +96,9 @@
    </item>
    <item>
     <widget class="QSplitter" name="splitter_v">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
@@ -103,6 +106,9 @@
       <layout class="QVBoxLayout" name="leftLayout">
        <item>
         <widget class="QSplitter" name="splitter_left">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
          <widget class="QFrame" name="frame_video">
           <property name="minimumSize">
            <size>
@@ -114,12 +120,15 @@
            <string notr="true">background-color: rgb(30, 30, 30);</string>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Shadow::Plain</enum>
           </property>
          </widget>
          <widget class="QGroupBox" name="groupBox_snippets">
           <property name="title">
-           <string/>
+           <string />
           </property>
           <layout class="QVBoxLayout" name="snippetsLayout">
            <property name="leftMargin">
@@ -137,7 +146,7 @@
            <item>
             <widget class="QListWidget" name="listWidget_snippets">
              <property name="toolTip">
-              <string>Double click inserts the element into the transcription at the cursor position.</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click inserts the element into the transcription at the cursor position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -156,7 +165,7 @@
               </size>
              </property>
              <property name="title">
-              <string/>
+              <string />
              </property>
              <widget class="QPushButton" name="pushButton_new_speaker">
               <property name="geometry">
@@ -168,7 +177,7 @@
                </rect>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_remove_speaker">
@@ -181,7 +190,7 @@
                </rect>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QCheckBox" name="checkBox_alternate_speakers">
@@ -194,7 +203,7 @@
                </rect>
               </property>
               <property name="toolTip">
-               <string>Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
                <string>Alternate</string>
@@ -240,7 +249,7 @@ red underline = Assigned to code or annotation</string>
           </size>
          </property>
          <property name="title">
-          <string/>
+          <string />
          </property>
          <widget class="QLineEdit" name="lineEdit_search">
           <property name="geometry">
@@ -252,7 +261,7 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>Search for text.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
          <widget class="QCheckBox" name="checkBox_case_sensitive">
@@ -268,7 +277,7 @@ red underline = Assigned to code or annotation</string>
            <string>Case sensitive</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QLabel" name="label_case_sensitive">
@@ -284,7 +293,7 @@ red underline = Assigned to code or annotation</string>
            <string>Case sensitive</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_next">
@@ -297,10 +306,10 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>Next</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QLabel" name="label_search_regex">
@@ -313,24 +322,22 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>Search uses Regex functions. 
-A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. 
-A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ 
-A ‘*’ after a character will match zero or more times. 
-‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. 
-Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::Box</enum>
           </property>
           <property name="lineWidth">
            <number>0</number>
           </property>
           <property name="text">
-           <string/>
+           <string />
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -346,10 +353,10 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>Previous</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QLabel" name="label_search_totals">
@@ -363,6 +370,9 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
           </property>
           <property name="text">
            <string>0 / 0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_insert_timestamp">
@@ -378,7 +388,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Insert timestamp</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_load_transcription">
@@ -394,7 +404,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Load a transcription file (.txt, .srt, .vtt) into the transcription</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_goto_bookmark">
@@ -410,7 +420,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Go to bookmark (Ctrl Shift B)</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_set_bookmark">
@@ -426,7 +436,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Set bookmark (Ctrl B)</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QComboBox" name="comboBox_player">
@@ -446,6 +456,9 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
        </item>
        <item>
         <widget class="QSplitter" name="splitter_write">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
          <widget class="QWidget" name="widget_transcript">
           <layout class="QHBoxLayout" name="transcriptLayout">
            <property name="spacing">
@@ -464,7 +477,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
             <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="lineNumbers" native="true"/>
+            <widget class="QWidget" name="lineNumbers" />
            </item>
            <item>
             <widget class="QTextEdit" name="textEdit">
@@ -513,7 +526,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
               </size>
              </property>
              <property name="toolTip">
-              <string>Left click on the slider button and drag left or right to change media position.</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change media position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="minimum">
               <number>0</number>
@@ -527,8 +540,11 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
              <property name="value">
               <number>0</number>
              </property>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
              <property name="tickPosition">
-              <enum>QSlider::NoTicks</enum>
+              <enum>QSlider::TickPosition::TicksBelow</enum>
              </property>
              <property name="tickInterval">
               <number>10</number>
@@ -540,10 +556,10 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
              <item>
               <widget class="QLabel" name="label_time_3">
                <property name="toolTip">
-                <string>Time</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
@@ -556,12 +572,15 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
                 </size>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
              <item>
               <spacer name="timeSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>40</width>
@@ -609,7 +628,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
               </size>
              </property>
              <property name="title">
-              <string/>
+              <string />
              </property>
              <widget class="QPushButton" name="pushButton_play">
               <property name="geometry">
@@ -621,12 +640,10 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Play / Pause
-Ctrl + S start/pause
-Ctrl + P start/pause</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QSlider" name="horizontalSlider_vol">
@@ -644,6 +661,9 @@ Ctrl + P start/pause</string>
               <property name="value">
                <number>100</number>
               </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
              </widget>
              <widget class="QLabel" name="label_volume">
               <property name="geometry">
@@ -655,10 +675,13 @@ Ctrl + P start/pause</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Volume</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QComboBox" name="comboBox_tracks">
@@ -682,6 +705,9 @@ Ctrl + P start/pause</string>
               </property>
               <property name="text">
                <string>Audio:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -707,8 +733,7 @@ Ctrl + P start/pause</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0
-Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
                <string>1.0x</string>
@@ -724,11 +749,10 @@ Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Decrease play rate
-Ctrl + Shift + &lt; </string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rate_up">
@@ -741,11 +765,10 @@ Ctrl + Shift + &lt; </string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Increase play rate
-Ctrl + Shift + &gt; </string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rewind_5">
@@ -758,11 +781,10 @@ Ctrl + Shift + &gt; </string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Rewind 5 seconds
-Ctrl + R</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rewind_30">
@@ -775,11 +797,10 @@ Ctrl + R</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Rewind 30 seconds
-Alt + Minus</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_forward_30">
@@ -792,11 +813,10 @@ Alt + Minus</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Forward 30 seconds. Alt + Plus
-Forward 5 seconds. Press 5</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_detach">
@@ -818,7 +838,7 @@ Forward 5 seconds. Press 5</string>
                <string>Detach / dock the video window</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_stop_segment">
@@ -834,7 +854,7 @@ Forward 5 seconds. Press 5</string>
                <string>Stop segment / loop playback</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_play_segment">
@@ -850,7 +870,7 @@ Forward 5 seconds. Press 5</string>
                <string>Play the selected range (wave selection, or transcript selection)</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_loop_segment">
@@ -866,7 +886,7 @@ Forward 5 seconds. Press 5</string>
                <string>Loop the selected range</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_clear_selection">
@@ -882,7 +902,7 @@ Forward 5 seconds. Press 5</string>
                <string>Clear the wave selection</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
             </widget>
@@ -921,6 +941,6 @@ Forward 5 seconds. Press 5</string>
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
  </tabstops>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

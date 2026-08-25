@@ -41,7 +41,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>This coded area</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -76,7 +76,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Undo all changes.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo all changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>

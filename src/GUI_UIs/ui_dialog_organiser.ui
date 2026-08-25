@@ -73,7 +73,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Create category</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -124,8 +124,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Apply changed structure.
-Warning. No Undo option.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Apply</string>

@@ -59,6 +59,9 @@
       <property name="text">
        <string>Coded area:</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+      </property>
       <property name="wordWrap">
        <bool>true</bool>
       </property>
@@ -73,7 +76,7 @@
        </rect>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Orientation::Vertical</enum>
       </property>
      </widget>
      <widget class="QLabel" name="label_coded_area_icon">
@@ -86,10 +89,13 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>This coded area</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_important">
@@ -118,7 +124,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Export image as html file.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -134,7 +140,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Show captions</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -150,7 +156,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Zoom in. W or +</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -166,7 +172,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Zoom out. Q or -</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -182,7 +188,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Rotate counter-clockwise</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -198,7 +204,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Rotate clockwise</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -214,7 +220,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Previous</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -230,7 +236,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Next</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -246,16 +252,19 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Pages</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -271,7 +280,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Last Page</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -287,7 +296,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Go to page</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -390,8 +399,11 @@
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -463,8 +475,11 @@
      <property name="value">
       <number>99</number>
      </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
      <property name="tickPosition">
-      <enum>QSlider::NoTicks</enum>
+      <enum>QSlider::TickPosition::TicksBelow</enum>
      </property>
      <property name="tickInterval">
       <number>10</number>
@@ -482,7 +497,13 @@
       </property>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
         <widget class="QSplitter" name="splitter">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
          <widget class="QListWidget" name="listWidget"/>
          <widget class="QGroupBox" name="groupBox_file_buttons">
           <property name="minimumSize">
@@ -510,7 +531,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>File with latest coding</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string/>
@@ -526,7 +547,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>Next file</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string/>
@@ -542,7 +563,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>File memo</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string/>
@@ -630,7 +651,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>Code name filter</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </widget>
@@ -644,8 +665,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>906</width>
-            <height>153</height>
+            <width>467</width>
+            <height>494</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
