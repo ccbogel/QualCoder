@@ -134,7 +134,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         # Sticky: a later cancelled merge must not undo the refresh owed to an earlier one
         if mp.projects_merged:
             self.projects_merged = True
-        if mp.merge_cancelled:
+        else:
+            # Cancelled or failed, so allow another attempt
             self.ui.pushButton_merge.setEnabled(True)
 
     # Functions to update a text file but attempt to keep original codings
