@@ -3,7 +3,7 @@
  <class>Dialog_Comparisons</class>
  <widget class="QDialog" name="Dialog_Comparisons">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -331,6 +331,9 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
         <widget class="QTableWidget" name="tableWidget"/>
         <widget class="QListWidget" name="listWidget">
          <property name="wordWrap">

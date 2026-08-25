@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-24 09:26+0200\n"
+"POT-Creation-Date: 2026-08-25 16:23+0200\n"
 "PO-Revision-Date: 2026-08-21 11:21+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
@@ -263,6 +263,7 @@ msgstr "MÉMO : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:1894
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:425
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1021
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1883
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1340
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:401
@@ -3297,6 +3298,7 @@ msgstr "Mémo"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes_by_segments.py:427
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:544
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4486
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:137
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:115
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:336
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_relations.py:1027
@@ -5187,7 +5189,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3673
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3801
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:142
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:147
 msgid "Delete files"
 msgstr "Supprimer des fichiers"
 
@@ -8178,6 +8180,8 @@ msgid "New"
 msgstr "Nouveau"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4879
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:55
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:152
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:703
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:493
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:673
@@ -8740,79 +8744,346 @@ msgstr " segments dans "
 msgid "PDF underlines coded: "
 msgstr "Soulignements codés dans le PDF : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:53
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:56
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:125
+msgid "Merge projects"
+msgstr "Fusionner les projets"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:127
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:542
+#, fuzzy
+msgid "Merge preview"
+msgstr "Fusionner les projets"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:132
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:201
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:543
 msgid "Merging: "
 msgstr "Fusionner : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:53
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:132
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:201
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:544
 msgid "Into: "
 msgstr "Dans : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:84
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:137
+msgid "Item"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:143
+#, fuzzy
+msgid ""
+"Existing values in the destination project are not over-written, apart from "
+"blank attribute values."
+msgstr ""
+"Les valeurs existantes ne sont pas écrasées, sauf pour les attributs vides."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:146
+#, fuzzy
+msgid "Save this report to a journal"
+msgstr "Enregistrer le rapport dans le journal"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:147
+msgid "The report is stored as a journal entry, merged or cancelled"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:150
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:123
+msgid "Merge"
+msgstr "Fusionner"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:223
+msgid "No data.qda database found in the selected folder."
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:225
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:242
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:283
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:317
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1032
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1038
+msgid "Project not merged"
+msgstr "Projet non fusionné"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:225
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:118
+msgid "Not a QualCoder project"
+msgstr "Pas un projet QualCoder"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:232
+#, fuzzy
+msgid "Reading the project to merge"
+msgstr "Projet non fusionné"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:235
+#, fuzzy
+msgid "Preparing the preview"
+msgstr "Préparation de la réponse..."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:255
+#, fuzzy
+msgid "Copying files"
+msgstr "Mauvais fichier"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:261
+#, fuzzy
+msgid "Merging"
+msgstr "Fusionner : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:281
+#, fuzzy
+msgid "Merge failed, no changes were made. "
+msgstr "La restructuration a échoué. Aucun changement n'a été apporté."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:283
+#, fuzzy
+msgid "Merge failed"
+msgstr "Echec de l’export"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:286
+#, fuzzy
+msgid "Finishing"
+msgstr "Fin de la fusion "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:293
+#, fuzzy
+msgid "Could not update the AI vectorstore: "
+msgstr "Impossible d'enregistrer les fichiers d’instruction : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:294
 msgid "Finished merging "
 msgstr "Fin de la fusion "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:86
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:296
 msgid ""
 "Existing values in destination project are not over-written, apart from "
 "blank attribute values."
 msgstr ""
 "Les valeurs existantes ne sont pas écrasées, sauf pour les attributs vides."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:91
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:306
 msgid "Project merged"
 msgstr "Projet fusionné"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:91
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:306
 msgid "Review the action log for details."
 msgstr "Voir le journal des actions pour plus de détails."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:95
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:507
-msgid "Project not merged"
-msgstr "Projet non fusionné"
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:313
+#, fuzzy
+msgid "Merge cancelled. No changes were made."
+msgstr "La restructuration a échoué. Aucun changement n'a été apporté."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:114
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:317
+#, fuzzy
+msgid "Merge cancelled"
+msgstr "(recherche annulée)"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:364
+#, fuzzy
+msgid "and more, not listed: "
+msgstr " n'existe pas : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:380
+#, fuzzy
+msgid "source: "
+msgstr "Source"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:381
+#, fuzzy
+msgid "destination: "
+msgstr "Description : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:382
+#, fuzzy
+msgid "Files to add"
+msgstr "Sélectionnez les codes à ajouter"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:383
+#, fuzzy
+msgid "Files already in this project"
+msgstr "Aucun fichier dans ce projet."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:385
+msgid "Warning: different text lengths for the same file name"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:397
+#, fuzzy
+msgid "Media files to copy"
+msgstr "Sélectionner des fichiers à coder"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:403
+#, fuzzy
+msgid "Code categories to add"
+msgstr "Sélectionnez les catégories à ajouter"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:404
+#, fuzzy
+msgid "Code categories already in this project"
+msgstr "Aucune catégorie dans ce projet."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:411
+#, fuzzy
+msgid "Codes to add"
+msgstr "Codes à supprimer"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:412
+#, fuzzy
+msgid "Codes matched to existing codes"
+msgstr "Utiliser les codes existants"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:492
+#, fuzzy
+msgid "Coded text segments to add"
+msgstr "Segments de texte codés"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:493
+#, fuzzy
+msgid "Coded PDF areas to add"
+msgstr "Zone codé"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:494
+#, fuzzy
+msgid "Coded image areas to add"
+msgstr "Diagramme proportionnelle par zone d'image"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:495
+#, fuzzy
+msgid "Coded audio/video segments to add"
+msgstr "Code par segments audio/vidéo"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:496
+#, fuzzy
+msgid "Text annotations to add"
+msgstr "Sélectionner l'annotation à modifier"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:499
+msgid "Codings already in this project, not duplicated"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:501
+msgid "Codings skipped, missing code or file in the source project"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:513
+#, fuzzy
+msgid "Cases to add"
+msgstr "Cas ajoutés : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:514
+#, fuzzy
+msgid "Cases skipped, name already in this project"
+msgstr ""
+" les noms figurant dans la grille de codage existent déjà dans le projet."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:515
+msgid "Case file links to add"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:522
+#, fuzzy
+msgid "Journals to add"
+msgstr "Journaux : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:523
+#, fuzzy
+msgid "Journals skipped, name already in this project"
+msgstr ""
+" les noms figurant dans la grille de codage existent déjà dans le projet."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:527
+#, fuzzy
+msgid "Stored queries to add"
+msgstr "Sélectionnez les catégories à ajouter"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:530
+#, fuzzy
+msgid "Attribute types to add"
+msgstr " les types d'attributs importés"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:536
+#, fuzzy
+msgid "Attribute values"
+msgstr "Attributs"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:546
+#, fuzzy
+msgid "Result: "
+msgstr "Résultats exportés : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:546
+#, fuzzy
+msgid "merged"
+msgstr "Fusionner"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:546
+#, fuzzy
+msgid "cancelled, no changes were made"
+msgstr "La restructuration a échoué. Aucun changement n'a été apporté."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:580
+#, fuzzy
+msgid "Merge report saved to journal: "
+msgstr "Rapport de restructuration enregistré dans le journal : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:594
 msgid "Adding top level category: "
 msgstr "Ajout d'une catégorie de premier niveau : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:136
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:614
 msgid "Adding sub-category: "
 msgstr "Ajout d'une sous-catégorie : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:142
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:620
 msgid " categories not added"
 msgstr " catégories non ajoutées"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:178
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:654
 msgid "Adding code name: "
 msgstr "Ajout d'un nom de code : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:226
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:695
 msgid "Adding journal: "
 msgstr "Ajout d'un journal : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:240
-msgid "Merging coded text"
-msgstr "Fusion de textes codés"
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:709
+#, fuzzy
+msgid "Merging audio/video codings"
+msgstr "Fusion de segments audio/vidéo codés"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:246
-msgid "Merging annotations"
-msgstr "Fusionner les annotations"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:254
-msgid "Merging coded image areas"
-msgstr "Fusion des zones d'images codées"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:261
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:727
 msgid "Merging coded audio/video segments"
 msgstr "Fusion de segments audio/vidéo codés"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:298
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:728
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:740
+msgid "Merging coded text"
+msgstr "Fusion de textes codés"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:748
+msgid "Merging annotations"
+msgstr "Fusionner les annotations"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:751
+#, fuzzy
+msgid "Merging coded image and PDF areas"
+msgstr "Fusion des zones d'images codées"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:766
+msgid "Merging coded image areas"
+msgstr "Fusion des zones d'images codées"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:769
+msgid "Codings skipped, missing code or file: "
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:805
 msgid "Adding case: "
 msgstr "Ajout d'un cas : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:342
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:850
 msgid ""
 "Warning! Inaccurate coding positions. Text lengths different for same text "
 "file: "
@@ -8820,41 +9091,46 @@ msgstr ""
 "Attention ! Positions de codage imprécises. Longueurs de texte différentes "
 "pour un même fichier : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:344
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:852
 msgid "Import project file text length: "
 msgstr "Taille du texte du fichier de projet importé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:345
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:853
 msgid "Destination project file text length: "
 msgstr "Longueur du texte du fichier de destination : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:408
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:916
 msgid "File copied: "
 msgstr "Fichier copié : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:412
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:920
 msgid "NOT copied. Permission error"
 msgstr "NON copié. Erreur de permission"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:430
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:956
 msgid "Adding attribute ("
 msgstr "Ajout d'un attribut ("
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:479
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1001
 msgid "Added attribute values for cases and files: n="
 msgstr "Ajout de valeurs d'attributs pour les cas et les dossiers : n="
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:504
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1031
+#, fuzzy
+msgid "Could not read the source project database."
+msgstr "Mise à jour nécessaire de la base de données du projet source."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1035
 msgid "Need to update the source project database."
 msgstr "Mise à jour nécessaire de la base de données du projet source."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:505
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1036
 msgid "Please open the source project using QualCoder. Then close the project."
 msgstr ""
 "Veuillez ouvrir le projet source en utilisant QualCoder. Puis fermer le "
 "projet."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:506
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:1037
 msgid "This will update the database schema. Then try merging again."
 msgstr "Mettez à jour la base de données et essayez de fusionner à nouveau."
 
@@ -13842,7 +14118,7 @@ msgstr ""
 "Sélectionnez des fichiers à analyser pour identifier les intervenant⋅es"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:675
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:176
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:181
 msgid "No files selected"
 msgstr "Aucun fichier sélectionné"
 
@@ -14073,17 +14349,9 @@ msgstr "Annulé. Aucun code d’intervenant⋅es n’est appliqué."
 msgid "Speaker code could not be found or created."
 msgstr "Le code de l’intervenant⋅e n'a pas pu être trouvé ou créé."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:118
-msgid "Not a QualCoder project"
-msgstr "Pas un projet QualCoder"
-
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:121
 msgid "The same project"
 msgstr "Le même projet"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:123
-msgid "Merge"
-msgstr "Fusionner"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:123
 msgid "into"
@@ -14093,56 +14361,52 @@ msgstr "en"
 msgid "Press Run Button to merge projects"
 msgstr "Appuyez sur le bouton Run pour fusionner les projets"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:125
-msgid "Merge projects"
-msgstr "Fusionner les projets"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:148
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:180
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:153
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:185
 msgid "Select text file to replace"
 msgstr "Sélectionnez le fichier texte à remplacer"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:150
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:155
 msgid "Replacing: "
 msgstr "Remplaçant : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:158
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:163
 msgid "Replacement file"
 msgstr "Fichier de remplacement"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:162
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:182
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:167
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:187
 msgid "Select replacement text file"
 msgstr "Sélectionnez le fichier texte de remplacement"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:165
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:170
 msgid "Replacement file: "
 msgstr "Fichier de remplacement : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:168
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:173
 msgid "Press to replace the text file"
 msgstr "Appuyez sur pour remplacer le fichier texte"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:176
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:181
 msgid "No existing or replacement file selected"
 msgstr "Aucun fichier existant ou de remplacement sélectionné"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:198
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:203
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:105
 msgid "Change ALL text code start positions in ALL text files by "
 msgstr ""
 "Modifiez les positions de début de code de texte dans TOUS les fichiers "
 "texte en "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:199
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:246
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:204
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:251
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:106
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:149
 msgid " characters.\n"
 msgstr " caractères.\n"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:200
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:205
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:252
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:107
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:150
 msgid "Made by coder: "
@@ -14150,61 +14414,61 @@ msgstr ""
 "Fait par le \n"
 "·euse : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:201
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:248
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:206
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:253
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:108
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:151
 msgid " to change."
 msgstr " à changer."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:202
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:249
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:207
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:254
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:109
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:152
 msgid "Backup project before performing this function.\n"
 msgstr "Sauvegardez le projet avant d'exécuter cette fonction.\n"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:203
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:250
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:208
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:255
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:110
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:153
 msgid "Press OK to continue."
 msgstr "Appuyez sur OK pour continuer."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:204
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:111
 msgid "Change code start positions"
 msgstr "Modifier les positions de début de code"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:226
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:273
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:231
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:278
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:131
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:174
 msgid "All text codings by "
 msgstr "Tous les codages de texte par "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:226
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:273
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:231
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:278
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:131
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:174
 msgid " resized by "
 msgstr " redimensionné par "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:227
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:274
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:232
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:279
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:131
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:174
 msgid " characters."
 msgstr " caractères."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:245
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:250
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:148
 msgid "Change ALL text code end positions in ALL text files by "
 msgstr ""
 "Modifiez les positions de fin de code de texte dans TOUS les fichiers texte "
 "en "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:251
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:256
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:154
 msgid "Change code end positions"
 msgstr "Modifier les positions de fin de code"

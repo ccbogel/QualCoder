@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ui version="4.0">
  <class>Dialog_view_av</class>
  <widget class="QDialog" name="Dialog_view_av">
@@ -62,7 +62,7 @@
          </size>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -87,7 +87,7 @@
          <string>Help</string>
         </property>
         <property name="text">
-         <string/>
+         <string />
         </property>
        </widget>
       </item>
@@ -97,7 +97,7 @@
    <item>
     <widget class="QSplitter" name="splitter_v">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="childrenCollapsible">
       <bool>false</bool>
@@ -107,7 +107,7 @@
        <item>
         <widget class="QSplitter" name="splitter_left">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <widget class="QFrame" name="frame_video">
           <property name="minimumSize">
@@ -120,12 +120,15 @@
            <string notr="true">background-color: rgb(30, 30, 30);</string>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Shadow::Plain</enum>
           </property>
          </widget>
          <widget class="QGroupBox" name="groupBox_snippets">
           <property name="title">
-           <string/>
+           <string />
           </property>
           <layout class="QVBoxLayout" name="snippetsLayout">
            <property name="leftMargin">
@@ -162,7 +165,7 @@
               </size>
              </property>
              <property name="title">
-              <string/>
+              <string />
              </property>
              <widget class="QPushButton" name="pushButton_new_speaker">
               <property name="geometry">
@@ -174,7 +177,7 @@
                </rect>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_remove_speaker">
@@ -187,7 +190,7 @@
                </rect>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QCheckBox" name="checkBox_alternate_speakers">
@@ -246,7 +249,7 @@ red underline = Assigned to code or annotation</string>
           </size>
          </property>
          <property name="title">
-          <string/>
+          <string />
          </property>
          <widget class="QLineEdit" name="lineEdit_search">
           <property name="geometry">
@@ -274,7 +277,7 @@ red underline = Assigned to code or annotation</string>
            <string>Case sensitive</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QLabel" name="label_case_sensitive">
@@ -290,7 +293,7 @@ red underline = Assigned to code or annotation</string>
            <string>Case sensitive</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_next">
@@ -306,7 +309,7 @@ red underline = Assigned to code or annotation</string>
            <string>Next</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QLabel" name="label_search_regex">
@@ -330,13 +333,16 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <bool>false</bool>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::Box</enum>
           </property>
           <property name="lineWidth">
            <number>0</number>
           </property>
           <property name="text">
-           <string/>
+           <string />
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -355,7 +361,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Previous</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QLabel" name="label_search_totals">
@@ -369,6 +375,9 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
           </property>
           <property name="text">
            <string>0 / 0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_insert_timestamp">
@@ -384,7 +393,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Insert timestamp</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_load_transcription">
@@ -400,7 +409,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Load a transcription file (.txt, .srt, .vtt) into the transcription</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_goto_bookmark">
@@ -416,7 +425,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Go to bookmark (Ctrl Shift B)</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_set_bookmark">
@@ -432,7 +441,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
            <string>Set bookmark (Ctrl B)</string>
           </property>
           <property name="text">
-           <string/>
+           <string />
           </property>
          </widget>
          <widget class="QComboBox" name="comboBox_player">
@@ -453,7 +462,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
        <item>
         <widget class="QSplitter" name="splitter_write">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <widget class="QWidget" name="widget_transcript">
           <layout class="QHBoxLayout" name="transcriptLayout">
@@ -473,7 +482,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
             <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="lineNumbers" native="true"/>
+            <widget class="QWidget" name="lineNumbers" />
            </item>
            <item>
             <widget class="QTextEdit" name="textEdit">
@@ -536,8 +545,11 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
              <property name="value">
               <number>0</number>
              </property>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
              <property name="tickPosition">
-              <enum>QSlider::NoTicks</enum>
+              <enum>QSlider::TickPosition::TicksBelow</enum>
              </property>
              <property name="tickInterval">
               <number>10</number>
@@ -552,7 +564,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
                 <string>Time</string>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
@@ -565,14 +577,14 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
                 </size>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
              <item>
               <spacer name="timeSpacer">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -621,7 +633,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
               </size>
              </property>
              <property name="title">
-              <string/>
+              <string />
              </property>
              <widget class="QPushButton" name="pushButton_play">
               <property name="geometry">
@@ -638,7 +650,7 @@ Ctrl + S start/pause
 Ctrl + P start/pause</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QSlider" name="horizontalSlider_vol">
@@ -656,6 +668,9 @@ Ctrl + P start/pause</string>
               <property name="value">
                <number>100</number>
               </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
              </widget>
              <widget class="QLabel" name="label_volume">
               <property name="geometry">
@@ -670,7 +685,10 @@ Ctrl + P start/pause</string>
                <string>Volume</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QComboBox" name="comboBox_tracks">
@@ -694,6 +712,9 @@ Ctrl + P start/pause</string>
               </property>
               <property name="text">
                <string>Audio:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -737,10 +758,10 @@ Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1</string>
               </property>
               <property name="toolTip">
                <string>Decrease play rate
-Ctrl + Shift +&lt;</string>
+Ctrl + Shift + &amp;lt; </string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rate_up">
@@ -754,10 +775,10 @@ Ctrl + Shift +&lt;</string>
               </property>
               <property name="toolTip">
                <string>Increase play rate
-Ctrl + Shift + &gt; </string>
+Ctrl + Shift + &amp;gt; </string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rewind_5">
@@ -774,7 +795,7 @@ Ctrl + Shift + &gt; </string>
 Ctrl + R</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rewind_30">
@@ -791,7 +812,7 @@ Ctrl + R</string>
 Alt + Minus</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_forward_30">
@@ -808,7 +829,7 @@ Alt + Minus</string>
 Forward 5 seconds. Press 5</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_detach">
@@ -830,7 +851,7 @@ Forward 5 seconds. Press 5</string>
                <string>Detach / dock the video window</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_stop_segment">
@@ -846,7 +867,7 @@ Forward 5 seconds. Press 5</string>
                <string>Stop segment / loop playback</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_play_segment">
@@ -862,7 +883,7 @@ Forward 5 seconds. Press 5</string>
                <string>Play the selected range (wave selection, or transcript selection)</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_loop_segment">
@@ -878,7 +899,7 @@ Forward 5 seconds. Press 5</string>
                <string>Loop the selected range</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_clear_selection">
@@ -894,7 +915,7 @@ Forward 5 seconds. Press 5</string>
                <string>Clear the wave selection</string>
               </property>
               <property name="text">
-               <string/>
+               <string />
               </property>
              </widget>
             </widget>
@@ -933,6 +954,6 @@ Forward 5 seconds. Press 5</string>
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
  </tabstops>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

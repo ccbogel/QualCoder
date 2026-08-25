@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>870</height>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,11 +17,11 @@
    <item row="1" column="0">
     <widget class="QSplitter" name="splitter_2">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Vertical</enum>
       </property>
       <widget class="QListWidget" name="listWidget"/>
       <widget class="QGroupBox" name="groupBox_file_buttons">
@@ -250,7 +250,7 @@ To set a bookmark press B</string>
      </widget>
      <widget class="QSplitter" name="splitter_right">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <widget class="QWidget" name="topPanel" native="true">
        <property name="sizePolicy">
@@ -284,7 +284,7 @@ To set a bookmark press B</string>
         <item>
          <widget class="QSplitter" name="splitter_media">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="childrenCollapsible">
            <bool>false</bool>
@@ -306,7 +306,10 @@ To set a bookmark press B</string>
             <string notr="true">background-color: rgb(30, 30, 30);</string>
            </property>
            <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Plain</enum>
            </property>
           </widget>
           <widget class="QWidget" name="widget_media">
@@ -511,6 +514,9 @@ Keypress 5 - Forward 5 seconds</string>
                <property name="text">
                 <string>1.0x</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
               </widget>
               <widget class="QPushButton" name="pushButton_rate_up">
                <property name="geometry">
@@ -616,6 +622,9 @@ Keypress 5 - Forward 5 seconds</string>
               <property name="text">
                <string/>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -647,8 +656,11 @@ Keypress 5 - Forward 5 seconds</string>
               <property name="value">
                <number>0</number>
               </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
               <property name="tickPosition">
-               <enum>QSlider::NoTicks</enum>
+               <enum>QSlider::TickPosition::TicksBelow</enum>
               </property>
               <property name="tickInterval">
                <number>10</number>
@@ -686,7 +698,7 @@ Keypress 5 - Forward 5 seconds</string>
                </size>
               </property>
               <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
+               <enum>QFrame::Shape::StyledPanel</enum>
               </property>
               <property name="widgetResizable">
                <bool>true</bool>
@@ -696,8 +708,8 @@ Keypress 5 - Forward 5 seconds</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>418</width>
-                 <height>100</height>
+                 <width>724</width>
+                 <height>136</height>
                 </rect>
                </property>
               </widget>
@@ -822,15 +834,18 @@ Keypress 5 - Forward 5 seconds</string>
          <property name="text">
           <string/>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -952,7 +967,7 @@ Keypress 5 - Forward 5 seconds</string>
        </rect>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_auto_code">

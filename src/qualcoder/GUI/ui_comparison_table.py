@@ -90,6 +90,7 @@ class Ui_Dialog_Comparisons(object):
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox_2)
         self.gridLayout.setObjectName("gridLayout")
         self.splitter = QtWidgets.QSplitter(parent=self.groupBox_2)
+        self.splitter.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.splitter.setObjectName("splitter")
         self.tableWidget = QtWidgets.QTableWidget(parent=self.splitter)
         self.tableWidget.setObjectName("tableWidget")

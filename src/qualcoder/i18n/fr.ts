@@ -27,174 +27,149 @@
 <context>
     <name>DialogCharts</name>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="283"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="289"/>
         <source>Charts</source>
         <translation>Graphiques</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="284"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="290"/>
         <source>Charts displayed in the default web browser</source>
         <translation>Graphiques affichés dans le navigateur par défaut</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="285"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="291"/>
         <source>Pie charts</source>
         <translation>Diagrammes circulaires</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="286"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="292"/>
         <source>Bar charts</source>
         <translation>Graphiques à barres</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="287"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="293"/>
         <source>Sunburst and treemap charts</source>
         <translation>Diagramme radial et Treemap</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="289"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="295"/>
         <source>Select coder</source>
         <translation>Sélectionner un codeur·se</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="291"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="297"/>
         <source>Select file</source>
         <translation>Sélectionnez un fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="293"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="299"/>
         <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
         <translation>Si des parties d&apos;un fichier texte sont attribuées à un cas, la fréquence des codes et le nombre total de caractères du texte peuvent être incorrects.
 Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="295"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="301"/>
         <source>Select case</source>
         <translation>Sélectionner un cas</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="296"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="302"/>
         <source>Select attributes</source>
         <translation>Sélectionner les attributs</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="297"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="303"/>
         <source>Filter out values below:</source>
         <translation>Filtrez les valeurs ci-dessous :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="298"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="304"/>
         <source>Enter number for filter cut off</source>
         <translation>Entrez le numéro de la coupure du filtre</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="299"/>
-        <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Filtres de données&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="300"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Graphiques de codage&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="305"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="311"/>
         <source>Select category</source>
         <translation>Sélectionnez une catégorie</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="306"/>
-        <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Graphes d&apos;attributs&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="307"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="313"/>
         <source>Numeric attributes</source>
         <translation>Attributs numériques</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="308"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="314"/>
         <source>Character attributes</source>
         <translation>Attributs de caractère</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="309"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="315"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="310"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="316"/>
         <source>Case</source>
         <translation>Cas</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="311"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="317"/>
         <source>Export HTML file</source>
         <translation>Exporter le fichier HTML</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="312"/>
-        <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Cartes thermiques&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="313"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="319"/>
         <source>Word cloud</source>
         <translation>Nuage de mots</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="317"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="323"/>
         <source>Width</source>
         <translation>Largeur</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="318"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="324"/>
         <source>Height</source>
         <translation>Hauteur</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="319"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="325"/>
         <source>Max words</source>
         <translation>Nombre maximal de mots</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="321"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="327"/>
         <source>Reverse colour range</source>
         <translation>Gamme de couleurs inversées</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="322"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="328"/>
         <source>Reverse range</source>
         <translation>Gamme inversée</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="323"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="329"/>
         <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
         <translation>Nombre de mots joints dans la phrase. Mots vides s&apos;applique à la sélection d&apos;un seul mot.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="324"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="330"/>
         <source>n-grams</source>
         <translation>n-grams</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="325"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="331"/>
         <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
         <translation>1=un mot, 3=une phrase de 3 mots, 4=une phrase de 4 mots</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="328"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="334"/>
         <source>Upper count limiter</source>
         <translation>Limiteur de nombre maximal</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="332"/>
-        <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation>&lt;b&gt; Graphique à barres cumulé&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="333"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="339"/>
         <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
@@ -207,22 +182,22 @@ Le fichier doit être au format texte brut, avec un mot par ligne.
 Chaque mot est exclu du nuage de mots n-grams=1.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="338"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="344"/>
         <source>Stop words</source>
         <translation>Mots vides</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="339"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="345"/>
         <source>Select stopwords list by language</source>
         <translation>Sélectionner la liste des mots vides par langue</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="301"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="307"/>
         <source>Right-click for text filter</source>
         <translation>Clic-droit pour filtrer le texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="302"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="308"/>
         <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
@@ -231,41 +206,66 @@ les statistiques de code et de caractères peuvent être erronées.
 Les calculs se font à partir du texte complet.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="314"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="320"/>
         <source>Background</source>
         <translation>Arrière-plan</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="315"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="321"/>
         <source>Foreground</source>
         <translation>Premier plan</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="329"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="335"/>
         <source>Image width</source>
         <translation>Largeur d’image</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="330"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="336"/>
         <source>Image height</source>
         <translation>Hauteur d’image</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="331"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="337"/>
         <source>Maximum words</source>
         <translation>Nombre maximal de mots</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="316"/>
-        <source>Make Word Cloud</source>
-        <translation>Créer un nuage de mots</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_charts.py" line="326"/>
+        <location filename="../GUI/ui_dialog_charts.py" line="332"/>
         <source>This is to allow a wider spread of heatmap colours when there are extreme count differences.
 0 represents no limit.</source>
         <translation>Cela permet d&apos;élargir la palette de couleurs de la carte thermique en cas de différences de comptage extrêmes.
 0 représente aucune limite.</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_charts.py" line="305"/>
+        <source>Data filters</source>
+        <translation>Filtres de données</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_charts.py" line="306"/>
+        <source>Coding charts</source>
+        <translation>Graphiques de codage</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_charts.py" line="312"/>
+        <source>Attribute charts</source>
+        <translation>Graphes d’attributs</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_charts.py" line="318"/>
+        <source>Heatmap charts</source>
+        <translation>Cartes thermiques</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_charts.py" line="322"/>
+        <source>Make Word Cloudp</source>
+        <translation>Créer un nuage de mots</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_charts.py" line="338"/>
+        <source>Cumulative barchart</source>
+        <translation>Graphique à barres cumulé</translation>
     </message>
 </context>
 <context>
@@ -597,11 +597,6 @@ Clic droit pour les options</translation>
         <translation>Rapport des segments correspondants</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_matching_segments.py" line="112"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Rapport de segments de texte correspondants exacts</translation>
-    </message>
-    <message>
         <location filename="../GUI/ui_report_matching_segments.py" line="118"/>
         <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
         <translation>Sélectionner fichier(s), codeur·se, 2+ codes. Exclure un code (clic droit).</translation>
@@ -652,6 +647,11 @@ Coché : Un code parmi ceux sélectionnés suffit.</translation>
         <location filename="../GUI/ui_report_matching_segments.py" line="121"/>
         <source>Matching exact coded text for multiple codes are collated into one line.</source>
         <translation>Le texte codé exact correspondant à plusieurs codes est regroupé sur une seule ligne.</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_matching_segments.py" line="112"/>
+        <source>Exact match text segments report</source>
+        <translation>Rapport de segments de texte correspondants exacts</translation>
     </message>
 </context>
 <context>
@@ -1122,62 +1122,62 @@ Classement par nom de fichier et nom de code.</translation>
 <context>
     <name>Dialog_Comparisons</name>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="109"/>
+        <location filename="../GUI/ui_comparison_table.py" line="110"/>
         <source>Code Counts by file or case</source>
         <translation>Nombre de codes par fichier ou par dossier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="111"/>
+        <location filename="../GUI/ui_comparison_table.py" line="112"/>
         <source>Code counts table</source>
         <translation>Occurrences des codes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="113"/>
+        <location filename="../GUI/ui_comparison_table.py" line="114"/>
         <source>Hide blank lines</source>
         <translation>Masquer les lignes vides</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="112"/>
+        <location filename="../GUI/ui_comparison_table.py" line="113"/>
         <source>Export to file</source>
         <translation>Exporter vers un fichier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="114"/>
+        <location filename="../GUI/ui_comparison_table.py" line="115"/>
         <source>Select files</source>
         <translation>Sélectionner des fichiers</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="115"/>
+        <location filename="../GUI/ui_comparison_table.py" line="116"/>
         <source>Select categories</source>
         <translation>Sélectionner des catégories</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="116"/>
+        <location filename="../GUI/ui_comparison_table.py" line="117"/>
         <source>Select codes</source>
         <translation>Sélectionner des codes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="117"/>
+        <location filename="../GUI/ui_comparison_table.py" line="118"/>
         <source>Select attribute</source>
         <translation>Sélectionner un attribut</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="118"/>
+        <location filename="../GUI/ui_comparison_table.py" line="119"/>
         <source>Select cases</source>
         <translation>Sélectionner des cas</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="119"/>
+        <location filename="../GUI/ui_comparison_table.py" line="120"/>
         <source>Highlight colour</source>
         <translation>Couleur de surlignage</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="120"/>
+        <location filename="../GUI/ui_comparison_table.py" line="121"/>
         <source>Transpose table</source>
         <translation>Transposer un tableau</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_comparison_table.py" line="110"/>
+        <location filename="../GUI/ui_comparison_table.py" line="111"/>
         <source>Show the overlapping codes.</source>
         <translation>Montrer les codes qui se chevauchent.</translation>
     </message>
@@ -1657,281 +1657,6 @@ Le fichier doit avoir une ligne d&apos;en-tête et la première colonne doit con
     </message>
 </context>
 <context>
-    <name>Dialog_code_av</name>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="422"/>
-        <source>Code Audio Video</source>
-        <translation>Codage audio et vidéo</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="470"/>
-        <source>Segment:</source>
-        <translation>Segment :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="441"/>
-        <source>1.0x</source>
-        <translation>1.0x</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="475"/>
-        <source>Help</source>
-        <translation>Aide</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="432"/>
-        <source>Show codings flagged important</source>
-        <translation>Montrer les codages marqués comme importants</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="426"/>
-        <source>Show files with selected file attributes</source>
-        <translation>Montrer les fichiers avec les attributs de fichier sélectionnés</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="471"/>
-        <source>Cannot code text when play transcript box is checked.</source>
-        <translation>Impossible de coder le texte si la case Jouer est cochée.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="434"/>
-        <source>Ctrl P or Ctrl D Play/Pause</source>
-        <translation>Ctrl P ou Ctrl D Lecture/Pause</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="435"/>
-        <source>Rewind 5 seconds. Ctrl + R</source>
-        <translation>Revenir en arrière de 5 secondes. Ctrl + R</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="433"/>
-        <source>Find code</source>
-        <translation>Trouver le code</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="466"/>
-        <source>Start segment</source>
-        <translation>Segment de départ</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="427"/>
-        <source>Clear file filter</source>
-        <translation>Effacer le filtre des fichiers</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="430"/>
-        <source>Clear code filter</source>
-        <translation>Effacer le filtre des codes</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="431"/>
-        <source>Code name filter</source>
-        <translation>Filtrer par nom de code</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="428"/>
-        <source>Go to bookmark (Shift B)
-To set a bookmark press B</source>
-        <translation>Aller au signet (Maj + B)
-Pour créer un signet, appuyez sur B</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="464"/>
-        <source>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment. Key shortcut: Ctrl S
-Open memo and apply segment to currently selected code. Key shortcut: G</source>
-        <translation>Appuyez sur le bouton Démarrer le segment pour commencer à coder le segment audio/vidéo. Appuyez sur le bouton Terminer le segment pour mettre fin au segment codé. Raccourci clavier : Ctrl + S
-Ouvrir la note et appliquer le segment au code actuellement sélectionné. Raccourci clavier : G</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="443"/>
-        <source>Change track, if multiple available.</source>
-        <translation>Changer de piste, si plusieurs sont disponibles.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="439"/>
-        <source>Decrease play rate Key &lt;</source>
-        <translation>Diminuer la vitesse de lecture Raccourci &lt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="442"/>
-        <source>Increase play rate Key &gt;</source>
-        <translation>Augmenter la vitesse de lecture Raccourci &gt;</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="448"/>
-        <source>Coder</source>
-        <translation>Codeur⋅se</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="445"/>
-        <source>Volume</source>
-        <translation>Volume</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="449"/>
-        <source>Coder visibility</source>
-        <translation>Visibilité du codeur⋅se</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="450"/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="451"/>
-        <source>Show annotations</source>
-        <translation>Montrer les annotations</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="452"/>
-        <source>Show memos</source>
-        <translation>Montrer les mémos</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="453"/>
-        <source>Auto code the transcript with exact text.
-Use | to code multiple texts.</source>
-        <translation>Codez automatiquement la transcription en utilisant le texte exact.
-Utilisez | pour coder plusieurs textes.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="463"/>
-        <source>0 / 0</source>
-        <translation>0 / 0</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="472"/>
-        <source>Scroll transcript</source>
-        <translation>Faire défiler la transcription</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="474"/>
-        <source>Sync coding</source>
-        <translation>Codage synchrone</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="479"/>
-        <source>Media player backend</source>
-        <translation>Moteur du lecteur multimédia</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="423"/>
-        <source>File with latest coding</source>
-        <translation>Fichier avec le dernier codage</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="424"/>
-        <source>Next file</source>
-        <translation>Fichier suivant</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="425"/>
-        <source>File memo</source>
-        <translation>Mémo de fichier</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="436"/>
-        <source>Rewind 30 seconds. Alt + Minus</source>
-        <translation>Rebobiner 30 secondes. Alt + Moins</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="440"/>
-        <source>Ctrl + Shift + &amp;gt; increase, Ctrl + Shift + &amp;lt; decrease</source>
-        <translation>Ctrl + Shift + &amp;gt; augmenter, Ctrl + Shift + &amp;lt; diminuer</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="444"/>
-        <source>Detach the video into a floating window. Close the window to dock it back.</source>
-        <translation>Détachez la vidéo pour l&apos;afficher dans une fenêtre flottante. Fermez la fenêtre pour la rattacher.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="446"/>
-        <source>Left click on the slider button and drag left or right to change media position.</source>
-        <translation>Cliquez et faites glisser le curseur pour modifier la position dans le média.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="447"/>
-        <source>Transcript</source>
-        <translation>Retranscription</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="455"/>
-        <source>Undo auto coding</source>
-        <translation>Annuler le codage automatique</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="456"/>
-        <source>Search transcript text</source>
-        <translation>Rechercher dans le texte de la retranscription</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="459"/>
-        <source>search case sensitive</source>
-        <translation>Recherche sensible à la casse</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="460"/>
-        <source>Search text. Case sensitive</source>
-        <translation>Recherche de texte. Sensible à la casse</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="461"/>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="462"/>
-        <source>Next</source>
-        <translation>Suivant</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="467"/>
-        <source>Button to select a segment.
-Then a menu of options will open.</source>
-        <translation>Bouton pour sélectionner un segment.
-Un menu d&apos;options s&apos;ouvrira ensuite.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="469"/>
-        <source>Drag on the wave to select, then click a code in the tree to assign it.</source>
-        <translation>Glissez sur l&apos;onde pour sélectionner, puis cliquez sur un code dans l&apos;arborescence pour l&apos;assigner.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="473"/>
-        <source>When coding text, also create the matching segment on the wave, using the transcript timestamps.</source>
-        <translation>Lors du codage du texte, créer aussi le segment correspondant sur l&apos;onde en utilisant les horodatages de la transcription.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="476"/>
-        <source>Screenshot</source>
-        <translation>Capture d’écran</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="477"/>
-        <source>Project image from screenshot</source>
-        <translation>Image du projet depuis la capture d&apos;écran</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="478"/>
-        <source>Mark speakers in the transcript</source>
-        <translation>Surligner l’intervenant⋅e dans la retranscription</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="437"/>
-        <source>Forward 30 seconds. Alt + Plus
-Keypress 5 - Forward 5 seconds</source>
-        <translation>Avancer 30 secondes. Alt + Plus
-Touche 5 - Avancer 5 secondes</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_av.py" line="457"/>
-        <source>Search for text.
-Check Case sensitive to match case.</source>
-        <translation>Rechercher du texte.
-Cochez Respecter la casse pour respecter la casse.</translation>
-    </message>
-</context>
-<context>
     <name>Dialog_code_colors</name>
     <message>
         <location filename="../GUI/ui_dialog_code_colours.py" line="95"/>
@@ -1980,154 +1705,6 @@ Cochez Respecter la casse pour respecter la casse.</translation>
         <location filename="../GUI/ui_dialog_code_context_image.py" line="58"/>
         <source>View Image</source>
         <translation>Visualiser l&apos;image</translation>
-    </message>
-</context>
-<context>
-    <name>Dialog_code_image</name>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="216"/>
-        <source>View Image</source>
-        <translation>Visualiser l&apos;image</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="218"/>
-        <source>Coded area:</source>
-        <translation>Zone codée :</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="220"/>
-        <source>Show codings flagged important</source>
-        <translation>Montrer les codages marqués comme importants</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="241"/>
-        <source>Show files using selected file attributes</source>
-        <translation>Montrer les fichiers utilisant les attributs de fichiers sélectionnés</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="217"/>
-        <source>Image details</source>
-        <translation>Détails de l&apos;image</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="232"/>
-        <source>Set default colour for new codes</source>
-        <translation>Définir la couleur par défaut pour les nouveaux codes</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="233"/>
-        <source>PDF controls</source>
-        <translation>Contrôles PDF</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="234"/>
-        <source>Find code</source>
-        <translation>Trouver le code</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="236"/>
-        <source>Coder visibility</source>
-        <translation>Visibilité du codeur⋅se</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="237"/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="242"/>
-        <source>Clear file filter</source>
-        <translation>Effacer le filtre des fichiers</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="243"/>
-        <source>Clear code filter</source>
-        <translation>Effacer le filtre des codes</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="235"/>
-        <source>Coder</source>
-        <translation>Codeur⋅se</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="219"/>
-        <source>This coded area</source>
-        <translation>Cette zone codée</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="221"/>
-        <source>Export image as html file.</source>
-        <translation>Exporter l&apos;image en tant que fichier html.</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="222"/>
-        <source>Show captions</source>
-        <translation>Montrer les légendes</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="223"/>
-        <source>Zoom in. W or +</source>
-        <translation>Zoomer W ou +</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="224"/>
-        <source>Zoom out. Q or -</source>
-        <translation>Dézoomer. Q ou -</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="225"/>
-        <source>Rotate counter-clockwise</source>
-        <translation>Tourner dans le sens inverse des aiguilles d&apos;une montre</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="226"/>
-        <source>Rotate clockwise</source>
-        <translation>Rotation dans le sens des aiguilles d&apos;une montre</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="227"/>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="228"/>
-        <source>Next</source>
-        <translation>Suivant</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="229"/>
-        <source>Pages</source>
-        <translation>Pages</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="230"/>
-        <source>Last Page</source>
-        <translation>Dernière page</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="231"/>
-        <source>Go to page</source>
-        <translation>Aller à la page</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="238"/>
-        <source>File with latest coding</source>
-        <translation>Fichier avec le dernier codage</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="239"/>
-        <source>Next file</source>
-        <translation>Fichier suivant</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="240"/>
-        <source>File memo</source>
-        <translation>Mémo de fichier</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_image.py" line="244"/>
-        <source>Code name filter</source>
-        <translation>Filtrer par nom de code</translation>
     </message>
 </context>
 <context>
@@ -4803,129 +4380,129 @@ ou à réduire (nombres négatifs)</translation>
 <context>
     <name>Dialog_view_av</name>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="307"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="314"/>
         <source>View Audio Video</source>
         <translation>Visualiser audio / vidéo</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="314"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="321"/>
         <source>Transcription:</source>
         <translation>Retranscription :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="338"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="345"/>
         <source>Audio:</source>
         <translation>Audio :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="339"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="346"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
         <translation>Faites défiler la retranscription pendant la lecture. (La retranscription ne peut pas être codée)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="342"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="349"/>
         <source>1.0x</source>
         <translation>1,0x</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="308"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="315"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="326"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="333"/>
         <source>0 / 0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="312"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="319"/>
         <source>green underline = Assigned to case.
 red underline = Assigned to code or annotation</source>
         <translation>souligné en vert = assigné au cas.
 souligné en rouge = Affecté au code ou à l&apos;annotation</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="317"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="324"/>
         <source>Case sensitive</source>
         <translation>Sensible à la casse</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="330"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="337"/>
         <source>Set bookmark (Ctrl B)</source>
         <translation>Ajouter en signet (Ctrl B)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="329"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="336"/>
         <source>Go to bookmark (Ctrl Shift B)</source>
         <translation>Aller au signet (Ctrl Maj B)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="311"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="318"/>
         <source>Alternate</source>
         <translation>Alterner</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="327"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="334"/>
         <source>Insert timestamp</source>
         <translation>Insérer un horodatage</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="328"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="335"/>
         <source>Load a transcription file (.txt, .srt, .vtt) into the transcription</source>
         <translation>Charger un fichier de retranscription (.txt, .srt, .vtt) dans la retranscription</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="331"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="338"/>
         <source>Media player backend</source>
         <translation>Moteur du lecteur multimédia</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="353"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="360"/>
         <source>Detach / dock the video window</source>
         <translation>Détacher / ancrer la fenêtre vidéo</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="354"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="361"/>
         <source>Stop segment / loop playback</source>
         <translation>Arrêter la lecture du segment / de la boucle</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="355"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="362"/>
         <source>Play the selected range (wave selection, or transcript selection)</source>
         <translation>Lire la plage sélectionnée (sélection d&apos;onde ou sélection de transcription)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="356"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="363"/>
         <source>Loop the selected range</source>
         <translation>Lire en boucle la plage sélectionnée</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="357"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="364"/>
         <source>Clear the wave selection</source>
         <translation>Effacer la sélection d&apos;ondes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="309"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="316"/>
         <source>Double click inserts the element into the transcription at the cursor position.</source>
         <translation>Un double-clic insère l&apos;élément dans la transcription à la position du curseur.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="310"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="317"/>
         <source>Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).</source>
         <translation>Insérer automatiquement le prochain intervenant⋅e à chaque saut de ligne (Alt+Entrée en insère un systématiquement).</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="315"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="322"/>
         <source>Search for text.</source>
         <translation>Recherchez le texte.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="318"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="325"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="319"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="326"/>
         <source>Search uses Regex functions. 
 A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. 
 A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ 
@@ -4940,22 +4517,22 @@ Un « * » après un caractère correspondra à zéro ou plusieurs occurrences.
 Aide-mémoire sur les expressions régulières : www.rexegg.com/regex-quickstart.html</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="325"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="332"/>
         <source>Previous</source>
         <translation>Précédent</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="332"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="339"/>
         <source>Left click on the slider button and drag left or right to change media position.</source>
         <translation>Cliquez et faites glisser le curseur pour modifier la position dans le média.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="333"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="340"/>
         <source>Time</source>
         <translation>Teùŝ</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="334"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="341"/>
         <source>Play / Pause
 Ctrl + S start/pause
 Ctrl + P start/pause</source>
@@ -4964,51 +4541,49 @@ Ctrl + S lancer/pause
 Ctrl + P lancer/pause</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="337"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="344"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="340"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="347"/>
         <source>Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0
 Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1</source>
         <translation>Ctrl + Shift + &amp;gt; augmenter la vitesse de lecture, maximum 2.0 
 Ctrl + Shift + &amp;lt; réduire la vitesse de lecture, minimum 0.1</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="345"/>
-        <source>Increase play rate
-Ctrl + Shift + &gt; </source>
-        <translation>Augmenter la vitesse de lecture
-Ctrl + Shift + &amp;gt; </translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="347"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="354"/>
         <source>Rewind 5 seconds
 Ctrl + R</source>
         <translation>Rebobiner 5 secondes
 Ctrl + R</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="349"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="356"/>
         <source>Rewind 30 seconds
 Alt + Minus</source>
         <translation>Rebobiner 30 secondes
 Alt + Minus</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="351"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="358"/>
         <source>Forward 30 seconds. Alt + Plus
 Forward 5 seconds. Press 5</source>
         <translation>Avancer de 30 secondes. Alt + Plus
 Avancer de 5 secondes. Appuyer  5</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="343"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="350"/>
         <source>Decrease play rate
-Ctrl + Shift +&lt;</source>
-        <translation>Réduire la vitesse de lecture
-Ctrl + Shift + &lt;</translation>
+Ctrl + Shift + &amp;lt; </source>
+        <translation>Diminuer la vitesse de lecture Raccourci &amp;lt; </translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_view_av.py" line="352"/>
+        <source>Increase play rate
+Ctrl + Shift + &amp;gt; </source>
+        <translation>Augmenter la vitesse de lecture Raccourci &amp;gt; </translation>
     </message>
 </context>
 <context>

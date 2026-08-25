@@ -109,7 +109,7 @@ class Ui_DialogMatchingTextSegments(object):
         _translate = QtCore.QCoreApplication.translate
         DialogMatchingTextSegments.setWindowTitle(_translate("DialogMatchingTextSegments", "Report matching text segments"))
         self.comboBox_coders.setToolTip(_translate("DialogMatchingTextSegments", "Select coder. Blank for all."))
-        self.label_title.setText(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Exact match text segments report</p></body></html>"))
+        self.label_title.setText(_translate("DialogMatchingTextSegments", "Exact match text segments report"))
         self.label_coder.setToolTip(_translate("DialogMatchingTextSegments", "Select coder. Blank for all"))
         self.pushButton_export.setToolTip(_translate("DialogMatchingTextSegments", "Export Excel file"))
         self.pushButton_run.setToolTip(_translate("DialogMatchingTextSegments", "Run"))
