@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>870</height>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,13 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
     <widget class="QSplitter" name="splitter_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
      <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Orientation::Vertical</enum>
+      </property>
       <widget class="QListWidget" name="listWidget"/>
       <widget class="QGroupBox" name="groupBox_file_buttons">
        <property name="minimumSize">
@@ -44,7 +50,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>File with latest coding</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -60,7 +66,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Next file</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -76,7 +82,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>File memo</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -243,6 +249,9 @@ To set a bookmark press B</string>
       </widget>
      </widget>
      <widget class="QSplitter" name="splitter_right">
+      <property name="orientation">
+       <enum>Qt::Orientation::Horizontal</enum>
+      </property>
       <widget class="QWidget" name="topPanel" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -274,6 +283,9 @@ To set a bookmark press B</string>
         </property>
         <item>
          <widget class="QSplitter" name="splitter_media">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
           <property name="childrenCollapsible">
            <bool>false</bool>
           </property>
@@ -294,7 +306,10 @@ To set a bookmark press B</string>
             <string notr="true">background-color: rgb(30, 30, 30);</string>
            </property>
            <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Plain</enum>
            </property>
           </widget>
           <widget class="QWidget" name="widget_media">
@@ -421,7 +436,7 @@ To set a bookmark press B</string>
                 </size>
                </property>
                <property name="toolTip">
-                <string>Rewind 30 seconds. Alt + Minus</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -449,7 +464,7 @@ To set a bookmark press B</string>
                 </size>
                </property>
                <property name="toolTip">
-                <string>Forward 30 seconds. Alt + Plus Keypress 5 - Forward 5 seconds</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -493,10 +508,13 @@ To set a bookmark press B</string>
                 </rect>
                </property>
                <property name="toolTip">
-                <string>Ctrl + Shift + &amp;gt; increase, Ctrl + Shift + &amp;lt; decrease</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase, Ctrl + Shift + &amp;lt; decrease&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>1.0x</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
               <widget class="QPushButton" name="pushButton_rate_up">
@@ -562,7 +580,7 @@ To set a bookmark press B</string>
                 </size>
                </property>
                <property name="toolTip">
-                <string>Detach the video into a floating window. Close the window to dock it back.</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Detach the video into a floating window. Close the window to dock it back.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -603,6 +621,9 @@ To set a bookmark press B</string>
               <property name="text">
                <string/>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -620,7 +641,7 @@ To set a bookmark press B</string>
                </size>
               </property>
               <property name="toolTip">
-               <string>Left click on the slider button and drag left or right to change media position.</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change media position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="minimum">
                <number>0</number>
@@ -634,8 +655,11 @@ To set a bookmark press B</string>
               <property name="value">
                <number>0</number>
               </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
               <property name="tickPosition">
-               <enum>QSlider::NoTicks</enum>
+               <enum>QSlider::TickPosition::TicksBelow</enum>
               </property>
               <property name="tickInterval">
                <number>10</number>
@@ -673,7 +697,7 @@ To set a bookmark press B</string>
                </size>
               </property>
               <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
+               <enum>QFrame::Shape::StyledPanel</enum>
               </property>
               <property name="widgetResizable">
                <bool>true</bool>
@@ -683,8 +707,8 @@ To set a bookmark press B</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>1380</width>
-                 <height>100</height>
+                 <width>724</width>
+                 <height>136</height>
                 </rect>
                </property>
               </widget>
@@ -731,7 +755,7 @@ To set a bookmark press B</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Transcript</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -809,12 +833,18 @@ To set a bookmark press B</string>
          <property name="text">
           <string/>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -936,7 +966,7 @@ To set a bookmark press B</string>
        </rect>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_auto_code">
@@ -990,7 +1020,7 @@ Use | to code multiple texts.</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Undo auto coding</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1006,7 +1036,7 @@ Use | to code multiple texts.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search transcript text</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search transcript text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1022,7 +1052,7 @@ Use | to code multiple texts.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search for text. Check Case sensitive to match case.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;Check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; to match case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_search_case">
@@ -1035,7 +1065,7 @@ Use | to code multiple texts.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>search case sensitive</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1051,7 +1081,7 @@ Use | to code multiple texts.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search text. Case sensitive</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1079,7 +1109,7 @@ Use | to code multiple texts.</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Previous</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1107,7 +1137,7 @@ Use | to code multiple texts.</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Next</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1165,8 +1195,7 @@ Open memo and apply segment to currently selected code. Key shortcut: G</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Button to select a segment.
-Then a menu of options will open.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment.&lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1182,7 +1211,7 @@ Then a menu of options will open.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Drag on the wave to select, then click a code in the tree to assign it.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Drag on the wave to select, then click a code in the tree to assign it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Segment:</string>
@@ -1214,7 +1243,7 @@ Then a menu of options will open.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>When coding text, also create the matching segment on the wave, using the transcript timestamps.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When coding text, also create the matching segment on the wave, using the transcript timestamps.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Sync coding</string>
@@ -1270,7 +1299,7 @@ Then a menu of options will open.</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Screenshot</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1298,7 +1327,7 @@ Then a menu of options will open.</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Project image from screenshot</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -1326,7 +1355,7 @@ Then a menu of options will open.</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>Mark speakers in the transcript</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark speakers in the transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>

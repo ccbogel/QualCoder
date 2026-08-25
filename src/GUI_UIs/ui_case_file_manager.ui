@@ -184,7 +184,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>Double click the file row to view image, audio, or video</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click the file row to view image, audio, or video&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>File:</string>

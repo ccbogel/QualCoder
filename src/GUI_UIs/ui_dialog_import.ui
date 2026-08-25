@@ -53,7 +53,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string/>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>,</string>
@@ -69,8 +69,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Delimiter must be a single character.
-Enter 'ta' for 'tab'</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter 'ta' for 'tab'&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
@@ -108,9 +107,7 @@ Enter 'ta' for 'tab'</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>NONE 123, abc
-MINIMAL 123, &amp;quot;abc&amp;quot;
-ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <item>
        <property name="text">
@@ -188,8 +185,7 @@ ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;</string>
    <item row="4" column="0">
     <widget class="QCheckBox" name="checkBox_collate">
      <property name="toolTip">
-      <string>If checked: All the rows of a qualitative column will be collated into one text file.
-If unchecked: Each qualitative answer will be an individual text file within the database.</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked: All the rows of a qualitative column will be collated into one text file.&lt;/p&gt;&lt;p&gt;If unchecked: Each qualitative answer will be an individual text file within the database.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>One file per qualitative column</string>

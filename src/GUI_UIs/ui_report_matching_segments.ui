@@ -3,7 +3,7 @@
  <class>DialogMatchingTextSegments</class>
  <widget class="QDialog" name="DialogMatchingTextSegments">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -65,7 +65,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Select coder. Blank for all.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_title">
@@ -79,7 +79,6 @@
       </property>
       <property name="font">
        <font>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -91,6 +90,9 @@
       </property>
       <property name="scaledContents">
        <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -216,7 +218,7 @@ Checked - any selected codes must match exactly.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Matching exact coded text for multiple codes are collated into one line.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>One line results</string>
@@ -263,7 +265,13 @@ Checked - any selected codes must match exactly.</string>
       </property>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
         <widget class="QSplitter" name="splitter_vert">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
          <widget class="QListWidget" name="listWidget_files"/>
          <widget class="QTreeWidget" name="treeWidget">
           <column>

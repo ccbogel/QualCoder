@@ -58,10 +58,8 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search for text.
-checkCase sensitive for case sensitive search
-check All files for searching all files search
-Right-click to change automatic searching options</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
+&lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_search_case">
@@ -74,7 +72,7 @@ Right-click to change automatic searching options</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>search case sensitive</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -90,7 +88,7 @@ Right-click to change automatic searching options</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>search all files</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -108,6 +106,9 @@ Right-click to change automatic searching options</string>
       <property name="text">
        <string>0 / 0</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
@@ -119,7 +120,7 @@ Right-click to change automatic searching options</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Previous</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -135,7 +136,7 @@ Right-click to change automatic searching options</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Next</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -151,13 +152,16 @@ Right-click to change automatic searching options</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search text. All text files.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -173,13 +177,16 @@ Right-click to change automatic searching options</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search text. Case sensitive</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -212,7 +219,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Undo auto coding</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -228,7 +235,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Delete all codes by this coder from this file</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -244,7 +251,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Annotate selection</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -260,7 +267,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Memo for this coded section</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -276,19 +283,16 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search uses Regex functions.
-A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.
-A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’
-A ‘*’ after a character will match zero or more times. 
-\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol.
-Regex cheatsheet: www.rexegg.com/regex-quickstart.html
-</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -304,7 +308,7 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html
        </rect>
       </property>
       <property name="toolTip">
-       <string>Auto code using start and end marks.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -456,8 +460,7 @@ As all assigned positions may be incorrect. </string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>After editing the text:
-Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -489,7 +492,7 @@ Review edited text to confirm code positions are correct. Press button to Undo e
        </rect>
       </property>
       <property name="toolTip">
-       <string>Show side pane</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -581,8 +584,11 @@ Formatted like below for name detection.
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -664,7 +670,7 @@ Formatted like below for name detection.
        </rect>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
      </widget>
     </widget>
@@ -842,13 +848,16 @@ Formatted like below for name detection.
           </rect>
          </property>
          <property name="toolTip">
-          <string>Search text. Case sensitive</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
          <property name="text">
           <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -876,7 +885,7 @@ Formatted like below for name detection.
           </size>
          </property>
          <property name="toolTip">
-          <string>search case sensitive</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string/>
@@ -904,6 +913,9 @@ Formatted like below for name detection.
       </property>
       <item>
        <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
         <property name="handleWidth">
          <number>9</number>
         </property>
@@ -926,6 +938,9 @@ Formatted like below for name detection.
           </property>
           <item>
            <widget class="QSplitter" name="leftsplitter">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
             <widget class="QTabWidget" name="tabWidget">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -940,7 +955,7 @@ Formatted like below for name detection.
               </size>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="tab_docs">
               <property name="sizePolicy">
@@ -993,7 +1008,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>File with latest coding</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1009,7 +1024,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>Go to bookmark</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1025,7 +1040,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>Next file</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1041,7 +1056,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>File memo</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1136,6 +1151,9 @@ Formatted like below for name detection.
                </item>
                <item>
                 <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>12</width>
@@ -1342,7 +1360,7 @@ Formatted like below for name detection.
                </rect>
               </property>
               <property name="toolTip">
-               <string>Code name filter</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </widget>
@@ -1426,6 +1444,9 @@ Formatted like below for name detection.
          <layout class="QGridLayout" name="gridLayout">
           <item row="2" column="0">
            <widget class="QSplitter" name="splitter_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
             <widget class="QTextEdit" name="textEdit_info">
              <property name="tabChangesFocus">
               <bool>true</bool>
