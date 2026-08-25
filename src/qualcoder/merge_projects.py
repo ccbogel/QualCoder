@@ -92,7 +92,12 @@ class MergeProgress:
             raise MergeCancelled()
 
     def hide(self):
+        """ reset() first: hide() alone leaves Qt's pending auto-show timer armed, and it
+        fires during the preview dialog's event loop, putting a modal dialog back on top.
+        """
+
         if self.dialog is not None:
+            self.dialog.reset()
             self.dialog.hide()
 
     def restart(self):
