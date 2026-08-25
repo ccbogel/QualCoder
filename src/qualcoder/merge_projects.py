@@ -24,12 +24,82 @@ https://qualcoder.org/
 import datetime
 import logging
 from pathlib import Path
+import re
 import shutil
 import sqlite3
+
+from PyQt6 import QtCore, QtWidgets
 
 from .helpers import Message
 
 logger = logging.getLogger(__name__)
+
+# Max item names listed per preview section. Counts are always complete
+MAX_LISTED_ITEMS = 200
+
+
+class DialogMergePreview(QtWidgets.QDialog):
+    """ Read only preview of what a merge would add, by section with counts and names.
+    Nothing is written yet, so Cancel leaves the project untouched.
+    """
+
+    def __init__(self, app, sections, path_s, parent=None):
+
+        super(DialogMergePreview, self).__init__(parent)
+        self.app = app
+        self.sections = sections
+        self.setWindowTitle(_("Merge preview"))
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.resize(760, 580)
+        self.setStyleSheet(f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";')
+        layout = QtWidgets.QVBoxLayout(self)
+        header = QtWidgets.QLabel(_("Merging: ") + f"{path_s}\n" + _("Into: ") + f"{app.project_path}")
+        header.setWordWrap(True)
+        layout.addWidget(header)
+        self.tree = QtWidgets.QTreeWidget()
+        self.tree.setColumnCount(2)
+        self.tree.setHeaderLabels([_("Item"), _("Count")])
+        self.tree.setAlternatingRowColors(True)
+        self.tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
+        layout.addWidget(self.tree)
+        self.fill_tree()
+        note = QtWidgets.QLabel(
+            _("Existing values in the destination project are not over-written, apart from blank attribute values."))
+        note.setWordWrap(True)
+        layout.addWidget(note)
+        self.checkbox_journal = QtWidgets.QCheckBox(_("Save this report to a journal"))
+        self.checkbox_journal.setToolTip(_("The report is stored as a journal entry, merged or cancelled"))
+        layout.addWidget(self.checkbox_journal)
+        button_box = QtWidgets.QDialogButtonBox()
+        merge_button = button_box.addButton(_("Merge"), QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
+        merge_button.setDefault(True)
+        button_box.addButton(_("Cancel"), QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        layout.addWidget(button_box)
+
+    def fill_tree(self):
+        """ One top level row per section, item names as children. """
+
+        # Expand a short report, otherwise open the warnings only
+        total_items = sum(len(s['items']) for s in self.sections)
+        expand_all = total_items <= 40
+        for section in self.sections:
+            top = QtWidgets.QTreeWidgetItem([section['title'], section['detail']])
+            if section['warning']:
+                for column in (0, 1):
+                    top.setForeground(column, QtCore.Qt.GlobalColor.red)
+            for item in section['items']:
+                top.addChild(QtWidgets.QTreeWidgetItem([item, ""]))
+            self.tree.addTopLevelItem(top)
+            if section['warning'] or (expand_all and section['items']):
+                top.setExpanded(True)
+        self.tree.resizeColumnToContents(0)
+
+    def save_to_journal(self):
+        """ True if the report should be stored as a journal entry. """
+
+        return self.checkbox_journal.isChecked()
 
 
 class MergeProjects:
@@ -44,10 +114,10 @@ class MergeProjects:
     Existing attribute values in destination are not over-written, unless already blank
      """
 
-    def __init__(self, app, path_s):
+    def __init__(self, app, path_s, show_preview=True):
         self.app = app
         self.path_s = path_s  # Path to source project folder
-        self.conn_s = sqlite3.connect(Path(self.path_s) / 'data.qda')  # Source project that is to be merged from
+        self.conn_s = None  # Source project that is to be merged from
         self.conn_d = self.app.conn  # Destination project - the currently opened project
         self.path_d = self.app.project_path  # Path to destination project folder
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
@@ -65,9 +135,34 @@ class MergeProjects:
         self.attributes_s = []  # values for Case and File attributes
         self.cases_s = []
         self.case_text_s = []  # case text and links to non-text files
-        self.copy_source_files_into_destination()
+        self.preview_sections = []  # Read only summary of what would be added
+        self.merge_cancelled = False
+        # Connecting to a missing file would create an empty database in the user folder
+        db_path_s = Path(self.path_s) / 'data.qda'
+        if not db_path_s.is_file():
+            self.summary_msg += _("No data.qda database found in the selected folder.") + "\n"
+            Message(self.app, _('Project not merged'), _("Not a QualCoder project")).exec()
+            return
+        self.conn_s = sqlite3.connect(db_path_s)
+        # Nothing is written until the preview is confirmed, so Cancel leaves the project untouched
         loaded = self.get_source_data()
+        save_journal = False
         if loaded:
+            self.preview_sections = self.build_preview()
+            if show_preview:
+                preview_dialog = DialogMergePreview(self.app, self.preview_sections, self.path_s)
+                proceed = preview_dialog.exec()
+                save_journal = preview_dialog.save_to_journal()
+                if not proceed:
+                    self.merge_cancelled = True
+                    self.summary_msg += "\n" + _("Merge cancelled. No changes were made.") + "\n"
+                    if save_journal:
+                        self.save_report_to_journal(merged=False)
+                    self.close_source_connection()
+                    Message(self.app, _('Project not merged'), _("Merge cancelled")).exec()
+                    return
+        if loaded:
+            self.copy_source_files_into_destination()
             msg, backup_name = self.app.save_backup("_Pre-merge")
             self.summary_msg += f"\n{msg}"
             self.insert_sources_get_new_file_ids()
@@ -88,17 +183,265 @@ class MergeProjects:
             self._emit_project_table_changes(
                 ['source', 'code_name', 'code_cat', 'code_text', 'code_image', 'code_av',
                  'cases', 'case_text', 'attribute', 'attribute_type', 'journal', 'annotation'])
-            Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
             self.projects_merged = True
             self.app.delete_backup = False
+            if save_journal:
+                self.save_report_to_journal(merged=True)
+            self.close_source_connection()
+            Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
         else:
+            self.close_source_connection()
             Message(self.app, _('Project not merged'), _("Project not merged")).exec()
+
+    def close_source_connection(self):
+        """ Release the source project database. """
+
+        if self.conn_s is not None:
+            try:
+                self.conn_s.close()
+            except sqlite3.Error as err:
+                logger.warning(f"Closing source project database: {err}")
+            self.conn_s = None
 
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
 
         if getattr(self.app, "project_events", None) is not None:
             self.app.project_events.emit_table_changes(tables, source=self)
+
+    def build_preview(self):
+        """ Read only summary of what the merge would add. Runs after get_source_data and
+        before anything is written.
+        Return: [{'title': str, 'detail': str, 'items': [str], 'warning': bool}, ...]
+        """
+
+        cur_s = self.conn_s.cursor()
+        cur_d = self.conn_d.cursor()
+        sections = []
+
+        def add(title, detail, items=None, warning=False):
+            items = list(items or [])
+            # Cap the listed names, the section count still carries the full figure
+            if len(items) > MAX_LISTED_ITEMS:
+                remaining = len(items) - MAX_LISTED_ITEMS
+                items = items[:MAX_LISTED_ITEMS] + [_("and more, not listed: ") + str(remaining)]
+            sections.append({'title': title, 'detail': detail, 'items': items, 'warning': warning})
+
+        # Files
+        new_files = []
+        matched_files = []
+        length_warnings = []
+        for src in self.source_s:
+            cur_d.execute("select id, length(fulltext) from source where name=?", [src['name']])
+            res = cur_d.fetchone()
+            if res is None:
+                new_files.append(src['name'])
+                continue
+            matched_files.append(src['name'])
+            if src['fulltext'] is not None and len(src['fulltext']) != res[1]:
+                length_warnings.append(
+                    src['name'] + " " + _("source: ") + f"{len(src['fulltext'])} " +
+                    _("destination: ") + f"{res[1]}")
+        add(_("Files to add"), str(len(new_files)), new_files)
+        add(_("Files already in this project"), str(len(matched_files)), matched_files)
+        if length_warnings:
+            add(_("Warning: different text lengths for the same file name"),
+                str(len(length_warnings)), length_warnings, warning=True)
+
+        # Media files to copy into the project folders
+        files_to_copy = []
+        for folder_name in ("audio", "documents", "images", "video"):
+            source_dir = Path(self.path_s) / folder_name
+            if not source_dir.is_dir():
+                continue
+            for file_ in source_dir.iterdir():
+                if file_.is_file() and not (Path(self.app.project_path) / folder_name / file_.name).exists():
+                    files_to_copy.append(f"{folder_name}/{file_.name}")
+        add(_("Media files to copy"), str(len(files_to_copy)), files_to_copy)
+
+        # Categories. get_source_data already removed names present in the destination
+        cur_s.execute("select count(*) from code_cat")
+        total_cats = cur_s.fetchone()[0]
+        new_cat_names = [c['name'] for c in self.categories_s]
+        add(_("Code categories to add"), str(len(new_cat_names)), new_cat_names)
+        add(_("Code categories already in this project"), str(total_cats - len(new_cat_names)))
+
+        # Codes
+        cur_d.execute("select name from code_name")
+        dest_code_names = [r[0] for r in cur_d.fetchall()]
+        new_codes = [c['name'] for c in self.codes_s if c['name'] not in dest_code_names]
+        matched_codes = [c['name'] for c in self.codes_s if c['name'] in dest_code_names]
+        add(_("Codes to add"), str(len(new_codes)), new_codes)
+        add(_("Codes matched to existing codes"), str(len(matched_codes)), matched_codes)
+
+        # Codings. Counts are what will actually be added, so rows already in the destination
+        # and duplicates inside the source are excluded. New codes and files get placeholder keys
+        cur_d.execute("select name, id from source")
+        dest_file_ids = {r[0]: r[1] for r in cur_d.fetchall()}
+        cur_d.execute("select name, cid from code_name")
+        dest_code_ids = {r[0]: r[1] for r in cur_d.fetchall()}
+        source_code_names = {c['cid']: c['name'] for c in self.codes_s}
+        source_file_names = {s['id']: s['name'] for s in self.source_s}
+
+        def code_key(cid):
+            """ Destination cid, or a placeholder for a code not there yet. """
+
+            name = source_code_names.get(cid)
+            if name is None:
+                return None  # No code row in the source
+            return dest_code_ids.get(name, ('new_code', name))
+
+        def file_key(fid):
+            """ Destination file id, or a placeholder for a file not there yet. """
+
+            name = source_file_names.get(fid)
+            if name is None:
+                return None  # No file row in the source
+            return dest_file_ids.get(name, ('new_file', name))
+
+        def split_new(rows, dest_sql, key_builder):
+            """ Return (to_add, already_there, orphans) for the source rows. """
+
+            cur_d.execute(dest_sql)
+            seen = set(cur_d.fetchall())
+            to_add, already_there, orphans = 0, 0, 0
+            for row in rows:
+                key = key_builder(row)
+                if key is None:
+                    orphans += 1
+                    continue
+                if key in seen:
+                    already_there += 1
+                    continue
+                seen.add(key)
+                to_add += 1
+            return to_add, already_there, orphans
+
+        def text_key(c):
+            cid, fid = code_key(c['cid']), file_key(c['fid'])
+            return None if cid is None or fid is None else (cid, fid, c['pos0'], c['pos1'], c['owner'])
+
+        def image_key(c):
+            cid, fid = code_key(c['cid']), file_key(c['fid'])
+            if cid is None or fid is None:
+                return None
+            return cid, fid, c['x1'], c['y1'], c['width'], c['height'], c['owner'], c['pdf_page']
+
+        def av_key(c):
+            cid, fid = code_key(c['cid']), file_key(c['fid'])
+            return None if cid is None or fid is None else (cid, fid, c['pos0'], c['pos1'], c['owner'])
+
+        def annotation_key(a):
+            fid = file_key(a['fid'])
+            return None if fid is None else (fid, a['pos0'], a['pos1'], a['owner'])
+
+        orphan_total = 0
+        text_add, text_old, orphans = split_new(
+            self.code_text_s, "select cid, fid, pos0, pos1, owner from code_text", text_key)
+        orphan_total += orphans
+        pdf_rows = [c for c in self.code_image_s if c['pdf_page'] is not None]
+        image_rows = [c for c in self.code_image_s if c['pdf_page'] is None]
+        image_sql = "select cid, id, x1, y1, width, height, owner, pdf_page from code_image"
+        pdf_add, pdf_old, orphans = split_new(pdf_rows, image_sql, image_key)
+        orphan_total += orphans
+        image_add, image_old, orphans = split_new(image_rows, image_sql, image_key)
+        orphan_total += orphans
+        av_add, av_old, orphans = split_new(
+            self.code_av_s, "select cid, id, pos0, pos1, owner from code_av", av_key)
+        orphan_total += orphans
+        annot_add, annot_old, orphans = split_new(
+            self.annotations_s, "select fid, pos0, pos1, owner from annotation", annotation_key)
+        orphan_total += orphans
+        add(_("Coded text segments to add"), str(text_add))
+        add(_("Coded PDF areas to add"), str(pdf_add))
+        add(_("Coded image areas to add"), str(image_add))
+        add(_("Coded audio/video segments to add"), str(av_add))
+        add(_("Text annotations to add"), str(annot_add))
+        already_there = text_old + pdf_old + image_old + av_old + annot_old
+        if already_there > 0:
+            add(_("Codings already in this project, not duplicated"), str(already_there))
+        if orphan_total > 0:
+            add(_("Codings skipped, missing code or file in the source project"),
+                str(orphan_total), warning=True)
+
+        # Cases. A source case whose name is in the destination is skipped with its links
+        cur_d.execute("select name from cases")
+        dest_case_names = [r[0] for r in cur_d.fetchall()]
+        new_cases = [c for c in self.cases_s if c['name'] not in dest_case_names]
+        skipped_cases = [c['name'] for c in self.cases_s if c['name'] in dest_case_names]
+        new_case_ids = [c['caseid'] for c in new_cases]
+        # Inserted only when both case and file resolve
+        case_links = len([ct for ct in self.case_text_s
+                          if ct['caseid'] in new_case_ids and ct['fid'] in source_file_names])
+        add(_("Cases to add"), str(len(new_cases)), [c['name'] for c in new_cases])
+        add(_("Cases skipped, name already in this project"), str(len(skipped_cases)), skipped_cases)
+        add(_("Case file links to add"), str(case_links))
+
+        # Journals and stored queries
+        cur_d.execute("select name from journal")
+        dest_journal_names = [r[0] for r in cur_d.fetchall()]
+        new_journals = [j['name'] for j in self.journals_s if j['name'] not in dest_journal_names]
+        skipped_journals = [j['name'] for j in self.journals_s if j['name'] in dest_journal_names]
+        add(_("Journals to add"), str(len(new_journals)), new_journals)
+        add(_("Journals skipped, name already in this project"), str(len(skipped_journals)), skipped_journals)
+        cur_d.execute("select title from stored_sql")
+        dest_sql_titles = [r[0] for r in cur_d.fetchall()]
+        new_sql = [s['title'] for s in self.stored_sql_s if s['title'] not in dest_sql_titles]
+        add(_("Stored queries to add"), str(len(new_sql)), new_sql)
+
+        # Attributes. get_source_data already removed types present in the destination
+        add(_("Attribute types to add"), str(len(self.attribute_types_s)),
+            [f"{a['name']} ({a['caseOrFile']})" for a in self.attribute_types_s])
+        # Values carry over for files, and for cases being added
+        attribute_values = len([a for a in self.attributes_s
+                                if (a['attr_type'] == "file" and a['id'] in source_file_names)
+                                or (a['attr_type'] == "case" and a['id'] in new_case_ids)])
+        add(_("Attribute values"), str(attribute_values))
+        return sections
+
+    def report_text(self, merged):
+        """ Plain text preview for the journal entry. merged: False if cancelled. """
+
+        lines = [_("Merge preview"), "",
+                 _("Merging: ") + self.path_s,
+                 _("Into: ") + self.path_d,
+                 _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                 _("Result: ") + (_("merged") if merged else _("cancelled, no changes were made")),
+                 ""]
+        for section in self.preview_sections:
+            lines.append(f"{section['title']}: {section['detail']}")
+            for item in section['items']:
+                lines.append(f"    {item}")
+        return "\n".join(lines)
+
+    def save_report_to_journal(self, merged):
+        """ Store the report as a journal entry. Journal names must be unique. """
+
+        now = datetime.datetime.now().astimezone()
+        date = now.strftime("%Y-%m-%d %H:%M:%S")
+        owner = self.app.settings['codername']
+        # Valid journal name: no dots or colons, and unique
+        name = re.sub(r"[^\w -]", "_", f"Merge preview {Path(self.path_s).stem} {now.strftime('%Y-%m-%d %H%M%S')}")
+        jentry = self.report_text(merged)
+        cur = self.conn_d.cursor()
+        attempt = name
+        suffix = 2
+        while True:
+            try:
+                cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
+                            (attempt, jentry, owner, date))
+                self.conn_d.commit()
+                break
+            except sqlite3.IntegrityError:
+                self.conn_d.rollback()
+                attempt = f"{name}_{suffix}"
+                suffix += 1
+                if suffix > 50:
+                    logger.warning("Could not create the merge preview journal entry")
+                    return
+        self.app.delete_backup = False
+        self.summary_msg += _("Merge report saved to journal: ") + attempt + "\n"
+        self._emit_project_table_changes(['journal'])
 
     def insert_categories(self):
         """ Insert categories into destination code_cat table.
@@ -140,7 +483,6 @@ class MergeProjects:
 
         if len(self.categories_s) > 0:
             self.summary_msg += str(len(self.categories_s)) + _(" categories not added") + "\n"
-            print("Categories NOT added:\n", self.categories_s)
             logger.debug("Categories NOT added:\n" + str(self.categories_s))
 
     def update_code_cid_and_insert_code(self):
@@ -230,35 +572,77 @@ class MergeProjects:
             cur_d.execute("insert or ignore into stored_sql (title, description, grouper, ssql) values(?,?,?,?)",
                           (s['title'], s['description'], s['grouper'], s['ssql']))
             self.conn_d.commit()
+        # A/V goes in before coded text, so code_text.avid can be remapped to the new avid.
+        # code_av and code_image have no unique constraint, so 'insert or ignore' would not stop
+        # duplicates: existing rows are matched by key set, which keeps a repeated merge idempotent
+        skipped_orphans = 0
+        avid_map = {}
+        cur_d.execute("select avid, cid, id, pos0, pos1, owner from code_av")
+        existing_av = {}
+        for row in cur_d.fetchall():
+            existing_av.setdefault(tuple(row[1:]), row[0])
+        for c in self.code_av_s:
+            if c['newcid'] == -1 or c['newfid'] == -1:
+                skipped_orphans += 1
+                continue
+            key = (c['newcid'], c['newfid'], c['pos0'], c['pos1'], c['owner'])
+            if key in existing_av:
+                c['newavid'] = existing_av[key]
+            else:
+                cur_d.execute(
+                    "insert into code_av (cid, id,pos0,pos1,memo,owner,date,important) values(?,?,?,?,?,?,?,?)",
+                    [c["newcid"], c["newfid"], c["pos0"], c["pos1"], c["memo"], c["owner"], c["date"],
+                     c["important"]])
+                self.conn_d.commit()
+                c['newavid'] = cur_d.lastrowid
+                existing_av[key] = c['newavid']
+            if c['avid'] is not None:
+                avid_map[c['avid']] = c['newavid']
+        if len(self.code_av_s) > 0:
+            self.summary_msg += _("Merging coded audio/video segments") + "\n"
         for c in self.code_text_s:
+            if c['newcid'] == -1 or c['newfid'] == -1:
+                skipped_orphans += 1
+                continue
+            c['newavid'] = avid_map.get(c['avid']) if c['avid'] is not None else None
             cur_d.execute("insert or ignore into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                memo,date, important) values(?,?,?,?,?,?,?,?,?)", (c['newcid'], c['newfid'],
-                                                                   c['seltext'], c['pos0'], c['pos1'], c['owner'],
-                                                                   c['memo'], c['date'], c['important']))
+                memo,date, important, avid) values(?,?,?,?,?,?,?,?,?,?)", (c['newcid'], c['newfid'],
+                                                                           c['seltext'], c['pos0'], c['pos1'],
+                                                                           c['owner'], c['memo'], c['date'],
+                                                                           c['important'], c['newavid']))
             self.conn_d.commit()
         if len(self.code_text_s) > 0:
             self.summary_msg += _("Merging coded text") + "\n"
         for a in self.annotations_s:
+            if a['newfid'] == -1:
+                skipped_orphans += 1
+                continue
             cur_d.execute("insert or ignore into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)",
                           [a["newfid"], a["pos0"], a["pos1"], a["memo"], a["owner"], a["date"]])
             self.conn_d.commit()
         if len(self.annotations_s) > 0:
             self.summary_msg += _("Merging annotations") + "\n"
+        cur_d.execute("select cid, id, x1, y1, width, height, owner, pdf_page from code_image")
+        existing_images = set(cur_d.fetchall())
         for c in self.code_image_s:
+            if c['newcid'] == -1 or c['newfid'] == -1:
+                skipped_orphans += 1
+                continue
+            key = (c['newcid'], c['newfid'], c['x1'], c['y1'], c['width'], c['height'], c['owner'], c['pdf_page'])
+            if key in existing_images:
+                continue
             cur_d.execute(
-                "insert or ignore into code_image (cid, id,x1,y1,width,height,memo,owner,date,important) values(?,?,?,?,?,?,?,?,?,?)",
+                "insert into code_image (cid, id,x1,y1,width,height,memo,owner,date,important,pdf_page) "
+                "values(?,?,?,?,?,?,?,?,?,?,?)",
                 [c["newcid"], c["newfid"], c["x1"], c["y1"], c["width"], c["height"], c["memo"], c["owner"], c["date"],
-                 c["important"]])
+                 c["important"], c["pdf_page"]])
             self.conn_d.commit()
+            existing_images.add(key)
         if len(self.code_image_s) > 0:
             self.summary_msg += _("Merging coded image areas") + "\n"
-        for c in self.code_av_s:
-            cur_d.execute(
-                "insert or ignore into code_av (cid, id,pos0,pos1,memo,owner,date,important) values(?,?,?,?,?,?,?,?)",
-                [c["newcid"], c["newfid"], c["pos0"], c["pos1"], c["memo"], c["owner"], c["date"], c["important"]])
-            self.conn_d.commit()
-        if len(self.code_av_s) > 0:
-            self.summary_msg += _("Merging coded audio/video segments") + "\n"
+        if skipped_orphans > 0:
+            # Source codings whose code or file row is missing
+            self.summary_msg += _("Codings skipped, missing code or file: ") + f"{skipped_orphans}\n"
 
     def insert_cases(self):
         """ Insert case data into destination.
@@ -302,20 +686,23 @@ class MergeProjects:
                 if case_s['caseid'] == case_text['caseid']:
                     case_text['newcaseid'] = case_s['newcaseid']
             for file_ in self.source_s:
-                if case_text['fid'] == file_['newid']:
+                # fid is a source id. Matching newid loses links or points them at the wrong file
+                if case_text['fid'] == file_['id']:
                     case_text['newfid'] = file_['newid']
         # Insert case text if newfileid is not -1 and newcaseid is not -1
         for c in self.case_text_s:
             if c['newcaseid'] > -1 and c['newfid'] > -1:
-                cur_d.execute("insert into case_text (caseid,fid,pos0,pos1) values(?,?,?,?)",
-                              [c['newcaseid'], c['newfid'], c['pos0'], c['pos1']])
+                cur_d.execute("insert into case_text (caseid,fid,pos0,pos1,owner,date,memo) values(?,?,?,?,?,?,?)",
+                              [c['newcaseid'], c['newfid'], c['pos0'], c['pos1'], c['owner'], c['date'], c['memo']])
                 self.app.conn.commit()
         # Create attribute placeholders for the destination case attributes
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         sql_attribute_types = 'select name from attribute_type where caseOrFile ="case"'
         cur_d.execute(sql_attribute_types)
         res_attr_types = cur_d.fetchall()
-        sql_attribute = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        # Placeholders for cases, so attr_type is case, not file
+        sql_attribute = "insert or ignore into attribute (name, attr_type, value, id, date, owner) " \
+                        "values(?,'case','',?,?,?)"
         for id_ in new_case_ids:
             for attribute_name in res_attr_types:
                 cur_d.execute(sql_attribute, [attribute_name[0], id_, now_date, self.app.settings['codername']])
@@ -400,16 +787,22 @@ class MergeProjects:
         folders = ["audio", "documents", "images", "video"]
         for folder_name in folders:
             source_dir = Path(self.path_s) / folder_name  # self.path_s + "/" + folder_name
-            for file_ in Path(source_dir).iterdir():
-                dest_path = Path(self.app.project_path) / folder_name / file_
-                if not dest_path.exists(): 
+            if not source_dir.is_dir():
+                continue
+            dest_dir = Path(self.app.project_path) / folder_name
+            for file_ in source_dir.iterdir():
+                if not file_.is_file():
+                    continue
+                # iterdir yields absolute paths. Joining one replaces the destination folder
+                dest_path = dest_dir / file_.name
+                if not dest_path.exists():
                     try:
-                        shutil.copyfile(Path(source_dir) / file_, dest_path)
-                        self.summary_msg += _("File copied: ") + f"{file_}\n"
+                        shutil.copyfile(file_, dest_path)
+                        self.summary_msg += _("File copied: ") + f"{file_.name}\n"
                     except shutil.SameFileError:
                         pass
                     except PermissionError:
-                        self.summary_msg += f"{file_} " + _("NOT copied. Permission error")
+                        self.summary_msg += f"{file_.name} " + _("NOT copied. Permission error")
 
     def insert_new_attribute_types(self):
         """ Insert new attribute types  for cases and files.
@@ -494,12 +887,21 @@ class MergeProjects:
         self.code_av_s = []
         self.cases_s = []
         self.case_text_s = []
+        self.source_s = []
         self.attribute_types_s = []
         self.attributes_s = []
         cur_s = self.conn_s.cursor()
         # Database version must be v5 or higher
-        cur_s.execute("select databaseversion from project")
-        version = cur_s.fetchone()
+        try:
+            cur_s.execute("select databaseversion from project")
+            version = cur_s.fetchone()
+        except sqlite3.DatabaseError as err:
+            logger.warning(f"Merge source project: {err}")
+            version = None
+        if version is None or version[0] is None:
+            self.summary_msg += _("Could not read the source project database.") + "\n"
+            self.summary_msg += _("Project not merged") + "\n"
+            return False
         if version[0] in ("v1", "v2", "v3", "v4"):
             self.summary_msg += _("Need to update the source project database.") + "\n"
             self.summary_msg += _("Please open the source project using QualCoder. Then close the project.") + "\n"
@@ -583,13 +985,13 @@ class MergeProjects:
                 res = cur_s.fetchone()
                 if res is not None:
                     code_s['supercodename'] = res[0]
-        # Code text data
-        sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
+        # Code text data. avid links a transcript coding to its A/V segment, remapped on insert
+        sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important, avid from code_text"
         cur_s.execute(sql_codetext)
         res_codetext = cur_s.fetchall()
         for i in res_codetext:
             ct = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "seltext": i[2], "pos0": i[3], "pos1": i[4],
-                  "owner": i[5], "date": i[6], "memo": i[7], "important": i[8]}
+                  "owner": i[5], "date": i[6], "memo": i[7], "important": i[8], "avid": i[9], "newavid": None}
             self.code_text_s.append(ct)
         # Text annotations data
         sql_annotations = "select fid, pos0, pos1, memo, owner, date from annotation"
@@ -598,21 +1000,27 @@ class MergeProjects:
         for i in res_annot:
             an = {"fid": i[0], "newfid": -1, "pos0": i[1], "pos1": i[2], "memo": i[3], "owner": i[4], "date": i[5]}
             self.annotations_s.append(an)
-        # Code image data
-        sql_code_img = "select cid, id, x1, y1, width, height, memo, date, owner, important from code_image"
+        # Code image data. pdf_page is the page of an area coded on a PDF.
+        # Databases older than v10 lack the column, so select a null placeholder
+        cur_s.execute("pragma table_info(code_image)")
+        code_image_columns = [r[1] for r in cur_s.fetchall()]
+        pdf_page_column = "pdf_page" if "pdf_page" in code_image_columns else "null"
+        sql_code_img = "select cid, id, x1, y1, width, height, memo, date, owner, important, " \
+                       f"{pdf_page_column} from code_image"
         cur_s.execute(sql_code_img)
         res_code_img = cur_s.fetchall()
         for i in res_code_img:
             cimg = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "x1": i[2], "y1": i[3],
-                    "width": i[4], "height": i[5], "memo": i[6], "date": i[7], "owner": i[8], "important": i[9]}
+                    "width": i[4], "height": i[5], "memo": i[6], "date": i[7], "owner": i[8], "important": i[9],
+                    "pdf_page": i[10]}
             self.code_image_s.append(cimg)
-        # Code AV data
-        sql_code_av = "select cid, id, pos0, pos1, owner, date, memo, important from code_av"
+        # Code AV data. avid is kept to remap code_text.avid
+        sql_code_av = "select cid, id, pos0, pos1, owner, date, memo, important, avid from code_av"
         cur_s.execute(sql_code_av)
         res_code_av = cur_s.fetchall()
         for i in res_code_av:
             c_av = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3],
-                    "owner": i[4], "date": i[5], "memo": i[6], "important": i[7]}
+                    "owner": i[4], "date": i[5], "memo": i[6], "important": i[7], "avid": i[8], "newavid": None}
             self.code_av_s.append(c_av)
         # Case data
         sql_cases = "select caseid, name, memo, owner, date from cases"
@@ -621,11 +1029,12 @@ class MergeProjects:
         for i in res_cases:
             c = {"caseid": i[0], "newcaseid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4]}
             self.cases_s.append(c)
-        sql_case_text = "select caseid, fid, pos0, pos1 from case_text"
+        sql_case_text = "select caseid, fid, pos0, pos1, owner, date, memo from case_text"
         cur_s.execute(sql_case_text)
         res_case_text = cur_s.fetchall()
         for i in res_case_text:
-            c = {"caseid": i[0], "newcaseid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3]}
+            c = {"caseid": i[0], "newcaseid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3],
+                 "owner": i[4], "date": i[5], "memo": i[6]}
             self.case_text_s.append(c)
         # Attribute type data
         sql_attr_type = "select name, memo, date, owner, caseOrFile, valuetype from attribute_type"
