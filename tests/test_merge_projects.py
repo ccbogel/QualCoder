@@ -957,6 +957,28 @@ def e2_preview_dialog_builds():
 
 
 
+
+# C7. hide() must also stop Qt's pending auto-show timer, or the modal progress dialog
+# pops back on top of the preview and the application looks frozen
+def c7_hidden_progress_stays_hidden():
+    from PyQt6 import QtCore
+    stub_app = types.SimpleNamespace(settings={"fontsize": 10, "font": "Noto Sans"})
+    prog = merge_projects.MergeProgress(stub_app)
+    prog.phase("reading", 2)  # Faster than minimumDuration, so the show timer is left armed
+    prog.phase("preview", 10)
+    prog.hide()
+    loop = QtCore.QEventLoop()  # Stands in for the preview dialog's event loop
+    QtCore.QTimer.singleShot(900, loop.quit)
+    loop.exec()
+    check("C7 hidden progress does not pop back over the preview", not prog.dialog.isVisible())
+    prog.restart()
+    prog.phase("copying", 15)
+    APP.processEvents()
+    check("C7 restart still re-arms the dialog", prog.dialog is not None)
+    prog.close()
+
+
+
 MERGE_HOLDER = [None]
 
 
@@ -985,6 +1007,7 @@ if __name__ == "__main__":
     c4_unexpected_error()
     c5_vectorstore_failure()
     c6_not_a_project_releases()
+    c7_hidden_progress_stays_hidden()
     d1_text_not_held_in_memory()
     d2_cancel_inside_large_file()
     e1_journal_report()
