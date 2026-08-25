@@ -131,7 +131,11 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
         mp = MergeProjects(self.app, self.merge_project_path)
         self.parent_text_edit.append(mp.summary_msg)
-        self.projects_merged = mp.projects_merged
+        # Sticky: a later cancelled merge must not undo the refresh owed to an earlier one
+        if mp.projects_merged:
+            self.projects_merged = True
+        if mp.merge_cancelled:
+            self.ui.pushButton_merge.setEnabled(True)
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):
