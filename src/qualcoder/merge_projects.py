@@ -38,6 +38,77 @@ logger = logging.getLogger(__name__)
 MAX_LISTED_ITEMS = 200
 
 
+class MergeCancelled(Exception):
+    """ Raised when the user cancels from the progress dialog. """
+
+
+class MergeProgress:
+    """ Progress dialog for the merge phases. Keeps the interface responsive and
+    raises MergeCancelled when the user cancels. No-op without a running application.
+    """
+
+    def __init__(self, app, parent=None):
+
+        self.dialog = None
+        if QtWidgets.QApplication.instance() is None:
+            return
+        self.dialog = QtWidgets.QProgressDialog("", _("Cancel"), 0, 100, parent)
+        self.dialog.setWindowTitle(_("Merge projects"))
+        self.dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        self.dialog.setMinimumDuration(400)  # Do not flash on a small project
+        self.dialog.setAutoClose(False)
+        self.dialog.setAutoReset(False)
+        self.dialog.setStyleSheet(f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";')
+        self.dialog.setValue(0)
+
+    def phase(self, label, value, repaint=True):
+        """ Move to the next phase. repaint=False skips event processing, which is required
+        while the merge transaction is open: repainting lets timers in other dialogs run,
+        and they write to the shared connection.
+        """
+
+        if self.dialog is None:
+            return
+        self.dialog.setLabelText(label)
+        self.dialog.setValue(value)
+        if repaint:
+            self.check()
+
+    def tick(self, index, total, base, span, every=100):
+        """ Update from inside a long loop, at intervals. """
+
+        if self.dialog is None or index % every or not total:
+            return
+        self.dialog.setValue(base + int(span * index / total))
+        self.check()
+
+    def check(self):
+        """ Repaint and raise if the user pressed Cancel. """
+
+        if self.dialog is None:
+            return
+        QtWidgets.QApplication.processEvents()
+        if self.dialog.wasCanceled():
+            raise MergeCancelled()
+
+    def hide(self):
+        if self.dialog is not None:
+            self.dialog.hide()
+
+    def restart(self):
+        """ Re-arm after hide(), which otherwise stops the dialog re-appearing. """
+
+        if self.dialog is None:
+            return
+        self.dialog.reset()  # Also clears the cancel flag
+        self.dialog.setValue(0)
+
+    def close(self):
+        if self.dialog is not None:
+            self.dialog.close()
+            self.dialog = None
+
+
 class DialogMergePreview(QtWidgets.QDialog):
     """ Read only preview of what a merge would add, by section with counts and names.
     Nothing is written yet, so Cancel leaves the project untouched.
@@ -118,7 +189,9 @@ class MergeProjects:
         self.app = app
         self.path_s = path_s  # Path to source project folder
         self.conn_s = None  # Source project that is to be merged from
-        self.conn_d = self.app.conn  # Destination project - the currently opened project
+        # The merge runs in one transaction. Other open dialogs have timers that write and commit
+        # on app.conn, and progress repaints let them run, so use a connection of our own
+        self.conn_d = None  # Destination project - the currently opened project
         self.path_d = self.app.project_path  # Path to destination project folder
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
         self.projects_merged = False
@@ -137,34 +210,50 @@ class MergeProjects:
         self.case_text_s = []  # case text and links to non-text files
         self.preview_sections = []  # Read only summary of what would be added
         self.merge_cancelled = False
+        self.copied_files = []  # Removed again if the merge is cancelled
+        self.progress = MergeProgress(self.app)
         # Connecting to a missing file would create an empty database in the user folder
         db_path_s = Path(self.path_s) / 'data.qda'
         if not db_path_s.is_file():
             self.summary_msg += _("No data.qda database found in the selected folder.") + "\n"
+            self.progress.close()
             Message(self.app, _('Project not merged'), _("Not a QualCoder project")).exec()
             return
         self.conn_s = sqlite3.connect(db_path_s)
-        # Nothing is written until the preview is confirmed, so Cancel leaves the project untouched
-        loaded = self.get_source_data()
+        # timeout lets a write by another dialog finish rather than fail outright
+        self.conn_d = sqlite3.connect(Path(self.path_d) / 'data.qda', timeout=30)
         save_journal = False
-        if loaded:
-            self.preview_sections = self.build_preview()
-            if show_preview:
-                preview_dialog = DialogMergePreview(self.app, self.preview_sections, self.path_s)
-                proceed = preview_dialog.exec()
-                save_journal = preview_dialog.save_to_journal()
-                if not proceed:
-                    self.merge_cancelled = True
-                    self.summary_msg += "\n" + _("Merge cancelled. No changes were made.") + "\n"
-                    if save_journal:
-                        self.save_report_to_journal(merged=False)
-                    self.close_source_connection()
-                    Message(self.app, _('Project not merged'), _("Merge cancelled")).exec()
-                    return
-        if loaded:
+        try:
+            self.progress.phase(_("Reading the project to merge"), 2)
+            loaded = self.get_source_data()
+            if loaded:
+                self.progress.phase(_("Preparing the preview"), 10)
+                self.preview_sections = self.build_preview()
+        except MergeCancelled:
+            self.cancel_merge(save_journal=False)
+            return
+        if not loaded:
+            self.close_connections()
+            Message(self.app, _('Project not merged'), _("Project not merged")).exec()
+            return
+        self.progress.hide()
+        if show_preview:
+            preview_dialog = DialogMergePreview(self.app, self.preview_sections, self.path_s)
+            proceed = preview_dialog.exec()
+            save_journal = preview_dialog.save_to_journal()
+            if not proceed:
+                self.cancel_merge(save_journal)
+                return
+        # Everything below is one transaction, so a cancel or an error rolls the project back
+        try:
+            self.progress.restart()
+            self.progress.phase(_("Copying files"), 15)
             self.copy_source_files_into_destination()
             msg, backup_name = self.app.save_backup("_Pre-merge")
             self.summary_msg += f"\n{msg}"
+            # From here the transaction is open, so no more event processing and no cancel.
+            # The database phase runs well under a second even on a very large project
+            self.progress.phase(_("Merging"), 40, repaint=False)
             self.insert_sources_get_new_file_ids()
             self.update_coding_file_ids()
             self.insert_categories()
@@ -173,35 +262,78 @@ class MergeProjects:
             self.insert_cases()
             self.insert_new_attribute_types()
             self.insert_attributes()
+            self.conn_d.commit()  # One transaction for the whole merge
+        except MergeCancelled:
+            self.conn_d.rollback()
+            self.cancel_merge(save_journal)
+            return
+        except Exception as err:
+            # Broad on purpose: an escaping error would leave an open transaction and a modal
+            # progress dialog on screen
+            self.conn_d.rollback()
+            self.remove_copied_files()
+            logger.exception("Merge projects failed")
+            self.summary_msg += "\n" + _("Merge failed, no changes were made. ") + f"{err}\n"
+            self.close_connections()
+            Message(self.app, _('Project not merged'), _("Merge failed") + f"\n{err}").exec()
+            return
+        try:
+            self.progress.phase(_("Finishing"), 95, repaint=False)
             # Update vectorstore
             if self.app.settings['ai_enable'] == 'True':
                 self.app.ai.sources_vectorstore.update_vectorstore()
-            self.summary_msg += "\n" + _("Finished merging ") + f"{self.path_s}  --> {self.path_d}\n"
-            self.summary_msg += _(
-                "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
-            # One event for the whole merge, not one per inserted row
-            self._emit_project_table_changes(
-                ['source', 'code_name', 'code_cat', 'code_text', 'code_image', 'code_av',
-                 'cases', 'case_text', 'attribute', 'attribute_type', 'journal', 'annotation'])
-            self.projects_merged = True
-            self.app.delete_backup = False
-            if save_journal:
-                self.save_report_to_journal(merged=True)
-            self.close_source_connection()
-            Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
-        else:
-            self.close_source_connection()
-            Message(self.app, _('Project not merged'), _("Project not merged")).exec()
+        except Exception as err:
+            # The merge itself is committed, so report and carry on
+            logger.exception("Vectorstore update after merge failed")
+            self.summary_msg += _("Could not update the AI vectorstore: ") + f"{err}\n"
+        self.summary_msg += "\n" + _("Finished merging ") + f"{self.path_s}  --> {self.path_d}\n"
+        self.summary_msg += _(
+            "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
+        # One event for the whole merge, not one per inserted row
+        self._emit_project_table_changes(
+            ['source', 'code_name', 'code_cat', 'code_text', 'code_image', 'code_av',
+             'cases', 'case_text', 'attribute', 'attribute_type', 'journal', 'annotation'])
+        self.projects_merged = True
+        self.app.delete_backup = False
+        if save_journal:
+            self.save_report_to_journal(merged=True)
+        self.close_connections()
+        Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
 
-    def close_source_connection(self):
-        """ Release the source project database. """
+    def cancel_merge(self, save_journal):
+        """ Undo anything copied, report and release the source project. """
 
-        if self.conn_s is not None:
+        self.merge_cancelled = True
+        self.remove_copied_files()
+        self.summary_msg += "\n" + _("Merge cancelled. No changes were made.") + "\n"
+        if save_journal and self.preview_sections:
+            self.save_report_to_journal(merged=False)
+        self.close_connections()
+        Message(self.app, _('Project not merged'), _("Merge cancelled")).exec()
+
+    def remove_copied_files(self):
+        """ Delete media files copied during a merge that did not complete. """
+
+        for file_path in self.copied_files:
             try:
-                self.conn_s.close()
+                Path(file_path).unlink(missing_ok=True)
+            except OSError as err:
+                logger.warning(f"Could not remove {file_path}: {err}")
+        self.copied_files = []
+
+    def close_connections(self):
+        """ Close the progress dialog and release both project databases. """
+
+        self.progress.close()
+        for name in ('conn_s', 'conn_d'):
+            conn = getattr(self, name)
+            if conn is None:
+                continue
+            try:
+                conn.close()
             except sqlite3.Error as err:
-                logger.warning(f"Closing source project database: {err}")
-            self.conn_s = None
+                logger.warning(f"Closing {name}: {err}")
+            setattr(self, name, None)
 
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
@@ -238,9 +370,9 @@ class MergeProjects:
                 new_files.append(src['name'])
                 continue
             matched_files.append(src['name'])
-            if src['fulltext'] is not None and len(src['fulltext']) != res[1]:
+            if src['fulltext_len'] is not None and src['fulltext_len'] != res[1]:
                 length_warnings.append(
-                    src['name'] + " " + _("source: ") + f"{len(src['fulltext'])} " +
+                    src['name'] + " " + _("source: ") + f"{src['fulltext_len']} " +
                     _("destination: ") + f"{res[1]}")
         add(_("Files to add"), str(len(new_files)), new_files)
         add(_("Files already in this project"), str(len(matched_files)), matched_files)
@@ -457,7 +589,6 @@ class MergeProjects:
                 self.summary_msg += _("Adding top level category: ") + c['name'] + "\n"
                 cur_d.execute("insert into code_cat (name,memo,owner,date,supercatid) values(?,?,?,?,?)",
                               (c['name'], c['memo'], c['owner'], c['date'], c['supercatid']))
-                self.conn_d.commit()
                 remove_list.append(c)
         for item in remove_list:
             self.categories_s.remove(item)
@@ -475,7 +606,6 @@ class MergeProjects:
                     remove_list.append(c)
                     sql = "insert into code_cat (name, memo, owner, date, supercatid) values (?,?,?,?,?)"
                     cur_d.execute(sql, [c['name'], c['memo'], c['owner'], c['date'], res_category[0]])
-                    self.conn_d.commit()
                     self.summary_msg += _("Adding sub-category: ") + f"{c['name']} --> {c['supercatname']}\n"
             for item in remove_list:
                 self.categories_s.remove(item)
@@ -512,7 +642,6 @@ class MergeProjects:
                 cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
                               (code_s['name'], code_s['memo'], code_s['owner'], code_s['date'], code_s['catid'],
                                code_s['color']))
-                self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 cid = cur_d.fetchone()[0]
                 code_s['newcid'] = cid
@@ -534,19 +663,12 @@ class MergeProjects:
                 if parent_newcid is not None and parent_newcid != code_s['newcid']:
                     cur_d.execute("update code_name set supercid=?, catid=null where cid=?",
                                   [parent_newcid, code_s['newcid']])
-        self.conn_d.commit()
 
         # Update code_text, code_image, code_av cids to destination values
-        for code_s in self.codes_s:
-            for coding_text in self.code_text_s:
-                if coding_text['cid'] == code_s['cid']:
-                    coding_text['newcid'] = code_s['newcid']
-            for coding_image in self.code_image_s:
-                if coding_image['cid'] == code_s['cid']:
-                    coding_image['newcid'] = code_s['newcid']
-            for coding_av in self.code_av_s:
-                if coding_av['cid'] == code_s['cid']:
-                    coding_av['newcid'] = code_s['newcid']
+        new_cids = {code_s['cid']: code_s['newcid'] for code_s in self.codes_s}
+        for rows in (self.code_text_s, self.code_image_s, self.code_av_s):
+            for row in rows:
+                row['newcid'] = new_cids.get(row['cid'], -1)
 
     def insert_coding_and_journal_data(self):
         """ Coding fid and cid have been updated, annotation fid has been updated.
@@ -566,12 +688,10 @@ class MergeProjects:
                 cur_d.execute("insert into journal (name, jentry, date, owner) values(?,?,?,?)",
                               (j['name'], j['jentry'], j['date'], j['owner']))
                 self.summary_msg += _("Adding journal: ") + j['name'] + "\n"
-                self.conn_d.commit()
         for s in self.stored_sql_s:
             # Cannot have two identical stored_sql titles, using 'or ignore'
             cur_d.execute("insert or ignore into stored_sql (title, description, grouper, ssql) values(?,?,?,?)",
                           (s['title'], s['description'], s['grouper'], s['ssql']))
-            self.conn_d.commit()
         # A/V goes in before coded text, so code_text.avid can be remapped to the new avid.
         # code_av and code_image have no unique constraint, so 'insert or ignore' would not stop
         # duplicates: existing rows are matched by key set, which keeps a repeated merge idempotent
@@ -581,6 +701,7 @@ class MergeProjects:
         existing_av = {}
         for row in cur_d.fetchall():
             existing_av.setdefault(tuple(row[1:]), row[0])
+        self.progress.phase(_("Merging audio/video codings"), 40, repaint=False)
         for c in self.code_av_s:
             if c['newcid'] == -1 or c['newfid'] == -1:
                 skipped_orphans += 1
@@ -593,13 +714,13 @@ class MergeProjects:
                     "insert into code_av (cid, id,pos0,pos1,memo,owner,date,important) values(?,?,?,?,?,?,?,?)",
                     [c["newcid"], c["newfid"], c["pos0"], c["pos1"], c["memo"], c["owner"], c["date"],
                      c["important"]])
-                self.conn_d.commit()
                 c['newavid'] = cur_d.lastrowid
                 existing_av[key] = c['newavid']
             if c['avid'] is not None:
                 avid_map[c['avid']] = c['newavid']
         if len(self.code_av_s) > 0:
             self.summary_msg += _("Merging coded audio/video segments") + "\n"
+        self.progress.phase(_("Merging coded text"), 55, repaint=False)
         for c in self.code_text_s:
             if c['newcid'] == -1 or c['newfid'] == -1:
                 skipped_orphans += 1
@@ -610,7 +731,6 @@ class MergeProjects:
                                                                            c['seltext'], c['pos0'], c['pos1'],
                                                                            c['owner'], c['memo'], c['date'],
                                                                            c['important'], c['newavid']))
-            self.conn_d.commit()
         if len(self.code_text_s) > 0:
             self.summary_msg += _("Merging coded text") + "\n"
         for a in self.annotations_s:
@@ -619,11 +739,11 @@ class MergeProjects:
                 continue
             cur_d.execute("insert or ignore into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)",
                           [a["newfid"], a["pos0"], a["pos1"], a["memo"], a["owner"], a["date"]])
-            self.conn_d.commit()
         if len(self.annotations_s) > 0:
             self.summary_msg += _("Merging annotations") + "\n"
         cur_d.execute("select cid, id, x1, y1, width, height, owner, pdf_page from code_image")
         existing_images = set(cur_d.fetchall())
+        self.progress.phase(_("Merging coded image and PDF areas"), 75, repaint=False)
         for c in self.code_image_s:
             if c['newcid'] == -1 or c['newfid'] == -1:
                 skipped_orphans += 1
@@ -636,7 +756,6 @@ class MergeProjects:
                 "values(?,?,?,?,?,?,?,?,?,?,?)",
                 [c["newcid"], c["newfid"], c["x1"], c["y1"], c["width"], c["height"], c["memo"], c["owner"], c["date"],
                  c["important"], c["pdf_page"]])
-            self.conn_d.commit()
             existing_images.add(key)
         if len(self.code_image_s) > 0:
             self.summary_msg += _("Merging coded image areas") + "\n"
@@ -649,7 +768,7 @@ class MergeProjects:
         First remove all existing matching case names and the associated case text data.
         """
 
-        cur_d = self.app.conn.cursor()
+        cur_d = self.conn_d.cursor()
         # Remove all duplicate cases and case text lists from source data
         cur_d.execute("select name from cases")
         res_cases_dest = cur_d.fetchall()
@@ -674,7 +793,6 @@ class MergeProjects:
         for case_s in self.cases_s:
             cur_d.execute("insert into cases (name, memo, owner, date) values (?,?,?,?)",
                           [case_s['name'], case_s['memo'], case_s['owner'], case_s['date']])
-            self.app.conn.commit()
             cur_d.execute("select last_insert_rowid()")
             case_id = cur_d.fetchone()[0]
             case_s['newcaseid'] = case_id
@@ -694,7 +812,6 @@ class MergeProjects:
             if c['newcaseid'] > -1 and c['newfid'] > -1:
                 cur_d.execute("insert into case_text (caseid,fid,pos0,pos1,owner,date,memo) values(?,?,?,?,?,?,?)",
                               [c['newcaseid'], c['newfid'], c['pos0'], c['pos1'], c['owner'], c['date'], c['memo']])
-                self.app.conn.commit()
         # Create attribute placeholders for the destination case attributes
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         sql_attribute_types = 'select name from attribute_type where caseOrFile ="case"'
@@ -706,7 +823,6 @@ class MergeProjects:
         for id_ in new_case_ids:
             for attribute_name in res_attr_types:
                 cur_d.execute(sql_attribute, [attribute_name[0], id_, now_date, self.app.settings['codername']])
-                self.app.conn.commit()
 
     def insert_sources_get_new_file_ids(self):
         """ Insert Source.source into Destination.source, unless source file name is already present.
@@ -725,18 +841,20 @@ class MergeProjects:
                 # Warn user if the source and destination fulltexts are different lengths
                 # Occurs if one of the texts was edited or replaced
                 # Check fulltext for not None, as might be image, audio, video
-                if src['fulltext'] is not None and len(src['fulltext']) != res[1]:
+                if src['fulltext_len'] is not None and src['fulltext_len'] != res[1]:
                     msg = _("Warning! Inaccurate coding positions. Text lengths different for same text file: ")
                     msg += src['name'] + "\n"
-                    msg += _("Import project file text length: ") + f"{len(src['fulltext'])}  "
+                    msg += _("Import project file text length: ") + f"{src['fulltext_len']}  "
                     msg += _("Destination project file text length: ") + str(res[1]) + "\n"
                     self.summary_msg += msg
             else:
                 # To update the av_text_id after all new ids have been generated
+                cur_s = self.conn_s.cursor()
+                cur_s.execute("select fulltext from source where id=?", [src['id']])
+                fulltext = cur_s.fetchone()[0]
                 cur_d.execute(
                     "insert into source(name,fulltext,mediapath,memo,owner,date, av_text_id) values(?,?,?,?,?,?,?)",
-                    (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date'], None))
-                self.conn_d.commit()
+                    (src['name'], fulltext, src['mediapath'], src['memo'], src['owner'], src['date'], None))
                 cur_d.execute("select last_insert_rowid()")
                 id_ = cur_d.fetchone()[0]
                 src['newid'] = id_
@@ -749,7 +867,6 @@ class MergeProjects:
                 res = cur_d.fetchone()
                 if res is not None:
                     cur_d.execute("update source set av_text_id=? where id=?", [res[0], src['newid']])
-                    self.conn_d.commit()
 
         # Create attribute placeholders for the destination file attributes
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
@@ -760,24 +877,14 @@ class MergeProjects:
         for id_ in new_source_file_ids:
             for attribute_name in res_attr_types:
                 cur_d.execute(sql_attribute, [attribute_name[0], id_, now_date, self.app.settings['codername']])
-                self.app.conn.commit()
 
     def update_coding_file_ids(self):
         """ Update the file ids in the codings and annotations data. """
 
-        for src in self.source_s:
-            for c_text in self.code_text_s:
-                if c_text['fid'] == src['id']:
-                    c_text['newfid'] = src['newid']
-            for an in self.annotations_s:
-                if an['fid'] == src['id']:
-                    an['newfid'] = src['newid']
-            for c_img in self.code_image_s:
-                if c_img['fid'] == src['id']:
-                    c_img['newfid'] = src['newid']
-            for c_av in self.code_av_s:
-                if c_av['fid'] == src['id']:
-                    c_av['newfid'] = src['newid']
+        new_ids = {src['id']: src['newid'] for src in self.source_s}
+        for rows in (self.code_text_s, self.annotations_s, self.code_image_s, self.code_av_s):
+            for row in rows:
+                row['newfid'] = new_ids.get(row['fid'], -1)
 
     def copy_source_files_into_destination(self):
         """ Copy source files into destination project.
@@ -785,24 +892,46 @@ class MergeProjects:
         """
 
         folders = ["audio", "documents", "images", "video"]
+        to_copy = []
         for folder_name in folders:
             source_dir = Path(self.path_s) / folder_name  # self.path_s + "/" + folder_name
             if not source_dir.is_dir():
                 continue
             dest_dir = Path(self.app.project_path) / folder_name
             for file_ in source_dir.iterdir():
-                if not file_.is_file():
-                    continue
                 # iterdir yields absolute paths. Joining one replaces the destination folder
-                dest_path = dest_dir / file_.name
-                if not dest_path.exists():
-                    try:
-                        shutil.copyfile(file_, dest_path)
-                        self.summary_msg += _("File copied: ") + f"{file_.name}\n"
-                    except shutil.SameFileError:
-                        pass
-                    except PermissionError:
-                        self.summary_msg += f"{file_.name} " + _("NOT copied. Permission error")
+                if file_.is_file() and not (dest_dir / file_.name).exists():
+                    to_copy.append((file_, dest_dir / file_.name))
+        for index, (source_file, dest_path) in enumerate(to_copy):
+            # Media can be large, so cancel is checked on every file and inside each one
+            self.progress.tick(index, len(to_copy), 15, 20, every=1)
+            try:
+                self.copy_one_file(source_file, dest_path)
+                self.copied_files.append(dest_path)
+                self.summary_msg += _("File copied: ") + f"{source_file.name}\n"
+            except shutil.SameFileError:
+                pass
+            except PermissionError:
+                self.summary_msg += f"{source_file.name} " + _("NOT copied. Permission error")
+
+    def copy_one_file(self, source_file, dest_path):
+        """ Copy in chunks, so Cancel responds part way through a large video.
+        A cancel removes the partial file before raising.
+        """
+
+        chunk = 8 * 1024 * 1024
+        try:
+            with open(source_file, 'rb') as f_in, open(dest_path, 'wb') as f_out:
+                while True:
+                    buffer = f_in.read(chunk)
+                    if not buffer:
+                        break
+                    f_out.write(buffer)
+                    self.progress.check()
+        except MergeCancelled:
+            Path(dest_path).unlink(missing_ok=True)
+            raise
+        shutil.copystat(source_file, dest_path)
 
     def insert_new_attribute_types(self):
         """ Insert new attribute types  for cases and files.
@@ -810,7 +939,7 @@ class MergeProjects:
         To be performed after Cases and files have been inserted.
         """
 
-        cur_d = self.app.conn.cursor()
+        cur_d = self.conn_d.cursor()
         cur_d.execute("select id from source")
         res_file_ids = cur_d.fetchall()
         cur_d.execute("select caseid from cases")
@@ -819,19 +948,16 @@ class MergeProjects:
         for a in self.attribute_types_s:
             cur_d.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
                           (a['name'], a['date'], a['owner'], a['memo'], a['caseOrFile'], a['valuetype']))
-            self.app.conn.commit()
             self.summary_msg += _("Adding attribute (") + a['caseOrFile'] + "): " + a['name'] + "\n"
             # Create attribute placeholders for new attributes, does NOT create for existing destination attributes
             if a['caseOrFile'] == "file":
                 for id_ in res_file_ids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                     cur_d.execute(sql, (a['name'], "", id_[0], "file", a['date'], a['owner']))
-                    self.app.conn.commit()
             if a['caseOrFile'] == "case":
                 for id_ in res_case_ids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                     cur_d.execute(sql, (a['name'], "", id_[0], "case", a['date'], a['owner']))
-                    self.app.conn.commit()
 
     def insert_attributes(self):
         """ Insert new attribute values for files and cases.
@@ -845,7 +971,7 @@ class MergeProjects:
         # Insert if a placeholder is missing
         sql_insert = "insert into attribute (name,id,attr_type,value,date,owner) values (?,?,?,?,?,?)"
         attribute_count = 0
-        cur_d = self.app.conn.cursor()
+        cur_d = self.conn_d.cursor()
         for a in self.attributes_s:
             if a['attr_type'] == "file":
                 source_dict = next((item for item in self.source_s if item["id"] == a['id']), {'newid': -1})
@@ -862,11 +988,9 @@ class MergeProjects:
                 if not res:
                     cur_d.execute(sql_insert,
                                   (a['name'], a['newid'], a['attr_type'], a['value'], a['date'], a['owner']))
-                    self.app.conn.commit()
                     attribute_count += 1
                 else:
                     cur_d.execute(sql_update, (a['value'], a['name'], a['newid'], a['attr_type']))
-                    self.app.conn.commit()
                     attribute_count += 1
         if attribute_count > 0:
             self.summary_msg += _("Added attribute values for cases and files: n=") + str(attribute_count) + "\n"
@@ -923,12 +1047,14 @@ class MergeProjects:
             src = {"title": i[0], "description": i[1], "grouper": i[2], "ssql": i[3]}
             self.stored_sql_s.append(src)
         # Source data
-        sql_source = "select id, name, fulltext,mediapath,memo,owner,date,av_text_id from source"
+        # length(fulltext) only. Holding every document's text would cost as much memory as
+        # the project itself. The text is fetched per file when it is inserted
+        sql_source = "select id, name, length(fulltext),mediapath,memo,owner,date,av_text_id from source"
         cur_s.execute(sql_source)
         res_source = cur_s.fetchall()
         # Later update av_text_id
         for i in res_source:
-            src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4],
+            src = {"id": i[0], "newid": -1, "name": i[1], "fulltext_len": i[2], "mediapath": i[3], "memo": i[4],
                    "owner": i[5], "date": i[6], "av_text_id": i[7], "av_text_filename": ""}
             self.source_s.append(src)
         # The av_text_id is not enough to recreate linkages. Need the referenced text file name.
@@ -947,7 +1073,7 @@ class MergeProjects:
                     "name": i[2], "memo": i[3], "owner": i[4], "date": i[5], }
             self.categories_s.append(ccat)
         # Remove categories from the source list, that are already present in the destination database
-        cur_d = self.app.conn.cursor()
+        cur_d = self.conn_d.cursor()
         cur_d.execute("select name from code_cat")
         res_dest_catnames = cur_d.fetchall()
         dest_cat_names_list = [r[0] for r in res_dest_catnames]
@@ -1045,7 +1171,7 @@ class MergeProjects:
         for row in res_attr_type_s:
             temp_attribute_types_s.append(dict(zip(keys, row)))
         # Remove matching attribute type names
-        cur_d = self.app.conn.cursor()
+        cur_d = self.conn_d.cursor()
         cur_d.execute("select name from attribute_type")
         res_attr_name_dest = cur_d.fetchall()
         attribute_names_dest = [r[0] for r in res_attr_name_dest]
