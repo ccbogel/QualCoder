@@ -233,7 +233,6 @@ Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="font">
     <font>
-     <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
@@ -252,7 +251,6 @@ Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="font">
     <font>
-     <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
@@ -315,7 +313,6 @@ Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="font">
     <font>
-     <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
@@ -441,7 +438,6 @@ Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="font">
     <font>
-     <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
@@ -496,7 +492,6 @@ Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="font">
     <font>
-     <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
@@ -540,7 +535,7 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Make Word Cloud</string>
    </property>
    <property name="text">
     <string/>
@@ -656,7 +651,8 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>This is to allow a wider spread of heatmap colours when there are extreme count differences.
+0 represents no limit.</string>
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
@@ -728,7 +724,6 @@ Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="font">
     <font>
-     <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>

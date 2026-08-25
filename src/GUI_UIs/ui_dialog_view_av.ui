@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Dialog_view_av</class>
  <widget class="QDialog" name="Dialog_view_av">
@@ -62,7 +62,7 @@
          </size>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -87,7 +87,7 @@
          <string>Help</string>
         </property>
         <property name="text">
-         <string />
+         <string/>
         </property>
        </widget>
       </item>
@@ -97,7 +97,7 @@
    <item>
     <widget class="QSplitter" name="splitter_v">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="childrenCollapsible">
       <bool>false</bool>
@@ -107,7 +107,7 @@
        <item>
         <widget class="QSplitter" name="splitter_left">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <widget class="QFrame" name="frame_video">
           <property name="minimumSize">
@@ -120,15 +120,12 @@
            <string notr="true">background-color: rgb(30, 30, 30);</string>
           </property>
           <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Shadow::Plain</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
          </widget>
          <widget class="QGroupBox" name="groupBox_snippets">
           <property name="title">
-           <string />
+           <string/>
           </property>
           <layout class="QVBoxLayout" name="snippetsLayout">
            <property name="leftMargin">
@@ -146,7 +143,7 @@
            <item>
             <widget class="QListWidget" name="listWidget_snippets">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click inserts the element into the transcription at the cursor position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>Double click inserts the element into the transcription at the cursor position.</string>
              </property>
             </widget>
            </item>
@@ -165,7 +162,7 @@
               </size>
              </property>
              <property name="title">
-              <string />
+              <string/>
              </property>
              <widget class="QPushButton" name="pushButton_new_speaker">
               <property name="geometry">
@@ -177,7 +174,7 @@
                </rect>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_remove_speaker">
@@ -190,7 +187,7 @@
                </rect>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QCheckBox" name="checkBox_alternate_speakers">
@@ -203,7 +200,7 @@
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).</string>
               </property>
               <property name="text">
                <string>Alternate</string>
@@ -249,7 +246,7 @@ red underline = Assigned to code or annotation</string>
           </size>
          </property>
          <property name="title">
-          <string />
+          <string/>
          </property>
          <widget class="QLineEdit" name="lineEdit_search">
           <property name="geometry">
@@ -261,7 +258,7 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Search for text.</string>
           </property>
          </widget>
          <widget class="QCheckBox" name="checkBox_case_sensitive">
@@ -277,7 +274,7 @@ red underline = Assigned to code or annotation</string>
            <string>Case sensitive</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QLabel" name="label_case_sensitive">
@@ -293,7 +290,7 @@ red underline = Assigned to code or annotation</string>
            <string>Case sensitive</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_next">
@@ -306,10 +303,10 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Next</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QLabel" name="label_search_regex">
@@ -322,22 +319,24 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" background-color:transparent;"&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href="http://www.rexegg.com/regex-quickstart.html"&gt;&lt;span style=" text-decoration: underline; color:#000080;"&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Search uses Regex functions. 
+A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. 
+A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ 
+A ‘*’ after a character will match zero or more times. 
+‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. 
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
           <property name="frameShape">
-           <enum>QFrame::Shape::Box</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
           <property name="lineWidth">
            <number>0</number>
           </property>
           <property name="text">
-           <string />
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+           <string/>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -353,10 +352,10 @@ red underline = Assigned to code or annotation</string>
            </rect>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Previous</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QLabel" name="label_search_totals">
@@ -370,9 +369,6 @@ red underline = Assigned to code or annotation</string>
           </property>
           <property name="text">
            <string>0 / 0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_insert_timestamp">
@@ -388,7 +384,7 @@ red underline = Assigned to code or annotation</string>
            <string>Insert timestamp</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_load_transcription">
@@ -404,7 +400,7 @@ red underline = Assigned to code or annotation</string>
            <string>Load a transcription file (.txt, .srt, .vtt) into the transcription</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_goto_bookmark">
@@ -420,7 +416,7 @@ red underline = Assigned to code or annotation</string>
            <string>Go to bookmark (Ctrl Shift B)</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_set_bookmark">
@@ -436,7 +432,7 @@ red underline = Assigned to code or annotation</string>
            <string>Set bookmark (Ctrl B)</string>
           </property>
           <property name="text">
-           <string />
+           <string/>
           </property>
          </widget>
          <widget class="QComboBox" name="comboBox_player">
@@ -457,7 +453,7 @@ red underline = Assigned to code or annotation</string>
        <item>
         <widget class="QSplitter" name="splitter_write">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <widget class="QWidget" name="widget_transcript">
           <layout class="QHBoxLayout" name="transcriptLayout">
@@ -477,7 +473,7 @@ red underline = Assigned to code or annotation</string>
             <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="lineNumbers" />
+            <widget class="QWidget" name="lineNumbers" native="true"/>
            </item>
            <item>
             <widget class="QTextEdit" name="textEdit">
@@ -526,7 +522,7 @@ red underline = Assigned to code or annotation</string>
               </size>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change media position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>Left click on the slider button and drag left or right to change media position.</string>
              </property>
              <property name="minimum">
               <number>0</number>
@@ -540,11 +536,8 @@ red underline = Assigned to code or annotation</string>
              <property name="value">
               <number>0</number>
              </property>
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
              <property name="tickPosition">
-              <enum>QSlider::TickPosition::TicksBelow</enum>
+              <enum>QSlider::NoTicks</enum>
              </property>
              <property name="tickInterval">
               <number>10</number>
@@ -556,10 +549,10 @@ red underline = Assigned to code or annotation</string>
              <item>
               <widget class="QLabel" name="label_time_3">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>Time</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </item>
@@ -572,14 +565,14 @@ red underline = Assigned to code or annotation</string>
                 </size>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </item>
              <item>
               <spacer name="timeSpacer">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Vertical</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -628,7 +621,7 @@ red underline = Assigned to code or annotation</string>
               </size>
              </property>
              <property name="title">
-              <string />
+              <string/>
              </property>
              <widget class="QPushButton" name="pushButton_play">
               <property name="geometry">
@@ -640,10 +633,12 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Play / Pause
+Ctrl + S start/pause
+Ctrl + P start/pause</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QSlider" name="horizontalSlider_vol">
@@ -661,9 +656,6 @@ red underline = Assigned to code or annotation</string>
               <property name="value">
                <number>100</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
              </widget>
              <widget class="QLabel" name="label_volume">
               <property name="geometry">
@@ -675,13 +667,10 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Volume</string>
               </property>
               <property name="text">
-               <string />
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               <string/>
               </property>
              </widget>
              <widget class="QComboBox" name="comboBox_tracks">
@@ -705,9 +694,6 @@ red underline = Assigned to code or annotation</string>
               </property>
               <property name="text">
                <string>Audio:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -733,7 +719,8 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0
+Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1</string>
               </property>
               <property name="text">
                <string>1.0x</string>
@@ -749,10 +736,11 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Decrease play rate
+Ctrl + Shift +&lt;</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rate_up">
@@ -765,10 +753,11 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Increase play rate
+Ctrl + Shift + &gt; </string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rewind_5">
@@ -781,10 +770,11 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Rewind 5 seconds
+Ctrl + R</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_rewind_30">
@@ -797,10 +787,11 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Rewind 30 seconds
+Alt + Minus</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_forward_30">
@@ -813,10 +804,11 @@ red underline = Assigned to code or annotation</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Forward 30 seconds. Alt + Plus
+Forward 5 seconds. Press 5</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_detach">
@@ -838,7 +830,7 @@ red underline = Assigned to code or annotation</string>
                <string>Detach / dock the video window</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_stop_segment">
@@ -854,7 +846,7 @@ red underline = Assigned to code or annotation</string>
                <string>Stop segment / loop playback</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_play_segment">
@@ -870,7 +862,7 @@ red underline = Assigned to code or annotation</string>
                <string>Play the selected range (wave selection, or transcript selection)</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_loop_segment">
@@ -886,7 +878,7 @@ red underline = Assigned to code or annotation</string>
                <string>Loop the selected range</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_clear_selection">
@@ -902,7 +894,7 @@ red underline = Assigned to code or annotation</string>
                <string>Clear the wave selection</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
              </widget>
             </widget>
@@ -941,6 +933,6 @@ red underline = Assigned to code or annotation</string>
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
  </tabstops>
- <resources />
- <connections />
+ <resources/>
+ <connections/>
 </ui>

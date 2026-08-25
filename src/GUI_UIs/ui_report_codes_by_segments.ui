@@ -3,7 +3,7 @@
  <class>DialogSegmentCodings</class>
  <widget class="QDialog" name="DialogSegmentCodings">
   <property name="windowModality">
-   <enum>Qt::WindowModality::NonModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -196,26 +196,20 @@
       </property>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
-        </property>
         <widget class="QSplitter" name="splitter_vert">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
          <widget class="QListWidget" name="listWidget_files">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Files. Right click for selection options.</string>
           </property>
          </widget>
          <widget class="QListWidget" name="listWidget_cases">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Cases. Right click for selection options.</string>
           </property>
          </widget>
          <widget class="QTreeWidget" name="treeWidget">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Codes. Right click for options</string>
           </property>
           <column>
            <property name="text">

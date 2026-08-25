@@ -47,7 +47,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>File name filter</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_clear_filter">
@@ -120,7 +120,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>View file</string>
       </property>
       <property name="text">
        <string/>
@@ -136,7 +136,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Create a text file</string>
       </property>
       <property name="text">
        <string/>
@@ -170,7 +170,7 @@ Text files (from any source) are exported from the text stored in the database a
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select files for deletion</string>
       </property>
       <property name="text">
        <string/>
@@ -186,7 +186,7 @@ Text files (from any source) are exported from the text stored in the database a
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Import file into project folder</string>
       </property>
       <property name="text">
        <string/>
@@ -202,7 +202,7 @@ Text files (from any source) are exported from the text stored in the database a
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Add attribute</string>
       </property>
       <property name="text">
        <string/>
@@ -218,7 +218,7 @@ Text files (from any source) are exported from the text stored in the database a
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Link to a file that is outside the project folder</string>
       </property>
       <property name="text">
        <string/>
@@ -234,7 +234,7 @@ Text files (from any source) are exported from the text stored in the database a
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Import linked file into project folder</string>
       </property>
       <property name="text">
        <string/>
@@ -267,7 +267,7 @@ Cannot export text transcription file associated with an audio or video as a lin
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export attributes to file</string>
       </property>
       <property name="text">
        <string/>
@@ -302,7 +302,7 @@ Cannot export text transcription file associated with an audio or video as a lin
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Undo file rename</string>
       </property>
       <property name="text">
        <string/>
@@ -318,7 +318,10 @@ Cannot export text transcription file associated with an audio or video as a lin
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Bulk rename of database name file entries.
+Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...
+Renamed as: User chosen prefix and numbered suffix _nnn.
+e.g. interview_001</string>
       </property>
       <property name="text">
        <string/>
@@ -334,7 +337,8 @@ Cannot export text transcription file associated with an audio or video as a lin
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save table display settings. &lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Save table display settings. 
+(Hidden rows and columns and column sizing)</string>
       </property>
       <property name="text">
        <string/>
@@ -350,7 +354,8 @@ Cannot export text transcription file associated with an audio or video as a lin
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Load saved table display setting.
+(Hidden rows and columns and column sizing)</string>
       </property>
       <property name="text">
        <string/>

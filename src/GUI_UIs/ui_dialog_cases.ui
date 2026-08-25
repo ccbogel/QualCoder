@@ -84,7 +84,7 @@
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Add case</string>
          </property>
          <property name="text">
           <string/>
@@ -100,7 +100,7 @@
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Delete case</string>
          </property>
          <property name="text">
           <string/>
@@ -116,7 +116,9 @@
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Import cases
+Import from a csv or xlsx file.
+The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</string>
          </property>
          <property name="text">
           <string/>
@@ -132,7 +134,7 @@
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Add attribute</string>
          </property>
          <property name="text">
           <string/>
@@ -176,7 +178,7 @@
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Case file manager</string>
          </property>
          <property name="text">
           <string/>
@@ -192,7 +194,7 @@
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Export attributes to file</string>
          </property>
          <property name="text">
           <string/>
