@@ -814,7 +814,7 @@ langauge = it</string>
                 <bool>true</bool>
                </property>
                <property name="textInteractionFlags">
-                <set>Qt::NoTextInteraction</set>
+                <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
                </property>
               </widget>
              </item>
