@@ -925,6 +925,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         def
         """
 
+        if event.type() != QtCore.QEvent.Type.KeyPress:
+            # ShortcutOverride and KeyRelease are QKeyEvent too, so one keystroke
+            # ran the action three times (Delete showed the dialog again on cancel)
+            return False
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
@@ -2236,6 +2240,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
+        if x < 0 or x >= len(self.source):
+            # itemChanged can fire while the table is refilled, with no current row
+            return
         # Update attribute value
         if y > self.CASE_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
@@ -2289,6 +2296,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         x = self.ui.tableWidget.currentRow()
+        if x < 0 or x >= len(self.source):
+            # No current row (-1 opened the last file, or crashed on an empty project)
+            return
         self.ui.tableWidget.selectRow(x)
         if self.source[x]['mediapath'] is not None and 'docs:' != self.source[x]['mediapath'][0:5]:
             if len(self.source[x]['mediapath']) > 6 and self.source[x]['mediapath'][:7] in ("/images", "images:"):
@@ -3681,6 +3691,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for selected in selection:
             names = f"{names}{selected['name']}\n"
         ui = DialogConfirmDelete(self.app, names)
+        self.set_cancel_as_default(ui)
         ok = ui.exec()
         if not ok:
             return
@@ -3778,6 +3789,24 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         self._emit_project_table_changes(['source', 'code_text', 'code_image', 'code_av', 'annotation', 'case_text', 'attribute'])
 
+    @staticmethod
+    def set_cancel_as_default(dialog):
+        """ Make Cancel the default button of a confirm delete dialog, so that
+        Enter or Space right after the Delete key does not confirm the deletion. """
+
+        button_box = getattr(dialog.ui, 'buttonBox', None)
+        if button_box is None:
+            return
+        ok = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok)
+        cancel = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        if ok is not None:
+            ok.setAutoDefault(False)
+            ok.setDefault(False)
+        if cancel is not None:
+            cancel.setAutoDefault(True)
+            cancel.setDefault(True)
+            cancel.setFocus()
+
     def delete(self):
         """ Delete files from database and update model and widget.
         Also, delete the files from subdirectories, if not externally linked.
@@ -3799,6 +3828,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for r in rows:
             filenames += f"\n{self.source[r]['name']}"
         ui = DialogConfirmDelete(self.app, filenames, _("Delete files"))
+        self.set_cancel_as_default(ui)
         ok = ui.exec()
         if not ok:
             return
