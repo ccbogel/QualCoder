@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_charts.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_charts.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -66,15 +66,15 @@ class Ui_DialogCharts(object):
         self.label_filters = QtWidgets.QLabel(parent=DialogCharts)
         self.label_filters.setGeometry(QtCore.QRect(380, 43, 321, 26))
         font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
+        font.setBold(True)
+        font.setWeight(75)
         self.label_filters.setFont(font)
         self.label_filters.setObjectName("label_filters")
         self.label_chart_options = QtWidgets.QLabel(parent=DialogCharts)
         self.label_chart_options.setGeometry(QtCore.QRect(10, 43, 311, 22))
         font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
+        font.setBold(True)
+        font.setWeight(75)
         self.label_chart_options.setFont(font)
         self.label_chart_options.setObjectName("label_chart_options")
         self.comboBox_category = QtWidgets.QComboBox(parent=DialogCharts)
@@ -91,8 +91,8 @@ class Ui_DialogCharts(object):
         self.label_chart_attributes = QtWidgets.QLabel(parent=DialogCharts)
         self.label_chart_attributes.setGeometry(QtCore.QRect(10, 400, 311, 26))
         font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
+        font.setBold(True)
+        font.setWeight(75)
         self.label_chart_attributes.setFont(font)
         self.label_chart_attributes.setObjectName("label_chart_attributes")
         self.label_num_attr = QtWidgets.QLabel(parent=DialogCharts)
@@ -125,8 +125,8 @@ class Ui_DialogCharts(object):
         self.label_chart_options_2 = QtWidgets.QLabel(parent=DialogCharts)
         self.label_chart_options_2.setGeometry(QtCore.QRect(10, 240, 321, 26))
         font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
+        font.setBold(True)
+        font.setWeight(75)
         self.label_chart_options_2.setFont(font)
         self.label_chart_options_2.setObjectName("label_chart_options_2")
         self.line_3 = QtWidgets.QFrame(parent=DialogCharts)
@@ -201,8 +201,8 @@ class Ui_DialogCharts(object):
         self.label_cumulative_bar = QtWidgets.QLabel(parent=DialogCharts)
         self.label_cumulative_bar.setGeometry(QtCore.QRect(10, 332, 321, 22))
         font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
+        font.setBold(True)
+        font.setWeight(75)
         self.label_cumulative_bar.setFont(font)
         self.label_cumulative_bar.setObjectName("label_cumulative_bar")
         self.comboBox_cumulative_bar = QtWidgets.QComboBox(parent=DialogCharts)
@@ -302,24 +302,24 @@ class Ui_DialogCharts(object):
         self.pushButton_attributes.setText(_translate("DialogCharts", "Select attributes"))
         self.label_filter.setText(_translate("DialogCharts", "Filter out values below:"))
         self.lineEdit_filter.setToolTip(_translate("DialogCharts", "Enter number for filter cut off"))
-        self.label_filters.setText(_translate("DialogCharts", "<b>Data filters</b>"))
-        self.label_chart_options.setText(_translate("DialogCharts", "<b>Coding charts</b>"))
+        self.label_filters.setText(_translate("DialogCharts", "Data filters"))
+        self.label_chart_options.setText(_translate("DialogCharts", "Coding charts"))
         self.comboBox_category.setToolTip(_translate("DialogCharts", "Right-click for text filter"))
         self.label_category.setToolTip(_translate("DialogCharts", "If portions of a text file are assigned to a case,\n"
 "the code frequency and total text characters may be incorrect.\n"
 "Codings from the entire text file are used for the calculations."))
         self.label_category.setText(_translate("DialogCharts", "Select category"))
-        self.label_chart_attributes.setText(_translate("DialogCharts", "<b>Attribute charts</b>"))
+        self.label_chart_attributes.setText(_translate("DialogCharts", "Attribute charts"))
         self.label_num_attr.setText(_translate("DialogCharts", "Numeric attributes"))
         self.label_char_attr.setText(_translate("DialogCharts", "Character attributes"))
         self.radioButton_file.setText(_translate("DialogCharts", "File"))
         self.radioButton_case.setText(_translate("DialogCharts", "Case"))
         self.checkBox_export_html.setText(_translate("DialogCharts", "Export HTML file"))
-        self.label_chart_options_2.setText(_translate("DialogCharts", "<b>Heatmap charts</b>"))
+        self.label_chart_options_2.setText(_translate("DialogCharts", "Heatmap charts"))
         self.label_word_clouds.setText(_translate("DialogCharts", "Word cloud"))
         self.comboBox_wordcloud_background.setToolTip(_translate("DialogCharts", "Background"))
         self.comboBox_wordcloud_foreground.setToolTip(_translate("DialogCharts", "Foreground"))
-        self.pushButton_wordcloud.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Make Word Cloud</p></body></html>"))
+        self.pushButton_wordcloud.setToolTip(_translate("DialogCharts", "Make Word Cloud"))
         self.label_width.setText(_translate("DialogCharts", "Width"))
         self.label_height.setText(_translate("DialogCharts", "Height"))
         self.label_max_words.setText(_translate("DialogCharts", "Max words"))
@@ -329,12 +329,13 @@ class Ui_DialogCharts(object):
         self.label_ngrams.setToolTip(_translate("DialogCharts", "Number of conjoined words in phrase. Stopwords applies to selection of 1 word only."))
         self.label_ngrams.setText(_translate("DialogCharts", "n-grams"))
         self.comboBox_ngrams.setToolTip(_translate("DialogCharts", "1=One word, 3=3 word phrase, 4=4 word phrase"))
-        self.label_upper_count.setToolTip(_translate("DialogCharts", "<html><head/><body><p>This is to allow a wider spread of heatmap colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>"))
+        self.label_upper_count.setToolTip(_translate("DialogCharts", "This is to allow a wider spread of heatmap colours when there are extreme count differences.\n"
+"0 represents no limit."))
         self.label_upper_count.setText(_translate("DialogCharts", "Upper count limiter"))
         self.lineEdit_width.setToolTip(_translate("DialogCharts", "Image width"))
         self.lineEdit_height.setToolTip(_translate("DialogCharts", "Image height"))
         self.lineEdit_max_words.setToolTip(_translate("DialogCharts", "Maximum words"))
-        self.label_cumulative_bar.setText(_translate("DialogCharts", "<b>Cumulative barchart</b>"))
+        self.label_cumulative_bar.setText(_translate("DialogCharts", "Cumulative barchart"))
         self.pushButton_stopwords.setToolTip(_translate("DialogCharts", "Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. \n"
 "This is temporary and must be selected each time the Charts screen is opened.\n"
 "\n"
@@ -342,13 +343,3 @@ class Ui_DialogCharts(object):
 "Each word is excluded in the n-grams=1 Word cloud."))
         self.pushButton_stopwords.setText(_translate("DialogCharts", "Stop words"))
         self.comboBox_stopwords.setToolTip(_translate("DialogCharts", "Select stopwords list by language"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    DialogCharts = QtWidgets.QDialog()
-    ui = Ui_DialogCharts()
-    ui.setupUi(DialogCharts)
-    DialogCharts.show()
-    sys.exit(app.exec())

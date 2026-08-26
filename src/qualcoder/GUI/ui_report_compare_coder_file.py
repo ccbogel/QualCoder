@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_report_compare_coder_file.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_report_compare_coder_file.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -108,13 +108,3 @@ class Ui_Dialog_reportCompareCoderFile(object):
         self.pushButton_run.setToolTip(_translate("Dialog_reportCompareCoderFile", "Run comparison.\n"
 "Select 2 coders, 1 file, 1 code."))
         self.pushButton_help1.setToolTip(_translate("Dialog_reportCompareCoderFile", "Statistics explanation"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_reportCompareCoderFile = QtWidgets.QDialog()
-    ui = Ui_Dialog_reportCompareCoderFile()
-    ui.setupUi(Dialog_reportCompareCoderFile)
-    Dialog_reportCompareCoderFile.show()
-    sys.exit(app.exec())

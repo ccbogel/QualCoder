@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_report_matching_segments.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_report_matching_segments.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -111,8 +111,8 @@ class Ui_DialogMatchingTextSegments(object):
     def retranslateUi(self, DialogMatchingTextSegments):
         _translate = QtCore.QCoreApplication.translate
         DialogMatchingTextSegments.setWindowTitle(_translate("DialogMatchingTextSegments", "Report matching text segments"))
-        self.comboBox_coders.setToolTip(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Select coder. Blank for all.</p></body></html>"))
-        self.label_title.setText(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Exact match text segments report</p></body></html>"))
+        self.comboBox_coders.setToolTip(_translate("DialogMatchingTextSegments", "Select coder. Blank for all."))
+        self.label_title.setText(_translate("DialogMatchingTextSegments", "Exact match text segments report"))
         self.label_coder.setToolTip(_translate("DialogMatchingTextSegments", "Select coder. Blank for all"))
         self.pushButton_export.setToolTip(_translate("DialogMatchingTextSegments", "Export Excel file"))
         self.pushButton_run.setToolTip(_translate("DialogMatchingTextSegments", "Run"))
@@ -121,16 +121,6 @@ class Ui_DialogMatchingTextSegments(object):
         self.label_instructions.setText(_translate("DialogMatchingTextSegments", "Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code)."))
         self.checkBox_any_matches.setText(_translate("DialogMatchingTextSegments", "Unchecked - all selected codes must match exactly.\n"
 "Checked - any selected codes must match exactly."))
-        self.checkBox_one_line.setToolTip(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Matching exact coded text for multiple codes are collated into one line.</p></body></html>"))
+        self.checkBox_one_line.setToolTip(_translate("DialogMatchingTextSegments", "Matching exact coded text for multiple codes are collated into one line."))
         self.checkBox_one_line.setText(_translate("DialogMatchingTextSegments", "One line results"))
         self.pushButton_file_filter.setToolTip(_translate("DialogMatchingTextSegments", "File attributes filter"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    DialogMatchingTextSegments = QtWidgets.QDialog()
-    ui = Ui_DialogMatchingTextSegments()
-    ui.setupUi(DialogMatchingTextSegments)
-    DialogMatchingTextSegments.show()
-    sys.exit(app.exec())

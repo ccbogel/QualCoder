@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_report_code_frequencies.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_report_code_frequencies.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -86,20 +86,10 @@ class Ui_Dialog_reportCodeFrequencies(object):
         self.label_selections.setText(_translate("Dialog_reportCodeFrequencies", "Code and category frequencies: overall and by coder"))
         self.pushButton_exporttext.setToolTip(_translate("Dialog_reportCodeFrequencies", "Export text file"))
         self.pushButton_export_excel.setToolTip(_translate("Dialog_reportCodeFrequencies", "Export Excel"))
-        self.pushButton_select_files.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Select files</p></body></html>"))
+        self.pushButton_select_files.setToolTip(_translate("Dialog_reportCodeFrequencies", "Select files"))
         self.pushButton_select_files.setText(_translate("Dialog_reportCodeFrequencies", "Select files"))
         self.radioButton.setText(_translate("Dialog_reportCodeFrequencies", "Alphabetic ascending"))
         self.radioButton_2.setText(_translate("Dialog_reportCodeFrequencies", "Totals descending"))
-        self.pushButton_file_attributes.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>File Attributes</p></body></html>"))
+        self.pushButton_file_attributes.setToolTip(_translate("Dialog_reportCodeFrequencies", "File Attributes"))
         self.checkBox_source_breakdown.setToolTip(_translate("Dialog_reportCodeFrequencies", "Show frequencies broken down by where they were coded"))
         self.checkBox_source_breakdown.setText(_translate("Dialog_reportCodeFrequencies", "Breakdown by source (text / image / A/V)"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_reportCodeFrequencies = QtWidgets.QDialog()
-    ui = Ui_Dialog_reportCodeFrequencies()
-    ui.setupUi(Dialog_reportCodeFrequencies)
-    Dialog_reportCodeFrequencies.show()
-    sys.exit(app.exec())

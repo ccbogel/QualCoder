@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_manage_links.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_manage_links.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -55,13 +55,3 @@ class Ui_Dialog_manage_links(object):
 "\n"
 "e.g. from C:/users/OldUser/Images to C:/usersNewUser/Images"))
         self.pushButton_bulk.setText(_translate("Dialog_manage_links", "Bulk change"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_manage_links = QtWidgets.QDialog()
-    ui = Ui_Dialog_manage_links()
-    ui.setupUi(Dialog_manage_links)
-    Dialog_manage_links.show()
-    sys.exit(app.exec())
