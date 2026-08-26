@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_report_codes_by_segments.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_report_codes_by_segments.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -104,16 +104,6 @@ class Ui_DialogSegmentCodings(object):
         self.label_title.setText(_translate("DialogSegmentCodings", "Codes by text segments table. 1 = code present, 0 = not coded."))
         self.pushButton_export_xlsx.setToolTip(_translate("DialogSegmentCodings", "Export to Excel"))
         self.pushButton_file_attributes.setToolTip(_translate("DialogSegmentCodings", "Select files by attributes"))
-        self.listWidget_files.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Files. Right click for selection options.</p></body></html>"))
-        self.listWidget_cases.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Cases. Right click for selection options.</p></body></html>"))
-        self.treeWidget.setToolTip(_translate("DialogSegmentCodings", "<html><head/><body><p>Codes. Right click for options</p></body></html>"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    DialogSegmentCodings = QtWidgets.QDialog()
-    ui = Ui_DialogSegmentCodings()
-    ui.setupUi(DialogSegmentCodings)
-    DialogSegmentCodings.show()
-    sys.exit(app.exec())
+        self.listWidget_files.setToolTip(_translate("DialogSegmentCodings", "Files. Right click for selection options."))
+        self.listWidget_cases.setToolTip(_translate("DialogSegmentCodings", "Cases. Right click for selection options."))
+        self.treeWidget.setToolTip(_translate("DialogSegmentCodings", "Codes. Right click for options"))

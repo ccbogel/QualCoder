@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_report_codings.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_report_codings.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -175,10 +175,11 @@ class Ui_Dialog_reportCodings(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_reportCodings.setWindowTitle(_translate("Dialog_reportCodings", "Reports"))
         self.label_text_limiter.setText(_translate("Dialog_reportCodings", "Text limiter:"))
-        self.pushButton_run_report.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Run report</p></body></html>"))
+        self.pushButton_run_report.setToolTip(_translate("Dialog_reportCodings", "Run report"))
         self.label_coder.setText(_translate("Dialog_reportCodings", "Coder:"))
-        self.pushButton_attributeselect.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Attributes. </p><p>Attribute selection will override files or cases selected in the left-hand-side lists.</p></body></html>"))
-        self.label_exports.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Export</p></body></html>"))
+        self.pushButton_attributeselect.setToolTip(_translate("Dialog_reportCodings", "Attributes.\n"
+"Attribute selection will override files or cases selected in the left-hand-side lists."))
+        self.label_exports.setToolTip(_translate("Dialog_reportCodings", "Export"))
         self.comboBox_export.setItemText(1, _translate("Dialog_reportCodings", "html"))
         self.comboBox_export.setItemText(2, _translate("Dialog_reportCodings", "txt"))
         self.comboBox_export.setItemText(3, _translate("Dialog_reportCodings", "odt"))
@@ -200,24 +201,15 @@ class Ui_Dialog_reportCodings(object):
         self.lineEdit_search_results.setToolTip(_translate("Dialog_reportCodings", "Search results for text"))
         self.label_search_results.setText(_translate("Dialog_reportCodings", "Search:"))
         self.pushButton_search_next.setToolTip(_translate("Dialog_reportCodings", "Search for next occurence in results"))
-        self.comboBox_sort.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Code names sort order.</p><p>Set this before running results.</p></body></html>"))
+        self.comboBox_sort.setToolTip(_translate("Dialog_reportCodings", "Code names sort order.\n"
+"Set this before running results."))
         self.comboBox_sort.setItemText(0, _translate("Dialog_reportCodings", "A - z"))
         self.comboBox_sort.setItemText(1, _translate("Dialog_reportCodings", "Z - a"))
         self.comboBox_sort.setItemText(2, _translate("Dialog_reportCodings", "10 - 1"))
         self.comboBox_sort.setItemText(3, _translate("Dialog_reportCodings", "1 - 10"))
         self.label_export.setText(_translate("Dialog_reportCodings", "Export:"))
-        self.checkBox_variables.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Export file  or case variables in columns for CSV or XLSX export</p></body></html>"))
+        self.checkBox_variables.setToolTip(_translate("Dialog_reportCodings", "Export file or case variables in columns for CSV or XLSX export"))
         self.checkBox_variables.setText(_translate("Dialog_reportCodings", "Variables CSV / XLSX"))
         self.pushButton_export_matrix.setText(_translate("Dialog_reportCodings", "Export matrix"))
-        self.checkBox_show_refs.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Show references</p></body></html>"))
+        self.checkBox_show_refs.setToolTip(_translate("Dialog_reportCodings", "Show references"))
         self.checkBox_show_refs.setText(_translate("Dialog_reportCodings", "References"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_reportCodings = QtWidgets.QDialog()
-    ui = Ui_Dialog_reportCodings()
-    ui.setupUi(Dialog_reportCodings)
-    Dialog_reportCodings.show()
-    sys.exit(app.exec())

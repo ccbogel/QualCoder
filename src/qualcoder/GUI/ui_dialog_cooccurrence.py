@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_cooccurrence.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_cooccurrence.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -112,7 +112,7 @@ class Ui_Dialog_Coocurrence(object):
     def retranslateUi(self, Dialog_Coocurrence):
         _translate = QtCore.QCoreApplication.translate
         Dialog_Coocurrence.setWindowTitle(_translate("Dialog_Coocurrence", "Code Co-occurence"))
-        self.label_selections.setToolTip(_translate("Dialog_Coocurrence", "<html><head/><body><p>Show the overlapping codes.</p></body></html>"))
+        self.label_selections.setToolTip(_translate("Dialog_Coocurrence", "Show the overlapping codes."))
         self.label_selections.setText(_translate("Dialog_Coocurrence", "Code co-occurence"))
         self.pushButton_export.setToolTip(_translate("Dialog_Coocurrence", "Export to file"))
         self.checkBox_hide_blanks.setText(_translate("Dialog_Coocurrence", "Hide blank lines"))
@@ -128,13 +128,3 @@ class Ui_Dialog_Coocurrence(object):
 ""))
         self.pushButton_color.setToolTip(_translate("Dialog_Coocurrence", "Highlight colour"))
         self.pushButton_transpose.setToolTip(_translate("Dialog_Coocurrence", "Transpose"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_Coocurrence = QtWidgets.QDialog()
-    ui = Ui_Dialog_Coocurrence()
-    ui.setupUi(Dialog_Coocurrence)
-    Dialog_Coocurrence.show()
-    sys.exit(app.exec())

@@ -58,8 +58,11 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
-&lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search for text.
+check Case sensitive for case sensitive search
+check All files for searching all files search
+
+Right-click to change automatic searching options</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_search_case">
@@ -72,7 +75,7 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>search case sensitive</string>
       </property>
       <property name="text">
        <string/>
@@ -88,7 +91,7 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>search all files</string>
       </property>
       <property name="text">
        <string/>
@@ -120,7 +123,7 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Previous</string>
       </property>
       <property name="text">
        <string/>
@@ -136,7 +139,7 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Next</string>
       </property>
       <property name="text">
        <string/>
@@ -152,7 +155,7 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search text. All text files.</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -177,7 +180,7 @@ Right click for options: all, first, last, within another code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search text. Case sensitive</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -219,7 +222,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Undo auto coding</string>
       </property>
       <property name="text">
        <string/>
@@ -235,7 +238,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Delete all codes by this coder from this file</string>
       </property>
       <property name="text">
        <string/>
@@ -251,7 +254,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Annotate selection</string>
       </property>
       <property name="text">
        <string/>
@@ -267,7 +270,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Memo for this coded section</string>
       </property>
       <property name="text">
        <string/>
@@ -283,7 +286,12 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search uses Regex functions.
+A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.
+A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’
+A ‘*’ after a character will match zero or more times.
+‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -308,7 +316,7 @@ Right click for options: all (default), first, code within code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Auto code using start and end marks.</string>
       </property>
       <property name="text">
        <string/>
@@ -460,7 +468,8 @@ As all assigned positions may be incorrect. </string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>After editing the text:
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</string>
       </property>
       <property name="text">
        <string/>
@@ -492,7 +501,7 @@ As all assigned positions may be incorrect. </string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Show side pane</string>
       </property>
       <property name="text">
        <string/>
@@ -848,7 +857,7 @@ Formatted like below for name detection.
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Search text. Case sensitive</string>
          </property>
          <property name="autoFillBackground">
           <bool>false</bool>
@@ -885,7 +894,7 @@ Formatted like below for name detection.
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>search case sensitive</string>
          </property>
          <property name="text">
           <string/>
@@ -1008,7 +1017,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>File with latest coding</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1024,7 +1033,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>Go to bookmark</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1040,7 +1049,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>Next file</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1056,7 +1065,7 @@ Formatted like below for name detection.
                    </rect>
                   </property>
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>File memo</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1360,7 +1369,7 @@ Formatted like below for name detection.
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Code name filter</string>
               </property>
              </widget>
             </widget>

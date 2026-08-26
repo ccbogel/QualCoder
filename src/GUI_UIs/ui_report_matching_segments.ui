@@ -65,7 +65,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select coder. Blank for all.</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_title">
@@ -86,7 +86,7 @@
        <string/>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Exact match text segments report</string>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
@@ -218,7 +218,7 @@ Checked - any selected codes must match exactly.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Matching exact coded text for multiple codes are collated into one line.</string>
       </property>
       <property name="text">
        <string>One line results</string>

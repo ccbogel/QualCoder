@@ -134,7 +134,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Select files</string>
       </property>
       <property name="text">
        <string>Select files</string>
@@ -191,7 +191,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File Attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>File Attributes</string>
       </property>
       <property name="text">
        <string/>

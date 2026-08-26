@@ -1,0 +1,229 @@
+﻿file,kind,before,after
+ui_case_file_manager.ui,string,"<html><head/><body><p>Double click the file row to view image, audio, or video</p></body></html>","Double click the file row to view image, audio, or video"
+ui_comparison_table.ui,string,<html><head/><body><p>Show the overlapping codes.</p></body></html>,Show the overlapping codes.
+ui_dialog_SQL.ui,string,<html><head/><body><p>Run</p></body></html>,Run
+ui_dialog_SQL.ui,string,<html><head/><body><p>Export to Excel</p></body></html>,Export to Excel
+ui_dialog_SQL.ui,string,<html><head/><body><p>Export to CSV file</p></body></html>,Export to CSV file
+ui_dialog_SQL.ui,string,<html><head/><body><p>Delimiter for export</p></body></html>,Delimiter for export
+ui_dialog_cases.ui,string,<html><head/><body><p>Add case</p></body></html>,Add case
+ui_dialog_cases.ui,string,<html><head/><body><p>Delete case</p></body></html>,Delete case
+ui_dialog_cases.ui,string,<html><head/><body><p>Import cases</p><p>Import from a csv or xlsx file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>,"Import cases
+Import from a csv or xlsx file.
+The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case."
+ui_dialog_cases.ui,string,<html><head/><body><p>Add attribute</p></body></html>,Add attribute
+ui_dialog_cases.ui,string,<html><head/><body><p>Case file manager</p></body></html>,Case file manager
+ui_dialog_cases.ui,string,<html><head/><body><p>Export attributes to file</p></body></html>,Export attributes to file
+ui_dialog_charts.ui,text (bold heading),<b>Data filters</b>,Data filters
+ui_dialog_charts.ui,text (bold heading),<b>Coding charts</b>,Coding charts
+ui_dialog_charts.ui,text (bold heading),<b>Attribute charts</b>,Attribute charts
+ui_dialog_charts.ui,text (bold heading),<b>Heatmap charts</b>,Heatmap charts
+ui_dialog_charts.ui,text (bold heading),<b>Cumulative barchart</b>,Cumulative barchart
+ui_dialog_charts.ui,string,<html><head/><body><p>Make Word Cloud</p></body></html>,Make Word Cloud
+ui_dialog_charts.ui,string,<html><head/><body><p>This is to allow a wider spread of heatmap colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>,"This is to allow a wider spread of heatmap colours when there are extreme count differences.
+0 represents no limit."
+ui_dialog_code_av.ui,string,<html><head/><body><p>File with latest coding</p></body></html>,File with latest coding
+ui_dialog_code_av.ui,string,<html><head/><body><p>Next file</p></body></html>,Next file
+ui_dialog_code_av.ui,string,<html><head/><body><p>File memo</p></body></html>,File memo
+ui_dialog_code_av.ui,string,<html><head/><body><p>Rewind 30 seconds. Alt + Minus</p></body></html>,Rewind 30 seconds. Alt + Minus
+ui_dialog_code_av.ui,string,<html><head/><body><p>Forward 30 seconds. Alt + Plus</p><p>Keypress 5 - Forward 5 seconds</p></body></html>,"Forward 30 seconds. Alt + Plus
+Keypress 5 - Forward 5 seconds"
+ui_dialog_code_av.ui,string,"<html><head/><body><p>Ctrl + Shift + &gt; increase, Ctrl + Shift + &lt; decrease</p></body></html>","Ctrl + Shift + > increase, Ctrl + Shift + < decrease"
+ui_dialog_code_av.ui,string,<html><head/><body><p>Detach the video into a floating window. Close the window to dock it back.</p></body></html>,Detach the video into a floating window. Close the window to dock it back.
+ui_dialog_code_av.ui,string,<html><head/><body><p>Left click on the slider button and drag left or right to change media position.</p></body></html>,Left click on the slider button and drag left or right to change media position.
+ui_dialog_code_av.ui,string,<html><head/><body><p>Transcript</p></body></html>,Transcript
+ui_dialog_code_av.ui,string,<html><head/><body><p>Undo auto coding</p></body></html>,Undo auto coding
+ui_dialog_code_av.ui,string,<html><head/><body><p>Search transcript text</p></body></html>,Search transcript text
+ui_dialog_code_av.ui,string,"<html><head/><body><p>Search for text.</p><p>Check <span style="" font-weight:600;"">Case sensitive</span> to match case.</p></body></html>","Search for text.
+Check Case sensitive to match case."
+ui_dialog_code_av.ui,string,<html><head/><body><p>search case sensitive</p></body></html>,search case sensitive
+ui_dialog_code_av.ui,string,<html><head/><body><p>Search text. Case sensitive</p></body></html>,Search text. Case sensitive
+ui_dialog_code_av.ui,string,<html><head/><body><p>Previous</p></body></html>,Previous
+ui_dialog_code_av.ui,string,<html><head/><body><p>Next</p></body></html>,Next
+ui_dialog_code_av.ui,string,<html><head/><body><p>Button to select a segment.</p><p>Then a menu of options will open.</p></body></html>,"Button to select a segment.
+Then a menu of options will open."
+ui_dialog_code_av.ui,string,"<html><head/><body><p>Drag on the wave to select, then click a code in the tree to assign it.</p></body></html>","Drag on the wave to select, then click a code in the tree to assign it."
+ui_dialog_code_av.ui,string,"<html><head/><body><p>When coding text, also create the matching segment on the wave, using the transcript timestamps.</p></body></html>","When coding text, also create the matching segment on the wave, using the transcript timestamps."
+ui_dialog_code_av.ui,string,<html><head/><body><p>Screenshot</p></body></html>,Screenshot
+ui_dialog_code_av.ui,string,<html><head/><body><p>Project image from screenshot</p></body></html>,Project image from screenshot
+ui_dialog_code_av.ui,string,<html><head/><body><p>Mark speakers in the transcript</p></body></html>,Mark speakers in the transcript
+ui_dialog_code_colours.ui,string,<html><head/><body><p>This coded area</p></body></html>,This coded area
+ui_dialog_code_colours.ui,string,<html><head/><body><p>Undo all changes.</p></body></html>,Undo all changes.
+ui_dialog_code_image.ui,string,<html><head/><body><p>This coded area</p></body></html>,This coded area
+ui_dialog_code_image.ui,string,<html><head/><body><p>Export image as html file.</p></body></html>,Export image as html file.
+ui_dialog_code_image.ui,string,<html><head/><body><p>Show captions</p></body></html>,Show captions
+ui_dialog_code_image.ui,string,<html><head/><body><p>Zoom in. W or +</p></body></html>,Zoom in. W or +
+ui_dialog_code_image.ui,string,<html><head/><body><p>Zoom out. Q or -</p></body></html>,Zoom out. Q or -
+ui_dialog_code_image.ui,string,<html><head/><body><p>Rotate counter-clockwise</p></body></html>,Rotate counter-clockwise
+ui_dialog_code_image.ui,string,<html><head/><body><p>Rotate clockwise</p></body></html>,Rotate clockwise
+ui_dialog_code_image.ui,string,<html><head/><body><p>Previous</p></body></html>,Previous
+ui_dialog_code_image.ui,string,<html><head/><body><p>Next</p></body></html>,Next
+ui_dialog_code_image.ui,string,<html><head/><body><p>Pages</p></body></html>,Pages
+ui_dialog_code_image.ui,string,<html><head/><body><p>Last Page</p></body></html>,Last Page
+ui_dialog_code_image.ui,string,<html><head/><body><p>Go to page</p></body></html>,Go to page
+ui_dialog_code_image.ui,string,<html><head/><body><p>File with latest coding</p></body></html>,File with latest coding
+ui_dialog_code_image.ui,string,<html><head/><body><p>Next file</p></body></html>,Next file
+ui_dialog_code_image.ui,string,<html><head/><body><p>File memo</p></body></html>,File memo
+ui_dialog_code_image.ui,string,<html><head/><body><p>Code name filter</p></body></html>,Code name filter
+ui_dialog_code_relations.ui,string,<html><head/><body><p>Relationship types</p></body></html>,Relationship types
+ui_dialog_code_text.ui,string,"<html><head/><body><p>Search for text.</p><p>check <span style="" font-weight:600;"">Case sensitive</span> for case sensitive search</p><p>check <span style="" font-weight:600;"">All files</span> for searching all files search</p>
+<p>Right-click to change automatic searching options</p></body></html>","Search for text.
+check Case sensitive for case sensitive search
+check All files for searching all files search
+
+Right-click to change automatic searching options"
+ui_dialog_code_text.ui,string,<html><head/><body><p>search case sensitive</p></body></html>,search case sensitive
+ui_dialog_code_text.ui,string,<html><head/><body><p>search all files</p></body></html>,search all files
+ui_dialog_code_text.ui,string,<html><head/><body><p>Previous</p></body></html>,Previous
+ui_dialog_code_text.ui,string,<html><head/><body><p>Next</p></body></html>,Next
+ui_dialog_code_text.ui,string,<html><head/><body><p>Search text. All text files.</p></body></html>,Search text. All text files.
+ui_dialog_code_text.ui,string,<html><head/><body><p>Search text. Case sensitive</p></body></html>,Search text. Case sensitive
+ui_dialog_code_text.ui,string,<html><head/><body><p>Undo auto coding</p></body></html>,Undo auto coding
+ui_dialog_code_text.ui,string,<html><head/><body><p>Delete all codes by this coder from this file</p></body></html>,Delete all codes by this coder from this file
+ui_dialog_code_text.ui,string,<html><head/><body><p>Annotate selection</p></body></html>,Annotate selection
+ui_dialog_code_text.ui,string,<html><head/><body><p>Memo for this coded section</p></body></html>,Memo for this coded section
+ui_dialog_code_text.ui,string,"<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style="" background-color:transparent;"">A ‘*’ after a character will match zero or more times. </span></p><p><span style="" background-color:transparent;"">‘</span>\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. </p><p>Regex cheatsheet: www.rexegg.com/regex-quickstart.html</p></body></html>","Search uses Regex functions.
+A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.
+A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’
+A ‘*’ after a character will match zero or more times.
+‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html"
+ui_dialog_code_text.ui,string,<html><head/><body><p>Auto code using start and end marks.</p></body></html>,Auto code using start and end marks.
+ui_dialog_code_text.ui,string,"<html><head/><body><p>After editing the text:</p><p>Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. </p></body></html>","After editing the text:
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect."
+ui_dialog_code_text.ui,string,<html><head/><body><p>Show side pane</p></body></html>,Show side pane
+ui_dialog_code_text.ui,string,<html><head/><body><p>Search text. Case sensitive</p></body></html>,Search text. Case sensitive
+ui_dialog_code_text.ui,string,<html><head/><body><p>search case sensitive</p></body></html>,search case sensitive
+ui_dialog_code_text.ui,string,<html><head/><body><p>File with latest coding</p></body></html>,File with latest coding
+ui_dialog_code_text.ui,string,<html><head/><body><p>Go to bookmark</p></body></html>,Go to bookmark
+ui_dialog_code_text.ui,string,<html><head/><body><p>Next file</p></body></html>,Next file
+ui_dialog_code_text.ui,string,<html><head/><body><p>File memo</p></body></html>,File memo
+ui_dialog_code_text.ui,string,<html><head/><body><p>Code name filter</p></body></html>,Code name filter
+ui_dialog_cooccurrence.ui,string,<html><head/><body><p>Show the overlapping codes.</p></body></html>,Show the overlapping codes.
+ui_dialog_import.ui,empty tooltip removed,<html><head/><body><p><br/></p></body></html>,
+ui_dialog_import.ui,string,<html><head/><body><p>Delimiter must be a single character.</p><p>Enter 'ta' for 'tab'</p></body></html>,"Delimiter must be a single character.
+Enter 'ta' for 'tab'"
+ui_dialog_import.ui,string,"<html><head/><body><p>NONE 123, abc</p><p>MINIMAL 123, &quot;abc&quot;</p><p>ALL &quot;123&quot;, &quot;abc&quot;</p><p><br/></p></body></html>","NONE 123, abc
+MINIMAL 123, ""abc""
+ALL ""123"", ""abc"""
+ui_dialog_import.ui,string,<html><head/><body><p>If checked: All the rows of a qualitative column will be collated into one text file.</p><p>If unchecked: Each qualitative answer will be an individual text file within the database.</p></body></html>,"If checked: All the rows of a qualitative column will be collated into one text file.
+If unchecked: Each qualitative answer will be an individual text file within the database."
+ui_dialog_journals.ui,string,"<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style="" background-color:transparent;"">A ‘*’ after a character will match zero or more times. </span></p><p><span style="" background-color:transparent;"">‘</span>\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. </p><p>Regex cheatsheet: <a href=""http://www.rexegg.com/regex-quickstart.html""><span style="" text-decoration: underline; color:#000080;"">www.rexegg.com/regex-quickstart.html</span></a></p></body></html>","Search uses Regex functions.
+A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.
+A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’
+A ‘*’ after a character will match zero or more times.
+‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html"
+ui_dialog_journals.ui,string,"<html><head/><body><p>Search for text.</p><p>check <span style="" font-weight:600;"">All journals</span> for searching all journals</p></body></html>","Search for text.
+check All journals for searching all journals"
+ui_dialog_manage_attributes.ui,string,<html><head/><body><p>Add</p></body></html>,Add
+ui_dialog_manage_attributes.ui,string,<html><head/><body><p>Delete</p></body></html>,Delete
+ui_dialog_manage_files.ui,string,<html><head/><body><p>File name filter</p></body></html>,File name filter
+ui_dialog_manage_files.ui,string,<html><head/><body><p>View file</p></body></html>,View file
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Create a text file</p></body></html>,Create a text file
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Select files for deletion</p></body></html>,Select files for deletion
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Import file into project folder</p></body></html>,Import file into project folder
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Add attribute</p></body></html>,Add attribute
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Link to a file that is outside the project folder</p></body></html>,Link to a file that is outside the project folder
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Import linked file into project folder</p></body></html>,Import linked file into project folder
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Export attributes to file</p></body></html>,Export attributes to file
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Undo file rename</p></body></html>,Undo file rename
+ui_dialog_manage_files.ui,string,"<html><head/><body><p>Bulk rename of database name file entries.</p><p>Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...</p><p>Renamed as: User chosen prefix and numbered suffix _nnn.</p><p>e.g. interview_001</p></body></html>","Bulk rename of database name file entries.
+Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...
+Renamed as: User chosen prefix and numbered suffix _nnn.
+e.g. interview_001"
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Save table display settings. </p><p>(Hidden rows and columns and column sizing)</p></body></html>,"Save table display settings.
+(Hidden rows and columns and column sizing)"
+ui_dialog_manage_files.ui,string,<html><head/><body><p>Load saved table display setting.</p><p>(Hidden rows and columns and column sizing)</p></body></html>,"Load saved table display setting.
+(Hidden rows and columns and column sizing)"
+ui_dialog_organiser.ui,string,<html><head/><body><p>Create category</p></body></html>,Create category
+ui_dialog_organiser.ui,string,<html><head/><body><p>Apply changed structure.</p><p>Warning. No Undo option.</p></body></html>,"Apply changed structure.
+Warning. No Undo option."
+ui_dialog_report_code_frequencies.ui,string,<html><head/><body><p>Select files</p></body></html>,Select files
+ui_dialog_report_code_frequencies.ui,string,<html><head/><body><p>File Attributes</p></body></html>,File Attributes
+ui_dialog_report_codings.ui,string,<html><head/><body><p>Run report</p></body></html>,Run report
+ui_dialog_report_codings.ui,string,<html><head/><body><p>Attributes. </p><p>Attribute selection will override files or cases selected in the left-hand-side lists.</p></body></html>,"Attributes.
+Attribute selection will override files or cases selected in the left-hand-side lists."
+ui_dialog_report_codings.ui,string,<html><head/><body><p>Export</p></body></html>,Export
+ui_dialog_report_codings.ui,string,<html><head/><body><p>Code names sort order.</p><p>Set this before running results.</p></body></html>,"Code names sort order.
+Set this before running results."
+ui_dialog_report_codings.ui,string,<html><head/><body><p>Export file  or case variables in columns for CSV or XLSX export</p></body></html>,Export file or case variables in columns for CSV or XLSX export
+ui_dialog_report_codings.ui,string,<html><head/><body><p>Show references</p></body></html>,Show references
+ui_dialog_view_av.ui,string,<html><head/><body><p>Double click inserts the element into the transcription at the cursor position.</p></body></html>,Double click inserts the element into the transcription at the cursor position.
+ui_dialog_view_av.ui,string,<html><head/><body><p>Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).</p></body></html>,Insert the next speaker automatically on each line break (Alt+Enter inserts one regardless).
+ui_dialog_view_av.ui,string,<html><head/><body><p>Search for text.</p></body></html>,Search for text.
+ui_dialog_view_av.ui,string,<html><head/><body><p>Next</p></body></html>,Next
+ui_dialog_view_av.ui,string,"<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style="" background-color:transparent;"">A ‘*’ after a character will match zero or more times. </span></p><p><span style="" background-color:transparent;"">‘</span>\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. </p><p>Regex cheatsheet: <a href=""http://www.rexegg.com/regex-quickstart.html""><span style="" text-decoration: underline; color:#000080;"">www.rexegg.com/regex-quickstart.html</span></a></p></body></html>","Search uses Regex functions.
+A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.
+A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’
+A ‘*’ after a character will match zero or more times.
+‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Previous</p></body></html>,Previous
+ui_dialog_view_av.ui,string,<html><head/><body><p>Left click on the slider button and drag left or right to change media position.</p></body></html>,Left click on the slider button and drag left or right to change media position.
+ui_dialog_view_av.ui,string,<html><head/><body><p>Time</p></body></html>,Time
+ui_dialog_view_av.ui,string,<html><head/><body><p>Play / Pause</p><p>Ctrl + S start/pause</p><p>Ctrl + P start/pause</p></body></html>,"Play / Pause
+Ctrl + S start/pause
+Ctrl + P start/pause"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Volume</p></body></html>,Volume
+ui_dialog_view_av.ui,string,"<html><head/><body><p>Ctrl + Shift + &gt; increase play rate, maximum 2.0</p><p>Ctrl + Shift + &lt; decrease play rate, minimum 0.1</p></body></html>","Ctrl + Shift + > increase play rate, maximum 2.0
+Ctrl + Shift + < decrease play rate, minimum 0.1"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Decrease play rate</p><p>Ctrl + Shift + &lt; </p></body></html>,"Decrease play rate
+Ctrl + Shift + <"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Increase play rate</p><p>Ctrl + Shift + &gt; </p></body></html>,"Increase play rate
+Ctrl + Shift + >"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Rewind 5 seconds</p><p>Ctrl + R</p></body></html>,"Rewind 5 seconds
+Ctrl + R"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Rewind 30 seconds</p><p>Alt + Minus</p></body></html>,"Rewind 30 seconds
+Alt + Minus"
+ui_dialog_view_av.ui,string,<html><head/><body><p>Forward 30 seconds. Alt + Plus</p><p>Forward 5 seconds. Press 5</p></body></html>,"Forward 30 seconds. Alt + Plus
+Forward 5 seconds. Press 5"
+ui_dialog_view_image.ui,string,<html><head/><body><p>Memo</p></body></html>,Memo
+ui_dialog_view_text.ui,string,<html><head/><body><p>Next</p></body></html>,Next
+ui_dialog_view_text.ui,string,"<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style="" background-color:transparent;"">A ‘*’ after a character will match zero or more times. </span></p><p><span style="" background-color:transparent;"">‘</span>\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. </p><p>Regex cheatsheet: <a href=""http://www.rexegg.com/regex-quickstart.html""><span style="" text-decoration: underline; color:#000080;"">www.rexegg.com/regex-quickstart.html</span></a></p></body></html>","Search uses Regex functions.
+A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.
+A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’
+A ‘*’ after a character will match zero or more times.
+‘\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol.
+Regex cheatsheet: www.rexegg.com/regex-quickstart.html"
+ui_dialog_view_text.ui,string,<html><head/><body><p>Previous</p></body></html>,Previous
+ui_main.ui,html -> plainText,"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.0//EN"" ""http://www.w3.org/TR/REC-html40/strict.dtd"">
+<html><head><meta name=""qrichtext"" content=""1"" /><meta charset=""utf-8"" /><style type=""text/css"">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: ""\2610""; }
+li.checked::marker { content: ""\2612""; }
+</style></head><body style="" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;"">
+<p style="" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"">Select an option from the Manage menu</p></body></html>",Select an option from the Manage menu
+ui_main.ui,html -> plainText,"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.0//EN"" ""http://www.w3.org/TR/REC-html40/strict.dtd"">
+<html><head><meta name=""qrichtext"" content=""1"" /><meta charset=""utf-8"" /><style type=""text/css"">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: ""\2610""; }
+li.checked::marker { content: ""\2612""; }
+</style></head><body style="" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;"">
+<p style="" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"">Select an option from the coding menu</p></body></html>",Select an option from the coding menu
+ui_main.ui,html -> plainText,"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.0//EN"" ""http://www.w3.org/TR/REC-html40/strict.dtd"">
+<html><head><meta name=""qrichtext"" content=""1"" /><meta charset=""utf-8"" /><style type=""text/css"">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: ""\2610""; }
+li.checked::marker { content: ""\2612""; }
+</style></head><body style="" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;"">
+<p style="" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"">Select an option from the Analysis or Reports menu</p></body></html>",Select an option from the Analysis or Reports menu
+ui_report_attribute_parameters.ui,string,<html><head/><body><p>Load filter settings</p></body></html>,Load filter settings
+ui_report_attribute_parameters.ui,string,<html><head/><body><p>Save filter settings.</p><p>Do not use apostrophe or comma in any values.</p></body></html>,"Save filter settings.
+Do not use apostrophe or comma in any values."
+ui_report_attribute_parameters.ui,string,<html><head/><body><p>Boolean And</p><p>For all parameter selections</p></body></html>,"Boolean And
+For all parameter selections"
+ui_report_attribute_parameters.ui,string,<html><head/><body><p>Boolean Or</p><p>For all parameter selections</p></body></html>,"Boolean Or
+For all parameter selections"
+ui_report_codes_by_segments.ui,string,<html><head/><body><p>Files. Right click for selection options.</p></body></html>,Files. Right click for selection options.
+ui_report_codes_by_segments.ui,string,<html><head/><body><p>Cases. Right click for selection options.</p></body></html>,Cases. Right click for selection options.
+ui_report_codes_by_segments.ui,string,<html><head/><body><p>Codes. Right click for options</p></body></html>,Codes. Right click for options
+ui_report_matching_segments.ui,string,<html><head/><body><p>Select coder. Blank for all.</p></body></html>,Select coder. Blank for all.
+ui_report_matching_segments.ui,string,<html><head/><body><p>Exact match text segments report</p></body></html>,Exact match text segments report
+ui_report_matching_segments.ui,string,<html><head/><body><p>Matching exact coded text for multiple codes are collated into one line.</p></body></html>,Matching exact coded text for multiple codes are collated into one line.
+ui_special_functions.ui,string,<html><head/><body><p>Number of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>,"Number of characters to extend (positive numbers)
+or reduce (negative numbers)"
+ui_special_functions.ui,string,<html><head/><body><p>Number of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>,"Number of characters to extend (positive numbers)
+or reduce (negative numbers)"

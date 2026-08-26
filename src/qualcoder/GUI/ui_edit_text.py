@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_edit_text.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_edit_text.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -77,13 +77,3 @@ class Ui_Dialog_edit_text(object):
         self.label.setText(_translate("Dialog_edit_text", "When editing text: Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.\n"
 "Positions may not correctly adjust. Make  a backup copy of the project before editing text.\n"
 ""))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_edit_text = QtWidgets.QDialog()
-    ui = Ui_Dialog_edit_text()
-    ui.setupUi(Dialog_edit_text)
-    Dialog_edit_text.show()
-    sys.exit(app.exec())

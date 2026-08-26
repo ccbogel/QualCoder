@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_manage_references.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_manage_references.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -102,13 +102,3 @@ class Ui_Dialog_manage_references(object):
 "Strong matches with 70% or more matching words are linked.\n"
 "Linking may be incorrect.\n"
 "Review after applying the function."))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_manage_references = QtWidgets.QDialog()
-    ui = Ui_Dialog_manage_references()
-    ui.setupUi(Dialog_manage_references)
-    Dialog_manage_references.show()
-    sys.exit(app.exec())

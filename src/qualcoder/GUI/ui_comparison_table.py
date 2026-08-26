@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_comparison_table.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_comparison_table.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -108,7 +108,7 @@ class Ui_Dialog_Comparisons(object):
     def retranslateUi(self, Dialog_Comparisons):
         _translate = QtCore.QCoreApplication.translate
         Dialog_Comparisons.setWindowTitle(_translate("Dialog_Comparisons", "Code Counts by file or case"))
-        self.label_selections.setToolTip(_translate("Dialog_Comparisons", "<html><head/><body><p>Show the overlapping codes.</p></body></html>"))
+        self.label_selections.setToolTip(_translate("Dialog_Comparisons", "Show the overlapping codes."))
         self.label_selections.setText(_translate("Dialog_Comparisons", "Code counts table"))
         self.pushButton_export.setToolTip(_translate("Dialog_Comparisons", "Export to file"))
         self.checkBox_hide_blanks.setText(_translate("Dialog_Comparisons", "Hide blank lines"))
@@ -119,13 +119,3 @@ class Ui_Dialog_Comparisons(object):
         self.pushButton_select_cases.setToolTip(_translate("Dialog_Comparisons", "Select cases"))
         self.pushButton_color.setToolTip(_translate("Dialog_Comparisons", "Highlight colour"))
         self.pushButton_transpose.setToolTip(_translate("Dialog_Comparisons", "Transpose table"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_Comparisons = QtWidgets.QDialog()
-    ui = Ui_Dialog_Comparisons()
-    ui.setupUi(Dialog_Comparisons)
-    Dialog_Comparisons.show()
-    sys.exit(app.exec())

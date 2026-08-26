@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_manage_references_import.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_manage_references_import.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #

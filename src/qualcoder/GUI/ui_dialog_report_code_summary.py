@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_report_code_summary.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_report_code_summary.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -70,13 +70,3 @@ class Ui_Dialog_code_summary(object):
         self.label_search_results.setText(_translate("Dialog_code_summary", "Search:"))
         self.label_codes.setText(_translate("Dialog_code_summary", "Code summary report"))
         self.comboBox_stopwords.setToolTip(_translate("Dialog_code_summary", "Select stopwords list by language"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_code_summary = QtWidgets.QDialog()
-    ui = Ui_Dialog_code_summary()
-    ui.setupUi(Dialog_code_summary)
-    Dialog_code_summary.show()
-    sys.exit(app.exec())

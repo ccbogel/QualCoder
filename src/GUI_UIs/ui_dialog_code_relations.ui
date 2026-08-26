@@ -149,7 +149,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relationship types&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Relationship types</string>
       </property>
       <item>
        <property name="text">

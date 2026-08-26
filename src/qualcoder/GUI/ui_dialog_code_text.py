@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_code_text.ui'
+# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_code_text.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -489,23 +489,31 @@ class Ui_Dialog_code_text(object):
         Dialog_code_text.setWindowTitle(_translate("Dialog_code_text", "Code Text"))
         self.pushButton_auto_code.setToolTip(_translate("Dialog_code_text", "Auto code with exact text.\n"
 "Right click for options: all, first, last, within another code."))
-        self.lineEdit_search.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search for text.</p><p>check <span style=\" font-weight:600;\">Case sensitive</span> for case sensitive search</p><p>check <span style=\" font-weight:600;\">All files</span> for searching all files search</p>\n"
-"<p>Right-click to change automatic searching options</p></body></html>"))
-        self.checkBox_search_case.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search case sensitive</p></body></html>"))
-        self.checkBox_search_all_files.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search all files</p></body></html>"))
+        self.lineEdit_search.setToolTip(_translate("Dialog_code_text", "Search for text.\n"
+"check Case sensitive for case sensitive search\n"
+"check All files for searching all files search\n"
+"\n"
+"Right-click to change automatic searching options"))
+        self.checkBox_search_case.setToolTip(_translate("Dialog_code_text", "search case sensitive"))
+        self.checkBox_search_all_files.setToolTip(_translate("Dialog_code_text", "search all files"))
         self.label_search_totals.setText(_translate("Dialog_code_text", "0 / 0"))
-        self.pushButton_previous.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Previous</p></body></html>"))
-        self.pushButton_next.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Next</p></body></html>"))
-        self.label_search_all_files.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search text. All text files.</p></body></html>"))
-        self.label_search_case_sensitive.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search text. Case sensitive</p></body></html>"))
+        self.pushButton_previous.setToolTip(_translate("Dialog_code_text", "Previous"))
+        self.pushButton_next.setToolTip(_translate("Dialog_code_text", "Next"))
+        self.label_search_all_files.setToolTip(_translate("Dialog_code_text", "Search text. All text files."))
+        self.label_search_case_sensitive.setToolTip(_translate("Dialog_code_text", "Search text. Case sensitive"))
         self.pushButton_auto_code_frag_this_file.setToolTip(_translate("Dialog_code_text", "Text fragment to auto code sentences.\n"
 "Right click for options: all (default), first, code within code."))
-        self.pushButton_auto_code_undo.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Undo auto coding</p></body></html>"))
-        self.pushButton_delete_all_codes.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Delete all codes by this coder from this file</p></body></html>"))
-        self.pushButton_annotate.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Annotate selection</p></body></html>"))
-        self.pushButton_coding_memo.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Memo for this coded section</p></body></html>"))
-        self.label_search_regex.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style=\" background-color:transparent;\">A ‘*’ after a character will match zero or more times. </span></p><p><span style=\" background-color:transparent;\">‘</span>\\. will match the dot symbol, ‘\\?’ will match the question mark. ‘\\n’ will match the line ending symbol. </p><p>Regex cheatsheet: www.rexegg.com/regex-quickstart.html</p></body></html>"))
-        self.pushButton_auto_code_surround.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Auto code using start and end marks.</p></body></html>"))
+        self.pushButton_auto_code_undo.setToolTip(_translate("Dialog_code_text", "Undo auto coding"))
+        self.pushButton_delete_all_codes.setToolTip(_translate("Dialog_code_text", "Delete all codes by this coder from this file"))
+        self.pushButton_annotate.setToolTip(_translate("Dialog_code_text", "Annotate selection"))
+        self.pushButton_coding_memo.setToolTip(_translate("Dialog_code_text", "Memo for this coded section"))
+        self.label_search_regex.setToolTip(_translate("Dialog_code_text", "Search uses Regex functions.\n"
+"A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’.\n"
+"A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’\n"
+"A ‘*’ after a character will match zero or more times.\n"
+"‘\\. will match the dot symbol, ‘\\?’ will match the question mark. ‘\\n’ will match the line ending symbol.\n"
+"Regex cheatsheet: www.rexegg.com/regex-quickstart.html"))
+        self.pushButton_auto_code_surround.setToolTip(_translate("Dialog_code_text", "Auto code using start and end marks."))
         self.pushButton_help.setToolTip(_translate("Dialog_code_text", "Help"))
         self.pushButton_show_memos.setToolTip(_translate("Dialog_code_text", "Show memos"))
         self.pushButton_show_annotations.setToolTip(_translate("Dialog_code_text", "Show annotations"))
@@ -523,9 +531,10 @@ class Ui_Dialog_code_text(object):
         self.comboBox_export.setItemText(4, _translate("Dialog_code_text", "txt"))
         self.comboBox_export.setItemText(5, _translate("Dialog_code_text", "html"))
         self.comboBox_export.setItemText(6, _translate("Dialog_code_text", "codebook"))
-        self.pushButton_undo_edit.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>After editing the text:</p><p>Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. </p></body></html>"))
+        self.pushButton_undo_edit.setToolTip(_translate("Dialog_code_text", "After editing the text:\n"
+"Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect."))
         self.pushButton_default_new_code_color.setToolTip(_translate("Dialog_code_text", "Set default colour for new codes"))
-        self.pushButton_right_side_pane.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show side pane</p></body></html>"))
+        self.pushButton_right_side_pane.setToolTip(_translate("Dialog_code_text", "Show side pane"))
         self.checkBox_auto_regex.setToolTip(_translate("Dialog_code_text", "Apply REGEX to autocoding for exact text and sentences buttons.\n"
 "https://www.datacamp.com/cheat-sheet/regular-expresso"))
         self.checkBox_auto_regex.setText(_translate("Dialog_code_text", "REGEX"))
@@ -542,12 +551,12 @@ class Ui_Dialog_code_text(object):
         self.lineEdit_edit_search.setToolTip(_translate("Dialog_code_text", "Search for text"))
         self.pushButton_edit_next.setToolTip(_translate("Dialog_code_text", "Next"))
         self.pushButton_edit_prev.setToolTip(_translate("Dialog_code_text", "Previous"))
-        self.label_edit_case_sensitive.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search text. Case sensitive</p></body></html>"))
-        self.checkBox_edit_case_sensitive.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search case sensitive</p></body></html>"))
-        self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File with latest coding</p></body></html>"))
-        self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))
-        self.pushButton_next_file.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Next file</p></body></html>"))
-        self.pushButton_document_memo.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File memo</p></body></html>"))
+        self.label_edit_case_sensitive.setToolTip(_translate("Dialog_code_text", "Search text. Case sensitive"))
+        self.checkBox_edit_case_sensitive.setToolTip(_translate("Dialog_code_text", "search case sensitive"))
+        self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "File with latest coding"))
+        self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "Go to bookmark"))
+        self.pushButton_next_file.setToolTip(_translate("Dialog_code_text", "Next file"))
+        self.pushButton_document_memo.setToolTip(_translate("Dialog_code_text", "File memo"))
         self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_text", "Show files with file attributes"))
         self.pushButton_clear_filter_file.setToolTip(_translate("Dialog_code_text", "Clear file filter"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_docs), _translate("Dialog_code_text", "Documents"))
@@ -563,18 +572,8 @@ class Ui_Dialog_code_text(object):
         self.label_code.setToolTip(_translate("Dialog_code_text", "Right click below to create new codes and categories"))
         self.pushButton_find_code.setToolTip(_translate("Dialog_code_text", "Find code"))
         self.pushButton_clear_filter_code.setToolTip(_translate("Dialog_code_text", "Clear code filter"))
-        self.lineEdit_code_filter.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Code name filter</p></body></html>"))
+        self.lineEdit_code_filter.setToolTip(_translate("Dialog_code_text", "Code name filter"))
         self.pushButton_code_rule.setToolTip(_translate("Dialog_code_text", "Code rule with examples"))
         self.pushButton_journal.setToolTip(_translate("Dialog_code_text", "Current journal"))
         self.pushButton_project_memo.setToolTip(_translate("Dialog_code_text", "Project memo"))
         self.label_info.setText(_translate("Dialog_code_text", "."))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_code_text = QtWidgets.QDialog()
-    ui = Ui_Dialog_code_text()
-    ui.setupUi(Dialog_code_text)
-    Dialog_code_text.show()
-    sys.exit(app.exec())

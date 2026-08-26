@@ -41,7 +41,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load filter settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Load filter settings</string>
       </property>
       <property name="text">
        <string/>
@@ -88,7 +88,8 @@ Wildcards for 'like' are % and _</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save filter settings.&lt;/p&gt;&lt;p&gt;Do not use apostrophe or comma in any values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Save filter settings.
+Do not use apostrophe or comma in any values.</string>
       </property>
       <property name="text">
        <string/>
@@ -126,7 +127,8 @@ Wildcards for 'like' are % and _</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean And&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Boolean And
+For all parameter selections</string>
       </property>
       <property name="text">
        <string>and</string>
@@ -148,7 +150,8 @@ Wildcards for 'like' are % and _</string>
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean Or&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Boolean Or
+For all parameter selections</string>
       </property>
       <property name="text">
        <string>or</string>
