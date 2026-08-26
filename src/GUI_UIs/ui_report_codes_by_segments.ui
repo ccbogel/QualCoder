@@ -205,17 +205,17 @@
          </property>
          <widget class="QListWidget" name="listWidget_files">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Files. Right click for selection options.</string>
           </property>
          </widget>
          <widget class="QListWidget" name="listWidget_cases">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Cases. Right click for selection options.</string>
           </property>
          </widget>
          <widget class="QTreeWidget" name="treeWidget">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Codes. Right click for options</string>
           </property>
           <column>
            <property name="text">

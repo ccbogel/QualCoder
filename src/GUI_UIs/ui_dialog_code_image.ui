@@ -89,7 +89,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>This coded area</string>
       </property>
       <property name="text">
        <string/>
@@ -124,7 +124,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export image as html file.</string>
       </property>
       <property name="text">
        <string/>
@@ -140,7 +140,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Show captions</string>
       </property>
       <property name="text">
        <string/>
@@ -156,7 +156,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Zoom in. W or +</string>
       </property>
       <property name="text">
        <string/>
@@ -172,7 +172,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Zoom out. Q or -</string>
       </property>
       <property name="text">
        <string/>
@@ -188,7 +188,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rotate counter-clockwise</string>
       </property>
       <property name="text">
        <string/>
@@ -204,7 +204,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rotate clockwise</string>
       </property>
       <property name="text">
        <string/>
@@ -220,7 +220,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Previous</string>
       </property>
       <property name="text">
        <string/>
@@ -236,7 +236,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Next</string>
       </property>
       <property name="text">
        <string/>
@@ -252,7 +252,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Pages</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -280,7 +280,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Last Page</string>
       </property>
       <property name="text">
        <string/>
@@ -296,7 +296,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Go to page</string>
       </property>
       <property name="text">
        <string/>
@@ -531,7 +531,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>File with latest coding</string>
            </property>
            <property name="text">
             <string/>
@@ -547,7 +547,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Next file</string>
            </property>
            <property name="text">
             <string/>
@@ -563,7 +563,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>File memo</string>
            </property>
            <property name="text">
             <string/>
@@ -651,7 +651,7 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code name filter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Code name filter</string>
            </property>
           </widget>
          </widget>

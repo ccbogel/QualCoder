@@ -62,7 +62,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Show the overlapping codes.</string>
       </property>
       <property name="text">
        <string>Code co-occurence</string>
