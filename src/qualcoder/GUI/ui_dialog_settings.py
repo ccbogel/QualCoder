@@ -331,7 +331,7 @@ class Ui_Dialog_settings(object):
         self.label_ai_access_info_url = QtWidgets.QLabel(parent=self.widget_ai_provider)
         self.label_ai_access_info_url.setText("")
         self.label_ai_access_info_url.setOpenExternalLinks(True)
-        self.label_ai_access_info_url.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.NoTextInteraction)
+        self.label_ai_access_info_url.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard|QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse|QtCore.Qt.TextInteractionFlag.TextBrowserInteraction|QtCore.Qt.TextInteractionFlag.TextSelectableByKeyboard|QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.label_ai_access_info_url.setObjectName("label_ai_access_info_url")
         self.gridLayout_6.addWidget(self.label_ai_access_info_url, 4, 2, 1, 1)
         self.label_2 = QtWidgets.QLabel(parent=self.widget_ai_provider)
