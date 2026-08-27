@@ -943,7 +943,7 @@ odt report: report of the coded text and areas.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Show codings prev</string>
+            <string>Show previous coding</string>
            </property>
            <property name="text">
             <string/>
@@ -959,7 +959,7 @@ odt report: report of the coded text and areas.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Show coding next</string>
+            <string>Show next coding</string>
            </property>
            <property name="text">
             <string/>
@@ -975,7 +975,7 @@ odt report: report of the coded text and areas.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Show codings falgged important</string>
+            <string>Show important codings</string>
            </property>
            <property name="text">
             <string/>

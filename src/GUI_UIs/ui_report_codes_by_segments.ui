@@ -121,6 +121,9 @@
         <height>28</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string>Coder</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -133,6 +136,9 @@
         <width>181</width>
         <height>30</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select coder. Blank for all</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_title">
