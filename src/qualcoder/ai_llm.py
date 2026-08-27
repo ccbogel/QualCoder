@@ -383,6 +383,20 @@ reasoning_effort = default
 api_base = https://openrouter.ai/api/v1
 api_key = 
 
+[ai_model_Ragarenn]
+desc = The University of Rennes is testing generative AI ("RAGaRenn")
+	since March 2024 to co-create usage guidelines with its staff. Using a 
+	local infrastructure on Eskemm Data, it aims to assess resource needs,
+	carbon impact, and professional use cases. 
+access_info_url = https://ragarenn.eskemm-numerique.fr/sso/ch@t/app
+large_model = ilaas/gemma-4-31b
+large_model_context_window = 32000
+fast_model = ilaas/mistral-small-4-119b
+fast_model_context_window = 32000
+reasoning_effort = default
+api_base = https://ragarenn.eskemm-numerique.fr/sso/ch@t/api
+api_key = 
+
 [ai_model_Ollama local AI]
 desc = Ollama is an open source server that lets you run LLMs locally on
 	your computer. To use it in QualCoder, you must have Ollama set up and
