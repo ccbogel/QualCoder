@@ -525,12 +525,18 @@ class DialogSettings(QtWidgets.QDialog):
 
     def ai_enable_state_changed(self):
         self.ui.comboBox_ai_profile.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.pushButton_ai_profile_edit.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.comboBox_ai_permissions.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.pushButton_advanced_AI_options.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
+        if not self.ui.checkBox_AI_enable.isChecked():  # collapse advanced options
+            self.ui.pushButton_advanced_AI_options.setChecked(False)
+            self.ui.widget_AI_advanced_options.hide()
         self.update_ai_auth_widgets()
     
     def load_ai_profiles(self):
