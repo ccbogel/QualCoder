@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_code_pdf.ui'
+# Form implementation generated from reading ui file 'ui_dialog_code_pdf.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -392,8 +392,8 @@ class Ui_Dialog_code_pdf(object):
         self.pushButton_clear_filter_file.setToolTip(_translate("Dialog_code_pdf", "Clear file filter"))
         self.label_status.setToolTip(_translate("Dialog_code_pdf", "Text extraction status"))
         self.pushButton_find_code.setToolTip(_translate("Dialog_code_pdf", "Find code"))
-        self.pushButton_show_codings_prev.setToolTip(_translate("Dialog_code_pdf", "Show codings prev"))
-        self.pushButton_show_codings_next.setToolTip(_translate("Dialog_code_pdf", "Show coding next"))
-        self.pushButton_important.setToolTip(_translate("Dialog_code_pdf", "Show codings falgged important"))
+        self.pushButton_show_codings_prev.setToolTip(_translate("Dialog_code_pdf", "Show previous coding"))
+        self.pushButton_show_codings_next.setToolTip(_translate("Dialog_code_pdf", "Show next coding"))
+        self.pushButton_important.setToolTip(_translate("Dialog_code_pdf", "Show important codings"))
         self.pushButton_clear_filter_code.setToolTip(_translate("Dialog_code_pdf", "Clear code filter"))
         self.lineEdit_code_filter.setToolTip(_translate("Dialog_code_pdf", "Code name filter"))

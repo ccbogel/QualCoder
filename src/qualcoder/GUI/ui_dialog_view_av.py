@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_view_av.ui'
+# Form implementation generated from reading ui file 'ui_dialog_view_av.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -342,6 +342,8 @@ class Ui_Dialog_view_av(object):
 "Ctrl + S start/pause\n"
 "Ctrl + P start/pause"))
         self.label_volume.setToolTip(_translate("Dialog_view_av", "Volume"))
+        self.comboBox_tracks.setToolTip(_translate("Dialog_view_av", "Change audio track if multiple tracks available"))
+        self.label_audio.setToolTip(_translate("Dialog_view_av", "Change audio track if multiple tracks available"))
         self.label_audio.setText(_translate("Dialog_view_av", "Audio:"))
         self.checkBox_scroll_transcript.setText(_translate("Dialog_view_av", "Scroll transcript while playing. (Transcript is read only)"))
         self.label_rate.setToolTip(_translate("Dialog_view_av", "Ctrl + Shift + > increase play rate, maximum 2.0\n"

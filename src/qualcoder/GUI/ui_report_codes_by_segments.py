@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_report_codes_by_segments.ui'
+# Form implementation generated from reading ui file 'ui_report_codes_by_segments.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -101,6 +101,8 @@ class Ui_DialogSegmentCodings(object):
         self.lineEdit.setToolTip(_translate("DialogSegmentCodings", "Text filter"))
         self.label_text_limiter.setToolTip(_translate("DialogSegmentCodings", "Text filter"))
         self.pushButton_run_report.setToolTip(_translate("DialogSegmentCodings", "Run report"))
+        self.label_coder.setToolTip(_translate("DialogSegmentCodings", "Coder"))
+        self.comboBox_coders.setToolTip(_translate("DialogSegmentCodings", "Select coder. Blank for all"))
         self.label_title.setText(_translate("DialogSegmentCodings", "Codes by text segments table. 1 = code present, 0 = not coded."))
         self.pushButton_export_xlsx.setToolTip(_translate("DialogSegmentCodings", "Export to Excel"))
         self.pushButton_file_attributes.setToolTip(_translate("DialogSegmentCodings", "Select files by attributes"))
