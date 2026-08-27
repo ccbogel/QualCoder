@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR" sourcelanguage="en_US">
 <context>
-    <name>DialogAddattribute</name>
+    <name>DialogAddAttribute</name>
     <message>
         <location filename="../GUI/ui_attribute.py" line="41"/>
         <source>Add Attribute</source>
@@ -753,12 +753,12 @@ Attention : cette action est irréversible.</translation>
         <translation>Executer le rapport</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="104"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="106"/>
         <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
         <translation>Codes par segments de texte tableau. 1 = code présent, 0 = non codé.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="105"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="107"/>
         <source>Export to Excel</source>
         <translation>Exporter vers Excel</translation>
     </message>
@@ -768,24 +768,34 @@ Attention : cette action est irréversible.</translation>
         <translation>Filtre de texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="106"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="108"/>
         <source>Select files by attributes</source>
         <translation>Sélectionner des fichiers par attributs</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="107"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="109"/>
         <source>Files. Right click for selection options.</source>
         <translation>Fichiers. Clic-droit pour sélectionner les options.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="108"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="110"/>
         <source>Cases. Right click for selection options.</source>
         <translation>Cas. Clic-droit pour sélectionner les options.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_report_codes_by_segments.py" line="109"/>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="111"/>
         <source>Codes. Right click for options</source>
         <translation>Codes. Clic-droit pour sélectionner les options</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="104"/>
+        <source>Coder</source>
+        <translation>Codeur⋅se</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_report_codes_by_segments.py" line="105"/>
+        <source>Select coder. Blank for all</source>
+        <translation>Selectionner codeur⋅se. Vide pour tous</translation>
     </message>
 </context>
 <context>
@@ -2410,21 +2420,6 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
         <translation>État de l’extraction du texte</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_code_pdf.py" line="395"/>
-        <source>Show codings prev</source>
-        <translation>Montrer le codage précédent</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_pdf.py" line="396"/>
-        <source>Show coding next</source>
-        <translation>Montrer le codage suivant</translation>
-    </message>
-    <message>
-        <location filename="../GUI/ui_dialog_code_pdf.py" line="397"/>
-        <source>Show codings falgged important</source>
-        <translation>Montrer les codes marquées comme important</translation>
-    </message>
-    <message>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="336"/>
         <source>Coder</source>
         <translation>Codeur⋅se</translation>
@@ -2438,6 +2433,21 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
         <location filename="../GUI/ui_dialog_code_pdf.py" line="386"/>
         <source>Rotate page 90° right</source>
         <translation>Tourner la page de 90° vers la droite</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_code_pdf.py" line="395"/>
+        <source>Show previous coding</source>
+        <translation>Montrer le codage précédent</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_code_pdf.py" line="396"/>
+        <source>Show next coding</source>
+        <translation>Montrer le codage suivant</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_code_pdf.py" line="397"/>
+        <source>Show important codings</source>
+        <translation>Montrer les codages importants</translation>
     </message>
 </context>
 <context>
@@ -4143,326 +4153,326 @@ Pour toutes les sélections de paramètres</translation>
 <context>
     <name>Dialog_settings</name>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="539"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="561"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="564"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="586"/>
         <source>General font and size</source>
         <translation>Police générale et taille</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="591"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="613"/>
         <source>Show IDs</source>
         <translation>Montrer les IDs</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="541"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="563"/>
         <source>Default project directory</source>
         <translation>Répertoire de projet par défaut</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="556"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="578"/>
         <source>Language</source>
         <translation>Langue</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="540"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="562"/>
         <source>Backup project folder every time project is opened</source>
         <translation>Sauvegarder le dossier de sauvegarde à chaque ouverture du projet</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="596"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="618"/>
         <source>Time format</source>
         <translation>Format de l’horodatage</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="593"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="615"/>
         <source>Speaker format</source>
         <translation>Format de l’intervenant⋅e</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="555"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="577"/>
         <source>/</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="566"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="588"/>
         <source>Font size for documents</source>
         <translation>Taille de la police pour les documents</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="567"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="589"/>
         <source>Reports with text context</source>
         <translation>Rapports avec contexte textuel</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="554"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="576"/>
         <source>Current coder: </source>
         <translation>Codeur⋅se actuel : </translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="551"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="573"/>
         <source>Set this name as the current coder.
 </source>
         <translation>Définir ce nom comme le codeur·se actuel.
 </translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="565"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="587"/>
         <source>Font size for codes tree</source>
         <translation>Taille de la police pour l’arbre des codes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="542"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="564"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
         <translation>Sauvegarde des fichiers vidéo et audio. Décochez cette case pour accélérer les sauvegardes.
 Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la sauvegarde.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="544"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="566"/>
         <source>Backups</source>
         <translation>Sauvegardes</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="598"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="620"/>
         <source>Style</source>
         <translation>Style</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="568"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="590"/>
         <source>Characters before and after</source>
         <translation>Caractères avant et après</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="569"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="591"/>
         <source>Text context, coded text style</source>
         <translation>Contexte du texte, style de texte codé</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="602"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="624"/>
         <source>AI Integration</source>
         <translation>Intégration de lIA</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="603"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="625"/>
         <source>enable AI integration</source>
         <translation>permettre l’intégration de l’IA</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="618"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="640"/>
         <source>Description:</source>
         <translation>Description:</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="615"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="637"/>
         <source>Get Access:</source>
         <translation>Accéder :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="604"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="626"/>
         <source>API key</source>
         <translation>Clé API</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="627"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="649"/>
         <source>Temperature:</source>
         <translation>Température :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="629"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="651"/>
         <source>Advanced option. Only change when you know whatr you are doing.</source>
         <translation>Option avancée. Ne modifiez que si vous savez ce que vous faites.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="622"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="644"/>
         <source>   Top_p:</source>
         <translation>   Top_p:</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="545"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="567"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="546"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="568"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="547"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="569"/>
         <source>2</source>
         <translation>2</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="548"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="570"/>
         <source>3</source>
         <translation>3</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="549"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="571"/>
         <source>4</source>
         <translation>4</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="550"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="572"/>
         <source>5</source>
         <translation>5</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="582"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="604"/>
         <source>8</source>
         <translation>8</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="583"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="605"/>
         <source>10</source>
         <translation>10</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="584"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="606"/>
         <source>12</source>
         <translation>12</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="585"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="607"/>
         <source>14</source>
         <translation>14</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="586"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="608"/>
         <source>16</source>
         <translation>16</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="587"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="609"/>
         <source>18</source>
         <translation>18</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="588"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="610"/>
         <source>100</source>
         <translation>100</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="589"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="611"/>
         <source>200</source>
         <translation>200</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="590"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="612"/>
         <source>300</source>
         <translation>300</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="641"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="663"/>
         <source>Language for AI conversations: </source>
         <translation>Langage pour les session IA : </translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="632"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="654"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
         <translation>Si cette option est sélectionnée, les sessions s’afficheront dans la même langue que le reste de l’interface utilisateur. Vous pouvez sélectionner cette langue en haut de cette fenêtre.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="633"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="655"/>
         <source>same as UI</source>
         <translation>Identique à l’UI</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="636"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="658"/>
         <source>Enter the name of your language here</source>
         <translation>Saisissez ici le nom de votre langue</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="630"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="652"/>
         <source>1.0</source>
         <translation>1.0</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="621"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="643"/>
         <source>Advanced AI Options...</source>
         <translation>Options avancées de lIA...</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="638"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="660"/>
         <source>Large Model:</source>
         <translation>Grand modèle :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="639"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="661"/>
         <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
         <translation>Sélectionnez un modèle d’IA disponible (qui peut être le même que le grand modèle). Le modèle rapide est utilisé pour les tâches simples uniquement.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="640"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="662"/>
         <source>&lt;select available model&gt;</source>
         <translation>&lt;sélectionner le modèle disponible&gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="643"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="665"/>
         <source>   Fast Model:</source>
         <translation>   Modèle rapide :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="642"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="664"/>
         <source>context window:</source>
         <translation>fenêtre contextuelle :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="624"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="646"/>
         <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
         <translation>Sélectionnez un modèle d’IA disponible. Le grand modèle est utilisé pour la plupart des fonctions d’IA de QualCoder.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="606"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="628"/>
         <source>AI Profile:</source>
         <translation>Profil de lIA :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="616"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="638"/>
         <source>Edit Name</source>
         <translation>Éditer le nom</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="605"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="627"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="634"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="656"/>
         <source>New AI Profile...</source>
         <translation>Nouveau profil IA...</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="628"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="650"/>
         <source>General Parameters:</source>
         <translation>Paramètres généraux :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="631"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="653"/>
         <source>API Base URL:</source>
         <translation>URL de base de l’API :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="635"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="657"/>
         <source>AI Models:</source>
         <translation>Modèles d’IA :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="623"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="645"/>
         <source>Reasoning:</source>
         <translation>Raisonnement :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="553"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="575"/>
         <source>Change</source>
         <translation>Modifier</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="557"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="579"/>
         <source>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
@@ -4479,12 +4489,12 @@ Alors mettez-la à jour. Par exemple:
 language = it</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="614"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="636"/>
         <source>Permissions:</source>
         <translation>Autorisations :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="607"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="629"/>
         <source>Define what the AI agent is allowed to do in your project:
 - Read-only: The AI agent cannot make any changes.
 - Sandboxed (default): The AI agent cannot make changes to your codes and memos, but it can create its own.
@@ -4495,67 +4505,67 @@ language = it</translation>
 - Accès complet : Lagent d’IA peut tout changer, mais demande habituellement d’abord confirmation.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="611"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="633"/>
         <source>Read-only</source>
         <translation>Lecture seule</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="612"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="634"/>
         <source>Sandboxed</source>
         <translation>Boîte à sable</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="613"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="635"/>
         <source>Full access</source>
         <translation>Accès complet</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="617"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="639"/>
         <source>Authentification:</source>
         <translation>Authentification :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="619"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="641"/>
         <source>Click to open the ChatGPT sign-in page in your default browser. Use it to authorize QualCoder to access AI models through this account.</source>
         <translation>Cliquez ici pour ouvrir la page de connexion à ChatGPT dans votre navigateur par défaut. Utilisez-la pour autoriser QualCoder à accéder aux modèles d’IA via ce compte.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="620"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="642"/>
         <source>Authenticate...</source>
         <translation>S’identifier...</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="597"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="619"/>
         <source>Codesstripe view</source>
         <translation>Vue avec bandes de code</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="599"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="621"/>
         <source>Code highlight style</source>
         <translation>Vue avec codes surlignés</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="600"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="622"/>
         <source>marker</source>
         <translation>marqueur</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="601"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="623"/>
         <source>underline</source>
         <translation>souligner</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="592"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="614"/>
         <source>Used when entering speaker name in transcription</source>
         <translation>À utiliser lors de la saisie du nom de l’intervenant⋅e dans la retranscription</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="594"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="616"/>
         <source>Show the identifying numbers for files, cases, codes, et cetera.</source>
         <translation>Afficher les numéros d’identification des fichiers, des cas, des codes, etc.</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_settings.py" line="595"/>
+        <location filename="../GUI/ui_dialog_settings.py" line="617"/>
         <source>Used when entering time position in transcription</source>
         <translation>À utiliser quand on entre un horodatage dans la retranscription</translation>
     </message>
@@ -4814,17 +4824,17 @@ ou à réduire (nombres négatifs)</translation>
         <translation>Retranscription :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="345"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="347"/>
         <source>Audio:</source>
         <translation>Audio :</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="346"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="348"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
         <translation>Faites défiler la retranscription pendant la lecture. (La retranscription ne peut pas être codée)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="349"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="351"/>
         <source>1.0x</source>
         <translation>1,0x</translation>
     </message>
@@ -4881,27 +4891,27 @@ souligné en rouge = Affecté au code ou à l’annotation</translation>
         <translation>Moteur du lecteur multimédia</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="360"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="362"/>
         <source>Detach / dock the video window</source>
         <translation>Détacher / ancrer la fenêtre vidéo</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="361"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="363"/>
         <source>Stop segment / loop playback</source>
         <translation>Arrêter la lecture du segment / de la boucle</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="362"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="364"/>
         <source>Play the selected range (wave selection, or transcript selection)</source>
         <translation>Lire la plage sélectionnée (sélection d’onde ou sélection de transcription)</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="363"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="365"/>
         <source>Loop the selected range</source>
         <translation>Lire en boucle la plage sélectionnée</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="364"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="366"/>
         <source>Clear the wave selection</source>
         <translation>Effacer la sélection d’onde</translation>
     </message>
@@ -4970,46 +4980,51 @@ Ctrl + P lancer/pause</translation>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="347"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="349"/>
         <source>Ctrl + Shift + &gt; increase play rate, maximum 2.0
 Ctrl + Shift + &lt; decrease play rate, minimum 0.1</source>
         <translation>Ctrl + Shift + &gt; augmenter la vitesse de lecture, maximum 2.0
 Ctrl + Shift + &lt; réduire la vitesse de lecture, minimum 0.1</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="350"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="352"/>
         <source>Decrease play rate
 Ctrl + Shift + &lt;</source>
         <translation>Réduire la vitesse de lecture
 Ctrl + Shift +&lt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="352"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="354"/>
         <source>Increase play rate
 Ctrl + Shift + &gt;</source>
         <translation>Augmenter la vitesse de lecture
 Ctrl + Shift + &gt;</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="354"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="356"/>
         <source>Rewind 5 seconds
 Ctrl + R</source>
         <translation>Rebobiner 5 secondes
 Ctrl + R</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="356"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="358"/>
         <source>Rewind 30 seconds
 Alt + Minus</source>
         <translation>Rebobiner 30 secondes
 Alt + Minus</translation>
     </message>
     <message>
-        <location filename="../GUI/ui_dialog_view_av.py" line="358"/>
+        <location filename="../GUI/ui_dialog_view_av.py" line="360"/>
         <source>Forward 30 seconds. Alt + Plus
 Forward 5 seconds. Press 5</source>
         <translation>Avancer de 30 secondes. Alt + Plus
 Avancer de 5 secondes. Appuyer  5</translation>
+    </message>
+    <message>
+        <location filename="../GUI/ui_dialog_view_av.py" line="346"/>
+        <source>Change audio track if multiple tracks available</source>
+        <translation>Changer de piste audio si plusieurs pistes sont disponibles</translation>
     </message>
 </context>
 <context>
