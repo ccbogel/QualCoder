@@ -385,7 +385,10 @@ def analyze_translation_status(language: Optional[str] = None) -> str:
         )
         status = lang_info["status"]
 
-        lang_display = f"{language_names.get(lang, lang)} ({lang})"
+        if lang_info["status"] == "community maintained":
+            lang_display = f"[{language_names.get(lang, lang)}](https://github.com/ccbogel/QualCoder/raw/refs/heads/master/other_languages//{lang}.zip) ({lang})"
+        else:
+            lang_display = f"{language_names.get(lang, lang)} ({lang})"
 
         # Handle Gettext
         if gettext_stats.get("missing"):

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-27 07:35+0200\n"
+"POT-Creation-Date: 2026-08-28 08:11+0200\n"
 "PO-Revision-Date: 2026-08-26 10:30+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
@@ -33,7 +33,7 @@ msgid "Exception handler"
 msgstr "Gestionnaire d’exception"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/error_dlg.py:95
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4009
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4023
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:69
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:9296
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:53
@@ -618,10 +618,10 @@ msgstr "Mémo pour fichier : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2507
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2516
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2606
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3287
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3338
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3343
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3505
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3286
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3337
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3342
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3504
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:498
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:502
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4105
@@ -1492,7 +1492,7 @@ msgstr "Sélectionner les couleurs du code"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:504
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:511
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:1400
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2853
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2852
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1066
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1082
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1092
@@ -1749,8 +1749,8 @@ msgstr "Cas"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5967
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6151
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6402
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3528
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3565
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3527
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3564
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4215
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4839
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:7748
@@ -2431,7 +2431,7 @@ msgstr "Modèles d’IA"
 msgid "Loading list of available AI models..."
 msgstr "Chargement de la liste des modèles d’IA disponibles..."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:597
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:611
 msgid ""
 "You are using the \"Blablador\" service on an old server that will soon be "
 "disabled. Your configuration will be updated automatically. Please test if "
@@ -2444,242 +2444,242 @@ msgstr ""
 "devrez peut-être changer de modèle d’IA dans la boîte de dialogue des "
 "paramètres sous « Paramètres avancés de l’IA »."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:601
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3763
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:615
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3777
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:187
 msgid "AI Setup"
 msgstr "Configuration de l’IA"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1758
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1772
 #, python-brace-format
 msgid " (+{0} more)"
 msgstr " (+{0} de plus)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1766
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2153
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1780
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2167
 msgid "category(ies)"
 msgstr "catégorie(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1768
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2155
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1782
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2169
 msgid "code(s)"
 msgstr "code(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1770
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1784
 msgid "coding(s)"
 msgstr "codage(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1782
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1796
 msgid "Created category: "
 msgstr "Catégorie créée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1786
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1800
 msgid "Created code: "
 msgstr "Code crée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1799
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1813
 msgid "Text coding"
 msgstr "Codage du texte"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1800
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1814
 msgid "Created text coding: "
 msgstr "Code du texte créé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1818
 msgid "Created case: "
 msgstr "Cas créé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1808
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1822
 msgid "Created case attribute: "
 msgstr "Attribut du cas crée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1812
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1826
 msgid "Created document attribute: "
 msgstr "Attribut de document crée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1829
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1843
 msgid "Linked text to case: "
 msgstr "Texte lié au cas : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1829
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1843
 msgid "Linked text to case"
 msgstr "Texte lié au cas"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1835
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1837
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1849
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1851
 msgid "Updated case: "
 msgstr "Cas mis à jour : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1838
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1852
 msgid "Updated case"
 msgstr "Cas mis à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1845
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1859
 msgid "Updated document: "
 msgstr "Document mis à jour : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1860
 msgid "Updated document"
 msgstr "Document mis à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1854
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1856
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1868
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1870
 msgid "Updated case attributes: "
 msgstr "Mise à jour des attributs du cas : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1857
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1871
 msgid "Updated case attributes"
 msgstr "Mise à jour des attributs du cas"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1865
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1867
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1879
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1881
 msgid "Updated document attributes: "
 msgstr "Attributs du document mis à jour : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1868
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1882
 msgid "Updated document attributes"
 msgstr "Attributs du document mis à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1876
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1878
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1890
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1892
 msgid "Updated category: "
 msgstr "Catégorie mis à jour : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1879
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1893
 msgid "Updated category"
 msgstr "Catégorie mis à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1887
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1889
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1901
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1903
 msgid "Updated code: "
 msgstr "Code mis à jour : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1890
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1904
 msgid "Updated code"
 msgstr "Code mis à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1893
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1907
 msgid "Updated text coding"
 msgstr "Texte codé mis à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1902
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1916
 msgid "Renamed category: "
 msgstr "Catégorie renommée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1911
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1925
 msgid "Renamed code: "
 msgstr "Code renommé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1927
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1928
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1941
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1942
 msgid "Moved category tree: "
 msgstr "Arborescence des catégories déplacée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1944
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1945
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1958
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1959
 msgid "Moved code tree: "
 msgstr "Arborescence du code déplacée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1946
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1960
 msgid "Moved code: "
 msgstr "Code déplacé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1954
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1968
 msgid "Moved text coding: "
 msgstr "Code du texte déplacé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1955
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1969
 msgid "Moved text coding"
 msgstr "Code du texte déplacé"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1972
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1973
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1986
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1987
 msgid "Deleted category tree: "
 msgstr "Arborescence des catégories supprimée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1992
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1993
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2006
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2007
 msgid "Deleted code tree: "
 msgstr "Arborescence de code supprimée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1995
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:1996
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2009
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2010
 msgid "Deleted code: "
 msgstr "Code supprimé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2008
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2022
 msgid "Deleted text coding: "
 msgstr "Code du texte supprimé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2009
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2023
 msgid "Deleted text coding"
 msgstr "Code du texte supprimé"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2029
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2043
 msgid "Removed case link: "
 msgstr "Lien vers le cas supprimé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2030
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2044
 msgid "Removed case link"
 msgstr "Lien vers le cas supprimé"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2054
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2068
 msgid "1 day ago"
 msgstr "Il y a un jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2055
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2069
 #, python-brace-format
 msgid "{0} days ago"
 msgstr "Il y a {0} jours"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2061
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2075
 msgid "1 minute ago"
 msgstr "Il y a 1 minute"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2062
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2076
 #, python-brace-format
 msgid "{0} minutes ago"
 msgstr "Il y a {0} minutes"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2066
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2080
 msgid "1 hour ago"
 msgstr "Il y a 1 heure"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2067
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2081
 #, python-brace-format
 msgid "{0} hours ago"
 msgstr "Il y a {0} heures"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2157
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2171
 msgid "case(s)"
 msgstr "cas"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2159
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2173
 msgid "text coding(s)"
 msgstr "codage(s) de texte"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2161
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2175
 msgid "document(s)"
 msgstr "document(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2163
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2177
 msgid "case link(s)"
 msgstr "lien(s) vers le cas"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2165
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2179
 msgid "attribute action(s)"
 msgstr "action(s) associée(s) à l’attribut"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2191
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2199
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2205
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2213
 msgid "Additional actions: "
 msgstr "Actions supplémentaires : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2701
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2715
 msgid "Stored AI change"
 msgstr "Modification du stockage de l’IA"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2705
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2719
 msgid ""
 "Could not be undone because the affected item no longer matches the recorded "
 "state. It may have been edited afterwards or still be blocked by dependent "
@@ -2689,12 +2689,12 @@ msgstr ""
 "plus à l’état enregistré. Il a peut-être été modifié par la suite ou est "
 "toujours bloqué par des données dépendantes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2710
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2724
 msgid "Could not be undone because the affected item is already missing."
 msgstr ""
 "Impossible d’annuler l’opération car l’élément concerné a déjà disparu."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2714
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2728
 msgid ""
 "Could not be undone because the stored undo information is incomplete or "
 "inconsistent."
@@ -2702,7 +2702,7 @@ msgstr ""
 "L’opération n’a pas pu être annulée car les informations d’annulation "
 "enregistrées sont incomplètes ou incohérentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2719
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2733
 msgid ""
 "This undo step remains in the list so you can remove the blocking condition "
 "and try again later."
@@ -2710,218 +2710,218 @@ msgstr ""
 "Cette action annulée reste dans la liste ; vous pouvez ainsi supprimer la "
 "condition de blocage et réessayer plus tard."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2723
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2737
 msgid "This undo step was removed from the list."
 msgstr "Cette étape d’annulation a été supprimée de la liste."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2726
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2740
 msgid "Reason: "
 msgstr "Motif : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2954
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2964
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2970
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2968
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2978
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2980
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2982
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2984
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2992
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2994
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2996
 msgid "Undo will remove "
 msgstr "Annuler la suppression "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2954
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2965
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2968
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2979
 msgid " code(s) and "
 msgstr " code(s) et "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2955
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2969
 msgid " related coding(s)."
 msgstr " code(s) associé(s)."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2959
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2974
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2973
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2988
 msgid "Warning: "
 msgstr "Avertissement : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2960
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2974
 msgid " of these codings are not owned by 'AI Agent'."
 msgstr " ces codes n’appartiennent pas à « AI Agent »."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2964
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2978
 msgid " category(ies). "
 msgstr " catégorie(s). "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2966
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2980
 msgid " subcategory(ies) would be detached, not deleted."
 msgstr " sous-catégorie(s) seront dissociées, et non supprimées."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2970
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2984
 msgid " standalone text coding(s)."
 msgstr " codage(s) de texte autonome(s)."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2975
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2989
 msgid " standalone coding(s) are not owned by 'AI Agent'."
 msgstr " codes autonomes n’appartiennent pas à « AI Agent »."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2978
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2992
 msgid " case(s)."
 msgstr " cas."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2980
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2993
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2994
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3007
 msgid " case link(s)."
 msgstr " lien(s) du cas."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2982
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2996
 msgid " attribute definition(s)."
 msgstr " définition(s) d’attribut(s)."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2986
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3000
 msgid " category(ies)"
 msgstr " catégorie(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2988
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3002
 msgid " code(s)"
 msgstr " code(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2990
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3004
 msgid " coding(s)"
 msgstr " codage(s)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2991
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2993
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3007
 msgid "Undo will restore "
 msgstr "La fonction « Annuler » permettra de rétablir "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2995
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3009
 msgid " updated category(ies) would be restored to their previous values."
 msgstr ""
 " catégorie(s) mises à jour seraient rétablies à leurs valeurs précédentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2997
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3011
 msgid " updated code(s) would be restored to their previous values."
 msgstr " les codes mis à jour sera rétablis à leurs valeurs précédentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:2999
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3013
 msgid " updated case(s) would be restored to their previous values."
 msgstr " les cas mis à jour sera rétablis à leurs valeurs précédentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3001
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3015
 msgid " updated document(s) would be restored to their previous values."
 msgstr " les documents mis à jour sera rétablis à leurs valeurs précédentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3003
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3017
 msgid " updated text coding(s) would be restored to their previous values."
 msgstr ""
 " les textes codés mis à jour sera rétablis à leurs valeurs précédentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3019
 msgid " attribute update(s) would be restored to their previous values."
 msgstr ""
 " les modifications apportées aux attributs seraient rétablies à leurs "
 "valeurs précédentes."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3007
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3021
 msgid " moved category tree(s) would be moved back to their previous parent."
 msgstr ""
 " les arborescences de catégories déplacées seraient replacées sous leur "
 "parent d’origine."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3009
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3023
 msgid " moved code(s) would be moved back to their previous parent."
 msgstr ""
 " le ou les codes déplacés seraient replacés dans leur élément parent "
 "d’origine."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3011
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3025
 msgid " moved text coding(s) would be moved back to their previous code."
 msgstr ""
 " les codes de texte déplacés seraient replacés dans leur code d’origine."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3014
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3028
 msgid " operation(s) appear changed since creation and may be skipped."
 msgstr ""
 " opération(s) semble(nt) avoir été modifiée(s) depuis leur création et "
 "peuvent être ignorée(s)."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3018
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3032
 msgid " operation(s) are already missing and may be skipped."
 msgstr " opération(s) sont déjà manquantes et peuvent être ignorées."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3611
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3645
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3677
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3699
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3625
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3659
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3691
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3713
 msgid "Undo AI changes"
 msgstr "Annuler les modifications apportées par l’IA"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3611
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3625
 msgid "No AI changes available to undo."
 msgstr "Aucune modification effectuée par l’IA ne peut être annulée."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3614
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3628
 msgid "Select AI changes to undo"
 msgstr ""
 "Sélectionnez les modifications apportées par l’IA que vous souhaitez annuler"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3632
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3646
 #, python-brace-format
 msgid "Undo {count} AI change set(s)?"
 msgstr "Annuler {count} jeu(x) de modifications de l’IA ?"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3644
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3658
 msgid "Do you want to continue?"
 msgstr "Voulez-vous continuer ?"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3678
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3692
 msgid "Selected change sets: "
 msgstr "Ensembles de modifications sélectionnés : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3679
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3693
 msgid "Undone operations: "
 msgstr "Opérations annulées : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3682
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3696
 msgid "Skipped operations: "
 msgstr "Opérations ignorées : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3685
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3699
 msgid "Blocked operations kept for retry: "
 msgstr "Opérations bloquées conservées en vue d’une nouvelle tentative : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3688
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3702
 msgid "Skipped operations removed from the list: "
 msgstr "Opérations ignorées supprimées de la liste : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3691
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3705
 msgid "Warning: removed codings not owned by 'AI Agent': "
 msgstr ""
 "Avertissement : suppression des codes n’appartenant pas à « AI Agent » : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3693
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3707
 msgid "Undo details:"
 msgstr "Détails de l’annulation :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3734
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3748
 msgid "AI: Legacy prompt migration failed."
 msgstr "IA : Échec de la migration des prompts hérités."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3742
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3756
 #, python-brace-format
 msgid "AI: Migrated {count} {scope} prompts to Markdown format."
 msgstr "IA : {count} {scope} invites ont été converties au format Markdown."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3753
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3767
 msgid "AI: Starting up..."
 msgstr "IA : Démarrage..."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3762
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3776
 msgid "AI: In the follwoing window, please set up the AI model."
 msgstr "IA : Dans la fenêtre suivante, veuillez configurer le modèle IA."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3769
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3783
 msgid "AI: No model selected, AI is disabled."
 msgstr "IA : Aucun modèle n’est sélectionné, l’IA est désactivée."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3781
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3795
 msgid ""
 "AI: You are still using the outdated GPT-4 turbo. Consider switching to a "
 "newer model, such as GPT 4.1. Go to Project > Settings to change the AI "
@@ -2931,7 +2931,7 @@ msgstr ""
 "passer à un modèle plus récent, tel que GPT 4.1. Allez dans Projet > "
 "Paramètres pour modifier le profil et le modèle IA."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3785
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3799
 msgid ""
 "AI: You are using the outdated Claude Opus 4 model from Anthropic. Consider "
 "switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
@@ -2941,20 +2941,20 @@ msgstr ""
 "de passer à un modèle plus récent, tel que Opus 4.1. Accédez à Projet > "
 "Paramètres pour modifier le profil et le modèle d’IA."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3796
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3810
 msgid "Please enter an API-key for the AI in the following dialog."
 msgstr ""
 "Veuillez saisir une clé API pour l’IA dans la boîte de dialogue suivante."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3797
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3811
 msgid "AI API-key"
 msgstr "Clé API IA"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3818
 msgid "AI: No API key set, AI is disabled."
 msgstr "IA : Aucune clé API n’a été définie, l’IA est désactivée."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3812
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3826
 msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
@@ -2963,20 +2963,20 @@ msgstr ""
 "sélectionnez un modèle d’IA large et un modèle d’IA rapide (les deux peuvent "
 "être identiques)."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3813
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3827
 msgid "AI Model Selection"
 msgstr "Sélection du modèle d’IA"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3819
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3833
 msgid "AI: No large/fast model selected, AI is disabled."
 msgstr ""
 "IA : Aucun modèle grand/rapide n’a été sélectionné, l’AI est désactivé."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3904
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3918
 msgid "AI: Ready"
 msgstr "IA : Prêt"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3915
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3929
 msgid ""
 "An error occured during AI initialization. The AI features will be disabled. "
 "Click on Project > Settings to reenable them."
@@ -2984,16 +2984,16 @@ msgstr ""
 "Une erreur s’est produite lors de l’initialisation de l’IA. Les fonctions "
 "d’IA seront désactivées. Cliquez sur Projet > Paramètres pour les réactiver."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3916
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3930
 msgid "AI Initialization"
 msgstr "Initialisation de l’IA"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3939
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3953
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:2477
 msgid "Do you really want to cancel the AI operation?"
 msgstr "Voulez-vous annuler l’opération IA ?"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3947
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3961
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:2488
 msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
@@ -3002,30 +3002,30 @@ msgstr ""
 "L’opération de l’IA n’a pas pu être interrompue immédiatement. Il peut "
 "s’écouler un certain temps avant que l’IA ne soit à nouveau prête."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4003
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4006
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4017
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4020
 msgid "AI Error:\n"
 msgstr "Erreur IA :\n"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4013
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4027
 msgid "Uncaught exception while handling AI error: "
 msgstr "Exception non gérée lors du traitement d’une erreur d’IA : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4044
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4166
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4058
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4180
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:799
 msgid "Authentication"
 msgstr "Authentification"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4318
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4332
 msgid "AI generate_code_descriptions\n"
 msgstr "AI generate_code_descriptions\n"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4319
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4333
 msgid "Prompt:\n"
 msgstr "Instruction :\n"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4377
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4391
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
@@ -3033,7 +3033,7 @@ msgstr ""
 "Étape 1 :\n"
 "Recherche de données relatives à  »"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4484
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4498
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
@@ -3259,7 +3259,7 @@ msgstr "Id"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1978
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2373
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2588
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4004
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4003
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:2229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:175
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:447
@@ -4384,7 +4384,7 @@ msgid "Search files"
 msgstr "Rechercher des fichiers"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:344
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4041
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4040
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1046
 msgid "Right click header row to hide columns"
 msgstr "Clic-droit sur l’entête pour masquer les colonnes"
@@ -4826,9 +4826,9 @@ msgid "view AV error"
 msgstr "voir erreur AV"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2396
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2943
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3140
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3245
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2942
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3139
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3244
 msgid "Duplicate file"
 msgstr "Fichier dupliqué"
 
@@ -4841,7 +4841,7 @@ msgstr ""
 "Fichier non crée"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2428
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3199
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1870
 msgid " created."
 msgstr " créé."
@@ -4915,23 +4915,23 @@ msgstr "Entrez le nom du fichier"
 msgid "Invalid file name."
 msgstr "Nom de fichier non valide."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2643
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2642
 msgid "File created: "
 msgstr "Fichier créé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2668
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2667
 msgid "Select Survey"
 msgstr "Choisir une enquête"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2669
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2668
 msgid "Data files"
 msgstr "Fichiers de données"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2672
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2671
 msgid "Import from survey: "
 msgstr "Importer depuis une enquête : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2686
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2685
 msgid ""
 "\n"
 "Presumed column delimiter for csv or tsv file: "
@@ -4939,11 +4939,11 @@ msgstr ""
 "\n"
 "Séparateur de colonnes par défaut pour les fichiers CSV ou TSV : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2712
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2711
 msgid "No columns assigned as qualitative."
 msgstr "Aucune colonne n’est définie comme qualitative."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2713
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2712
 msgid ""
 "\n"
 "No columns assigned as qualitative."
@@ -4951,43 +4951,43 @@ msgstr ""
 "\n"
 "Aucune colonne n’est définie comme qualitative."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2867
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2866
 msgid "Some existing data updated."
 msgstr "Certaines données existantes ont été mises à jour."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2868
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2867
 msgid "rows imported."
 msgstr "lignes importées."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2872
 msgid "Survey Import"
 msgstr "Importer une enquête"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2875
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2874
 msgid "{} rows imported."
 msgstr "{} lignes importées."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2877
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2876
 msgid "Some existing data updated"
 msgstr "Certaines données existantes ont été mises à jour"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2878
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2877
 msgid "Import successful."
 msgstr "Import réussie."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2902
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2901
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:6525
 msgid "Open file"
 msgstr "Fichier ouvert"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2914
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2913
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references_import.py:127
 msgid "Importing"
 msgstr "Import"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2944
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3140
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3246
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2943
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3139
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3245
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
@@ -4995,31 +4995,31 @@ msgstr ""
 "Nom de fichier en double. \n"
 "Fichier non importé"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2956
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3324
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2955
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3323
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:321
 msgid "Cannot import LaTeX file"
 msgstr "Impossible dimporter le fichier LaTeX"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2957
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3325
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2956
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3324
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:322
 msgid "Could not convert LaTeX to readable text"
 msgstr "Impossible de convertir LaTeX en fichier lisible"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2970
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2992
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3016
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3030
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3044
+msgid "Cannot copy file: "
+msgstr "Impossible de copier le fichier : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2971
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2993
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3017
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3031
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3045
-msgid "Cannot copy file: "
-msgstr "Impossible de copier le fichier : "
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2972
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2994
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3018
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3032
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3046
 msgid ""
 "Is the file open?\n"
 "Is there a permission restriction?"
@@ -5027,59 +5027,59 @@ msgstr ""
 "Le fichier est-il ouvert ?\n"
 "Y a-t-il une restriction d’autorisation ?"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2973
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2995
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3019
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3033
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3047
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2972
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2994
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3018
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3032
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3046
 msgid "Copy file permission error"
 msgstr "Erreur d’autorisation de copie de fichier"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2981
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3003
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2980
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3002
 msgid "Removing failed import copy: "
 msgstr "Suppression de la copie d’import échouée : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3053
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3052
 msgid "Not supported file type"
 msgstr "Type de fichier non supporté"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3054
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3053
 msgid "Cannot import file"
 msgstr "Impossible d’importer le fichier"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3126
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3125
 msgid "Deleting waveform error: "
 msgstr "Erreur de la suppression de la forme d’onde : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3156
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3396
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3155
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3395
 msgid " linked"
 msgstr " relié"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3158
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3157
 msgid " imported."
 msgstr " importé."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3287
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3286
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:297
 msgid " lines not imported"
 msgstr " lignes non importées"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3301
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3307
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3300
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3306
 msgid "Cannot import PDF"
 msgstr "Impossible d’importer PDF"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3308
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3307
 msgid "Damaged or unreadable PDF"
 msgstr "PDF endommagé ou illisible"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3314
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3313
 msgid "No text layer detected (scanned PDF?)."
 msgstr "Aucun calque de texte détecté (PDF scanné ?)."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3315
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3314
 msgid ""
 "Area coding will be available in the PDF view, but text coding and text "
 "search will not."
@@ -5087,83 +5087,83 @@ msgstr ""
 "Le codage par zone sera disponible dans la vue PDF, mais le codage par texte "
 "et la recherche par texte ne le seront pas."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3317
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3316
 msgid "PDF without text"
 msgstr "PDF sans texte"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3338
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3337
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:1214
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:334
 msgid "Cannot import"
 msgstr "Impossible d’importer"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3344
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3343
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:340
 msgid "Cannot import "
 msgstr "Impossible d’importer "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3394
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3393
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:909
 msgid " imported"
 msgstr " importé"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3415
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3414
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:934
 msgid "PDF highlights"
 msgstr "PDF surligné"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3496
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3495
 msgid "Export to"
 msgstr "Exporter vers"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3503
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3502
 msgid "Invalid file name. Please rename this file before exporting."
 msgstr "Nom de fichier non valide. Veuillez le renommer avant l’export."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3509
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3508
 msgid "Linked file. Exported text representation."
 msgstr "Fichier relié. Exporter le texte."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3524
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3526
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3557
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3559
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3523
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3525
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3556
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3558
 msgid "exported."
 msgstr "exporté."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3528
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3527
 msgid "File not found: "
 msgstr "Fichier non trouvé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3528
 msgid "Media file NOT exported."
 msgstr "Fichier multimédia NON exporté."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3534
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3533
 msgid "QC or user created file exported."
 msgstr "Fichier crée par l’utilisateur⋅trice ou QC exporté."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3562
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3561
 msgid "File NOT exported."
 msgstr "Fichier NON exporté."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3568
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3567
 msgid " files exported. "
 msgstr " fichiers exportés. "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3568
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3567
 msgid "Exported to: "
 msgstr "Exporter vers : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3570
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3569
 msgid "Files not exported: "
 msgstr "Fichiers non exportés : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3571
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3570
 msgid "Files exported"
 msgstr "Fichiers exportés"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3613
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3612
 msgid ""
 "AI index is busy; the deleted file will be removed from the index on the "
 "next update."
@@ -5171,46 +5171,46 @@ msgstr ""
 "L’index AI est occupé; le fichier supprimé sera enlevé de l’index lors de la "
 "prochaine mise à jour."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3625
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3726
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3862
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3624
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3725
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3861
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:368
 msgid "Deleting file error: "
 msgstr "Suppression d’une erreur de fichier : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3633
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3632
 msgid "Cannot delete file"
 msgstr "Impossible de supprimer le fichier"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3634
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3633
 msgid "The file is in use by another program and was not deleted:"
 msgstr ""
 "Le fichier est utilisé par un autre programme et ne peut être supprimé :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3683
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3830
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3682
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3829
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:147
 msgid "Delete files"
 msgstr "Supprimer des fichiers"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3704
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3703
 msgid "Deleted file: "
 msgstr "Fichier supprimé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3919
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3918
 msgid "Deleted: "
 msgstr "Supprimé : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3942
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3941
 msgid "Minimum: "
 msgstr "Minimum : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3943
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3942
 msgid "Maximum: "
 msgstr "Maximum : "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3964
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3966
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3963
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3965
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:551
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:935
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:942
@@ -5220,7 +5220,7 @@ msgstr "Maximum : "
 msgid "Files"
 msgstr "Fichiers"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3991
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3990
 msgid ""
 "\n"
 "Externally linked file:\n"
@@ -5228,52 +5228,52 @@ msgstr ""
 "\n"
 "Fichier externe lié :\n"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4055
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4054
 msgid "Survey Import Assistant"
 msgstr "Assistant d’import d’enquêtes"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4074
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4073
 msgid "Columns:"
 msgstr "Colonnes :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4117
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4116
 msgid "Adding columns to the Case will add those values to the case name"
 msgstr ""
 "L’ajout de colonnes au dossier entraînera l’ajout de ces valeurs au nom du "
 "cas"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4118
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4117
 msgid "Example: using columns id, country --> ID4_Fiji "
 msgstr ""
 "Exemple : en utilisant les colonnes « id » et « country » --> ID4_Fiji "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4119
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4118
 msgid "1. Cases / Participants (e.g., ID, Name):"
 msgstr "1. Cas / Participants (ex : ID, Nom) :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4125
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4124
 msgid "2. Attributes (e.g., Age, Gender):"
 msgstr "2. Attributs (ex : Âge, Genre) :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4131
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4130
 msgid "Multiple qualitative columns will be collated into one file."
 msgstr ""
 "Plusieurs colonnes de données qualitatives seront regroupées dans un seul "
 "fichier."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4132
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4131
 msgid "The column name is a header preceding each block of text."
 msgstr "Le nom de la colonne est un titre qui précède chaque bloc de texte."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4133
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4132
 msgid "3. Qualitative Texts:"
 msgstr "3. Textes qualitatifs :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4141
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4140
 msgid "Assign attributes to cases (check). Files (uncheck)"
 msgstr "Attribuer des attributs aux cas (coché). Fichiers (décoché)"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4147
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4146
 msgid "Autocode text segments using column name"
 msgstr "Autocoder des segments de texte avec le nom de colonne"
 
