@@ -184,35 +184,31 @@ def update_translation_placeholders(language: Optional[str] = None) -> None:
     pot_filename = os.path.join(PROJECT_ROOT, "src", "qualcoder", "qualcoder.pot")
     extract_pot_file(os.path.join(PROJECT_ROOT, "src", "qualcoder"), pot_filename)
     update_po_files(I18N_DIR, pot_filename, language)
+    update_po_files(OTHER_LANGS_DIR, pot_filename, language)
     update_qt_ts_files(language)
 
 # --- New Language Placeholders ---
 def create_new_language_placeholders(language: str) -> None:
     """Create empty .po and .ts files for a new language in other_languages."""
     print(f"Creating placeholder files for language: {language}")
+    os.makedirs(OTHER_LANGS_DIR, exist_ok=True)
 
-    # Create empty .po file
     new_po_file = os.path.join(OTHER_LANGS_DIR, f"{language}.po")
-    with open(new_po_file, "w", encoding="utf-8"):
-        pass
-    print(f"Created empty .po file: {new_po_file}")
-
-    # Update .ts file via project.pro
+    with open(new_po_file, "w", encoding="utf-8") as f:
+        f.write('msgid ""\nmsgstr ""\n')
+    print(f"Created .po file: {new_po_file}")
     new_ts_file = os.path.join(OTHER_LANGS_DIR, f"{language}.ts")
     if not os.path.exists(GUI_DIR):
         print(f"Error: {GUI_DIR} does not exist.")
         return
 
-    # Read existing project.pro
+    rel_ts_path = os.path.relpath(OTHER_LANGS_DIR, GUI_DIR).replace(os.path.sep, "/")
+    new_ts_entry = f"{rel_ts_path}/{language}.ts"
+
     pro_content = ""
     if os.path.exists(PROJECT_PRO_PATH):
         with open(PROJECT_PRO_PATH, "r", encoding="utf-8") as f:
             pro_content = f.read()
-
-    # Add new .ts entry
-    rel_ts_path = os.path.relpath(OTHER_LANGS_DIR, GUI_DIR).replace(os.path.sep, "/")
-    new_ts_entry = f"{rel_ts_path}/{language}.ts"
-
     if new_ts_entry not in pro_content:
         lines = pro_content.split("\n")
         new_lines = []
@@ -220,27 +216,39 @@ def create_new_language_placeholders(language: str) -> None:
         added = False
 
         for line in lines:
-            new_lines.append(line)
             if line.startswith("TRANSLATIONS"):
                 in_translations = True
+                new_lines.append(line)
                 continue
-            if in_translations and line.strip() and not line.strip().startswith("#"):
-                if line.strip().endswith(".ts") and not added:
-                    new_lines.append(new_ts_entry)
-                    added = True
-                    in_translations = False
+            if in_translations:
+                if line.strip() and not line.strip().startswith("#"):
+                    if line.strip().endswith(".ts") and not added:
+                        if not line.rstrip().endswith("\\"):
+                            new_lines.append(line + " \\")
+                        else:
+                            new_lines.append(line)
+                        new_lines.append(f"    {new_ts_entry}")
+                        added = True
+                        in_translations = False
+                    else:
+                        new_lines.append(line)
+                else:
+                    new_lines.append(line)
+            else:
+                new_lines.append(line)
 
         if not added:
-            new_lines.extend(["", "TRANSLATIONS = \\", new_ts_entry])
+            new_lines.extend(["", "TRANSLATIONS = \\", f"    {new_ts_entry}"])
 
         with open(PROJECT_PRO_PATH, "w", encoding="utf-8") as f:
             f.write("\n".join(new_lines))
+        print(f"Updated project.pro with: {new_ts_entry}")
 
-    # Run pylupdate5
-    run_subprocess(["pylupdate5", PROJECT_PRO_PATH], cwd=GUI_DIR)
+    if not run_subprocess(["pylupdate5", PROJECT_PRO_PATH], cwd=GUI_DIR):
+        print(f"Failed to run pylupdate5 for {language}.ts")
+        return
     print(f"Created/updated .ts file: {new_ts_file}")
 
-    # Update placeholders
     update_translation_placeholders(language)
     print("New placeholder files created.")
 
@@ -343,7 +351,7 @@ def analyze_translation_status(language: Optional[str] = None) -> str:
     language_names = {
         "de": "Deutsch", "en": "English", "es": "Español", "fr": "Français",
         "it": "Italiano", "ja": "日本語", "pt": "Português", "ro": "Română",
-        "sv": "Svenska", "zh": "中文", "eu": "Euskara", "eo": "Esperanto", "fa": "فارسی",
+        "sv": "Svenska", "zh": "中文", "eu": "Euskara", "eo": "Esperanto", "oc": "Occitan", "fa": "فارسی",
     }
 
     # Collect languages
