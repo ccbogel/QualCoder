@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-27 07:35+0200\n"
-"PO-Revision-Date: 2026-08-26 23:55-0700\n"
+"PO-Revision-Date: 2026-08-27 21:54-0700\n"
 "Last-Translator: Auto-translated via Argostranslate (EN - < ES)>\n"
 "Language-Team: ES <LL@li.org>\n"
 "Language: es\n"
@@ -20,7 +20,6 @@ msgstr ""
 msgid "Copy"
 msgstr "Copiar"
 
-# Copiar mensaje de error al portapapeles
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/error_dlg.py:45
 msgid "Copy error message and traceback to the clipboard."
 msgstr "Copiar el mensaje de error al portapapeles."
@@ -51,21 +50,18 @@ msgstr "Mostrar archivos por atributos"
 msgid "Show case files"
 msgstr "Mostrar archivos del caso"
 
-# Ordenar por nombre (ascendente)
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_file_summary.py:119 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2038 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:748
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1322 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes_by_segments.py:285 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:168
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:396 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:443 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4214
 msgid "Sort by name ascending"
 msgstr "Ordenar por nombre (ascendente)"
 
-# Ordenar por nombre (descendente)
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_file_summary.py:120 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2039 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:749
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1323 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes_by_segments.py:286 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:169
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:397 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:444 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4215
 msgid "Sort by name descending"
 msgstr "Ordenar por nombre (descendente)"
 
-# Ordenar por caso (ascendente)
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_file_summary.py:121 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2040 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:750
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:1324 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:170 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4216
 msgid "Sort by case ascending"
@@ -463,7 +459,6 @@ msgstr "No se pudo leer el texto del PDF: "
 msgid "Coded area"
 msgstr "Área codificada"
 
-# Selecciona un código en la lista.
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2682 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:2071 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:2074
 msgid "Select a code in the list first."
 msgstr "Seleccione primero un código de la lista."
@@ -484,13 +479,11 @@ msgstr "Anotación:"
 msgid "Annotation"
 msgstr "Anotación"
 
-# Ningún archivo seleccionado
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2775 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2895 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4432 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4859 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5046
 msgid "No file was selected"
 msgstr "No se seleccionó ningún archivo"
 
-# Ningún código seleccionado
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2779 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3408 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3552 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3674
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:502 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4430 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4864 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5147
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5296 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5442
@@ -515,7 +508,6 @@ msgstr "Seleccionar la codificación para el memo"
 msgid "Memo for coded segment: "
 msgstr "Memo del segmento codificado: "
 
-# Nota
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3004
 msgid "Memo for coded area: "
 msgstr "Memo del área codificada: "
@@ -528,7 +520,6 @@ msgstr "Seleccionar el código para desmarcar"
 msgid "Select coding to flag important"
 msgstr "Seleccionar la codificación que se marcará como importante"
 
-# Seleccionar
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3225 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4151 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4819 /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2853
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:947 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2284
 msgid "Select replacement code"
@@ -554,7 +545,6 @@ msgstr "Ese segmento de texto ya está codificado con el código elegido."
 msgid "Mark speakers"
 msgstr "Marcar hablantes"
 
-# Ningún archivo seleccionado
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3291
 msgid "No file was selected."
 msgstr "No se seleccionó ningún archivo."
@@ -583,7 +573,6 @@ msgstr "última coincidencia en el archivo"
 msgid "code within code"
 msgstr "dentro de otro código"
 
-# Selecciona/seleccionar
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3352 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3388 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4963 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:316
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:1829 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:808 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1248 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1980
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2022
@@ -655,7 +644,6 @@ msgstr ""
 msgid "Auto-code"
 msgstr "Codificar automáticamente"
 
-# Deshacer autocodificación
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3532 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3658
 msgid "Finished auto-coding."
 msgstr "Terminó la codificación automática."
@@ -770,7 +758,6 @@ msgstr "codificados previamente."
 msgid "Select auto-codings to undo"
 msgstr "Seleccionar las codificaciones automáticas que se van a deshacer"
 
-# Deshacer autocodificación
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3783 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:619 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5274
 msgid "Undo autocoding: "
 msgstr "Deshacer la codificación automática: "
@@ -813,7 +800,6 @@ msgstr "Anotaciones del archivo: "
 msgid "Code: "
 msgstr "Código: "
 
-# Nota
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3861 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3869 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4068 /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:810
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:826 /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:846 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:464
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4902 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:5517 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:543 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:560
@@ -829,7 +815,6 @@ msgstr "Código: "
 msgid "Memo: "
 msgstr "Memo: "
 
-# Nota
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3871
 msgid "Memos"
 msgstr "Memos"
@@ -968,14 +953,10 @@ msgstr "Seleccionar la anotación que se editará"
 msgid "Select annotation to delete"
 msgstr "Seleccionar la anotación que se eliminará"
 
-# Seleccionar
-# memo > nota
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4380 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:5003 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:6705
 msgid "Select code to resize"
 msgstr "Seleccionar el código que se redimensionará"
 
-# Seleccionar
-# memo > nota
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4386
 msgid "Select area to resize"
 msgstr "Seleccionar el área que se redimensionará"
@@ -1029,7 +1010,6 @@ msgstr "Buscar código"
 msgid "Find and select first code that matches text."
 msgstr "Buscar y seleccionar el primer código que coincida con el texto."
 
-# Introduce
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4938 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:289 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:781 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1219
 msgid "Enter text to match all or partial code:"
 msgstr "Introduzca el texto para hacer coincidir todo o parte del código:"
@@ -1075,14 +1055,13 @@ msgstr "IMPORTANTE"
 msgid "Memo coded area"
 msgstr "Memo del área codificada"
 
-# Texto codificado en nota (M)
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5423 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:3954 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:862 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2081
 msgid "Memo coded text (M)"
 msgstr "Memo del texto codificado (M)"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5426
 msgid "Toggle important"
-msgstr "Alternar la marca de importante"
+msgstr "Añadir marca importante"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5432
 msgid "Annotate"
@@ -1092,7 +1071,6 @@ msgstr "Anotar"
 msgid "Text coding is disabled for this file."
 msgstr "La codificación de texto está deshabilitada para este archivo."
 
-# Duplicar
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5774 /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:2279 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:5113 /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:6780
 msgid "Duplicate Error"
 msgstr "Error de duplicado"
@@ -1207,7 +1185,6 @@ msgstr "... y más, consulte el archivo de registro."
 msgid "All segments were relocated exactly."
 msgstr "Todos los segmentos se reubicaron con exactitud."
 
-# No se han podido importar los datos de
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5990
 msgid "Restructure complete"
 msgstr "Reestructuración completa"
@@ -1240,7 +1217,6 @@ msgstr "Segmentos reubicados de forma aproximada (requieren revisión):"
 msgid "Journal"
 msgstr "Diario"
 
-# Utilices
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6048
 msgid "Could not create the journal entry."
 msgstr "No se pudo crear la entrada del diario."
@@ -1393,7 +1369,6 @@ msgstr "El texto aparece varias veces en la ruta. Algunos vínculos no se actual
 msgid "Search folders"
 msgstr "Buscar carpetas"
 
-# Seleccionar
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:169 /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:184
 msgid "Select file"
 msgstr "Seleccionar archivo"
@@ -1410,7 +1385,6 @@ msgstr "Archivo incorrecto"
 msgid "Bad link fixed for file: "
 msgstr "Enlace incorrecto corregido para el archivo: "
 
-# Ruta
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:225
 msgid " Path: "
 msgstr " Ruta: "
@@ -1541,7 +1515,6 @@ msgstr "Descendente"
 msgid "Show name like"
 msgstr "Mostrar nombres similares a"
 
-# Mostrar
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:476
 msgid "Show this coder"
 msgstr "Mostrar este codificador"
@@ -1550,10 +1523,9 @@ msgstr "Mostrar este codificador"
 msgid "Show values like"
 msgstr "Mostrar valores similares a"
 
-# Introduce
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:484 /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1072
 msgid "Enter date"
-msgstr "Introducir la fecha"
+msgstr "Introducir fecha"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:489 /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1098 /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:910
 msgid "Show all rows Ctrl A"
@@ -1578,7 +1550,6 @@ msgstr "Mostrar nombres similares a:"
 msgid "Show values like:"
 msgstr "Mostrar valores similares a:"
 
-# Diarios recopilados
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:605
 msgid "Collated journals exported: "
 msgstr "Diarios recopilados exportados: "
@@ -1607,12 +1578,10 @@ msgstr "Exportación de diario"
 msgid "Journal deleted: "
 msgstr "Diario eliminado: "
 
-# No se añadió ningún nombre
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:780
 msgid "No name was entered"
 msgstr "No se ingresó ningún nombre"
 
-# revista > diario
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:784
 msgid "Journal name in use"
 msgstr "El nombre del diario ya está en uso"
@@ -1621,7 +1590,6 @@ msgstr "El nombre del diario ya está en uso"
 msgid "Warning - invalid characters"
 msgstr "Advertencia: caracteres no válidos"
 
-# use > usa
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:790
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "En el nombre del diario utilice únicamente: a-z, A-z 0-9 - espacio"
