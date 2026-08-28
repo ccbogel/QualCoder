@@ -679,7 +679,7 @@ Marcado: basta con que coincida exactamente cualquiera de los códigos seleccion
     <message>
       <location filename="../GUI/ui_dialog_organiser.py" line="78"></location>
       <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
-      <translation>Organizador de códigos. Haga clic derecho sobre los códigos y las categorías para vincularlos y fusionarlos, añadir categorías nuevas y reestructurar el árbol de códigos.</translation>
+      <translation>Haga clic derecho sobre los códigos y las categorías para vincularlos y fusionarlos, añadir categorías nuevas y reestructurar el árbol de códigos.</translation>
     </message>
     <message>
       <location filename="../GUI/ui_dialog_organiser.py" line="81"></location>
@@ -1139,7 +1139,7 @@ Ordenado por nombre de archivo y nombre de código.</translation>
     <message>
       <location filename="../GUI/ui_comparison_table.py" line="112"></location>
       <source>Code counts table</source>
-      <translation>Tabla de recuento de códigos</translation>
+      <translation>Recuento de códigos</translation>
     </message>
     <message>
       <location filename="../GUI/ui_comparison_table.py" line="114"></location>
@@ -1561,12 +1561,12 @@ ALL "123", "abc"</translation>
     <message>
       <location filename="../GUI/ui_case_file_manager.py" line="84"></location>
       <source>Auto assign file text to case</source>
-      <translation>Asignar automáticamente el texto del archivo al caso</translation>
+      <translation>Autoasignar texto del archivo al caso</translation>
     </message>
     <message>
       <location filename="../GUI/ui_case_file_manager.py" line="85"></location>
       <source>Add selected files to case</source>
-      <translation>Añadir los archivos seleccionados al caso</translation>
+      <translation>Añadir archivos seleccionados al caso</translation>
     </message>
     <message>
       <location filename="../GUI/ui_case_file_manager.py" line="86"></location>
@@ -3823,7 +3823,7 @@ En Configuración se ajustan el número de caracteres y el estilo de visualizaci
     <message>
       <location filename="../GUI/ui_dialog_report_codings.py" line="200"></location>
       <source>Text context</source>
-      <translation>Contexto del texto</translation>
+      <translation>Contexto</translation>
     </message>
     <message>
       <location filename="../GUI/ui_dialog_report_codings.py" line="201"></location>
@@ -3942,7 +3942,7 @@ seleccione dos codificadores, un archivo y un código.</translation>
     <message>
       <location filename="../GUI/ui_report_compare_coder_file.py" line="104"></location>
       <source>Coder comparisons by file</source>
-      <translation>Comparación entre codificadores por archivo</translation>
+      <translation>Comparar codificadores por archivo</translation>
     </message>
     <message>
       <location filename="../GUI/ui_report_compare_coder_file.py" line="105"></location>
