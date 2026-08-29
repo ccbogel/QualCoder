@@ -1206,11 +1206,13 @@ class App(object):
             return "#ca1b9a"
         if self.settings['stylesheet'] == "native":
             palette = QtWidgets.QApplication.instance().palette()
-            color_role = getattr(
-                QtGui.QPalette.ColorRole,
-                "Accent",
-                QtGui.QPalette.ColorRole.Highlight,
-            )
+            color_role = QtGui.QPalette.ColorRole.Highlight
+            if platform.system() == "Darwin":
+                color_role = getattr(
+                    QtGui.QPalette.ColorRole,
+                    "Accent",
+                    QtGui.QPalette.ColorRole.Highlight,
+                )
             return palette.color(color_role).name(QtGui.QColor.NameFormat.HexRgb)
         return '#f89407'  # Default
 
