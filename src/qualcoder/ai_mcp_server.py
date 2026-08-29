@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Internal MCP server for QualCoder.
@@ -198,6 +198,27 @@ class AiMcpServer:
         """Normalize one AI-provided memo update to public text only."""
 
         return self._memo_public_text(memo)
+
+    def _active_model_id(self) -> str:
+        """Model id used by the agent, not the profile label."""
+        try:
+            return str(self.app.ai.get_active_model_id()).strip()
+        except Exception:
+            return ""
+
+    def _stamp_ai_model(self, memo: Any) -> str:
+        """Append the model id to a memo written by the AI Agent."""
+
+        text = "" if memo is None else str(memo)
+        model_id = self._active_model_id()
+        if model_id == "":
+            return text
+        stamp = f"{self.AI_AGENT_OWNER}, model: {model_id}"
+        if stamp in text:
+            return text
+        if text.strip() == "":
+            return stamp
+        return f"{text}\n\n{stamp}"
 
     def _merge_public_memo(self, existing_memo: Any, memo: Any) -> str:
         """Replace only the AI-visible memo text and preserve any private suffix."""
@@ -1522,7 +1543,7 @@ class AiMcpServer:
             cur.execute(
                 "INSERT INTO code_name (name, memo, catid, owner, date, color, supercid) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (name, memo, catid, self.AI_AGENT_OWNER, now, color, supercid),
+                (name, self._stamp_ai_model(memo), catid, self.AI_AGENT_OWNER, now, color, supercid),
             )
             cid = int(cur.lastrowid)
             conn.commit()
@@ -1620,7 +1641,7 @@ class AiMcpServer:
 
             cur.execute(
                 "INSERT INTO code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (cid, fid, seltext, pos0, pos1, self.AI_AGENT_OWNER, now, memo),
+                (cid, fid, seltext, pos0, pos1, self.AI_AGENT_OWNER, now, self._stamp_ai_model(memo)),
             )
             ctid = int(cur.lastrowid)
             conn.commit()
