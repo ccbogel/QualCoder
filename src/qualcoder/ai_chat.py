@@ -1458,6 +1458,27 @@ class DialogAIChat(QtWidgets.QDialog):
             rendered_html = rendered_html.replace(placeholder, replacement)
         return rendered_html
 
+    def _render_chat_summary(self, summary: str, analysis_type: str) -> str:
+        """Render a chat summary and emphasize topic exploration labels."""
+
+        if str(analysis_type).strip().lower() != 'topic_exploration':
+            return self._render_plain_text_with_prompt_refs(summary, style_role="info")
+
+        labels = set()
+        for translation_key in ('\nDescription:', '\nPrompt:', '\nMaterial:'):
+            labels.add(translation_key.removeprefix('\n'))
+            labels.add(_(translation_key).removeprefix('\n'))
+
+        rendered_lines = []
+        for line in str(summary if summary is not None else '').split('\n'):
+            label = next((item for item in labels if item != '' and line.startswith(item)), None)
+            if label is None:
+                rendered_lines.append(self._render_plain_text_with_prompt_refs(line, style_role="info"))
+                continue
+            rendered_value = self._render_plain_text_with_prompt_refs(line[len(label):], style_role="info")
+            rendered_lines.append(f'<b>{html_lib.escape(label)}</b>{rendered_value}')
+        return '<br />'.join(rendered_lines)
+
     def _open_prompt_record_in_library(self, prompt: AgentPromptRecord):
         """Open one prompt record in the prompt library dialog."""
 
@@ -5716,7 +5737,7 @@ data collected. This information will accompany every prompt sent to the AI, res
 
                 # Show title
                 html_parts.append(f'<h1 style={self.ai_info_style}>{self._display_chat_name(name, analysis_type)}</h1>')
-                summary_br = self._render_plain_text_with_prompt_refs(summary, style_role="info")
+                summary_br = self._render_chat_summary(summary, analysis_type)
                 display_type = self._display_chat_type_label(analysis_type, preserve_legacy_general=True)
                 if not self._is_agent_chat_type(analysis_type):
                     html_parts.append(

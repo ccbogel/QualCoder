@@ -701,6 +701,55 @@ class TestAiTextAnalysisPromptResolution(TestCase):
         self.assertEqual("text-analysis/system-prompt", prompt_record.name)
 
 
+class DummyChatSummaryRenderer:
+    """Minimal renderer stub for chat summary formatting tests."""
+
+    @staticmethod
+    def _render_plain_text_with_prompt_refs(text: str, style_role: str = "user") -> str:
+        del style_role
+        return text
+
+
+class TestAiChatSummaryRendering(TestCase):
+    """Regression tests for AI chat summary label formatting."""
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: {
+        "\nDescription:": "\nBeschreibung:",
+        "\nPrompt:": "\nPrompt:",
+        "\nMaterial:": "\nMaterial:",
+    }.get(text, text), create=True)
+    def test_topic_exploration_labels_are_bold(self, _translate):
+        del _translate
+        renderer = DummyChatSummaryRenderer()
+
+        html_string = DialogAIChat._render_chat_summary(
+            renderer,
+            "Thema erkunden.\nBeschreibung: Details\nPrompt: system/default\nMaterial: 3 Dateien",
+            "topic_exploration",
+        )
+
+        self.assertEqual(
+            "Thema erkunden.<br /><b>Beschreibung:</b> Details"
+            "<br /><b>Prompt:</b> system/default<br /><b>Material:</b> 3 Dateien",
+            html_string,
+        )
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: {
+        "\nDescription:": "\nBeschreibung:",
+    }.get(text, text), create=True)
+    def test_stored_source_label_is_also_bold(self, _translate):
+        del _translate
+        renderer = DummyChatSummaryRenderer()
+
+        html_string = DialogAIChat._render_chat_summary(
+            renderer,
+            "Explore topic.\nDescription: Details",
+            "topic_exploration",
+        )
+
+        self.assertEqual("Explore topic.<br /><b>Description:</b> Details", html_string)
+
+
 # TEST_PERSIST_PATH = '/fake/path/'
 CONFIG_INI_AI_EX4C0559 = {
     "backup_num": "5",
