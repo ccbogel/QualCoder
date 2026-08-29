@@ -894,6 +894,26 @@ class AiLLM():
             return str(self.app.ai_models[model_idx].get('name', '')).strip()
         return 'unknown'
 
+    def get_active_model_id(self, model_kind: str = 'large') -> str:
+        """Return the model id sent to the API, not the user's profile label."""
+
+        normalized_kind = 'fast' if str(model_kind).strip().lower() == 'fast' else 'large'
+        params = self._fast_llm_params if normalized_kind == 'fast' else self._large_llm_params
+        if isinstance(params, dict):
+            for key in ('model', 'azure_deployment', 'deployment_name'):
+                value = str(params.get(key, '') or '').strip()
+                if value != '':
+                    return value
+        # Not initialized yet: fall back to the configured profile.
+        try:
+            model_idx = int(self.app.settings.get('ai_model_index', '-1'))
+            if 0 <= model_idx < len(self.app.ai_models):
+                key = 'fast_model' if normalized_kind == 'fast' else 'large_model'
+                return str(self.app.ai_models[model_idx].get(key, '')).strip()
+        except Exception:
+            pass
+        return ''
+
     def _llm_provider_name(self, factory) -> str:
         if factory is AzureChatOpenAI:
             return 'azure'
