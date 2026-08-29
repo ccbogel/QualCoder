@@ -4157,6 +4157,11 @@ class DialogCodeText(QtWidgets.QWidget):
             self.annotations = self.app.get_annotations()
             self.load_file(self.file_)
             return
+        annotation_changed = "annotation" in tables
+        if annotation_changed:
+            self.annotations = self.app.get_annotations()
+            if self.file_ is not None:
+                self.get_coded_text_update_eventfilter_tooltips()
         if "code_cat" not in tables and "code_name" not in tables:
             if "code_text" not in tables:
                 return

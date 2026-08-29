@@ -18,6 +18,7 @@ More information about the actual project, its goals and research question, the 
 - Cases may be used to group documents or text passages that belong to a person, organization, location, group, or another analytic unit. A case can cover whole documents or only selected text spans.
 - Case attributes and document attributes are structured analytic variables assigned to cases or documents, for example age, gender, organization type, or interview setting.
 - All documents, cases, categories, codes, and even the single codings have provisions for an attached memo where the user can take notes about the interpretation of a text passage or the meaning of a certain code and when to apply it. Note that these memos can also be empty.
+- Memos can also be attached directly to text passages; these are called annotations.
 - The current date is: {{CURRENT_DATE}}
 
 # Your capabilities

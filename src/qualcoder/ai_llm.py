@@ -1813,6 +1813,12 @@ class AiLLM():
                 label = _("Text coding")
             return _("Created text coding: ") + label
 
+        if op_type == "create_annotation":
+            source_name = self._short_change_label(op.get("source_name", ""))
+            if allow_db_lookup and source_name == "":
+                source_name = self._short_change_label(self._lookup_source_name(int(op.get("fid", -1))))
+            return (_("Created annotation: ") + source_name) if source_name != "" else _("Created annotation")
+
         if op_type == "create_case":
             name = self._short_change_label(op.get("name", ""))
             return (_("Created case: ") + name) if name != "" else ""
@@ -1905,6 +1911,9 @@ class AiLLM():
 
         if op_type == "update_coding_text":
             return _("Updated text coding")
+
+        if op_type == "update_annotation":
+            return _("Updated annotation")
 
         if op_type == "rename_category":
             old_name = self._short_change_label(op.get("old_name", ""))
@@ -2043,6 +2052,19 @@ class AiLLM():
                     return _("Removed case link: ") + label
             return _("Removed case link")
 
+        if op_type == "delete_annotation":
+            snapshot = self._snapshot_tables(op)
+            annotation_rows = snapshot.get("annotation", [])
+            if isinstance(annotation_rows, list) and len(annotation_rows) > 0 and isinstance(annotation_rows[0], dict):
+                source_name = ""
+                if allow_db_lookup:
+                    source_name = self._short_change_label(
+                        self._lookup_source_name(int(annotation_rows[0].get("fid", -1)))
+                    )
+                if source_name != "":
+                    return _("Deleted annotation: ") + source_name
+            return _("Deleted annotation")
+
         return ""
 
     def _format_ai_change_age(self, created_at: str) -> str:
@@ -2131,6 +2153,7 @@ class AiLLM():
         coding_count = 0
         document_count = 0
         case_link_count = 0
+        annotation_count = 0
         attribute_count = 0
         operation_summaries = []
         seen_operation_summaries = set()
@@ -2151,6 +2174,8 @@ class AiLLM():
                 document_count += 1
             elif op_type in ("create_case_text", "delete_case_text"):
                 case_link_count += 1
+            elif op_type in ("create_annotation", "update_annotation", "delete_annotation"):
+                annotation_count += 1
             elif op_type in (
                     "create_case_attribute",
                     "create_document_attribute",
@@ -2175,6 +2200,8 @@ class AiLLM():
             parts.append(str(document_count) + " " + _("document(s)"))
         if case_link_count > 0:
             parts.append(str(case_link_count) + " " + _("case link(s)"))
+        if annotation_count > 0:
+            parts.append(str(annotation_count) + " " + _("annotation(s)"))
         if attribute_count > 0:
             parts.append(str(attribute_count) + " " + _("attribute action(s)"))
         if len(parts) == 0:
@@ -2320,6 +2347,40 @@ class AiLLM():
             return False, "changed", row
         return True, "ok", row
 
+    def _can_undo_create_annotation(self, cur, op):
+        anid = int(op.get("anid", -1))
+        if anid <= 0:
+            return False, "invalid", None
+        cur.execute(
+            "SELECT anid, fid, pos0, pos1, owner, ifnull(memo,''), ifnull(date,'') "
+            "FROM annotation WHERE anid=?",
+            (anid,),
+        )
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        expected = {
+            "fid": int(op.get("fid", -1)),
+            "pos0": int(op.get("pos0", -1)),
+            "pos1": int(op.get("pos1", -1)),
+            "owner": str(op.get("owner", "AI Agent")),
+            "memo": str(op.get("memo", "")),
+        }
+        if expected["fid"] > 0 and row[1] != expected["fid"]:
+            return False, "changed", row
+        if expected["pos0"] >= 0 and row[2] != expected["pos0"]:
+            return False, "changed", row
+        if expected["pos1"] >= 0 and row[3] != expected["pos1"]:
+            return False, "changed", row
+        if expected["owner"] != "" and str(row[4]) != expected["owner"]:
+            return False, "changed", row
+        if str(row[5]) != expected["memo"]:
+            return False, "changed", row
+        expected_date = str(op.get("created_at", ""))
+        if expected_date != "" and str(row[6]) != expected_date:
+            return False, "changed", row
+        return True, "ok", row
+
     def _can_undo_create_case(self, cur, op):
         caseid = int(op.get("caseid", -1))
         if caseid <= 0:
@@ -2444,6 +2505,22 @@ class AiLLM():
         after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
         expected_memo = str(after.get("memo", ""))
         if str(row[1]) != expected_memo:
+            return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_update_annotation(self, cur, op):
+        anid = int(op.get("anid", -1))
+        if anid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT anid, ifnull(memo,''), ifnull(date,'') FROM annotation WHERE anid=?", (anid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        after = op.get("after", {}) if isinstance(op.get("after", {}), dict) else {}
+        if str(row[1]) != str(after.get("memo", "")):
+            return False, "changed", row
+        expected_date = str(after.get("date", ""))
+        if expected_date != "" and str(row[2]) != expected_date:
             return False, "changed", row
         return True, "ok", row
 
@@ -2611,6 +2688,7 @@ class AiLLM():
             "code_av": "avid",
             "code_image": "imid",
             "case_text": "id",
+            "annotation": "anid",
         }
         for table_name, pk_name in primary_keys.items():
             rows = tables.get(table_name, [])
@@ -2629,11 +2707,24 @@ class AiLLM():
                 cur.execute(f"SELECT 1 FROM {table_name} WHERE {pk_name}=?", (pk_value,))
                 if cur.fetchone() is not None:
                     return False, "changed"
+        annotation_rows = tables.get("annotation", [])
+        if isinstance(annotation_rows, list):
+            for row in annotation_rows:
+                if not isinstance(row, dict):
+                    return False, "invalid"
+                cur.execute(
+                    "SELECT 1 FROM annotation WHERE fid=? AND pos0=? AND pos1=? AND owner=?",
+                    (row.get("fid"), row.get("pos0"), row.get("pos1"), row.get("owner")),
+                )
+                if cur.fetchone() is not None:
+                    return False, "changed"
         return True, "ok"
 
     def _restore_snapshot(self, cur, op):
         tables = self._snapshot_tables(op)
-        restore_order = ("code_cat", "code_name", "cases", "code_text", "case_text", "code_av", "code_image")
+        restore_order = (
+            "code_cat", "code_name", "cases", "code_text", "case_text", "annotation", "code_av", "code_image"
+        )
         for table_name in restore_order:
             rows = tables.get(table_name, [])
             if not isinstance(rows, list) or len(rows) == 0:
@@ -2655,6 +2746,7 @@ class AiLLM():
             "text_codings": len(tables.get("code_text", [])) if isinstance(tables.get("code_text", []), list) else 0,
             "av_codings": len(tables.get("code_av", [])) if isinstance(tables.get("code_av", []), list) else 0,
             "image_codings": len(tables.get("code_image", [])) if isinstance(tables.get("code_image", []), list) else 0,
+            "annotations": len(tables.get("annotation", [])) if isinstance(tables.get("annotation", []), list) else 0,
         }
 
     def _emit_project_table_changes(self, tables: list[str], source="ai_agent_undo") -> None:
@@ -2750,12 +2842,14 @@ class AiLLM():
         case_ids = set()
         coding_ctids = set()
         case_link_ids = set()
+        annotation_ids = set()
         skipped_changed = 0
         skipped_missing = 0
         restore_categories = 0
         restore_codes = 0
         restore_codings = 0
         restore_case_links = 0
+        restore_annotations = 0
         revert_updated_categories = 0
         revert_updated_codes = 0
         revert_moved_categories = 0
@@ -2764,6 +2858,7 @@ class AiLLM():
         revert_updated_cases = 0
         revert_updated_documents = 0
         revert_updated_codings = 0
+        revert_updated_annotations = 0
         remove_attributes = 0
         revert_updated_attributes = 0
 
@@ -2794,6 +2889,14 @@ class AiLLM():
                     cid = int(op.get("cid", -1))
                     if ctid > 0 and cid not in code_ids:
                         coding_ctids.add(ctid)
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "create_annotation":
+                ok, reason, row_data = self._can_undo_create_annotation(cur, op)
+                if ok:
+                    annotation_ids.add(int(op.get("anid", -1)))
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -2872,6 +2975,14 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "update_annotation":
+                ok, reason, row_data = self._can_undo_update_annotation(cur, op)
+                if ok:
+                    revert_updated_annotations += 1
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
             elif op_type == "rename_category":
                 ok, reason, row_data = self._can_undo_rename_category(cur, op)
                 if ok:
@@ -2935,6 +3046,14 @@ class AiLLM():
                     skipped_changed += 1
                 elif reason == "missing":
                     skipped_missing += 1
+            elif op_type == "delete_annotation":
+                ok, reason = self._can_restore_snapshot(cur, op)
+                if ok:
+                    restore_annotations += len(self._snapshot_tables(op).get("annotation", []))
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
 
         code_codings_total = 0
         code_codings_non_ai = 0
@@ -2992,6 +3111,8 @@ class AiLLM():
             lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
         if len(case_link_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_link_ids)) + _(" case link(s)."))
+        if len(annotation_ids) > 0:
+            lines.append(_("Undo will remove ") + str(len(annotation_ids)) + _(" annotation(s)."))
         if remove_attributes > 0:
             lines.append(_("Undo will remove ") + str(remove_attributes) + _(" attribute definition(s)."))
         if restore_categories > 0 or restore_codes > 0 or restore_codings > 0:
@@ -3005,6 +3126,8 @@ class AiLLM():
             lines.append(_("Undo will restore ") + ", ".join(parts) + ".")
         if restore_case_links > 0:
             lines.append(_("Undo will restore ") + str(restore_case_links) + _(" case link(s)."))
+        if restore_annotations > 0:
+            lines.append(_("Undo will restore ") + str(restore_annotations) + _(" annotation(s)."))
         if revert_updated_categories > 0:
             lines.append(str(revert_updated_categories) + _(" updated category(ies) would be restored to their previous values."))
         if revert_updated_codes > 0:
@@ -3015,6 +3138,8 @@ class AiLLM():
             lines.append(str(revert_updated_documents) + _(" updated document(s) would be restored to their previous values."))
         if revert_updated_codings > 0:
             lines.append(str(revert_updated_codings) + _(" updated text coding(s) would be restored to their previous values."))
+        if revert_updated_annotations > 0:
+            lines.append(str(revert_updated_annotations) + _(" updated annotation(s) would be restored to their previous values."))
         if revert_updated_attributes > 0:
             lines.append(str(revert_updated_attributes) + _(" attribute update(s) would be restored to their previous values."))
         if revert_moved_categories > 0:
@@ -3092,6 +3217,29 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "code_text")
+                    continue
+
+                if op_type == "create_annotation":
+                    ok, reason, row = self._can_undo_create_annotation(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    cur.execute("DELETE FROM annotation WHERE anid=?", (int(row[0]),))
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "annotation")
                     continue
 
                 if op_type == "create_case_text":
@@ -3448,6 +3596,38 @@ class AiLLM():
                         self._add_project_table_changes(project_table_changes, "code_text")
                     continue
 
+                if op_type == "update_annotation":
+                    ok, reason, row = self._can_undo_update_annotation(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    before = op.get("before", {}) if isinstance(op.get("before", {}), dict) else {}
+                    cur.execute(
+                        "UPDATE annotation SET memo=?, owner=?, date=? WHERE anid=?",
+                        (
+                            str(before.get("memo", "")),
+                            str(before.get("owner", "")),
+                            str(before.get("date", "")),
+                            int(row[0]),
+                        ),
+                    )
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "annotation")
+                    continue
+
                 if op_type in ("update_case_attributes", "update_document_attributes"):
                     ok, reason, rows = self._can_undo_update_attributes(cur, op)
                     if not ok:
@@ -3574,7 +3754,9 @@ class AiLLM():
                         self._add_project_table_changes(project_table_changes, "code_text")
                     continue
 
-                if op_type in ("delete_category_tree", "delete_code", "delete_coding_text", "delete_case_text"):
+                if op_type in (
+                        "delete_category_tree", "delete_code", "delete_coding_text", "delete_case_text",
+                        "delete_annotation"):
                     ok, reason = self._can_restore_snapshot(cur, op)
                     if not ok:
                         if reason == "changed":

@@ -5,14 +5,18 @@ from pathlib import Path
 import shutil
 import sqlite3
 import tempfile
+from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import patch
 
 from qualcoder.__main__ import App
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
+from qualcoder.ai_llm import AiLLM
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
+from qualcoder.code_av import DialogCodeAV
+from qualcoder.code_text import DialogCodeText
 
 """ Useful insights from:
 https: // stackoverflow.com / questions / 32527861 / python - unit - test - that - uses - an - external - data - file / 32528173
@@ -496,6 +500,265 @@ class TestAiMemoPolicy(TestCase):
         cur.execute("select memo from code_text where ctid=1")
         self.assertEqual("Updated coding\n#####\nPrivate coding", cur.fetchone()[0])
         conn.close()
+
+
+class TestAiAnnotations(TestCase):
+    """Internal MCP annotation reads, writes, permissions, and undo."""
+
+    class FakeEvents:
+        def __init__(self):
+            self.calls = []
+
+        def emit_table_changes(self, tables, source=""):
+            self.calls.append((list(tables), source))
+
+    class FakeAi:
+        def __init__(self):
+            self.operations = []
+
+        def record_ai_change(self, change_set_id, operation):
+            self.operations.append((change_set_id, dict(operation)))
+
+    class FakeApp:
+        def __init__(self, project_path):
+            self.project_path = project_path
+            self.settings = {"ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS}
+            self.delete_backup = True
+            self.project_events = TestAiAnnotations.FakeEvents()
+            self.ai = TestAiAnnotations.FakeAi()
+            self.conn = sqlite3.connect(os.path.join(project_path, "data.qda"))
+
+    def setUp(self):
+        self.project_path = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.project_path, "data.qda")
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        cur.execute(
+            "CREATE TABLE source (id integer primary key, name text, fulltext text, memo text, owner text, date text)"
+        )
+        cur.execute(
+            "CREATE TABLE annotation (anid integer primary key, fid integer, pos0 integer, pos1 integer, memo text, "
+            "owner text, date text, unique(fid,pos0,pos1,owner))"
+        )
+        cur.execute(
+            "CREATE TABLE coder_names (name text unique not null, visibility integer not null default 1)"
+        )
+        cur.execute(
+            "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text, date text)"
+        )
+        cur.execute(
+            "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
+            "owner text, date text, memo text)"
+        )
+        cur.execute(
+            "CREATE VIEW annotation_visible AS SELECT a.* FROM annotation AS a WHERE NOT EXISTS "
+            "(SELECT 1 FROM coder_names AS c WHERE c.name=a.owner AND c.visibility=0)"
+        )
+        fulltext = "Alpha beta Alpha gamma unique phrase."
+        cur.execute(
+            "INSERT INTO source (id,name,fulltext,memo,owner,date) VALUES (1,?,?,?,?,?)",
+            ("doc one", fulltext, "", "default", "2026-01-01 10:00:00"),
+        )
+        cur.execute("INSERT INTO coder_names (name,visibility) VALUES ('Visible Coder',1)")
+        cur.execute("INSERT INTO coder_names (name,visibility) VALUES ('Hidden Coder',0)")
+        cur.execute(
+            "INSERT INTO annotation (anid,fid,pos0,pos1,memo,owner,date) VALUES (1,1,6,10,'visible','Visible Coder','d')"
+        )
+        cur.execute(
+            "INSERT INTO annotation (anid,fid,pos0,pos1,memo,owner,date) VALUES (2,1,17,22,'hidden','Hidden Coder','d')"
+        )
+        conn.commit()
+        conn.close()
+        self.app = self.FakeApp(self.project_path)
+        self.server = AiMcpServer(self.app)
+
+    def tearDown(self):
+        self.app.conn.close()
+        shutil.rmtree(self.project_path)
+
+    def test_annotation_reads_follow_visibility_and_explicit_owner(self):
+        tool_names = [tool["name"] for tool in self.server._list_tools_payload()["tools"]]
+        self.assertIn("annotations/create", tool_names)
+        self.assertIn("annotations/update", tool_names)
+        self.assertIn("annotations/delete", tool_names)
+        resource_uris = [str(resource.uri) for resource in self.server._base_resources()]
+        self.assertIn("qualcoder://annotations", resource_uris)
+        templates_response = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 1, "method": "resources/templates/list", "params": {}}
+        )
+        self.assertNotIn("error", templates_response)
+        template_uris = [
+            str(template["uriTemplate"])
+            for template in templates_response["result"]["resourceTemplates"]
+        ]
+        self.assertIn("qualcoder://annotations/{anid}{?owner}", template_uris)
+
+        visible = self.server._read_resource_payload("qualcoder://annotations", {})
+        self.assertEqual([1], [item["anid"] for item in visible["annotations"]])
+        self.assertEqual("beta", visible["annotations"][0]["quote"])
+
+        hidden = self.server._read_resource_payload(
+            "qualcoder://annotations?owner=Hidden+Coder", {}
+        )
+        self.assertEqual([2], [item["anid"] for item in hidden["annotations"]])
+        hidden_one = self.server._read_resource_payload(
+            "qualcoder://annotations/2?owner=Hidden+Coder", {}
+        )
+        self.assertEqual("Hidden Coder", hidden_one["annotation"]["owner"])
+        with self.assertRaisesRegex(ValueError, "not found or is not visible"):
+            self.server._read_resource_payload("qualcoder://annotations/2", {})
+
+    def test_create_annotation_requires_a_unique_exact_quote_or_positions(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        with self.assertRaisesRegex(ValueError, "occurs 2 times"):
+            self.server._call_tool_payload(
+                "annotations/create", {"fid": 1, "quote": "Alpha", "memo": "ambiguous"}, "cs"
+            )
+        with self.assertRaisesRegex(ValueError, "not found exactly"):
+            self.server._call_tool_payload(
+                "annotations/create", {"fid": 1, "quote": "Unique Phrase", "memo": "wrong case"}, "cs"
+            )
+
+        created = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "quote": "unique phrase", "memo": "agent note"}, "cs"
+        )
+        payload = created["structuredContent"]
+        self.assertTrue(payload["created"])
+        self.assertEqual((23, 36), (payload["annotation"]["pos0"], payload["annotation"]["pos1"]))
+        self.assertEqual("AI Agent", payload["annotation"]["owner"])
+
+        positioned = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "Alpha", "memo": "first"}, "cs"
+        )
+        self.assertTrue(positioned["structuredContent"]["created"])
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            self.server._call_tool_payload(
+                "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "alpha", "memo": "bad"}, "cs"
+            )
+
+        duplicate = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "memo": "ignored"}, "cs"
+        )
+        self.assertFalse(duplicate["structuredContent"]["created"])
+        self.assertEqual("already_exists", duplicate["structuredContent"]["reason"])
+        self.assertIn((['annotation'], 'ai_agent'), self.app.project_events.calls)
+
+        create_operation = self.app.ai.operations[-1][1]
+        undo_manager = AiLLM.__new__(AiLLM)
+        undo_manager.app = self.app
+        undo_result = undo_manager._undo_ai_change_set({"operations": [create_operation]})
+        self.assertEqual(1, undo_result["undone"])
+        cur = self.app.conn.cursor()
+        positioned_anid = positioned["structuredContent"]["annotation"]["anid"]
+        cur.execute("SELECT count(*) FROM annotation WHERE anid=?", (positioned_anid,))
+        self.assertEqual(0, cur.fetchone()[0])
+
+    def test_update_delete_permissions_private_memo_and_undo(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
+        denied = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "quote": "unique phrase", "memo": "note"}, "cs"
+        )
+        self.assertTrue(denied["isError"])
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        denied_update = self.server._call_tool_payload(
+            "annotations/update", {"anid": 1, "memo": "not allowed"}, "cs"
+        )
+        self.assertTrue(denied_update["isError"])
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        cur = self.app.conn.cursor()
+        cur.execute("UPDATE annotation SET memo=? WHERE anid=1", ("public\n#####\nprivate",))
+        self.app.conn.commit()
+        updated = self.server._call_tool_payload(
+            "annotations/update", {"anid": 1, "memo": "revised"}, "cs-update"
+        )
+        self.assertEqual("revised\n", updated["structuredContent"]["annotation"]["memo"])
+        cur.execute("SELECT memo FROM annotation WHERE anid=1")
+        self.assertEqual("revised\n#####\nprivate", cur.fetchone()[0])
+
+        update_operation = self.app.ai.operations[-1][1]
+        undo_manager = AiLLM.__new__(AiLLM)
+        undo_manager.app = self.app
+        undo_result = undo_manager._undo_ai_change_set({"operations": [update_operation]})
+        self.assertEqual(1, undo_result["undone"])
+        cur.execute("SELECT memo FROM annotation WHERE anid=1")
+        self.assertEqual("public\n#####\nprivate", cur.fetchone()[0])
+
+        deleted = self.server._call_tool_payload("annotations/delete", {"anid": 1}, "cs-delete")
+        self.assertTrue(deleted["structuredContent"]["deleted"])
+        delete_operation = self.app.ai.operations[-1][1]
+        undo_result = undo_manager._undo_ai_change_set({"operations": [delete_operation]})
+        self.assertEqual(1, undo_result["undone"])
+        cur.execute("SELECT memo FROM annotation WHERE anid=1")
+        self.assertEqual("public\n#####\nprivate", cur.fetchone()[0])
+
+    def test_annotation_reads_support_reference_candidates_and_compaction(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog.get_filename = lambda _fid: "doc one"
+        stored_result = {
+            "action": "mcp_result",
+            "contents": [
+                {
+                    "uri": "qualcoder://annotations?file_ids=1",
+                    "payload": {
+                        "annotations": [
+                            {
+                                "fid": 1,
+                                "source_name": "doc one",
+                                "pos0": 6,
+                                "quote": "beta",
+                                "context_before": "Alpha ",
+                                "context_after": " Alpha",
+                            }
+                        ]
+                    },
+                }
+            ],
+        }
+        candidates = dialog._extract_ref_candidates_from_tool_result(
+            "MCP result:\n" + json.dumps(stored_result)
+        )
+        self.assertEqual("beta", candidates[0]["text"])
+        self.assertEqual(6, candidates[0]["start"])
+        self.assertTrue(dialog._is_compactable_resource_uri("qualcoder://annotations?file_ids=1"))
+
+    def test_annotation_events_refresh_open_text_and_transcript_dialogs(self):
+        refreshed_annotations = [{"anid": 9, "memo": "revised"}]
+        fake_app = SimpleNamespace(get_annotations=lambda: refreshed_annotations)
+
+        text_dialog = SimpleNamespace(
+            app=fake_app,
+            attributes=[],
+            file_={"id": 1},
+            annotations=[],
+            refresh_count=0,
+        )
+
+        def refresh_text():
+            text_dialog.refresh_count += 1
+
+        text_dialog.get_coded_text_update_eventfilter_tooltips = refresh_text
+        DialogCodeText._on_project_data_changed(text_dialog, ["annotation"], "ai_agent")
+        self.assertEqual(refreshed_annotations, text_dialog.annotations)
+        self.assertEqual(1, text_dialog.refresh_count)
+
+        av_dialog = SimpleNamespace(
+            app=fake_app,
+            attributes=[],
+            annotations=[],
+            segments=[],
+            code_text=[],
+            refresh_count=0,
+        )
+
+        def refresh_transcript():
+            av_dialog.refresh_count += 1
+
+        av_dialog.get_coded_text_update_eventfilter_tooltips = refresh_transcript
+        DialogCodeAV._on_project_data_changed(av_dialog, ["annotation"], "ai_agent")
+        self.assertEqual(refreshed_annotations, av_dialog.annotations)
+        self.assertEqual(1, av_dialog.refresh_count)
 
 
 class DummyReferenceApp:

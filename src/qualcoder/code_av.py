@@ -3102,7 +3102,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         code_tree_changed = "code_cat" in tables or "code_name" in tables
 
         refresh_segments = "code_av" in tables or "code_text" in tables or ("code_name" in tables and bool(self.segments))
-        refresh_transcript = "code_text" in tables or ("code_name" in tables and bool(self.code_text))
+        refresh_annotations = "annotation" in tables
+        refresh_transcript = (
+            "code_text" in tables or refresh_annotations or ("code_name" in tables and bool(self.code_text))
+        )
         refresh_counts = "code_av" in tables or "code_text" in tables
 
         if code_tree_changed:
@@ -3111,6 +3114,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         elif not refresh_counts and not refresh_segments and not refresh_transcript:
             return
 
+        if refresh_annotations:
+            self.annotations = self.app.get_annotations()
         if refresh_transcript:
             self.get_coded_text_update_eventfilter_tooltips()
         if refresh_segments and self.file_ is not None and self.media is not None:

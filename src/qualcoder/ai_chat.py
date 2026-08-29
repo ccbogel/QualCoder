@@ -6292,6 +6292,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if base_uri in (
             "qualcoder://codes/tree",
             "qualcoder://documents",
+            "qualcoder://annotations",
             "qualcoder://vector/search",
             "qualcoder://search/bm25",
             "qualcoder://search/regex",
@@ -6300,6 +6301,8 @@ data collected. This information will accompany every prompt sent to the AI, res
         if re.fullmatch(r"qualcoder://documents/text/\d+", base_uri):
             return True
         if re.fullmatch(r"qualcoder://codes/segments/\d+", base_uri):
+            return True
+        if re.fullmatch(r"qualcoder://annotations/\d+", base_uri):
             return True
         return False
 
@@ -6324,6 +6327,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                             summary["hits"] = len(resource_payload.get("hits", []))
                         elif "documents" in resource_payload and isinstance(resource_payload.get("documents"), list):
                             summary["documents"] = len(resource_payload.get("documents", []))
+                        elif "annotations" in resource_payload and isinstance(resource_payload.get("annotations"), list):
+                            summary["annotations"] = len(resource_payload.get("annotations", []))
+                        elif "annotation" in resource_payload and isinstance(resource_payload.get("annotation"), dict):
+                            summary["annotations"] = 1
                         elif "text" in resource_payload:
                             summary["excerpt_chars"] = len(str(resource_payload.get("text", "")))
                             total_length = resource_payload.get("total_length", None)
@@ -6335,6 +6342,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                                 summary["total_hits"] = selection.get("total_hits")
                             if "total_segments" in selection:
                                 summary["total_segments"] = selection.get("total_segments")
+                            if "total_annotations" in selection:
+                                summary["total_annotations"] = selection.get("total_annotations")
                             if "truncated" in selection:
                                 summary["truncated"] = bool(selection.get("truncated", False))
         elif method == "resources/list":
@@ -8290,6 +8299,37 @@ data collected. This information will accompany every prompt sent to the AI, res
                             segment_quote,
                             seg.get("context_before", ""),
                             seg.get("context_after", ""),
+                        )
+                    )
+                continue
+
+            if uri == "qualcoder://annotations" or re.fullmatch(r"qualcoder://annotations/\d+", uri):
+                annotation_items = payload.get("annotations", [])
+                if re.fullmatch(r"qualcoder://annotations/\d+", uri):
+                    annotation = payload.get("annotation", None)
+                    annotation_items = [annotation] if isinstance(annotation, dict) else []
+                if not isinstance(annotation_items, list):
+                    continue
+                for annotation in annotation_items:
+                    if not isinstance(annotation, dict):
+                        continue
+                    source_id = self._safe_int(annotation.get("fid", None), -1)
+                    start = self._safe_int(annotation.get("pos0", None), -1)
+                    quote = str(annotation.get("quote", ""))
+                    if source_id <= 0 or start < 0 or quote.strip() == "":
+                        continue
+                    source_name = str(annotation.get("source_name", "")).strip()
+                    if source_name == "":
+                        source_name = self.get_filename(source_id)
+                    quote_truncated = bool(annotation.get("quote_truncated", False))
+                    candidates.extend(
+                        self._build_ref_candidates_for_excerpt(
+                            source_id,
+                            source_name,
+                            start,
+                            quote,
+                            "" if quote_truncated else annotation.get("context_before", ""),
+                            "" if quote_truncated else annotation.get("context_after", ""),
                         )
                     )
                 continue
