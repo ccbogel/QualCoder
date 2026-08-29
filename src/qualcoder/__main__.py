@@ -908,7 +908,7 @@ Click "Yes" to start now.')
         if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_5:
             self.ui.menuHelp.popup(QtGui.QCursor.pos())
 
-    def settings_report(self):
+    def settings_report(self, swith_to_action_log: bool = True):
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
@@ -940,7 +940,8 @@ Click "Yes" to start now.')
             self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
         self.ui.textEdit.append("<p></p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
-        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        if swith_to_action_log:
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def text_segments_codes_table(self):
         """ Show table of text segments (rows) by codes (columns). """
@@ -1914,7 +1915,7 @@ Click "Yes" to start now.')
             return
 
         self.app.settings, self.app.ai_models = self.app.load_settings()
-        self.settings_report()
+        self.settings_report(swith_to_action_log=False)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.update_placeholder_tab_styles()
