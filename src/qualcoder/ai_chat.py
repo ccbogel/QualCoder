@@ -1493,55 +1493,33 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.toolButton_edit_title.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.toolButton_edit_title.setIconSize(QtCore.QSize(16, 16))
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
-        self.ai_response_color = "#356399"
-        self.ai_user_color = "#287368"
-        self.ai_status_color = "#808080"
-        self.ai_response_style = f'"{doc_font} color: #356399;"'
-        self.ai_user_style = f'"{doc_font} color: #287368;"'
-        self.ai_info_style = f'"{doc_font}"'
-        self.ai_status_style = f'"{doc_font} color: #808080;"'
-        self.ai_actions_style = f'"{doc_font}"'
-        if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
-            self.ai_response_color = "#8FB1D8"
-            self.ai_user_color = "#35998A"
-            self.ai_status_color = "#B5B5B5"
-            self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-            self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-            self.ai_info_style = f'"{doc_font}"'
-            self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
-        elif self.app.settings['stylesheet'] == 'native':
-            # Determine whether dark or light native style is active:
-            style_hints = QGuiApplication.styleHints()
-            # Older versions fot PyQt6 may not have QGuiApplication.styleHints().colorScheme() e.g. PtQ66 vers 6.2.3
+        light_colors = ("#356399", "#287368", "#808080")
+        dark_colors = ("#A5D6FF", "#4EC9B0", "#B5B5B5")
+
+        stylesheet = self.app.settings["stylesheet"]
+        use_dark_colors = stylesheet in ("dark", "rainbow")
+        if stylesheet == "native":
             try:
-                if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
-                    self.ai_response_color = "#8FB1D8"
-                    self.ai_user_color = "#35998A"
-                    self.ai_status_color = "#B5B5B5"
-                    self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-                    self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-                    self.ai_info_style = f'"{doc_font}"'
-                    self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
-                else:
-                    self.ai_response_color = "#356399"
-                    self.ai_user_color = "#287368"
-                    self.ai_status_color = "#808080"
-                    self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-                    self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-                    self.ai_info_style = f'"{doc_font}"'
-                    self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
-            except AttributeError as e_:
-                print(f"Using older version of PyQT6? {e_}")
-                logger.debug(f"Using older version of PyQT6? {e_}")
-                pass
-        else:
-            self.ai_response_color = "#356399"
-            self.ai_user_color = "#287368"
-            self.ai_status_color = "#808080"
-            self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-            self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-            self.ai_info_style = f'"{doc_font}"'
-            self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
+                use_dark_colors = (
+                    QGuiApplication.styleHints().colorScheme()
+                    == QtCore.Qt.ColorScheme.Dark
+                )
+            except AttributeError as exception:
+                print(f"Using an older PyQt6 version? {exception}")
+                logger.debug(
+                    "Could not determine the native color scheme: %s", exception
+                )
+
+        (
+            self.ai_response_color,
+            self.ai_user_color,
+            self.ai_status_color,
+        ) = dark_colors if use_dark_colors else light_colors
+        self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
+        self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
+        self.ai_info_style = f'"{doc_font}"'
+        self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
+        self.ai_actions_style = f'"{doc_font}"'
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         default_bg_color = self.ui.plainTextEdit_question.palette().color(
             self.ui.plainTextEdit_question.viewport().backgroundRole()
