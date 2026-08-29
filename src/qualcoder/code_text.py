@@ -37,7 +37,7 @@ import sqlite3
 import unicodedata
 import webbrowser
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets, sip
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 # Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
@@ -489,10 +489,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_current_result_index = None
         self.ai_search_prompt = None
         self.ai_search_ai_model = None
+        self.ai_search_ai_model_id = ''
         self.ai_include_coded_segments = None
         self.ai_search_found = False
         self.ai_search_analysis_counter = 0
         self.ai_search_session_id = 0
+        self.ai_search_message_shown = False  # text view holds a search message, not file text
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
@@ -595,6 +597,32 @@ class DialogCodeText(QtWidgets.QWidget):
         except Exception as err:
             logger.warning(err)
             return False
+
+    def _show_ai_search_message(self, message=''):
+        """Show a temporary search message instead of the file text."""
+
+        self.ai_search_message_shown = True
+        self.ui.plainTextEdit.setPlainText(message)
+        if getattr(self, 'eventFilterTT', None) is not None and self.file_ is not None:
+            # no code tooltips over a search message
+            self.eventFilterTT.set_codes_and_annotations(self.app, [], self.codes, [], self.file_)
+        if getattr(self, 'coding_margin', None) is not None:
+            self.coding_margin.update()
+
+    def _ai_search_ui_alive(self) -> bool:
+        """False when the coding window was closed while a search was running."""
+
+        try:
+            ui = self.ui
+        except RuntimeError:
+            return False
+        if ui is None:
+            return False
+        for widget_name in ('listWidget_ai', 'plainTextEdit'):
+            widget = getattr(ui, widget_name, None)
+            if widget is None or sip.isdeleted(widget):
+                return False
+        return True
 
     def _ai_search_scope_status(self) -> str:
         ai = getattr(self.app, 'ai', None)
@@ -4530,6 +4558,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.text.endswith('\n'):
             self.text = self.text[:-1]
         self.detect_text_direction()
+        self.ai_search_message_shown = False
         self.ui.plainTextEdit.setPlainText(self.text)
 
         # margin visibility handled via layout container; sync with preference <- L
@@ -4914,7 +4943,9 @@ class DialogCodeText(QtWidgets.QWidget):
             if ai_search_result is not None:
                 memo = _("AI interpretation: ") + ai_search_result["interpretation"]
                 memo += _("\n\nAI search prompt: ") + prompt_name_and_scope(self.ai_search_prompt)
-                memo += _("\nAI model: ") + self.ai_search_ai_model
+                memo += _("\nAI profile: ") + self.ai_search_ai_model
+                if str(self.ai_search_ai_model_id).strip() != '':
+                    memo += _("\nAI model: ") + str(self.ai_search_ai_model_id).strip()
 
                 msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'
                 msg += _("Do you want to store the AI interpretation in a memo together with the coding?<br/><br/>")
@@ -5742,6 +5773,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.file_['start'] = 0
         self.file_['end'] = len(file_result['fulltext'])
         self.text = file_result['fulltext']
+        self.ai_search_message_shown = False
         self.ui.plainTextEdit.setPlainText(self.text)
         self.prev_text = copy(self.text)
         self.ui.plainTextEdit.removeEventFilter(self.eventFilterTT)
@@ -6292,6 +6324,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_results = []
             self.ai_search_prompt = ui.current_prompt
             self.ai_search_ai_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+            # store the model id actually used, not only the profile label
+            self.ai_search_ai_model_id = self.app.ai.get_active_model_id()
 
             # Prepare the UI
             self.ai_search_running = True
@@ -6300,7 +6334,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.listWidget_ai.clear()
             self.ai_search_current_result_index = None
             self.ai_search_spinner_timer.start(500)
-            self.ui.plainTextEdit.setPlainText(_('Searching for related data, please wait...'))
+            self._show_ai_search_message(_('Searching for related data, please wait...'))
 
             # Phase 1: find similar chunks of data from the vectorstore
             self.ai_search_session_id += 1
@@ -6327,10 +6361,10 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if self._ai_search_scope_status() == 'canceled':
             self.ai_search_running = False
-            self.ui.plainTextEdit.setPlainText('')
+            self._show_ai_search_message()
             return
         if chunks is None or len(chunks) == 0:
-            self.ui.plainTextEdit.setPlainText('')
+            self._show_ai_search_message()
             msg = _('AI: No related data found for "') + self.ai_search_code_name + '".'
             Message(self.app, _('AI Search'), msg, "warning").exec()
             self.ai_search_running = False
@@ -6370,14 +6404,14 @@ class DialogCodeText(QtWidgets.QWidget):
             chunks = filtered_chunks
 
         if len(chunks) == 0:
-            self.ui.plainTextEdit.setPlainText('')
+            self._show_ai_search_message()
             msg = _('AI: No new data found for "') + self.ai_search_code_name + _(
                 '" beside what has already been coded with this code.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
             self.ai_search_running = False
             return
 
-        self.ui.plainTextEdit.setPlainText(
+        self._show_ai_search_message(
             _('Potentially related data found, inspecting it closer. Please be patient...'))
 
         # 2) Send the first "ai_search_analysis_max_count" chunks to the llm for further analysis 
@@ -6396,6 +6430,10 @@ class DialogCodeText(QtWidgets.QWidget):
         the user has to click on 'find more' to continue), or 
         2) 'len(self.ai_search_similar_chunk_list)' is reached, meaning that all the 
         chunks found in step 1 have been analyzed and the search is finished."""
+
+        if not self._ai_search_ui_alive():  # coding window closed, stop the search
+            self.ai_search_running = False
+            return
 
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list):
             # still chunks left for analysis            
@@ -6417,7 +6455,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ai_search_running = False
                 if len(self.ai_search_results) == 0:  # nothing found
                     self.ai_search_update_listview_action()
-                    self.ui.plainTextEdit.setPlainText('')
+                    self._show_ai_search_message()
                     msg = _('The closer inspection of the first ') + str(self.ai_search_chunks_pos) + ' ' + \
                           _('pieces of data yielded no results. You can continue to inspect more by clicking on "find '
                             'more" in the list on the left.')
@@ -6425,7 +6463,7 @@ class DialogCodeText(QtWidgets.QWidget):
         else:  # search finished
             self.ai_search_running = False
             if len(self.ai_search_results) == 0:  # nothing found
-                self.ui.plainTextEdit.setPlainText('')
+                self._show_ai_search_message()
                 self.ai_search_update_listview_action()
                 msg = _(
                     'Upon closer inspection, no pieces of data relevant to your search query could be identified. '
@@ -6443,6 +6481,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if session_id is not None and int(session_id) != int(self.ai_search_session_id):
             return
         if not self.ai_search_running:  # Search has been cancelled
+            return
+        if not self._ai_search_ui_alive():  # coding window closed while running
+            self.ai_search_running = False
             return
         if doc is not None:
             self.ai_search_results.append(doc)
@@ -6472,6 +6513,9 @@ class DialogCodeText(QtWidgets.QWidget):
         - Stop search: Shown if a search is actually running in the background
         - (search finished): Shown if all results from stage 1 have already been analyzed  
         """
+        if not self._ai_search_ui_alive():  # nothing to update anymore
+            return
+
         # add action item to the list if necessary
         if self.ui.listWidget_ai.count() <= len(self.ai_search_results):
             self.ui.listWidget_ai.addItem('')
@@ -6636,6 +6680,13 @@ class DialogCodeText(QtWidgets.QWidget):
     def ai_search_update_spinner(self):
         """ Updating the ai_progressBar and the text spinner in the list view to indicate to the user that 
         an AI search is running in the background. """
+        if not self._ai_search_ui_alive():  # coding window closed, stop the timer
+            self.ai_search_running = False
+            try:
+                self.ai_search_spinner_timer.stop()
+            except RuntimeError:
+                pass
+            return
         if self._ai_search_scope_status() in ('finished', 'errored', 'canceled', 'idle'):
             self.ai_search_running = False
         if self.ai_search_running:
