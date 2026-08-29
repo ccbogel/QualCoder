@@ -750,6 +750,59 @@ class TestAiChatSummaryRendering(TestCase):
         self.assertEqual("Explore topic.<br /><b>Description:</b> Details", html_string)
 
 
+class DummyProgressSignal:
+    """Record AI progress payloads emitted by a chat operation."""
+
+    def __init__(self):
+        self.payloads = []
+
+    def emit(self, payload: str):
+        self.payloads.append(json.loads(payload))
+
+
+class DummyInternalJsonInvoker:
+    """Minimal chat stub for internal JSON status tests."""
+
+    class App:
+        ai = None
+
+    def __init__(self):
+        self.app = self.App()
+
+    _emit_mcp_status_text = DialogAIChat._emit_mcp_status_text
+    _normalize_progress_note = DialogAIChat._normalize_progress_note
+
+    @staticmethod
+    def _invoke_json_llm(messages, **kwargs):
+        del messages, kwargs
+        return {"action": "final_answer"}
+
+
+class TestAiInternalJsonStatus(TestCase):
+    """Regression tests for AI status messages during internal JSON steps."""
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_reflection_starts_with_analyzing_status(self, _translate):
+        del _translate
+        invoker = DummyInternalJsonInvoker()
+        progress = DummyProgressSignal()
+        signals = type("Signals", (), {"progress": progress})()
+
+        result = DialogAIChat._invoke_json_llm_with_step_timeout(
+            invoker,
+            [],
+            status_kind="reflection",
+            signals=signals,
+            chat_idx=7,
+        )
+
+        self.assertEqual({"action": "final_answer"}, result)
+        self.assertEqual(
+            [{"chat_idx": 7, "status": "Analyzing...", "status_kind": "reflection"}],
+            progress.payloads,
+        )
+
+
 # TEST_PERSIST_PATH = '/fake/path/'
 CONFIG_INI_AI_EX4C0559 = {
     "backup_num": "5",

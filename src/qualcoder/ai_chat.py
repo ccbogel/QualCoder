@@ -7653,6 +7653,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                                            signals=None, chat_idx: int = -1) -> Dict[str, Any]:
         """Run one internal JSON LLM step with a visible soft timeout and a hard wall-clock timeout."""
 
+        if status_kind == "reflection":
+            self._emit_mcp_status_text(signals, chat_idx, _("Analyzing..."), status_kind=status_kind)
+
         ai_service = getattr(self.app, 'ai', None)
         if ai_service is None:
             return self._invoke_json_llm(
