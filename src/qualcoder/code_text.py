@@ -4631,6 +4631,13 @@ class DialogCodeText(QtWidgets.QWidget):
             if 'color' not in item:
                 item['color'] = '#cccccc'
             self.code_text.append(item)
+        if self.ai_search_message_shown:
+            # a search message is on screen: no tooltips, no highlighting
+            self.eventFilterTT.set_codes_and_annotations(self.app, [], self.codes, [], self.file_)
+            if getattr(self, 'coding_margin', None) is not None:
+                self.coding_margin.update()
+            return
+
         # Update filter for tooltip and redo formatting
         if self.important:
             imp_coded = []
@@ -4780,7 +4787,7 @@ class DialogCodeText(QtWidgets.QWidget):
         For defined colours in color_selector, make text light on dark, and conversely dark on light
         """
 
-        if self.file_ is None or self.ui.plainTextEdit.toPlainText() == "":
+        if self.file_ is None or self.ai_search_message_shown or self.ui.plainTextEdit.toPlainText() == "":
             # still refresh the side margin so it clears properly <- L
             if hasattr(self, 'coding_margin') and self.coding_margin is not None:
                 self.coding_margin.update()
