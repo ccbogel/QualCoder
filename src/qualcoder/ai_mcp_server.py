@@ -220,6 +220,13 @@ class AiMcpServer:
             return stamp
         return f"{text}\n\n{stamp}"
 
+    def _stamp_ai_model_if_ai_owned(self, memo: Any, owner: Any) -> str:
+        """Stamp only entities the AI Agent owns, never a human memo."""
+
+        if str(owner if owner is not None else "").strip() != self.AI_AGENT_OWNER:
+            return "" if memo is None else str(memo)
+        return self._stamp_ai_model(memo)
+
     def _merge_public_memo(self, existing_memo: Any, memo: Any) -> str:
         """Replace only the AI-visible memo text and preserve any private suffix."""
 
@@ -1851,7 +1858,8 @@ class AiMcpServer:
             old_name = str(code.get("name", ""))
             old_memo = str(code.get("memo", ""))
             new_name = old_name if not has_name else " ".join(str(arguments.get("name", "")).split()).strip()
-            new_memo = old_memo if not has_memo else self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            new_memo = old_memo if not has_memo else self._merge_public_memo(
+                old_memo, self._stamp_ai_model_if_ai_owned(arguments.get("memo", ""), code.get("owner")))
             if new_name == "":
                 raise ValueError("name must not be empty.")
             if new_name.casefold() != old_name.casefold():
@@ -1921,7 +1929,8 @@ class AiMcpServer:
                 raise ValueError(f"Text coding id {ctid} not found.")
 
             old_memo = str(coding.get("memo", ""))
-            new_memo = self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            new_memo = self._merge_public_memo(
+                old_memo, self._stamp_ai_model_if_ai_owned(arguments.get("memo", ""), coding.get("owner")))
             if new_memo == old_memo:
                 return {
                     "tool": "codes/update_text_coding",
