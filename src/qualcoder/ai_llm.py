@@ -234,7 +234,35 @@ def get_available_models(app, api_base: str, api_key: str) -> list:
             msg.deleteLater()
     return model_list
 
-def get_default_ai_models():
+def _parse_ai_models_ini(ini_string: str) -> list[dict[str, str]]:
+    """Parse AI profile definitions from an INI-formatted string.
+
+    Args:
+        ini_string: AI profile definitions using ``ai_model_`` sections.
+    """
+
+    config = configparser.ConfigParser()
+    config.read_string(ini_string)
+    ai_models = []
+    for section in config.sections():
+        if section.startswith('ai_model_'):
+            model = {
+                'name': section[9:],
+                'desc': config[section].get('desc', ''),
+                'access_info_url': config[section].get('access_info_url', ''),
+                'large_model': config[section].get('large_model', ''),
+                'large_model_context_window': config[section].get('large_model_context_window', '32768'),
+                'fast_model': config[section].get('fast_model', ''),
+                'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
+                'reasoning_effort': config[section].get('reasoning_effort', ''),
+                'api_base': config[section].get('api_base', ''),
+                'api_key': config[section].get('api_key', '')
+            }
+            ai_models.append(model)
+    return ai_models
+
+
+def get_default_ai_models() -> list[dict[str, str]]:
     ini_string = """
 [ai_model_OpenAI GPT5.6 reasoning]
 desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
@@ -396,26 +424,138 @@ api_base = http://localhost:11434/v1/
 api_key = <no API key needed>
 
     """
-    
-    config = configparser.ConfigParser()
-    config.read_string(ini_string)
-    ai_models = []
-    for section in config.sections():
-        if section.startswith('ai_model_'):
-            model = {
-                'name': section[9:],
-                'desc': config[section].get('desc', ''),
-                'access_info_url': config[section].get('access_info_url', ''),
-                'large_model': config[section].get('large_model', ''),
-                'large_model_context_window': config[section].get('large_model_context_window', '32768'),
-                'fast_model': config[section].get('fast_model', ''),
-                'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
-                'reasoning_effort': config[section].get('reasoning_effort', ''),
-                'api_base': config[section].get('api_base', ''),
-                'api_key': config[section].get('api_key', '')
-            }
-            ai_models.append(model)
-    return ai_models
+
+    return _parse_ai_models_ini(ini_string)
+
+
+def get_obsolete_ai_models() -> list[dict[str, str]]:
+    """Return historical default profiles that may be removed safely when unchanged."""
+
+    ini_string = """
+[ai_model_OpenAI GPT5.5 reasoning]
+desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.4-mini
+fast_model_context_window = 400000
+reasoning_effort = medium
+api_base =
+api_key =
+
+[ai_model_OpenAI GPT5.5 no reasoning]
+desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.4-mini
+fast_model_context_window = 400000
+reasoning_effort = low
+api_base =
+api_key =
+
+[ai_model_OpenAI_ChatGPT_Login GPT5.5]
+desc = Lets you use your ChatGPT Plus, Pro, or Team account with QualCoder.
+	No API key, no extra cost. Use the "Renew" button to authenticate your account.
+    Note that this is experimental, availability may vary.
+access_info_url = https://chatgpt.com/
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.5
+fast_model_context_window = 272000
+reasoning_effort = medium
+api_base = ChatGPT_OAuth
+api_key = <no API key needed>
+
+[ai_model_Blablador Huge]
+desc = The largest and most powerful model currently running on Blablador.
+    Availability might change.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-huge
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 128000
+reasoning_effort = default
+api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
+api_key =
+
+[ai_model_Anthropic Claude Opus 4.8]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-opus-4-8
+large_model_context_window = 1000000
+fast_model = claude-sonnet-5
+fast_model_context_window = 1000000
+reasoning_effort = medium
+api_base = https://api.anthropic.com/v1/
+api_key =
+
+[ai_model_Anthropic Claude Sonnet 5]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-sonnet-5
+large_model_context_window = 1000000
+fast_model = claude-sonnet-5
+fast_model_context_window = 1000000
+reasoning_effort = medium
+api_base = https://api.anthropic.com/v1/
+api_key =
+
+[ai_model_Google Gemini 3.5 Flash]
+desc = Google offers several free and paid models on their servers.
+	Select one in the Advanced AI options below.
+	You need an API-key from Google.
+access_info_url = https://ai.google.dev/gemini-api/docs
+large_model = gemini-3.5-flash
+large_model_context_window = 1000000
+fast_model = gemini-3.1-flash-lite
+fast_model_context_window = 1000000
+reasoning_effort = default
+api_base = https://generativelanguage.googleapis.com/v1beta/openai/
+api_key =
+
+[ai_model_Deepseek Chat V3]
+desc = Deepseek is a high quality Chinese chat model.
+	You will need an an API-key from Deepseek and have payed credits in your account.
+	Deepseek will charge a small amount for every use.
+access_info_url = https://platform.deepseek.com/api_keys
+large_model = deepseek-chat
+large_model_context_window = 64000
+fast_model = deepseek-chat
+fast_model_context_window = 64000
+reasoning_effort = default
+api_base = https://api.deepseek.com
+api_key =
+
+[ai_model_Ragarenn]
+desc = The University of Rennes is testing generative AI ("RAGaRenn")
+	since March 2024 to co-create usage guidelines with its staff. Using a
+	local infrastructure on Eskemm Data, it aims to assess resource needs,
+	carbon impact, and professional use cases.
+access_info_url = https://ragarenn.eskemm-numerique.fr/sso/ch@t/app
+large_model = ilaas/gemma-4-31b
+large_model_context_window = 32000
+fast_model = ilaas/mistral-small-4-119b
+fast_model_context_window = 32000
+reasoning_effort = default
+api_base = https://ragarenn.eskemm-numerique.fr/sso/ch@t/api
+api_key =
+    """
+
+    return _parse_ai_models_ini(ini_string)
+
 
 def add_new_ai_model(current_models: list, new_name: str) -> tuple[list, int]:
     """Adds a new AI profile to the list, sets some default values,
@@ -493,6 +633,28 @@ def _find_ai_model_index_by_name(models: list, model_name: str) -> int:
     return -1
 
 
+def _remove_obsolete_ai_models(current_models: list[dict[str, str]],
+                               current_model_index: int) -> tuple[list[dict[str, str]], int]:
+    """Remove unchanged obsolete profiles except for the selected profile.
+
+    Args:
+        current_models: AI profiles loaded from config.ini.
+        current_model_index: Index of the currently selected profile.
+    """
+
+    obsolete_models = get_obsolete_ai_models()
+    retained_models = []
+    adjusted_current_index = 0
+    for model_index, model in enumerate(current_models):
+        if model_index == current_model_index:
+            adjusted_current_index = len(retained_models)
+            retained_models.append(model)
+        elif model not in obsolete_models:
+            retained_models.append(model)
+    current_models[:] = retained_models
+    return current_models, adjusted_current_index
+
+
 def _parse_seen_ai_model_upgrade_offers(settings: dict | None) -> set[str]:
     """Return the set of one-time model-upgrade prompts that were already shown."""
 
@@ -548,6 +710,9 @@ def update_ai_models(current_models: list, current_model_index: int,
     if current_model_index < 0 or current_model_index > (len(current_models) - 1):
         current_model_index = 0
 
+    current_models, current_model_index = _remove_obsolete_ai_models(
+        current_models, current_model_index
+    )
     current_model_name = str(current_models[current_model_index].get('name', '')).strip()
     current_group_key = get_ai_profile_group_key(current_models[current_model_index])
 
