@@ -1547,10 +1547,11 @@ class AiMcpServer:
                     },
                 }
 
+            memo = self._stamp_ai_model(memo)
             cur.execute(
                 "INSERT INTO code_name (name, memo, catid, owner, date, color, supercid) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (name, self._stamp_ai_model(memo), catid, self.AI_AGENT_OWNER, now, color, supercid),
+                (name, memo, catid, self.AI_AGENT_OWNER, now, color, supercid),
             )
             cid = int(cur.lastrowid)
             conn.commit()
@@ -1646,9 +1647,10 @@ class AiMcpServer:
                     },
                 }
 
+            memo = self._stamp_ai_model(memo)
             cur.execute(
                 "INSERT INTO code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (cid, fid, seltext, pos0, pos1, self.AI_AGENT_OWNER, now, self._stamp_ai_model(memo)),
+                (cid, fid, seltext, pos0, pos1, self.AI_AGENT_OWNER, now, memo),
             )
             ctid = int(cur.lastrowid)
             conn.commit()
