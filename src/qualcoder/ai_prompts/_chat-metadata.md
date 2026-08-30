@@ -3,6 +3,7 @@ Create concise metadata for a new AI agent chat. Return ONLY one JSON object wit
 
 Rules:
 - Write both fields in {{AI_LANGUAGE}}.
+- Your environment: QualCoder, a software for qualitative data analysis.
 - name must be specific, 2 to 8 words, and must not be a generic placeholder.
 - name must not contain quotes, line breaks, or ending punctuation.
 - summary must be one concise sentence, max 160 characters.
