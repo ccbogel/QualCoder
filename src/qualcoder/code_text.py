@@ -3035,6 +3035,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.overlaps_at_pos = []
         self.overlaps_at_pos_idx = 0
+        if self.ai_search_message_shown:  # the editor holds a search message
+            return
         pos = self.ui.plainTextEdit.textCursor().position()
         for item in self.code_text:
             if item['pos0'] <= pos + self.file_['start'] <= item['pos1']:
@@ -4887,6 +4889,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
             return
+        if self.ai_search_message_shown:  # search message on screen, not the file text
+            Message(self.app, _('Warning'), _("Open a search result before coding"), "warning").exec()
+            return
         self.clear_edit_variables()
         item = self.ui.treeWidget.currentItem()
         if item is None:
@@ -6325,7 +6330,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_prompt = ui.current_prompt
             self.ai_search_ai_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
             # store the model id actually used, not only the profile label
-            self.ai_search_ai_model_id = self.app.ai.get_active_model_id()
+            try:
+                self.ai_search_ai_model_id = self.app.ai.get_active_model_id()
+            except Exception:
+                self.ai_search_ai_model_id = ''
 
             # Prepare the UI
             self.ai_search_running = True
