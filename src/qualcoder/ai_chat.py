@@ -2285,8 +2285,9 @@ class DialogAIChat(QtWidgets.QDialog):
             return heading
         safe_model = html_lib.escape(model_line)
         model_size = max(1, self.app.settings['fontsize'] - 1)
+        # plain label, matches the API field name and needs no translation
         heading += (f'<div style="font-size: {model_size}pt; opacity: 0.75;">'
-                    f'{_("model")}: {safe_model}</div>')
+                    f'model: {safe_model}</div>')
         return heading
 
     def _ai_agent_heading_html(self, author: str = '', chat_idx: Optional[int] = None,
