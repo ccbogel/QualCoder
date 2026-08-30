@@ -841,6 +841,193 @@ fast_model_context_window = 1
 reasoning_effort =
 api_base = http://localhost:11434/v1/
 api_key = <no API key needed>
+
+# Default profiles introduced in May 2024.
+[ai_model_OpenAI_GPT4]
+desc =
+access_info_url =
+large_model = gpt-4-turbo
+large_model_context_window = 32768
+fast_model = gpt-3.5-turbo
+fast_model_context_window = 32768
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_Blablador]
+desc =
+access_info_url =
+large_model = alias-large
+large_model_context_window = 32768
+fast_model = alias-fast
+fast_model_context_window = 32768
+reasoning_effort =
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key =
+
+# Context-window update from July 2024.
+[ai_model_OpenAI_GPT4]
+desc =
+access_info_url =
+large_model = gpt-4-turbo
+large_model_context_window = 131072
+fast_model = gpt-3.5-turbo
+fast_model_context_window = 32768
+reasoning_effort =
+api_base =
+api_key =
+
+# Expanded OpenAI defaults from July 2024.
+[ai_model_OpenAI_GPT4-turbo]
+desc =
+access_info_url =
+large_model = gpt-4-turbo
+large_model_context_window = 131072
+fast_model = gpt-3.5-turbo
+fast_model_context_window = 32768
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_OpenAI_GPT4o]
+desc =
+access_info_url =
+large_model = gpt-4o
+large_model_context_window = 131072
+fast_model = gpt-3.5-turbo
+fast_model_context_window = 32768
+reasoning_effort =
+api_base =
+api_key =
+
+# Profile descriptions and GPT-4o Mini update from July 2024.
+[ai_model_GPT-4-turbo]
+desc = The best model from OpenAI as of now for our purpose.
+	You will need an an API-key from OpenAI and have payed credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4-turbo
+large_model_context_window = 128000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_OpenAI_GPT4o]
+desc = Faster, cheaper, but slightly less powerful than GPT-4-turbo.
+	You will need an an API-key from OpenAI and have payed credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4o
+large_model_context_window = 128000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_Blablador]
+desc = A free and open source model (Mixtral 8x7B), excellent privacy,
+	albeit not as powerful as GPT-4.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. In order to gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-large
+large_model_context_window = 32768
+fast_model = alias-fast
+fast_model_context_window = 32768
+reasoning_effort =
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key =
+
+# Wording updates from December 2024.
+[ai_model_GPT-4-turbo]
+desc = The best model from OpenAI for now.
+	                You need an API-key from OpenAI and have paid for credits in your account.
+	                OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4-turbo
+large_model_context_window = 128000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_OpenAI_GPT4o]
+desc = Faster, cheaper, but slightly less powerful than GPT-4-turbo.
+	                You need an API-key from OpenAI and have paid for credits in your account.
+	                OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4o
+large_model_context_window = 128000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_Blablador]
+desc = A free and open source model (Mixtral 8x7B), excellent privacy,
+	but not as powerful as GPT-4.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-large
+large_model_context_window = 32768
+fast_model = alias-fast
+fast_model_context_window = 32768
+reasoning_effort =
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key =
+
+# GPT-4o became the default in February 2025.
+[ai_model_OpenAI_GPT4o]
+desc = Current default model from OpenAI, faster and cheaper than GPT4-turbo.
+	                You need an API-key from OpenAI and have paid for credits in your account.
+	                OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4o
+large_model_context_window = 128000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_GPT-4-turbo]
+desc = Classic model from OpenAI, still very capable.
+	                You need an API-key from OpenAI and have paid for credits in your account.
+	                OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4-turbo
+large_model_context_window = 128000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_Blablador]
+desc = A free and open source model, excellent privacy,
+	but not as powerful as GPT-4.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-large
+large_model_context_window = 32768
+fast_model = alias-fast
+fast_model_context_window = 32768
+reasoning_effort =
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key =
     """
 
     return _parse_ai_models_ini(ini_string)

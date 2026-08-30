@@ -32,9 +32,23 @@ class TestAiModelUpdates(TestCase):
         obsolete_snapshots = {tuple(sorted(model.items())) for model in self.obsolete_models}
         current_snapshots = {tuple(sorted(model.items())) for model in self.default_models}
 
-        self.assertEqual(30, len(self.obsolete_models))
+        self.assertEqual(44, len(self.obsolete_models))
         self.assertEqual(len(self.obsolete_models), len(obsolete_snapshots))
         self.assertTrue(obsolete_snapshots.isdisjoint(current_snapshots))
+
+    def test_gpt_35_era_profiles_are_in_obsolete_history(self):
+        """The earliest configurable profiles using GPT-3.5 are retained as snapshots."""
+
+        gpt_35_profiles = [
+            model for model in self.obsolete_models
+            if model['fast_model'] == 'gpt-3.5-turbo'
+        ]
+
+        self.assertEqual(4, len(gpt_35_profiles))
+        self.assertEqual(
+            {'OpenAI_GPT4', 'OpenAI_GPT4-turbo', 'OpenAI_GPT4o'},
+            {model['name'] for model in gpt_35_profiles},
+        )
 
     def test_unchanged_obsolete_profile_is_removed(self):
         """An unselected obsolete default is removed and the selection remains stable."""
