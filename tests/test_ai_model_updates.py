@@ -26,6 +26,16 @@ class TestAiModelUpdates(TestCase):
         self.default_models = get_default_ai_models()
         self.obsolete_models = get_obsolete_ai_models()
 
+    def test_obsolete_history_is_unique_and_excludes_current_defaults(self):
+        """Historical snapshots contain no duplicate or current profile definitions."""
+
+        obsolete_snapshots = {tuple(sorted(model.items())) for model in self.obsolete_models}
+        current_snapshots = {tuple(sorted(model.items())) for model in self.default_models}
+
+        self.assertEqual(30, len(self.obsolete_models))
+        self.assertEqual(len(self.obsolete_models), len(obsolete_snapshots))
+        self.assertTrue(obsolete_snapshots.isdisjoint(current_snapshots))
+
     def test_unchanged_obsolete_profile_is_removed(self):
         """An unselected obsolete default is removed and the selection remains stable."""
 
@@ -76,3 +86,13 @@ class TestAiModelUpdates(TestCase):
         self.assertEqual([expected_model], matching_models)
         self.assertEqual('Mistral', models[current_index]['name'])
 
+    def test_earlier_historical_profile_is_removed(self):
+        """An unchanged profile from an earlier model generation is removed."""
+
+        obsolete_model = copy.deepcopy(_find_model(self.obsolete_models, 'OpenAI GPT5.2 reasoning'))
+        selected_model = copy.deepcopy(_find_model(self.default_models, 'Mistral'))
+
+        models, current_index, _ = update_ai_models([obsolete_model, selected_model], 1)
+
+        self.assertIsNone(_find_model(models, 'OpenAI GPT5.2 reasoning'))
+        self.assertEqual('Mistral', models[current_index]['name'])

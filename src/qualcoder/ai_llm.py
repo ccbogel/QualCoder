@@ -235,30 +235,36 @@ def get_available_models(app, api_base: str, api_key: str) -> list:
     return model_list
 
 def _parse_ai_models_ini(ini_string: str) -> list[dict[str, str]]:
-    """Parse AI profile definitions from an INI-formatted string.
+    """Parse AI profiles while preserving sections with duplicate names.
 
     Args:
         ini_string: AI profile definitions using ``ai_model_`` sections.
     """
 
-    config = configparser.ConfigParser()
-    config.read_string(ini_string)
     ai_models = []
-    for section in config.sections():
-        if section.startswith('ai_model_'):
-            model = {
-                'name': section[9:],
-                'desc': config[section].get('desc', ''),
-                'access_info_url': config[section].get('access_info_url', ''),
-                'large_model': config[section].get('large_model', ''),
-                'large_model_context_window': config[section].get('large_model_context_window', '32768'),
-                'fast_model': config[section].get('fast_model', ''),
-                'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
-                'reasoning_effort': config[section].get('reasoning_effort', ''),
-                'api_base': config[section].get('api_base', ''),
-                'api_key': config[section].get('api_key', '')
-            }
-            ai_models.append(model)
+    section_pattern = re.compile(r'^\[ai_model_[^\]\r\n]+\][ \t]*$', re.MULTILINE)
+    section_starts = [match.start() for match in section_pattern.finditer(ini_string)]
+    for section_index, section_start in enumerate(section_starts):
+        if section_index + 1 < len(section_starts):
+            section_end = section_starts[section_index + 1]
+        else:
+            section_end = len(ini_string)
+        config = configparser.ConfigParser()
+        config.read_string(ini_string[section_start:section_end])
+        section = config.sections()[0]
+        model = {
+            'name': section[9:],
+            'desc': config[section].get('desc', ''),
+            'access_info_url': config[section].get('access_info_url', ''),
+            'large_model': config[section].get('large_model', ''),
+            'large_model_context_window': config[section].get('large_model_context_window', '32768'),
+            'fast_model': config[section].get('fast_model', ''),
+            'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
+            'reasoning_effort': config[section].get('reasoning_effort', ''),
+            'api_base': config[section].get('api_base', ''),
+            'api_key': config[section].get('api_key', '')
+        }
+        ai_models.append(model)
     return ai_models
 
 
@@ -552,6 +558,289 @@ fast_model_context_window = 32000
 reasoning_effort = default
 api_base = https://ragarenn.eskemm-numerique.fr/sso/ch@t/api
 api_key =
+
+[ai_model_Anthropic Claude]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-opus-4-20250514
+large_model_context_window = 200000
+fast_model = claude-sonnet-4-20250514
+fast_model_context_window = 200000
+reasoning_effort =
+api_base = https://api.anthropic.com/v1/
+api_key =
+
+[ai_model_Anthropic Claude Opus 4.1]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-opus-4-1
+large_model_context_window = 200000
+fast_model = claude-sonnet-4
+fast_model_context_window = 200000
+reasoning_effort =
+api_base = https://api.anthropic.com/v1/
+api_key =
+
+[ai_model_Anthropic Claude Sonnet 4.5]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-sonnet-4-5
+large_model_context_window = 200000
+fast_model = claude-sonnet-4-5
+fast_model_context_window = 200000
+reasoning_effort = medium
+api_base = https://api.anthropic.com/v1/
+api_key =
+
+[ai_model_Blablador]
+desc = Free and open source models, excellent privacy, but not as powerful
+	as the commercial offerings. Blablador runs on a server of the Helmholtz
+	Society, a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-large
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 32000
+reasoning_effort =
+api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
+api_key =
+
+[ai_model_Blablador Huge]
+desc = The largest and most powerful model currently running on Blablador.
+	Availability might change.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-huge
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 128000
+reasoning_effort =
+api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
+api_key =
+
+[ai_model_Deepseek Chat V3]
+desc = Deepseek is a high quality Chinese chat model.
+	You will need an an API-key from Deepseek and have payed credits in your account.
+	Deepseek will charge a small amount for every use.
+access_info_url = https://platform.deepseek.com/api_keys
+large_model = deepseek-chat
+large_model_context_window = 64000
+fast_model = deepseek-chat
+fast_model_context_window = 64000
+reasoning_effort =
+api_base = https://api.deepseek.com
+api_key =
+
+[ai_model_Google Gemini]
+desc = Google offers several free and paid models on their servers.
+	Select one in the Advanced AI options below.
+	You need an API-key from Google.
+access_info_url = https://ai.google.dev/gemini-api/docs
+large_model = gemini-2.5-flash
+large_model_context_window = 1000000
+fast_model = gemini-2.5-flash
+fast_model_context_window = 1000000
+reasoning_effort = default
+api_base = https://generativelanguage.googleapis.com/v1beta/openai/
+api_key =
+
+[ai_model_Mistral]
+desc = Mistral AI offers high-performance, open-source and proprietary language models, prioritizing transparency, privacy, and ethical AI for researchers and developers.
+access_info_url = https://mistral.ai
+large_model = mistral-large-latest
+large_model_context_window = 128000
+fast_model = mistral-small-latest
+fast_model_context_window = 128000
+reasoning_effort =
+api_base = https://api.mistral.ai/v1
+api_key =
+
+[ai_model_Ollama local AI]
+desc = Ollama is an open source server that lets you run LLMs locally on
+	your computer. To use it in QualCoder, you must have Ollama set up and
+	running first. Use the Advanced AI Options below to select between your
+	locally installed models.
+access_info_url = https://ollama.com
+large_model =
+large_model_context_window = 32000
+fast_model =
+fast_model_context_window = 32000
+reasoning_effort =
+api_base = http://localhost:11434/v1/
+api_key = <no API key needed>
+
+[ai_model_OpenAI ChatGPT Login]
+desc = Lets you use your ChatGPT Plus, Pro, or Team account with QualCoder.
+	No API key is needed, so no extra cost. Use the authentication controls
+	in the settings dialog. Note that this is experimental, availability
+	may vary.
+access_info_url = https://chatgpt.com/
+large_model = gpt-5.5
+large_model_context_window = 272000
+fast_model = gpt-5.5
+fast_model_context_window = 272000
+reasoning_effort = medium
+api_base = ChatGPT_OAuth
+api_key = <no API key needed>
+
+[ai_model_OpenAI GPT4.1]
+desc = Powerful and large model from OpenAI, for complex tasks.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4.1
+large_model_context_window = 1000000
+fast_model = gpt-4.1-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_OpenAI GPT5.1 no reasoning]
+desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-5.1
+large_model_context_window = 1000000
+fast_model = gpt-5-mini
+fast_model_context_window = 128000
+reasoning_effort = low
+api_base =
+api_key =
+
+[ai_model_OpenAI GPT5.1 reasoning]
+desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-5.1
+large_model_context_window = 1000000
+fast_model = gpt-5-mini
+fast_model_context_window = 128000
+reasoning_effort = medium
+api_base =
+api_key =
+
+[ai_model_OpenAI GPT5.2 no reasoning]
+desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-5.2
+large_model_context_window = 1000000
+fast_model = gpt-5-mini
+fast_model_context_window = 128000
+reasoning_effort = low
+api_base =
+api_key =
+
+[ai_model_OpenAI GPT5.2 reasoning]
+desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-5.2
+large_model_context_window = 1000000
+fast_model = gpt-5-mini
+fast_model_context_window = 128000
+reasoning_effort = medium
+api_base =
+api_key =
+
+[ai_model_OpenAI_GPT4o]
+desc = General use model from OpenAI, faster and cheaper than other options.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4o
+large_model_context_window = 1000000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+reasoning_effort =
+api_base =
+api_key =
+
+[ai_model_OpenRouter]
+desc = OpenRouter is a unified interface to access many different AI language
+	models, both free and paid. You need an API-key from OpenRouter.
+	Select a model in the Advanced AI Options below.
+access_info_url = https://openrouter.ai/
+large_model = deepseek/deepseek-chat:free
+large_model_context_window = 64000
+fast_model = deepseek/deepseek-chat:free
+fast_model_context_window = 64000
+reasoning_effort =
+api_base = https://openrouter.ai/api/v1
+api_key =
+
+[ai_model_Blablador]
+desc = Free and open source models, excellent privacy, but not as powerful
+	as the commercial offerings. Blablador runs on a server of the Helmholtz
+	Society, a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-large
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 32000
+reasoning_effort =
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key =
+
+[ai_model_Blablador Huge]
+desc = Llama 3.1 405b, very large and powerful. Availability might change.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-llama3-huge
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 128000
+reasoning_effort =
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key =
+
+[ai_model_Google Gemini]
+desc = Google offers several free and paid models on their servers.
+	Select one in the Advanced AI options below.
+	You need an API-key from Google.
+access_info_url = https://ai.google.dev/gemini-api/docs
+large_model = gemini-2.5-flash
+large_model_context_window = 1000000
+fast_model = gemini-2.5-flash
+fast_model_context_window = 1000000
+reasoning_effort =
+api_base = https://generativelanguage.googleapis.com/v1beta/openai/
+api_key =
+
+[ai_model_Ollama local AI]
+desc = Ollama is an open source server that lets you run LLMs locally on
+	your computer. To use it in QualCoder, you must have Ollama set up and
+	running first. Use the Advanced AI Options below to select between your
+	locally installed models.
+access_info_url = https://ollama.com
+large_model = test
+large_model_context_window = 1
+fast_model = test
+fast_model_context_window = 1
+reasoning_effort =
+api_base = http://localhost:11434/v1/
+api_key = <no API key needed>
     """
 
     return _parse_ai_models_ini(ini_string)
