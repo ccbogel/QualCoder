@@ -236,40 +236,40 @@ def get_available_models(app, api_base: str, api_key: str) -> list:
 
 def get_default_ai_models():
     ini_string = """
-[ai_model_OpenAI GPT5.5 reasoning]
+[ai_model_OpenAI GPT5.6 reasoning]
 desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.5
+large_model = gpt-5.6-sol
 large_model_context_window = 272000
-fast_model = gpt-5.4-mini
-fast_model_context_window = 400000
+fast_model = gpt-5.6-terra
+fast_model_context_window = 272000
 reasoning_effort = medium
 api_base = 
 api_key = 
 
-[ai_model_OpenAI GPT5.5 no reasoning]
+[ai_model_OpenAI GPT5.6 no reasoning]
 desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.5
+large_model = gpt-5.6-sol
 large_model_context_window = 272000
-fast_model = gpt-5.4-mini
-fast_model_context_window = 400000
+fast_model = gpt-5.6-terra
+fast_model_context_window = 272000
 reasoning_effort = low
 api_base = 
 api_key = 
 
-[ai_model_OpenAI_ChatGPT_Login GPT5.5]
+[ai_model_OpenAI_ChatGPT_Login GPT5.6]
 desc = Lets you use your ChatGPT Plus, Pro, or Team account with QualCoder.
 	No API key, no extra cost. Use the "Renew" button to authenticate your account.
     Note that this is experimental, availability may vary. 
 access_info_url = https://chatgpt.com/
-large_model = gpt-5.5
+large_model = gpt-5.6-sol
 large_model_context_window = 272000
-fast_model = gpt-5.5
+fast_model = gpt-5.6-terra
 fast_model_context_window = 272000
 reasoning_effort = medium
 api_base = ChatGPT_OAuth
@@ -288,33 +288,17 @@ fast_model = alias-fast
 fast_model_context_window = 32000
 reasoning_effort = default
 api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
-api_key = 
+api_key =  
 
-[ai_model_Blablador Huge]
-desc = The largest and most powerful model currently running on Blablador. 
-    Availability might change.
-	Blablador is free to use and runs on a server of the Helmholtz Society,
-	a large non-profit research organization in Germany. To gain
-	access and get an API-key, you have to identify yourself once with your
-	university, ORCID, GitHub, or Google account.
-access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
-large_model = alias-huge
-large_model_context_window = 128000
-fast_model = alias-fast
-fast_model_context_window = 128000
-reasoning_effort = default
-api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
-api_key = 
-
-[ai_model_Anthropic Claude Opus 4.8]
+[ai_model_Anthropic Claude Opus 5]
 desc = Claude is a family of high quality models from Anthropic.
 	You need an API-key from Anthropic and credits in your account.
 	Anthropic will charge a small amount for every use.
 access_info_url = https://console.anthropic.com/settings/keys
-large_model = claude-opus-4-8
+large_model = claude-opus-5
 large_model_context_window = 1000000
-fast_model = claude-sonnet-5
-fast_model_context_window = 1000000
+fast_model = claude-haiku-4-5-20251001
+fast_model_context_window = 200000
 reasoning_effort = medium
 api_base = https://api.anthropic.com/v1/
 api_key = 
@@ -326,18 +310,18 @@ desc = Claude is a family of high quality models from Anthropic.
 access_info_url = https://console.anthropic.com/settings/keys
 large_model = claude-sonnet-5
 large_model_context_window = 1000000
-fast_model = claude-sonnet-5
-fast_model_context_window = 1000000
+fast_model = claude-haiku-4-5-20251001
+fast_model_context_window = 200000
 reasoning_effort = medium
 api_base = https://api.anthropic.com/v1/
 api_key = 
 
-[ai_model_Google Gemini 3.5 Flash]
+[ai_model_Google Gemini 3.6 Flash]
 desc = Google offers several free and paid models on their servers.
 	Select one in the Advanced AI options below.
 	You need an API-key from Google.
 access_info_url = https://ai.google.dev/gemini-api/docs
-large_model = gemini-3.5-flash
+large_model = gemini-3.6-flash
 large_model_context_window = 1000000
 fast_model = gemini-3.1-flash-lite
 fast_model_context_window = 1000000
@@ -345,14 +329,14 @@ reasoning_effort = default
 api_base = https://generativelanguage.googleapis.com/v1beta/openai/
 api_key = 
 
-[ai_model_Deepseek Chat V3]
+[ai_model_Deepseek Chat V4]
 desc = Deepseek is a high quality Chinese chat model.
 	You will need an an API-key from Deepseek and have payed credits in your account.
 	Deepseek will charge a small amount for every use.
 access_info_url = https://platform.deepseek.com/api_keys
-large_model = deepseek-chat
+large_model = deepseek-v4-pro
 large_model_context_window = 64000
-fast_model = deepseek-chat
+fast_model = deepseek-v4-flash
 fast_model_context_window = 64000
 reasoning_effort = default
 api_base = https://api.deepseek.com
@@ -384,7 +368,7 @@ api_base = https://openrouter.ai/api/v1
 api_key = 
 
 [ai_model_Ragarenn]
-desc = The University of Rennes is testing generative AI ("RAGaRenn")
+desc = France only: The University of Rennes is testing generative AI ("RAGaRenn")
 	since March 2024 to co-create usage guidelines with its staff. Using a 
 	local infrastructure on Eskemm Data, it aims to assess resource needs,
 	carbon impact, and professional use cases. 
