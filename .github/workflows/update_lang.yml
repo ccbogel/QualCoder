@@ -2,6 +2,11 @@ name: Execute rebuild_lang.py
 
 on:
   workflow_dispatch:
+    inputs:
+      script_args:
+        description: "Arguments pour rebuild_lang.py (ex: --update --lang fr)"
+        required: false
+        default: "--update"
 
 jobs:
   run-script:
@@ -15,8 +20,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
-        run: pip install lxml polib
+      - name: Install Python dependencies
+        run: pip install lxml polib PyQt5
+
+      - name: Install gettext tools (xgettext, msgmerge)
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Install Qt tools (pylupdate5, lrelease)
+        run: sudo apt-get install -y qttools5-dev-tools
 
       - name: Execute rebuild_lang.py
-        run: python rebuild_lang.py --update
+        run: python rebuild_lang.py ${{ github.event.inputs.script_args }}
