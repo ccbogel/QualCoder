@@ -217,31 +217,36 @@ class AiMcpServer:
         return ""
 
     def _strip_ai_provenance(self, text: str) -> str:
-        """Remove a provenance block added by an earlier call."""
+        """Remove a provenance block added by an earlier call, in any language."""
 
-        marker = "\n\n**Coded by:**"
-        idx = text.find(marker)
-        if idx >= 0:
-            text = text[:idx]
-        label = "**AI interpretation:** "
-        if text.startswith(label):
-            text = text[len(label):]
-        return text.rstrip()
+        label_line = re.compile(r"^\*\*[^*\n]+:\*\* .*$")
+        parts = text.rsplit("\n\n", 1)
+        if len(parts) != 2:
+            return text.rstrip()
+        tail = [line for line in parts[1].splitlines() if line.strip() != ""]
+        if len(tail) == 0 or not all(label_line.match(line) for line in tail):
+            return text.rstrip()
+        body = parts[0]
+        # only now, the leading label is ours too
+        leading = re.match(r"^\*\*[^*\n]+:\*\* ", body)
+        if leading is not None:
+            body = body[leading.end():]
+        return body.rstrip()
 
     def _stamp_ai_model(self, memo: Any) -> str:
         """Rewrite a memo written by the AI Agent with its provenance block."""
 
         text = self._strip_ai_provenance("" if memo is None else str(memo))
-        block = f"**Coded by:** {self.AI_AGENT_OWNER}"
+        block = f'**{_("Coded by")}:** {self.AI_AGENT_OWNER}'
         profile = self._active_profile_name()
         if profile != "":
-            block += f"\n**AI profile:** {profile}"
+            block += f'\n**{_("AI profile")}:** {profile}'
         model_id = self._active_model_id()
         if model_id != "":
-            block += f"\n**AI model:** {model_id}"
+            block += f'\n**{_("AI model")}:** {model_id}'
         if text.strip() == "":
             return block
-        return f"**AI interpretation:** {text}\n\n{block}"
+        return f'**{_("AI interpretation")}:** {text}\n\n{block}'
 
     def _stamp_ai_model_if_ai_owned(self, memo: Any, owner: Any) -> str:
         """Stamp only entities the AI Agent owns, never a human memo."""
