@@ -206,19 +206,42 @@ class AiMcpServer:
         except Exception:
             return ""
 
-    def _stamp_ai_model(self, memo: Any) -> str:
-        """Append the model id to a memo written by the AI Agent."""
+    def _active_profile_name(self) -> str:
+        """Profile label the user gave the API entry."""
+        try:
+            model_idx = int(self.app.settings.get("ai_model_index", "-1"))
+            if 0 <= model_idx < len(self.app.ai_models):
+                return str(self.app.ai_models[model_idx].get("name", "")).strip()
+        except Exception:
+            pass
+        return ""
 
-        text = "" if memo is None else str(memo)
+    def _strip_ai_provenance(self, text: str) -> str:
+        """Remove a provenance block added by an earlier call."""
+
+        marker = "\n\n**Coded by:**"
+        idx = text.find(marker)
+        if idx >= 0:
+            text = text[:idx]
+        label = "**AI interpretation:** "
+        if text.startswith(label):
+            text = text[len(label):]
+        return text.rstrip()
+
+    def _stamp_ai_model(self, memo: Any) -> str:
+        """Rewrite a memo written by the AI Agent with its provenance block."""
+
+        text = self._strip_ai_provenance("" if memo is None else str(memo))
+        block = f"**Coded by:** {self.AI_AGENT_OWNER}"
+        profile = self._active_profile_name()
+        if profile != "":
+            block += f"\n**AI profile:** {profile}"
         model_id = self._active_model_id()
-        if model_id == "":
-            return text
-        stamp = f"{self.AI_AGENT_OWNER}, model: {model_id}"
-        if stamp in text:
-            return text
+        if model_id != "":
+            block += f"\n**AI model:** {model_id}"
         if text.strip() == "":
-            return stamp
-        return f"{text}\n\n{stamp}"
+            return block
+        return f"**AI interpretation:** {text}\n\n{block}"
 
     def _stamp_ai_model_if_ai_owned(self, memo: Any, owner: Any) -> str:
         """Stamp only entities the AI Agent owns, never a human memo."""
