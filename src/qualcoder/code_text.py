@@ -587,6 +587,21 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.ui.pushButton_ai_search.setEnabled(self._ai_menu_options_enabled())
 
+    def closeEvent(self, event):
+        """Cancel a running AI search so it does not block the next coding window."""
+
+        try:
+            if self.ai_search_running:
+                self.ai_search_running = False
+                try:
+                    self.ai_search_spinner_timer.stop()
+                except RuntimeError:
+                    pass
+            self._cancel_ai_search_scope(wait_ms=0)
+        except Exception as err:
+            logger.debug(f"Could not cancel AI search on close: {err}")
+        event.accept()
+
     def _ai_search_scope_id(self):
         return id(self)
 
@@ -603,6 +618,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def _show_ai_search_message(self, message=''):
         """Show a temporary search message instead of the file text."""
 
+        if not self._ai_search_ui_alive():  # window gone, nothing to show
+            return
         self.ai_search_message_shown = True
         self.ui.plainTextEdit.setPlainText(message)
         if getattr(self, 'eventFilterTT', None) is not None and self.file_ is not None:
@@ -6376,6 +6393,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if session_id is not None and int(session_id) != int(self.ai_search_session_id):
             return
+        if not self._ai_search_ui_alive():  # coding window closed while running
+            self.ai_search_running = False
+            return
         if self._ai_search_scope_status() == 'canceled':
             self.ai_search_running = False
             self._show_ai_search_message()
@@ -6674,6 +6694,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def scroll_text_into_view(self):
         """Scroll so the current selection is centered in the viewport."""
 
+        if not self._ai_search_ui_alive():  # deferred call, window may be gone
+            return
         editor = self.ui.plainTextEdit
         original_cursor = editor.textCursor()
         if not original_cursor.hasSelection():
