@@ -23,12 +23,12 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install lxml polib PyQt5
+          pip install PyQt5
 
       - name: Install system dependencies (gettext, Qt tools)
         run: |
           sudo apt-get update
-          sudo apt-get install -y gettext qttools5-dev-tools python3-lxml
+          sudo apt-get install -y gettext qttools5-dev-tools python3-lxml python3-polib
 
       - name: Add Qt tools to PATH
         run: |
