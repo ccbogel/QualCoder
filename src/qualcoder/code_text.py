@@ -76,6 +76,8 @@ class DialogCodeText(QtWidgets.QWidget):
     Trialled using setHtml for documents, but on marking text Html formatting was replaced, also
     on unmarking text, the unmark was not immediately cleared (needed to reload the file). """
 
+    ai_search_message_shown = False  # text view holds a search message, not file text
+
     def __init__(self, app, parent_textedit, tab_reports):
 
         super(DialogCodeText, self).__init__()
@@ -494,7 +496,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_found = False
         self.ai_search_analysis_counter = 0
         self.ai_search_session_id = 0
-        self.ai_search_message_shown = False  # text view holds a search message, not file text
+        self.ai_search_message_shown = False
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
