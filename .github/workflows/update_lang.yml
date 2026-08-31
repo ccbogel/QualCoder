@@ -15,5 +15,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install lxml
+        run: pip install lxml
+
       - name: Execute rebuild_lang.py
         run: python rebuild_lang.py --update
