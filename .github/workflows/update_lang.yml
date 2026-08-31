@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       script_args:
-        description: "Args"
+        description: "Arguments for rebuild_lang.py (e.g., --update)"
         required: false
         default: "--update"
 
@@ -20,15 +20,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install system dependencies (gettext, Qt tools)
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-deps lxml polib PyQt5
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gettext qttools5-dev-tools python3-lxml python3-polib
+          sudo apt-get install -y gettext qttools5-dev-tools
 
       - name: Add Qt tools to PATH
         run: |
           echo "/usr/lib/qt5/bin" >> $GITHUB_PATH
-          echo "/usr/bin" >> $GITHUB_PATH
-          
+
+      - name: Verify dependencies
+        run: |
+          python -c "from lxml import etree; print('lxml OK')"
+          python -c "import polib; print('polib OK')"
+          python -c "from PyQt5.QtCore import QCoreApplication; print('PyQt5 OK')"
+          which xgettext && echo "xgettext OK" || exit 1
+          which msgmerge && echo "msgmerge OK" || exit 1
+          which pylupdate5 && echo "pylupdate5 OK" || exit 1
+          which lrelease && echo "lrelease OK" || exit 1
+
       - name: Execute rebuild_lang.py
         run: python rebuild_lang.py ${{ github.event.inputs.script_args }}
