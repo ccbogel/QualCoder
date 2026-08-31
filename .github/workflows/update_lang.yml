@@ -15,17 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Required for git operations
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install system dependencies
+      - name: Install latest gettext and Qt tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y gettext qttools5-dev-tools
+          sudo apt-get install -y --upgrade gettext qttools5-dev-tools
 
       - name: Check gettext version
         run: xgettext --version
