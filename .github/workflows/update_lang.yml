@@ -15,22 +15,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required to fetch full history for git operations
+          fetch-depth: 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install lxml polib PyQt5
-
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gettext qttools5-dev-tools
+
+      - name: Check gettext version
+        run: xgettext --version
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install lxml polib PyQt5
 
       - name: Add Qt tools to PATH
         run: |
