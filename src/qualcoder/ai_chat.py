@@ -562,6 +562,7 @@ class DialogAIChat(QtWidgets.QDialog):
     current_streaming_chat_idx = -1
     chat_msg_list = [] 
     is_updating_chat_window = False
+    _chat_ai_model_snapshots = {}
     ai_semantic_search_chunks = []
     last_export_dir = ''
     # filenames = []
