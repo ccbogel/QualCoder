@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependances
+      - name: Install dependencies
         run: pip install lxml polib
 
       - name: Execute rebuild_lang.py
