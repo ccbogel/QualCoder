@@ -4972,12 +4972,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.ui.tabWidget.currentIndex() == 1:  # ai search
             ai_search_result = self.get_overlapping_ai_search_result()
             if ai_search_result is not None:
-                # fixed English labels: the memo is a provenance record, not UI text
-                memo = "**AI interpretation:** " + ai_search_result["interpretation"]
-                memo += "\n\n**AI search prompt:** " + prompt_name_and_scope(self.ai_search_prompt)
-                memo += "\n**AI profile:** " + str(self.ai_search_ai_model)
+                # labels are bold and translatable, the markup stays out of the catalog
+                memo = f'**{_("AI interpretation")}:** ' + ai_search_result["interpretation"]
+                memo += f'\n\n**{_("AI search prompt")}:** ' + prompt_name_and_scope(self.ai_search_prompt)
+                memo += f'\n**{_("AI profile")}:** ' + str(self.ai_search_ai_model)
                 if str(self.ai_search_ai_model_id).strip() != '':
-                    memo += "\n**AI model:** " + str(self.ai_search_ai_model_id).strip()
+                    memo += f'\n**{_("AI model")}:** ' + str(self.ai_search_ai_model_id).strip()
 
                 msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'
                 msg += _("Do you want to store the AI interpretation in a memo together with the coding?<br/><br/>")
