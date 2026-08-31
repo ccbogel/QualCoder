@@ -23,11 +23,22 @@ jobs:
       - name: Install Python dependencies
         run: pip install lxml polib PyQt5
 
-      - name: Install gettext tools (xgettext, msgmerge)
-        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Install gettext and Qt tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext qttools5-dev-tools
 
-      - name: Install Qt tools (pylupdate5, lrelease)
-        run: sudo apt-get install -y qttools5-dev-tools
+      - name: Verify tools are installed
+        run: |
+          which xgettext || echo "xgettext not found"
+          which msgmerge || echo "msgmerge not found"
+          which pylupdate5 || echo "pylupdate5 not found"
+          which lrelease || echo "lrelease not found"
+
+      - name: Add Qt tools to PATH
+        run: |
+          echo "/usr/lib/qt5/bin" >> $GITHUB_PATH
+          echo "/usr/bin" >> $GITHUB_PATH
 
       - name: Execute rebuild_lang.py
         run: python rebuild_lang.py ${{ github.event.inputs.script_args }}
