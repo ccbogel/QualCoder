@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-31 06:35+0000\n"
-"PO-Revision-Date: 2026-08-26 10:30+0200\n"
+"PO-Revision-Date: 2026-08-31 08:41+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 50.0\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/ai_mcp_server.py:433
 msgid "(unnamed category)"
@@ -8292,7 +8292,7 @@ msgstr "Dans : "
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:137
 msgid "Item"
-msgstr "élément"
+msgstr "Élément"
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:143
 msgid ""
@@ -8352,7 +8352,7 @@ msgstr "Fusionner"
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:281
 msgid "Merge failed, no changes were made. "
-msgstr "La fusion a échoué. Aucun changement n’a été apporté."
+msgstr "La fusion a échoué. Aucun changement n’a été apporté. "
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:283
 msgid "Merge failed"
@@ -8488,7 +8488,7 @@ msgstr "Journaux ignorés, noms déjà dans ce projet"
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:527
 msgid "Stored queries to add"
-msgstr "requêtes stockées à ajouter"
+msgstr "Requêtes stockées à ajouter"
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:530
 msgid "Attribute types to add"
@@ -8504,7 +8504,7 @@ msgstr "Résultat : "
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:546
 msgid "merged"
-msgstr "Fusionné"
+msgstr "fusionné"
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:546
 msgid "cancelled, no changes were made"
@@ -8601,7 +8601,7 @@ msgstr "Ajout de valeurs d’attributs pour les cas et les dossiers : n="
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1031
 msgid "Could not read the source project database."
-msgstr "Impossible de lire la base de données du projet source"
+msgstr "Impossible de lire la base de données du projet source."
 
 #: /home/runner/work/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1035
 msgid "Need to update the source project database."
