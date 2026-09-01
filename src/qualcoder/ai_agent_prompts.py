@@ -41,17 +41,20 @@ https://qualcoder.org/
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
 import os
 import re
-from typing import Any, Dict, List, Optional, Tuple
 import unicodedata
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
 import yaml
 
 
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
 PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", re.DOTALL)
+PROMPT_NAME_QT_PATTERN = r"[\p{L}\p{N}][\p{L}\p{N}\p{M}_-]{0,63}"
+PROMPT_FILENAME_MAX_BYTES = 255
 LEGACY_PROMPT_TYPE_FOLDERS = {
     "search": "search",
     "code_analysis": "code-analysis",
@@ -72,6 +75,80 @@ WINDOWS_RESERVED_FILENAMES = {
     "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
 }
 logger = logging.getLogger(__name__)
+
+
+def normalize_prompt_name_component(name: str) -> str:
+    """Return one trimmed prompt name component in Unicode NFC form."""
+
+    return unicodedata.normalize("NFC", str(name if name is not None else "").strip())
+
+
+def prompt_name_key(name: str) -> str:
+    """Return a normalization- and case-insensitive prompt name key."""
+
+    normalized_name = normalize_prompt_name_component(name)
+    return unicodedata.normalize("NFC", normalized_name.casefold())
+
+
+def _is_prompt_name_start_character(character: str) -> bool:
+    return unicodedata.category(character)[:1] in ("L", "N")
+
+
+def _is_prompt_name_character(character: str) -> bool:
+    return character in "_-" or unicodedata.category(character)[:1] in ("L", "M", "N")
+
+
+def prompt_name_fits_filesystem(name: str) -> bool:
+    """Return whether the complete Markdown filename fits the portable byte limit."""
+
+    return _name_component_fits_filesystem(name, suffix=".md")
+
+
+def prompt_folder_name_fits_filesystem(name: str) -> bool:
+    """Return whether a folder name fits the portable filesystem byte limit."""
+
+    return _name_component_fits_filesystem(name)
+
+
+def _name_component_fits_filesystem(name: str, suffix: str = "") -> bool:
+    """Return whether one encoded filesystem component fits the portable byte limit."""
+
+    normalized_name = normalize_prompt_name_component(name)
+    try:
+        return len((normalized_name + suffix).encode("utf-8")) <= PROMPT_FILENAME_MAX_BYTES
+    except UnicodeEncodeError:
+        return False
+
+
+def is_windows_reserved_prompt_name(name: str) -> bool:
+    """Return whether a prompt name is reserved as a Windows filename."""
+
+    return prompt_name_key(name) in WINDOWS_RESERVED_FILENAMES
+
+
+def is_valid_prompt_name(name: str) -> bool:
+    """Return whether a prompt name is portable and valid for explicit use."""
+
+    return _is_valid_name_component(name, suffix=".md")
+
+
+def is_valid_prompt_folder_name(name: str) -> bool:
+    """Return whether a prompt folder name is portable and valid for explicit use."""
+
+    return _is_valid_name_component(name)
+
+
+def _is_valid_name_component(name: str, suffix: str = "") -> bool:
+    """Return whether a prompt filesystem component follows the shared name rules."""
+
+    normalized_name = normalize_prompt_name_component(name)
+    return (
+        1 <= len(normalized_name) <= 64
+        and _is_prompt_name_start_character(normalized_name[0])
+        and all(_is_prompt_name_character(character) for character in normalized_name[1:])
+        and _name_component_fits_filesystem(normalized_name, suffix=suffix)
+        and not is_windows_reserved_prompt_name(normalized_name)
+    )
 
 
 @dataclass
@@ -196,41 +273,44 @@ class AiAgentPromptsCatalog:
         include_internal: bool = False,
         apply_init: bool = True,
     ) -> Optional[AgentPromptRecord]:
-        """Find one prompt variant by exact name and scope without deduplicating scopes."""
+        """Find one prompt variant by case-insensitive name and exact scope."""
 
         query_name = self._normalize_prompt_name(name)
+        query_key = self._conflict_key(query_name)
         query_scope = str(scope if scope is not None else "").strip()
         prompt_type = self._normalize_prompt_type(prompt_type)
-        if query_name == "" or query_scope == "":
+        if query_key == "" or query_scope == "":
             return None
         for prompt in self.list_prompt_variants(
             prompt_type=prompt_type,
             include_internal=include_internal,
             apply_init=apply_init,
         ):
-            if prompt.name == query_name and prompt.scope == query_scope:
+            if self._conflict_key(prompt.name) == query_key and prompt.scope == query_scope:
                 return prompt
         return None
 
     def get_prompt(self, name: str, include_internal: bool = False) -> Optional[AgentPromptRecord]:
-        """Resolve one explicit user-callable prompt by exact filename match."""
+        """Resolve one explicit user-callable prompt by case-insensitive name."""
 
         query = self._normalize_prompt_name(name)
-        if query == "":
+        query_key = self._conflict_key(query)
+        if query_key == "":
             return None
         for prompt in self.list_prompts(include_internal=include_internal):
-            if prompt.name == query:
+            if self._conflict_key(prompt.name) == query_key:
                 return prompt
         return None
 
     def get_internal_prompt(self, name: str) -> Optional[AgentPromptRecord]:
-        """Resolve one internal prompt by exact filename match."""
+        """Resolve one internal prompt by case-insensitive name."""
 
         query = self._normalize_prompt_name(name)
-        if query == "":
+        query_key = self._conflict_key(query)
+        if query_key == "":
             return None
         for prompt in self.list_prompts(include_internal=True):
-            if prompt.is_internal and prompt.name == query:
+            if prompt.is_internal and self._conflict_key(prompt.name) == query_key:
                 return prompt
         return None
 
@@ -357,7 +437,11 @@ class AiAgentPromptsCatalog:
         text = str(value if value is not None else "").strip()
         if text == "":
             return ""
-        parts = [part.strip() for part in text.replace("\\", "/").split("/") if part.strip() != ""]
+        parts: List[str] = []
+        for part in text.replace("\\", "/").split("/"):
+            normalized_part = normalize_prompt_name_component(part)
+            if normalized_part != "":
+                parts.append(normalized_part)
         return "/".join(parts)
 
     def relative_dir_of_prompt_path(self, relative_path: str) -> str:
@@ -570,17 +654,23 @@ class AiAgentPromptsCatalog:
         return value
 
     def _conflict_key(self, name: str) -> str:
-        return self._normalize_prompt_name(name).casefold()
+        return prompt_name_key(self._normalize_prompt_name(name))
 
     def _portable_path_key(self, path: str) -> str:
-        return os.path.normcase(os.path.normpath(path)).casefold()
+        normalized_path = os.path.normcase(os.path.normpath(path)).casefold()
+        return unicodedata.normalize("NFC", normalized_path)
 
     def _normalize_prompt_name(self, name: str) -> str:
         text = str(name if name is not None else "").strip()
         if text == "":
             return ""
         parts = re.split(r"[\\/]+", text)
-        return "/".join(part for part in parts if part != "")
+        normalized_parts: List[str] = []
+        for part in parts:
+            normalized_part = normalize_prompt_name_component(part)
+            if normalized_part != "":
+                normalized_parts.append(normalized_part)
+        return "/".join(normalized_parts)
 
     def _is_internal_prompt_name(self, name: str) -> bool:
         normalized_name = self._normalize_prompt_name(name)
@@ -621,19 +711,29 @@ class AiAgentPromptsCatalog:
         return result
 
     def _slugify_prompt_filename(self, name: str, max_length: int = 64) -> str:
-        """Convert one prompt name into a portable lowercase filename slug."""
+        """Convert one legacy prompt name into a portable Unicode filename."""
 
-        text = unicodedata.normalize("NFKD", str(name if name is not None else ""))
-        text = "".join(ch for ch in text if not unicodedata.combining(ch))
-        text = text.lower()
-        text = re.sub(r"[^a-z0-9]+", "-", text)
-        text = re.sub(r"-{2,}", "-", text).strip("-")
-        if text == "":
-            text = "prompt"
-        text = text[:max_length].rstrip("-")
-        if text == "":
-            text = "prompt"
-        if text in WINDOWS_RESERVED_FILENAMES:
+        source_name = normalize_prompt_name_component(name)
+        characters: List[str] = []
+        for character in source_name:
+            if len(characters) == 0:
+                if _is_prompt_name_start_character(character):
+                    characters.append(character)
+                continue
+            if _is_prompt_name_character(character):
+                characters.append(character)
+            elif characters[-1] != "-":
+                characters.append("-")
+
+        text = "".join(characters).rstrip("-")
+        truncated_text = ""
+        for character in text:
+            candidate = truncated_text + character
+            if len(candidate) > max_length or not prompt_name_fits_filesystem(candidate):
+                break
+            truncated_text = candidate
+        text = truncated_text.rstrip("-") or "prompt"
+        if is_windows_reserved_prompt_name(text):
             suffix = "-prompt"
             text = text[:max(1, max_length - len(suffix))].rstrip("-") + suffix
         return text

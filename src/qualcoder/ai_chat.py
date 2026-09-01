@@ -48,7 +48,12 @@ from PyQt6.QtGui import QCursor, QGuiApplication, QAction, QPalette, QShortcut, 
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
-from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
+from .ai_agent_prompts import (
+    AiAgentPromptsCatalog,
+    AgentPromptRecord,
+    prompt_name_and_scope,
+    prompt_name_key,
+)
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
 from .ai_search_dialog import DialogAiSearch
@@ -533,7 +538,7 @@ class PromptSlashReferenceHighlighter(QtGui.QSyntaxHighlighter):
             if not self.enabled_provider():
                 return
             prompt_names = {
-                str(prompt.name if prompt.name is not None else '').strip('/').casefold()
+                prompt_name_key(str(prompt.name if prompt.name is not None else '').strip('/'))
                 for prompt in self.records_provider()
             }
             prompt_names.discard('')
@@ -543,7 +548,7 @@ class PromptSlashReferenceHighlighter(QtGui.QSyntaxHighlighter):
 
         for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
             token = match.group(0).strip()
-            prompt_name = token[1:].rstrip('/.,;:!?').casefold()
+            prompt_name = prompt_name_key(token[1:].rstrip('/.,;:!?'))
             if prompt_name not in prompt_names:
                 continue
             fmt = QtGui.QTextCharFormat()
@@ -850,29 +855,26 @@ class DialogAIChat(QtWidgets.QDialog):
         normalized_parent = str(parent if parent is not None else '').strip('/')
         if normalized_full == '':
             return None
-        if normalized_parent == '':
-            if '/' in normalized_full:
+        full_parts = normalized_full.split('/')
+        parent_parts = normalized_parent.split('/') if normalized_parent != '' else []
+        if len(full_parts) != len(parent_parts) + 1:
+            return None
+        for index, parent_part in enumerate(parent_parts):
+            if prompt_name_key(full_parts[index]) != prompt_name_key(parent_part):
                 return None
-            return normalized_full
-        prefix = normalized_parent + '/'
-        if not normalized_full.startswith(prefix):
-            return None
-        remainder = normalized_full[len(prefix):]
-        if remainder == '' or '/' in remainder:
-            return None
-        return remainder
+        return full_parts[-1]
 
     def _matching_prompt_completion_items(self, prefix: str) -> List[Dict[str, Any]]:
         """Return direct matching categories and prompts for the current token."""
 
         self._refresh_prompt_completion_records()
         parent, leaf = self._split_prompt_completion_query(prefix)
-        normalized_leaf = leaf.casefold()
+        normalized_leaf = prompt_name_key(leaf)
         items: List[Dict[str, Any]] = []
 
         for category in self._iter_prompt_completion_categories():
             child_name = self._is_direct_prompt_completion_child(category, parent)
-            if child_name is None or not child_name.casefold().startswith(normalized_leaf):
+            if child_name is None or not prompt_name_key(child_name).startswith(normalized_leaf):
                 continue
             full_insert = '/' + category + '/'
             items.append(
@@ -888,7 +890,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         for prompt in self._prompt_completion_records:
             child_name = self._is_direct_prompt_completion_child(prompt.name, parent)
-            if child_name is None or not child_name.casefold().startswith(normalized_leaf):
+            if child_name is None or not prompt_name_key(child_name).startswith(normalized_leaf):
                 continue
             tooltip_lines = []
             if prompt.description != '':
@@ -1255,7 +1257,7 @@ class DialogAIChat(QtWidgets.QDialog):
         """Return known slash-callable prompt names for the current chat."""
 
         return {
-            str(prompt.name if prompt.name is not None else '').strip('/').casefold()
+            prompt_name_key(str(prompt.name if prompt.name is not None else '').strip('/'))
             for prompt in self._prompt_completion_records
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
@@ -1264,7 +1266,7 @@ class DialogAIChat(QtWidgets.QDialog):
         """Return prompt records keyed by normalized slash reference name."""
 
         return {
-            str(prompt.name if prompt.name is not None else '').strip('/').casefold(): prompt
+            prompt_name_key(str(prompt.name if prompt.name is not None else '').strip('/')): prompt
             for prompt in self._prompt_completion_records
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
@@ -1272,7 +1274,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _resolve_prompt_reference_name(self, prompt_name: str) -> Optional[AgentPromptRecord]:
         """Resolve a slash prompt reference, with chat-type-local fallback for analysis prompts."""
 
-        normalized = str(prompt_name if prompt_name is not None else '').strip('/').casefold()
+        normalized = prompt_name_key(str(prompt_name if prompt_name is not None else '').strip('/'))
         if normalized == '':
             return None
         records_by_name = self._prompt_reference_records_by_name()
@@ -1290,9 +1292,9 @@ class DialogAIChat(QtWidgets.QDialog):
         prefix = prefix_map.get(analysis_type, '')
         if prefix == '':
             return None
-        if normalized.startswith(prefix.casefold()):
+        if normalized.startswith(prompt_name_key(prefix)):
             return None
-        return records_by_name.get((prefix + normalized).casefold())
+        return records_by_name.get(prompt_name_key(prefix + normalized))
 
     def _prompt_reference_tooltip(self, prompt: AgentPromptRecord) -> str:
         """Build tooltip text for a recognized slash prompt reference."""
@@ -1320,7 +1322,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return None
         for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
             if match.start() <= char_pos <= match.end():
-                prompt_name = match.group(0)[1:].rstrip('/.,;:!?').casefold()
+                prompt_name = match.group(0)[1:].rstrip('/.,;:!?')
                 return self._resolve_prompt_reference_name(prompt_name)
         return None
 
@@ -1391,7 +1393,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         def replace_prompt_ref(match: re.Match) -> str:
             token = match.group(0)
-            prompt_name = token[1:].rstrip('/.,;:!?').casefold()
+            prompt_name = token[1:].rstrip('/.,;:!?')
             placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
             replacements[placeholder] = self._prompt_reference_html_span(
                 token,
@@ -1416,7 +1418,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
                     replacements[placeholder] = self._prompt_reference_html_span(
                         matched_label,
-                        records_by_label.get(matched_label.casefold()),
+                        records_by_label.get(prompt_name_key(matched_label)),
                         style_role=style_role,
                     )
                     return placeholder
@@ -2719,7 +2721,7 @@ class DialogAIChat(QtWidgets.QDialog):
         base_prompt = self.agent_prompts_catalog.get_internal_prompt(self._agent_base_prompt_name())
         if base_prompt is not None:
             for prompt in self.agent_prompts_catalog.expand_prompt_references([base_prompt], include_internal=True):
-                prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
+                prompt_key = prompt_name_key(prompt.name)
                 if prompt_key == "" or prompt_key in included_prompt_keys:
                     continue
                 included_prompt_keys.add(prompt_key)
@@ -2730,7 +2732,7 @@ class DialogAIChat(QtWidgets.QDialog):
         project_memo = extract_ai_memo(self.app.get_project_memo())
         if len(project_memo) > 0:
             for prompt in self.agent_prompts_catalog.resolve_prompt_references(project_memo):
-                prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
+                prompt_key = prompt_name_key(prompt.name)
                 if prompt_key == "" or prompt_key in included_prompt_keys:
                     continue
                 included_prompt_keys.add(prompt_key)
@@ -2823,7 +2825,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         loaded_prompts: List[AgentPromptRecord] = []
         for prompt in prompts:
-            prompt_key = str(prompt.name if prompt.name is not None else '').strip().casefold()
+            prompt_key = prompt_name_key(prompt.name)
             if prompt_key == '' or prompt_key in base_prompt_keys:
                 continue
             prompt_message = self._build_turn_prompt_message(prompt)
@@ -6257,7 +6259,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
                     continue
-                if prompt_name.casefold() in base_prompt_keys:
+                if prompt_name_key(prompt_name) in base_prompt_keys:
                     continue
                 msg_id = self._safe_message_id(msg)
                 prev_id = latest_prompt_ids.get(prompt_name, -1)
@@ -6407,7 +6409,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
                     continue
-                if prompt_name.casefold() in base_prompt_keys:
+                if prompt_name_key(prompt_name) in base_prompt_keys:
                     continue
                 msg_id = self._safe_message_id(msg)
                 if msg_id != latest_prompt_ids.get(prompt_name, -1):
