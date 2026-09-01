@@ -140,8 +140,8 @@ msgid ""
 "This menu is shown from the New button. Please use the New button at the "
 "bottom left."
 msgstr ""
-"Dieses Menü wird über die Schaltfläche „Neu“ angezeigt. Bitte verwenden Sie "
-"die Schaltfläche „Neu“ unten links."
+"Dieses Menü wird über die Schaltfläche „Neu“ aufgerufen. Verwenden Sie bitte"
+" die Schaltfläche „Neu“ unten links."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2145
 msgid "Unsupported AI Agent tab link target."
@@ -789,8 +789,8 @@ msgid ""
 "far?"
 msgstr ""
 "{step} hat das Zeitlimit von QualCoder erreicht. Möchten Sie die Reflexion "
-"beenden und aus den bisher gesammelten Ergebnissen eine vorläufige Antwort "
-"erstellen?"
+"beenden und anhand der bisher gesammelten Ergebnisse eine vorläufige Antwort"
+" erstellen?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7712
 #, python-brace-format, fuzzy
@@ -1828,7 +1828,7 @@ msgstr "Fall \"{name}\" wird aktualisiert..."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:532
 #, fuzzy, python-brace-format
 msgid "Updating document \"{name}\"..."
-msgstr "Dokument „{name}“ wird aktualisiert..."
+msgstr "Dokument \"{name}\" wird aktualisiert..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:542
 #, python-brace-format
@@ -1948,12 +1948,13 @@ msgid ""
 "'Prompt' and 'prompt' are treated as duplicates. Reserved Windows filenames "
 "such as CON, NUL, COM1, and LPT1 are not allowed."
 msgstr ""
-"Prompt-Namen dürfen Unicode-Buchstaben einschließlich Akzenten und Umlauten,"
-" Zahlen, Bindestriche und Unterstriche enthalten. Sie müssen mit einem "
-"Buchstaben oder einer Zahl beginnen und dürfen höchstens 64 Zeichen lang "
-"sein. Bei Namen wird nicht zwischen Groß- und Kleinschreibung unterschieden,"
-" sodass „Prompt“ und „prompt“ als Duplikate gelten. Für Windows reservierte "
-"Dateinamen wie CON, NUL, COM1 und LPT1 sind nicht zulässig."
+"Prompt-Namen dürfen Unicode-Buchstaben einschließlich Buchstaben mit "
+"Akzenten und Umlauten, Zahlen, Bindestriche und Unterstriche enthalten. Sie "
+"müssen mit einem Buchstaben oder einer Zahl beginnen und dürfen höchstens 64"
+" Zeichen lang sein. Bei Namen wird nicht zwischen Groß- und Kleinschreibung "
+"unterschieden, sodass „Prompt“ und „prompt“ als Duplikate gelten. Für "
+"Windows reservierte Dateinamen wie CON, NUL, COM1 und LPT1 sind nicht "
+"zulässig."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:213
 msgid "Create new prompt"
@@ -2709,7 +2710,7 @@ msgstr "Sollen die importierten Daten vorhandene Attribute überschreiben?"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\cases.py:451
 #, fuzzy
 msgid "Cases exist"
-msgstr "Fälle sind bereits vorhanden"
+msgstr "Fälle bereits vorhanden"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\cases.py:519
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\cases.py:603
@@ -3412,12 +3413,12 @@ msgstr "Verwenden Sie | zum Codieren mehrerer Texte"
 #, fuzzy
 msgid "Auto code the transcript with the current code for this text:"
 msgstr ""
-"Transkript mit dem aktuellen Code für diesen Text automatisch codieren:"
+"Das Transkript für diesen Text mit dem aktuellen Code automatisch kodieren:"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:530
 #, fuzzy
 msgid "Autocode transcript"
-msgstr "Transkript automatisch codieren"
+msgstr "Transkript automatisch kodieren"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:558
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3518
@@ -3436,7 +3437,7 @@ msgstr "Fehler bei der automatischen Kodierung: "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:567
 #, fuzzy
 msgid "Transcript coding: "
-msgstr "Transkriptcodierung: "
+msgstr "Transkriptkodierung: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:567
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3528
@@ -3487,7 +3488,7 @@ msgstr "Sprecher:innen markieren"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:597
 #, fuzzy
 msgid "codings"
-msgstr "Codierungen"
+msgstr "Kodierungen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:605
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3768
@@ -3909,7 +3910,7 @@ msgid ""
 "Add timestamps to the transcript, or untick Sync coding."
 msgstr ""
 "Die synchrone Kodierung ist aktiviert, aber das Transkript enthält keine Zeitstempel.\n"
-"Ohne Zeitstempel kann die Kodierung nicht zwischen Text und Wellenform gespiegelt werden (Textpositionen lassen sich nicht den Medienzeitpunkten zuordnen).\n"
+"Ohne Zeitstempel kann die Kodierung nicht zwischen Text und Wellenform gespiegelt werden (Textpositionen lassen sich nicht der Medienzeit zuordnen).\n"
 "Die Kodierung wurde normal, aber ohne Spiegelung gespeichert.\n"
 "Fügen Sie dem Transkript Zeitstempel hinzu oder deaktivieren Sie „Kodierung synchronisieren“."
 
@@ -3921,8 +3922,8 @@ msgid ""
 "repeat frames. Re-encoding it with denser keyframes gives precise "
 "navigation."
 msgstr ""
-"Die Keyframes in dieser Datei liegen etwa %s Sekunden auseinander. Daher "
-"kann die Navigation stocken oder Frames wiederholen. Eine Neukodierung mit "
+"Die Keyframes in dieser Datei liegen etwa %s Sekunden auseinander, sodass "
+"die Navigation stocken oder Frames wiederholen kann. Eine Neukodierung mit "
 "dichter gesetzten Keyframes ermöglicht eine präzise Navigation."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:2394
@@ -4661,8 +4662,8 @@ msgid ""
 "Click to fit and center the graph. In the graph, press + or W to zoom in, - "
 "or Q to zoom out."
 msgstr ""
-"Klicken, um die Grafik anzupassen und zu zentrieren. Drücken Sie in der "
-"Grafik + oder W zum Vergrößern und - oder Q zum Verkleinern."
+"Klicken, um den Graphen anzupassen und zu zentrieren. Drücken Sie im Graphen"
+" + oder W zum Vergrößern und - oder Q zum Verkleinern."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:128
 #, fuzzy
@@ -4680,7 +4681,7 @@ msgstr ""
 "SICHERN SIE DAS PROJEKT, bevor Sie Änderungen am Codebaum anwenden.\n"
 "Der Code Organisator wird hauptsächlich in der Grounded Theory verwendet und hilft Ihnen, Codierungskonzepte und ihre Hierarchie zu entwickeln und zu organisieren.\n"
 "Wählen Sie einen Codezweig oder Alle aus und klicken Sie dann mit der rechten Maustaste, um:\n"
-"Kategorien hinzuzufügen, Codes und Kategorien umzubenennen, Memos zu aktualisieren, Codes zusammenzuführen, Kategorien zusammenzuführen, Codes zu löschen oder Kategorien zu löschen.\n"
+"Kategorien hinzuzufügen, Codes und Kategorien umzubenennen, Memos zu aktualisieren, Codes und Kategorien zusammenzuführen sowie Codes und Kategorien zu löschen.\n"
 "Ziehen Sie einen Auswahlrahmen auf oder wählen Sie mit Strg+Klick mehrere Knoten aus. Klicken Sie dann mit der rechten Maustaste auf einen davon, um Gruppenaktionen auszuführen (löschen oder unter einem Code/einer Kategorie verknüpfen).\n"
 "Verschieben Sie die Arbeitsfläche durch Ziehen mit der mittleren Maustaste oder halten Sie die Leertaste gedrückt und ziehen Sie mit der linken Maustaste.\n"
 "\n"
@@ -4962,7 +4963,7 @@ msgstr "Kategorie "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1507
 #, fuzzy
 msgid "Apply changes to code tree"
-msgstr "Änderungen am Codebaum anwenden"
+msgstr "Änderungen auf den Codebaum anwenden"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1511
 #, fuzzy
@@ -4977,7 +4978,7 @@ msgstr "Keine Änderungen anzuwenden."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1568
 #, fuzzy
 msgid "Category name already in use: "
-msgstr "Kategoriename wird bereits verwendet: "
+msgstr "Kategorie-Name wird bereits verwendet: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1630
 #, fuzzy
@@ -5406,7 +5407,7 @@ msgstr "Es wurde keine Datei ausgewählt"
 #, fuzzy
 msgid "Text coding is disabled for this file. Re-import the PDF."
 msgstr ""
-"Die Textkodierung ist für diese Datei deaktiviert. Importieren Sie die PDF "
+"Die Textkodierung ist für diese Datei deaktiviert. Importieren Sie das PDF "
 "erneut."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2991
@@ -5717,7 +5718,7 @@ msgstr "Ausgewählten Text kopieren"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4300
 #, fuzzy
 msgid "Undo last unmark"
-msgstr "Letzte Aufhebung der Markierung rückgängig machen"
+msgstr "Letzte Markierungsaufhebung rückgängig machen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4302
 #, fuzzy
@@ -5752,7 +5753,7 @@ msgstr "Rand nach rechts verschieben"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4413
 #, fuzzy
 msgid "Go to page"
-msgstr "Zu Seite gehen"
+msgstr "Gehe zu Seite"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4322
 #, fuzzy
@@ -5782,7 +5783,7 @@ msgstr "Zu löschende Anmerkung auswählen"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4386
 #, fuzzy
 msgid "Select area to resize"
-msgstr "Bereich zum Ändern der Größe auswählen"
+msgstr "Bereich zur Größenänderung auswählen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4413
 #, fuzzy
@@ -5852,7 +5853,7 @@ msgstr "Annotieren"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5593
 #, fuzzy
 msgid "Text coding is disabled for this file."
-msgstr "Die Textkodierung ist für diese Datei deaktiviert."
+msgstr "Textkodierung ist für diese Datei deaktiviert."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5775
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:2279
@@ -5863,7 +5864,7 @@ msgstr "Dieser exakt kodierte Bereich existiert bereits."
 #, fuzzy
 msgid "The text extracted from this PDF does not match the imported text."
 msgstr ""
-"Der aus dieser PDF extrahierte Text stimmt nicht mit dem importierten Text "
+"Der aus diesem PDF extrahierte Text stimmt nicht mit dem importierten Text "
 "überein."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5791
@@ -5872,13 +5873,13 @@ msgid ""
 "This usually means the file was imported in an older QualCoder version using"
 " an older text method."
 msgstr ""
-"Dies bedeutet normalerweise, dass die Datei mit einer älteren QualCoder-"
-"Version und einer älteren Textextraktionsmethode importiert wurde."
+"Dies bedeutet normalerweise, dass die Datei in einer älteren QualCoder-"
+"Version mit einem älteren Verfahren zur Textextraktion importiert wurde."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5792
 #, fuzzy
 msgid "Restructure this file to the new method now?"
-msgstr "Diese Datei jetzt auf die neue Methode umstellen?"
+msgstr "Diese Datei jetzt auf das neue Verfahren umstellen?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5793
 #, fuzzy
@@ -5887,7 +5888,7 @@ msgid ""
 "case assignments will be adjusted to the new text method."
 msgstr ""
 "Der gespeicherte Text wird aktualisiert. Die Kodierungen (aller Codierer), "
-"Annotationen und Fallzuordnungen werden an die neue Textmethode angepasst."
+"Annotationen und Fallzuordnungen werden an das neue Textverfahren angepasst."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5795
 #, fuzzy
@@ -5896,7 +5897,7 @@ msgid ""
 "reported for review."
 msgstr ""
 "Segmente, die nicht genau gefunden werden können, behalten ihr "
-"ursprüngliches Zitat und werden zur Überprüfung gemeldet."
+"ursprüngliches Zitat und werden zur Überprüfung aufgeführt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5797
 #, fuzzy
@@ -5905,7 +5906,7 @@ msgid ""
 "coding and search can be performed."
 msgstr ""
 "Wenn Sie Nein wählen, bleibt die Textkodierung für diese Datei deaktiviert. "
-"Bildbereiche können kodiert und durchsucht werden."
+"Bildbereiche können kodiert und die Suche kann verwendet werden."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5800
 #, fuzzy
@@ -5921,7 +5922,8 @@ msgstr "Die Datei verwendet bereits dieses Layout."
 #, fuzzy
 msgid "Convert this PDF's stored text to the selected layout?"
 msgstr ""
-"Gespeicherten Text dieser PDF-Datei in das ausgewählte Layout konvertieren?"
+"Den gespeicherten Text dieser PDF-Datei in das ausgewählte Layout "
+"konvertieren?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5860
 #, fuzzy
@@ -5991,12 +5993,12 @@ msgstr "Fallverknüpfungen:"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5978
 #, fuzzy
 msgid "Relocated approximately, please review:"
-msgstr "Ungefähr neu positioniert, bitte überprüfen:"
+msgstr "Ungefähr neu positioniert, bitte prüfen:"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5983
 #, fuzzy
 msgid "... and more, see the log file."
-msgstr "... und weitere; siehe Protokolldatei."
+msgstr "... und weitere, siehe Protokolldatei."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5988
 #, fuzzy
@@ -6060,7 +6062,7 @@ msgstr "Originaldatei kann nicht geöffnet werden."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6082
 #, fuzzy
 msgid "Export highlighted PDF"
-msgstr "Hervorgehobene PDF exportieren"
+msgstr "PDF mit Hervorhebungen exportieren"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6092
 #, fuzzy
@@ -6068,14 +6070,14 @@ msgid ""
 "Text codings will be skipped: the extracted text is not ready or does not "
 "match the imported text. Only area codings will be exported."
 msgstr ""
-"Textkodierungen werden übersprungen: Der extrahierte Text ist nicht "
+"Textkodierungen werden übersprungen: Der extrahierte Text ist noch nicht "
 "verfügbar oder stimmt nicht mit dem importierten Text überein. Nur "
 "Bereichskodierungen werden exportiert."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6146
 #, fuzzy
 msgid "Highlighted PDF exported: "
-msgstr "Hervorgehobene PDF exportiert: "
+msgstr "Hervorgehobenes PDF exportiert: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6148
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6399
@@ -6483,10 +6485,9 @@ msgid ""
 "by character, the text extracted from the PDF pages, and the PDF coding view"
 " depends on that mapping."
 msgstr ""
-"Diese Datei ist eine PDF-Datei. Der darin gespeicherte Text kann nicht "
-"bearbeitet werden: Er entspricht Zeichen für Zeichen dem aus den PDF-Seiten "
-"extrahierten Text, und die PDF-Codieransicht ist von dieser Zuordnung "
-"abhängig."
+"Diese Datei ist eine PDF-Datei. Der gespeicherte Text kann nicht bearbeitet "
+"werden: Er entspricht Zeichen für Zeichen dem aus den PDF-Seiten "
+"extrahierten Text, und die PDF-Codieransicht basiert auf dieser Zuordnung."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5686
 #, fuzzy
@@ -6494,8 +6495,8 @@ msgid ""
 "To work with an editable copy of the text use Manage Files > 'Extract pdf "
 "text to new file'."
 msgstr ""
-"Um mit einer bearbeitbaren Kopie des Textes zu arbeiten, verwenden Sie "
-"Dateien verwalten > „PDF-Text in neue Datei extrahieren“."
+"Um mit einer bearbeitbaren Kopie des Textes zu arbeiten, wählen Sie Dateien "
+"verwalten > „PDF-Text in neue Datei extrahieren“."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6258
 msgid "Please finish editing the text before starting an AI search."
@@ -6811,13 +6812,14 @@ msgstr "Kategoriezweig"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:952
 #, fuzzy
 msgid "All categories and codes under this category will also be deleted."
-msgstr "Alle untergeordneten Kategorien und Codes werden ebenfalls gelöscht."
+msgstr ""
+"Alle Kategorien und Codes unter dieser Kategorie werden ebenfalls gelöscht."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:953
 #, fuzzy
 msgid "All codings made with these codes across all files will be deleted."
 msgstr ""
-"Alle mit diesen Codes vorgenommenen Codierungen werden in allen Dateien "
+"Alle mit diesen Codes erstellten Codierungen in sämtlichen Dateien werden "
 "gelöscht."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:954
@@ -6900,7 +6902,7 @@ msgstr "Name in Verwendung"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1122
 #, fuzzy
 msgid "is already in use"
-msgstr "ist bereits in Verwendung"
+msgstr "wird bereits verwendet"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1128
 msgid "Code renamed from: "
@@ -6961,7 +6963,7 @@ msgstr "Code verschoben."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1348
 #, fuzzy
 msgid "Move category: Select blank or category"
-msgstr "Kategorie verschieben: Leer oder Kategorie auswählen"
+msgstr "Kategorie verschieben: Leeres Feld oder Kategorie auswählen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1357
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1367
@@ -7989,7 +7991,7 @@ msgstr "Lesezeichen im Text für diese Audio-/Videodatei setzen"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:430
 #, fuzzy
 msgid "Open file and move to bookmarked text position"
-msgstr "Datei öffnen und zur markierten Textposition springen"
+msgstr "Datei öffnen und zur Textposition des Lesezeichens springen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:432
 msgid "Assign segment to currently selected code, and open memo for segment."
@@ -8886,7 +8888,7 @@ msgstr "Seiten werden konvertiert"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:1402
 #, fuzzy
 msgid "Skipped duplicate image: "
-msgstr "Dupliziertes Bild übersprungen: "
+msgstr "Doppeltes Bild übersprungen: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:1412
 msgid "Image loaded from pdf: "
@@ -9276,7 +9278,7 @@ msgstr "PDF kann nicht importiert werden"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3307
 #, fuzzy
 msgid "Damaged or unreadable PDF"
-msgstr "Beschädigte oder nicht lesbare PDF-Datei"
+msgstr "Beschädigte oder unlesbare PDF-Datei"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3313
 #, fuzzy
@@ -9760,8 +9762,8 @@ msgid ""
 "'Allow other applications on this computer to communicate with Zotero'."
 msgstr ""
 "- Aktivieren Sie die lokale API in Zotero: Einstellungen, Erweitert, "
-"Allgemein und wählen Sie „Anderen Anwendungen auf diesem Computer die "
-"Kommunikation mit Zotero erlauben“ aus."
+"Allgemein, und aktivieren Sie „Anderen Anwendungen auf diesem Computer die "
+"Kommunikation mit Zotero erlauben“."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:386
 #, fuzzy
@@ -9770,8 +9772,8 @@ msgid ""
 "extensions.zotero.httpServer.enabled to true."
 msgstr ""
 "- Falls Sie diese Option nicht finden: Öffnen Sie Einstellungen, Erweitert, "
-"Konfigurationseditor und setzen Sie extensions.zotero.httpServer.enabled auf"
-" true."
+"Konfigurationseditor, und setzen Sie extensions.zotero.httpServer.enabled "
+"auf true."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:388
 #, fuzzy
@@ -9791,7 +9793,7 @@ msgstr "Abgerufene Referenzen: "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:411
 #, fuzzy
 msgid "No references were found."
-msgstr "Es wurden keine Referenzen gefunden."
+msgstr "Keine Referenzen gefunden."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:418
 #, fuzzy
@@ -9801,12 +9803,12 @@ msgstr "Durchsuchte Anhänge: "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:483
 #, fuzzy
 msgid "No references were selected."
-msgstr "Es wurden keine Referenzen ausgewählt."
+msgstr "Keine Referenzen ausgewählt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:494
 #, fuzzy
 msgid "Importing references"
-msgstr "Referenzen importieren"
+msgstr "Referenzen werden importiert"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:553
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ris.py:575
@@ -10018,7 +10020,7 @@ msgstr "Kein QualCoder-Projekt"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:232
 #, fuzzy
 msgid "Reading the project to merge"
-msgstr "Einzufügendes Projekt wird eingelesen"
+msgstr "Zusammenzuführendes Projekt wird eingelesen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:235
 #, fuzzy
@@ -10169,12 +10171,12 @@ msgstr "Hinzuzufügende Textanmerkungen"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:499
 #, fuzzy
 msgid "Codings already in this project, not duplicated"
-msgstr "Bereits im Projekt vorhandene Codierungen, nicht dupliziert"
+msgstr "Bereits in diesem Projekt vorhandene Codierungen, nicht dupliziert"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:501
 #, fuzzy
 msgid "Codings skipped, missing code or file in the source project"
-msgstr "Codierungen übersprungen, Code oder Datei im Quellprojekt fehlt"
+msgstr "Codierungen übersprungen, Code oder Datei fehlt im Quellprojekt"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:513
 #, fuzzy
@@ -10184,12 +10186,12 @@ msgstr "Hinzuzufügende Fälle"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:514
 #, fuzzy
 msgid "Cases skipped, name already in this project"
-msgstr "Fälle übersprungen, Name bereits im Projekt vorhanden"
+msgstr "Fälle übersprungen, Name bereits in diesem Projekt vorhanden"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:515
 #, fuzzy
 msgid "Case file links to add"
-msgstr "Hinzuzufügende Fall-Dateiverknüpfungen"
+msgstr "Hinzuzufügende Verknüpfungen zwischen Fällen und Dateien"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:522
 #, fuzzy
@@ -10199,7 +10201,7 @@ msgstr "Hinzuzufügende Journale"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:523
 #, fuzzy
 msgid "Journals skipped, name already in this project"
-msgstr "Journale übersprungen, Name bereits im Projekt vorhanden"
+msgstr "Journale übersprungen, Name bereits in diesem Projekt vorhanden"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:527
 #, fuzzy
@@ -10229,7 +10231,7 @@ msgstr "zusammengeführt"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:546
 #, fuzzy
 msgid "cancelled, no changes were made"
-msgstr "abgebrochen, es wurden keine Änderungen vorgenommen"
+msgstr "abgebrochen, keine Änderungen vorgenommen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:580
 #, fuzzy
@@ -10259,7 +10261,7 @@ msgstr "Notizbuch hinzufügen: "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:709
 #, fuzzy
 msgid "Merging audio/video codings"
-msgstr "Zusammenführen von Audio/Video-Codierungen"
+msgstr "Audio/Video-Codierungen werden zusammengeführt"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:727
 msgid "Merging coded audio/video segments"
@@ -10277,7 +10279,7 @@ msgstr "Zusammenführung von Anmerkungen"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:751
 #, fuzzy
 msgid "Merging coded image and PDF areas"
-msgstr "Zusammenführen codierter Bild- und PDF-Bereiche"
+msgstr "Codierte Bild- und PDF-Bereiche werden zusammengeführt"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\merge_projects.py:766
 msgid "Merging coded image areas"
@@ -10359,7 +10361,7 @@ msgstr "In Textdatei umwandeln"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_preview.py:225
 #, fuzzy
 msgid "Create a new editable text file with a copy of this PDF's text"
-msgstr "Eine neue bearbeitbare Textdatei mit dem Text dieser PDF erstellen"
+msgstr "Neue bearbeitbare Textdatei mit einer Kopie des PDF-Texts erstellen"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_preview.py:228
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:788
@@ -10410,13 +10412,13 @@ msgstr "PDF-Anmerkungen:"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:420
 #, fuzzy
 msgid "PDF annotations added to file memo: "
-msgstr "PDF-Anmerkungen zur Dateinotiz hinzugefügt: "
+msgstr "PDF-Anmerkungen zum Dateimemo hinzugefügt: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:436
 #, fuzzy
 msgid "Underlined segments were detected in the imported PDF(s)."
 msgstr ""
-"In den importierten PDF-Dateien wurden unterstrichene Abschnitte erkannt."
+"In den importierten PDF-Dateien wurden unterstrichene Textstellen erkannt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:437
 #, fuzzy
@@ -10424,15 +10426,15 @@ msgid ""
 "Code those segments? A 'PDF Underlines' category will be created, with one "
 "code per colour (named and coloured after the closest QualCoder colour)."
 msgstr ""
-"Diese Abschnitte codieren? Die Kategorie „PDF-Unterstreichungen“ wird "
-"erstellt, mit einem Code pro Farbe (benannt und eingefärbt nach der "
+"Diese Textstellen codieren? Die Kategorie „PDF-Unterstreichungen“ wird mit "
+"einem Code pro Farbe erstellt (benannt und eingefärbt entsprechend der "
 "ähnlichsten QualCoder-Farbe)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:441
 #, fuzzy
 msgid "Highlighted segments were detected in the imported PDF(s)."
 msgstr ""
-"In den importierten PDF-Dateien wurden hervorgehobene Abschnitte erkannt."
+"In den importierten PDF-Dateien wurden hervorgehobene Textstellen erkannt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:442
 #, fuzzy
@@ -10441,9 +10443,9 @@ msgid ""
 "code per highlight colour (named and coloured after the closest QualCoder "
 "colour)."
 msgstr ""
-"Diese Abschnitte codieren? Die Kategorie „PDF-Hervorhebungen“ wird erstellt,"
-" mit einem Code pro Hervorhebungsfarbe (benannt und eingefärbt nach der "
-"ähnlichsten QualCoder-Farbe)."
+"Diese Textstellen codieren? Die Kategorie „PDF-Hervorhebungen“ wird mit "
+"einem Code pro Hervorhebungsfarbe erstellt (benannt und eingefärbt "
+"entsprechend der ähnlichsten QualCoder-Farbe)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:446
 #, fuzzy
@@ -10451,7 +10453,7 @@ msgid ""
 "Highlighted and underlined segments were detected in the imported PDF(s)."
 msgstr ""
 "In den importierten PDF-Dateien wurden hervorgehobene und unterstrichene "
-"Abschnitte erkannt."
+"Textstellen erkannt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:447
 #, fuzzy
@@ -10460,19 +10462,19 @@ msgid ""
 "be created, with one code per colour (named and coloured after the closest "
 "QualCoder colour)."
 msgstr ""
-"Diese Abschnitte codieren? Die Kategorien „PDF-Hervorhebungen“ und „PDF-"
-"Unterstreichungen“ werden erstellt, mit einem Code pro Farbe (benannt und "
-"eingefärbt nach der ähnlichsten QualCoder-Farbe)."
+"Diese Textstellen codieren? Die Kategorien „PDF-Hervorhebungen“ und „PDF-"
+"Unterstreichungen“ werden mit einem Code pro Farbe erstellt (benannt und "
+"eingefärbt entsprechend der ähnlichsten QualCoder-Farbe)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:457
 #, fuzzy
 msgid "Codes created from PDF highlight annotations"
-msgstr "Codes aus PDF-Hervorhebungsanmerkungen erstellt"
+msgstr "Aus PDF-Hervorhebungen erstellte Codes"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:458
 #, fuzzy
 msgid "Codes created from PDF underline annotations"
-msgstr "Codes aus PDF-Unterstreichungsanmerkungen erstellt"
+msgstr "Aus PDF-Unterstreichungen erstellte Codes"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\pdf_utils.py:508
 #, fuzzy
@@ -12962,9 +12964,9 @@ msgid ""
 "Without a group, the whole match is the name: ~\\w+: detects ~QknowSubject:\n"
 "Several markers on one line each start their own turn."
 msgstr ""
-"Das Muster kann an beliebiger Stelle in der Zeile übereinstimmen.\n"
-"Bei einer Erfassungsgruppe ist Gruppe 1 der Sprecher:innenname: ~(\\w+): erkennt QknowSubject\n"
-"Ohne Gruppe ist die gesamte Übereinstimmung der Name: ~\\w+: erkennt ~QknowSubject:\n"
+"Das Muster kann an jeder Stelle der Zeile übereinstimmen.\n"
+"Bei einer Capturing-Gruppe ist Gruppe 1 der Sprecher:innenname: ~(\\w+): erkennt QknowSubject\n"
+"Ohne Gruppe ist der gesamte Treffer der Name: ~\\w+: erkennt ~QknowSubject:\n"
 "Mehrere Markierungen in einer Zeile beginnen jeweils einen eigenen Redebeitrag."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:372
@@ -12989,8 +12991,8 @@ msgid ""
 "Click a format name to use only that one. Click its checkbox to add or remove it\n"
 "from a combination. Check 'Custom (regex)' to add your own pattern to the mix."
 msgstr ""
-"Klicken Sie auf einen Formatnamen, um nur dieses Format zu verwenden. Aktivieren oder deaktivieren Sie das Kontrollkästchen,\n"
-"um das Format zu einer Kombination hinzuzufügen oder daraus zu entfernen. Aktivieren Sie „Benutzerdefiniert (Regex)“, um ein eigenes Muster hinzuzufügen."
+"Klicken Sie auf einen Formatnamen, um nur dieses Format zu verwenden. Klicken Sie auf das zugehörige Kontrollkästchen, um es\n"
+"einer Kombination hinzuzufügen oder daraus zu entfernen. Aktivieren Sie „Benutzerdefiniert (Regex)“, um ein eigenes Muster hinzuzufügen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:610
 msgid "Mark Speakers"
@@ -13182,7 +13184,7 @@ msgid ""
 "Inline codes (';' in the marker) apply PER SEGMENT and are editable; right click one to copy it to all segments or promote it to the whole row."
 msgstr ""
 "Markierte Segmente werden codiert. Entfernen Sie die Markierung bei Segmenten, die übersprungen werden sollen.\n"
-"Inline-Codes (';' in der Markierung) gelten JE SEGMENT und können bearbeitet werden. Klicken Sie mit der rechten Maustaste auf einen Code, um ihn in alle Segmente zu kopieren oder für die gesamte Zeile zu übernehmen."
+"Inline-Codes (';' in der Markierung) gelten PRO SEGMENT und können bearbeitet werden. Klicken Sie mit der rechten Maustaste auf einen Code, um ihn in alle Segmente zu kopieren oder für die gesamte Zeile zu übernehmen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1643
 #, fuzzy
@@ -13200,9 +13202,9 @@ msgid ""
 "Codes applied to THIS segment only, ';'-separated. Edit freely: the changes "
 "are used when the main dialog is accepted."
 msgstr ""
-"Codes, die NUR für dieses Segment gelten, getrennt durch ';'. Sie können "
-"frei bearbeitet werden; die Änderungen werden beim Bestätigen des "
-"Hauptdialogs übernommen."
+"Codes, die NUR für dieses Segment gelten, getrennt durch ';'. Sie können sie"
+" frei bearbeiten; die Änderungen werden beim Bestätigen des Hauptdialogs "
+"übernommen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1748
 #, fuzzy
@@ -13212,7 +13214,7 @@ msgstr "Diese Inline-Codes in ALLE Segmente kopieren"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1749
 #, fuzzy
 msgid "Promote to Additional codes (whole row)"
-msgstr "Zu zusätzlichen Codes hochstufen (gesamte Zeile)"
+msgstr "Als zusätzliche Codes übernehmen (gesamte Zeile)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1750
 #, fuzzy
@@ -13232,8 +13234,8 @@ msgid ""
 "Use those existing codes, or create new codes under Speakers with a numeric "
 "suffix, e.g. \"{}\"?"
 msgstr ""
-"Vorhandene Codes verwenden oder unter „Sprecher:innen“ neue Codes mit einem "
-"numerischen Suffix erstellen, z. B. „{}“?"
+"Diese vorhandenen Codes verwenden oder unter „Sprecher:innen“ neue Codes mit"
+" einem numerischen Suffix erstellen, z. B. „{}“?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1842
 #, fuzzy
@@ -13243,7 +13245,7 @@ msgstr "Vorhandene Codes verwenden"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1843
 #, fuzzy
 msgid "Create new (suffix)"
-msgstr "Neu erstellen (Suffix)"
+msgstr "Neue Codes erstellen (Suffix)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1858
 msgid "This contains all the speakers that have been marked in documents."
@@ -13522,8 +13524,8 @@ msgstr ""
 #, fuzzy
 msgid "It is best to edit text before ANY coding has been applied."
 msgstr ""
-"Der Text sollte möglichst bearbeitet werden, bevor IRGENDETWAS codiert "
-"wurde."
+"Der Text sollte möglichst bearbeitet werden, bevor JEGLICHE Codierung "
+"vorgenommen wurde."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:169
 #, fuzzy
@@ -13531,7 +13533,7 @@ msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
 "coded) and underlined (coded)."
 msgstr ""
-"Vermeiden Sie es, Textabschnitte auszuwählen, die sowohl nicht "
+"Vermeiden Sie die Auswahl von Textabschnitten, die sowohl nicht "
 "unterstrichenen (nicht codierten) als auch unterstrichenen (codierten) Text "
 "enthalten."
 
@@ -13541,15 +13543,14 @@ msgid ""
 "Positions of the underlying codes / annotations / case-assigned may be "
 "incorrect if text is typed over or deleted."
 msgstr ""
-"Die Positionen der zugrunde liegenden Codes / Annotationen / Fallzuweisungen"
-" können fehlerhaft sein, wenn Text überschrieben oder gelöscht wird."
+"Die Positionen der zugehörigen Codes / Annotationen / Fallzuweisungen können"
+" fehlerhaft sein, wenn Text überschrieben oder gelöscht wird."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:172
 #, fuzzy
 msgid "Auto-save: Text changes are automatically saved every 20 seconds."
 msgstr ""
-"Automatisches Speichern: Textänderungen werden alle 20 Sekunden automatisch "
-"gespeichert."
+"Automatisches Speichern: Textänderungen werden alle 20 Sekunden gespeichert."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:272
 #, fuzzy
@@ -13933,7 +13934,7 @@ msgstr "Keine Kategorien"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:338
 #, fuzzy
 msgid "No categories linked to codes in this item."
-msgstr "Keine mit Codes in diesem Element verknüpften Kategorien."
+msgstr "Keine Kategorien sind mit Codes in diesem Element verknüpft."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:345
 #, fuzzy
@@ -14152,7 +14153,7 @@ msgstr "Häufigkeiten anzeigen"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:2602
 #, fuzzy
 msgid "Connect to..."
-msgstr "Verbinden mit..."
+msgstr "Verbinden mit …"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:2605
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:7148
@@ -14385,7 +14386,7 @@ msgstr "Diagrammbeschreibung"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4484
 #, fuzzy
 msgid "Node counts by type"
-msgstr "Anzahl der Knoten nach Typ"
+msgstr "Knotenanzahl nach Typ"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4500
 #, fuzzy
@@ -14401,7 +14402,7 @@ msgstr "(Kategorie im Diagramm nicht angezeigt)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4542
 #, fuzzy
 msgid "Category to code hierarchy (graph subset)"
-msgstr "Hierarchie von Kategorien und Codes (Diagrammausschnitt)"
+msgstr "Kategorie-Code-Hierarchie (Diagrammausschnitt)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4553
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4810
@@ -14511,7 +14512,7 @@ msgstr "Keine Codeknoten im Diagramm vorhanden."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4825
 #, fuzzy
 msgid "Software citation:"
-msgstr "Software-Zitation:"
+msgstr "Software zitieren:"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4835
 #, fuzzy
@@ -14556,7 +14557,7 @@ msgid ""
 msgstr ""
 "Das Diagramm enthält keine Knoten oder Elemente.\n"
 "\n"
-"Durch die Aktualisierung wird '"
+"Bei einer Aktualisierung wird '"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4907
 #, fuzzy
@@ -15047,12 +15048,12 @@ msgstr "Diese Linie ausblenden?"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:85
 #, fuzzy
 msgid "1. Category hierarchical"
-msgstr "1. Hierarchisch nach Kategorie"
+msgstr "1. Kategoriehierarchie"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:86
 #, fuzzy
 msgid "2. File hierarchical"
-msgstr "2. Hierarchisch nach Datei"
+msgstr "2. Dateihierarchie"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:87
 #, fuzzy
@@ -15062,7 +15063,7 @@ msgstr "3. Dateivergleich (2 Dateien)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:88
 #, fuzzy
 msgid "4. Case hierarchical"
-msgstr "4. Hierarchisch nach Fall"
+msgstr "4. Fallhierarchie"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:89
 #, fuzzy
@@ -15099,7 +15100,7 @@ msgstr "Nach einem Klick auf „Erzeugen“ wählen Sie 2 Dateien aus."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:265
 #, fuzzy
 msgid "Co-occurrence types:"
-msgstr "Kookkurrenztypen:"
+msgstr "Arten der Kookkurrenz:"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:266
 #, fuzzy
@@ -15275,9 +15276,8 @@ msgid ""
 "a central phenomenon."
 msgstr ""
 "Beziehungen, die aus dem Paradigmenmodell des axialen Kodierens nach Strauss"
-" & Corbin abgeleitet sind. Sie werden beim offenen, axialen und selektiven "
-"Kodieren verwendet, um die Struktur rund um ein zentrales Phänomen "
-"darzustellen."
+" & Corbin abgeleitet sind. Sie dienen beim offenen, axialen und selektiven "
+"Kodieren dazu, die Struktur rund um ein zentrales Phänomen darzustellen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:269
 #, fuzzy
@@ -15295,7 +15295,7 @@ msgid ""
 "Moustakas' transcendental phenomenology and van Manen's hermeneutic "
 "phenomenology."
 msgstr ""
-"Beziehungen zur Darstellung der Struktur gelebter Erfahrung nach der "
+"Beziehungen zur Darstellung der Struktur gelebter Erfahrungen nach der "
 "transzendentalen Phänomenologie von Moustakas und der hermeneutischen "
 "Phänomenologie von van Manen."
 
@@ -15307,8 +15307,8 @@ msgid ""
 " researcher in generating themes."
 msgstr ""
 "Beziehungen für die reflexive thematische Analyse nach dem sechsstufigen "
-"Ansatz von Braun und Clarke. Betont die Reflexivität und die aktive Rolle "
-"der Forschenden bei der Entwicklung von Themen."
+"Ansatz von Braun und Clarke. Betont die Reflexivität der Forschenden und "
+"ihre aktive Rolle bei der Entwicklung von Themen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:277
 #, fuzzy
@@ -15318,8 +15318,8 @@ msgid ""
 "relations, and subject positions."
 msgstr ""
 "Beziehungen für die Kritische Diskursanalyse (Fairclough) und die "
-"Foucaultsche Diskursanalyse. Im Mittelpunkt steht, wie Sprache soziale "
-"Wirklichkeit, Machtverhältnisse und Subjektpositionen konstruiert."
+"Foucaultsche Diskursanalyse. Der Schwerpunkt liegt darauf, wie Sprache "
+"soziale Wirklichkeit, Machtverhältnisse und Subjektpositionen konstruiert."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:280
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:959
@@ -15340,7 +15340,7 @@ msgstr "(Keine Bezeichnung)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:284
 #, fuzzy
 msgid "is associated with"
-msgstr "ist verbunden mit"
+msgstr "steht in Beziehung zu"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:285
 #, fuzzy
@@ -15570,7 +15570,7 @@ msgstr "steht in intertextuellem Bezug zu"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:330
 #, fuzzy
 msgid "positions subject as"
-msgstr "positioniert Subjekt als"
+msgstr "positioniert das Subjekt als"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:331
 #, fuzzy
@@ -15621,8 +15621,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:341
 #, fuzzy
 msgid "Subsumption: one concept is a type or instance of another."
-msgstr ""
-"Subsumtion: Ein Konzept ist ein Typ oder eine Ausprägung eines anderen."
+msgstr "Subsumtion: Ein Konzept ist ein Typ oder eine Instanz eines anderen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:342
 #, fuzzy
@@ -15717,13 +15716,12 @@ msgstr ""
 msgid "One category is subsumed under or elaborates a higher-order category."
 msgstr ""
 "Eine Kategorie ist einer übergeordneten Kategorie untergeordnet oder "
-"differenziert sie aus."
+"differenziert diese aus."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:356
 #, fuzzy
 msgid "Two concepts co-occur without specified directionality."
-msgstr ""
-"Zwei Konzepte treten gemeinsam auf, ohne dass eine Richtung angegeben ist."
+msgstr "Zwei Konzepte treten gemeinsam auf, ohne festgelegte Richtung."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:357
 #, fuzzy
@@ -15755,7 +15753,8 @@ msgstr ""
 #, fuzzy
 msgid "Two categories share some coded segments or meaning."
 msgstr ""
-"Zwei Kategorien teilen einige codierte Segmente oder Bedeutungsinhalte."
+"Zwei Kategorien haben einige codierte Segmente oder Bedeutungsinhalte "
+"gemeinsam."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:363
 #, fuzzy
@@ -15778,7 +15777,7 @@ msgstr "Eine Kategorie erfasst den Kern mehrerer untergeordneter Kategorien."
 #, fuzzy
 msgid "One category clarifies the meaning of another through context."
 msgstr ""
-"Eine Kategorie verdeutlicht die Bedeutung einer anderen durch den Kontext."
+"Eine Kategorie verdeutlicht durch den Kontext die Bedeutung einer anderen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:367
 #, fuzzy
@@ -15805,7 +15804,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:371
 #, fuzzy
 msgid "A meaning unit that bounds or delimits the experience."
-msgstr "Eine Bedeutungseinheit, welche die Erfahrung begrenzt oder abgrenzt."
+msgstr "Eine Bedeutungseinheit, die die Erfahrung begrenzt oder abgrenzt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:372
 #, fuzzy
@@ -15818,7 +15817,7 @@ msgstr ""
 msgid ""
 "The experience manifests through bodily sensation or corporeal presence."
 msgstr ""
-"Die Erfahrung äußert sich durch körperliche Empfindung oder leibliche "
+"Die Erfahrung äußert sich durch körperliche Empfindungen oder leibliche "
 "Präsenz."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:374
@@ -15829,18 +15828,18 @@ msgstr "Die Erfahrung findet in einem bestimmten räumlichen Kontext statt."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:375
 #, fuzzy
 msgid "The experience unfolds within subjective time."
-msgstr "Die Erfahrung entfaltet sich innerhalb der subjektiven Zeit."
+msgstr "Die Erfahrung entfaltet sich in der subjektiven Zeit."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:376
 #, fuzzy
 msgid "The experience involves connection with others."
-msgstr "Die Erfahrung beinhaltet eine Verbindung mit anderen."
+msgstr "Die Erfahrung beinhaltet eine Verbindung zu anderen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:377
 #, fuzzy
 msgid "One meaning unit participates in constructing a broader theme."
 msgstr ""
-"Eine Bedeutungseinheit wirkt an der Bildung eines übergeordneten Themas mit."
+"Eine Bedeutungseinheit trägt zur Bildung eines übergeordneten Themas bei."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:378
 #, fuzzy
@@ -15857,12 +15856,14 @@ msgstr "Ein vorläufiges Thema, das verwandte Codes gruppiert."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:380
 #, fuzzy
 msgid "A theme nested within a broader overarching theme."
-msgstr "Ein Thema, das in ein breiteres übergeordnetes Thema eingebettet ist."
+msgstr ""
+"Ein Thema, das in ein umfassenderes übergeordnetes Thema eingebettet ist."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:381
 #, fuzzy
 msgid "Two themes share codes or meaning territory."
-msgstr "Zwei Themen teilen Codes oder Bedeutungsbereiche."
+msgstr ""
+"Zwei Themen überschneiden sich in ihren Codes oder Bedeutungsbereichen."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:382
 #, fuzzy
@@ -15872,13 +15873,13 @@ msgstr "Eine nach der Überprüfung überarbeitete Version eines Themas."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:383
 #, fuzzy
 msgid "The 'essence' or core meaning of a theme."
-msgstr "Die „Essenz“ oder Kernaussage eines Themas."
+msgstr "Die „Essenz“ oder Kernbedeutung eines Themas."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:384
 #, fuzzy
 msgid "A vivid data extract that captures the theme."
 msgstr ""
-"Ein anschaulicher Datenauszug, der das Thema treffend veranschaulicht."
+"Ein anschaulicher Datenauszug, der das Thema prägnant zum Ausdruck bringt."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:385
 #, fuzzy
@@ -15926,7 +15927,7 @@ msgstr ""
 #, fuzzy
 msgid "One text draws on, references, or transforms another text."
 msgstr ""
-"Ein Text greift einen anderen Text auf, verweist darauf oder transformiert "
+"Ein Text greift einen anderen Text auf, verweist auf ihn oder transformiert "
 "ihn."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:393
@@ -15948,7 +15949,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:396
 #, fuzzy
 msgid "One statement takes another as given or assumed."
-msgstr "Eine Aussage setzt eine andere als gegeben oder vorausgesetzt voraus."
+msgstr "Eine Aussage nimmt eine andere als gegeben oder vorausgesetzt an."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:397
 #, fuzzy
@@ -15958,7 +15959,7 @@ msgstr "Ein Konzept wird im Deutungsrahmen eines anderen verstanden."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:400
 #, fuzzy
 msgid "Use for simple visual links between codes."
-msgstr "Für einfache visuelle Verbindungen zwischen Codes."
+msgstr "Für einfache visuelle Verbindungen zwischen Codes verwenden."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:401
 #, fuzzy
@@ -15973,7 +15974,7 @@ msgstr "Asymmetrisch: A verursacht B ≠ B verursacht A."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:403
 #, fuzzy
 msgid "Mereological relation (part-whole)."
-msgstr "Mereologische Beziehung (Teil-Ganzes)."
+msgstr "Mereologische Beziehung (Teil-Ganzes-Beziehung)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:404
 #, fuzzy
@@ -16123,7 +16124,7 @@ msgstr "Moustakas: struktural = Bedingungen/Kontext."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:433
 #, fuzzy
 msgid "Composite textural-structural description."
-msgstr "Zusammengesetzte textural-strukturale Beschreibung."
+msgstr "Kombinierte textural-strukturale Beschreibung."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:434
 #, fuzzy
@@ -16179,8 +16180,8 @@ msgstr "Hierarchische Themenstruktur."
 #, fuzzy
 msgid "May signal need to merge or split."
 msgstr ""
-"Kann darauf hindeuten, dass eine Zusammenführung oder Aufteilung "
-"erforderlich ist."
+"Kann darauf hindeuten, dass Codes zusammengeführt oder aufgeteilt werden "
+"sollten."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:445
 #, fuzzy
@@ -16295,7 +16296,7 @@ msgstr "Durchgezogen mit Doppelpfeil"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:481
 #, fuzzy
 msgid "Framework:"
-msgstr "Rahmenwerk:"
+msgstr "Framework:"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:482
 #, fuzzy
@@ -16338,7 +16339,7 @@ msgstr "Verbinden"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1005
 #, fuzzy
 msgid "Duplicate relation"
-msgstr "Doppelte Beziehung"
+msgstr "Beziehung duplizieren"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:495
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:956
@@ -16346,21 +16347,22 @@ msgstr "Doppelte Beziehung"
 #, fuzzy
 msgid "A relation with this name already exists in the User framework."
 msgstr ""
-"Eine Beziehung mit diesem Namen ist im Benutzer-Framework bereits vorhanden."
+"Eine Beziehung mit diesem Namen ist im Benutzer:innen-Framework bereits "
+"vorhanden."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:496
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:997
 #, fuzzy
 msgid "Another relation with this name already exists in the User framework."
 msgstr ""
-"Eine andere Beziehung mit diesem Namen ist im Benutzer-Framework bereits "
-"vorhanden."
+"Eine andere Beziehung mit diesem Namen ist im Benutzer:innen-Framework "
+"bereits vorhanden."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:497
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1014
 #, fuzzy
 msgid "Saved to User"
-msgstr "Im Benutzer-Framework gespeichert"
+msgstr "Im Benutzer:innen-Framework gespeichert"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:498
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1015
@@ -16369,8 +16371,8 @@ msgid ""
 "The edited relation has been saved as a new entry in the User framework. The"
 " original system relation remains unchanged."
 msgstr ""
-"Die bearbeitete Beziehung wurde als neuer Eintrag im Benutzer-Framework "
-"gespeichert. Die ursprüngliche Systembeziehung bleibt unverändert."
+"Die bearbeitete Beziehung wurde als neuer Eintrag im Benutzer:innen-"
+"Framework gespeichert. Die ursprüngliche Systembeziehung bleibt unverändert."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:500
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1036
@@ -16380,8 +16382,8 @@ msgid ""
 "frameworks. Only relations in the User framework can be removed."
 msgstr ""
 "Systembeziehungen können nicht gelöscht werden. Sie sind Teil der "
-"wissenschaftlichen Referenzrahmen. Nur Beziehungen im Benutzer-Framework "
-"können entfernt werden."
+"wissenschaftlichen Referenz-Frameworks. Nur Beziehungen im Benutzer:innen-"
+"Framework können entfernt werden."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:502
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1162
@@ -16393,13 +16395,13 @@ msgstr "Automatisch aus benutzerdefinierter Bezeichnung gespeichert."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1057
 #, fuzzy
 msgid "Import user relations"
-msgstr "Benutzerbeziehungen importieren"
+msgstr "Benutzer:innen-Beziehungen importieren"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:504
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1121
 #, fuzzy
 msgid "Export user relations"
-msgstr "Benutzerbeziehungen exportieren"
+msgstr "Benutzer:innen-Beziehungen exportieren"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:506
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1140
@@ -16434,7 +16436,7 @@ msgid ""
 "with a top-level 'User' key."
 msgstr ""
 "Die Datei enthält keine gültige Benutzer-Framework-Struktur. Erwartet wird "
-"JSON mit dem Schlüssel „User“ auf oberster Ebene."
+"JSON mit einem übergeordneten Schlüssel „User“."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:512
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1079
@@ -16567,12 +16569,12 @@ msgstr "Relation löschen"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1041
 #, fuzzy
 msgid "Delete relation '"
-msgstr "Relation '"
+msgstr "Relation „"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1041
 #, fuzzy
 msgid "'?"
-msgstr "' löschen?"
+msgstr "“ löschen?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:122
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:874
@@ -16668,13 +16670,13 @@ msgid ""
 "Do you want to switch to the new profile now?\n"
 "Your existing API-key (if available) will be copied to the new profile for convenience."
 msgstr ""
-"Für diesen Anbieter ist jetzt ein neueres standardmäßiges KI-Profil verfügbar.\n"
+"Für diesen Anbieter ist jetzt ein neueres Standard-KI-Profil verfügbar.\n"
 "\n"
 "Aktuelles Profil: {current}\n"
 "Neues Profil: {new}\n"
 "\n"
 "Möchten Sie jetzt zum neuen Profil wechseln?\n"
-"Ihr vorhandener API-Schlüssel (falls verfügbar) wird der Einfachheit halber in das neue Profil übernommen."
+"Ihr vorhandener API-Schlüssel (falls verfügbar) wird dabei in das neue Profil kopiert."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:189
 #, fuzzy
