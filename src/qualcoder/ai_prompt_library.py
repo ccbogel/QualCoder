@@ -1160,7 +1160,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self._mark_dirty()
         self._refresh_tree_from_memory()
 
-    def open_tree_context_menu(self, position) -> None:
+    def open_tree_context_menu(self, position: QtCore.QPoint) -> None:
+        """Open the prompt tree context menu.
+
+        Args:
+            position: Position in the tree widget's viewport.
+        """
         item = self.ui.treeWidget_prompts.itemAt(position)
         if item is not None:
             self.ui.treeWidget_prompts.setCurrentItem(item)
@@ -1174,13 +1179,31 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             new_folder_action.triggered.connect(self.new_folder)
             menu.addAction(new_prompt_action)
             menu.addAction(new_folder_action)
+
+        if not menu.isEmpty():
+            menu.addSeparator()
+        duplicate_action = QAction(_('Duplicate'), self)
+        copy_action = QAction(_('Copy'), self)
+        paste_action = QAction(_('Paste'), self)
+        delete_action = QAction(_('Delete'), self)
+        duplicate_action.setEnabled(self.ui.pushButton_duplicate_prompt.isEnabled())
+        copy_action.setEnabled(self.ui.toolButton_copy.isEnabled())
+        paste_action.setEnabled(self.ui.toolButton_paste.isEnabled())
+        delete_action.setEnabled(self.ui.toolButton_delete.isEnabled())
+        duplicate_action.triggered.connect(self.duplicate_prompt)
+        copy_action.triggered.connect(self.copy_prompt_to_clipboard)
+        paste_action.triggered.connect(self.paste_prompt_from_clipboard)
+        delete_action.triggered.connect(self.delete_selected)
+        menu.addAction(duplicate_action)
+        menu.addAction(copy_action)
+        menu.addAction(paste_action)
+        menu.addAction(delete_action)
+
         if kind == ITEM_KIND_FOLDER:
+            menu.addSeparator()
             rename_folder_action = QAction(_('Rename folder'), self)
-            delete_folder_action = QAction(_('Delete folder'), self)
             rename_folder_action.triggered.connect(self.rename_folder)
-            delete_folder_action.triggered.connect(self.delete_folder)
             menu.addAction(rename_folder_action)
-            menu.addAction(delete_folder_action)
         if not menu.isEmpty():
             menu.exec(self.ui.treeWidget_prompts.viewport().mapToGlobal(position))
 
