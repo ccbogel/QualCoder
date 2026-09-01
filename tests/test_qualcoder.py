@@ -1162,6 +1162,77 @@ class TestAiReadinessChat(TestCase):
         chat.update_chat_window.assert_called_once_with()
 
 
+class DummyAgentBasePromptCatalog:
+    """Minimal prompt catalog for agent base-system-prompt tests."""
+
+    def __init__(self) -> None:
+        self.base_prompt = AgentPromptRecord(
+            scope="system",
+            root_path="",
+            name="_agent",
+            file_path="",
+            content="Base agent prompt.",
+            description="",
+            is_internal=True,
+        )
+        self.resolve_prompt_references = MagicMock(return_value=[])
+
+    def get_internal_prompt(self, name: str) -> AgentPromptRecord | None:
+        if name == "_agent":
+            return self.base_prompt
+        return None
+
+    @staticmethod
+    def expand_prompt_references(prompts: list[AgentPromptRecord],
+                                 include_internal: bool = False) -> list[AgentPromptRecord]:
+        del include_internal
+        return prompts
+
+
+class TestAgentBasePromptProjectMemo(TestCase):
+    """Regression tests for the project-memo section in agent context."""
+
+    @staticmethod
+    def _build_chat(project_memo: str) -> tuple[SimpleNamespace, DummyAgentBasePromptCatalog]:
+        catalog = DummyAgentBasePromptCatalog()
+        chat = SimpleNamespace(
+            app=SimpleNamespace(get_project_memo=lambda: project_memo),
+            agent_prompts_catalog=catalog,
+            _agent_base_prompt_name=lambda: "_agent",
+            _render_base_agent_prompt_record=lambda prompt: prompt.content,
+        )
+        return chat, catalog
+
+    def test_nonempty_project_memo_is_explicitly_labelled(self):
+        chat, catalog = self._build_chat("Research question: How do participants adapt?")
+
+        system_prompt, _included_prompt_keys = DialogAIChat._collect_agent_base_prompt_context(chat)
+
+        self.assertIn(
+            "# Project memo\n\n"
+            "The following block is the current user-authored QualCoder project memo. "
+            "It contains background information about the research project that you are working on.\n\n"
+            "<project_memo>\n"
+            "Research question: How do participants adapt?\n"
+            "</project_memo>",
+            system_prompt,
+        )
+        catalog.resolve_prompt_references.assert_called_once_with(
+            "Research question: How do participants adapt?"
+        )
+
+    def test_empty_ai_visible_project_memo_has_explicit_empty_state(self):
+        chat, catalog = self._build_chat("#####\nPrivate note")
+
+        system_prompt, _included_prompt_keys = DialogAIChat._collect_agent_base_prompt_context(chat)
+
+        self.assertTrue(system_prompt.endswith("# Project memo\n\nThe project memo is currently empty."))
+        self.assertNotIn("<project_memo>", system_prompt)
+        self.assertNotIn("The following block", system_prompt)
+        self.assertNotIn("Private note", system_prompt)
+        catalog.resolve_prompt_references.assert_not_called()
+
+
 class DummyProgressSignal:
     """Record AI progress payloads emitted by a chat operation."""
 

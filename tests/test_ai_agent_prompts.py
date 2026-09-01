@@ -120,6 +120,15 @@ class TestPromptNames(TestCase):
         self.assertEqual("Mixed_Case", prompt.name)
         self.assertEqual("Mixed_Case", variant.name)
 
+    def test_readiness_prompt_points_to_labelled_project_memo_section(self):
+        prompt = self.catalog.get_prompt("Check-project-AI-readiness")
+
+        self.assertIsNotNone(prompt)
+        self.assertIn(
+            "Review the section explicitly labelled `# Project memo` in your system context.",
+            prompt.content,
+        )
+
     def test_slash_reference_resolution_is_case_insensitive(self):
         self._write_prompt("Überblick/Résumé_Analysis.md")
 

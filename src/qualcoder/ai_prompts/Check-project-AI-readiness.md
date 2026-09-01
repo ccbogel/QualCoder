@@ -9,7 +9,7 @@ This is an AI-readiness assessment, not a general judgment of the quality of the
 
 ## Audit process
 
-1. Review the project memo included in your context.
+1. Review the section explicitly labelled `# Project memo` in your system context.
 2. Inspect the available document inventory, document memos and attributes, cases and case links, and the code/category tree where relevant.
 3. Inspect representative excerpts from the empirical text documents. Select a varied sample based on document names, types, lengths, and apparent roles in the project. For small corpora, inspect every document where practical; for larger corpora, use a transparent sample and state what you inspected.
 4. For documents that appear to be interviews or group discussions, inspect enough text from the beginning and, where useful, another part of the transcript to assess speaker identification and formatting consistency.

@@ -2766,7 +2766,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     sections.append(prompt_text)
 
         project_memo = extract_ai_memo(self.app.get_project_memo())
-        if len(project_memo) > 0:
+        if project_memo.strip() != "":
             for prompt in self.agent_prompts_catalog.resolve_prompt_references(project_memo):
                 prompt_key = prompt_name_key(prompt.name)
                 if prompt_key == "" or prompt_key in included_prompt_keys:
@@ -2777,10 +2777,15 @@ class DialogAIChat(QtWidgets.QDialog):
                     sections.append(prompt_text)
 
             sections.append(
-                '# Information about the current project\n\n'
-                'Here is some background information about the research project the team is working on:\n'
+                '# Project memo\n\n'
+                'The following block is the current user-authored QualCoder project memo. '
+                'It contains background information about the research project that you are working on.\n\n'
+                '<project_memo>\n'
                 + project_memo
+                + '\n</project_memo>'
             )
+        else:
+            sections.append('# Project memo\n\nThe project memo is currently empty.')
 
         return '\n\n'.join(section for section in sections if section != ""), included_prompt_keys
 
