@@ -44,7 +44,7 @@ from lxml import etree
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 I18N_DIR = os.path.join(PROJECT_ROOT, "src", "qualcoder", "i18n")
 OTHER_LANGS_DIR = os.path.join(PROJECT_ROOT, "other_languages")
-GUI_DIR = os.path.join(PROJECT_ROOT, "src", "qualcoder", "GUI")
+GUI_UI_DIR = os.path.join(PROJECT_ROOT, "src", "GUI_UIs")
 
 # --- Utility Functions ---
 def get_all_languages() -> List[str]:
@@ -113,37 +113,40 @@ def update_po_files(directory: str, pot_filename: str, lang: Optional[str] = Non
                 pass
 
 def delete_obsolete_ts(file_ts: str) -> None:
-    """Remove obsolete entries from a .ts file."""
+    """Remove obsolete and vanished entries from a `.ts` file."""
     parser = etree.XMLParser(remove_blank_text=True)
     tree = etree.parse(file_ts, parser)
     root = tree.getroot()
-    for message in root.xpath('//message[translation[@type="obsolete"]]'):
+    inactive_messages = root.xpath(
+        '//message[translation[@type="obsolete" or @type="vanished"]]'
+    )
+    for message in inactive_messages:
         message.getparent().remove(message)
     tree.write(file_ts, encoding="utf-8", xml_declaration=True, pretty_print=True)
 
 def run_pylupdate6(ts_files: List[str]) -> bool:
-    """Update Qt translation files from the generated UI modules.
+    """Update Qt translation files from the Qt Designer sources.
 
     Args:
         ts_files: Paths of the Qt translation files to update or create.
     """
     ui_files = []
-    if os.path.exists(GUI_DIR):
+    if os.path.exists(GUI_UI_DIR):
         ui_files = sorted(
             file
-            for file in os.listdir(GUI_DIR)
-            if file.startswith("ui_") and file.endswith(".py")
+            for file in os.listdir(GUI_UI_DIR)
+            if file.startswith("ui_") and file.endswith(".ui")
         )
 
     if not ui_files:
-        print(f"No generated UI modules found in {GUI_DIR}.")
+        print(f"No Qt Designer UI files found in {GUI_UI_DIR}.")
         return False
 
     command = ["pylupdate6"]
     for ts_file in ts_files:
         command.extend(["--ts", ts_file])
     command.extend(ui_files)
-    return run_subprocess(command, cwd=GUI_DIR)
+    return run_subprocess(command, cwd=GUI_UI_DIR)
 
 def update_qt_ts_files(lang: Optional[str] = None) -> None:
     """Update Qt .ts files using pylupdate6."""
@@ -176,13 +179,13 @@ def update_qt_ts_files(lang: Optional[str] = None) -> None:
         return
     print("Updated ts translation files")
 
-    # Clean obsolete entries
+    # Clean inactive entries
     for ts_file in ts_files:
         for directory in [I18N_DIR, OTHER_LANGS_DIR]:
             ts_path = os.path.join(directory, ts_file)
             if os.path.exists(ts_path):
                 delete_obsolete_ts(ts_path)
-                print(f"Cleaned obsolete entries in {ts_file}")
+                print(f"Cleaned inactive entries in {ts_file}")
 
 def update_translation_placeholders(language: Optional[str] = None) -> None:
     """Update .pot, .po, and .ts files for all or a specific language."""
@@ -205,8 +208,8 @@ def create_new_language_placeholders(language: str) -> None:
 
     # Create the .ts file with pylupdate6
     new_ts_file = os.path.join(OTHER_LANGS_DIR, f"{language}.ts")
-    if not os.path.exists(GUI_DIR):
-        print(f"Error: {GUI_DIR} does not exist.")
+    if not os.path.exists(GUI_UI_DIR):
+        print(f"Error: {GUI_UI_DIR} does not exist.")
         return
 
     if not run_pylupdate6([new_ts_file]):
