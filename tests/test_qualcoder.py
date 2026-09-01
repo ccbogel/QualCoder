@@ -7,9 +7,9 @@ import sqlite3
 import tempfile
 from types import SimpleNamespace
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from qualcoder.__main__ import App
+from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_llm import AiLLM
@@ -360,6 +360,100 @@ class TestMainWindow(TestCase):
 
     def test_settings_report(self):
         pass
+
+
+class TestMainWindowAiActions(TestCase):
+    """Regression tests for AI menu dispatching."""
+
+    def test_ai_analysis_actions_share_handler(self):
+        topic_action = object()
+        text_action = object()
+        code_action = object()
+        expected_handlers = {
+            topic_action: ("new_topic_exploration", True),
+            text_action: ("new_text_analysis", False),
+            code_action: ("new_code_analysis", True),
+        }
+
+        for action, (expected_handler, shows_ai_agent) in expected_handlers.items():
+            with self.subTest(handler=expected_handler):
+                ai_chat_window = SimpleNamespace(
+                    new_topic_exploration=MagicMock(),
+                    new_text_analysis=MagicMock(),
+                    new_code_analysis=MagicMock(),
+                )
+                tab_widget = SimpleNamespace(setCurrentWidget=MagicMock())
+                ui = SimpleNamespace(
+                    actionAI_topic_exploration=topic_action,
+                    actionAI_text_analysis=text_action,
+                    actionAI_code_analysis=code_action,
+                    tabWidget=tab_widget,
+                    tab_ai_agent=object(),
+                )
+                window = SimpleNamespace(
+                    ai_chat_window=ai_chat_window,
+                    ui=ui,
+                    sender=MagicMock(return_value=action),
+                    set_ai_chat_sidebar_mode=MagicMock(),
+                )
+
+                MainWindow.ai_go_analysis(window)
+
+                getattr(ai_chat_window, expected_handler).assert_called_once_with()
+                if shows_ai_agent:
+                    window.set_ai_chat_sidebar_mode.assert_called_once_with(False, persist=False)
+                    tab_widget.setCurrentWidget.assert_called_once_with(ui.tab_ai_agent)
+                else:
+                    window.set_ai_chat_sidebar_mode.assert_not_called()
+                    tab_widget.setCurrentWidget.assert_not_called()
+
+    def test_text_coding_reuses_open_dialog(self):
+        class FakeDialogCodeText:
+            instances = 0
+
+            def __init__(self, app=None, parent_text_edit=None, tab_reports=None):
+                del app, parent_text_edit, tab_reports
+                type(self).instances += 1
+                self.current_context = object()
+                self.ui = SimpleNamespace(
+                    tabWidget=SimpleNamespace(setCurrentWidget=MagicMock()),
+                    tab_docs=object(),
+                    tab_ai=object(),
+                )
+
+            @staticmethod
+            def objectName():
+                return "open_text_coding"
+
+        existing = FakeDialogCodeText()
+        original_context = existing.current_context
+        layout = SimpleNamespace(
+            count=MagicMock(return_value=1),
+            itemAt=MagicMock(return_value=SimpleNamespace(widget=MagicMock(return_value=existing))),
+        )
+        tab_coding = SimpleNamespace(layout=MagicMock(return_value=layout))
+        tab_widget = SimpleNamespace(setCurrentWidget=MagicMock())
+        ui = SimpleNamespace(
+            tab_coding=tab_coding,
+            tab_reports=object(),
+            tabWidget=tab_widget,
+            textBrowser_coding=SimpleNamespace(hide=MagicMock()),
+            textEdit=object(),
+        )
+        window = SimpleNamespace(
+            app=SimpleNamespace(get_text_filenames=MagicMock(return_value=[{"id": 1}])),
+            ui=ui,
+            tab_layout_helper=MagicMock(),
+        )
+
+        with patch("qualcoder.__main__.DialogCodeText", FakeDialogCodeText):
+            MainWindow.text_coding(window, task="documents")
+
+        self.assertEqual(1, FakeDialogCodeText.instances)
+        self.assertIs(original_context, existing.current_context)
+        window.tab_layout_helper.assert_not_called()
+        tab_widget.setCurrentWidget.assert_called_once_with(tab_coding)
+        existing.ui.tabWidget.setCurrentWidget.assert_called_once_with(existing.ui.tab_docs)
 
 
 class TestAiMemoPolicy(TestCase):
@@ -1011,6 +1105,61 @@ class TestAiChatSummaryRendering(TestCase):
         )
 
         self.assertEqual("Explore topic.<br /><b>Description:</b> Details", html_string)
+
+
+class TestAiReadinessChat(TestCase):
+    """Regression tests for starting the project AI-readiness audit."""
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_readiness_chat_resolves_effective_prompt_and_starts_mcp_agent(self, _translate):
+        del _translate
+        readiness_prompt = AgentPromptRecord(
+            scope="user",
+            root_path="",
+            name="Check-project-AI-readiness",
+            file_path="",
+            content="Audit this project.",
+            description="",
+            is_internal=False,
+        )
+        worker = object()
+        messages = [object()]
+        chat = SimpleNamespace(
+            app=SimpleNamespace(
+                ai=SimpleNamespace(
+                    is_busy=MagicMock(return_value=False),
+                    is_ready=MagicMock(return_value=True),
+                )
+            ),
+            agent_prompts_catalog=SimpleNamespace(
+                get_prompt=MagicMock(return_value=readiness_prompt),
+            ),
+            _can_start_general_chat=MagicMock(return_value=True),
+            _start_general_chat_session=MagicMock(return_value=2),
+            _persist_agent_prompt_record=MagicMock(),
+            history_add_message=MagicMock(),
+            history_get_ai_messages_compacted=MagicMock(return_value=messages),
+            _start_mcp_agent_worker=MagicMock(),
+            _mcp_general_chat_worker=worker,
+            update_chat_window=MagicMock(),
+        )
+
+        DialogAIChat.new_project_ai_readiness_chat(chat)
+
+        chat.agent_prompts_catalog.get_prompt.assert_called_once_with("Check-project-AI-readiness")
+        chat._persist_agent_prompt_record.assert_called_once_with(
+            2,
+            readiness_prompt,
+            activation_source="bootstrap",
+        )
+        chat.history_add_message.assert_called_once_with(
+            "instruct",
+            "",
+            "Perform the activated project AI-readiness assessment now.",
+            2,
+        )
+        chat._start_mcp_agent_worker.assert_called_once_with(messages, 2, worker)
+        chat.update_chat_window.assert_called_once_with()
 
 
 class DummyProgressSignal:

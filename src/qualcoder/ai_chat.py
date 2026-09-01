@@ -2537,6 +2537,42 @@ class DialogAIChat(QtWidgets.QDialog):
             return
         self._start_general_chat_session(name, summary)
 
+    def new_project_ai_readiness_chat(self) -> None:
+        """Start an MCP-backed agent chat using the project AI-readiness prompt."""
+
+        if not self._can_start_general_chat():
+            return
+        if self.app.ai.is_busy():
+            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
+            Message(self.app, _('AI busy'), msg, "warning").exec()
+            return
+        if not self.app.ai.is_ready():
+            msg = _('The AI not yet fully loaded. Please wait and retry.')
+            Message(self.app, _('AI not ready'), msg, "warning").exec()
+            return
+
+        prompt_name = "Check-project-AI-readiness"
+        readiness_prompt = self.agent_prompts_catalog.get_prompt(prompt_name)
+        if readiness_prompt is None:
+            msg = _('The AI-readiness prompt "Check-project-AI-readiness.md" could not be found.')
+            Message(self.app, _('AI Agent'), msg, "warning").exec()
+            return
+
+        chat_idx = self._start_general_chat_session(_('Project AI readiness check'), '')
+        if chat_idx is None or chat_idx < 0:
+            return
+
+        self._persist_agent_prompt_record(chat_idx, readiness_prompt, activation_source='bootstrap')
+        self.history_add_message(
+            'instruct',
+            '',
+            'Perform the activated project AI-readiness assessment now.',
+            chat_idx,
+        )
+        messages = self.history_get_ai_messages_compacted()
+        self._start_mcp_agent_worker(messages, chat_idx, self._mcp_general_chat_worker)
+        self.update_chat_window()
+
     def _support_chat_prompt_name(self) -> str:
         """Return the internal prompt name for Help-menu support sessions."""
 
