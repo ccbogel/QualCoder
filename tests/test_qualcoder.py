@@ -5,9 +5,13 @@ from pathlib import Path
 import shutil
 import sqlite3
 import tempfile
+import threading
+import time
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+
+from PyQt6 import QtWidgets
 
 from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
@@ -1243,6 +1247,67 @@ class DummyProgressSignal:
         self.payloads.append(json.loads(payload))
 
 
+class DummyConfirmationSignal:
+    """Answer internal timeout confirmation requests without a GUI."""
+
+    def __init__(self, abort: bool):
+        self.abort = abort
+        self.requests = []
+
+    def emit(self, request: dict):
+        self.requests.append(request)
+        request["abort"] = self.abort
+        request["answered"].set()
+
+
+class DummyTimeoutAiService:
+    """Minimal AI service for internal timeout retry tests."""
+
+    def __init__(self):
+        self.run_count = 0
+
+    @staticmethod
+    def _get_current_run_context():
+        return SimpleNamespace(run_id="parent-run")
+
+    def _create_run_context(self, **kwargs):
+        del kwargs
+        self.run_count += 1
+        return SimpleNamespace(
+            run_id=f"internal-run-{self.run_count}",
+            cancel_event=threading.Event(),
+            error_text="",
+        )
+
+    @staticmethod
+    def _register_run_context(run_context):
+        del run_context
+
+    @staticmethod
+    def _set_current_run_context(run_context):
+        del run_context
+
+    @staticmethod
+    def _update_run_status(run_id, status, error_text=""):
+        del run_id, status, error_text
+
+    @staticmethod
+    def _finalize_run_context(run_context, terminal_status):
+        del run_context, terminal_status
+
+    @staticmethod
+    def _clear_current_run_context():
+        return None
+
+    @staticmethod
+    def is_current_run_canceled():
+        return False
+
+    @staticmethod
+    def _request_cancel_run(run_context):
+        run_context.cancel_event.set()
+
+
 class DummyInternalJsonInvoker:
     """Minimal chat stub for internal JSON status tests."""
 
@@ -1284,6 +1349,116 @@ class TestAiInternalJsonStatus(TestCase):
             [{"chat_idx": 7, "status": "Analyzing...", "status_kind": "reflection"}],
             progress.payloads,
         )
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_reflection_timeout_question_mentions_provisional_answer(self, _translate):
+        del _translate
+
+        question = DialogAIChat._internal_step_timeout_question(
+            "Internal reflection",
+            "reflection",
+        )
+
+        self.assertIn("QualCoder's time limit", question)
+        self.assertIn("provisional answer", question)
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_provider_timeout_does_not_request_confirmation(self, _translate):
+        del _translate
+        confirmation = DummyConfirmationSignal(abort=False)
+        signals = type(
+            "Signals",
+            (),
+            {"progress": DummyProgressSignal(), "confirmation": confirmation},
+        )()
+        invoker = DummyInternalJsonInvoker()
+        invoker.app.ai = DummyTimeoutAiService()
+        invoker._invoke_json_llm = MagicMock(side_effect=TimeoutError("provider timeout"))
+        invoker._internal_json_step_timeouts = lambda: (10.0, 20.0)
+
+        with self.assertRaises(TimeoutError):
+            DialogAIChat._invoke_json_llm_with_step_timeout(
+                invoker,
+                [],
+                step_name="Internal reflection",
+                status_kind="reflection",
+                signals=signals,
+                chat_idx=7,
+            )
+
+        self.assertEqual(0, len(confirmation.requests))
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_hard_timeout_keeps_waiting_when_user_declines_abort(self, _translate):
+        del _translate
+        confirmation = DummyConfirmationSignal(abort=False)
+        signals = type(
+            "Signals",
+            (),
+            {"progress": DummyProgressSignal(), "confirmation": confirmation},
+        )()
+        invoker = DummyInternalJsonInvoker()
+        invoker.app.ai = DummyTimeoutAiService()
+
+        def delayed_result(messages, **kwargs):
+            del messages, kwargs
+            time.sleep(0.35)
+            return {"action": "final_answer"}
+
+        invoker._invoke_json_llm = delayed_result
+        invoker._internal_json_step_timeouts = lambda: (0.05, 0.1)
+        invoker._internal_step_timeout_question = DialogAIChat._internal_step_timeout_question
+        invoker._request_internal_step_timeout_confirmation = (
+            DialogAIChat._request_internal_step_timeout_confirmation.__get__(invoker)
+        )
+
+        result = DialogAIChat._invoke_json_llm_with_step_timeout(
+            invoker,
+            [],
+            step_name="Internal planning",
+            status_kind="planning",
+            signals=signals,
+            chat_idx=7,
+        )
+
+        self.assertEqual({"action": "final_answer"}, result)
+        self.assertEqual(1, len(confirmation.requests))
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_timeout_dialog_closes_when_operation_finishes(self, _translate):
+        del _translate
+        operation_finished = threading.Event()
+        answered = threading.Event()
+        request = {
+            "question": "Continue?",
+            "abort": True,
+            "answered": answered,
+            "operation_finished": operation_finished,
+        }
+        msg_box = MagicMock()
+        completion_timer = MagicMock()
+        timer_callback = None
+
+        def connect_timer(callback):
+            nonlocal timer_callback
+            timer_callback = callback
+
+        def finish_during_dialog():
+            operation_finished.set()
+            timer_callback()
+            return QtWidgets.QMessageBox.StandardButton.No
+
+        completion_timer.timeout.connect.side_effect = connect_timer
+        msg_box.exec.side_effect = finish_during_dialog
+        chat = SimpleNamespace(app=SimpleNamespace(settings={"fontsize": "10"}))
+
+        with patch("qualcoder.ai_chat.Message", return_value=msg_box), \
+                patch("qualcoder.ai_chat.QtCore.QTimer", return_value=completion_timer):
+            DialogAIChat._ai_internal_timeout_confirmation_callback(chat, request)
+
+        msg_box.reject.assert_called_once_with()
+        self.assertTrue(answered.is_set())
+        self.assertFalse(request["abort"])
 
 
 # TEST_PERSIST_PATH = '/fake/path/'

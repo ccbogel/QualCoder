@@ -3267,6 +3267,7 @@ class DialogAIChat(QtWidgets.QDialog):
             chat_idx,
             *worker_args,
             progress_callback=self.ai_mcp_progress_callback,
+            confirmation_callback=self._ai_internal_timeout_confirmation_callback,
             model_kind='large',
             scope_type='chat',
             scope_id=chat_idx,
@@ -6971,6 +6972,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                                             messages,
                                             chat_idx,
                                             progress_callback=self.ai_mcp_progress_callback,
+                                            confirmation_callback=self._ai_internal_timeout_confirmation_callback,
                                             model_kind='large',
                                             scope_type='chat',
                                             scope_id=chat_idx,
@@ -7696,6 +7698,56 @@ data collected. This information will accompany every prompt sent to the AI, res
         hard_timeout = read_timeout + 60.0
         return soft_timeout, hard_timeout
 
+    @staticmethod
+    def _internal_step_timeout_question(step_name: str, status_kind: str) -> str:
+        """Return the confirmation question for an internal AI step timeout."""
+
+        step_label = str(step_name).strip() or _("Internal step")
+        if str(status_kind).strip().lower() == "reflection":
+            return _(
+                '{step} has reached QualCoder\'s time limit. Do you want to stop the '
+                'reflection and generate a provisional answer from the results collected so far?'
+            ).format(step=step_label)
+        return _(
+            '{step} has reached QualCoder\'s time limit. Do you want to abort the AI process?'
+        ).format(step=step_label)
+
+    def _request_internal_step_timeout_confirmation(self, signals, chat_idx: int,
+                                                    step_name: str, status_kind: str,
+                                                    operation_finished: threading.Event) -> bool:
+        """Ask the GUI thread whether a timed-out internal AI step should stop.
+
+        Args:
+            signals: Worker signals used to reach the GUI thread.
+            chat_idx: Chat index associated with the running AI operation.
+            step_name: User-facing name of the internal step.
+            status_kind: Internal phase, such as planning or reflection.
+            operation_finished: Event set when the timed-out operation finishes.
+
+        Returns:
+            True when the user chose to stop, otherwise False.
+        """
+
+        confirmation_signal = getattr(signals, 'confirmation', None)
+        if confirmation_signal is None or not hasattr(confirmation_signal, 'emit'):
+            return True
+
+        answered = threading.Event()
+        request: Dict[str, Any] = {
+            "chat_idx": chat_idx,
+            "question": self._internal_step_timeout_question(step_name, status_kind),
+            "abort": True,
+            "answered": answered,
+            "operation_finished": operation_finished,
+        }
+        confirmation_signal.emit(request)
+
+        ai_service = getattr(self.app, 'ai', None)
+        while not answered.wait(0.2):
+            if ai_service is not None and ai_service.is_current_run_canceled():
+                return True
+        return bool(request.get("abort", True))
+
     def _invoke_json_llm_with_step_timeout(self, messages: List[Any], schema_name: str = '',
                                            response_schema: Optional[Dict[str, Any]] = None,
                                            context: str = 'mcp_json_control',
@@ -7718,8 +7770,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 model_kind=model_kind,
             )
 
+        soft_timeout, hard_timeout = self._internal_json_step_timeouts()
+        step_label = str(step_name).strip() or _("Internal step")
         parent_context = ai_service._get_current_run_context()
         parent_run_id = str(getattr(parent_context, 'run_id', '')).strip()
+
         run_context = ai_service._create_run_context(
             model_kind=model_kind,
             purpose='invoke',
@@ -7765,19 +7820,16 @@ data collected. This information will accompany every prompt sent to the AI, res
         )
         thread.start()
 
-        soft_timeout, hard_timeout = self._internal_json_step_timeouts()
-        step_label = str(step_name).strip() or _("Internal step")
         soft_notice_sent = False
-        start_time = time.monotonic()
-
+        deadline = time.monotonic() + hard_timeout
         while not finished.wait(0.2):
             if ai_service.is_current_run_canceled():
                 ai_service._request_cancel_run(run_context)
                 thread.join(1.0)
                 raise AICancelled(parent_run_id if parent_run_id != '' else run_context.run_id)
 
-            elapsed = time.monotonic() - start_time
-            if not soft_notice_sent and elapsed >= soft_timeout:
+            remaining = deadline - time.monotonic()
+            if not soft_notice_sent and remaining <= hard_timeout - soft_timeout:
                 soft_notice_sent = True
                 self._emit_mcp_status_text(
                     signals,
@@ -7786,10 +7838,31 @@ data collected. This information will accompany every prompt sent to the AI, res
                     status_kind=status_kind,
                 )
 
-            if elapsed >= hard_timeout:
-                ai_service._request_cancel_run(run_context)
-                thread.join(2.0)
-                raise TimeoutError(step_label)
+            if remaining <= 0:
+                abort_requested = self._request_internal_step_timeout_confirmation(
+                    signals,
+                    chat_idx,
+                    step_label,
+                    status_kind,
+                    finished,
+                )
+                if ai_service.is_current_run_canceled():
+                    ai_service._request_cancel_run(run_context)
+                    thread.join(1.0)
+                    raise AICancelled(parent_run_id if parent_run_id != '' else run_context.run_id)
+                if finished.is_set():
+                    break
+                if abort_requested:
+                    ai_service._request_cancel_run(run_context)
+                    thread.join(2.0)
+                    raise TimeoutError(step_label)
+                self._emit_mcp_status_text(
+                    signals,
+                    chat_idx,
+                    _('{step} is continuing at your request...').format(step=step_label),
+                    status_kind=status_kind,
+                )
+                deadline = time.monotonic() + hard_timeout
 
         if "error" in error_holder:
             raise error_holder["error"]
@@ -9240,6 +9313,43 @@ data collected. This information will accompany every prompt sent to the AI, res
         )
         self.update_chat_window()
         self._update_undo_button_state()
+
+    def _ai_internal_timeout_confirmation_callback(self, request: Dict[str, Any]) -> None:
+        """Show an internal-step timeout question on the GUI thread."""
+
+        if not isinstance(request, dict):
+            return
+        answered = request.get("answered")
+        try:
+            question = str(request.get("question", "")).strip()
+            if question == "":
+                request["abort"] = True
+                return
+            operation_finished = request.get("operation_finished")
+            if isinstance(operation_finished, threading.Event) and operation_finished.is_set():
+                request["abort"] = False
+                return
+            msg_box = Message(self.app, _('AI timeout'), question, icon='warning')
+            msg_box.setStandardButtons(
+                QtWidgets.QMessageBox.StandardButton.Yes |
+                QtWidgets.QMessageBox.StandardButton.No
+            )
+            msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
+            completion_timer = QtCore.QTimer(msg_box)
+            completion_timer.setInterval(100)
+
+            def close_completed_timeout_dialog() -> None:
+                if isinstance(operation_finished, threading.Event) and operation_finished.is_set():
+                    msg_box.reject()
+
+            completion_timer.timeout.connect(close_completed_timeout_dialog)
+            completion_timer.start()
+            reply = msg_box.exec()
+            completion_timer.stop()
+            request["abort"] = reply == QtWidgets.QMessageBox.StandardButton.Yes
+        finally:
+            if isinstance(answered, threading.Event):
+                answered.set()
 
     def ai_mcp_progress_callback(self, progress_msg):
         """Receive live MCP status updates from the worker thread."""

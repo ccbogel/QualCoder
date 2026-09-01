@@ -4960,6 +4960,7 @@ class AiLLM():
         return res
 
     def start_query(self, func, result_callback, *args, progress_callback=None,
+                    confirmation_callback=None,
                     model_kind: str = 'large', scope_type: str = '', scope_id=None,
                     group_id: str = '', parent_run_id: str = '', cancel_result=None, **kwargs):
         """Calls an AI related function in a background thread
@@ -4968,6 +4969,7 @@ class AiLLM():
             func: the function to be called.  *args, **kwargs are handed over to this function. 
             result_callback: callback function
             progress_callback: callback function for progress/status updates
+            confirmation_callback: callback for questions that must be shown by the GUI thread
         """
         self.run_progress_msg = ''
         self.run_progress_count = -1
@@ -5002,6 +5004,8 @@ class AiLLM():
             worker.signals.progress.connect(progress_callback)
         else:
             worker.signals.progress.connect(self._handle_run_progress)
+        if confirmation_callback is not None:
+            worker.signals.confirmation.connect(confirmation_callback)
         worker.signals.error.connect(self._handle_run_error)
         self.threadpool.start(worker)
         return run_context.run_id
