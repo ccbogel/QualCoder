@@ -560,10 +560,17 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self._set_folder_item_data(item, folder)
         return item
 
-    def _make_prompt_item(self, parent_item, prompt: EditorPromptRecord) -> QtWidgets.QTreeWidgetItem:
+    def _make_prompt_item(
+        self,
+        parent_item: QtWidgets.QTreeWidgetItem,
+        prompt: EditorPromptRecord,
+    ) -> QtWidgets.QTreeWidgetItem:
         item = QtWidgets.QTreeWidgetItem(parent_item)
         item.setText(0, self._prompt_tree_label(prompt))
-        item.setToolTip(0, prompt.description)
+        tooltip = prompt.name
+        if prompt.description:
+            tooltip += "\n\n" + prompt.description
+        item.setToolTip(0, tooltip)
         item.setIcon(0, self._prompt_file_icon())
         item.setFlags((item.flags() | Qt.ItemFlag.ItemIsDragEnabled) & ~Qt.ItemFlag.ItemIsDropEnabled)
         self._set_prompt_item_data(item, prompt)
