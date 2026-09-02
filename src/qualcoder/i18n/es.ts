@@ -1521,7 +1521,7 @@ Si no se marca: cada respuesta cualitativa será un archivo de texto independien
     <message>
       <location filename="..\..\GUI_UIs\ui_ai_chat.ui" line="0"/>
       <source>&lt;Select chat&gt;</source>
-      <translation type="unfinished"/>
+      <translation>&lt;Seleccionar chat&gt;</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_ai_chat.ui" line="0"/>
@@ -4586,7 +4586,8 @@ language = it</translation>
       <location filename="..\..\GUI_UIs\ui_dialog_speakers.ui" line="0"/>
       <source>How each speaker is marked at the start of a line: Name: , #Name: , @Name: , [Name] , {Name} , or a custom pattern. Auto-detect picks the format with the most turns.</source>
       <translation>Cómo se marca cada hablante al inicio de la línea: 
-Nombre: , #Nombre: , @Nombre: , [Nombre] , {Nombre} o un patrón personalizado.</translation>
+Nombre: , #Nombre: , @Nombre: , [Nombre] , {Nombre} o un patrón personalizado.
+La detección automática elige el formato con más turnos.</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_dialog_speakers.ui" line="0"/>
@@ -5227,7 +5228,7 @@ No codifique este texto hasta volver a cargar Codificación &gt; Codificar texto
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>AI assisted analysis</source>
-      <translation type="unfinished"/>
+      <translation>Análisis asistido por IA</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
@@ -5521,17 +5522,17 @@ No codifique este texto hasta volver a cargar Codificación &gt; Codificar texto
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Setup wizard</source>
-      <translation type="unfinished"/>
+      <translation>Asistente de configuración</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Rebuild internal memory</source>
-      <translation type="unfinished"/>
+      <translation>Reconstruir la memoria interna</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>AI Agent chat</source>
-      <translation type="unfinished"/>
+      <translation>Chat con el Agente de IA</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
@@ -5552,7 +5553,7 @@ No codifique este texto hasta volver a cargar Codificación &gt; Codificar texto
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Edit AI prompts that can be used in various stages of the analysis</source>
-      <translation type="unfinished"/>
+      <translation>Editar los prompts de IA que pueden utilizarse en distintas fases del análisis</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
@@ -5582,12 +5583,12 @@ No codifique este texto hasta volver a cargar Codificación &gt; Codificar texto
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Agent sidebar view</source>
-      <translation type="unfinished"/>
+      <translation>Vista lateral del Agente</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Show the AI agent conversation in a sidebar next to other workspaces</source>
-      <translation type="unfinished"/>
+      <translation>Mostrar la conversación con el Agente de IA en una vista lateral junto a los demás espacios de trabajo</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
@@ -5597,42 +5598,42 @@ No codifique este texto hasta volver a cargar Codificación &gt; Codificar texto
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>AI topic exploration</source>
-      <translation type="unfinished"/>
+      <translation>Exploración temática con IA</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Explore a free-search topic together with the AI agent.</source>
-      <translation type="unfinished"/>
+      <translation>Explore un tema de búsqueda libre junto con el Agente de IA.</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>AI text analysis</source>
-      <translation type="unfinished"/>
+      <translation>Análisis de textos con IA</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Analyse a piece of text from your empirical data together with the AI.</source>
-      <translation type="unfinished"/>
+      <translation>Analice un fragmento de texto de sus datos empíricos junto con la IA.</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>AI code analysis</source>
-      <translation type="unfinished"/>
+      <translation>Análisis de códigos con IA</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Analyze the data collected under a certain code together with the AI agent.</source>
-      <translation type="unfinished"/>
+      <translation>Analice los datos reunidos bajo un código determinado junto con el Agente de IA.</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Check project AI readiness</source>
-      <translation type="unfinished"/>
+      <translation>Comprobar la preparación del proyecto para la IA</translation>
     </message>
     <message>
       <location filename="..\..\GUI_UIs\ui_main.ui" line="0"/>
       <source>Checks whether the current QualCoder project is well prepared for working with the AI agent and produces a report</source>
-      <translation type="unfinished"/>
+      <translation>Comprueba si el proyecto actual de QualCoder está bien preparado para trabajar con el Agente de IA y genera un informe</translation>
     </message>
   </context>
 </TS>
