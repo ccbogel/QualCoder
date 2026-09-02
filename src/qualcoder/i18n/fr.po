@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-02 01:44+0200\n"
-"PO-Revision-Date: 2026-08-31 10:22+0200\n"
+"PO-Revision-Date: 2026-09-02 11:14+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -122,7 +122,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2085
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2141
 msgid "Unknown AI Agent New-menu target: "
-msgstr "Agent IA inconnu : nouvelle cible de menu : "
+msgstr "Agent IA inconnu – Cible du menu Nouveau : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2108
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:452
@@ -149,7 +149,7 @@ msgstr "Discuter avec l’IA"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4738
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4746
 msgid "Code analysis"
-msgstr "Analyse du code"
+msgstr "Analyse de code"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2181
 msgid "Code analysis (legacy)"
@@ -175,7 +175,7 @@ msgstr "Exploration thématique (ancienne version)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2193
 msgid "New Agent Chat"
-msgstr "Nouveau agent IA"
+msgstr "Nouvelle discussion avec l’IA"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2355
 msgid "Please enter a chat title."
@@ -241,7 +241,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2603
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6851
 msgid "AI busy"
-msgstr "L’IA est surchargé"
+msgstr "L’IA est surchargée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2550
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2606
@@ -258,15 +258,15 @@ msgid "AI not ready"
 msgstr "L’IA n’est pas prête"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2557
-#, fuzzy
 msgid ""
 "The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be found."
-msgstr "L’instruction d’aide interne de l’IA « _help.md » est introuvable."
+msgstr ""
+"L’instruction de préparation de l’IA « Check-project-AI-readiness.md » est "
+"introuvable."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2561
-#, fuzzy
 msgid "Project AI readiness check"
-msgstr "Création du projet"
+msgstr "Vérification de la préparation de l’IA au projet"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2612
 msgid "The internal AI support prompt \"_help.md\" could not be found."
@@ -325,12 +325,12 @@ msgstr "A préparé les éléments de base pour l’exploration initiale du suje
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:3425
 msgid "Preparing topic exploration..."
-msgstr "Préparation de l’exploration du sujet..."
+msgstr "Préparation de l’exploration du sujet…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:3448
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:8780
 msgid "Working..."
-msgstr "En cours..."
+msgstr "En cours…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:3456
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:8788
@@ -398,7 +398,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5440
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9185
 msgid "Preparing response..."
-msgstr "Préparation de la réponse..."
+msgstr "Préparation de la réponse…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:3893
 msgid "Error during MCP-based topic exploration bootstrap: "
@@ -437,11 +437,11 @@ msgstr "Aucun code n’est disponible pour cette analyse de code."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4290
 msgid "Prepared the selected coded segments for analysis."
-msgstr "Les segments codés sélectionnés en vue de leur analyse sont préparées."
+msgstr "Les segments codés sélectionnés en vue de leur analyse sont préparés."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4401
 msgid "Preparing coded segments..."
-msgstr "Préparation des segments codés..."
+msgstr "Préparation des segments codés…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4421
 #, python-brace-format
@@ -457,8 +457,8 @@ msgstr ""
 "Seuls {loaded} des {total} segments codés ({coverage:.1f} %) ont pu être "
 "chargés avant que la limite de caractères ne soit atteinte. Veuillez "
 "restreindre la portée par code, fichiers, cas, attributs ou codeur⋅ses. Si "
-"vous souhaitez tout de même continuer, envoyez un message de suivi tel que "
-"« Analyser quand même »."
+"vous souhaitez tout de même continuer, envoyez un message de suivi tel que « "
+"Analyser quand même »."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4676
 msgid "Error during MCP-based code analysis bootstrap: "
@@ -553,11 +553,11 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9245
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9438
 msgid "Chat has been canceled by the user."
-msgstr "Le chat a été annulé par l’utilisateur."
+msgstr "La discussion a été annulée par l’utilisateur."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4874
 msgid "Sorry, the AI could could not find any data related to \""
-msgstr "L’IA n’a pu trouver aucune donnée relative à »"
+msgstr "L’IA n’a pu trouver aucune donnée relative à «"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4881
 msgid "Found related data. Analyzing the most relevant segments closer."
@@ -567,7 +567,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4951
 msgid "Analyze more data..."
-msgstr "Analyser plus de données..."
+msgstr "Analyser plus de données…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:4976
 msgid "Error: There is no more data to analyze."
@@ -588,11 +588,11 @@ msgstr "Aucun passage n’est disponible pour cette analyse de texte."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5171
 msgid "Prepared the selected text passage for analysis."
-msgstr "J’ai préparé le passage choisi en vue de son analyse."
+msgstr "Préparation du passage choisi en vue de son analyse."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5230
 msgid "Preparing selected text passage..."
-msgstr "Préparation du passage sélectionné..."
+msgstr "Préparation du passage sélectionné…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5480
 msgid "Error during MCP-based text analysis bootstrap: "
@@ -628,7 +628,7 @@ msgstr "Voulez-vous vraiment supprimer "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5563
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6121
 msgid "Delete Chat"
-msgstr "Supprimer le chat"
+msgstr "Supprimer la discussion"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5565
 #, python-brace-format
@@ -670,16 +670,12 @@ msgstr "Résumé :"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5788
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5792
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6018
-#, fuzzy
 msgid "Date:"
-msgstr "Date : "
+msgstr "Date :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5788
-#, fuzzy
 msgid "Prompt:"
-msgstr ""
-"\n"
-"Instruction :"
+msgstr "Instruction :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5856
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:263
@@ -692,13 +688,13 @@ msgstr "Info :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5887
 msgid "Thinking..."
-msgstr "Je réfléchis..."
+msgstr "Réflexion…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5967
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:5993
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6008
 msgid "(source reference)"
-msgstr "(référence source)"
+msgstr "(référence de la source)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6115
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\cases.py:1232
@@ -721,7 +717,7 @@ msgstr "Modifier le titre"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6186
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6187
 msgid "Export Chat"
-msgstr "Export du chat"
+msgstr "Export de la discussion"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6150
 msgid "Edit chat title"
@@ -737,21 +733,21 @@ msgstr "Le fichier existe déjà. Voulez-vous le remplacer ?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6874
 msgid "Please select a chat or create a new one."
-msgstr "Veuillez sélectionner un chat ou en créer un nouveau."
+msgstr "Veuillez sélectionner une discussion ou en créer un nouveau."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6875
 msgid "Chat selection"
-msgstr "Sélection du chat"
+msgstr "Sélection de la discussion"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6952
 #, python-brace-format
 msgid "Loaded prompt: {name}"
-msgstr "Instructon chargée : {name}"
+msgstr "Instruction chargée : {name}"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:6961
 #, python-brace-format
 msgid "Loaded prompts: {names}"
-msgstr "Invites chargées : {names}"
+msgstr "Instructions chargées : {names}"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7189
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7310
@@ -778,6 +774,9 @@ msgid ""
 "reflection and generate a provisional answer from the results collected so "
 "far?"
 msgstr ""
+"{step} a atteint la limite de temps imposée par QualCoder. Souhaitez-vous "
+"interrompre la réflexion et générer une réponse provisoire à partir des "
+"résultats recueillis jusqu’à présent ?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7712
 #, python-brace-format
@@ -785,21 +784,22 @@ msgid ""
 "{step} has reached QualCoder's time limit. Do you want to abort the AI "
 "process?"
 msgstr ""
+"{step} a atteint la limite de temps imposée par QualCoder. Souhaitez-vous "
+"interrompre le processus d’IA ?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7761
-#, fuzzy
 msgid "Analyzing..."
-msgstr "Je réfléchis..."
+msgstr "Analyse…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7837
 #, python-brace-format
 msgid "{step} is taking longer than expected..."
-msgstr "L’étape {step} prend plus de temps que prévu..."
+msgstr "L’étape {step} prend plus de temps que prévu…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7862
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "{step} is continuing at your request..."
-msgstr "L’étape {step} prend plus de temps que prévu..."
+msgstr "{step} se poursuit à votre demande…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:8576
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:8603
@@ -818,21 +818,22 @@ msgstr "Erreur lors d’une session avec un agent IA basé sur le MCP : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9234
 msgid "Error: Invalid result from MCP AI agent chat worker."
 msgstr ""
-"Erreur : résultat non valide provenant du module de chat de l’agent IA MCP."
+"Erreur : résultat non valide provenant du module de discussion de l’agent IA "
+"MCP."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9297
 msgid "Error: Invalid message stream from MCP AI agent chat worker."
 msgstr ""
-"Erreur : flux de messages non valide provenant du module de chat de l’agent "
-"IA MCP."
+"Erreur : flux de messages non valide provenant du module de discussion de "
+"l’agent IA MCP."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9332
 msgid "AI timeout"
-msgstr ""
+msgstr "Délai d’attente de l’IA"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9415
 msgid "Repairing invalid final answer format..."
-msgstr "Correction du format incorrect de la réponse finale..."
+msgstr "Correction du format incorrect de la réponse finale…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9423
 msgid ""
@@ -867,9 +868,8 @@ msgstr ""
 "réponse partielle a été conservée."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9484
-#, fuzzy
 msgid "Error communicating with "
-msgstr "Erreur de communication avec\n"
+msgstr "Erreur de communication avec "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9491
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4830
@@ -963,7 +963,7 @@ msgstr "Modèles d’IA"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:221
 msgid "Loading list of available AI models..."
-msgstr "Chargement de la liste des modèles d’IA disponibles..."
+msgstr "Chargement de la liste des modèles d’IA disponibles…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:1236
 msgid ""
@@ -1020,14 +1020,12 @@ msgid "Created text coding: "
 msgstr "Code du texte créé : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2445
-#, fuzzy
 msgid "Created annotation: "
-msgstr "Supprimer l’annotation"
+msgstr "Annotation crée : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2445
-#, fuzzy
 msgid "Created annotation"
-msgstr "Supprimer l’annotation"
+msgstr "Annotation crée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2449
 msgid "Created case: "
@@ -1107,9 +1105,8 @@ msgid "Updated text coding"
 msgstr "Texte codé mis à jour"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2541
-#, fuzzy
 msgid "Updated annotation"
-msgstr "Modifier l’annotation"
+msgstr "Annotation mise à jour"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2550
 msgid "Renamed category: "
@@ -1173,14 +1170,12 @@ msgid "Removed case link"
 msgstr "Lien vers le cas supprimé"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2690
-#, fuzzy
 msgid "Deleted annotation: "
-msgstr "Supprimer l’annotation"
+msgstr "Annotation supprimée : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2691
-#, fuzzy
 msgid "Deleted annotation"
-msgstr "Supprimer l’annotation"
+msgstr "Annotation supprimée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2715
 msgid "1 day ago"
@@ -1226,9 +1221,8 @@ msgid "case link(s)"
 msgstr "lien(s) vers le cas"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2829
-#, fuzzy
 msgid "annotation(s)"
-msgstr "annotations :"
+msgstr "annotation(s)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2831
 msgid "attribute action(s)"
@@ -1337,28 +1331,24 @@ msgstr " lien(s) du cas."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3740
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3755
-#, fuzzy
 msgid " annotation(s)."
-msgstr "annotations :"
+msgstr " annotation(s)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3742
 msgid " attribute definition(s)."
 msgstr " définition(s) d’attribut(s)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3746
-#, fuzzy
 msgid " category(ies)"
-msgstr "catégorie(s)"
+msgstr " catégorie(s)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3748
-#, fuzzy
 msgid " code(s)"
-msgstr "code(s)"
+msgstr " code(s)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3750
-#, fuzzy
 msgid " coding(s)"
-msgstr "codage(s)"
+msgstr " codage(s)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3751
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3753
@@ -1389,9 +1379,8 @@ msgstr ""
 " les textes codés mis à jour sera rétablis à leurs valeurs précédentes."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3767
-#, fuzzy
 msgid " updated annotation(s) would be restored to their previous values."
-msgstr " les codes mis à jour sera rétablis à leurs valeurs précédentes."
+msgstr " annotation(s) mis à jour seront rétablis à leurs valeurs précédentes."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3769
 msgid " attribute update(s) would be restored to their previous values."
@@ -1445,7 +1434,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4453
 #, python-brace-format
 msgid "Undo {count} AI change set(s)?"
-msgstr "Annuler {count} jeu(x) de modifications de l’IA ?"
+msgstr "Annuler {count} ensemble(s) de modifications IA ?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4465
 msgid "Do you want to continue?"
@@ -1491,7 +1480,7 @@ msgstr "IA : {count} {scope} invites ont été converties au format Markdown."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4574
 msgid "AI: Starting up..."
-msgstr "IA : Démarrage..."
+msgstr "IA : Démarrage…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4583
 msgid "AI: In the follwoing window, please set up the AI model."
@@ -1554,7 +1543,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4725
 msgid "AI: Ready"
-msgstr "IA : Prêt"
+msgstr "IA : Prête"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:4736
 msgid ""
@@ -1588,11 +1577,8 @@ msgid "AI generate_code_descriptions\n"
 msgstr "AI generate_code_descriptions\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:5144
-#, fuzzy
 msgid "Prompt:\n"
-msgstr ""
-"\n"
-"Instruction :"
+msgstr "Instruction :\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:5202
 msgid ""
@@ -1600,7 +1586,7 @@ msgid ""
 "Searching data related to \""
 msgstr ""
 "Étape 1 :\n"
-"Recherche de données relatives à  »"
+"Recherche de données relatives à »"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:5309
 msgid ""
@@ -1608,7 +1594,7 @@ msgid ""
 "Inspecting the data more closely..."
 msgstr ""
 "Étape 2 :\n"
-"Examiner les données de plus près..."
+"Examiner les données de plus près…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:440
 msgid "(unnamed category)"
@@ -1617,7 +1603,7 @@ msgstr "(catégorie sans nom)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:441
 #, python-brace-format
 msgid "Creating category \"{name}\"..."
-msgstr "Création de la catégorie « {name} »..."
+msgstr "Création de la catégorie « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:445
 msgid "(unnamed code)"
@@ -1626,7 +1612,7 @@ msgstr "(code sans nom)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:446
 #, python-brace-format
 msgid "Creating code \"{name}\"..."
-msgstr "Création du code « {name} »..."
+msgstr "Création du code « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:452
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:485
@@ -1670,22 +1656,22 @@ msgstr "Document"
 msgid "Creating text coding for code \"{code}\" in document \"{document}\"..."
 msgstr ""
 "Création d’un encodage de texte pour le code « {code} » dans le document "
-"« {document} »..."
+"« {document} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:465
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Creating annotation in document \"{name}\"..."
-msgstr "Mise à jour du document « {name} »..."
+msgstr "Création de l’annotation dans le document « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:469
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Updating annotation #{anid}..."
-msgstr "Mise à jour du texte codé #{ctid}..."
+msgstr "Mise à jour de l’annotation #{anid}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:470
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Deleting annotation #{anid}..."
-msgstr "Suppression du code de texte #{ctid}..."
+msgstr "Suppression de l’annotation #{anid}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:475
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:497
@@ -1710,67 +1696,66 @@ msgstr "Catégorie"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:477
 #, python-brace-format
 msgid "Reviewing impact of deleting category \"{name}\"..."
-msgstr ""
-"Analyse des conséquences de la suppression de la catégorie « {name} »..."
+msgstr "Examen des conséquences de la suppression de la catégorie « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:479
 #, python-brace-format
 msgid "Moving category \"{name}\"..."
-msgstr "Déplacement de la catégorie « {name} »..."
+msgstr "Déplacement de la catégorie « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:480
 #, python-brace-format
 msgid "Deleting category \"{name}\"..."
-msgstr "Suppression de la catégorie « {name} »..."
+msgstr "Suppression de la catégorie « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:487
 #, python-brace-format
 msgid "Reviewing impact of deleting code \"{name}\"..."
-msgstr "Analyse de l’impact de la suppression du code « {name} »..."
+msgstr "Examen de l’impact de la suppression du code « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:489
 #, python-brace-format
 msgid "Moving code \"{name}\"..."
-msgstr "Déplacement du code « {name} »..."
+msgstr "Déplacement du code « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:490
 #, python-brace-format
 msgid "Deleting code \"{name}\"..."
-msgstr "Suppression du code « {name} »..."
+msgstr "Suppression du code « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:494
 msgid "Updating category \"error: missing category id\"..."
 msgstr ""
-"Mise à jour de la catégorie « erreur : identifiant de catégorie manquant »..."
+"Mise à jour de la catégorie « erreur : identifiant de catégorie manquant »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:498
 #, python-brace-format
 msgid "Updating category \"{name}\"..."
-msgstr "Mise à jour de la catégorie « {name} »..."
+msgstr "Mise à jour de la catégorie « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:502
 msgid "Updating code \"error: missing code id\"..."
-msgstr "Mise à jour du code « erreur : identifiant de code manquant »..."
+msgstr "Mise à jour du code « erreur : identifiant de code manquant »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:506
 #, python-brace-format
 msgid "Updating code \"{name}\"..."
-msgstr "Mise à jour du code « {name} »..."
+msgstr "Mise à jour du code « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:509
 #, python-brace-format
 msgid "Updating text coding #{ctid}..."
-msgstr "Mise à jour du texte codé #{ctid}..."
+msgstr "Mise à jour du texte codé #{ctid}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:512
 #, python-brace-format
 msgid "Moving text coding #{ctid}..."
-msgstr "Déplacement du code de texte #{ctid}..."
+msgstr "Déplacement du code de texte #{ctid}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:515
 #, python-brace-format
 msgid "Deleting text coding #{ctid}..."
-msgstr "Suppression du code de texte #{ctid}..."
+msgstr "Suppression du code de texte #{ctid}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:519
 msgid "(unnamed case)"
@@ -1779,7 +1764,7 @@ msgstr "(cas non identifiée)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:520
 #, python-brace-format
 msgid "Creating case \"{name}\"..."
-msgstr "Création du cas « {name} »..."
+msgstr "Création du cas « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:525
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:538
@@ -1799,100 +1784,99 @@ msgstr "Cas"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:526
 #, python-brace-format
 msgid "Updating case \"{name}\"..."
-msgstr "Mise à jour du cas « {name} »..."
+msgstr "Mise à jour du cas « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:532
 #, python-brace-format
 msgid "Updating document \"{name}\"..."
-msgstr "Mise à jour du document « {name} »..."
+msgstr "Mise à jour du document « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:542
 #, python-brace-format
 msgid "Linking text from \"{document}\" to case \"{case}\"..."
-msgstr "Lien entre le texte de « {document} » et du cas « {case} »..."
+msgstr "Lien entre le texte de « {document} » et du cas « {case} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:548
 #, python-brace-format
 msgid "Removing case-text link #{id}..."
-msgstr "Suppression du lien vers le texte vers le cas #{id}..."
+msgstr "Suppression du lien vers le texte vers le cas #{id}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:549
 #, python-brace-format
 msgid "Executing tool \"{name}\"..."
-msgstr "Exécution de l’outil « {name} »..."
+msgstr "Exécution de l’outil « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:557
 msgid "Reviewing the list of text documents..."
-msgstr "Analyse de la liste des documents texte..."
+msgstr "Examen de la liste des documents texte…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:559
 msgid "Reviewing the list of cases..."
-msgstr "Analyse de la liste des cas..."
+msgstr "Examen de la liste des cas…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:561
-#, fuzzy
 msgid "Reviewing text annotations..."
-msgstr "Analyse de la liste des cas..."
+msgstr "Examen des annotations de texte…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:563
 msgid "Reviewing the current code structure..."
-msgstr "Analyse de la structure actuelle du code..."
+msgstr "Examen de la structure actuelle du code…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:565
 msgid "Running semantic search in the project data..."
-msgstr "Lancement d’une recherche sémantique dans les données du projet..."
+msgstr "Lancement d’une recherche sémantique dans les données du projet…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:567
 msgid "Running keyword search in empirical data (BM25)..."
 msgstr ""
-"Lancement d’une recherche par mot-clé dans des données empiriques (BM25)..."
+"Lancement d’une recherche par mot-clé dans des données empiriques (BM25)…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:569
 msgid "Running keyword search in empirical data (Regex)..."
 msgstr ""
 "Effectuer une recherche par mot-clé dans des données empiriques (expressions "
-"régulières)..."
+"régulières)…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:571
 msgid "Reviewing available QualCoder help pages..."
-msgstr "Analyse des pages d’aide disponibles de QualCoder..."
+msgstr "Examen des pages d’aide disponibles de QualCoder…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:573
 msgid "Searching the QualCoder help..."
-msgstr "Recherche dans l’aide de QualCoder..."
+msgstr "Recherche dans l’aide de QualCoder…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:576
 msgid "Reviewing a QualCoder help page..."
-msgstr "Analyse une page d’aide de QualCoder..."
+msgstr "Examen une page d’aide de QualCoder…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:583
 #, python-brace-format
 msgid "Reviewing text segments for case \"{name}\"..."
-msgstr "Analyse des segments de texte pour le cas « {name} »..."
+msgstr "Examen des segments de texte pour le cas « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:590
 #, python-brace-format
 msgid "Reviewing case details for \"{name}\"..."
-msgstr "Analyse des détails du cas concernant « {name} »..."
+msgstr "Examen des détails du cas concernant « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:597
 #, python-brace-format
 msgid "Reviewing coded text segments for \"{name}\"..."
-msgstr "Analyse des segments de texte codés pour « {name} »..."
+msgstr "Examen des segments de texte codés pour « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:600
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Reviewing annotation #{anid}..."
-msgstr "Suppression du lien vers le texte vers le cas #{id}..."
+msgstr "Examen de l’annotation #{anid}…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:607
 #, python-brace-format
 msgid "Reviewing passages from \"{name}\"..."
-msgstr "Analyse de passages tirés de « {name} »..."
+msgstr "Examen de passages tirés de « {name} »…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:609
 msgid "Reviewing project material..."
-msgstr "Analyse des matériaux du projet..."
+msgstr "Examen des matériaux du projet…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:2022
 msgid ""
@@ -1907,8 +1891,8 @@ msgstr ""
 #, python-brace-format
 msgid "Warning: {count} affected coding(s) are not owned by 'AI Agent'."
 msgstr ""
-"Avertissement : les {count} codes concernés n’appartiennent pas à « AI "
-"Agent »."
+"Avertissement : les {count} codes concernés n’appartiennent pas à « AI Agent "
+"»."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:2054
 msgid ""
@@ -1927,6 +1911,13 @@ msgid ""
 "'Prompt' and 'prompt' are treated as duplicates. Reserved Windows filenames "
 "such as CON, NUL, COM1, and LPT1 are not allowed."
 msgstr ""
+"Les noms de prompt peuvent contenir des caractères Unicode, y compris des "
+"accents et des trémas, des chiffres, des tirets et des tirets bas. Ils "
+"doivent commencer par une lettre ou un chiffre et ne pas dépasser 64 "
+"caractères. La distinction entre majuscules et minuscules n’est pas prise en "
+"compte ; ainsi, « Instruction » et « instruction » sont considérés comme des "
+"doublons. Les noms de fichiers réservés sous Windows, tels que CON, NUL, "
+"COM1 et LPT1, ne sont pas autorisés."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:213
 msgid "Create new prompt"
@@ -2010,28 +2001,26 @@ msgid "Folder names must not start with \"_\"."
 msgstr "Les noms de dossiers ne doivent pas commencer par « _ »."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1114
-#, fuzzy
 msgid "The folder name must be no longer than 64 characters."
-msgstr "Le nom ne doit pas dépasser 64 caractères."
+msgstr "The folder name must be no longer than 64 characters."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1117
 msgid "The encoded folder name is too long for a portable filesystem."
 msgstr ""
+"Le nom du dossier encodé est trop long pour un système de fichiers portable."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1121
-#, fuzzy
 msgid "This folder name is reserved by Windows and cannot be used."
-msgstr "Ce nom de filtre est déjà utilisé : "
+msgstr "Ce nom de dossier est réservé à Windows et ne doit pas être utilisé."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1124
-#, fuzzy
 msgid ""
 "Folder names must start with a letter or number and contain Unicode letters, "
 "combining marks, numbers, hyphens, and underscores only."
 msgstr ""
 "Les noms de dossiers doivent être compatibles avec le système de fichiers. "
 "N’utilisez que des lettres minuscules, des chiffres, des tirets et des "
-"traits de soulignement."
+"tirets bas."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1134
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1262
@@ -2118,7 +2107,7 @@ msgstr "Voulez-vous vraiment modifier le type d’instruction de «"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1305
 msgid "\" to \""
-msgstr "» à  «"
+msgstr "» à «"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1305
 msgid "\"?"
@@ -2153,20 +2142,22 @@ msgstr "Le nom ne doit pas dépasser 64 caractères."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1416
 msgid "The encoded prompt filename is too long for a portable filesystem."
 msgstr ""
+"Le nom du fichier de l’instruction encodé est trop long pour un système de "
+"fichiers portable."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1422
 msgid "This prompt name is reserved by Windows and cannot be used."
 msgstr ""
+"Ce nom d’instruction est réservé par Windows et ne peut pas être utilisé."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1425
-#, fuzzy
 msgid ""
 "Prompt names must start with a letter or number and contain Unicode letters, "
 "combining marks, numbers, hyphens, and underscores only."
 msgstr ""
 "Les noms d’instructions doivent être compatibles avec le système de "
 "fichiers. N’utilisez que des lettres minuscules, des chiffres, des tirets et "
-"des traits de soulignement."
+"des tirets bas."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1443
 msgid ""
@@ -2217,7 +2208,7 @@ msgstr "La dernière instruction utilisée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_search_dialog.py:272
 msgid "could not be found. The prompt will be reset to the default."
-msgstr "n’a pas été trouvé. L’instruction sera réinitialisée par défaut."
+msgstr "n’a pas été trouvée. L’instruction sera réinitialisée par défaut."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_search_dialog.py:273
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_search_dialog.py:891
@@ -2371,11 +2362,8 @@ msgstr "Recherche dans tous les cas"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes_by_segments.py:152
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_code_summary.py:431
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:303
-#, fuzzy
 msgid "MEMO: "
-msgstr ""
-"\n"
-"MÉMO : "
+msgstr "MÉMO : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_search_dialog.py:810
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_search_dialog.py:826
@@ -2536,7 +2524,7 @@ msgstr ""
 msgid "Migrating the existing AI memory to the new internal search database..."
 msgstr ""
 "Migration de la mémoire IA existante vers la nouvelle base de données de "
-"recherche interne..."
+"recherche interne…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_vectorstore.py:965
 msgid ""
@@ -3110,18 +3098,16 @@ msgid "Codebook for"
 msgstr "Grille de codage pour"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\codebook.py:266
-#, fuzzy
 msgid "Category:"
-msgstr "Catégorie : "
+msgstr "Catégorie :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\codebook.py:272
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:269
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:731
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:3968
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:4038
-#, fuzzy
 msgid "Code:"
-msgstr "Code : "
+msgstr "Code :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\coder_names.py:73
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1022
@@ -3404,11 +3390,12 @@ msgstr "Retranscription codée : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5421
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5426
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5604
-#, fuzzy
 msgid ""
 "\n"
 "Code: "
-msgstr "Code : "
+msgstr ""
+"\n"
+"Code : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:568
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3529
@@ -3543,7 +3530,7 @@ msgstr "Vidéo"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:926
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:626
 msgid "Dock video back"
-msgstr "Remettre la vidéo dans le dock"
+msgstr "Réancrer la vidéo"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:1021
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:1894
@@ -3890,9 +3877,8 @@ msgstr "Effacer le segment"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:2914
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:4907
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:5522
-#, fuzzy
 msgid "Segment: "
-msgstr "Segment :"
+msgstr "Segment : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:2407
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:2915
@@ -4018,7 +4004,7 @@ msgstr "La forme d’onde n’a pas pu être générée"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:2628
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:654
 msgid "Generating waveform..."
-msgstr "Génération de la forme d’onde..."
+msgstr "Génération de la forme d’onde…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_av.py:2736
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references.py:417
@@ -4515,9 +4501,8 @@ msgstr "Audios / vidéos codés"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:264
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:266
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:728
-#, fuzzy
 msgid " File: "
-msgstr "Fichiers : "
+msgstr " Fichiers : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:405
 msgid "Apply more codes to this segment"
@@ -4529,11 +4514,11 @@ msgstr "Supprimer le code"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:409
 msgid "Remove important flag"
-msgstr "Enlever la marque importante"
+msgstr "Retirer le marqueur important"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:411
 msgid "Add important flag"
-msgstr "Ajouter un drapeau important"
+msgstr "Ajouter le marqueur important"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_in_all_files.py:412
 msgid "Export to ODT file"
@@ -4608,9 +4593,9 @@ msgid ""
 msgstr ""
 "SAUVEGARDEZ LE PROJET avant d’appliquer des modifications à l’arborescence "
 "des codes.\n"
-"L’. est principalement utilisé dans le cadre de la théorie ancrée pour vous "
-"aider à développer et organiser les concepts de codage ainsi que leur "
-"hiérarchie.\n"
+"L’organisateur de codes. est principalement utilisé dans le cadre de la "
+"théorie ancrée pour vous aider à développer et organiser les concepts de "
+"codage ainsi que leur hiérarchie.\n"
 "Sélectionnez une branche de codes ou l’option « Tout », puis faites un clic "
 "droit pour :\n"
 "Ajouter des catégories, renommer des codes et des catégories, mettre à jour "
@@ -4851,18 +4836,16 @@ msgid "category "
 msgstr "catégorie "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1490
-#, fuzzy
 msgid "Code "
-msgstr "Code A"
+msgstr "Code "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1494
 msgid "under "
 msgstr "sous "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1499
-#, fuzzy
 msgid "Category "
-msgstr "Catégorie : "
+msgstr "Catégorie "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1507
 msgid "Apply changes to code tree"
@@ -4889,9 +4872,8 @@ msgid "Code organiser - applied changes:"
 msgstr "Organisateur de code - changements appliqués :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1699
-#, fuzzy
 msgid "Code organiser "
-msgstr "Organiser les codes"
+msgstr "Organisateur de codes "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_organiser.py:1707
 msgid "Applying changes failed. Nothing was changed."
@@ -5165,27 +5147,24 @@ msgstr "Aller au signet (appuyer sur B pour définir)"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_exact_matches.py:184
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:240
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:598
-#, fuzzy
 msgid "Characters: "
-msgstr "Caractères :"
+msgstr "Caractères : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:1906
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5975
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6021
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:1355
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:1422
-#, fuzzy
 msgid "Codings:"
-msgstr "Codages : "
+msgstr "Codages :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:1908
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2751
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2758
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:2411
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:2414
-#, fuzzy
 msgid "Memo:"
-msgstr "Mémo : "
+msgstr "Mémo :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2018
 msgid "Restructure to whole paragraphs (join lines)"
@@ -5215,7 +5194,7 @@ msgstr "PDF est protégé par mot de passe"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2254
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2311
 msgid "Reading text..."
-msgstr "Lecture du texte en cours..."
+msgstr "Lecture du texte en cours…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2320
 msgid "Could not read PDF text: "
@@ -5239,9 +5218,8 @@ msgid "Area:"
 msgstr "Zone :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2763
-#, fuzzy
 msgid "Annotation:"
-msgstr "Annotation : "
+msgstr "Annotation :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:2765
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:4342
@@ -5375,12 +5353,12 @@ msgstr "Autocodage terminé."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5307
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5320
 msgid "Code sentence"
-msgstr "Phrase de code"
+msgstr "Phrase codée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3560
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5310
 msgid "Auto code sentence using this text fragment:"
-msgstr "Phrase d’autocodage utilisant ce texte :"
+msgstr "Phrase autocodée en utilisant ce texte :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3575
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5325
@@ -5427,9 +5405,8 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:1300
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:1326
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_models.py:1727
-#, fuzzy
 msgid "File: "
-msgstr "Fichiers : "
+msgstr "Fichier : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3648
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5414
@@ -5455,7 +5432,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3659
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5425
 msgid "Automatic code sentence in files:"
-msgstr "Phrase de code automatique dans les fichiers :"
+msgstr "Phrase automatiquement codée dans les fichiers :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3661
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5427
@@ -5502,7 +5479,7 @@ msgstr " nouvelles sections codées trouvées."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3754
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5248
 msgid "previously coded."
-msgstr "préalablement codifiés."
+msgstr "préalablement codés."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:3832
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:153
@@ -5790,7 +5767,7 @@ msgstr "Déplacé approximativement ; veuillez examiner :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5983
 msgid "... and more, see the log file."
-msgstr "... et plus encore, voir le fichier journal."
+msgstr "… et plus encore, voir le fichier journal."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:5988
 msgid "All segments were relocated exactly."
@@ -5933,7 +5910,7 @@ msgstr "Fréquence de co-occurence"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6291
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:3402
 msgid "No co-occurrences found in this file."
-msgstr "Pas de co-occurences trouvés dans ce fichier."
+msgstr "Pas de co-occurences trouvées dans ce fichier."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_pdf.py:6294
 msgid "Coded Text Segments"
@@ -6244,7 +6221,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:4928
 msgid "AI Interpretation"
-msgstr "Interprétation par IA"
+msgstr "Interprétation de l'IA"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:5654
 msgid "Text reverted to prior to edit"
@@ -6304,15 +6281,15 @@ msgstr "L’IA est occupée, veuillez attendre un moment et réessayer."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6308
 msgid "Searching for related data, please wait..."
-msgstr "Recherche de données connexes, veuillez patienter..."
+msgstr "Recherche de données connexes, veuillez patienter…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6339
 msgid "AI: No related data found for \""
-msgstr "IA : Aucune donnée connexe n’a été trouvée pour  «"
+msgstr "IA : Aucune donnée connexe n’a été trouvée pour «"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6379
 msgid "AI: No new data found for \""
-msgstr "IA : Aucune nouvelle donnée trouvée pour  «"
+msgstr "IA : Aucune nouvelle donnée trouvée pour «"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6380
 msgid "\" beside what has already been coded with this code."
@@ -6323,11 +6300,11 @@ msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
 msgstr ""
 "Des données potentiellement liées ont été trouvées, nous les examinons de "
-"plus près. Veuillez patienter..."
+"plus près. Veuillez patienter…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6426
 msgid "The closer inspection of the first "
-msgstr "L’examen plus approfondi de la première "
+msgstr "Examen plus approfondi de la première "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6427
 msgid ""
@@ -6359,7 +6336,7 @@ msgstr "Cliquez ici pour arrêter la recherche"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6501
 msgid ">> Find more..."
-msgstr ">> En savoir plus..."
+msgstr ">> En savoir plus…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6502
 msgid "Click here to analyze more data"
@@ -6379,7 +6356,7 @@ msgstr "(recherche terminée)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6529
 msgid "Do you want to stop the search?"
-msgstr "Vous êtes sûr de vouloir  arrêter la recherche ?"
+msgstr "Vous êtes sûr de vouloir arrêter la recherche ?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6530
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:2901
@@ -6396,7 +6373,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6544
 msgid "The AI is busy. Please wait a moment and retry."
-msgstr "L’IA est occupée. Veuillez patienter un moment et réessayer."
+msgstr "L’IA est surchargée. Veuillez patienter un moment et réessayer."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_text.py:6798
 msgid "Font and size"
@@ -6914,7 +6891,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\import_survey.py:315
 msgid "Survey file:"
-msgstr "Fichier d'enquête :"
+msgstr "Fichier d’enquête :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\import_survey.py:316
 msgid "Fields:"
@@ -6942,7 +6919,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\import_survey.py:345
 msgid "Survey not loaded: "
-msgstr "Enquête non chargé : "
+msgstr "Enquête non chargée : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\import_survey.py:346
 msgid "Survey not loaded"
@@ -7043,7 +7020,7 @@ msgstr "Optionnel : Installez VLC pour le codage audio et vidéo."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:185
 msgid "Optional: Install ffmpeg for waveform images."
-msgstr "Optionnel : Installez ffmpeg pour les images de forme d'onde."
+msgstr "Optionnel : Installez ffmpeg pour les images de forme d’onde."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:188
 msgid "Acknowledgements"
@@ -7179,7 +7156,7 @@ msgstr "Extraction des codes"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:288
 msgid "Help contents"
-msgstr "Contenu de l'aide"
+msgstr "Contenu de l’aide"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:289
 msgid "Code image"
@@ -7405,7 +7382,7 @@ msgstr "Insérer horodatage dans le format"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:322
 msgid "Enter a new speakers name into shortcuts"
-msgstr "Entrez un nouveau nom d'intervenant⋅e dans les raccourcis"
+msgstr "Entrez un nouveau nom d’intervenant⋅e dans les raccourcis"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:323
 msgid "Delete speaker names from shortcuts"
@@ -7428,7 +7405,7 @@ msgstr "Diminuer la vitesse de lecture"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:327
 msgid "When tree item selected - Rename code or category"
 msgstr ""
-"Lorsque l’élément de l'arborescence est sélectionné - Renommer le code ou la "
+"Lorsque l’élément de l’arborescence est sélectionné - Renommer le code ou la "
 "catégorie"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:333
@@ -7681,7 +7658,7 @@ msgstr "Zoomer"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:406
 msgid "Code image key shortcuts"
-msgstr "Raccourcis clavier pour le codage d'images"
+msgstr "Raccourcis clavier pour le codage d’images"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:416
 msgid ""
@@ -8572,9 +8549,8 @@ msgid "(no value)"
 msgstr "(aucune valeur)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:755
-#, fuzzy
 msgid "Rows: "
-msgstr "Lignes :"
+msgstr "Lignes : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:764
 msgid "Hidden columns: "
@@ -8782,9 +8758,8 @@ msgid "Bulk Rename of database file name entries"
 msgstr "Renommer l’entrée du fichier de la base de données"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:1595
-#, fuzzy
 msgid "Renamed database file entry:"
-msgstr "Entrée de fichier de base de données renommée : "
+msgstr "Entrée de fichier de base de données renommée :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:1673
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3495
@@ -8990,11 +8965,12 @@ msgid "No columns assigned as qualitative."
 msgstr "Aucune colonne n’est définie comme qualitative."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:2712
-#, fuzzy
 msgid ""
 "\n"
 "No columns assigned as qualitative."
-msgstr "Aucune colonne n’est définie comme qualitative."
+msgstr ""
+"\n"
+"Aucune colonne n’est définie comme qualitative."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:2866
 msgid "Some existing data updated."
@@ -9139,9 +9115,8 @@ msgstr "Impossible d’importer"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3343
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\text_file_replacement.py:340
-#, fuzzy
 msgid "Cannot import "
-msgstr "Impossible d’importer"
+msgstr "Impossible d’importer "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3393
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references.py:909
@@ -9205,8 +9180,8 @@ msgid ""
 "AI index is busy; the deleted file will be removed from the index on the "
 "next update."
 msgstr ""
-"L’index AI est occupé; le fichier supprimé sera enlevé de l’index lors de la "
-"prochaine mise à jour."
+"L’index AI est occupé ; le fichier supprimé sera enlevé de l’index lors de "
+"la prochaine mise à jour."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3624
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3725
@@ -9239,14 +9214,12 @@ msgid "Deleted: "
 msgstr "Supprimé : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3941
-#, fuzzy
 msgid "Minimum: "
-msgstr "Minimum :"
+msgstr "Minimum : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3942
-#, fuzzy
 msgid "Maximum: "
-msgstr "Maximum :"
+msgstr "Maximum : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_files.py:3990
 msgid ""
@@ -9318,7 +9291,7 @@ msgstr "Sélectionner le chemin que vous souhaitez remplacer.\n"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_links.py:87
 msgid "e.g. C:/Users/olduser/Images  To replace olduser enter: olduser\n"
 msgstr ""
-"exemple : C:/Users/olduser/Images  Pour remplacer olduser, saisissez : "
+"exemple : C:/Users/olduser/Images Pour remplacer olduser, saisissez : "
 "olduser\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_links.py:88
@@ -9598,7 +9571,7 @@ msgstr "Puis redémarrer Zotero."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:397
 msgid "Fetching references from Zotero..."
-msgstr "Récupération des références depuis Zotero..."
+msgstr "Récupération des références depuis Zotero…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:404
 msgid "References fetched: "
@@ -9606,7 +9579,7 @@ msgstr "Références récupérées : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:411
 msgid "No references were found."
-msgstr "Aucune référence n’ont été trouvées."
+msgstr "Aucune référence n’a été trouvée."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\manage_references_import_zotero.py:418
 msgid "Attachments scanned: "
@@ -9656,7 +9629,7 @@ msgstr "Insérer une référence"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\memo.py:153
 msgid "No references found in this project."
-msgstr "Aucunes références trouvées dans ce projet."
+msgstr "Aucune référence trouvée dans ce projet."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\memo.py:207
 msgid "Memo export"
@@ -9681,7 +9654,6 @@ msgstr "MÉMO CODÉ"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1487
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2612
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:545
-#, fuzzy
 msgid "Coder: "
 msgstr "Codeur·se : "
 
@@ -10474,7 +10446,7 @@ msgstr "Projet exporté"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\refi.py:2193
 msgid "Codebook has been exported to "
-msgstr "La grille de codage a été exporté vers "
+msgstr "La grille de codage a été exportée vers "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\refi.py:2199
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\refi.py:2200
@@ -10803,11 +10775,12 @@ msgstr "Fichier texte\n"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:314
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_exact_matches.py:197
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:255
-#, fuzzy
 msgid ""
 "\n"
 "Codings: "
-msgstr "Codages : "
+msgstr ""
+"\n"
+"Codages : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:289
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes_by_segments.py:146
@@ -11009,9 +10982,8 @@ msgid "Search text: "
 msgstr "Texte de recherche : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1490
-#, fuzzy
 msgid "Files:"
-msgstr "Fichiers : "
+msgstr "Fichiers :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1501
 msgid "DATE:"
@@ -11032,7 +11004,7 @@ msgstr "Aucun code n’a été sélectionné."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1582
 msgid "No files, cases found."
-msgstr "Aucun fichier, aucun cas n’a été trouvée."
+msgstr "Aucun fichier, aucun cas n’a été trouvé."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1583
 msgid "Nothing selected"
@@ -11072,28 +11044,28 @@ msgid "Codes: "
 msgstr "Codes : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1626
-#, fuzzy
 msgid "Attributes:"
-msgstr "Attributs : "
+msgstr "Attributs :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1645
-#, fuzzy
 msgid ""
 "\n"
 "Files:\n"
-msgstr "Fichiers : "
+msgstr ""
+"\n"
+"Fichiers :\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1650
-#, fuzzy
 msgid " Files: "
-msgstr "Fichiers : "
+msgstr " Fichiers : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:1652
-#, fuzzy
 msgid ""
 "\n"
 "Cases:\n"
-msgstr "Cas : "
+msgstr ""
+"\n"
+"Cas :\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2084
 msgid "Text code statistics:"
@@ -11102,9 +11074,8 @@ msgstr "Statistiques de codes texte :"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2086
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2168
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2243
-#, fuzzy
 msgid "Count:"
-msgstr "Compte : "
+msgstr "Compte :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2087
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2169
@@ -11132,11 +11103,8 @@ msgstr "Nombre total de codes"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2400
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:3315
-#, fuzzy
 msgid "MEMO:"
-msgstr ""
-"\n"
-"MÉMO : "
+msgstr "MÉMO :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:2413
 msgid "Overlapping codes:"
@@ -11244,14 +11212,12 @@ msgid "Delete coded section"
 msgstr "Supprimer le texte codé"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:3064
-#, fuzzy
 msgid "FILE MEMO:"
-msgstr " MEMO DE FICHIER : "
+msgstr "MÉMO DE FICHIER :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_codes.py:3072
-#, fuzzy
 msgid "CASE MEMO:"
-msgstr "MÉMO DE CAS : "
+msgstr "MÉMO DE CAS :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_code_summary.py:429
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:436
@@ -11338,9 +11304,8 @@ msgstr "CODAGES D’IMAGES : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_code_summary.py:648
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:1004
-#, fuzzy
 msgid "Image: "
-msgstr "Image :"
+msgstr "Image : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_code_summary.py:649
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_code_summary.py:700
@@ -11391,11 +11356,12 @@ msgstr "Pourcentage moyen des médias : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:322
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_exact_matches.py:202
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:265
-#, fuzzy
 msgid ""
 "\n"
 "Memo: "
-msgstr "Mémo : "
+msgstr ""
+"\n"
+"Mémo : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:429
 msgid "CODER COMPARISON FOR FILE"
@@ -11466,7 +11432,7 @@ msgstr "Non codé : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:707
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:835
 msgid "Coder 0: "
-msgstr "Codeur·se  0 : "
+msgstr "Codeur·se 0 : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:560
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:708
@@ -11568,9 +11534,8 @@ msgstr "Nombre d’intersections : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:722
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:732
-#, fuzzy
 msgid "pixels"
-msgstr " pixels"
+msgstr "pixels"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:838
 msgid "Total text dual coded: "
@@ -11588,9 +11553,8 @@ msgstr "Désaccord total sur le texte (code unique) : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:528
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:539
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4608
-#, fuzzy
 msgid "Area: "
-msgstr "Zone :"
+msgstr "Zone : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:1106
 msgid "Intersections: "
@@ -11606,9 +11570,8 @@ msgstr "Proportion : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_compare_coder_file.py:1134
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:1097
-#, fuzzy
 msgid "Scale: "
-msgstr "Échelle :"
+msgstr "Échelle : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_comparison_table.py:196
 msgid "Select Attribute"
@@ -11743,9 +11706,8 @@ msgid "Categories selected"
 msgstr "Catégories sélectionnées"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_cooccurrence.py:385
-#, fuzzy
 msgid "Categories selected "
-msgstr "Catégories sélectionnées"
+msgstr "Catégories sélectionnées "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_cooccurrence.py:534
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_cooccurrence.py:618
@@ -12004,9 +11966,8 @@ msgstr "Segment moyen : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:429
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:481
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:3264
-#, fuzzy
 msgid " msecs"
-msgstr "msecs"
+msgstr " msecs"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:437
 msgid "TRANSCRIPT:"
@@ -12018,9 +11979,8 @@ msgid "END OF TRANSCRIPT"
 msgstr "FIN DE RETRANSCRIPTION"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:488
-#, fuzzy
 msgid "TRANSCRIPT: "
-msgstr "RETRANSCRIPTION :"
+msgstr "RETRANSCRIPTION : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\report_file_summary.py:514
 msgid "PDF IMAGE DETAILS"
@@ -12336,7 +12296,7 @@ msgstr "Sélectionner un fichier RIS ou NBIB"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ris.py:505
 msgid "No references found in: "
-msgstr "Aucunes références trouvées dans : "
+msgstr "Aucune référence trouvée dans : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ris.py:574
 msgid "Bibliography loaded from: "
@@ -12482,14 +12442,14 @@ msgid ""
 "more languages...\" in the dropdown."
 msgstr ""
 "Il est possible d’installer d’autres langues prises en charge par la "
-"communauté en sélectionnant « Ajouter d’autres langues... » dans le menu "
+"communauté en sélectionnant « Ajouter d’autres langues… » dans le menu "
 "déroulant."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\settings.py:400
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\settings.py:451
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\settings.py:455
 msgid "Add more languages..."
-msgstr "Ajouter d’autres langues..."
+msgstr "Ajouter d’autres langues…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\settings.py:456
 msgid "Could not open the user translation folder."
@@ -12840,8 +12800,8 @@ msgid ""
 "* = not in every turn (inconsistent). Edit them per segment in Preview "
 "segments; they cannot be edited here."
 msgstr ""
-"* = pas à chaque tour (incohérent). Modifiez-les segment par segment dans "
-"« Aperçu des segments » ; ils ne peuvent pas être modifiés ici."
+"* = pas à chaque tour (incohérent). Modifiez-les segment par segment dans « "
+"Aperçu des segments » ; ils ne peuvent pas être modifiés ici."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1564
 msgid "speakers"
@@ -12949,11 +12909,11 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1892
 msgid "Applying speaker codes"
-msgstr "A"
+msgstr "Appliquer les codes des intervenante⋅es"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:1971
 msgid "Cancelled. No speaker codes were applied."
-msgstr "Annulé. Aucun code d’intervenant⋅es n’est appliqué."
+msgstr "Annulé. Aucun code des intervenant⋅es n’est appliqué."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\speakers.py:2041
 msgid "Speaker code could not be found or created."
@@ -13078,9 +13038,8 @@ msgstr " redimensionné par "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\special_functions.py:279
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\GUI\special_functions.py:131
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\GUI\special_functions.py:174
-#, fuzzy
 msgid " characters."
-msgstr " caractères.\n"
+msgstr " caractères."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\special_functions.py:250
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\GUI\special_functions.py:148
@@ -13196,7 +13155,7 @@ msgstr ""
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\text_file_replacement.py:166
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\text_file_replacement.py:193
 msgid " unmatched codings"
-msgstr " codifications inégalées"
+msgstr " codages ne correspondants pas"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\text_file_replacement.py:339
 msgid ""
@@ -13277,9 +13236,8 @@ msgid "Width"
 msgstr "Largeur"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:830
-#, fuzzy
 msgid "Width:"
-msgstr "Largeur : "
+msgstr "Largeur :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:833
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:1099
@@ -13287,9 +13245,8 @@ msgid "Height"
 msgstr "Hauteur"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:833
-#, fuzzy
 msgid "Height:"
-msgstr "Hauteur : "
+msgstr "Hauteur :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_av.py:853
 msgid "Loop selection"
@@ -13379,7 +13336,7 @@ msgstr "Code par segments audio/vidéo"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:125
 msgid "Code frequency sunburst"
-msgstr "Diagramme circulaire  de la fréquence du code"
+msgstr "Diagramme circulaire de la fréquence du code"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:126
 msgid "Code frequency treemap"
@@ -13407,7 +13364,7 @@ msgstr "Diagramme circulaire du code par A/V"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:132
 msgid "Code by A/V treemap"
-msgstr "Diagramme circulaire du code par  A/V"
+msgstr "Diagramme circulaire du code par A/V"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:142
 msgid "Files by codes"
@@ -13436,9 +13393,8 @@ msgstr "Filtre de fichier"
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:250
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:271
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:292
-#, fuzzy
 msgid "Text:"
-msgstr "Texte : "
+msgstr "Texte :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:271
 msgid "Case filter"
@@ -13555,9 +13511,8 @@ msgstr "Graphique à barres des attributs"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:1812
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:1842
-#, fuzzy
 msgid " attribute: "
-msgstr "attribut :"
+msgstr " attribut : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_charts.py:1841
 msgid "Attribute histogram"
@@ -13799,7 +13754,7 @@ msgstr "Afficher les fréquences"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:2602
 msgid "Connect to..."
-msgstr "Connecter à..."
+msgstr "Connecter à…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:2605
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:7148
@@ -13849,9 +13804,8 @@ msgid " width"
 msgstr " largeur"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:3338
-#, fuzzy
 msgid " height:"
-msgstr "hauteur :"
+msgstr " hauteur :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:3346
 msgid "Select coded area"
@@ -13995,11 +13949,8 @@ msgid "Loaded graph: "
 msgstr "Graphique chargé: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4331
-#, fuzzy
 msgid "Description: "
-msgstr ""
-"\n"
-"Description :"
+msgstr "Description : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4364
 msgid "[Notice: graph image could not be embedded in the report.]"
@@ -14125,9 +14076,8 @@ msgid "Analytical summary exported to:\n"
 msgstr "Résumé analytique exporté vers :\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4840
-#, fuzzy
 msgid "The file could not be saved:\n"
-msgstr "Le fichier n’a pas pu être enregistré :"
+msgstr "Le fichier n’a pas pu être enregistré :\n"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph.py:4869
 msgid "Save Graph"
@@ -15621,7 +15571,7 @@ msgstr "Cadre :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:482
 msgid "Search relations..."
-msgstr "Recherche de relations..."
+msgstr "Recherche de relations…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:483
 msgid "Custom label:"
@@ -15629,7 +15579,7 @@ msgstr "Étiquette personnalisée :"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:484
 msgid "Override with a custom label..."
-msgstr "Remplacer avec une étiquette personnalisée..."
+msgstr "Remplacer avec une étiquette personnalisée…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:485
 msgid "Color:"
@@ -15760,7 +15710,7 @@ msgstr "Importé : "
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:516
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1114
 msgid "Skipped (duplicates or invalid): "
-msgstr "Passé (dupliqué ou invalide) : "
+msgstr "Ignoré (dupliqué ou invalide) : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:517
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1137
@@ -15772,9 +15722,8 @@ msgid "Relation detail"
 msgstr "Détail de la relation"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:596
-#, fuzzy
 msgid "Framework: "
-msgstr "Cadre :"
+msgstr "Cadre : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:601
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:650
@@ -15805,11 +15754,11 @@ msgstr "ex, est la conséquence de"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:653
 msgid "Brief definition of the relation..."
-msgstr "Brève définition de la relation..."
+msgstr "Brève définition de la relation…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:658
 msgid "Methodological notes, references, usage tips..."
-msgstr "Notes méthodologiques, références, conseils d’utilisation..."
+msgstr "Notes méthodologiques, références, conseils d’utilisation…"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:669
 msgid "OK"
@@ -15831,11 +15780,11 @@ msgstr "Informations"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:983
 msgid "The '(No label)' entry cannot be edited."
-msgstr "L’entrée «(Aucune étiquette)» ne peut pas être modifiée."
+msgstr "L’entrée « (Aucune étiquette) » ne peut pas être modifiée."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1031
 msgid "The '(No label)' entry cannot be deleted."
-msgstr "L’entrée «(Aucune étiquette)» ne peut être supprimée."
+msgstr "L’entrée « (Aucune étiquette) » ne peut être supprimée."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_graph_relations.py:1040
 msgid "Delete relation"
@@ -15880,7 +15829,7 @@ msgstr "Rotation dans le sens horaire"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:1752
 msgid "Rotate counter-clockwise"
-msgstr "Rotation dans  le sens horaire inverse"
+msgstr "Rotation dans le sens horaire inverse"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:1792
 msgid "Move or resize"
@@ -15925,14 +15874,12 @@ msgstr ""
 "+ - (dé)zoomer"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:2369
-#, fuzzy
 msgid " Height: "
-msgstr "Hauteur : "
+msgstr " Hauteur : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\view_image.py:2370
-#, fuzzy
 msgid " Scale: "
-msgstr "Échelle :"
+msgstr " Échelle : "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:179
 #, python-brace-format
@@ -16025,7 +15972,7 @@ msgstr "Le lien d’action doit se terminer par une action de menu."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:454
 msgid "Link error"
-msgstr "Erreur d elien"
+msgstr "Erreur de lien"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:470
 msgid "Unsupported link scheme."
@@ -16090,7 +16037,7 @@ msgstr "Sauvegarde des fichiers multimédias"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:937
 msgid "AI integration is enabled"
-msgstr "L’intégration de l’IA est activé"
+msgstr "L’intégration de l’IA est activée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:939
 msgid "AI integration is disabled"
@@ -16098,7 +16045,7 @@ msgstr "L’intégration de l’IA est désactivée"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:946
 msgid "AI permissions"
-msgstr "Autorisation IA"
+msgstr "Autorisations de l’IA"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\__main__.py:949
 msgid "Folder paths / represents \\"
@@ -16470,301 +16417,3 @@ msgstr "Cette version peut être une version préliminaire."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\GUI\special_functions.py:54
 msgid "Uncaught Exception"
 msgstr "Uncaught Exception"
-
-#~ msgid "Delete folder"
-#~ msgstr "Supprimer le dossier"
-
-#~ msgid "Ticked segments will be coded. Untick the ones to skip."
-#~ msgstr ""
-#~ "Les segments cochés seront encodés. Décochez ceux que vous souhaitez "
-#~ "ignorer."
-
-#~ msgid " next  characters"
-#~ msgstr " caractères suivants"
-
-#~ msgid " previous  characters"
-#~ msgstr " caractères antérieurs"
-
-#~ msgid "Coding highlighted segments"
-#~ msgstr "Codage des segments surlignés"
-
-#~ msgid "Click for details."
-#~ msgstr "Cliquez pour plus de détails."
-
-#~ msgid "Waveform unavailable (ffmpeg not found)"
-#~ msgstr "Forme d’onde indisponible (ffmpeg introuvable)"
-
-#~ msgid "Refresh codes trees via menu options for coding, reports"
-#~ msgstr ""
-#~ "Mettre à jour les arbres de codes via les options de menu (codages, "
-#~ "rapports)"
-
-#~ msgid "Short pause"
-#~ msgstr "Courte pause"
-
-#~ msgid "Timed pause in seconds"
-#~ msgstr "Pause temporisée en secondes"
-
-#~ msgid "Unintelligible"
-#~ msgstr "Inintelligible"
-
-#~ msgid "Uncertain transcription"
-#~ msgstr "Retranscription incertaine"
-
-#~ msgid "Fast speech"
-#~ msgstr "Débit rapide"
-
-#~ msgid "Slow speech"
-#~ msgstr "Débit lent"
-
-#~ msgid "Audible breathing"
-#~ msgstr "Respiration audible"
-
-#~ msgid "Laughter"
-#~ msgstr "Rire"
-
-#~ msgid "Latching"
-#~ msgstr "Verrouillage"
-
-#~ msgid "Predefined text"
-#~ msgstr "Texte prédéfini"
-
-#~ msgid "QualCoder will crash"
-#~ msgstr "QualCoder a crashé"
-
-#~ msgid "Memo coded text M"
-#~ msgstr "Texte codé Memo M"
-
-#~ msgid "Word cloud"
-#~ msgstr "Nuage de mots"
-
-#~ msgid "VLC is not installed. Cannot code audio/video files."
-#~ msgstr ""
-#~ "VLC n’est pas installé. Impossible de coder les fichiers audio/vidéo."
-
-#~ msgid "Install VLC"
-#~ msgstr "Installer VLC"
-
-#~ msgid "New Entries: "
-#~ msgstr "Nouvelles entrées : "
-
-#~ msgid "Duplicates not inserted: "
-#~ msgstr "Les doublons ne sont pas insérés : "
-
-#~ msgid "References already exist"
-#~ msgstr "Les références existent déjà"
-
-#~ msgid "Report text context style: "
-#~ msgstr "Contexte et style du texte du rapport : "
-
-#~ msgid "All file types"
-#~ msgstr "Tout type fichier"
-
-#~ msgid "No file types"
-#~ msgstr "Aucun type fichier"
-
-#~ msgid "All extensions"
-#~ msgstr "Toutes extensions"
-
-#~ msgid "No extensions"
-#~ msgstr "Aucune extensions"
-
-#~ msgid "Delete F4"
-#~ msgstr "Supprimer F4"
-
-#~ msgid "QualCoder project missing folders. Created empty folders"
-#~ msgstr "Dossiers manquants dans le projet QualCoder. Dossiers vides créés"
-
-#~ msgid "Add a new code"
-#~ msgstr "Ajouter un nouveau code"
-
-#~ msgid "Add a new category"
-#~ msgstr "Ajouter une nouvelle catégorie"
-
-#~ msgid "QualCoder roughly displays PDFs."
-#~ msgstr "QualCoder affiche grossièrement les PDF."
-
-#~ msgid "Original fonts or bold or italic are not applied."
-#~ msgstr ""
-#~ "Les polices originales ou les caractères gras ou italiques ne sont pas "
-#~ "appliqués."
-
-#~ msgid "Plain text must match exactly for Code PDF to work correctly."
-#~ msgstr ""
-#~ "Le texte en clair doit correspondre exactement pour que Code PDF "
-#~ "fonctionne correctement."
-
-#~ msgid ""
-#~ "A warning will display if the parsed PDF text does not match the database "
-#~ "stored plain text."
-#~ msgstr ""
-#~ "Un avertissement s’affiche si le texte PDF analysé ne correspond pas au "
-#~ "texte brut stocké dans la base de données."
-
-#~ msgid ""
-#~ "Plain text of PDFs loaded in to QualCoder before version 3.4 will not "
-#~ "have the plain text positions correct for PDF display."
-#~ msgstr ""
-#~ "Le texte brut des PDF chargés dans QualCoder avant la version 3.4 n’aura "
-#~ "pas les positions correctes pour l'affichage du PDF."
-
-#~ msgid "This means coding stripes will show in incorrect positions."
-#~ msgstr ""
-#~ "Cela signifie que les bandes de codage apparaîtront dans des positions "
-#~ "incorrectes."
-
-#~ msgid ""
-#~ "Similarly, if the PDF plain text has been edited in any way, this will "
-#~ "affect coding stripes display."
-#~ msgstr ""
-#~ "De même, si le texte brut du PDF a été modifié de quelque manière que ce "
-#~ "soit, cela affectera l'affichage des bandes de codage."
-
-#~ msgid "Press Enter to search"
-#~ msgstr "Appuyez sur la touche Enter pour rechercher"
-
-#~ msgid "PDF objects"
-#~ msgstr "Objet PDF"
-
-#~ msgid ""
-#~ "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
-#~ "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
-#~ msgstr ""
-#~ "Modifier la position de départ (agrandir MAJ GAUCHE/réduire ALT DROITE)\n"
-#~ "Modifier la position finale (agrandir MAJ DROITE/réduire ALT GAUCHE)"
-
-#~ msgid "Use key presses"
-#~ msgstr "Utiliser les touches"
-
-#~ msgid "PDF Image exported"
-#~ msgstr "Image PDF exporté"
-
-#~ msgid "Pages: "
-#~ msgstr "Pages : "
-
-#~ msgid "Parsing the PDF text."
-#~ msgstr "Parser le fichier PDF."
-
-#~ msgid ""
-#~ "Texts do not match. PDF imported before 3.4 QualCodr version or the PDF "
-#~ "text has been edited."
-#~ msgstr ""
-#~ "Les textes ne correspondent pas. Le PDF a été importé avant QualCoder 3.4 "
-#~ "ou le texte a été modifié."
-
-#~ msgid ""
-#~ "\n"
-#~ "View PDF but cannot code. Code positions will appear wrongly.\n"
-#~ "Character difference: "
-#~ msgstr ""
-#~ "\n"
-#~ "Visualiser le PDF mais ne pas pouvoir coder. Les positions de code "
-#~ "s'affichent de manière erronée.\n"
-#~ "Différence de caractères : "
-
-#~ msgid "TEXT START CHARACTER POSITION: "
-#~ msgstr "POSITION DU CARACTÈRE DE DÉBUT DE TEXTE : "
-
-#~ msgid "TEXT END CHARACTER POSITION: "
-#~ msgstr "POSITION DU CARACTÈRE DE FIN DE TEXTE : "
-
-#~ msgid "NUMBER OF CHARACTERS: "
-#~ msgstr "NOMBRE DE CARACTÈRES : "
-
-#~ msgid "Important"
-#~ msgstr "Important"
-
-#~ msgid "Code memo"
-#~ msgstr "Code mémo"
-
-#~ msgid "Select code for important flag"
-#~ msgstr "Sélectionner un code avec un drapeau important"
-
-#~ msgid "Select code to remove important flag"
-#~ msgstr "Sélectionnez le code où enlever un drapeau important"
-
-#~ msgid "PDF loaded text does not match Imported PDF text length."
-#~ msgstr ""
-#~ "La longueur du texte du PDF chargé ne correspond pas à celle du texte du "
-#~ "PDF importé."
-
-#~ msgid "Mark using the right hand side text pane."
-#~ msgstr "Surligner à l'aide du volet de texte de droite."
-
-#~ msgid "Cannot mark"
-#~ msgstr "Impossible de surligner"
-
-#~ msgid "original"
-#~ msgstr "original"
-
-#~ msgid "dark"
-#~ msgstr "sombre"
-
-#~ msgid "purple"
-#~ msgstr "violet"
-
-#~ msgid "rainbow"
-#~ msgstr "arc-en-ciel"
-
-#~ msgid "native"
-#~ msgstr "natif"
-
-#~ msgid "Renew"
-#~ msgstr "Renouveler"
-
-#~ msgid "Authenticate"
-#~ msgstr "S’Identifier"
-
-#~ msgid "Code renamed: "
-#~ msgstr "Code renommé : "
-
-#~ msgid "Notice"
-#~ msgstr "Notice"
-
-#~ msgid "Select at least one Qualitative Text column to analyse."
-#~ msgstr "Sélectionnez au moins une colonne de texte qualitatif à analyser."
-
-#~ msgid "New code name"
-#~ msgstr "Nouveau nom de code"
-
-#~ msgid "Code added: "
-#~ msgstr "Code ajouté : "
-
-#~ msgid "Category renamed: "
-#~ msgstr "Catégorie renommée : "
-
-#~ msgid "Insert coded text items"
-#~ msgstr "Insérer des éléments de texte codés"
-
-#~ msgid "Insert coded image items"
-#~ msgstr "Insérer des éléments d'image codés"
-
-#~ msgid "Insert coded A/V items"
-#~ msgstr "Insérer les éléments A/V codés"
-
-#~ msgid "Expand category"
-#~ msgstr "Expand category"
-
-#~ msgid "Import and link segments"
-#~ msgstr "Importer et relier des segments"
-
-#~ msgid "Cases have already been created."
-#~ msgstr "Les cas ont déjà été créés."
-
-#~ msgid " renamed category(ies) would be restored to their old names."
-#~ msgstr " les catégories renommées retrouveraient leurs anciens noms."
-
-#~ msgid " renamed code(s) would be restored to their old names."
-#~ msgstr " les codes renommés retrouveront leur ancien nom."
-
-#~ msgid "Renaming category \"{name}\"..."
-#~ msgstr "Renommage de la catégorie « {name} »..."
-
-#~ msgid "Renaming code \"{name}\"..."
-#~ msgstr "Renommage du code « {name} »..."
-
-#~ msgid "Screenshot saved"
-#~ msgstr "Capture d'écran sauvegardée"
-
-#~ msgid "You must select a {self.prompt_type} prompt."
-#~ msgstr "Vous devez sélectionnez une instruction {self.prompt_type}."
