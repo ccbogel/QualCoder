@@ -49,7 +49,7 @@
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
         <source>Sunburst and treemap charts</source>
-        <translation type="unfinished">Diagrammes en radiales et Treemap</translation>
+        <translation>Diagrammes en radiales et Treemap</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -322,7 +322,7 @@ Chaque mot est exclu du nuage de mots n-grams=1.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
         <source>Remove nodes</source>
-        <translation type="unfinished">Supprimer les nœuds</translation>
+        <translation>Supprimer les nœuds</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
@@ -409,7 +409,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
         <source>Show coded av segments</source>
-        <translation type="unfinished">Montrer les segments codés A/V</translation>
+        <translation>Montrer les segments codés A/V</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
@@ -434,7 +434,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
         <source>Changing to another report will lose unsaved graph.</source>
-        <translation type="unfinished">hanger de rapport supprime le graphique non enregistré.</translation>
+        <translation>hanger de rapport supprime le graphique non enregistré.</translation>
     </message>
 </context>
 <context>
@@ -514,12 +514,12 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph_models.ui" line="0"/>
         <source>Show categories as parent nodes</source>
-        <translation type="unfinished">Montrer les catégories comme nœuds parents</translation>
+        <translation>Montrer les catégories comme nœuds parents</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph_models.ui" line="0"/>
         <source>Select 1 or more categories after clicking Generate.</source>
-        <translation type="unfinished">Sélectionner une ou des catégories après avoir cliqué sur Générer.</translation>
+        <translation>Sélectionner une ou des catégories après avoir cliqué sur Générer.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph_models.ui" line="0"/>
@@ -547,7 +547,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
         <source>Select the references to import. Items already in the project (duplicates) are unchecked by default.</source>
-        <translation type="unfinished">Sélectionner les références à importer : celles déjà dans le projet (doublons) sont décochées par défaut.</translation>
+        <translation>Sélectionner les références à importer : celles déjà dans le projet (doublons) sont décochées par défaut.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
@@ -557,7 +557,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
         <source>Deselect all</source>
-        <translation type="unfinished">Désélectionner tout</translation>
+        <translation>Désélectionner tout</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
@@ -615,7 +615,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_report_matching_segments.ui" line="0"/>
         <source>Select coder. Blank for all</source>
-        <translation type="unfinished">Sélectionner codeur⋅se. Vide pour tous</translation>
+        <translation>Sélectionner codeur⋅se. Vide pour tous</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_report_matching_segments.ui" line="0"/>
@@ -763,7 +763,7 @@ Attention : cette action est irréversible.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
         <source>Run report</source>
-        <translation type="unfinished">Exécuter le rapport</translation>
+        <translation>Exécuter le rapport</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
@@ -773,7 +773,7 @@ Attention : cette action est irréversible.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
         <source>Select coder. Blank for all</source>
-        <translation type="unfinished">Sélectionner codeur⋅se. Vide pour tous</translation>
+        <translation>Sélectionner codeur⋅se. Vide pour tous</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
@@ -3568,7 +3568,7 @@ Vérifiez après avoir appliqué la fonction.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_node_relations.ui" line="0"/>
         <source>Select relation</source>
-        <translation type="unfinished">Sélectionner une relation</translation>
+        <translation>Sélectionner une relation</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_node_relations.ui" line="0"/>
