@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Internal MCP server for QualCoder.
@@ -205,6 +205,62 @@ class AiMcpServer:
         """Normalize one AI-provided memo update to public text only."""
 
         return self._memo_public_text(memo)
+
+    def _active_model_id(self) -> str:
+        """Model id used by the agent, not the profile label."""
+        try:
+            return str(self.app.ai.get_active_model_id()).strip()
+        except Exception:
+            return ""
+
+    def _active_profile_name(self) -> str:
+        """Profile label the user gave the API entry."""
+        try:
+            model_idx = int(self.app.settings.get("ai_model_index", "-1"))
+            if 0 <= model_idx < len(self.app.ai_models):
+                return str(self.app.ai_models[model_idx].get("name", "")).strip()
+        except Exception:
+            pass
+        return ""
+
+    def _strip_ai_provenance(self, text: str) -> str:
+        """Remove a provenance block added by an earlier call, in any language."""
+
+        label_line = re.compile(r"^\*\*[^*\n]+:\*\* .*$")
+        parts = text.rsplit("\n\n", 1)
+        if len(parts) != 2:
+            return text.rstrip()
+        tail = [line for line in parts[1].splitlines() if line.strip() != ""]
+        if len(tail) == 0 or not all(label_line.match(line) for line in tail):
+            return text.rstrip()
+        body = parts[0]
+        # only now, the leading label is ours too
+        leading = re.match(r"^\*\*[^*\n]+:\*\* ", body)
+        if leading is not None:
+            body = body[leading.end():]
+        return body.rstrip()
+
+    def _stamp_ai_model(self, memo: Any) -> str:
+        """Rewrite a memo written by the AI Agent with its provenance block."""
+
+        text = self._strip_ai_provenance("" if memo is None else str(memo))
+        block = f'**{_("Coded by")}:** {self.AI_AGENT_OWNER}'
+        profile = self._active_profile_name()
+        if profile != "":
+            block += f'\n**{_("AI profile")}:** {profile}'
+        model_id = self._active_model_id()
+        if model_id != "":
+            block += f'\n**{_("AI model")}:** {model_id}'
+        if text.strip() == "":
+            return block
+        return f'**{_("AI interpretation")}:** {text}\n\n{block}'
+
+    def _stamp_ai_model_if_ai_owned(self, memo: Any, owner: Any) -> str:
+        """Stamp only entities the AI Agent owns, never a human memo."""
+
+        if str(owner if owner is not None else "").strip() != self.AI_AGENT_OWNER:
+            return "" if memo is None else str(memo)
+        return self._stamp_ai_model(memo)
 
     def _merge_public_memo(self, existing_memo: Any, memo: Any) -> str:
         """Replace only the AI-visible memo text and preserve any private suffix."""
@@ -1621,6 +1677,7 @@ class AiMcpServer:
                     },
                 }
 
+            memo = self._stamp_ai_model(memo)
             cur.execute(
                 "INSERT INTO code_name (name, memo, catid, owner, date, color, supercid) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -1720,6 +1777,7 @@ class AiMcpServer:
                     },
                 }
 
+            memo = self._stamp_ai_model(memo)
             cur.execute(
                 "INSERT INTO code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (cid, fid, seltext, pos0, pos1, self.AI_AGENT_OWNER, now, memo),
@@ -2170,7 +2228,8 @@ class AiMcpServer:
             old_name = str(code.get("name", ""))
             old_memo = str(code.get("memo", ""))
             new_name = old_name if not has_name else " ".join(str(arguments.get("name", "")).split()).strip()
-            new_memo = old_memo if not has_memo else self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            new_memo = old_memo if not has_memo else self._merge_public_memo(
+                old_memo, self._stamp_ai_model_if_ai_owned(arguments.get("memo", ""), code.get("owner")))
             if new_name == "":
                 raise ValueError("name must not be empty.")
             if new_name.casefold() != old_name.casefold():
@@ -2240,7 +2299,8 @@ class AiMcpServer:
                 raise ValueError(f"Text coding id {ctid} not found.")
 
             old_memo = str(coding.get("memo", ""))
-            new_memo = self._merge_public_memo(old_memo, arguments.get("memo", ""))
+            new_memo = self._merge_public_memo(
+                old_memo, self._stamp_ai_model_if_ai_owned(arguments.get("memo", ""), coding.get("owner")))
             if new_memo == old_memo:
                 return {
                     "tool": "codes/update_text_coding",

@@ -567,6 +567,7 @@ class DialogAIChat(QtWidgets.QDialog):
     current_streaming_chat_idx = -1
     chat_msg_list = [] 
     is_updating_chat_window = False
+    _chat_ai_model_snapshots = {}
     ai_semantic_search_chunks = []
     last_export_dir = ''
     # filenames = []
@@ -681,6 +682,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_text_text = ''
         self.ai_text_start_pos = -1
         self._chat_ai_profile_snapshots: Dict[int, str] = {}
+        self._chat_ai_model_snapshots: Dict[int, str] = {}
         self.ai_output_autoscroll = True
         self._chat_window_refresh_pending = False
         self._chat_window_refresh_timer = QtCore.QTimer(self)
@@ -1703,6 +1705,7 @@ class DialogAIChat(QtWidgets.QDialog):
                                 msg_type TEXT,
                                 msg_author TEXT,
                                 msg_content TEXT,
+                                msg_model TEXT,
                                 FOREIGN KEY (chat_id) REFERENCES chats(id))''')
         
         cursor.execute('''CREATE TABLE IF NOT EXISTS topic_chat_embeddings (
@@ -1716,6 +1719,10 @@ class DialogAIChat(QtWidgets.QDialog):
         chat_columns = {str(row[1]).strip() for row in cursor.fetchall() if isinstance(row, tuple) and len(row) > 1}
         if 'compaction_frontier_msg_id' not in chat_columns:
             cursor.execute("ALTER TABLE chats ADD COLUMN compaction_frontier_msg_id INTEGER DEFAULT 0")
+        cursor.execute("PRAGMA table_info(chat_messages)")
+        msg_columns = {str(row[1]).strip() for row in cursor.fetchall() if isinstance(row, tuple) and len(row) > 1}
+        if 'msg_model' not in msg_columns:
+            cursor.execute("ALTER TABLE chat_messages ADD COLUMN msg_model TEXT")
         self.chat_history_conn.commit()
         self.current_chat_idx = -1
         self.fill_chat_list()
@@ -1761,6 +1768,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_text_text = ''
         self.ai_text_start_pos = -1
         self._chat_ai_profile_snapshots.clear()
+        self._chat_ai_model_snapshots.clear()
         self._multi_chat_selection_active = False
 
         selection_model = self.ui.treeView_chat_list.selectionModel()
@@ -2205,6 +2213,13 @@ class DialogAIChat(QtWidgets.QDialog):
             author = ''
         return author or 'unknown'
 
+    def _current_ai_model_id(self) -> str:
+        """Model id actually used for requests, not the profile label."""
+        try:
+            return str(self.app.ai.get_active_model_id()).strip()
+        except Exception:
+            return ''
+
     def _normalize_ai_profile_author(self, author: str = '', chat_idx: Optional[int] = None,
                                      fallback_to_current: bool = False) -> str:
         """Resolve display/storage author names for AI messages."""
@@ -2232,7 +2247,26 @@ class DialogAIChat(QtWidgets.QDialog):
         author = self._current_ai_profile_name()
         if chat_idx is not None and chat_idx >= 0:
             self._chat_ai_profile_snapshots[int(chat_idx)] = author
+            self._chat_ai_model_snapshots[int(chat_idx)] = self._current_ai_model_id()
         return author
+
+    def _resolve_message_model_id(self, model_id: str = '', chat_idx: Optional[int] = None,
+                                  fallback_to_current: bool = False) -> str:
+        """Model id for one message: stored value, chat snapshot, then current."""
+
+        stored = str(model_id if model_id is not None else '').strip()
+        if stored != '':
+            return stored
+        if not fallback_to_current:
+            # Stored messages without a model stay blank, they predate this field.
+            return ''
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx is not None and chat_idx >= 0:
+            snapshot = str(self._chat_ai_model_snapshots.get(int(chat_idx), '')).strip()
+            if snapshot != '':
+                return snapshot
+        return self._current_ai_model_id()
 
     def _clear_chat_ai_profile_snapshot(self, chat_idx: Optional[int] = None) -> None:
         """Remove a previously frozen AI profile snapshot for one chat."""
@@ -2242,20 +2276,35 @@ class DialogAIChat(QtWidgets.QDialog):
         if chat_idx is None or chat_idx < 0:
             return
         self._chat_ai_profile_snapshots.pop(int(chat_idx), None)
+        self._chat_ai_model_snapshots.pop(int(chat_idx), None)
 
-    def _message_heading_html(self, heading_text: str) -> str:
+    def _message_heading_html(self, heading_text: str, model_id: str = '') -> str:
         safe_heading = html_lib.escape(str(heading_text if heading_text is not None else ""))
         heading_size = self.app.settings['fontsize'] + 1
-        return f'<div style="margin-top: 6px; font-size: {heading_size}pt;">⦿ <b>{safe_heading}</b></div>'
+        heading = f'<div style="margin-top: 6px; font-size: {heading_size}pt;">⦿ <b>{safe_heading}</b></div>'
+        model_line = str(model_id if model_id is not None else '').strip()
+        if model_line == '':
+            return heading
+        safe_model = html_lib.escape(model_line)
+        model_size = max(1, self.app.settings['fontsize'] - 1)
+        # plain label, matches the API field name and needs no translation
+        heading += (f'<div style="font-size: {model_size}pt; opacity: 0.75;">'
+                    f'model: {safe_model}</div>')
+        return heading
 
     def _ai_agent_heading_html(self, author: str = '', chat_idx: Optional[int] = None,
-                               fallback_to_current: bool = False) -> str:
+                               fallback_to_current: bool = False, model_id: str = '') -> str:
         display_author = self._normalize_ai_profile_author(
             author,
             chat_idx=chat_idx,
             fallback_to_current=fallback_to_current,
         )
-        return self._message_heading_html(f'{_("AI Agent")} ({display_author}):')
+        display_model = self._resolve_message_model_id(
+            model_id,
+            chat_idx=chat_idx,
+            fallback_to_current=fallback_to_current,
+        )
+        return self._message_heading_html(f'{_("AI Agent")} ({display_author}):', model_id=display_model)
             
     def fill_chat_list(self):
         self.chat_list_model.clear()
@@ -5794,21 +5843,25 @@ data collected. This information will accompany every prompt sent to the AI, res
                 # Show chat messages:
                 agent_status_lines = []
                 agent_status_author = ''
+                agent_status_model = ''
                 markdown_hr_width = max(
                     1,
                     max(self.ui.ai_output.width(), self.ui.scrollArea_ai_output.viewport().width()) - 24
                 )
 
                 def flush_agent_status_block():
-                    nonlocal agent_status_lines, agent_status_author
+                    nonlocal agent_status_lines, agent_status_author, agent_status_model
                     if len(agent_status_lines) == 0:
                         return
                     # body = '<br />'.join(agent_status_lines)
                     body = "".join(agent_status_lines)
-                    block = f'{self._ai_agent_heading_html(agent_status_author, chat_idx=self.current_chat_idx)}<ul>{body}</ul>'
+                    heading = self._ai_agent_heading_html(agent_status_author, chat_idx=self.current_chat_idx,
+                                                          model_id=agent_status_model)
+                    block = f'{heading}<ul>{body}</ul>'
                     html_parts.append(f'<p style={self.ai_status_style}>{block}</p>')
                     agent_status_lines = []
                     agent_status_author = ''
+                    agent_status_model = ''
 
                 for msg in self.chat_msg_list:
                     msg_type = str(msg[2])
@@ -5837,6 +5890,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                             flush_agent_status_block()
                         if agent_status_author == '':
                             agent_status_author = status_author
+                            agent_status_model = str(msg[5] if len(msg) > 5 and msg[5] is not None else '')
                         agent_status_lines.append(status_line)
                         continue
 
@@ -5864,7 +5918,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                             style_role="ai",
                         )
                         author = msg[3]
-                        txt = f'{self._ai_agent_heading_html(author, chat_idx=self.current_chat_idx)}{txt}'
+                        msg_model = msg[5] if len(msg) > 5 else ''
+                        txt = f'{self._ai_agent_heading_html(author, chat_idx=self.current_chat_idx, model_id=msg_model)}{txt}'
                         html_parts.append(f'<p style={self.ai_response_style}>{txt}</p>')
                     elif msg_type == 'info':
                         txt = self._message_heading_html(_("Info:"))
@@ -6661,9 +6716,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             if db_conn is None:
                 db_conn = self.chat_history_conn
             cursor = db_conn.cursor()
+            msg_model = ''
+            if msg_type in ('ai', 'agent_status', 'tool_call', 'single_instruct'):
+                msg_model = self._resolve_message_model_id(
+                    chat_idx=chat_idx, fallback_to_current=True)
             # Insert new message
-            cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)'
-                           ' VALUES (?, ?, ?, ?)', (curr_chat_id, msg_type, msg_author, msg_content))
+            cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content, msg_model)'
+                           ' VALUES (?, ?, ?, ?, ?)', (curr_chat_id, msg_type, msg_author, msg_content, msg_model))
             if commit:
                 db_conn.commit()
             if refresh:
@@ -6695,8 +6754,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             if prev_author == str(msg_author) and prev_content == status_line:
                 return
 
-        cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)'
-                       ' VALUES (?, ?, ?, ?)', (curr_chat_id, 'agent_status', msg_author, status_line))
+        cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content, msg_model)'
+                       ' VALUES (?, ?, ?, ?, ?)', (curr_chat_id, 'agent_status', msg_author, status_line,
+                                                   self._resolve_message_model_id(
+                                                       chat_idx=chat_idx, fallback_to_current=True)))
         self.chat_history_conn.commit()
 
     def _chat_user_message_count(self, chat_id: int, db_conn=None) -> int:
