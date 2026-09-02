@@ -22,19 +22,20 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-import multiprocessing
 import base64
 import datetime
 import gettext
 import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
+import multiprocessing
 import os
 from pathlib import Path
 import platform
 import shutil
-import sys
 import sqlite3
+import sys
+from typing import Optional
 import urllib.request
 import webbrowser
 
@@ -647,6 +648,9 @@ Click "Yes" to start now.')
         self.ui.actionText_segments_by_codes.triggered.connect(self.text_segments_codes_table)
         self.ui.actionView_Graph.setShortcut('Alt+G')
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
+        self.ui.actionAI_topic_exploration.triggered.connect(self.ai_go_analysis)
+        self.ui.actionAI_text_analysis.triggered.connect(self.ai_go_analysis)
+        self.ui.actionAI_code_analysis.triggered.connect(self.ai_go_analysis)
         # Reports menu
         self.ui.actionCoding_comparison.setShortcut('Alt+L')
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
@@ -674,6 +678,7 @@ Click "Yes" to start now.')
         self.ui.actionAI_Agent_Sidebar.setCheckable(True)
         self.ui.actionAI_Agent_Sidebar.toggled.connect(self.toggle_ai_chat_sidebar)
         self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
+        self.ui.actionCheck_project_AI_readiness.triggered.connect(self.ai_check_project_readiness)
         self.ui.tabWidget.currentChanged.connect(self.remember_last_non_ai_chat_tab)
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
@@ -882,6 +887,10 @@ Click "Yes" to start now.')
         self.ui.actionAI_Agent_Sidebar.setEnabled(ai_actions_enabled)
         self.ui.actionAI_Search_and_Coding.setEnabled(ai_actions_enabled)
         self.ui.actionAI_assisted_coding.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_topic_exploration.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_text_analysis.setEnabled(ai_actions_enabled)
+        self.ui.actionAI_code_analysis.setEnabled(ai_actions_enabled)
+        self.ui.actionCheck_project_AI_readiness.setEnabled(ai_actions_enabled)
         self.ui.actionAsk_the_AI_Agent.setEnabled(ai_actions_enabled)
 
         if self.ai_chat_tab_sidebar_button is not None:
@@ -908,7 +917,7 @@ Click "Yes" to start now.')
         if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_5:
             self.ui.menuHelp.popup(QtGui.QCursor.pos())
 
-    def settings_report(self):
+    def settings_report(self, swith_to_action_log: bool = True):
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
@@ -940,7 +949,8 @@ Click "Yes" to start now.')
             self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
         self.ui.textEdit.append("<p></p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
-        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        if swith_to_action_log:
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def text_segments_codes_table(self):
         """ Show table of text segments (rows) by codes (columns). """
@@ -1141,13 +1151,15 @@ Click "Yes" to start now.')
         self.journal_display = ui
         ui.show()
 
-    def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0, doc_ids=None):
-        """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. 
+    def text_coding(self, task: str = 'documents', doc_id: Optional[int] = None,
+                    doc_sel_start: int = 0, doc_sel_end: int = 0,
+                    doc_ids: Optional[list[int]] = None) -> None:
+        """Show text coding, reusing the open dialog to preserve its context.
+
         Args:
             task: "documents": The default, shows the tab with the text documents
                   "ai_search": Shows the tab "AI Search"
-            doc_id: If not None and task = "documents", this doument will be loaded in the coding window
+            doc_id: If not None and task = "documents", this document will be loaded in the coding window
             doc_sel_start: The character-position of the beginning of the selection in the coding window
             doc_sel_end: The end of the selection
             doc_ids: Optional list of file ids; with task = "mark_speakers" they become
@@ -1169,9 +1181,25 @@ Click "Yes" to start now.')
                 return
         if len(files) > 0:
             self.ui.textBrowser_coding.hide()
-            ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
-            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-            self.tab_layout_helper(self.ui.tab_coding, ui)
+            ui = None
+            contents = self.ui.tab_coding.layout()
+            if contents is not None:
+                for i in range(contents.count()):
+                    widget = contents.itemAt(i).widget()
+                    if not isinstance(widget, DialogCodeText):
+                        continue
+                    try:
+                        widget.objectName()  # Detect a deleted C++ object.
+                    except RuntimeError:
+                        continue
+                    ui = widget
+                    break
+            if ui is None:
+                ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
+                ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+                self.tab_layout_helper(self.ui.tab_coding, ui)
+            else:
+                self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
             if task == 'documents':
                 ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
                 if doc_id is not None:
@@ -1914,7 +1942,7 @@ Click "Yes" to start now.')
             return
 
         self.app.settings, self.app.ai_models = self.app.load_settings()
-        self.settings_report()
+        self.settings_report(swith_to_action_log=False)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.update_placeholder_tab_styles()
@@ -2670,6 +2698,35 @@ Click "Yes" to start now.')
         else:
             self.set_ai_chat_sidebar_mode(False, persist=False)
             self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+
+    def ai_go_analysis(self) -> None:
+        """Start the AI analysis selected in the Analysis menu."""
+
+        if self.ai_chat_window is None:
+            return
+        handlers = {
+            self.ui.actionAI_topic_exploration: (self.ai_chat_window.new_topic_exploration, True),
+            self.ui.actionAI_text_analysis: (self.ai_chat_window.new_text_analysis, False),
+            self.ui.actionAI_code_analysis: (self.ai_chat_window.new_code_analysis, True),
+        }
+        selected_handler = handlers.get(self.sender())
+        if selected_handler is None:
+            logger.warning("Unknown AI analysis menu action")
+            return
+        handler, show_ai_agent = selected_handler
+        if show_ai_agent:
+            self.set_ai_chat_sidebar_mode(False, persist=False)
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+        handler()
+
+    def ai_check_project_readiness(self) -> None:
+        """Start an AI Agent chat that assesses the current project."""
+
+        if self.ai_chat_window is None:
+            return
+        self.set_ai_chat_sidebar_mode(False, persist=False)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_agent)
+        self.ai_chat_window.new_project_ai_readiness_chat()
 
     def ai_go_help_support(self):
         """Action triggered by Help > Ask the AI Agent."""

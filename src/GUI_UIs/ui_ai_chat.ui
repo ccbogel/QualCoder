@@ -16,9 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-   <property name="windowTitle">
-    <string>AI Agent</string>
-   </property>
+  <property name="windowTitle">
+   <string>AI Agent</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>6</number>
@@ -231,6 +231,9 @@
         <property name="styleSheet">
          <string notr="true">background-color: palette(window);</string>
         </property>
+        <property name="placeholderText">
+         <string>&lt;Select chat&gt;</string>
+        </property>
        </widget>
       </item>
       <item row="1" column="2">
@@ -270,7 +273,7 @@
       <item>
        <widget class="QSplitter" name="splitter_ai_output">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="childrenCollapsible">
          <bool>false</bool>
@@ -302,8 +305,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>670</width>
-               <height>137</height>
+               <width>654</width>
+               <height>115</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
@@ -331,25 +334,25 @@
                  <bool>false</bool>
                 </property>
                 <property name="inputMethodHints">
-                 <set>Qt::ImhNone</set>
+                 <set>Qt::InputMethodHint::ImhNone</set>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::NoFrame</enum>
+                 <enum>QFrame::Shape::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Sunken</enum>
+                 <enum>QFrame::Shadow::Sunken</enum>
                 </property>
                 <property name="text">
                  <string/>
                 </property>
                 <property name="textFormat">
-                 <enum>Qt::RichText</enum>
+                 <enum>Qt::TextFormat::RichText</enum>
                 </property>
                 <property name="scaledContents">
                  <bool>false</bool>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                 <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -358,7 +361,7 @@
                  <number>6</number>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 <set>Qt::TextInteractionFlag::LinksAccessibleByKeyboard|Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextBrowserInteraction|Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -396,7 +399,7 @@
         <widget class="QWidget" name="widget_question" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -504,7 +507,7 @@
              <item>
               <spacer name="verticalSpacer">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Orientation::Vertical</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>

@@ -5,14 +5,22 @@ from pathlib import Path
 import shutil
 import sqlite3
 import tempfile
+import threading
+import time
+from types import SimpleNamespace
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from qualcoder.__main__ import App
+from PyQt6 import QtWidgets
+
+from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
+from qualcoder.ai_llm import AiLLM
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
+from qualcoder.code_av import DialogCodeAV
+from qualcoder.code_text import DialogCodeText
 
 """ Useful insights from:
 https: // stackoverflow.com / questions / 32527861 / python - unit - test - that - uses - an - external - data - file / 32528173
@@ -358,6 +366,100 @@ class TestMainWindow(TestCase):
         pass
 
 
+class TestMainWindowAiActions(TestCase):
+    """Regression tests for AI menu dispatching."""
+
+    def test_ai_analysis_actions_share_handler(self):
+        topic_action = object()
+        text_action = object()
+        code_action = object()
+        expected_handlers = {
+            topic_action: ("new_topic_exploration", True),
+            text_action: ("new_text_analysis", False),
+            code_action: ("new_code_analysis", True),
+        }
+
+        for action, (expected_handler, shows_ai_agent) in expected_handlers.items():
+            with self.subTest(handler=expected_handler):
+                ai_chat_window = SimpleNamespace(
+                    new_topic_exploration=MagicMock(),
+                    new_text_analysis=MagicMock(),
+                    new_code_analysis=MagicMock(),
+                )
+                tab_widget = SimpleNamespace(setCurrentWidget=MagicMock())
+                ui = SimpleNamespace(
+                    actionAI_topic_exploration=topic_action,
+                    actionAI_text_analysis=text_action,
+                    actionAI_code_analysis=code_action,
+                    tabWidget=tab_widget,
+                    tab_ai_agent=object(),
+                )
+                window = SimpleNamespace(
+                    ai_chat_window=ai_chat_window,
+                    ui=ui,
+                    sender=MagicMock(return_value=action),
+                    set_ai_chat_sidebar_mode=MagicMock(),
+                )
+
+                MainWindow.ai_go_analysis(window)
+
+                getattr(ai_chat_window, expected_handler).assert_called_once_with()
+                if shows_ai_agent:
+                    window.set_ai_chat_sidebar_mode.assert_called_once_with(False, persist=False)
+                    tab_widget.setCurrentWidget.assert_called_once_with(ui.tab_ai_agent)
+                else:
+                    window.set_ai_chat_sidebar_mode.assert_not_called()
+                    tab_widget.setCurrentWidget.assert_not_called()
+
+    def test_text_coding_reuses_open_dialog(self):
+        class FakeDialogCodeText:
+            instances = 0
+
+            def __init__(self, app=None, parent_text_edit=None, tab_reports=None):
+                del app, parent_text_edit, tab_reports
+                type(self).instances += 1
+                self.current_context = object()
+                self.ui = SimpleNamespace(
+                    tabWidget=SimpleNamespace(setCurrentWidget=MagicMock()),
+                    tab_docs=object(),
+                    tab_ai=object(),
+                )
+
+            @staticmethod
+            def objectName():
+                return "open_text_coding"
+
+        existing = FakeDialogCodeText()
+        original_context = existing.current_context
+        layout = SimpleNamespace(
+            count=MagicMock(return_value=1),
+            itemAt=MagicMock(return_value=SimpleNamespace(widget=MagicMock(return_value=existing))),
+        )
+        tab_coding = SimpleNamespace(layout=MagicMock(return_value=layout))
+        tab_widget = SimpleNamespace(setCurrentWidget=MagicMock())
+        ui = SimpleNamespace(
+            tab_coding=tab_coding,
+            tab_reports=object(),
+            tabWidget=tab_widget,
+            textBrowser_coding=SimpleNamespace(hide=MagicMock()),
+            textEdit=object(),
+        )
+        window = SimpleNamespace(
+            app=SimpleNamespace(get_text_filenames=MagicMock(return_value=[{"id": 1}])),
+            ui=ui,
+            tab_layout_helper=MagicMock(),
+        )
+
+        with patch("qualcoder.__main__.DialogCodeText", FakeDialogCodeText):
+            MainWindow.text_coding(window, task="documents")
+
+        self.assertEqual(1, FakeDialogCodeText.instances)
+        self.assertIs(original_context, existing.current_context)
+        window.tab_layout_helper.assert_not_called()
+        tab_widget.setCurrentWidget.assert_called_once_with(tab_coding)
+        existing.ui.tabWidget.setCurrentWidget.assert_called_once_with(existing.ui.tab_docs)
+
+
 class TestAiMemoPolicy(TestCase):
 
     class FakeApp:
@@ -496,6 +598,265 @@ class TestAiMemoPolicy(TestCase):
         cur.execute("select memo from code_text where ctid=1")
         self.assertEqual("Updated coding\n#####\nPrivate coding", cur.fetchone()[0])
         conn.close()
+
+
+class TestAiAnnotations(TestCase):
+    """Internal MCP annotation reads, writes, permissions, and undo."""
+
+    class FakeEvents:
+        def __init__(self):
+            self.calls = []
+
+        def emit_table_changes(self, tables, source=""):
+            self.calls.append((list(tables), source))
+
+    class FakeAi:
+        def __init__(self):
+            self.operations = []
+
+        def record_ai_change(self, change_set_id, operation):
+            self.operations.append((change_set_id, dict(operation)))
+
+    class FakeApp:
+        def __init__(self, project_path):
+            self.project_path = project_path
+            self.settings = {"ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS}
+            self.delete_backup = True
+            self.project_events = TestAiAnnotations.FakeEvents()
+            self.ai = TestAiAnnotations.FakeAi()
+            self.conn = sqlite3.connect(os.path.join(project_path, "data.qda"))
+
+    def setUp(self):
+        self.project_path = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.project_path, "data.qda")
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        cur.execute(
+            "CREATE TABLE source (id integer primary key, name text, fulltext text, memo text, owner text, date text)"
+        )
+        cur.execute(
+            "CREATE TABLE annotation (anid integer primary key, fid integer, pos0 integer, pos1 integer, memo text, "
+            "owner text, date text, unique(fid,pos0,pos1,owner))"
+        )
+        cur.execute(
+            "CREATE TABLE coder_names (name text unique not null, visibility integer not null default 1)"
+        )
+        cur.execute(
+            "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text, date text)"
+        )
+        cur.execute(
+            "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
+            "owner text, date text, memo text)"
+        )
+        cur.execute(
+            "CREATE VIEW annotation_visible AS SELECT a.* FROM annotation AS a WHERE NOT EXISTS "
+            "(SELECT 1 FROM coder_names AS c WHERE c.name=a.owner AND c.visibility=0)"
+        )
+        fulltext = "Alpha beta Alpha gamma unique phrase."
+        cur.execute(
+            "INSERT INTO source (id,name,fulltext,memo,owner,date) VALUES (1,?,?,?,?,?)",
+            ("doc one", fulltext, "", "default", "2026-01-01 10:00:00"),
+        )
+        cur.execute("INSERT INTO coder_names (name,visibility) VALUES ('Visible Coder',1)")
+        cur.execute("INSERT INTO coder_names (name,visibility) VALUES ('Hidden Coder',0)")
+        cur.execute(
+            "INSERT INTO annotation (anid,fid,pos0,pos1,memo,owner,date) VALUES (1,1,6,10,'visible','Visible Coder','d')"
+        )
+        cur.execute(
+            "INSERT INTO annotation (anid,fid,pos0,pos1,memo,owner,date) VALUES (2,1,17,22,'hidden','Hidden Coder','d')"
+        )
+        conn.commit()
+        conn.close()
+        self.app = self.FakeApp(self.project_path)
+        self.server = AiMcpServer(self.app)
+
+    def tearDown(self):
+        self.app.conn.close()
+        shutil.rmtree(self.project_path)
+
+    def test_annotation_reads_follow_visibility_and_explicit_owner(self):
+        tool_names = [tool["name"] for tool in self.server._list_tools_payload()["tools"]]
+        self.assertIn("annotations/create", tool_names)
+        self.assertIn("annotations/update", tool_names)
+        self.assertIn("annotations/delete", tool_names)
+        resource_uris = [str(resource.uri) for resource in self.server._base_resources()]
+        self.assertIn("qualcoder://annotations", resource_uris)
+        templates_response = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 1, "method": "resources/templates/list", "params": {}}
+        )
+        self.assertNotIn("error", templates_response)
+        template_uris = [
+            str(template["uriTemplate"])
+            for template in templates_response["result"]["resourceTemplates"]
+        ]
+        self.assertIn("qualcoder://annotations/{anid}{?owner}", template_uris)
+
+        visible = self.server._read_resource_payload("qualcoder://annotations", {})
+        self.assertEqual([1], [item["anid"] for item in visible["annotations"]])
+        self.assertEqual("beta", visible["annotations"][0]["quote"])
+
+        hidden = self.server._read_resource_payload(
+            "qualcoder://annotations?owner=Hidden+Coder", {}
+        )
+        self.assertEqual([2], [item["anid"] for item in hidden["annotations"]])
+        hidden_one = self.server._read_resource_payload(
+            "qualcoder://annotations/2?owner=Hidden+Coder", {}
+        )
+        self.assertEqual("Hidden Coder", hidden_one["annotation"]["owner"])
+        with self.assertRaisesRegex(ValueError, "not found or is not visible"):
+            self.server._read_resource_payload("qualcoder://annotations/2", {})
+
+    def test_create_annotation_requires_a_unique_exact_quote_or_positions(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        with self.assertRaisesRegex(ValueError, "occurs 2 times"):
+            self.server._call_tool_payload(
+                "annotations/create", {"fid": 1, "quote": "Alpha", "memo": "ambiguous"}, "cs"
+            )
+        with self.assertRaisesRegex(ValueError, "not found exactly"):
+            self.server._call_tool_payload(
+                "annotations/create", {"fid": 1, "quote": "Unique Phrase", "memo": "wrong case"}, "cs"
+            )
+
+        created = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "quote": "unique phrase", "memo": "agent note"}, "cs"
+        )
+        payload = created["structuredContent"]
+        self.assertTrue(payload["created"])
+        self.assertEqual((23, 36), (payload["annotation"]["pos0"], payload["annotation"]["pos1"]))
+        self.assertEqual("AI Agent", payload["annotation"]["owner"])
+
+        positioned = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "Alpha", "memo": "first"}, "cs"
+        )
+        self.assertTrue(positioned["structuredContent"]["created"])
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            self.server._call_tool_payload(
+                "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "alpha", "memo": "bad"}, "cs"
+            )
+
+        duplicate = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "memo": "ignored"}, "cs"
+        )
+        self.assertFalse(duplicate["structuredContent"]["created"])
+        self.assertEqual("already_exists", duplicate["structuredContent"]["reason"])
+        self.assertIn((['annotation'], 'ai_agent'), self.app.project_events.calls)
+
+        create_operation = self.app.ai.operations[-1][1]
+        undo_manager = AiLLM.__new__(AiLLM)
+        undo_manager.app = self.app
+        undo_result = undo_manager._undo_ai_change_set({"operations": [create_operation]})
+        self.assertEqual(1, undo_result["undone"])
+        cur = self.app.conn.cursor()
+        positioned_anid = positioned["structuredContent"]["annotation"]["anid"]
+        cur.execute("SELECT count(*) FROM annotation WHERE anid=?", (positioned_anid,))
+        self.assertEqual(0, cur.fetchone()[0])
+
+    def test_update_delete_permissions_private_memo_and_undo(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
+        denied = self.server._call_tool_payload(
+            "annotations/create", {"fid": 1, "quote": "unique phrase", "memo": "note"}, "cs"
+        )
+        self.assertTrue(denied["isError"])
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        denied_update = self.server._call_tool_payload(
+            "annotations/update", {"anid": 1, "memo": "not allowed"}, "cs"
+        )
+        self.assertTrue(denied_update["isError"])
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        cur = self.app.conn.cursor()
+        cur.execute("UPDATE annotation SET memo=? WHERE anid=1", ("public\n#####\nprivate",))
+        self.app.conn.commit()
+        updated = self.server._call_tool_payload(
+            "annotations/update", {"anid": 1, "memo": "revised"}, "cs-update"
+        )
+        self.assertEqual("revised\n", updated["structuredContent"]["annotation"]["memo"])
+        cur.execute("SELECT memo FROM annotation WHERE anid=1")
+        self.assertEqual("revised\n#####\nprivate", cur.fetchone()[0])
+
+        update_operation = self.app.ai.operations[-1][1]
+        undo_manager = AiLLM.__new__(AiLLM)
+        undo_manager.app = self.app
+        undo_result = undo_manager._undo_ai_change_set({"operations": [update_operation]})
+        self.assertEqual(1, undo_result["undone"])
+        cur.execute("SELECT memo FROM annotation WHERE anid=1")
+        self.assertEqual("public\n#####\nprivate", cur.fetchone()[0])
+
+        deleted = self.server._call_tool_payload("annotations/delete", {"anid": 1}, "cs-delete")
+        self.assertTrue(deleted["structuredContent"]["deleted"])
+        delete_operation = self.app.ai.operations[-1][1]
+        undo_result = undo_manager._undo_ai_change_set({"operations": [delete_operation]})
+        self.assertEqual(1, undo_result["undone"])
+        cur.execute("SELECT memo FROM annotation WHERE anid=1")
+        self.assertEqual("public\n#####\nprivate", cur.fetchone()[0])
+
+    def test_annotation_reads_support_reference_candidates_and_compaction(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog.get_filename = lambda _fid: "doc one"
+        stored_result = {
+            "action": "mcp_result",
+            "contents": [
+                {
+                    "uri": "qualcoder://annotations?file_ids=1",
+                    "payload": {
+                        "annotations": [
+                            {
+                                "fid": 1,
+                                "source_name": "doc one",
+                                "pos0": 6,
+                                "quote": "beta",
+                                "context_before": "Alpha ",
+                                "context_after": " Alpha",
+                            }
+                        ]
+                    },
+                }
+            ],
+        }
+        candidates = dialog._extract_ref_candidates_from_tool_result(
+            "MCP result:\n" + json.dumps(stored_result)
+        )
+        self.assertEqual("beta", candidates[0]["text"])
+        self.assertEqual(6, candidates[0]["start"])
+        self.assertTrue(dialog._is_compactable_resource_uri("qualcoder://annotations?file_ids=1"))
+
+    def test_annotation_events_refresh_open_text_and_transcript_dialogs(self):
+        refreshed_annotations = [{"anid": 9, "memo": "revised"}]
+        fake_app = SimpleNamespace(get_annotations=lambda: refreshed_annotations)
+
+        text_dialog = SimpleNamespace(
+            app=fake_app,
+            attributes=[],
+            file_={"id": 1},
+            annotations=[],
+            refresh_count=0,
+        )
+
+        def refresh_text():
+            text_dialog.refresh_count += 1
+
+        text_dialog.get_coded_text_update_eventfilter_tooltips = refresh_text
+        DialogCodeText._on_project_data_changed(text_dialog, ["annotation"], "ai_agent")
+        self.assertEqual(refreshed_annotations, text_dialog.annotations)
+        self.assertEqual(1, text_dialog.refresh_count)
+
+        av_dialog = SimpleNamespace(
+            app=fake_app,
+            attributes=[],
+            annotations=[],
+            segments=[],
+            code_text=[],
+            refresh_count=0,
+        )
+
+        def refresh_transcript():
+            av_dialog.refresh_count += 1
+
+        av_dialog.get_coded_text_update_eventfilter_tooltips = refresh_transcript
+        DialogCodeAV._on_project_data_changed(av_dialog, ["annotation"], "ai_agent")
+        self.assertEqual(refreshed_annotations, av_dialog.annotations)
+        self.assertEqual(1, av_dialog.refresh_count)
 
 
 class DummyReferenceApp:
@@ -699,6 +1060,405 @@ class TestAiTextAnalysisPromptResolution(TestCase):
         self.assertIsNotNone(prompt_record)
         self.assertEqual("system", prompt_record.scope)
         self.assertEqual("text-analysis/system-prompt", prompt_record.name)
+
+
+class DummyChatSummaryRenderer:
+    """Minimal renderer stub for chat summary formatting tests."""
+
+    @staticmethod
+    def _render_plain_text_with_prompt_refs(text: str, style_role: str = "user") -> str:
+        del style_role
+        return text
+
+
+class TestAiChatSummaryRendering(TestCase):
+    """Regression tests for AI chat summary label formatting."""
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: {
+        "\nDescription:": "\nBeschreibung:",
+        "\nPrompt:": "\nPrompt:",
+        "\nMaterial:": "\nMaterial:",
+    }.get(text, text), create=True)
+    def test_topic_exploration_labels_are_bold(self, _translate):
+        del _translate
+        renderer = DummyChatSummaryRenderer()
+
+        html_string = DialogAIChat._render_chat_summary(
+            renderer,
+            "Thema erkunden.\nBeschreibung: Details\nPrompt: system/default\nMaterial: 3 Dateien",
+            "topic_exploration",
+        )
+
+        self.assertEqual(
+            "Thema erkunden.<br /><b>Beschreibung:</b> Details"
+            "<br /><b>Prompt:</b> system/default<br /><b>Material:</b> 3 Dateien",
+            html_string,
+        )
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: {
+        "\nDescription:": "\nBeschreibung:",
+    }.get(text, text), create=True)
+    def test_stored_source_label_is_also_bold(self, _translate):
+        del _translate
+        renderer = DummyChatSummaryRenderer()
+
+        html_string = DialogAIChat._render_chat_summary(
+            renderer,
+            "Explore topic.\nDescription: Details",
+            "topic_exploration",
+        )
+
+        self.assertEqual("Explore topic.<br /><b>Description:</b> Details", html_string)
+
+
+class TestAiReadinessChat(TestCase):
+    """Regression tests for starting the project AI-readiness audit."""
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_readiness_chat_resolves_effective_prompt_and_starts_mcp_agent(self, _translate):
+        del _translate
+        readiness_prompt = AgentPromptRecord(
+            scope="user",
+            root_path="",
+            name="Check-project-AI-readiness",
+            file_path="",
+            content="Audit this project.",
+            description="",
+            is_internal=False,
+        )
+        worker = object()
+        messages = [object()]
+        chat = SimpleNamespace(
+            app=SimpleNamespace(
+                ai=SimpleNamespace(
+                    is_busy=MagicMock(return_value=False),
+                    is_ready=MagicMock(return_value=True),
+                )
+            ),
+            agent_prompts_catalog=SimpleNamespace(
+                get_prompt=MagicMock(return_value=readiness_prompt),
+            ),
+            _can_start_general_chat=MagicMock(return_value=True),
+            _start_general_chat_session=MagicMock(return_value=2),
+            _persist_agent_prompt_record=MagicMock(),
+            history_add_message=MagicMock(),
+            history_get_ai_messages_compacted=MagicMock(return_value=messages),
+            _start_mcp_agent_worker=MagicMock(),
+            _mcp_general_chat_worker=worker,
+            update_chat_window=MagicMock(),
+        )
+
+        DialogAIChat.new_project_ai_readiness_chat(chat)
+
+        chat.agent_prompts_catalog.get_prompt.assert_called_once_with("Check-project-AI-readiness")
+        chat._persist_agent_prompt_record.assert_called_once_with(
+            2,
+            readiness_prompt,
+            activation_source="bootstrap",
+        )
+        chat.history_add_message.assert_called_once_with(
+            "instruct",
+            "",
+            "Perform the activated project AI-readiness assessment now.",
+            2,
+        )
+        chat._start_mcp_agent_worker.assert_called_once_with(messages, 2, worker)
+        chat.update_chat_window.assert_called_once_with()
+
+
+class DummyAgentBasePromptCatalog:
+    """Minimal prompt catalog for agent base-system-prompt tests."""
+
+    def __init__(self) -> None:
+        self.base_prompt = AgentPromptRecord(
+            scope="system",
+            root_path="",
+            name="_agent",
+            file_path="",
+            content="Base agent prompt.",
+            description="",
+            is_internal=True,
+        )
+        self.resolve_prompt_references = MagicMock(return_value=[])
+
+    def get_internal_prompt(self, name: str) -> AgentPromptRecord | None:
+        if name == "_agent":
+            return self.base_prompt
+        return None
+
+    @staticmethod
+    def expand_prompt_references(prompts: list[AgentPromptRecord],
+                                 include_internal: bool = False) -> list[AgentPromptRecord]:
+        del include_internal
+        return prompts
+
+
+class TestAgentBasePromptProjectMemo(TestCase):
+    """Regression tests for the project-memo section in agent context."""
+
+    @staticmethod
+    def _build_chat(project_memo: str) -> tuple[SimpleNamespace, DummyAgentBasePromptCatalog]:
+        catalog = DummyAgentBasePromptCatalog()
+        chat = SimpleNamespace(
+            app=SimpleNamespace(get_project_memo=lambda: project_memo),
+            agent_prompts_catalog=catalog,
+            _agent_base_prompt_name=lambda: "_agent",
+            _render_base_agent_prompt_record=lambda prompt: prompt.content,
+        )
+        return chat, catalog
+
+    def test_nonempty_project_memo_is_explicitly_labelled(self):
+        chat, catalog = self._build_chat("Research question: How do participants adapt?")
+
+        system_prompt, _included_prompt_keys = DialogAIChat._collect_agent_base_prompt_context(chat)
+
+        self.assertIn(
+            "# Project memo\n\n"
+            "The following block is the current user-authored QualCoder project memo. "
+            "It contains background information about the research project that you are working on.\n\n"
+            "<project_memo>\n"
+            "Research question: How do participants adapt?\n"
+            "</project_memo>",
+            system_prompt,
+        )
+        catalog.resolve_prompt_references.assert_called_once_with(
+            "Research question: How do participants adapt?"
+        )
+
+    def test_empty_ai_visible_project_memo_has_explicit_empty_state(self):
+        chat, catalog = self._build_chat("#####\nPrivate note")
+
+        system_prompt, _included_prompt_keys = DialogAIChat._collect_agent_base_prompt_context(chat)
+
+        self.assertTrue(system_prompt.endswith("# Project memo\n\nThe project memo is currently empty."))
+        self.assertNotIn("<project_memo>", system_prompt)
+        self.assertNotIn("The following block", system_prompt)
+        self.assertNotIn("Private note", system_prompt)
+        catalog.resolve_prompt_references.assert_not_called()
+
+
+class DummyProgressSignal:
+    """Record AI progress payloads emitted by a chat operation."""
+
+    def __init__(self):
+        self.payloads = []
+
+    def emit(self, payload: str):
+        self.payloads.append(json.loads(payload))
+
+
+class DummyConfirmationSignal:
+    """Answer internal timeout confirmation requests without a GUI."""
+
+    def __init__(self, abort: bool):
+        self.abort = abort
+        self.requests = []
+
+    def emit(self, request: dict):
+        self.requests.append(request)
+        request["abort"] = self.abort
+        request["answered"].set()
+
+
+class DummyTimeoutAiService:
+    """Minimal AI service for internal timeout retry tests."""
+
+    def __init__(self):
+        self.run_count = 0
+
+    @staticmethod
+    def _get_current_run_context():
+        return SimpleNamespace(run_id="parent-run")
+
+    def _create_run_context(self, **kwargs):
+        del kwargs
+        self.run_count += 1
+        return SimpleNamespace(
+            run_id=f"internal-run-{self.run_count}",
+            cancel_event=threading.Event(),
+            error_text="",
+        )
+
+    @staticmethod
+    def _register_run_context(run_context):
+        del run_context
+
+    @staticmethod
+    def _set_current_run_context(run_context):
+        del run_context
+
+    @staticmethod
+    def _update_run_status(run_id, status, error_text=""):
+        del run_id, status, error_text
+
+    @staticmethod
+    def _finalize_run_context(run_context, terminal_status):
+        del run_context, terminal_status
+
+    @staticmethod
+    def _clear_current_run_context():
+        return None
+
+    @staticmethod
+    def is_current_run_canceled():
+        return False
+
+    @staticmethod
+    def _request_cancel_run(run_context):
+        run_context.cancel_event.set()
+
+
+class DummyInternalJsonInvoker:
+    """Minimal chat stub for internal JSON status tests."""
+
+    class App:
+        ai = None
+
+    def __init__(self):
+        self.app = self.App()
+
+    _emit_mcp_status_text = DialogAIChat._emit_mcp_status_text
+    _normalize_progress_note = DialogAIChat._normalize_progress_note
+
+    @staticmethod
+    def _invoke_json_llm(messages, **kwargs):
+        del messages, kwargs
+        return {"action": "final_answer"}
+
+
+class TestAiInternalJsonStatus(TestCase):
+    """Regression tests for AI status messages during internal JSON steps."""
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_reflection_starts_with_analyzing_status(self, _translate):
+        del _translate
+        invoker = DummyInternalJsonInvoker()
+        progress = DummyProgressSignal()
+        signals = type("Signals", (), {"progress": progress})()
+
+        result = DialogAIChat._invoke_json_llm_with_step_timeout(
+            invoker,
+            [],
+            status_kind="reflection",
+            signals=signals,
+            chat_idx=7,
+        )
+
+        self.assertEqual({"action": "final_answer"}, result)
+        self.assertEqual(
+            [{"chat_idx": 7, "status": "Analyzing...", "status_kind": "reflection"}],
+            progress.payloads,
+        )
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_reflection_timeout_question_mentions_provisional_answer(self, _translate):
+        del _translate
+
+        question = DialogAIChat._internal_step_timeout_question(
+            "Internal reflection",
+            "reflection",
+        )
+
+        self.assertIn("QualCoder's time limit", question)
+        self.assertIn("provisional answer", question)
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_provider_timeout_does_not_request_confirmation(self, _translate):
+        del _translate
+        confirmation = DummyConfirmationSignal(abort=False)
+        signals = type(
+            "Signals",
+            (),
+            {"progress": DummyProgressSignal(), "confirmation": confirmation},
+        )()
+        invoker = DummyInternalJsonInvoker()
+        invoker.app.ai = DummyTimeoutAiService()
+        invoker._invoke_json_llm = MagicMock(side_effect=TimeoutError("provider timeout"))
+        invoker._internal_json_step_timeouts = lambda: (10.0, 20.0)
+
+        with self.assertRaises(TimeoutError):
+            DialogAIChat._invoke_json_llm_with_step_timeout(
+                invoker,
+                [],
+                step_name="Internal reflection",
+                status_kind="reflection",
+                signals=signals,
+                chat_idx=7,
+            )
+
+        self.assertEqual(0, len(confirmation.requests))
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_hard_timeout_keeps_waiting_when_user_declines_abort(self, _translate):
+        del _translate
+        confirmation = DummyConfirmationSignal(abort=False)
+        signals = type(
+            "Signals",
+            (),
+            {"progress": DummyProgressSignal(), "confirmation": confirmation},
+        )()
+        invoker = DummyInternalJsonInvoker()
+        invoker.app.ai = DummyTimeoutAiService()
+
+        def delayed_result(messages, **kwargs):
+            del messages, kwargs
+            time.sleep(0.35)
+            return {"action": "final_answer"}
+
+        invoker._invoke_json_llm = delayed_result
+        invoker._internal_json_step_timeouts = lambda: (0.05, 0.1)
+        invoker._internal_step_timeout_question = DialogAIChat._internal_step_timeout_question
+        invoker._request_internal_step_timeout_confirmation = (
+            DialogAIChat._request_internal_step_timeout_confirmation.__get__(invoker)
+        )
+
+        result = DialogAIChat._invoke_json_llm_with_step_timeout(
+            invoker,
+            [],
+            step_name="Internal planning",
+            status_kind="planning",
+            signals=signals,
+            chat_idx=7,
+        )
+
+        self.assertEqual({"action": "final_answer"}, result)
+        self.assertEqual(1, len(confirmation.requests))
+
+    @patch("qualcoder.ai_chat._", side_effect=lambda text: text, create=True)
+    def test_timeout_dialog_closes_when_operation_finishes(self, _translate):
+        del _translate
+        operation_finished = threading.Event()
+        answered = threading.Event()
+        request = {
+            "question": "Continue?",
+            "abort": True,
+            "answered": answered,
+            "operation_finished": operation_finished,
+        }
+        msg_box = MagicMock()
+        completion_timer = MagicMock()
+        timer_callback = None
+
+        def connect_timer(callback):
+            nonlocal timer_callback
+            timer_callback = callback
+
+        def finish_during_dialog():
+            operation_finished.set()
+            timer_callback()
+            return QtWidgets.QMessageBox.StandardButton.No
+
+        completion_timer.timeout.connect.side_effect = connect_timer
+        msg_box.exec.side_effect = finish_during_dialog
+        chat = SimpleNamespace(app=SimpleNamespace(settings={"fontsize": "10"}))
+
+        with patch("qualcoder.ai_chat.Message", return_value=msg_box), \
+                patch("qualcoder.ai_chat.QtCore.QTimer", return_value=completion_timer):
+            DialogAIChat._ai_internal_timeout_confirmation_callback(chat, request)
+
+        msg_box.reject.assert_called_once_with()
+        self.assertTrue(answered.is_set())
+        self.assertFalse(request["abort"])
 
 
 # TEST_PERSIST_PATH = '/fake/path/'

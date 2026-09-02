@@ -22,11 +22,14 @@ https://qualcoder.org/
 
 import atexit
 import hashlib
+import importlib
+import inspect
 import logging
 import math
 import os
 import re
 import sqlite3
+import threading
 import time
 import traceback
 import weakref
@@ -43,22 +46,70 @@ os.environ['FAISS_NO_AVX2'] = '1'
 os.environ['FAISS_OPT_LEVEL'] = '' 
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 
-from huggingface_hub import hf_hub_url
 import faiss
-import numpy as np
-import requests
-import sentence_transformers  # Keep a reference so it is not garbage collected in subthreads.
+from huggingface_hub import hf_hub_download
+from huggingface_hub.utils.tqdm import tqdm as HuggingFaceTqdm
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import FAISS as LegacyFAISS
+import numpy as np
 from PyQt6 import QtCore, QtWidgets
+import sentence_transformers  # Keep a reference so it is not garbage collected in subthreads.
 
 from qualcoder.ai_async_worker import AIException
-from qualcoder.ai_async_worker import Worker
+from qualcoder.ai_async_worker import Worker, WorkerSignals
 from qualcoder.error_dlg import show_error_dlg
 from qualcoder.helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+_HF_DOWNLOAD_SUPPORTS_TQDM_CLASS = "tqdm_class" in inspect.signature(hf_hub_download).parameters
+_HF_PROGRESS_CLASS_LOCK = threading.Lock()
+_HUGGINGFACE_TQDM_MODULE = importlib.import_module("huggingface_hub.utils.tqdm")
+
+
+class _EmbeddingModelDownloadCancelled(Exception):
+    """Raised internally when the user cancels the embedding-model download."""
+
+
+def _create_huggingface_progress_class(
+        vectorstore: "AiVectorstore", signals: Optional[WorkerSignals], file_name: str
+) -> type[HuggingFaceTqdm]:
+    """Create a Hugging Face progress bar that forwards updates to Qt.
+
+    Args:
+        vectorstore: Vectorstore controlling cancellation.
+        signals: Worker signals receiving progress messages.
+        file_name: Name displayed in the progress dialog.
+    """
+
+    class QtDownloadProgress(HuggingFaceTqdm):
+        """Forward Hugging Face byte progress without writing to a terminal."""
+
+        def __init__(self, *args, **kwargs):
+            self.qt_total = kwargs.get("total") or 0
+            self.qt_downloaded = kwargs.get("initial") or 0
+            self.qt_last_percent = -1
+            super().__init__(*args, **kwargs)
+
+        def display(self, msg=None, pos=None) -> None:
+            """Suppress terminal output because progress is shown in Qt."""
+
+        def update(self, size: float = 1) -> Optional[bool]:
+            if vectorstore.download_model_cancel:
+                raise _EmbeddingModelDownloadCancelled
+            self.qt_downloaded += size
+            displayed = super().update(size)
+            if signals is not None and signals.progress is not None:
+                percent = 50
+                if self.qt_total > 0:
+                    percent = min(100, round(self.qt_downloaded / self.qt_total * 100))
+                if percent != self.qt_last_percent:
+                    self.qt_last_percent = percent
+                    signals.progress.emit(f'{os.path.basename(file_name)}: {percent}%')
+            return displayed
+
+    return QtDownloadProgress
 
 
 def ai_exception_handler(exception_type, value, tb_obj):
@@ -298,6 +349,10 @@ class AiVectorstore:
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.collection_name = collection_name
+        self.download_model_running = False
+        self.download_model_cancel = False
+        self.download_model_msg = ''
+        self.download_model_error = ''
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
         self._register_quit_hook()
@@ -356,6 +411,9 @@ class AiVectorstore:
                     QtWidgets.QApplication.processEvents()
                     time.sleep(0.01)
                 pd.close()
+                if not self.embedding_model_is_cached():
+                    self.app.settings['ai_enable'] = 'False'
+                    return False
             else:
                 self.app.settings['ai_enable'] = 'False'
                 return False
@@ -367,69 +425,86 @@ class AiVectorstore:
                 return False
         return True
 
-    def _download_embedding_model(self, signals=None):
+    def _download_model_file(self, file_name: str, signals: Optional[WorkerSignals]) -> str:
+        """Download one model file while forwarding Hugging Face progress to Qt.
+
+        Args:
+            file_name: Repository-relative model filename.
+            signals: Worker signals receiving progress messages.
+        """
+
+        progress_class = _create_huggingface_progress_class(self, signals, file_name)
+        download_args = {
+            'repo_id': self.model_name,
+            'filename': file_name,
+            'local_dir': self.model_folder,
+        }
+        if _HF_DOWNLOAD_SUPPORTS_TQDM_CLASS:
+            return hf_hub_download(**download_args, tqdm_class=progress_class)
+
+        # huggingface_hub 0.x does not expose tqdm_class on hf_hub_download. Temporarily
+        # replace its module-level progress class; the lock prevents another download from
+        # observing this instance-specific Qt callback.
+        with _HF_PROGRESS_CLASS_LOCK:
+            original_progress_class = _HUGGINGFACE_TQDM_MODULE.tqdm
+            _HUGGINGFACE_TQDM_MODULE.tqdm = progress_class
+            try:
+                return hf_hub_download(**download_args)
+            finally:
+                _HUGGINGFACE_TQDM_MODULE.tqdm = original_progress_class
+
+    def _download_embedding_model(self, signals: Optional[WorkerSignals] = None) -> None:
+        """Download missing embedding-model files through Hugging Face Hub.
+
+        Args:
+            signals: Worker signals receiving progress messages.
+        """
+
         if not self.embedding_model_is_cached():
             self.download_model_running = True
-            self.download_model_cancel = False
             for file_name in self.model_files:
                 local_path = os.path.join(self.model_folder, file_name)
                 if os.path.exists(local_path):
                     continue
-                url = hf_hub_url(self.model_name, file_name)
-                local_folder = os.path.dirname(local_path)
-                os.makedirs(local_folder, exist_ok=True)
-                tmp_filename = local_path + ".tmp"
-                response = requests.get(url, stream=True, timeout=20)
-                response.raise_for_status()
-                with open(tmp_filename, "wb") as handle:
-                    total_length = response.headers.get('content-length')
-                    if total_length is not None:
-                        total_length = int(total_length)
-                        expected_size = (total_length / 1024) + 1
-                    else:
-                        expected_size = 0
-                    count = 0
-                    for chunk in response.iter_content(chunk_size=1024):
-                        if self.download_model_cancel:
-                            return
-                        if not chunk:
-                            continue
-                        handle.write(chunk)
-                        count += 1
-                        if expected_size > 0:
-                            msg = f'{os.path.basename(local_path)}: {round(count / expected_size * 100)}%'
-                        else:
-                            msg = f'{os.path.basename(local_path)}: 50%'
-                        if signals is not None and signals.progress is not None:
-                            signals.progress.emit(msg)
-                        print(msg, '                           ', end='\r', flush=True)
-                msg = f'{os.path.basename(local_path)}: 100%'
+                if self.download_model_cancel:
+                    return
                 if signals is not None and signals.progress is not None:
-                    signals.progress.emit(msg)
-                print(msg, '                           ', end='\r', flush=True)
-                if os.path.exists(local_path):
-                    os.remove(local_path)
-                os.rename(tmp_filename, local_path)
+                    signals.progress.emit(f'{os.path.basename(file_name)}: 0%')
+                try:
+                    self._download_model_file(file_name, signals)
+                except _EmbeddingModelDownloadCancelled:
+                    self.download_model_cancel = True
+                    return
+                if signals is not None and signals.progress is not None:
+                    signals.progress.emit(f'{os.path.basename(file_name)}: 100%')
 
     def _download_embedding_model_callback(self, msg):
         self.download_model_msg = msg
 
     def _download_embedding_model_finished(self):
-        if not self.ai_worker_running():
-            self.download_model_running = False
-            if self.download_model_cancel:
-                msg = _("AI: Could not download all the necessary components, the AI integration will be disabled.")
-            else:
-                msg = _('AI: Success, components downloaded and installed.')
-            self.parent_text_edit.append(msg)
-            logger.debug(msg)
+        self.download_model_running = False
+        if self.embedding_model_is_cached():
+            msg = _('AI: Success, components downloaded and installed.')
+        else:
+            self.app.settings['ai_enable'] = 'False'
+            msg = _("AI: Could not download all the necessary components, the AI integration will be disabled.")
+        self.parent_text_edit.append(msg)
+        logger.debug(msg)
+
+    def _download_embedding_model_error(self, exception_type, value, tb_obj) -> None:
+        """Record and display a background download error."""
+
+        self.download_model_error = str(value)
+        ai_exception_handler(exception_type, value, tb_obj)
 
     def download_embedding_model(self):
         self.download_model_running = True
+        self.download_model_cancel = False
+        self.download_model_error = ''
         worker = Worker(self._download_embedding_model)
         worker.signals.finished.connect(self._download_embedding_model_finished)
         worker.signals.progress.connect(self._download_embedding_model_callback)
-        worker.signals.error.connect(ai_exception_handler)
+        worker.signals.error.connect(self._download_embedding_model_error)
         self.threadpool.start(worker)
 
     def _ensure_embedding_function(self):

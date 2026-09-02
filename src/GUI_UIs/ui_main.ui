@@ -18,20 +18,20 @@
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
       <widget class="QTabWidget" name="tabWidget">
        <property name="tabPosition">
-        <enum>QTabWidget::North</enum>
+        <enum>QTabWidget::TabPosition::North</enum>
        </property>
        <property name="tabShape">
-        <enum>QTabWidget::Rounded</enum>
+        <enum>QTabWidget::TabShape::Rounded</enum>
        </property>
        <property name="currentIndex">
         <number>0</number>
@@ -147,10 +147,10 @@
         <item>
          <widget class="QFrame" name="sidebar_frame">
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::NoFrame</enum>
           </property>
           <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
+           <enum>QFrame::Shadow::Plain</enum>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="leftMargin">
@@ -180,7 +180,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -276,26 +276,38 @@
     <property name="title">
      <string>AI</string>
     </property>
-    <addaction name="actionAI_Setup_wizard"/>
-    <addaction name="actionAI_Configuration"/>
-    <addaction name="actionAI_Rebuild_internal_memory"/>
-    <addaction name="actionAI_Edit_Project_Memo"/>
-    <addaction name="actionAI_Prompts"/>
-    <addaction name="separator"/>
     <addaction name="actionAI_Agent"/>
     <addaction name="actionAI_Agent_Sidebar"/>
     <addaction name="actionAI_Search_and_Coding"/>
+    <addaction name="actionAI_Prompts"/>
+    <addaction name="separator"/>
+    <addaction name="actionCheck_project_AI_readiness"/>
+    <addaction name="actionAI_Setup_wizard"/>
+    <addaction name="actionAI_Configuration"/>
+    <addaction name="actionAI_Rebuild_internal_memory"/>
    </widget>
    <widget class="QMenu" name="menuAnalysis">
     <property name="title">
      <string>Analysis</string>
     </property>
+    <widget class="QMenu" name="menuAI_assisted_analysis">
+     <property name="title">
+      <string>AI assisted analysis</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionAI_topic_exploration"/>
+     <addaction name="actionAI_text_analysis"/>
+     <addaction name="actionAI_code_analysis"/>
+    </widget>
     <addaction name="actionCoding_reports"/>
     <addaction name="actionCode_co_occurrence"/>
     <addaction name="actionCode_relations"/>
     <addaction name="actionCode_text_exact_matches"/>
     <addaction name="actionText_segments_by_codes"/>
     <addaction name="actionView_Graph"/>
+    <addaction name="menuAI_assisted_analysis"/>
    </widget>
    <addaction name="menuProject"/>
    <addaction name="menuFiles_and_Cases"/>
@@ -604,15 +616,15 @@
   </action>
   <action name="actionAI_Setup_wizard">
    <property name="text">
-    <string>Setup Wizard</string>
+    <string>Setup wizard</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Rebuild_internal_memory">
    <property name="text">
-    <string>Rebuild Internal Memory</string>
+    <string>Rebuild internal memory</string>
    </property>
   </action>
   <action name="actionAI_Edit_Project_Memo">
@@ -622,12 +634,12 @@
   </action>
   <action name="actionAI_Agent">
    <property name="text">
-    <string>AI Agent</string>
+    <string>AI Agent chat</string>
    </property>
   </action>
   <action name="actionAI_Search_and_Coding">
    <property name="text">
-    <string>AI Assisted Coding</string>
+    <string>AI assisted coding</string>
    </property>
   </action>
   <action name="actionAI_Configuration">
@@ -638,12 +650,15 @@
     <string>AI related Settings</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Prompts">
    <property name="text">
     <string>Prompt library</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit AI prompts that can be used in various stages of the analysis</string>
    </property>
   </action>
   <action name="actionCode_organiser">
@@ -681,12 +696,47 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sidebar Mode</string>
+    <string>Agent sidebar view</string>
+   </property>
+   <property name="toolTip">
+    <string>Show the AI agent conversation in a sidebar next to other workspaces</string>
    </property>
   </action>
   <action name="actionAsk_the_AI_Agent">
    <property name="text">
     <string>Ask the AI Agent</string>
+   </property>
+  </action>
+  <action name="actionAI_topic_exploration">
+   <property name="text">
+    <string>AI topic exploration</string>
+   </property>
+   <property name="toolTip">
+    <string>Explore a free-search topic together with the AI agent.</string>
+   </property>
+  </action>
+  <action name="actionAI_text_analysis">
+   <property name="text">
+    <string>AI text analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Analyse a piece of text from your empirical data together with the AI.</string>
+   </property>
+  </action>
+  <action name="actionAI_code_analysis">
+   <property name="text">
+    <string>AI code analysis</string>
+   </property>
+   <property name="toolTip">
+    <string>Analyze the data collected under a certain code together with the AI agent.</string>
+   </property>
+  </action>
+  <action name="actionCheck_project_AI_readiness">
+   <property name="text">
+    <string>Check project AI readiness</string>
+   </property>
+   <property name="toolTip">
+    <string>Checks whether the current QualCoder project is well prepared for working with the AI agent and produces a report</string>
    </property>
   </action>
  </widget>

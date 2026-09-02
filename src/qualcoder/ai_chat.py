@@ -48,7 +48,12 @@ from PyQt6.QtGui import QCursor, QGuiApplication, QAction, QPalette, QShortcut, 
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
-from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
+from .ai_agent_prompts import (
+    AiAgentPromptsCatalog,
+    AgentPromptRecord,
+    prompt_name_and_scope,
+    prompt_name_key,
+)
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
 from .ai_search_dialog import DialogAiSearch
@@ -533,7 +538,7 @@ class PromptSlashReferenceHighlighter(QtGui.QSyntaxHighlighter):
             if not self.enabled_provider():
                 return
             prompt_names = {
-                str(prompt.name if prompt.name is not None else '').strip('/').casefold()
+                prompt_name_key(str(prompt.name if prompt.name is not None else '').strip('/'))
                 for prompt in self.records_provider()
             }
             prompt_names.discard('')
@@ -543,7 +548,7 @@ class PromptSlashReferenceHighlighter(QtGui.QSyntaxHighlighter):
 
         for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
             token = match.group(0).strip()
-            prompt_name = token[1:].rstrip('/.,;:!?').casefold()
+            prompt_name = prompt_name_key(token[1:].rstrip('/.,;:!?'))
             if prompt_name not in prompt_names:
                 continue
             fmt = QtGui.QTextCharFormat()
@@ -850,29 +855,26 @@ class DialogAIChat(QtWidgets.QDialog):
         normalized_parent = str(parent if parent is not None else '').strip('/')
         if normalized_full == '':
             return None
-        if normalized_parent == '':
-            if '/' in normalized_full:
+        full_parts = normalized_full.split('/')
+        parent_parts = normalized_parent.split('/') if normalized_parent != '' else []
+        if len(full_parts) != len(parent_parts) + 1:
+            return None
+        for index, parent_part in enumerate(parent_parts):
+            if prompt_name_key(full_parts[index]) != prompt_name_key(parent_part):
                 return None
-            return normalized_full
-        prefix = normalized_parent + '/'
-        if not normalized_full.startswith(prefix):
-            return None
-        remainder = normalized_full[len(prefix):]
-        if remainder == '' or '/' in remainder:
-            return None
-        return remainder
+        return full_parts[-1]
 
     def _matching_prompt_completion_items(self, prefix: str) -> List[Dict[str, Any]]:
         """Return direct matching categories and prompts for the current token."""
 
         self._refresh_prompt_completion_records()
         parent, leaf = self._split_prompt_completion_query(prefix)
-        normalized_leaf = leaf.casefold()
+        normalized_leaf = prompt_name_key(leaf)
         items: List[Dict[str, Any]] = []
 
         for category in self._iter_prompt_completion_categories():
             child_name = self._is_direct_prompt_completion_child(category, parent)
-            if child_name is None or not child_name.casefold().startswith(normalized_leaf):
+            if child_name is None or not prompt_name_key(child_name).startswith(normalized_leaf):
                 continue
             full_insert = '/' + category + '/'
             items.append(
@@ -888,7 +890,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         for prompt in self._prompt_completion_records:
             child_name = self._is_direct_prompt_completion_child(prompt.name, parent)
-            if child_name is None or not child_name.casefold().startswith(normalized_leaf):
+            if child_name is None or not prompt_name_key(child_name).startswith(normalized_leaf):
                 continue
             tooltip_lines = []
             if prompt.description != '':
@@ -1255,7 +1257,7 @@ class DialogAIChat(QtWidgets.QDialog):
         """Return known slash-callable prompt names for the current chat."""
 
         return {
-            str(prompt.name if prompt.name is not None else '').strip('/').casefold()
+            prompt_name_key(str(prompt.name if prompt.name is not None else '').strip('/'))
             for prompt in self._prompt_completion_records
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
@@ -1264,7 +1266,7 @@ class DialogAIChat(QtWidgets.QDialog):
         """Return prompt records keyed by normalized slash reference name."""
 
         return {
-            str(prompt.name if prompt.name is not None else '').strip('/').casefold(): prompt
+            prompt_name_key(str(prompt.name if prompt.name is not None else '').strip('/')): prompt
             for prompt in self._prompt_completion_records
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
@@ -1272,7 +1274,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _resolve_prompt_reference_name(self, prompt_name: str) -> Optional[AgentPromptRecord]:
         """Resolve a slash prompt reference, with chat-type-local fallback for analysis prompts."""
 
-        normalized = str(prompt_name if prompt_name is not None else '').strip('/').casefold()
+        normalized = prompt_name_key(str(prompt_name if prompt_name is not None else '').strip('/'))
         if normalized == '':
             return None
         records_by_name = self._prompt_reference_records_by_name()
@@ -1290,9 +1292,9 @@ class DialogAIChat(QtWidgets.QDialog):
         prefix = prefix_map.get(analysis_type, '')
         if prefix == '':
             return None
-        if normalized.startswith(prefix.casefold()):
+        if normalized.startswith(prompt_name_key(prefix)):
             return None
-        return records_by_name.get((prefix + normalized).casefold())
+        return records_by_name.get(prompt_name_key(prefix + normalized))
 
     def _prompt_reference_tooltip(self, prompt: AgentPromptRecord) -> str:
         """Build tooltip text for a recognized slash prompt reference."""
@@ -1320,7 +1322,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return None
         for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
             if match.start() <= char_pos <= match.end():
-                prompt_name = match.group(0)[1:].rstrip('/.,;:!?').casefold()
+                prompt_name = match.group(0)[1:].rstrip('/.,;:!?')
                 return self._resolve_prompt_reference_name(prompt_name)
         return None
 
@@ -1391,7 +1393,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         def replace_prompt_ref(match: re.Match) -> str:
             token = match.group(0)
-            prompt_name = token[1:].rstrip('/.,;:!?').casefold()
+            prompt_name = token[1:].rstrip('/.,;:!?')
             placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
             replacements[placeholder] = self._prompt_reference_html_span(
                 token,
@@ -1416,7 +1418,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
                     replacements[placeholder] = self._prompt_reference_html_span(
                         matched_label,
-                        records_by_label.get(matched_label.casefold()),
+                        records_by_label.get(prompt_name_key(matched_label)),
                         style_role=style_role,
                     )
                     return placeholder
@@ -1458,6 +1460,27 @@ class DialogAIChat(QtWidgets.QDialog):
             rendered_html = rendered_html.replace(placeholder, replacement)
         return rendered_html
 
+    def _render_chat_summary(self, summary: str, analysis_type: str) -> str:
+        """Render a chat summary and emphasize topic exploration labels."""
+
+        if str(analysis_type).strip().lower() != 'topic_exploration':
+            return self._render_plain_text_with_prompt_refs(summary, style_role="info")
+
+        labels = set()
+        for translation_key in ('\nDescription:', '\nPrompt:', '\nMaterial:'):
+            labels.add(translation_key.removeprefix('\n'))
+            labels.add(_(translation_key).removeprefix('\n'))
+
+        rendered_lines = []
+        for line in str(summary if summary is not None else '').split('\n'):
+            label = next((item for item in labels if item != '' and line.startswith(item)), None)
+            if label is None:
+                rendered_lines.append(self._render_plain_text_with_prompt_refs(line, style_role="info"))
+                continue
+            rendered_value = self._render_plain_text_with_prompt_refs(line[len(label):], style_role="info")
+            rendered_lines.append(f'<b>{html_lib.escape(label)}</b>{rendered_value}')
+        return '<br />'.join(rendered_lines)
+
     def _open_prompt_record_in_library(self, prompt: AgentPromptRecord):
         """Open one prompt record in the prompt library dialog."""
 
@@ -1493,55 +1516,33 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.toolButton_edit_title.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.toolButton_edit_title.setIconSize(QtCore.QSize(16, 16))
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
-        self.ai_response_color = "#356399"
-        self.ai_user_color = "#287368"
-        self.ai_status_color = "#808080"
-        self.ai_response_style = f'"{doc_font} color: #356399;"'
-        self.ai_user_style = f'"{doc_font} color: #287368;"'
-        self.ai_info_style = f'"{doc_font}"'
-        self.ai_status_style = f'"{doc_font} color: #808080;"'
-        self.ai_actions_style = f'"{doc_font}"'
-        if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
-            self.ai_response_color = "#8FB1D8"
-            self.ai_user_color = "#35998A"
-            self.ai_status_color = "#B5B5B5"
-            self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-            self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-            self.ai_info_style = f'"{doc_font}"'
-            self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
-        elif self.app.settings['stylesheet'] == 'native':
-            # Determine whether dark or light native style is active:
-            style_hints = QGuiApplication.styleHints()
-            # Older versions fot PyQt6 may not have QGuiApplication.styleHints().colorScheme() e.g. PtQ66 vers 6.2.3
+        light_colors = ("#356399", "#287368", "#808080")
+        dark_colors = ("#A5D6FF", "#4EC9B0", "#B5B5B5")
+
+        stylesheet = self.app.settings["stylesheet"]
+        use_dark_colors = stylesheet in ("dark", "rainbow")
+        if stylesheet == "native":
             try:
-                if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
-                    self.ai_response_color = "#8FB1D8"
-                    self.ai_user_color = "#35998A"
-                    self.ai_status_color = "#B5B5B5"
-                    self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-                    self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-                    self.ai_info_style = f'"{doc_font}"'
-                    self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
-                else:
-                    self.ai_response_color = "#356399"
-                    self.ai_user_color = "#287368"
-                    self.ai_status_color = "#808080"
-                    self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-                    self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-                    self.ai_info_style = f'"{doc_font}"'
-                    self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
-            except AttributeError as e_:
-                print(f"Using older version of PyQT6? {e_}")
-                logger.debug(f"Using older version of PyQT6? {e_}")
-                pass
-        else:
-            self.ai_response_color = "#356399"
-            self.ai_user_color = "#287368"
-            self.ai_status_color = "#808080"
-            self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
-            self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
-            self.ai_info_style = f'"{doc_font}"'
-            self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
+                use_dark_colors = (
+                    QGuiApplication.styleHints().colorScheme()
+                    == QtCore.Qt.ColorScheme.Dark
+                )
+            except AttributeError as exception:
+                print(f"Using an older PyQt6 version? {exception}")
+                logger.debug(
+                    "Could not determine the native color scheme: %s", exception
+                )
+
+        (
+            self.ai_response_color,
+            self.ai_user_color,
+            self.ai_status_color,
+        ) = dark_colors if use_dark_colors else light_colors
+        self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
+        self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
+        self.ai_info_style = f'"{doc_font}"'
+        self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
+        self.ai_actions_style = f'"{doc_font}"'
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         default_bg_color = self.ui.plainTextEdit_question.palette().color(
             self.ui.plainTextEdit_question.viewport().backgroundRole()
@@ -2536,6 +2537,42 @@ class DialogAIChat(QtWidgets.QDialog):
             return
         self._start_general_chat_session(name, summary)
 
+    def new_project_ai_readiness_chat(self) -> None:
+        """Start an MCP-backed agent chat using the project AI-readiness prompt."""
+
+        if not self._can_start_general_chat():
+            return
+        if self.app.ai.is_busy():
+            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
+            Message(self.app, _('AI busy'), msg, "warning").exec()
+            return
+        if not self.app.ai.is_ready():
+            msg = _('The AI not yet fully loaded. Please wait and retry.')
+            Message(self.app, _('AI not ready'), msg, "warning").exec()
+            return
+
+        prompt_name = "Check-project-AI-readiness"
+        readiness_prompt = self.agent_prompts_catalog.get_prompt(prompt_name)
+        if readiness_prompt is None:
+            msg = _('The AI-readiness prompt "Check-project-AI-readiness.md" could not be found.')
+            Message(self.app, _('AI Agent'), msg, "warning").exec()
+            return
+
+        chat_idx = self._start_general_chat_session(_('Project AI readiness check'), '')
+        if chat_idx is None or chat_idx < 0:
+            return
+
+        self._persist_agent_prompt_record(chat_idx, readiness_prompt, activation_source='bootstrap')
+        self.history_add_message(
+            'instruct',
+            '',
+            'Perform the activated project AI-readiness assessment now.',
+            chat_idx,
+        )
+        messages = self.history_get_ai_messages_compacted()
+        self._start_mcp_agent_worker(messages, chat_idx, self._mcp_general_chat_worker)
+        self.update_chat_window()
+
     def _support_chat_prompt_name(self) -> str:
         """Return the internal prompt name for Help-menu support sessions."""
 
@@ -2720,7 +2757,7 @@ class DialogAIChat(QtWidgets.QDialog):
         base_prompt = self.agent_prompts_catalog.get_internal_prompt(self._agent_base_prompt_name())
         if base_prompt is not None:
             for prompt in self.agent_prompts_catalog.expand_prompt_references([base_prompt], include_internal=True):
-                prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
+                prompt_key = prompt_name_key(prompt.name)
                 if prompt_key == "" or prompt_key in included_prompt_keys:
                     continue
                 included_prompt_keys.add(prompt_key)
@@ -2729,9 +2766,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     sections.append(prompt_text)
 
         project_memo = extract_ai_memo(self.app.get_project_memo())
-        if len(project_memo) > 0:
+        if project_memo.strip() != "":
             for prompt in self.agent_prompts_catalog.resolve_prompt_references(project_memo):
-                prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
+                prompt_key = prompt_name_key(prompt.name)
                 if prompt_key == "" or prompt_key in included_prompt_keys:
                     continue
                 included_prompt_keys.add(prompt_key)
@@ -2740,10 +2777,15 @@ class DialogAIChat(QtWidgets.QDialog):
                     sections.append(prompt_text)
 
             sections.append(
-                '# Information about the current project\n\n'
-                'Here is some background information about the research project the team is working on:\n'
+                '# Project memo\n\n'
+                'The following block is the current user-authored QualCoder project memo. '
+                'It contains background information about the research project that you are working on.\n\n'
+                '<project_memo>\n'
                 + project_memo
+                + '\n</project_memo>'
             )
+        else:
+            sections.append('# Project memo\n\nThe project memo is currently empty.')
 
         return '\n\n'.join(section for section in sections if section != ""), included_prompt_keys
 
@@ -2824,7 +2866,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         loaded_prompts: List[AgentPromptRecord] = []
         for prompt in prompts:
-            prompt_key = str(prompt.name if prompt.name is not None else '').strip().casefold()
+            prompt_key = prompt_name_key(prompt.name)
             if prompt_key == '' or prompt_key in base_prompt_keys:
                 continue
             prompt_message = self._build_turn_prompt_message(prompt)
@@ -3225,6 +3267,7 @@ class DialogAIChat(QtWidgets.QDialog):
             chat_idx,
             *worker_args,
             progress_callback=self.ai_mcp_progress_callback,
+            confirmation_callback=self._ai_internal_timeout_confirmation_callback,
             model_kind='large',
             scope_type='chat',
             scope_id=chat_idx,
@@ -5738,7 +5781,7 @@ data collected. This information will accompany every prompt sent to the AI, res
 
                 # Show title
                 html_parts.append(f'<h1 style={self.ai_info_style}>{self._display_chat_name(name, analysis_type)}</h1>')
-                summary_br = self._render_plain_text_with_prompt_refs(summary, style_role="info")
+                summary_br = self._render_chat_summary(summary, analysis_type)
                 display_type = self._display_chat_type_label(analysis_type, preserve_legacy_general=True)
                 if not self._is_agent_chat_type(analysis_type):
                     html_parts.append(
@@ -6258,7 +6301,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
                     continue
-                if prompt_name.casefold() in base_prompt_keys:
+                if prompt_name_key(prompt_name) in base_prompt_keys:
                     continue
                 msg_id = self._safe_message_id(msg)
                 prev_id = latest_prompt_ids.get(prompt_name, -1)
@@ -6293,6 +6336,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if base_uri in (
             "qualcoder://codes/tree",
             "qualcoder://documents",
+            "qualcoder://annotations",
             "qualcoder://vector/search",
             "qualcoder://search/bm25",
             "qualcoder://search/regex",
@@ -6301,6 +6345,8 @@ data collected. This information will accompany every prompt sent to the AI, res
         if re.fullmatch(r"qualcoder://documents/text/\d+", base_uri):
             return True
         if re.fullmatch(r"qualcoder://codes/segments/\d+", base_uri):
+            return True
+        if re.fullmatch(r"qualcoder://annotations/\d+", base_uri):
             return True
         return False
 
@@ -6325,6 +6371,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                             summary["hits"] = len(resource_payload.get("hits", []))
                         elif "documents" in resource_payload and isinstance(resource_payload.get("documents"), list):
                             summary["documents"] = len(resource_payload.get("documents", []))
+                        elif "annotations" in resource_payload and isinstance(resource_payload.get("annotations"), list):
+                            summary["annotations"] = len(resource_payload.get("annotations", []))
+                        elif "annotation" in resource_payload and isinstance(resource_payload.get("annotation"), dict):
+                            summary["annotations"] = 1
                         elif "text" in resource_payload:
                             summary["excerpt_chars"] = len(str(resource_payload.get("text", "")))
                             total_length = resource_payload.get("total_length", None)
@@ -6336,6 +6386,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                                 summary["total_hits"] = selection.get("total_hits")
                             if "total_segments" in selection:
                                 summary["total_segments"] = selection.get("total_segments")
+                            if "total_annotations" in selection:
+                                summary["total_annotations"] = selection.get("total_annotations")
                             if "truncated" in selection:
                                 summary["truncated"] = bool(selection.get("truncated", False))
         elif method == "resources/list":
@@ -6399,7 +6451,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
                     continue
-                if prompt_name.casefold() in base_prompt_keys:
+                if prompt_name_key(prompt_name) in base_prompt_keys:
                     continue
                 msg_id = self._safe_message_id(msg)
                 if msg_id != latest_prompt_ids.get(prompt_name, -1):
@@ -6920,6 +6972,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                                             messages,
                                             chat_idx,
                                             progress_callback=self.ai_mcp_progress_callback,
+                                            confirmation_callback=self._ai_internal_timeout_confirmation_callback,
                                             model_kind='large',
                                             scope_type='chat',
                                             scope_id=chat_idx,
@@ -7645,6 +7698,56 @@ data collected. This information will accompany every prompt sent to the AI, res
         hard_timeout = read_timeout + 60.0
         return soft_timeout, hard_timeout
 
+    @staticmethod
+    def _internal_step_timeout_question(step_name: str, status_kind: str) -> str:
+        """Return the confirmation question for an internal AI step timeout."""
+
+        step_label = str(step_name).strip() or _("Internal step")
+        if str(status_kind).strip().lower() == "reflection":
+            return _(
+                '{step} has reached QualCoder\'s time limit. Do you want to stop the '
+                'reflection and generate a provisional answer from the results collected so far?'
+            ).format(step=step_label)
+        return _(
+            '{step} has reached QualCoder\'s time limit. Do you want to abort the AI process?'
+        ).format(step=step_label)
+
+    def _request_internal_step_timeout_confirmation(self, signals, chat_idx: int,
+                                                    step_name: str, status_kind: str,
+                                                    operation_finished: threading.Event) -> bool:
+        """Ask the GUI thread whether a timed-out internal AI step should stop.
+
+        Args:
+            signals: Worker signals used to reach the GUI thread.
+            chat_idx: Chat index associated with the running AI operation.
+            step_name: User-facing name of the internal step.
+            status_kind: Internal phase, such as planning or reflection.
+            operation_finished: Event set when the timed-out operation finishes.
+
+        Returns:
+            True when the user chose to stop, otherwise False.
+        """
+
+        confirmation_signal = getattr(signals, 'confirmation', None)
+        if confirmation_signal is None or not hasattr(confirmation_signal, 'emit'):
+            return True
+
+        answered = threading.Event()
+        request: Dict[str, Any] = {
+            "chat_idx": chat_idx,
+            "question": self._internal_step_timeout_question(step_name, status_kind),
+            "abort": True,
+            "answered": answered,
+            "operation_finished": operation_finished,
+        }
+        confirmation_signal.emit(request)
+
+        ai_service = getattr(self.app, 'ai', None)
+        while not answered.wait(0.2):
+            if ai_service is not None and ai_service.is_current_run_canceled():
+                return True
+        return bool(request.get("abort", True))
+
     def _invoke_json_llm_with_step_timeout(self, messages: List[Any], schema_name: str = '',
                                            response_schema: Optional[Dict[str, Any]] = None,
                                            context: str = 'mcp_json_control',
@@ -7653,6 +7756,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                                            status_kind: str = '',
                                            signals=None, chat_idx: int = -1) -> Dict[str, Any]:
         """Run one internal JSON LLM step with a visible soft timeout and a hard wall-clock timeout."""
+
+        if status_kind == "reflection":
+            self._emit_mcp_status_text(signals, chat_idx, _("Analyzing..."), status_kind=status_kind)
 
         ai_service = getattr(self.app, 'ai', None)
         if ai_service is None:
@@ -7664,8 +7770,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 model_kind=model_kind,
             )
 
+        soft_timeout, hard_timeout = self._internal_json_step_timeouts()
+        step_label = str(step_name).strip() or _("Internal step")
         parent_context = ai_service._get_current_run_context()
         parent_run_id = str(getattr(parent_context, 'run_id', '')).strip()
+
         run_context = ai_service._create_run_context(
             model_kind=model_kind,
             purpose='invoke',
@@ -7711,19 +7820,16 @@ data collected. This information will accompany every prompt sent to the AI, res
         )
         thread.start()
 
-        soft_timeout, hard_timeout = self._internal_json_step_timeouts()
-        step_label = str(step_name).strip() or _("Internal step")
         soft_notice_sent = False
-        start_time = time.monotonic()
-
+        deadline = time.monotonic() + hard_timeout
         while not finished.wait(0.2):
             if ai_service.is_current_run_canceled():
                 ai_service._request_cancel_run(run_context)
                 thread.join(1.0)
                 raise AICancelled(parent_run_id if parent_run_id != '' else run_context.run_id)
 
-            elapsed = time.monotonic() - start_time
-            if not soft_notice_sent and elapsed >= soft_timeout:
+            remaining = deadline - time.monotonic()
+            if not soft_notice_sent and remaining <= hard_timeout - soft_timeout:
                 soft_notice_sent = True
                 self._emit_mcp_status_text(
                     signals,
@@ -7732,10 +7838,31 @@ data collected. This information will accompany every prompt sent to the AI, res
                     status_kind=status_kind,
                 )
 
-            if elapsed >= hard_timeout:
-                ai_service._request_cancel_run(run_context)
-                thread.join(2.0)
-                raise TimeoutError(step_label)
+            if remaining <= 0:
+                abort_requested = self._request_internal_step_timeout_confirmation(
+                    signals,
+                    chat_idx,
+                    step_label,
+                    status_kind,
+                    finished,
+                )
+                if ai_service.is_current_run_canceled():
+                    ai_service._request_cancel_run(run_context)
+                    thread.join(1.0)
+                    raise AICancelled(parent_run_id if parent_run_id != '' else run_context.run_id)
+                if finished.is_set():
+                    break
+                if abort_requested:
+                    ai_service._request_cancel_run(run_context)
+                    thread.join(2.0)
+                    raise TimeoutError(step_label)
+                self._emit_mcp_status_text(
+                    signals,
+                    chat_idx,
+                    _('{step} is continuing at your request...').format(step=step_label),
+                    status_kind=status_kind,
+                )
+                deadline = time.monotonic() + hard_timeout
 
         if "error" in error_holder:
             raise error_holder["error"]
@@ -8288,6 +8415,37 @@ data collected. This information will accompany every prompt sent to the AI, res
                             segment_quote,
                             seg.get("context_before", ""),
                             seg.get("context_after", ""),
+                        )
+                    )
+                continue
+
+            if uri == "qualcoder://annotations" or re.fullmatch(r"qualcoder://annotations/\d+", uri):
+                annotation_items = payload.get("annotations", [])
+                if re.fullmatch(r"qualcoder://annotations/\d+", uri):
+                    annotation = payload.get("annotation", None)
+                    annotation_items = [annotation] if isinstance(annotation, dict) else []
+                if not isinstance(annotation_items, list):
+                    continue
+                for annotation in annotation_items:
+                    if not isinstance(annotation, dict):
+                        continue
+                    source_id = self._safe_int(annotation.get("fid", None), -1)
+                    start = self._safe_int(annotation.get("pos0", None), -1)
+                    quote = str(annotation.get("quote", ""))
+                    if source_id <= 0 or start < 0 or quote.strip() == "":
+                        continue
+                    source_name = str(annotation.get("source_name", "")).strip()
+                    if source_name == "":
+                        source_name = self.get_filename(source_id)
+                    quote_truncated = bool(annotation.get("quote_truncated", False))
+                    candidates.extend(
+                        self._build_ref_candidates_for_excerpt(
+                            source_id,
+                            source_name,
+                            start,
+                            quote,
+                            "" if quote_truncated else annotation.get("context_before", ""),
+                            "" if quote_truncated else annotation.get("context_after", ""),
                         )
                     )
                 continue
@@ -9155,6 +9313,43 @@ data collected. This information will accompany every prompt sent to the AI, res
         )
         self.update_chat_window()
         self._update_undo_button_state()
+
+    def _ai_internal_timeout_confirmation_callback(self, request: Dict[str, Any]) -> None:
+        """Show an internal-step timeout question on the GUI thread."""
+
+        if not isinstance(request, dict):
+            return
+        answered = request.get("answered")
+        try:
+            question = str(request.get("question", "")).strip()
+            if question == "":
+                request["abort"] = True
+                return
+            operation_finished = request.get("operation_finished")
+            if isinstance(operation_finished, threading.Event) and operation_finished.is_set():
+                request["abort"] = False
+                return
+            msg_box = Message(self.app, _('AI timeout'), question, icon='warning')
+            msg_box.setStandardButtons(
+                QtWidgets.QMessageBox.StandardButton.Yes |
+                QtWidgets.QMessageBox.StandardButton.No
+            )
+            msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
+            completion_timer = QtCore.QTimer(msg_box)
+            completion_timer.setInterval(100)
+
+            def close_completed_timeout_dialog() -> None:
+                if isinstance(operation_finished, threading.Event) and operation_finished.is_set():
+                    msg_box.reject()
+
+            completion_timer.timeout.connect(close_completed_timeout_dialog)
+            completion_timer.start()
+            reply = msg_box.exec()
+            completion_timer.stop()
+            request["abort"] = reply == QtWidgets.QMessageBox.StandardButton.Yes
+        finally:
+            if isinstance(answered, threading.Event):
+                answered.set()
 
     def ai_mcp_progress_callback(self, progress_msg):
         """Receive live MCP status updates from the worker thread."""

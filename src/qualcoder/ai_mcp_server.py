@@ -77,6 +77,8 @@ class AiMcpServer:
     max_regex_page_size = 100
     default_regex_context_chars = 120
     max_regex_context_chars = 1000
+    default_annotation_page_size = 40
+    max_annotation_page_size = 200
     default_snippet_context_min_chars = 200
     max_snippet_context_chars = 500
     max_regex_hits = 20000
@@ -97,6 +99,7 @@ class AiMcpServer:
         "codes/create_category",
         "codes/create_code",
         "codes/create_text_coding",
+        "annotations/create",
         "cases/create_case",
         "cases/link_text_to_case",
     )
@@ -117,6 +120,8 @@ class AiMcpServer:
         "documents/create_attribute",
         "documents/update_document",
         "documents/update_attributes",
+        "annotations/update",
+        "annotations/delete",
     )
     PREVIEW_TOOL_NAMES = (
         "codes/preview_delete_category",
@@ -151,6 +156,8 @@ class AiMcpServer:
             "(qualcoder://documents/text/{id}, with optional start/length or line_start/line_end), "
             "cases list (qualcoder://cases), case details by id (qualcoder://cases/{id}), "
             "and case text segments by case id (qualcoder://cases/text/{id}), "
+            "text annotations (qualcoder://annotations) and annotation details by id "
+            "(qualcoder://annotations/{anid}), "
             "code tree (qualcoder://codes/tree), and coded text segments by code id "
             "(qualcoder://codes/segments/{cid}) with optional filters file_ids, case_ids, and owner, "
             "semantic vector search "
@@ -163,7 +170,7 @@ class AiMcpServer:
             "(qualcoder://help/pages), help search (qualcoder://help/search?q=...), and help page reads "
             "(qualcoder://help/page/{slug}). "
             "Available tools include preview and write operations for categories, codes, text codings, "
-            "case attributes, document attributes, and cases. "
+            "case attributes, document attributes, cases, and text annotations. "
             "Delete actions on categories or codes should be previewed before execution."
         )
 
@@ -450,6 +457,17 @@ class AiMcpServer:
                     code=str(code_name),
                     document=str(file_name),
                 )
+            if tool_name == "annotations/create":
+                fid = self._to_int(tool_args.get("fid"), -1)
+                file_name = self._fetch_source_name(fid) if fid > 0 else None
+                if file_name is None or str(file_name).strip() == "":
+                    file_name = _("Document") + (f" #{fid}" if fid > 0 else "")
+                return _('Creating annotation in document "{name}"...').format(name=str(file_name))
+            if tool_name in ("annotations/update", "annotations/delete"):
+                anid = self._to_int(tool_args.get("anid"), -1)
+                if tool_name == "annotations/update":
+                    return _('Updating annotation #{anid}...').format(anid=anid if anid > 0 else "?")
+                return _('Deleting annotation #{anid}...').format(anid=anid if anid > 0 else "?")
             if tool_name in ("codes/delete_category", "codes/move_category", "codes/preview_delete_category"):
                 catid = self._to_int(tool_args.get("catid"), -1)
                 category_name = self._fetch_category_name(catid) if catid > 0 else None
@@ -539,6 +557,8 @@ class AiMcpServer:
             return _('Reviewing the list of text documents...')
         if uri_base == "qualcoder://cases":
             return _('Reviewing the list of cases...')
+        if uri_base == "qualcoder://annotations":
+            return _('Reviewing text annotations...')
         if uri_base == "qualcoder://codes/tree":
             return _('Reviewing the current code structure...')
         if uri_base == "qualcoder://vector/search":
@@ -575,6 +595,9 @@ class AiMcpServer:
             if code_name is None or code_name == "":
                 code_name = f"Code {cid}"
             return _('Reviewing coded text segments for "{name}"...').format(name=code_name)
+        annotation_match = re.fullmatch(r"qualcoder://annotations/(\d+)", uri_base)
+        if annotation_match is not None:
+            return _('Reviewing annotation #{anid}...').format(anid=int(annotation_match.group(1)))
         file_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_base)
         if file_match is not None:
             file_id = int(file_match.group(1))
@@ -717,6 +740,15 @@ class AiMcpServer:
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
+                    uriTemplate="qualcoder://annotations/{anid}{?owner}",
+                    name="Text annotation by id",
+                    description=(
+                        "Read one text annotation by annotation id. By default, coder visibility is respected. "
+                        "Supplying owner explicitly permits reading that owner's annotation even when hidden."
+                    ),
+                    mimeType="application/json",
+                ),
+                types.ResourceTemplate(
                     uriTemplate="qualcoder://codes/segments/{cid}",
                     name="Coded text segments by code id",
                     description=(
@@ -817,6 +849,9 @@ class AiMcpServer:
             return {"documents": self._fetch_text_documents()}
         if uri_no_query == "qualcoder://cases":
             return {"cases": self._fetch_cases()}
+        if uri_no_query == "qualcoder://annotations":
+            options = self._parse_annotation_options(query)
+            return self._read_annotations(options)
         if uri_no_query == "qualcoder://help/pages":
             return self.help_index.list_pages()
         if uri_no_query == "qualcoder://vector/search":
@@ -852,6 +887,12 @@ class AiMcpServer:
             cid = int(code_segments_match.group(1))
             options = self._parse_code_segments_options(query)
             return self._read_code_segments(cid, options)
+
+        annotation_match = re.fullmatch(r"qualcoder://annotations/(\d+)", uri_no_query)
+        if annotation_match is not None:
+            anid = int(annotation_match.group(1))
+            owners = self._parse_string_list_options(query, ("owner", "owners"))
+            return self._read_annotation(anid, owners)
 
         file_match = re.fullmatch(r"qualcoder://documents/text/(\d+)", uri_no_query)
         if file_match is not None:
@@ -900,6 +941,16 @@ class AiMcpServer:
                 uri="qualcoder://cases",
                 name="Cases",
                 description="List cases in the project with memo, attributes, and linked-file counts.",
+                mimeType="application/json",
+            ),
+            types.Resource(
+                uri="qualcoder://annotations",
+                name="Text annotations",
+                description=(
+                    "Paginated text annotations with source passages. Optional filters: file_ids, case_ids, "
+                    "owner, cursor, and page_size. By default, coder visibility is respected; an explicit owner "
+                    "filter reads that owner's annotations even when hidden."
+                ),
                 mimeType="application/json",
             ),
             types.Resource(
@@ -994,6 +1045,51 @@ class AiMcpServer:
                             "memo": {"type": "string"},
                         },
                         "required": ["cid", "fid", "quote"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "annotations/create",
+                    "description": (
+                        "Create one text annotation in a text-backed document. Provide either an exact quote that "
+                        "occurs exactly once, or explicit pos0 and pos1 character positions. If quote and positions "
+                        "are both provided, they must identify the same text."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "fid": {"type": "integer"},
+                            "memo": {"type": "string"},
+                            "quote": {"type": "string"},
+                            "pos0": {"type": "integer"},
+                            "pos1": {"type": "integer"},
+                        },
+                        "required": ["fid", "memo"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "annotations/update",
+                    "description": "Update the public memo text for one annotation. Requires Full access.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "anid": {"type": "integer"},
+                            "memo": {"type": "string"},
+                        },
+                        "required": ["anid", "memo"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
+                    "name": "annotations/delete",
+                    "description": "Delete one text annotation by annotation id. Requires Full access.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "anid": {"type": "integer"},
+                        },
+                        "required": ["anid"],
                         "additionalProperties": False,
                     },
                 },
@@ -1342,6 +1438,12 @@ class AiMcpServer:
             payload = self._tool_create_code(arguments, change_set_id)
         elif tool_name == "codes/create_text_coding":
             payload = self._tool_create_text_coding(arguments, change_set_id)
+        elif tool_name == "annotations/create":
+            payload = self._tool_create_annotation(arguments, change_set_id)
+        elif tool_name == "annotations/update":
+            payload = self._tool_update_annotation(arguments, change_set_id)
+        elif tool_name == "annotations/delete":
+            payload = self._tool_delete_annotation(arguments, change_set_id)
         elif tool_name == "codes/preview_delete_category":
             payload = self._tool_preview_delete_category(arguments)
         elif tool_name == "codes/preview_delete_code":
@@ -1658,6 +1760,244 @@ class AiMcpServer:
                     "memo": memo,
                     "owner": self.AI_AGENT_OWNER,
                     "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_create_annotation(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        """Create one annotation over an unambiguous text span."""
+
+        fid = self._to_int(arguments.get("fid"), -1)
+        memo = self._memo_update_text(arguments.get("memo", ""))
+        quote_value = arguments.get("quote", None)
+        quote = "" if quote_value is None else str(quote_value)
+        has_pos0 = "pos0" in arguments
+        has_pos1 = "pos1" in arguments
+
+        if fid <= 0:
+            raise ValueError("fid must be a positive integer.")
+        if memo.strip() == "":
+            raise ValueError("Annotation memo must not be empty.")
+        if has_pos0 != has_pos1:
+            raise ValueError("Provide both pos0 and pos1, or neither.")
+        if not has_pos0 and quote.strip() == "":
+            raise ValueError("Provide an exact quote or explicit pos0 and pos1 character positions.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            source_row = cur.execute(
+                "SELECT id, name, ifnull(fulltext,'') FROM source WHERE id=? AND fulltext IS NOT NULL",
+                (fid,),
+            ).fetchone()
+            if source_row is None:
+                raise ValueError(f"Text document id {fid} not found.")
+            fulltext = str(source_row[2])
+
+            if has_pos0:
+                pos0 = self._to_int(arguments.get("pos0"), -1)
+                pos1 = self._to_int(arguments.get("pos1"), -1)
+                if pos0 < 0 or pos1 <= pos0:
+                    raise ValueError("Annotation positions must satisfy 0 <= pos0 < pos1.")
+                if pos1 > len(fulltext):
+                    raise ValueError("pos1 exceeds the document length.")
+                excerpt = fulltext[pos0:pos1]
+                if quote != "" and excerpt != quote:
+                    raise ValueError("The supplied quote does not match the text at pos0 and pos1.")
+            else:
+                positions = self._exact_quote_positions(quote, fulltext)
+                if len(positions) == 0:
+                    raise ValueError(
+                        f"Quote was not found exactly in document {fid}. Provide pos0 and pos1 character positions."
+                    )
+                if len(positions) > 1:
+                    raise ValueError(
+                        f"Quote occurs {len(positions)} times in document {fid} and is ambiguous. "
+                        "Provide pos0 and pos1 character positions."
+                    )
+                pos0 = positions[0]
+                pos1 = pos0 + len(quote)
+                excerpt = quote
+
+            existing = cur.execute(
+                "SELECT anid, ifnull(memo,''), date FROM annotation "
+                "WHERE fid=? AND pos0=? AND pos1=? AND owner=?",
+                (fid, pos0, pos1, self.AI_AGENT_OWNER),
+            ).fetchone()
+            if existing is not None:
+                return {
+                    "tool": "annotations/create",
+                    "created": False,
+                    "reason": "already_exists",
+                    "annotation": {
+                        "anid": int(existing[0]),
+                        "fid": fid,
+                        "source_name": str(source_row[1] if source_row[1] is not None else ""),
+                        "pos0": pos0,
+                        "pos1": pos1,
+                        "quote": excerpt,
+                        "memo": str(existing[1] if existing[1] is not None else ""),
+                        "owner": self.AI_AGENT_OWNER,
+                        "date": str(existing[2] if existing[2] is not None else ""),
+                    },
+                }
+
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute(
+                "INSERT INTO annotation (fid, pos0, pos1, memo, owner, date) VALUES (?, ?, ?, ?, ?, ?)",
+                (fid, pos0, pos1, memo, self.AI_AGENT_OWNER, now),
+            )
+            anid = int(cur.lastrowid)
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "create_annotation",
+                    "anid": anid,
+                    "fid": fid,
+                    "source_name": str(source_row[1] if source_row[1] is not None else ""),
+                    "pos0": pos0,
+                    "pos1": pos1,
+                    "memo": memo,
+                    "owner": self.AI_AGENT_OWNER,
+                    "created_at": now,
+                },
+            )
+            self._emit_project_table_changes(["annotation"])
+            return {
+                "tool": "annotations/create",
+                "created": True,
+                "annotation": {
+                    "anid": anid,
+                    "fid": fid,
+                    "source_name": str(source_row[1] if source_row[1] is not None else ""),
+                    "pos0": pos0,
+                    "pos1": pos1,
+                    "quote": excerpt,
+                    "memo": memo,
+                    "owner": self.AI_AGENT_OWNER,
+                    "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_update_annotation(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        """Update the public memo text of one annotation."""
+
+        anid = self._to_int(arguments.get("anid"), -1)
+        if anid <= 0:
+            raise ValueError("anid must be a positive integer.")
+        if "memo" not in arguments:
+            raise ValueError("Provide the memo field to update.")
+        public_memo = self._memo_update_text(arguments.get("memo", ""))
+        if public_memo.strip() == "":
+            raise ValueError("Annotation memo must not be empty. Use annotations/delete to remove the annotation.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            annotation = self._fetch_annotation_row_cur(cur, anid)
+            if annotation is None:
+                raise ValueError(f"Annotation id {anid} not found.")
+            old_memo = str(annotation.get("memo", ""))
+            new_memo = self._merge_public_memo(old_memo, public_memo)
+            if new_memo == old_memo:
+                return {
+                    "tool": "annotations/update",
+                    "updated": False,
+                    "reason": "no_changes",
+                    "annotation": {"anid": anid, "fid": int(annotation.get("fid", -1))},
+                }
+
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("UPDATE annotation SET memo=?, date=? WHERE anid=?", (new_memo, now, anid))
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "update_annotation",
+                    "anid": anid,
+                    "fid": int(annotation.get("fid", -1)),
+                    "before": {
+                        "memo": old_memo,
+                        "date": str(annotation.get("date", "")),
+                        "owner": str(annotation.get("owner", "")),
+                    },
+                    "after": {
+                        "memo": new_memo,
+                        "date": now,
+                        "owner": str(annotation.get("owner", "")),
+                    },
+                },
+            )
+            self._emit_project_table_changes(["annotation"])
+            return {
+                "tool": "annotations/update",
+                "updated": True,
+                "annotation": {
+                    "anid": anid,
+                    "fid": int(annotation.get("fid", -1)),
+                    "pos0": int(annotation.get("pos0", -1)),
+                    "pos1": int(annotation.get("pos1", -1)),
+                    "memo": new_memo,
+                    "owner": str(annotation.get("owner", "")),
+                    "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _tool_delete_annotation(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        """Delete one annotation and record a restorable snapshot."""
+
+        anid = self._to_int(arguments.get("anid"), -1)
+        if anid <= 0:
+            raise ValueError("anid must be a positive integer.")
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            annotation = self._fetch_annotation_row_cur(cur, anid)
+            if annotation is None:
+                raise ValueError(f"Annotation id {anid} not found.")
+            snapshot = {"tables": {"annotation": [dict(annotation)]}}
+            cur.execute("DELETE FROM annotation WHERE anid=?", (anid,))
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "delete_annotation",
+                    "anid": anid,
+                    "snapshot": snapshot,
+                },
+            )
+            self._emit_project_table_changes(["annotation"])
+            return {
+                "tool": "annotations/delete",
+                "deleted": True,
+                "annotation": {
+                    "anid": anid,
+                    "fid": int(annotation.get("fid", -1)),
+                    "pos0": int(annotation.get("pos0", -1)),
+                    "pos1": int(annotation.get("pos1", -1)),
+                    "owner": str(annotation.get("owner", "")),
                 },
             }
         except Exception:
@@ -2976,6 +3316,19 @@ class AiMcpServer:
             (ctid_i,),
         )
 
+    def _fetch_annotation_row_cur(self, cur: sqlite3.Cursor, anid: Any) -> Optional[Dict[str, Any]]:
+        """Return one annotation row as a dictionary."""
+
+        anid_i = self._to_int(anid, -1)
+        if anid_i <= 0:
+            return None
+        return self._fetchone_dict_cur(
+            cur,
+            "SELECT anid, fid, pos0, pos1, ifnull(memo,'') as memo, owner, date "
+            "FROM annotation WHERE anid=?",
+            (anid_i,),
+        )
+
     def _fetch_case_row_cur(self, cur: sqlite3.Cursor, caseid: Any) -> Optional[Dict[str, Any]]:
         caseid_i = self._to_int(caseid, -1)
         if caseid_i <= 0:
@@ -3358,6 +3711,22 @@ class AiMcpServer:
                 return -1, -1
             return start, start + len(quote_text)
 
+    def _exact_quote_positions(self, quote: str, fulltext: str) -> List[int]:
+        """Return every exact start position for a quote, including overlapping matches."""
+
+        quote_text = str(quote if quote is not None else "")
+        if quote_text == "":
+            return []
+        positions: List[int] = []
+        start = 0
+        while start <= len(fulltext) - len(quote_text):
+            match = fulltext.find(quote_text, start)
+            if match < 0:
+                break
+            positions.append(match)
+            start = match + 1
+        return positions
+
     def _record_ai_change(self, change_set_id: str, operation: Dict[str, Any]) -> None:
         ai = getattr(self.app, "ai", None)
         if ai is not None and hasattr(ai, "record_ai_change"):
@@ -3641,6 +4010,29 @@ class AiMcpServer:
             "max_chars": max_chars,
             "cursor": cursor,
             "file_ids": file_ids,
+        }
+
+    def _parse_annotation_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+        """Parse filters and pagination for annotation reads."""
+
+        cursor = max(0, self._to_int(query.get("cursor", [0])[0], 0))
+        page_size = self._to_int(
+            query.get("page_size", [self.default_annotation_page_size])[0],
+            self.default_annotation_page_size,
+        )
+        page_size = max(1, min(page_size, self.max_annotation_page_size))
+        max_chars = self._to_int(
+            query.get("max_chars", [self.default_segments_max_chars])[0],
+            self.default_segments_max_chars,
+        )
+        max_chars = max(1, min(max_chars, self.max_segments_chars_limit))
+        return {
+            "cursor": cursor,
+            "page_size": page_size,
+            "max_chars": max_chars,
+            "file_ids": self._parse_positive_int_list_options(query, ("file_ids",)),
+            "case_ids": self._parse_positive_int_list_options(query, ("case_ids",)),
+            "owners": self._parse_string_list_options(query, ("owner", "owners")),
         }
 
     def _parse_string_list_options(self, query: Dict[str, List[str]], keys: Tuple[str, ...]) -> List[str]:
@@ -5255,6 +5647,176 @@ class AiMcpServer:
             if r_start > end:
                 break
         return False
+
+    def _read_annotations(self, options: Dict[str, Any]) -> Dict[str, Any]:
+        """Read a filtered, paginated set of text annotations."""
+
+        cursor = int(options.get("cursor", 0))
+        page_size = int(options.get("page_size", self.default_annotation_page_size))
+        max_chars = int(options.get("max_chars", self.default_segments_max_chars))
+        file_ids = options.get("file_ids", [])
+        case_ids = options.get("case_ids", [])
+        owners = options.get("owners", [])
+        if not isinstance(file_ids, list):
+            file_ids = []
+        if not isinstance(case_ids, list):
+            case_ids = []
+        if not isinstance(owners, list):
+            owners = []
+
+        if len(owners) > 0:
+            table_name = "annotation"
+        else:
+            if not self._view_exists("annotation_visible"):
+                raise RuntimeError("Required view 'annotation_visible' not found.")
+            table_name = "annotation_visible"
+
+        where_parts: List[str] = []
+        where_params: List[Any] = []
+        if len(file_ids) > 0:
+            placeholders = ",".join(["?"] * len(file_ids))
+            where_parts.append(f"a.fid IN ({placeholders})")
+            where_params.extend(file_ids)
+        if len(case_ids) > 0:
+            placeholders = ",".join(["?"] * len(case_ids))
+            where_parts.append(
+                "EXISTS (SELECT 1 FROM case_text AS ctf WHERE ctf.fid=a.fid "
+                f"AND ctf.caseid IN ({placeholders}) "
+                "AND a.pos0 >= ctf.pos0 AND a.pos1 <= ctf.pos1)"
+            )
+            where_params.extend(case_ids)
+        if len(owners) > 0:
+            placeholders = ",".join(["?"] * len(owners))
+            where_parts.append(f"a.owner IN ({placeholders})")
+            where_params.extend(owners)
+        where_sql = "" if len(where_parts) == 0 else " WHERE " + " AND ".join(where_parts)
+
+        count_row = self._fetchone(
+            f"SELECT count(*) FROM {table_name} AS a" + where_sql,
+            tuple(where_params),
+        )
+        total_annotations = 0 if count_row is None else int(count_row[0])
+        rows = self._fetchall(
+            "SELECT a.anid, a.fid, a.pos0, a.pos1, ifnull(a.memo,''), a.owner, a.date, source.name "
+            f"FROM {table_name} AS a JOIN source ON source.id=a.fid"
+            + where_sql
+            + " ORDER BY a.fid, a.pos0, a.anid LIMIT ? OFFSET ?",
+            tuple(where_params + [page_size, cursor]),
+        )
+
+        source_texts = self._fetch_sources_texts([self._to_int(row[1], -1) for row in rows])
+        case_memberships = self._fetch_case_memberships([self._to_int(row[1], -1) for row in rows])
+        annotations: List[Dict[str, Any]] = []
+        used_chars = 0
+        hit_max_char_limit = False
+        for row in rows:
+            fid = self._to_int(row[1], -1)
+            source_row = source_texts.get(fid)
+            fulltext = "" if source_row is None else str(source_row[1] if source_row[1] is not None else "")
+            pos0 = self._to_int(row[2], -1)
+            pos1 = self._to_int(row[3], -1)
+            full_quote = fulltext[pos0:pos1] if 0 <= pos0 < pos1 <= len(fulltext) else ""
+            remaining_chars = max_chars - used_chars
+            if remaining_chars <= 0:
+                hit_max_char_limit = True
+                break
+            quote = full_quote[:remaining_chars]
+            quote_truncated = len(quote) < len(full_quote)
+            if quote_truncated:
+                hit_max_char_limit = True
+            annotation = {
+                "anid": row[0],
+                "fid": row[1],
+                "source_name": row[7],
+                "pos0": row[2],
+                "pos1": row[3],
+                "quote": quote,
+                "quote_truncated": quote_truncated,
+                "memo": "" if row[4] is None else str(row[4]),
+                "owner": row[5],
+                "date": row[6],
+                "matching_cases": self._matching_cases_for_range(
+                    pos0,
+                    pos1,
+                    case_memberships.get(fid, []),
+                ),
+            }
+            self._append_line_range_fields(annotation, fulltext, pos0, pos1 - pos0)
+            self._append_snippet_context_fields(annotation, fulltext, pos0, pos1 - pos0)
+            annotations.append(annotation)
+            used_chars += len(quote)
+            if quote_truncated:
+                break
+
+        next_cursor = min(cursor + len(annotations), total_annotations)
+        return {
+            "selection": {
+                "cursor": cursor,
+                "page_size": page_size,
+                "max_chars": max_chars,
+                "file_ids": file_ids,
+                "case_ids": case_ids,
+                "owners": owners,
+                "total_annotations": total_annotations,
+                "next_cursor": next_cursor,
+                "truncated": next_cursor < total_annotations,
+                "hit_max_char_limit": hit_max_char_limit,
+            },
+            "annotations": annotations,
+        }
+
+    def _read_annotation(self, anid: int, owners: List[str]) -> Dict[str, Any]:
+        """Read one annotation, respecting visibility unless an owner is explicit."""
+
+        if anid <= 0:
+            raise ValueError("anid must be a positive integer.")
+        if len(owners) > 0:
+            table_name = "annotation"
+        else:
+            if not self._view_exists("annotation_visible"):
+                raise RuntimeError("Required view 'annotation_visible' not found.")
+            table_name = "annotation_visible"
+        where_owner = ""
+        params: List[Any] = [anid]
+        if len(owners) > 0:
+            placeholders = ",".join(["?"] * len(owners))
+            where_owner = f" AND a.owner IN ({placeholders})"
+            params.extend(owners)
+        row = self._fetchone(
+            "SELECT a.anid, a.fid, a.pos0, a.pos1, ifnull(a.memo,''), a.owner, a.date, "
+            "source.name, ifnull(source.fulltext,'') "
+            f"FROM {table_name} AS a JOIN source ON source.id=a.fid WHERE a.anid=?"
+            + where_owner,
+            tuple(params),
+        )
+        if row is None:
+            raise ValueError(f"Annotation id {anid} not found or is not visible for the requested owner.")
+        fulltext = str(row[8] if row[8] is not None else "")
+        fid = self._to_int(row[1], -1)
+        pos0 = self._to_int(row[2], -1)
+        pos1 = self._to_int(row[3], -1)
+        full_quote = fulltext[pos0:pos1] if 0 <= pos0 < pos1 <= len(fulltext) else ""
+        quote = full_quote[:self.max_read_length]
+        annotation = {
+            "anid": row[0],
+            "fid": row[1],
+            "source_name": row[7],
+            "pos0": row[2],
+            "pos1": row[3],
+            "quote": quote,
+            "quote_truncated": len(quote) < len(full_quote),
+            "memo": "" if row[4] is None else str(row[4]),
+            "owner": row[5],
+            "date": row[6],
+            "matching_cases": self._matching_cases_for_range(
+                pos0,
+                pos1,
+                self._fetch_case_memberships([fid]).get(fid, []),
+            ),
+        }
+        self._append_line_range_fields(annotation, fulltext, pos0, pos1 - pos0)
+        self._append_snippet_context_fields(annotation, fulltext, pos0, pos1 - pos0)
+        return {"annotation": annotation}
 
     def _read_code_segments(self, cid: int, options: Dict[str, Any]) -> Dict[str, Any]:
         code_name = self._fetch_code_name(cid)

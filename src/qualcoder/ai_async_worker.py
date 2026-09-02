@@ -54,6 +54,9 @@ class WorkerSignals(QObject):
 
     progress
         int indicating % progress
+
+    confirmation
+        object containing a request that must be answered by the GUI thread
         
     streaming
         str containing the current streaming response particle coming from the LLM
@@ -64,6 +67,7 @@ class WorkerSignals(QObject):
     result = pyqtSignal(object)
     progress = pyqtSignal(str)
     streaming = pyqtSignal(str)
+    confirmation = pyqtSignal(object)
 
 
 class Worker(QRunnable):
