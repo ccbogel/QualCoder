@@ -49,7 +49,7 @@
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
         <source>Sunburst and treemap charts</source>
-        <translation>Diagramme radial et Treemap</translation>
+        <translation type="unfinished">Diagrammes en radiales et Treemap</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -322,7 +322,7 @@ Chaque mot est exclu du nuage de mots n-grams=1.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
         <source>Remove nodes</source>
-        <translation>Supprimer les noeuds</translation>
+        <translation type="unfinished">Supprimer les nœuds</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
@@ -409,7 +409,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
         <source>Show coded av segments</source>
-        <translation>Montrer les segments codés av</translation>
+        <translation type="unfinished">Montrer les segments codés A/V</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
@@ -434,7 +434,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph.ui" line="0"/>
         <source>Changing to another report will lose unsaved graph.</source>
-        <translation>Changer de rapport supprime les graphiques non enregistrés.</translation>
+        <translation type="unfinished">hanger de rapport supprime le graphique non enregistré.</translation>
     </message>
 </context>
 <context>
@@ -514,12 +514,12 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph_models.ui" line="0"/>
         <source>Show categories as parent nodes</source>
-        <translation>Montrer les catégories comme noeuds parents</translation>
+        <translation type="unfinished">Montrer les catégories comme nœuds parents</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph_models.ui" line="0"/>
         <source>Select 1 or more categories after clicking Generate.</source>
-        <translation>Selectionner une ou des catégories après avoir cliqué sur Générer.</translation>
+        <translation type="unfinished">Sélectionner une ou des catégories après avoir cliqué sur Générer.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_graph_models.ui" line="0"/>
@@ -547,7 +547,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
         <source>Select the references to import. Items already in the project (duplicates) are unchecked by default.</source>
-        <translation>Sélectionner les références à importer : celles déjà dans le projet (dupliquées) sont décochées par défaut.</translation>
+        <translation type="unfinished">Sélectionner les références à importer : celles déjà dans le projet (doublons) sont décochées par défaut.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
@@ -557,7 +557,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
         <source>Deselect all</source>
-        <translation>Déselectionner tout</translation>
+        <translation type="unfinished">Désélectionner tout</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_references_import.ui" line="0"/>
@@ -615,7 +615,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="../../GUI_UIs/ui_report_matching_segments.ui" line="0"/>
         <source>Select coder. Blank for all</source>
-        <translation>Selectionner codeur⋅se. Vide pour tous</translation>
+        <translation type="unfinished">Sélectionner codeur⋅se. Vide pour tous</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_report_matching_segments.ui" line="0"/>
@@ -763,7 +763,7 @@ Attention : cette action est irréversible.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
         <source>Run report</source>
-        <translation>Executer le rapport</translation>
+        <translation type="unfinished">Exécuter le rapport</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
@@ -773,7 +773,7 @@ Attention : cette action est irréversible.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
         <source>Select coder. Blank for all</source>
-        <translation>Selectionner codeur⋅se. Vide pour tous</translation>
+        <translation type="unfinished">Sélectionner codeur⋅se. Vide pour tous</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_report_codes_by_segments.ui" line="0"/>
@@ -1460,7 +1460,7 @@ Si la case n’est pas cochée : Chaque réponse qualitative sera un fichier tex
     <message>
         <location filename="../../GUI_UIs/ui_ai_chat.ui" line="0"/>
         <source>Delete the selected chat</source>
-        <translation>Supprimer le chat sélectionné</translation>
+        <translation>Supprimer la discussion sélectionné</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_ai_chat.ui" line="0"/>
@@ -1480,7 +1480,7 @@ Si la case n’est pas cochée : Chaque réponse qualitative sera un fichier tex
     <message>
         <location filename="../../GUI_UIs/ui_ai_chat.ui" line="0"/>
         <source>Create a new chat</source>
-        <translation>Créer un nouveau chat</translation>
+        <translation>Créer une nouvelle discussion</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_ai_chat.ui" line="0"/>
@@ -1521,7 +1521,7 @@ Si la case n’est pas cochée : Chaque réponse qualitative sera un fichier tex
     <message>
         <location filename="../../GUI_UIs/ui_ai_chat.ui" line="0"/>
         <source>&lt;Select chat&gt;</source>
-        <translation>&lt;Sélectionner un chat&gt;</translation>
+        <translation>&lt;Sélectionner une discussion&gt;</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_ai_chat.ui" line="0"/>
@@ -3568,7 +3568,7 @@ Vérifiez après avoir appliqué la fonction.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_node_relations.ui" line="0"/>
         <source>Select relation</source>
-        <translation>Selectionner une relation</translation>
+        <translation type="unfinished">Sélectionner une relation</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_node_relations.ui" line="0"/>
@@ -5526,7 +5526,7 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>AI Agent chat</source>
-        <translation>Chat avec l’agent IA</translation>
+        <translation>Discussion avec l’agent IA</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
