@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-02 01:44+0200\n"
-"PO-Revision-Date: 2026-08-27 21:54-0700\n"
+"PO-Revision-Date: 2026-09-02 04:43-0700\n"
 "Last-Translator: Auto-translated via Argostranslate (EN - < ES)>\n"
 "Language-Team: ES <LL@li.org>\n"
 "Language: es\n"
@@ -257,15 +257,15 @@ msgid "AI not ready"
 msgstr "La IA no está lista"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2557
-#, fuzzy
 msgid ""
 "The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be found."
-msgstr "No se pudo encontrar el prompt interno de ayuda de la IA \"_help.md\"."
+msgstr ""
+"No se pudo encontrar el prompt de comprobación de preparación para la IA "
+"\"Check-project-AI-readiness.md\"."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2561
-#, fuzzy
 msgid "Project AI readiness check"
-msgstr "Creación del proyecto"
+msgstr "Comprobación de la preparación del proyecto para la IA"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:2612
 msgid "The internal AI support prompt \"_help.md\" could not be found."
@@ -771,6 +771,9 @@ msgid ""
 "reflection and generate a provisional answer from the results collected so "
 "far?"
 msgstr ""
+"{step} ha alcanzado el límite de tiempo de QualCoder. ¿Desea detener la "
+"reflexión y generar una respuesta provisional a partir de los resultados "
+"reunidos hasta ahora?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7712
 #, python-brace-format
@@ -778,11 +781,12 @@ msgid ""
 "{step} has reached QualCoder's time limit. Do you want to abort the AI "
 "process?"
 msgstr ""
+"{step} ha alcanzado el límite de tiempo de QualCoder. ¿Desea interrumpir el "
+"proceso de la IA?"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7761
-#, fuzzy
 msgid "Analyzing..."
-msgstr "Pensando..."
+msgstr "Analizando..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7837
 #, python-brace-format
@@ -790,9 +794,9 @@ msgid "{step} is taking longer than expected..."
 msgstr "{step} está tardando más de lo esperado..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:7862
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "{step} is continuing at your request..."
-msgstr "{step} está tardando más de lo esperado..."
+msgstr "{step} continúa a petición suya..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:8576
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:8603
@@ -821,7 +825,7 @@ msgstr ""
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9332
 msgid "AI timeout"
-msgstr ""
+msgstr "Tiempo de espera de la IA agotado"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_chat.py:9415
 msgid "Repairing invalid final answer format..."
@@ -1010,14 +1014,12 @@ msgid "Created text coding: "
 msgstr "Codificación de texto creada: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2445
-#, fuzzy
 msgid "Created annotation: "
-msgstr "Eliminar la anotación"
+msgstr "Anotación creada: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2445
-#, fuzzy
 msgid "Created annotation"
-msgstr "Eliminar la anotación"
+msgstr "Anotación creada"
 
 # Seleccionar un caso
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2449
@@ -1098,9 +1100,8 @@ msgid "Updated text coding"
 msgstr "Codificación de texto actualizada"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2541
-#, fuzzy
 msgid "Updated annotation"
-msgstr "Editar anotación"
+msgstr "Anotación actualizada"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2550
 msgid "Renamed category: "
@@ -1166,14 +1167,12 @@ msgid "Removed case link"
 msgstr "Vínculo de caso eliminado"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2690
-#, fuzzy
 msgid "Deleted annotation: "
-msgstr "Eliminar la anotación"
+msgstr "Anotación eliminada: "
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2691
-#, fuzzy
 msgid "Deleted annotation"
-msgstr "Eliminar la anotación"
+msgstr "Anotación eliminada"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2715
 msgid "1 day ago"
@@ -1219,9 +1218,8 @@ msgid "case link(s)"
 msgstr "vínculo(s) de caso"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2829
-#, fuzzy
 msgid "annotation(s)"
-msgstr "anotaciones:"
+msgstr "anotación(es)"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:2831
 msgid "attribute action(s)"
@@ -1329,9 +1327,8 @@ msgstr " vínculo(s) de caso."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3740
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3755
-#, fuzzy
 msgid " annotation(s)."
-msgstr "anotaciones:"
+msgstr " anotación(es)."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3742
 msgid " attribute definition(s)."
@@ -1378,9 +1375,9 @@ msgstr ""
 "anteriores."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3767
-#, fuzzy
 msgid " updated annotation(s) would be restored to their previous values."
-msgstr " código(s) actualizado(s) se restaurarían a sus valores anteriores."
+msgstr ""
+" anotación(es) actualizada(s) se restaurarían a sus valores anteriores."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_llm.py:3769
 msgid " attribute update(s) would be restored to their previous values."
@@ -1663,19 +1660,19 @@ msgstr ""
 "\"{document}\"..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:465
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Creating annotation in document \"{name}\"..."
-msgstr "Actualizando el documento \"{name}\"..."
+msgstr "Creando la anotación en el documento \"{name}\"..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:469
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Updating annotation #{anid}..."
-msgstr "Actualizando la codificación de texto #{ctid}..."
+msgstr "Actualizando la anotación #{anid}..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:470
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Deleting annotation #{anid}..."
-msgstr "Eliminando la codificación de texto #{ctid}..."
+msgstr "Eliminando la anotación #{anid}..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:475
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:497
@@ -1818,9 +1815,8 @@ msgid "Reviewing the list of cases..."
 msgstr "Revisando la lista de casos..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:561
-#, fuzzy
 msgid "Reviewing text annotations..."
-msgstr "Revisando la lista de casos..."
+msgstr "Revisando las anotaciones de texto..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:563
 msgid "Reviewing the current code structure..."
@@ -1869,9 +1865,9 @@ msgid "Reviewing coded text segments for \"{name}\"..."
 msgstr "Revisando los segmentos de texto codificados de \"{name}\"..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:600
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Reviewing annotation #{anid}..."
-msgstr "Eliminando el vínculo caso-texto #{id}..."
+msgstr "Revisando la anotación #{anid}..."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_mcp_server.py:607
 #, python-brace-format
@@ -1914,6 +1910,12 @@ msgid ""
 "'Prompt' and 'prompt' are treated as duplicates. Reserved Windows filenames "
 "such as CON, NUL, COM1, and LPT1 are not allowed."
 msgstr ""
+"Los nombres de los prompts pueden contener letras Unicode, incluidas vocales "
+"acentuadas y diéresis, números, guiones y guiones bajos. Deben empezar por "
+"una letra o un número y no superar los 64 caracteres. No distinguen "
+"mayúsculas de minúsculas, de modo que \"Prompt\" y \"prompt\" se consideran "
+"duplicados. No se admiten los nombres de archivo reservados por Windows, "
+"como CON, NUL, COM1 y LPT1."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:213
 msgid "Create new prompt"
@@ -1997,27 +1999,28 @@ msgid "Folder names must not start with \"_\"."
 msgstr "Los nombres de carpeta no deben comenzar con \"_\"."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1114
-#, fuzzy
 msgid "The folder name must be no longer than 64 characters."
-msgstr "El nombre no debe superar los 64 caracteres."
+msgstr "El nombre de la carpeta no debe superar los 64 caracteres."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1117
 msgid "The encoded folder name is too long for a portable filesystem."
 msgstr ""
+"El nombre de carpeta codificado es demasiado largo para un sistema de "
+"archivos portable."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1121
-#, fuzzy
 msgid "This folder name is reserved by Windows and cannot be used."
-msgstr "Este nombre de filtro ya está en uso: "
+msgstr ""
+"Este nombre de carpeta está reservado por Windows y no se puede utilizar."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1124
-#, fuzzy
 msgid ""
 "Folder names must start with a letter or number and contain Unicode letters, "
 "combining marks, numbers, hyphens, and underscores only."
 msgstr ""
-"Los nombres de carpeta deben ser compatibles con el sistema de archivos. "
-"Utilice únicamente letras minúsculas, números, guiones y guiones bajos."
+"Los nombres de carpeta deben empezar por una letra o un número y contener "
+"únicamente letras Unicode, marcas diacríticas, números, guiones y guiones "
+"bajos."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1134
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1262
@@ -2142,19 +2145,22 @@ msgstr "El nombre no debe superar los 64 caracteres."
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1416
 msgid "The encoded prompt filename is too long for a portable filesystem."
 msgstr ""
+"El nombre de archivo del prompt codificado es demasiado largo para un "
+"sistema de archivos portable."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1422
 msgid "This prompt name is reserved by Windows and cannot be used."
 msgstr ""
+"Este nombre de prompt está reservado por Windows y no se puede utilizar."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1425
-#, fuzzy
 msgid ""
 "Prompt names must start with a letter or number and contain Unicode letters, "
 "combining marks, numbers, hyphens, and underscores only."
 msgstr ""
-"Los nombres de los prompts deben ser compatibles con el sistema de archivos. "
-"Utilice únicamente letras minúsculas, números, guiones y guiones bajos."
+"Los nombres de los prompts deben empezar por una letra o un número y "
+"contener únicamente letras Unicode, marcas diacríticas, números, guiones y "
+"guiones bajos."
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\ai_prompt_library.py:1443
 msgid ""
@@ -6729,9 +6735,8 @@ msgstr "Fusionada desde la categoría:"
 # Fusionar código
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1413
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1532
-#, fuzzy
 msgid "Merger date:"
-msgstr "Fusionar código: "
+msgstr "Fecha de la fusión:"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\code_tree.py:1470
 msgid "There is no other code to merge into."
@@ -7343,9 +7348,8 @@ msgid "Link to file"
 msgstr "Vincular a un archivo"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:305
-#, fuzzy
 msgid "Case file manager"
-msgstr "Filtro de casos"
+msgstr "Gestor de archivos del caso"
 
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\information.py:305
 msgid "Export all"
