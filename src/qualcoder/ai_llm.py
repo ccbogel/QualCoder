@@ -22,6 +22,7 @@ https://qualcoder.org/
 
 import asyncio
 import configparser
+import json
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -1150,6 +1151,38 @@ def _store_seen_ai_model_upgrade_offers(settings: dict | None, seen_offers: set[
     settings['ai_model_upgrade_offers_seen'] = '||'.join(sorted(seen_offers))
 
 
+def _parse_pending_ai_model_upgrade_offer(settings: dict | None) -> dict | None:
+    """Return the persisted model-upgrade offer, if it is valid."""
+
+    if settings is None:
+        return None
+    raw_value = str(settings.get('ai_model_upgrade_offer_pending', '')).strip()
+    if raw_value == '':
+        return None
+    try:
+        offer = json.loads(raw_value)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if not isinstance(offer, dict):
+        return None
+    current_model_name = str(offer.get('current_model_name', '')).strip()
+    suggested_model_name = str(offer.get('suggested_model_name', '')).strip()
+    if current_model_name == '' or suggested_model_name == '':
+        return None
+    return {
+        'current_model_name': current_model_name,
+        'suggested_model_name': suggested_model_name,
+    }
+
+
+def _store_pending_ai_model_upgrade_offer(settings: dict | None, offer: dict | None) -> None:
+    """Persist or clear a deferred model-upgrade offer."""
+
+    if settings is None:
+        return
+    settings['ai_model_upgrade_offer_pending'] = '' if offer is None else json.dumps(offer)
+
+
 def _queue_ai_profile_upgrade_offer(current_models: list, current_model_name: str,
                                     suggested_model_name: str,
                                     settings: dict | None) -> dict | None:
@@ -1274,6 +1307,16 @@ def update_ai_models(current_models: list, current_model_index: int,
         pending_upgrade_offer = _queue_ai_profile_upgrade_offer(
             current_models, current_model_name, suggested_model_name, settings
         )
+    elif current_model_name != '':
+        stored_offer = _parse_pending_ai_model_upgrade_offer(settings)
+        if stored_offer is not None and stored_offer['current_model_name'] == current_model_name:
+            pending_upgrade_offer = _queue_ai_profile_upgrade_offer(
+                current_models,
+                stored_offer['current_model_name'],
+                stored_offer['suggested_model_name'],
+                settings,
+            )
+    _store_pending_ai_model_upgrade_offer(settings, pending_upgrade_offer)
     
     return current_models, current_model_index, pending_upgrade_offer
 

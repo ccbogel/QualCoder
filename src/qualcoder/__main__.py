@@ -155,6 +155,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def _show_pending_ai_model_upgrade_offer(self) -> None:
         """Show one deferred AI-profile upgrade offer after the main window is visible."""
 
+        if self.app.settings.get('ai_enable', 'False') != 'True':
+            return
+
         offer = getattr(self.app, 'pending_ai_model_upgrade_offer', None)
         if not isinstance(offer, dict) or len(offer) == 0:
             return
@@ -163,14 +166,23 @@ class MainWindow(QtWidgets.QMainWindow):
         suggested_model_name = str(offer.get('suggested_model_name', '')).strip()
         current_index = self._find_ai_model_index_by_name(self.app.ai_models, current_model_name)
         suggested_index = self._find_ai_model_index_by_name(self.app.ai_models, suggested_model_name)
-        if current_index < 0 or suggested_index < 0 or current_index == suggested_index:
+        try:
+            selected_index = int(self.app.settings.get('ai_model_index', -1))
+        except (TypeError, ValueError):
+            selected_index = -1
+        if current_index < 0 or suggested_index < 0 or current_index == suggested_index or \
+                selected_index != current_index:
             self.app.pending_ai_model_upgrade_offer = None
+            self.app.settings['ai_model_upgrade_offer_pending'] = ''
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
             return
 
         seen_value = str(self.app.settings.get('ai_model_upgrade_offers_seen', '')).strip()
         seen_offers = {item for item in seen_value.split('||') if item != ''}
         if suggested_model_name in seen_offers:
             self.app.pending_ai_model_upgrade_offer = None
+            self.app.settings['ai_model_upgrade_offer_pending'] = ''
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
             return
 
         current_model = self.app.ai_models[current_index]
@@ -196,6 +208,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if msg_box.clickedButton() == switch_button:
             suggested_model['api_key'] = current_model.get('api_key', '')
             self.app.settings['ai_model_index'] = suggested_index
+        self.app.settings['ai_model_upgrade_offer_pending'] = ''
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
         self.app.pending_ai_model_upgrade_offer = None
 
@@ -1953,6 +1966,7 @@ Click "Yes" to start now.')
             self.app.ai.init_llm(self, rebuild_vectorstore=False)
         else:  
             self.app.ai.close()
+        self._show_pending_ai_model_upgrade_offer()
         self.update_ai_menu_options()
         self.ai_chat_window.refresh_placeholder_if_visible()
             
@@ -2640,6 +2654,7 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(_('AI: Setup Wizard'))
         QtWidgets.QApplication.processEvents()  # update ui
         self.app.ai.init_llm(self, rebuild_vectorstore=False, enable_ai=True)
+        self._show_pending_ai_model_upgrade_offer()
         self.update_ai_menu_options()
         self.ai_chat_window.refresh_placeholder_if_visible()
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
