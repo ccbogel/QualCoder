@@ -23,11 +23,15 @@ Async worker for lengthy AI functions that would otherwise block the UI.
 Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/ 
 """
 
+import logging
 import sys
-import traceback  # TODO unused
-from typing import Any  # TODO unused
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot  # TODO QThreadPool not used
+from typing import Callable, Optional
+
 from PyQt6 import sip
+from PyQt6.QtCore import QCoreApplication, QObject, QRunnable, QThread, Qt, pyqtSignal, pyqtSlot
+
+
+logger = logging.getLogger(__name__)
 
 
 class AIException(Exception):
@@ -68,6 +72,71 @@ class WorkerSignals(QObject):
     progress = pyqtSignal(str)
     streaming = pyqtSignal(str)
     confirmation = pyqtSignal(object)
+
+
+class GuiThreadRelay(QObject):
+    """Deliver worker messages and errors safely in the Qt application thread."""
+
+    message = pyqtSignal(str)
+    error = pyqtSignal(object, object, object)
+
+    def __init__(self, message_handler: Callable[[str], None],
+                 error_handler: Optional[Callable[[object, object, object], None]] = None,
+                 parent: Optional[QObject] = None):
+        """Create a queued relay for callbacks that may touch GUI objects.
+
+        Args:
+            message_handler: Callback that displays a message in the GUI.
+            error_handler: Optional callback that displays a worker error.
+            parent: Optional QObject owner.
+        """
+
+        super().__init__(parent)
+        self._message_handler = message_handler
+        self._error_handler = error_handler
+        self.message.connect(
+            self._deliver_message,
+            type=Qt.ConnectionType.QueuedConnection,
+        )
+        self.error.connect(
+            self._deliver_error,
+            type=Qt.ConnectionType.QueuedConnection,
+        )
+
+    @staticmethod
+    def _in_application_thread() -> bool:
+        app = QCoreApplication.instance()
+        return app is None or QThread.currentThread() == app.thread()
+
+    @pyqtSlot(str)
+    def _deliver_message(self, message: str) -> None:
+        if not self._in_application_thread():
+            logger.critical("Blocked a GUI message callback outside the Qt application thread")
+            return
+        self._message_handler(message)
+
+    @pyqtSlot(object, object, object)
+    def _deliver_error(self, exception_type: object, value: object,
+                       traceback_obj: object) -> None:
+        if self._error_handler is None:
+            return
+        if not self._in_application_thread():
+            logger.critical("Blocked a GUI error callback outside the Qt application thread")
+            return
+        self._error_handler(exception_type, value, traceback_obj)
+
+    @pyqtSlot(str)
+    def post_message(self, message: str) -> None:
+        """Queue a GUI message from any thread."""
+
+        self.message.emit(message)
+
+    @pyqtSlot(object, object, object)
+    def post_error(self, exception_type: object, value: object,
+                   traceback_obj: object) -> None:
+        """Queue a GUI error callback from any thread."""
+
+        self.error.emit(exception_type, value, traceback_obj)
 
 
 class Worker(QRunnable):
