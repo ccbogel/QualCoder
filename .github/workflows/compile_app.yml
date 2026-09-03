@@ -1,0 +1,71 @@
+name: Build QualCoder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller qualcoder_onefile.spec
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QualCoder-Windows
+          path: dist/
+
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make build script executable
+        run: chmod +x ./mac_build-dmg.sh
+
+      - name: Build DMG
+        run: ./mac_build-dmg.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QualCoder-macOS
+          path: |
+            dist/
+            *.dmg
+
+  build-debian:
+    name: Build for Debian
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make build script executable
+        run: chmod +x ./debian_build-deb.sh
+
+      - name: Build DEB
+        run: ./debian_build-deb.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QualCoder-Debian
+          path: |
+            dist/
+            *.deb
