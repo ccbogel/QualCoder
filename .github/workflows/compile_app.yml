@@ -1,4 +1,4 @@
-name: Build QualCoder
+name: Build and Release QualCoder
 
 on:
   workflow_dispatch:
@@ -34,11 +34,17 @@ jobs:
           QUALCODER_VERSION: ${{ github.event.inputs.version }}
         run: pyinstaller qualcoder_onefile.spec
 
+      - name: Rename output file
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          Get-ChildItem dist\*.exe | Rename-Item -NewName { "QualCoder_Windows_$version.exe" }
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QualCoder-Windows_${{ github.event.inputs.version }}
-          path: dist/
+          name: windows-build
+          path: dist/*.exe
 
   build-macos:
     name: Build for macOS
@@ -65,13 +71,15 @@ jobs:
       - name: Build DMG
         run: ./mac_build-dmg.sh "${{ github.event.inputs.version }}"
 
+      - name: Rename DMG file
+        run: |
+          mv dist/*.dmg "dist/QualCoder_macOS_${{ github.event.inputs.version }}.dmg"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QualCoder-macOS_${{ github.event.inputs.version }}
-          path: |
-            dist/
-            *.dmg
+          name: macos-build
+          path: dist/*.dmg
 
   build-debian:
     name: Build for Debian
@@ -95,16 +103,50 @@ jobs:
       - name: Create dist directory
         run: mkdir -p dist
 
+      - name: Build Linux executable with PyInstaller
+        run: pyinstaller qualCoder.spec --onefile --name QualCoder
+
+      - name: Rename Linux executable
+        run: |
+          mv dist/QualCoder "dist/QualCoder_Linux_${{ github.event.inputs.version }}"
+
       - name: Make build script executable
         run: chmod +x ./debian_build-deb.sh
 
       - name: Build DEB
         run: ./debian_build-deb.sh "${{ github.event.inputs.version }}"
 
+      - name: Rename DEB file
+        run: |
+          mv dist/*.deb "dist/QualCoder_Debian_${{ github.event.inputs.version }}.deb"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QualCoder-Debian_${{ github.event.inputs.version }}
-          path: |
-            dist/
-            *.deb
+          name: debian-build
+          path: dist/
+
+  create-release:
+    name: Create Draft Release
+    needs: [build-windows, build-macos, build-debian]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List downloaded files
+        run: ls -R artifacts/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: QualCoder ${{ github.event.inputs.version }}
+          draft: true
+          files: |
+            artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
