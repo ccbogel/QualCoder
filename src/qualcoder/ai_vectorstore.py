@@ -330,10 +330,6 @@ class AiVectorstore:
     faiss_db = None
     faiss_db_path = None
     _is_closing = False
-    # Worker cancellation flag. Separate from _is_closing, which close() resets so a new project
-    # can be opened, while a worker that outlived the wait must keep seeing the cancel.
-    # Cleared when new work is queued.
-    _cancel_workers = False
     collection_name = ''
     reading_doc = ''
 
@@ -343,6 +339,9 @@ class AiVectorstore:
     chunk_overlap = 100
     chunker_version = "recursive_char_v1"
     chunk_separators = [".", "!", "?", "\n\n", "\n", " ", ""]
+    # SentenceTransformer has no mid-call cancellation. Small calls keep shutdown and
+    # source-deletion latency bounded to one batch instead of one complete document.
+    embedding_batch_size = 4
 
     def __init__(self, app, parent_text_edit, collection_name):
         self.app = app
@@ -352,6 +351,12 @@ class AiVectorstore:
         self.download_model_cancel = False
         self.download_model_msg = ''
         self.download_model_error = ''
+        self.import_workers_count = 0
+        self.vectorstore_workers_count = 0
+        self._is_closing = False
+        self._state_lock = threading.Lock()
+        self._index_write_lock = threading.RLock()
+        self._worker_generation = 0
         self._ui_relay = GuiThreadRelay(parent_text_edit.append, ai_exception_handler)
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
@@ -372,6 +377,22 @@ class AiVectorstore:
         """Queue a status message for delivery in the Qt application thread."""
 
         self._ui_relay.post_message(message)
+
+    def _worker_generation_snapshot(self) -> int:
+        """Return the generation assigned to newly queued work."""
+
+        with self._state_lock:
+            return self._worker_generation
+
+    def cancelled(self, worker_generation: Optional[int] = None) -> bool:
+        """Return whether work has been invalidated by shutdown or project closure."""
+
+        with self._state_lock:
+            if self._is_closing:
+                return True
+            if worker_generation is not None and worker_generation != self._worker_generation:
+                return True
+        return False
 
     def prepare_embedding_model(self, parent_window=None) -> bool:
         if not self.embedding_model_is_cached():
@@ -549,6 +570,35 @@ class AiVectorstore:
         keys = ('name', 'id', 'fulltext', 'memo', 'owner', 'date', 'mediapath')
         return [dict(zip(keys, row)) for row in rows]
 
+    def _project_source_exists(self, source_id: int) -> bool:
+        """Return whether a source still exists in the project database."""
+
+        conn = self._connect_project_db()
+        try:
+            row = conn.execute(
+                "SELECT 1 FROM source WHERE id=? LIMIT 1",
+                (int(source_id),),
+            ).fetchone()
+        finally:
+            conn.close()
+        return row is not None
+
+    def _project_source_matches(self, source_id: int, source_name: str, text: str) -> bool:
+        """Return whether an import snapshot still matches its project source."""
+
+        conn = self._connect_project_db()
+        try:
+            row = conn.execute(
+                "SELECT name, fulltext FROM source WHERE id=? LIMIT 1",
+                (int(source_id),),
+            ).fetchone()
+        finally:
+            conn.close()
+        if row is None:
+            return False
+        current_text = "" if row[1] is None else str(row[1])
+        return str(row[0]) == str(source_name) and current_text == text
+
     def _connect_search_db(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self._search_db_path, timeout=30)
         conn.execute("PRAGMA journal_mode=WAL")
@@ -702,9 +752,9 @@ class AiVectorstore:
 
     def _index_source(self, conn: sqlite3.Connection, source_id: int, source_name: str, text: str,
                       candidate_vectors_by_hash: Optional[Dict[str, List[np.ndarray]]] = None,
-                      signals=None) -> int:
-        if self._is_closing:
-            return 0
+                      signals=None, worker_generation: Optional[int] = None) -> Optional[int]:
+        if self.cancelled(worker_generation):
+            return None
 
         docs = self._split_source_text(source_id, source_name, text)
         if candidate_vectors_by_hash is None:
@@ -734,65 +784,79 @@ class AiVectorstore:
                 texts_to_embed.append(doc.page_content)
 
         new_vectors: List[np.ndarray] = []
-        if texts_to_embed:
-            embedded = self.app.ai_embedding_function.embed_documents(texts_to_embed)
-            new_vectors = [np.asarray(vec, dtype=np.float32) for vec in embedded]
+        for batch_start in range(0, len(texts_to_embed), self.embedding_batch_size):
+            if self.cancelled(worker_generation) or not self._project_source_exists(source_id):
+                self.reading_doc = ''
+                return None
+            batch = texts_to_embed[batch_start:batch_start + self.embedding_batch_size]
+            embedded = self.app.ai_embedding_function.embed_documents(batch)
+            if self.cancelled(worker_generation):
+                self.reading_doc = ''
+                return None
+            new_vectors.extend(np.asarray(vector, dtype=np.float32) for vector in embedded)
 
         # Delete + reinsert in one short atomic transaction; minimal lock window.
-        self._delete_source_rows(conn, source_id)
+        with self._index_write_lock:
+            if self.cancelled(worker_generation):
+                self.reading_doc = ''
+                return None
+            if not self._project_source_matches(source_id, source_name, text):
+                self.reading_doc = ''
+                return None
+            self._delete_source_rows(conn, source_id)
 
-        embedded_idx = 0
-        for doc in docs:
-            vector = chunk_vectors.pop(0)
-            if vector is None:
-                vector = new_vectors[embedded_idx]
-                embedded_idx += 1
+            embedded_idx = 0
+            for doc in docs:
+                vector = chunk_vectors.pop(0)
+                if vector is None:
+                    vector = new_vectors[embedded_idx]
+                    embedded_idx += 1
 
-            cur = conn.execute(
-                "INSERT INTO search_chunks(source_id, source_name, chunk_index, start_index, length, text, text_hash, hash_ordinal) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                cur = conn.execute(
+                    "INSERT INTO search_chunks(source_id, source_name, chunk_index, start_index, length, text, text_hash, hash_ordinal) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        int(source_id),
+                        str(source_name),
+                        int(doc.metadata["chunk_index"]),
+                        int(doc.metadata["start_index"]),
+                        len(doc.page_content),
+                        doc.page_content,
+                        str(doc.metadata["text_hash"]),
+                        int(doc.metadata["hash_ordinal"]),
+                    ),
+                )
+                chunk_id = int(cur.lastrowid)
+                doc.id = str(chunk_id)
+                conn.execute(
+                    "INSERT INTO search_embeddings(chunk_id, dim, vector_blob) VALUES (?, ?, ?)",
+                    (chunk_id, int(vector.shape[0]), self._vector_to_blob(vector)),
+                )
+                conn.execute(
+                    "INSERT INTO search_chunk_fts(chunk_id, source_id, source_name, start_index, length, text) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        chunk_id,
+                        int(source_id),
+                        str(source_name),
+                        int(doc.metadata["start_index"]),
+                        len(doc.page_content),
+                        doc.page_content,
+                    ),
+                )
+
+            conn.execute(
+                "INSERT OR REPLACE INTO search_source_state(source_id, source_name, text_hash, text_len, last_indexed_at) "
+                "VALUES (?, ?, ?, ?, ?)",
                 (
                     int(source_id),
                     str(source_name),
-                    int(doc.metadata["chunk_index"]),
-                    int(doc.metadata["start_index"]),
-                    len(doc.page_content),
-                    doc.page_content,
-                    str(doc.metadata["text_hash"]),
-                    int(doc.metadata["hash_ordinal"]),
+                    self._hash_text(text),
+                    len(text),
+                    datetime.utcnow().isoformat(timespec="seconds"),
                 ),
             )
-            chunk_id = int(cur.lastrowid)
-            doc.id = str(chunk_id)
-            conn.execute(
-                "INSERT INTO search_embeddings(chunk_id, dim, vector_blob) VALUES (?, ?, ?)",
-                (chunk_id, int(vector.shape[0]), self._vector_to_blob(vector)),
-            )
-            conn.execute(
-                "INSERT INTO search_chunk_fts(chunk_id, source_id, source_name, start_index, length, text) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (
-                    chunk_id,
-                    int(source_id),
-                    str(source_name),
-                    int(doc.metadata["start_index"]),
-                    len(doc.page_content),
-                    doc.page_content,
-                ),
-            )
-
-        conn.execute(
-            "INSERT OR REPLACE INTO search_source_state(source_id, source_name, text_hash, text_len, last_indexed_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (
-                int(source_id),
-                str(source_name),
-                self._hash_text(text),
-                len(text),
-                datetime.utcnow().isoformat(timespec="seconds"),
-            ),
-        )
-        conn.commit()
+            conn.commit()
         self.reading_doc = ''
         return len(docs)
 
@@ -877,13 +941,17 @@ class AiVectorstore:
         self.faiss_db = self._compat_store
 
     def _refresh_sources(self, conn: sqlite3.Connection, signals=None,
-                         legacy_candidates: Optional[Dict[int, List[Tuple[int, str, np.ndarray]]]] = None) -> None:
+                         legacy_candidates: Optional[Dict[int, List[Tuple[int, str, np.ndarray]]]] = None,
+                         worker_generation: Optional[int] = None) -> None:
         docs = self._fetch_project_text_sources()
         current_source_ids = {int(doc['id']) for doc in docs}
         existing_ids = {int(row[0]) for row in conn.execute("SELECT source_id FROM search_source_state").fetchall()}
-        for source_id in sorted(existing_ids.difference(current_source_ids)):
-            self._delete_source_rows(conn, source_id)
-        conn.commit()
+        with self._index_write_lock:
+            if self.cancelled(worker_generation):
+                return
+            for source_id in sorted(existing_ids.difference(current_source_ids)):
+                self._delete_source_rows(conn, source_id)
+            conn.commit()
 
         if len(docs) == 0:
             msg = _("AI: No documents, AI is ready.")
@@ -896,9 +964,7 @@ class AiVectorstore:
         logger.debug(msg)
 
         for doc in docs:
-            if self.cancelled():
-                # Per document checkpoint: the finest unit that can be abandoned, since
-                # embed_documents for one document is a single blocking call
+            if self.cancelled(worker_generation):
                 logger.debug("AI vectorstore: indexing cancelled, leaving the remaining documents")
                 return
             source_id = int(doc['id'])
@@ -920,13 +986,24 @@ class AiVectorstore:
                     text,
                     legacy_candidates[source_id],
                 )
-            self._index_source(conn, source_id, source_name, text, candidate_vectors_by_hash=candidates, signals=signals)
+            self._index_source(
+                conn,
+                source_id,
+                source_name,
+                text,
+                candidate_vectors_by_hash=candidates,
+                signals=signals,
+                worker_generation=worker_generation,
+            )
 
-    def _open_db(self, rebuild=False, signals=None):
-        if self._is_closing:
+    def _open_db(self, rebuild: bool = False, worker_generation: Optional[int] = None,
+                 signals=None) -> None:
+        if self.cancelled(worker_generation):
             return
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             self._ensure_embedding_function()
+            if self.cancelled(worker_generation):
+                return
             self._set_project_paths()
             os.makedirs(os.path.dirname(self._legacy_faiss_path), exist_ok=True)
             conn = self._connect_search_db()
@@ -969,9 +1046,17 @@ class AiVectorstore:
                                 signals.progress.emit(
                                     _('The old AI memory could not be migrated automatically. Rebuilding from the project texts instead.')
                                 )
-                self._refresh_sources(conn, signals=signals, legacy_candidates=legacy_candidates)
-                self._rebuild_faiss_index_from_db(conn)
-                self._set_meta_build_state(conn, "ready")
+                self._refresh_sources(
+                    conn,
+                    signals=signals,
+                    legacy_candidates=legacy_candidates,
+                    worker_generation=worker_generation,
+                )
+                with self._index_write_lock:
+                    if self.cancelled(worker_generation):
+                        return
+                    self._rebuild_faiss_index_from_db(conn)
+                    self._set_meta_build_state(conn, "ready")
                 msg = _("AI: Checked all documents, memory is up to date.")
                 self._post_message(msg)
                 logger.debug(msg)
@@ -986,7 +1071,8 @@ class AiVectorstore:
         self.app.ai._status = ''
 
     def init_vectorstore(self, rebuild=False):
-        self._is_closing = False
+        with self._state_lock:
+            self._is_closing = False
         self.prepare_embedding_model()
         if self.app.settings['ai_enable'] == 'False':
             self.close()
@@ -1001,9 +1087,16 @@ class AiVectorstore:
             self.open_db(rebuild)
 
     def open_db(self, rebuild=False):
-        worker = Worker(self._open_db, rebuild)
+        worker_generation = self._worker_generation_snapshot()
+        worker = Worker(
+            self._open_db,
+            rebuild,
+            worker_generation=worker_generation,
+        )
         self.vectorstore_workers_count += 1
-        worker.signals.finished.connect(self._finish_vectorstore_worker)
+        worker.signals.finished.connect(
+            lambda generation=worker_generation: self._finish_vectorstore_worker(generation)
+        )
         worker.signals.error.connect(self._ui_relay.post_error)
         worker.signals.progress.connect(self.open_progress)
         self.threadpool.start(worker)
@@ -1015,8 +1108,10 @@ class AiVectorstore:
     def progress_import(self, msg: str) -> None:
         self._post_message(msg)
 
-    def finished_import(self):
-        self._finish_vectorstore_worker()
+    def finished_import(self, worker_generation: Optional[int] = None) -> None:
+        if self.cancelled(worker_generation):
+            return
+        self._finish_vectorstore_worker(worker_generation)
         self.import_workers_count -= 1
         if self.import_workers_count <= 0:
             self.import_workers_count = 0
@@ -1024,7 +1119,9 @@ class AiVectorstore:
             self._post_message(msg)
             logger.debug(msg)
 
-    def _finish_vectorstore_worker(self):
+    def _finish_vectorstore_worker(self, worker_generation: Optional[int] = None) -> None:
+        if self.cancelled(worker_generation):
+            return
         if self.vectorstore_workers_count > 0:
             self.vectorstore_workers_count -= 1
 
@@ -1150,56 +1247,93 @@ class AiVectorstore:
                 break
         return results
 
-    def _import_document(self, id_, name, text, signals=None):
-        if self._is_closing:
+    def _import_document(self, id_: int, name: str, text: Optional[str],
+                         worker_generation: Optional[int] = None, signals=None) -> None:
+        source_id = int(id_)
+        if self.cancelled(worker_generation):
             return
         self._ensure_embedding_function()
+        if self.cancelled(worker_generation):
+            return
         self._set_project_paths()
         conn = self._connect_search_db()
         try:
             self._ensure_search_schema(conn)
             self._set_meta_build_state(conn, "building")
-            self._index_source(conn, int(id_), str(name), "" if text is None else str(text), signals=signals)
-            self._rebuild_faiss_index_from_db(conn)
-            self._set_meta_build_state(conn, "ready")
+            indexed_count = self._index_source(
+                conn,
+                source_id,
+                str(name),
+                "" if text is None else str(text),
+                signals=signals,
+                worker_generation=worker_generation,
+            )
+            if indexed_count is None:
+                return
+            with self._index_write_lock:
+                if self.cancelled(worker_generation):
+                    return
+                self._rebuild_faiss_index_from_db(conn)
+                self._set_meta_build_state(conn, "ready")
         finally:
             conn.close()
         self.reading_doc = ''
 
-    def import_document(self, id_, name, text):
-        self._cancel_workers = False  # work deliberately asked for
-        worker = Worker(self._import_document, id_, name, text)
-        worker.signals.finished.connect(self.finished_import)
+    def import_document(self, id_: int, name: str, text: Optional[str]) -> None:
+        worker_generation = self._worker_generation_snapshot()
+        worker = Worker(
+            self._import_document,
+            id_,
+            name,
+            text,
+            worker_generation=worker_generation,
+        )
+        worker.signals.finished.connect(
+            lambda generation=worker_generation: self.finished_import(generation)
+        )
         worker.signals.progress.connect(self.progress_import)
         worker.signals.error.connect(self._ui_relay.post_error)
         self.import_workers_count += 1
         self.vectorstore_workers_count += 1
         self.threadpool.start(worker)
 
-    def _update_vectorstore(self, signals=None):
+    def _update_vectorstore(self, worker_generation: Optional[int] = None,
+                            signals=None) -> None:
+        if self.cancelled(worker_generation):
+            return
         self.app.ai._status = ''
         self._ensure_embedding_function()
+        if self.cancelled(worker_generation):
+            return
         self._set_project_paths()
         conn = self._connect_search_db()
         try:
             self._ensure_search_schema(conn)
             self._set_meta_build_state(conn, "building")
-            self._refresh_sources(conn)
-            if not self.cancelled():  # rebuilding the index while leaving is pointless
+            self._refresh_sources(conn, signals=signals, worker_generation=worker_generation)
+            with self._index_write_lock:
+                if self.cancelled(worker_generation):
+                    return
                 self._rebuild_faiss_index_from_db(conn)
-            self._set_meta_build_state(conn, "ready")
+                self._set_meta_build_state(conn, "ready")
         finally:
             conn.close()
 
     def update_vectorstore(self):
-        self._cancel_workers = False  # work deliberately asked for
-        worker = Worker(self._update_vectorstore)
+        worker_generation = self._worker_generation_snapshot()
+        worker = Worker(
+            self._update_vectorstore,
+            worker_generation=worker_generation,
+        )
         self.vectorstore_workers_count += 1
-        worker.signals.finished.connect(self._finish_vectorstore_worker)
+        worker.signals.finished.connect(
+            lambda generation=worker_generation: self._finish_vectorstore_worker(generation)
+        )
         worker.signals.error.connect(self._ui_relay.post_error)
         self.threadpool.start(worker)
 
     def rebuild_vectorstore(self):
+        worker_generation = self._worker_generation_snapshot()
         self.app.ai._status = ''
         self._ensure_embedding_function()
         self._set_project_paths()
@@ -1208,25 +1342,31 @@ class AiVectorstore:
             self._ensure_search_schema(conn)
             self._set_meta_build_state(conn, "building")
             self._reset_search_store(conn)
-            self._refresh_sources(conn)
-            if not self.cancelled():  # rebuilding the index while leaving is pointless
+            self._refresh_sources(conn, worker_generation=worker_generation)
+            with self._index_write_lock:
+                if self.cancelled(worker_generation):
+                    return
                 self._rebuild_faiss_index_from_db(conn)
-            self._set_meta_build_state(conn, "ready")
+                self._set_meta_build_state(conn, "ready")
         finally:
             conn.close()
 
-    def delete_document(self, id_):
-        self._ensure_embedding_function()
-        self._set_project_paths()
-        conn = self._connect_search_db()
-        try:
-            self._ensure_search_schema(conn)
-            self._set_meta_build_state(conn, "building")
-            self._delete_source_rows(conn, int(id_))
-            self._rebuild_faiss_index_from_db(conn)
-            self._set_meta_build_state(conn, "ready")
-        finally:
-            conn.close()
+    def delete_document(self, id_: int) -> None:
+        """Remove all indexed data for a source deleted from the project database."""
+
+        source_id = int(id_)
+        with self._index_write_lock:
+            self._set_project_paths()
+            conn = self._connect_search_db()
+            try:
+                self._ensure_search_schema(conn)
+                self._set_meta_build_state(conn, "building")
+                self._delete_source_rows(conn, source_id)
+                conn.commit()
+                self._rebuild_faiss_index_from_db(conn)
+                self._set_meta_build_state(conn, "ready")
+            finally:
+                conn.close()
 
     def _register_quit_hook(self):
         """
@@ -1242,35 +1382,33 @@ class AiVectorstore:
             atexit.register(cancel_all_vectorstore_workers)
             _QUIT_HOOK_INSTALLED = True
 
-    def cancel_workers(self):
+    def cancel_workers(self) -> None:
         """
         Asks the work in progress to give up and drops whatever has not started. Does not
         wait: the worker leaves on its own at its next checkpoint.
         """
 
-        self._cancel_workers = True
+        with self._index_write_lock:
+            with self._state_lock:
+                self._worker_generation += 1
         self.threadpool.clear()
 
-    def cancelled(self):
-        """
-        True when the worker must give up: closing, or cancellation requested.
-        """
-
-        return self._is_closing or self._cancel_workers
-
-    def close(self):
-        self._is_closing = True
+    def close(self) -> None:
+        with self._state_lock:
+            self._is_closing = True
         self.download_model_cancel = True
         self.cancel_workers()
         if not self.threadpool.waitForDone(5000):
-            # The cancel flag stays set so the worker leaves at its next checkpoint
+            # Its generation remains invalid, so it leaves after the current embedding batch.
             logger.warning("AI vectorstore worker still running after 5s, cancellation left in place")
         self.import_workers_count = 0
         self.vectorstore_workers_count = 0
         self._faiss_index = None
         self._chunk_ids_by_pos = []
         self.faiss_db = None
-        self._is_closing = False
+        self.reading_doc = ''
+        with self._state_lock:
+            self._is_closing = False
 
     def ai_worker_running(self):
         return self.vectorstore_workers_count
