@@ -87,6 +87,22 @@ class TestAiModelUpdates(TestCase):
         self.assertEqual('OpenAI GPT5.5 reasoning', models[current_index]['name'])
         self.assertEqual(selected_model, models[current_index])
 
+    def test_unseen_upgrade_offer_survives_model_list_reload(self):
+        """An unseen offer remains available after newly added profiles were persisted."""
+
+        selected_model = copy.deepcopy(_find_model(self.obsolete_models, 'OpenAI GPT5.5 reasoning'))
+        settings = {}
+
+        models, current_index, first_offer = update_ai_models([selected_model], 0, settings)
+        _, _, reloaded_offer = update_ai_models(copy.deepcopy(models), current_index, settings)
+
+        expected_offer = {
+            'current_model_name': 'OpenAI GPT5.5 reasoning',
+            'suggested_model_name': 'OpenAI GPT5.6 reasoning',
+        }
+        self.assertEqual(expected_offer, first_offer)
+        self.assertEqual(expected_offer, reloaded_offer)
+
     def test_obsolete_profile_with_same_name_is_replaced(self):
         """An obsolete definition is replaced when the current default uses the same name."""
 

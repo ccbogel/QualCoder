@@ -369,6 +369,52 @@ class TestMainWindow(TestCase):
 class TestMainWindowAiActions(TestCase):
     """Regression tests for AI menu dispatching."""
 
+    def test_ai_model_upgrade_offer_waits_until_ai_is_enabled(self):
+        """A pending model offer is retained while AI is disabled and shown later."""
+
+        offer = {
+            'current_model_name': 'Current profile',
+            'suggested_model_name': 'New profile',
+        }
+        app = SimpleNamespace(
+            settings={
+                'ai_enable': 'False',
+                'ai_model_index': '0',
+                'ai_model_upgrade_offers_seen': '',
+                'ai_model_upgrade_offer_pending': 'persisted offer',
+            },
+            ai_models=[
+                {'name': 'Current profile', 'api_key': 'secret'},
+                {'name': 'New profile', 'api_key': ''},
+            ],
+            pending_ai_model_upgrade_offer=offer,
+            write_config_ini=MagicMock(),
+        )
+        window = SimpleNamespace(
+            app=app,
+            _find_ai_model_index_by_name=MainWindow._find_ai_model_index_by_name,
+        )
+
+        with patch('qualcoder.__main__.Message') as message_class:
+            MainWindow._show_pending_ai_model_upgrade_offer(window)
+            message_class.assert_not_called()
+            self.assertIs(app.pending_ai_model_upgrade_offer, offer)
+
+            app.settings['ai_enable'] = 'True'
+            message_box = message_class.return_value
+            switch_button = object()
+            keep_button = object()
+            message_box.addButton.side_effect = [switch_button, keep_button]
+            message_box.clickedButton.return_value = keep_button
+
+            MainWindow._show_pending_ai_model_upgrade_offer(window)
+
+        message_class.assert_called_once()
+        self.assertIsNone(app.pending_ai_model_upgrade_offer)
+        self.assertEqual('New profile', app.settings['ai_model_upgrade_offers_seen'])
+        self.assertEqual('', app.settings['ai_model_upgrade_offer_pending'])
+        app.write_config_ini.assert_called_once_with(app.settings, app.ai_models)
+
     def test_ai_analysis_actions_share_handler(self):
         topic_action = object()
         text_action = object()
@@ -1541,6 +1587,7 @@ CONFIG_INI_AI_EX4C0559 = {
     "ai_temperature": "1.0",
     "ai_top_p": "1.0",
     "ai_timeout": "30.0",
+    "ai_model_upgrade_offer_pending": "",
 }
 
 

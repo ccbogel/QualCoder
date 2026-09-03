@@ -891,6 +891,7 @@ class App(object):
                 'report_text_context_characters', 'report_text_context_style',
                 'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
                 'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
+                'ai_model_upgrade_offer_pending',
                 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
                 ]
         for key in keys:
@@ -928,6 +929,8 @@ class App(object):
                 if key == 'ai_extended_logging':
                     settings_data[key] = 'False'
                 if key == 'ai_model_upgrade_offers_seen':
+                    settings_data[key] = ''
+                if key == 'ai_model_upgrade_offer_pending':
                     settings_data[key] = ''
                 if key == 'ai_chat_sidebar':
                     settings_data[key] = 'False'
@@ -1353,6 +1356,7 @@ class App(object):
             'ai_permissions': 1,
             'ai_extended_logging': 'False',
             'ai_model_upgrade_offers_seen': '',
+            'ai_model_upgrade_offer_pending': '',
             'ai_chat_sidebar': 'False',
             'ai_chat_sidebar_width': 320,
             'ai_chat_splitter_output_bottom': 80
