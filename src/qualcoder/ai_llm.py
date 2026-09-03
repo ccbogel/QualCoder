@@ -4782,6 +4782,8 @@ class AiLLM():
     def close(self):
         self._status = 'closing'
         self.cancel_all_runs(wait_ms=5000)
+        if not self.threadpool.waitForDone(5000):
+            logger.warning("AI LLM worker still running after 5s, cancellation left in place")
         self.sources_vectorstore.close()
         self._large_llm_params = None
         self._fast_llm_params = None
