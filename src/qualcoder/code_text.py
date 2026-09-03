@@ -37,7 +37,7 @@ import sqlite3
 import unicodedata
 import webbrowser
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets, sip
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 # Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
@@ -583,6 +583,21 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.ui.pushButton_ai_search.setEnabled(self._ai_menu_options_enabled())
 
+    def closeEvent(self, event):
+        """Cancel a running AI search so it does not block the next coding window."""
+
+        try:
+            if self.ai_search_running:
+                self.ai_search_running = False
+                try:
+                    self.ai_search_spinner_timer.stop()
+                except RuntimeError:
+                    pass
+            self._cancel_ai_search_scope(wait_ms=0)
+        except Exception as err:
+            logger.debug(f"Could not cancel AI search on close: {err}")
+        event.accept()
+
     def _ai_search_scope_id(self):
         return id(self)
 
@@ -595,6 +610,21 @@ class DialogCodeText(QtWidgets.QWidget):
         except Exception as err:
             logger.warning(err)
             return False
+
+    def _ai_search_ui_alive(self) -> bool:
+        """Return whether the coding window's AI search widgets still exist."""
+
+        try:
+            ui = self.ui
+        except RuntimeError:
+            return False
+        if ui is None:
+            return False
+        for widget_name in ('listWidget_ai', 'plainTextEdit'):
+            widget = getattr(ui, widget_name, None)
+            if widget is None or sip.isdeleted(widget):
+                return False
+        return True
 
     def _ai_search_scope_status(self) -> str:
         ai = getattr(self.app, 'ai', None)
@@ -6330,6 +6360,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if session_id is not None and int(session_id) != int(self.ai_search_session_id):
             return
+        if not self._ai_search_ui_alive():
+            self.ai_search_running = False
+            return
         if self._ai_search_scope_status() == 'canceled':
             self.ai_search_running = False
             self.ui.plainTextEdit.setPlainText('')
@@ -6402,6 +6435,10 @@ class DialogCodeText(QtWidgets.QWidget):
         2) 'len(self.ai_search_similar_chunk_list)' is reached, meaning that all the 
         chunks found in step 1 have been analyzed and the search is finished."""
 
+        if not self._ai_search_ui_alive():
+            self.ai_search_running = False
+            return
+
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list):
             # still chunks left for analysis            
             if self.ai_search_analysis_counter < ai_search_analysis_max_count:
@@ -6449,6 +6486,9 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if not self.ai_search_running:  # Search has been cancelled
             return
+        if not self._ai_search_ui_alive():
+            self.ai_search_running = False
+            return
         if doc is not None:
             self.ai_search_results.append(doc)
             item_text = f'{doc["metadata"]["name"]}: '
@@ -6477,6 +6517,9 @@ class DialogCodeText(QtWidgets.QWidget):
         - Stop search: Shown if a search is actually running in the background
         - (search finished): Shown if all results from stage 1 have already been analyzed  
         """
+        if not self._ai_search_ui_alive():
+            return
+
         # add action item to the list if necessary
         if self.ui.listWidget_ai.count() <= len(self.ai_search_results):
             self.ui.listWidget_ai.addItem('')
@@ -6618,6 +6661,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def scroll_text_into_view(self):
         """Scroll so the current selection is centered in the viewport."""
 
+        if not self._ai_search_ui_alive():
+            return
         editor = self.ui.plainTextEdit
         original_cursor = editor.textCursor()
         if not original_cursor.hasSelection():
@@ -6641,6 +6686,13 @@ class DialogCodeText(QtWidgets.QWidget):
     def ai_search_update_spinner(self):
         """ Updating the ai_progressBar and the text spinner in the list view to indicate to the user that 
         an AI search is running in the background. """
+        if not self._ai_search_ui_alive():
+            self.ai_search_running = False
+            try:
+                self.ai_search_spinner_timer.stop()
+            except RuntimeError:
+                pass
+            return
         if self._ai_search_scope_status() in ('finished', 'errored', 'canceled', 'idle'):
             self.ai_search_running = False
         if self.ai_search_running:
