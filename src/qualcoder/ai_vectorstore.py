@@ -45,6 +45,7 @@ os.environ['FAISS_NO_AVX2'] = '1'
 # index also compatible with older machines and non-intel platforms.    
 os.environ['FAISS_OPT_LEVEL'] = '' 
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 import faiss
 from huggingface_hub import hf_hub_download

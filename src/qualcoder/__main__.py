@@ -39,6 +39,10 @@ from typing import Optional
 import urllib.request
 import webbrowser
 
+# Hugging Face tokenizers otherwise creates a native Rayon thread pool which can
+# outlive the Qt window in frozen macOS builds and crash during QApplication teardown.
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
 from qualcoder.ai_chat import DialogAIChat
@@ -2908,7 +2912,11 @@ def gui():
         # log the exception and show error msg
         qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
-    sys.exit(app.exec())
+    exit_code = app.exec()
+    app.processEvents()
+    QtCore.QCoreApplication.sendPostedEvents(None, QtCore.QEvent.Type.DeferredDelete)
+    app.processEvents()
+    return exit_code
 
 
 def install_droid_sans_mono():
@@ -2932,4 +2940,4 @@ def install_noto_sans():
 if __name__ == "__main__":
     # Pyinstaller fix
     multiprocessing.freeze_support()
-    gui()
+    sys.exit(gui())
