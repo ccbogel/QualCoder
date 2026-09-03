@@ -90,7 +90,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           sudo apt-get update
-          sudo apt-get install -y dpkg
+          sudo apt-get install -y dpkg debuild
 
       - name: Create dist directory
         run: mkdir -p dist
