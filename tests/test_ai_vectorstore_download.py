@@ -26,6 +26,10 @@ class TestEmbeddingModelDownload(TestCase):
     def setUp(self):
         self.store = object.__new__(AiVectorstore)
         self.store.download_model_cancel = False
+        self.messages = []
+        self.store._ui_relay = SimpleNamespace(
+            post_message=self.messages.append,
+        )
         self.signal = RecordingSignal()
         self.signals = SimpleNamespace(progress=self.signal)
 
@@ -148,9 +152,7 @@ class TestEmbeddingModelDownload(TestCase):
             self.assertEqual([], self.signal.messages)
 
     def test_failed_download_is_not_reported_as_successful(self):
-        messages = []
         self.store.app = SimpleNamespace(settings={"ai_enable": "True"})
-        self.store.parent_text_edit = SimpleNamespace(append=messages.append)
         self.store.download_model_running = True
         self.store.embedding_model_is_cached = lambda: False
 
@@ -159,4 +161,4 @@ class TestEmbeddingModelDownload(TestCase):
 
         self.assertFalse(self.store.download_model_running)
         self.assertEqual("False", self.store.app.settings["ai_enable"])
-        self.assertIn("Could not download", messages[0])
+        self.assertIn("Could not download", self.messages[0])

@@ -55,8 +55,7 @@ import numpy as np
 from PyQt6 import QtCore, QtWidgets
 import sentence_transformers  # Keep a reference so it is not garbage collected in subthreads.
 
-from qualcoder.ai_async_worker import AIException
-from qualcoder.ai_async_worker import Worker, WorkerSignals
+from qualcoder.ai_async_worker import AIException, GuiThreadRelay, Worker, WorkerSignals
 from qualcoder.error_dlg import show_error_dlg
 from qualcoder.helpers import Message
 
@@ -353,6 +352,7 @@ class AiVectorstore:
         self.download_model_cancel = False
         self.download_model_msg = ''
         self.download_model_error = ''
+        self._ui_relay = GuiThreadRelay(parent_text_edit.append, ai_exception_handler)
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
         self._register_quit_hook()
@@ -367,6 +367,11 @@ class AiVectorstore:
             chunk_overlap=self.chunk_overlap,
             keep_separator="end",
         )
+
+    def _post_message(self, message: str) -> None:
+        """Queue a status message for delivery in the Qt application thread."""
+
+        self._ui_relay.post_message(message)
 
     def prepare_embedding_model(self, parent_window=None) -> bool:
         if not self.embedding_model_is_cached():
@@ -488,14 +493,14 @@ class AiVectorstore:
         else:
             self.app.settings['ai_enable'] = 'False'
             msg = _("AI: Could not download all the necessary components, the AI integration will be disabled.")
-        self.parent_text_edit.append(msg)
+        self._post_message(msg)
         logger.debug(msg)
 
     def _download_embedding_model_error(self, exception_type, value, tb_obj) -> None:
         """Record and display a background download error."""
 
         self.download_model_error = str(value)
-        ai_exception_handler(exception_type, value, tb_obj)
+        self._ui_relay.post_error(exception_type, value, tb_obj)
 
     def download_embedding_model(self):
         self.download_model_running = True
@@ -882,12 +887,12 @@ class AiVectorstore:
 
         if len(docs) == 0:
             msg = _("AI: No documents, AI is ready.")
-            self.parent_text_edit.append(msg)
+            self._post_message(msg)
             logger.debug(msg)
             return
 
         msg = _("AI: Checking for new documents")
-        self.parent_text_edit.append(msg)
+        self._post_message(msg)
         logger.debug(msg)
 
         for doc in docs:
@@ -946,7 +951,7 @@ class AiVectorstore:
                 self._set_meta_build_state(conn, "building")
                 if rebuild:
                     msg = _('AI: Rebuilding memory. The local AI will read through all your documents, please be patient.')
-                    self.parent_text_edit.append(msg)
+                    self._post_message(msg)
                     logger.debug(msg)
                     self._reset_search_store(conn)
                 else:
@@ -968,7 +973,7 @@ class AiVectorstore:
                 self._rebuild_faiss_index_from_db(conn)
                 self._set_meta_build_state(conn, "ready")
                 msg = _("AI: Checked all documents, memory is up to date.")
-                self.parent_text_edit.append(msg)
+                self._post_message(msg)
                 logger.debug(msg)
             finally:
                 conn.close()
@@ -989,7 +994,7 @@ class AiVectorstore:
             return
         if self.app.project_name == '':
             self.close()
-            self.parent_text_edit.append(_('AI: Finished loading (no project open).'))
+            self._post_message(_('AI: Finished loading (no project open).'))
             self.app.ai._status = ''
         else:
             self.app.ai._status = ''
@@ -999,16 +1004,16 @@ class AiVectorstore:
         worker = Worker(self._open_db, rebuild)
         self.vectorstore_workers_count += 1
         worker.signals.finished.connect(self._finish_vectorstore_worker)
-        worker.signals.error.connect(ai_exception_handler)
+        worker.signals.error.connect(self._ui_relay.post_error)
         worker.signals.progress.connect(self.open_progress)
         self.threadpool.start(worker)
 
-    def open_progress(self, msg):
-        self.parent_text_edit.append(msg)
+    def open_progress(self, msg: str) -> None:
+        self._post_message(msg)
         logger.debug(msg)
 
-    def progress_import(self, msg):
-        self.parent_text_edit.append(msg)
+    def progress_import(self, msg: str) -> None:
+        self._post_message(msg)
 
     def finished_import(self):
         self._finish_vectorstore_worker()
@@ -1016,7 +1021,7 @@ class AiVectorstore:
         if self.import_workers_count <= 0:
             self.import_workers_count = 0
             msg = _("AI: Checked all documents, memory is up to date.")
-            self.parent_text_edit.append(msg)
+            self._post_message(msg)
             logger.debug(msg)
 
     def _finish_vectorstore_worker(self):
@@ -1166,7 +1171,7 @@ class AiVectorstore:
         worker = Worker(self._import_document, id_, name, text)
         worker.signals.finished.connect(self.finished_import)
         worker.signals.progress.connect(self.progress_import)
-        worker.signals.error.connect(ai_exception_handler)
+        worker.signals.error.connect(self._ui_relay.post_error)
         self.import_workers_count += 1
         self.vectorstore_workers_count += 1
         self.threadpool.start(worker)
@@ -1191,7 +1196,7 @@ class AiVectorstore:
         worker = Worker(self._update_vectorstore)
         self.vectorstore_workers_count += 1
         worker.signals.finished.connect(self._finish_vectorstore_worker)
-        worker.signals.error.connect(ai_exception_handler)
+        worker.signals.error.connect(self._ui_relay.post_error)
         self.threadpool.start(worker)
 
     def rebuild_vectorstore(self):
