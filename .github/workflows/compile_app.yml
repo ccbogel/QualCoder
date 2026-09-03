@@ -21,18 +21,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller tqdm regex requests
+          pip install pyinstaller tqdm regex requests filelock
 
       - name: Create dist directory
         run: mkdir -p dist
 
       - name: Build with PyInstaller
-        env:
-          QUALCODER_VERSION: ${{ github.event.inputs.version }}
-        run: pyinstaller qualcoder_onefile.spec
+        run: pyinstaller qualCoder_onefile.spec
 
       - name: Rename output file
         shell: pwsh
@@ -57,7 +55,7 @@ jobs:
         run: |
           brew install create-dmg
           python -m pip install --upgrade pip
-          pip install pyinstaller
+          pip install pyinstaller tqdm regex requests filelock
 
       - name: Create dist directories
         run: mkdir -p dist/dmg dist/app
@@ -93,10 +91,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller
+          pip install pyinstaller tqdm regex requests filelock
           sudo apt-get update
           sudo apt-get install -y dpkg-dev fakeroot
 
@@ -104,7 +102,7 @@ jobs:
         run: mkdir -p dist
 
       - name: Build Linux executable with PyInstaller
-        run: pyinstaller qualCoder.spec --onefile --name QualCoder
+        run: pyinstaller qualCoder_onefile.spec
 
       - name: Rename Linux executable
         run: |
