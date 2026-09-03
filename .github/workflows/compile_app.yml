@@ -2,6 +2,11 @@ name: Build QualCoder
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Numéro de version (ex: 4.0 ou 4-0)'
+        required: true
+        type: string
 
 jobs:
   build-windows:
@@ -16,16 +21,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install PyInstaller
-        run: pip install pyinstaller
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller tqdm
 
       - name: Build with PyInstaller
+        env:
+          QUALCODER_VERSION: ${{ github.event.inputs.version }}
         run: pyinstaller qualcoder_onefile.spec
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QualCoder-Windows
+          name: QualCoder-Windows_${{ github.event.inputs.version }}
           path: dist/
 
   build-macos:
@@ -35,16 +44,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Create dist directories
+        run: mkdir -p dist/dmg dist/app
+
       - name: Make build script executable
         run: chmod +x ./mac_build-dmg.sh
 
       - name: Build DMG
-        run: ./mac_build-dmg.sh
+        run: ./mac_build-dmg.sh "${{ github.event.inputs.version }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QualCoder-macOS
+          name: QualCoder-macOS_${{ github.event.inputs.version }}
           path: |
             dist/
             *.dmg
@@ -56,16 +81,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          sudo apt-get update
+          sudo apt-get install -y dpkg
+
+      - name: Create dist directory
+        run: mkdir -p dist
+
       - name: Make build script executable
         run: chmod +x ./debian_build-deb.sh
 
       - name: Build DEB
-        run: ./debian_build-deb.sh
+        run: ./debian_build-deb.sh "${{ github.event.inputs.version }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QualCoder-Debian
+          name: QualCoder-Debian_${{ github.event.inputs.version }}
           path: |
             dist/
             *.deb
