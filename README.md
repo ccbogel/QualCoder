@@ -12,9 +12,9 @@ Instructions and other information are available here: [Documentation](https://q
 
 It is best to download the Current Release from the Releases page: https://github.com/ccbogel/QualCoder/releases
 
-**There is a Beta pre-release for the Qualcoder 4.0 version now available:
+**There is a Beta pre-release for the Qualcoder 4.0 version now available:**
 
-https://github.com/ccbogel/QualCoder/releases/tag/4.0-Beta**
+**https://github.com/ccbogel/QualCoder/releases/tag/4.0-Beta**
 
 If you like QualCoder please buy me a coffee ...
 
