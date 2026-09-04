@@ -12,6 +12,10 @@ Instructions and other information are available here: [Documentation](https://q
 
 It is best to download the Current Release from the Releases page: https://github.com/ccbogel/QualCoder/releases
 
+**There is a Beta pre-release for the Qualcoder 4.0 version now available:
+
+https://github.com/ccbogel/QualCoder/releases/tag/4.0-Beta**
+
 If you like QualCoder please buy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
