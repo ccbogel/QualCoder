@@ -2,7 +2,7 @@
 set -e  # Exit on first error
 
 # Check for required dependencies
-for cmd in dpkg-dev debuild fakeroot upx-ucl python3 python3-venv; do
+for cmd in dpkg-dev debuild fakeroot upx-ucl python3 python3-venv lintian; do
     if ! command -v $cmd >/dev/null 2>&1; then
         echo "Error: $cmd is required but not installed."
         echo "Install it with: sudo apt install $cmd"
@@ -18,10 +18,6 @@ fi
 
 VERSION="$1"
 NEW_DIR="qualcoder-${VERSION}"
-
-# Clean up previous builds
-echo "Cleaning previous builds..."
-rm -rf "${NEW_DIR}" dist/ build/ .env/
 
 # Create virtual environment and compile
 echo "Compiling QualCoder..."
@@ -67,4 +63,5 @@ debuild -us -uc
 cd ..
 
 # Result
-echo "Package generated: $(ls -1 *.deb 2>/dev/null | head -1 || echo 'No .deb file found')"
+lintian qualcoder_${VERSION}_amd64.deb
+echo "Package released : qualcoder_${VERSION}_amd64.deb"
