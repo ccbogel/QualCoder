@@ -2820,7 +2820,7 @@ def gui():
         pass
     qual_app = App()
     settings = qual_app.settings
-    ai_models = qual_app.ai_models 
+    ai_models = qual_app.ai_models
     project_path = qual_app.get_most_recent_projectpath()
     if platform.system() == "Windows" and settings.get('stylesheet') == "native":
         # Avoid early native Windows style initialization crashes in Qt before our later Fusion fallback runs.
