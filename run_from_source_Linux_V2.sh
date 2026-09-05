@@ -3,18 +3,21 @@
 # Run it by typing inside the Qualcoder folder: ./run_from_source_Linux.sh
 # Works on Ubuntu 26 and Fedora 44 
 
+# This version is almost identitical to the changes proposed to "run_from_source_linux.sh", the difference is (appart of
+# some minor wirting discrepancies) the addition off a tiny helper script that converts the XPM into PNG just if Wayland 
+# missbehaves with that format (I read it may do that). The scriptlet is deleted after is job is done
+
 # This simple helper that adds the icons, .desktop, and helper initalization 
 # script to their designed places in ~/.local
 #
 # betor, 2026 (beto.rebonatto.neto@gmail.com)
 
-
-#Created the procedure I added as a function in order to better separate my contributions from the original script
+#Created the procedure I added as a function in order to better separate my contributions from the install script
 add_desktop_and_icon_files_to_the_correct_places_without_sudoing(){
     #This function automatically adds the icon to the correct and valid "dot folders" at Home. The structure is almosts equal to /usr used in .deb pcakges
     #That means that it is really easy to do the necessary changes when converting
     #Variables
-    SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" 
+    SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" #Assigns the path of the directory of the script (aka repo root) so qualcoder knows that this script's directorys is where everything is
     #Assigns the path of the directory of the script (aka repo root) so qualcoder knows that this script's directorys is where everything is
     DOT_LOCAL_SHARE="$HOME/.local/share"
     APPS_DIR="$DOT_LOCAL_SHARE/applications"
@@ -55,15 +58,32 @@ add_desktop_and_icon_files_to_the_correct_places_without_sudoing(){
 
     # Icon copy
     if check_dir "$ICON_DIR"; then
-        if ! cp "$SCRIPT_DIR/qualcoder-debian/usr/share/icons/qualcoder.xpm" "$ICON_DIR/"; then
-            # I read somewhere that Wayland sometimes missbehaves with XPM files, may need verification and further testing
-            echo "Failed to copy icon file correctly it'll not be displayed. Please add the icon manually to \"$ICON_DIR\"."
-            echo "Also assure that \"$APPS_DIR/QualCoder.desktop\" points to the correct icon file in \" $ICON_DIR\""
+        if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+            echo "XDG_SESSION_TYPE is \"wayland\" converting the XPM icon file to PNG"
+            EXT=".png"
+            touch "$SCRIPT_DIR/tmp_xmp_to_png.py" # creates a small python handler to convert to png because wayland does not handle xpm files well
+            cat > "$SCRIPT_DIR/tmp_xmp_to_png.py" << EOF
+from PIL import Image
+import os
+script_dir=os.path.abspath(os.path.dirname(__file__))
+xmp=os.path.join(f"{script_dir}","qualcoder-debian/usr/share/icons/qualcoder.xpm")
+png=os.path.join(os.environ["HOME"],".local/share/icons/qualcoder.png")
+im=Image.open(xmp)
+im.save(png)
+EOF
+        "$SCRIPT_DIR/.env/bin/python" "$SCRIPT_DIR/tmp_xmp_to_png.py" #calls the .env python directly
+        rm "$SCRIPT_DIR/tmp_xmp_to_png.py" # deletes the helper
+        elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
+            echo "XDG_SESSION_TYPE is \"x11\" copying XPM icon..."
+            EXT=".xpm"
+            if ! cp "$SCRIPT_DIR/qualcoder-debian/usr/share/icons/qualcoder.xpm" "$ICON_DIR/"; then
+                echo "Failed to copy icon file correctly it'll not be displayed."
+            fi
+        else
+            echo "Unknown or no graphical session"
         fi  
     fi
-    # .desktop generation
-    # It is better to automatically generate the .desktop file via bash in order to better ensure the expansion of env variables
-    # I do not know how deb packages handle this
+    # .desktop generation -> it is better to automatically generate the .desktop file via bash in order to better ensure the expansion of default env variables
     if check_dir "$APPS_DIR"; then
         if ! touch "$APPS_DIR/QualCoder.desktop"; then
             echo "Failed to create desktop file correctly icon support will not work."
@@ -72,7 +92,7 @@ add_desktop_and_icon_files_to_the_correct_places_without_sudoing(){
 [Desktop Entry]
 Name=QualCoder
 GenericName=qualcoder
-Icon=$ICON_DIR/qualcoder.xpm
+Icon=$ICON_DIR/qualcoder$EXT
 Comment=Qualitative data analysis for text, images, audio, video.
 #Needs to change in .deb pkgs
 Exec=$BIN_DIR/run-qualcoder
@@ -162,6 +182,7 @@ EOF
     fi
 return 0
 }
+
 
 echo "Starting"
 # Create venv
