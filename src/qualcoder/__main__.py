@@ -2806,18 +2806,7 @@ def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
     # Return WM_CLASS as the same default from the standart .desktop on repo if the system is linux (i.e "QualCoder")
     if sys.platform in ["linux", "bsd"]: 
-        #check for the OSs that may use .desktop files (not sure about BSD or if the project wants to support it, since it is Py + Qt it SHOULD work)
-        desktopfile_loaction_usr="/usr/share/applications/QualCoder.desktop" 
-        #regular .desktop 
-        desktopfile_loaction_home=f"{os.environ['HOME']}/.local/share/applications/QualCoder.desktop" 
-        #Other possible location for .desktop files
-        if os.path.exists(desktopfile_loaction_usr) or os.path.exists(desktopfile_loaction_home):
-            QtWidgets.QApplication.setDesktopFileName("QualCoder")
-        else:
-            pass 
-        #Added else/pass if any other supported OS has any other qwirky way to handle this like macOS('darwin') or Windows ('win32'), if not they can be safelly taken out
-    else:
-        pass
+        QtWidgets.QApplication.setDesktopFileName("QualCoder")
     qual_app = App()
     settings = qual_app.settings
     ai_models = qual_app.ai_models
