@@ -64,6 +64,7 @@ override_dh_auto_install:
     install -D -m 755 src/qualcoder debian/qualcoder/usr/bin/qualcoder
     install -D -m 644 usr/share/applications/QualCoder.desktop debian/qualcoder/usr/share/applications/QualCoder.desktop
     install -D -m 644 usr/share/icons/qualcoder.xpm debian/qualcoder/usr/share/icons/qualcoder.xpm
+    install -D -m 644 usr/share/icons/qualcoder.png debian/qualcoder/usr/share/icons/qualcoder.png
     install -D -m 644 usr/share/man/man1/qualcoder.1 debian/qualcoder/usr/share/man/man1/qualcoder.1
 EOF
 

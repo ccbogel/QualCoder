@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=QualCoder
 GenericName=qualcoder
-Icon=/usr/share/icons/qualcoder.xpm
+Icon=qualcoder
 Comment=Qualitative data analysis for text, images, audio, video.
 Exec=/usr/bin/qualcoder
 
