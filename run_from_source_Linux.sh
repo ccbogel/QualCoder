@@ -124,14 +124,14 @@ EOF
 # https://qualcoder.wordpress.com/
 # https://qualcoder.org/
 
-\$SCRIPT_DIR="$SCRIPT_DIR"
+SCRIPT_DIR="$SCRIPT_DIR"
 
-cd "\$SCRIPT_DIR"
+cd \$SCRIPT_DIR
 source .env/bin/activate
 
 # Move to src folder to then run qualcoder module
 echo "Starting QualCoder."
-cd "\$SCRIPT_DIR/src"
+cd \$SCRIPT_DIR/src
 python3 -m qualcoder
 
 # Exit environment

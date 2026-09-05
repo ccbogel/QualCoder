@@ -144,14 +144,14 @@ EOF
 # https://qualcoder.wordpress.com/
 # https://qualcoder.org/
 
-\$SCRIPT_DIR="$SCRIPT_DIR"
+SCRIPT_DIR="$SCRIPT_DIR"
 
-cd "\$SCRIPT_DIR"
+cd \$SCRIPT_DIR
 source .env/bin/activate
 
 # Move to src folder to then run qualcoder module
 echo "Starting QualCoder."
-cd "\$SCRIPT_DIR/src"
+cd \$SCRIPT_DIR/src
 python3 -m qualcoder
 
 # Exit environment
@@ -165,7 +165,7 @@ EOF
         # This Approach allow for users who want the latest bugfixes and testing feature to call qualcoder easily for testing
         # while keeping the binary files and the string "qualcoder" free for .deb or the binary (if the user puts in there) 
         if [ -e "$HOME/.bash_aliases" ]; then
-            ALIAS=$(cat "$HOME/.bash_aliases" | grep "qualcoder=\"run-qualcoder\"") 
+            ALIAS=$(cat "$HOME/.bash_aliases" | grep "qualcoder=\"$BIN_DIR/run-qualcoder\"") 
             #checks if the alias already exists to avoid duplicated entries
             if [ -z "$ALIAS" ]; then
                 echo "Assigning \"qualcoder\" as an alias to allow for CLI call"
