@@ -2829,7 +2829,7 @@ def gui():
     QtWidgets.QApplication.setAttribute(
         QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
     app = QtWidgets.QApplication(sys.argv)
-    app._qc_installed_translators = [] #My syntax highlighter (ty on VS Code ) is flagging this, if it is nothing ignore
+    app._qc_installed_translators = []
     # Noto Sans - for general application
     install_noto_sans()
     QtGui.QFontDatabase.addApplicationFont(str(qc_config_folder / "NotoSans-Regular.ttf"))
