@@ -2808,6 +2808,10 @@ def gui():
     settings = qual_app.settings
     ai_models = qual_app.ai_models
     project_path = qual_app.get_most_recent_projectpath()
+    
+    if sys.platform in ["linux", "bsd"]: 
+        QtWidgets.QApplication.setDesktopFileName("QualCoder")
+        
     if platform.system() == "Windows" and settings.get('stylesheet') == "native":
         # Avoid early native Windows style initialization crashes in Qt before our later Fusion fallback runs.
         os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
