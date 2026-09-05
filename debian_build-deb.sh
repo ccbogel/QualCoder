@@ -9,13 +9,18 @@ fi
 VERSION="$1"
 NEW_DIR="qualcoder-${VERSION}"
 
-# Compile QualCoder
-python3 -m venv ".env"
-source .env/bin/activate
-python3 -m pip install --upgrade pip
-pip install -r requirements.txt
-pyinstaller qualcoder_onefile.spec
-deactivate
+if [ -d "dist" ]; then
+    echo "Binary exist"
+else
+    echo "Compile QualCoder"
+    # Compile QualCoder
+    python3 -m venv ".env"
+    source .env/bin/activate
+    python3 -m pip install --upgrade pip
+    pip install -r requirements.txt
+    pyinstaller qualcoder_onefile.spec
+    deactivate
+fi
 
 #  Create .deb
 echo "Copy template ${NEW_DIR}..."
@@ -43,5 +48,6 @@ echo "Build version ${VERSION}..."
 cd "$NEW_DIR"
 debuild -us -uc
 cd ..
+lintian qualcoder_${VERSION}_amd64.deb
 
 echo "Package released : qualcoder_${VERSION}_amd64.deb"
