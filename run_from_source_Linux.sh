@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 # Make this script executable
 # Run it by typing inside the Qualcoder folder: ./run_from_source_Linux.sh
 # Works on Ubuntu 26 and Fedora 44 
