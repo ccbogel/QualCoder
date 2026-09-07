@@ -134,6 +134,16 @@ BUILTIN_LANGUAGE_LABELS = [
 ]
 
 
+class ProjectOpenError(Exception):
+    """Describe why a selected folder cannot be opened as a QualCoder project."""
+
+    def __init__(self, reason: str, project_path: str, details: str = "") -> None:
+        super().__init__(details)
+        self.reason = reason
+        self.project_path = project_path
+        self.details = details
+
+
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
     Project data is stored in a directory with .qda suffix
@@ -155,6 +165,64 @@ class MainWindow(QtWidgets.QMainWindow):
             if str(model.get('name', '')).strip() == target_name:
                 return idx
         return -1
+
+    @staticmethod
+    def _open_project_connection(project_path: str) -> tuple[str, sqlite3.Connection]:
+        """Normalize and validate a project path, then open its database.
+
+        Args:
+            project_path: Selected project directory.
+
+        Returns:
+            The normalized project path and an open database connection.
+
+        Raises:
+            ProjectOpenError: The folder or database is not a QualCoder project.
+        """
+
+        # QFileDialog normally returns forward slashes on every platform and much
+        # of QualCoder relies on that internal convention. Path also removes a
+        # trailing separator without converting Windows paths to backslashes.
+        normalized_path = Path(project_path).as_posix()
+        project_directory = Path(normalized_path)
+        if project_directory.suffix.lower() != ".qda":
+            raise ProjectOpenError("wrong_suffix", normalized_path)
+        if not project_directory.is_dir():
+            raise ProjectOpenError("folder_unavailable", normalized_path)
+
+        database_path = project_directory / "data.qda"
+        if not database_path.is_file():
+            raise ProjectOpenError("missing_database", normalized_path)
+
+        try:
+            connection = sqlite3.connect(database_path)
+        except (OSError, sqlite3.Error) as err:
+            raise ProjectOpenError("database_unavailable", normalized_path, str(err)) from err
+
+        try:
+            result = connection.execute(
+                "select databaseversion, date, memo, about from project"
+            ).fetchone()
+            if result is None or not isinstance(result[3], str) or "QualCoder" not in result[3]:
+                raise ProjectOpenError("invalid_database", normalized_path)
+        except ProjectOpenError:
+            connection.close()
+            raise
+        except (IndexError, sqlite3.Error) as err:
+            connection.close()
+            raise ProjectOpenError("invalid_database", normalized_path, str(err)) from err
+
+        try:
+            # Acquire and release a write transaction without changing the database.
+            # This catches read-only, locked, or incompletely downloaded cloud files
+            # before the active project is closed.
+            connection.execute("begin immediate")
+            connection.rollback()
+        except sqlite3.Error as err:
+            connection.close()
+            raise ProjectOpenError("database_unavailable", normalized_path, str(err)) from err
+
+        return normalized_path, connection
 
     def _show_pending_ai_model_upgrade_offer(self) -> None:
         """Show one deferred AI-profile upgrade offer after the main window is visible."""
@@ -2001,7 +2069,7 @@ Click "Yes" to start now.')
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    def open_project(self, path_:str="", newproject:str="no"):
+    def open_project(self, path_: str = "", newproject: str = "no") -> None:
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not back up on a newly created project, as it will not contain data.
@@ -2016,7 +2084,6 @@ Click "Yes" to start now.')
             newproject: yes or no  if yes then do not make an initial backup
         """
 
-        self.journal_display = None
         default_directory = self.app.settings['directory']
         if path_ == "" or path_ is False:
             if default_directory == "":
@@ -2025,45 +2092,44 @@ Click "Yes" to start now.')
                                                                _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
             return
-        msg = ""
         # New path variable from recent_projects.txt contains time | path
         # Older variable only listed the project path
-        path_split = path_.split("|")
-        proj_path = ""
-        if len(path_split) == 1:
-            proj_path = path_split[0]
-        if len(path_split) == 2:
-            proj_path = path_split[1]
-        if len(proj_path) > 3 and proj_path[-4:] == ".qda":
-            # Close the current project first: stale tab dialogs show old data and can
-            # write its ids into the new database (newproject flow already closed it)
-            if newproject == "no" and (self.app.project_name != "" or self.app.conn is not None):
-                self.close_project()
-            try:
-                self.app.create_connection(proj_path)
-            except Exception as err:
-                self.app.conn = None
-                msg += " " + str(err)
-                logger.debug(msg)
-        if self.app.conn is None:
-            msg += f"\n{proj_path}"
-            Message(self.app, _("Cannot open file"), msg, "critical").exec()
-            self.app.project_path = ""
-            self.app.project_name = ""
-            return
-        # Check that the connection is to a valid QualCoder database
-        cur = self.app.conn.cursor()
+        proj_path = path_.split("|", maxsplit=1)[-1]
         try:
-            cur.execute("select databaseversion, date, memo, about from project")
-            res = cur.fetchone()
-            if "QualCoder" not in res[3]:
-                logger.debug("This is not a QualCoder database")
-                self.close_project()
-                return
-        except Exception as err:
-            logger.debug("This in not a QualCoder database " + str(err))
-            self.close_project()
+            proj_path, project_connection = self._open_project_connection(proj_path)
+        except ProjectOpenError as err:
+            messages = {
+                "wrong_suffix": _("The selected folder is not a QualCoder project folder. "
+                                  "Its name must end with .qda."),
+                "folder_unavailable": _("The selected project folder does not exist or cannot be accessed."),
+                "missing_database": _("No data.qda database found in the selected folder."),
+                "database_unavailable": _("The project database could not be opened."),
+                "invalid_database": _("The selected folder does not contain a valid QualCoder project database."),
+            }
+            msg = messages[err.reason]
+            if err.details:
+                msg += f"\n\n{err.details}"
+            msg += f"\n\n{err.project_path}"
+            logger.warning(msg)
+            Message(self.app, _("Cannot open project"), msg, "critical").exec()
             return
+
+        # Do not alter the active project until the selected project has been validated.
+        self.journal_display = None
+        if newproject == "no" and (self.app.project_name != "" or self.app.conn is not None):
+            try:
+                self.close_project()
+            except Exception:
+                project_connection.close()
+                raise
+        elif self.app.conn is not None and self.app.conn is not project_connection:
+            # A newly created project already has a connection at this point.
+            self.app.conn.close()
+        self.app.project_path = proj_path
+        self.app.project_name = Path(proj_path).name
+        self.app.conn = project_connection
+
+        cur = self.app.conn.cursor()
 
         # Potential design flaw to have the current coders name in the config.ini file (early versions of QC).
         # as it would change to this coder when opening different projects
@@ -2605,14 +2671,15 @@ Click "Yes" to start now.')
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
-    def delete_backup_folders(self):
+    def delete_backup_folders(self) -> None:
         """ Delete the most current backup created on opening a project,
         providing the project was not changed in any way.
         Delete the oldest backups if more than BACKUP_NUM are created.
         Backup name format: directories/projectname_BKUP_yyyymmdd_hh.qda
         Requires: self.settings['backup_num'] """
 
-        if self.app.project_path == "" or not Path(self.app.project_path).exists():
+        project_path = Path(self.app.project_path)
+        if self.app.project_path == "" or not project_path.exists():
             return
         if self.app.delete_backup_path_name != "" and self.app.delete_backup:
             try:
@@ -2620,29 +2687,33 @@ Click "Yes" to start now.')
             except Exception as err:
                 print(str(err))
                 logger.warning(str(err))
-        # Get a list of backup folders for current project
-        parts = self.app.project_path.split('/')
-        project_name_and_suffix = parts[-1]
-        directory = self.app.project_path[0:-len(project_name_and_suffix)]
-        project_name = project_name_and_suffix[:-4]
-        project_name_and_bkup = project_name + "_BKUP_"
-        lenname = len(project_name_and_bkup)
-        files_folders = os.listdir(directory)
-        backups = []
-        for f_ in files_folders:
-            if f_[0:lenname] == project_name_and_bkup and f_[-4:] == ".qda":
-                backups.append(f_)
+        # Get a list of backup folders for the current project. Path handles both
+        # slash styles and also relative project paths without producing an empty
+        # parent directory.
+        directory = project_path.parent
+        project_name_and_bkup = project_path.stem + "_BKUP_"
+        try:
+            backups = [
+                path for path in directory.iterdir()
+                if path.is_dir()
+                and path.name.startswith(project_name_and_bkup)
+                and path.suffix.lower() == ".qda"
+            ]
+        except OSError as err:
+            logger.warning(str(err))
+            return
         # Sort newest to oldest, and remove any that are more than BACKUP_NUM position in the list
-        backups.sort(reverse=True)
+        backups.sort(key=lambda path: path.name, reverse=True)
         to_remove = []
         if len(backups) > self.app.settings['backup_num']:
             to_remove = backups[self.app.settings['backup_num']:]
         if not to_remove:
             return
-        for f_ in to_remove:
+        for backup_path in to_remove:
             try:
-                shutil.rmtree(directory + f_)
-                self.ui.textEdit.append(_("Deleting: ") + directory + f_)
+                if backup_path != '':
+                    shutil.rmtree(backup_path)
+                    self.ui.textEdit.append(_("Deleting: ") + str(backup_path))
             except Exception as err:
                 print(str(err))
                 logger.warning(str(err))
