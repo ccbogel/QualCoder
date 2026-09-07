@@ -421,6 +421,8 @@ class DialogJournals(QtWidgets.QDialog):
             action_attribute_descending = menu.addAction(_("Descending"))
 
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:  # Dismissed menu: None matches unbuilt actions
+            return
         if action == action_modified_date_asc:
             self.load_journals("date asc")
             return
@@ -487,13 +489,14 @@ class DialogJournals(QtWidgets.QDialog):
         action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
-            self.rows_hidden = False
         # Convert journal to source file <- L    
         action_convert_to_source = None
         if row != -1:
             action_convert_to_source = menu.addAction(_("Convert journal to source file"))
 
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:  # Dismissed menu: None matches unbuilt actions
+            return
         if action == action_modified_date_asc:
             self.load_journals("date asc")
             return
