@@ -251,6 +251,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if self.table_files_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
         action = menu.exec(self.ui.tableWidget_files.mapToGlobal(position))
+        if action is None:  # Dismissed menu: None matches unbuilt actions
+            return
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_files.rowCount()):
                 self.ui.tableWidget_files.setRowHidden(r, False)
@@ -540,6 +542,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
             action_keywords_descending = menu.addAction(_("Descending"))
 
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
+        if action is None:  # Dismissed menu: None matches unbuilt actions
+            return
         if action == action_id_asc:
             sorted_list = sorted(self.refs, key=lambda x: x['risid'])
             self.refs = sorted_list
@@ -645,6 +649,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_edit_reference = menu.addAction(_("Edit reference"))
         action_delete_reference = menu.addAction(_("Delete"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
+        if action is None:  # Dismissed menu: None matches unbuilt actions
+            return
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
                 self.ui.tableWidget_refs.setRowHidden(r, False)
