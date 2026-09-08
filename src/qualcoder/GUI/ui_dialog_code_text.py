@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_code_text.ui'
+# Form implementation generated from reading ui file 'ui_dialog_code_text.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -109,11 +109,11 @@ class Ui_Dialog_code_text(object):
         self.pushButton_edit.setText("")
         self.pushButton_edit.setObjectName("pushButton_edit")
         self.label_exports = QtWidgets.QLabel(parent=self.groupBox)
-        self.label_exports.setGeometry(QtCore.QRect(773, 43, 24, 24))
+        self.label_exports.setGeometry(QtCore.QRect(740, 43, 24, 24))
         self.label_exports.setText("")
         self.label_exports.setObjectName("label_exports")
         self.comboBox_export = QtWidgets.QComboBox(parent=self.groupBox)
-        self.comboBox_export.setGeometry(QtCore.QRect(803, 40, 101, 30))
+        self.comboBox_export.setGeometry(QtCore.QRect(770, 40, 141, 30))
         self.comboBox_export.setObjectName("comboBox_export")
         self.comboBox_export.addItem("")
         self.comboBox_export.setItemText(0, "")
