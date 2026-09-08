@@ -845,6 +845,8 @@ class DialogCases(QtWidgets.QDialog):
         action_hide_columns_starting = menu.addAction(_("Hide columns starting with"))
         action_show_columns_starting = menu.addAction(_("Show columns starting with"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:  # Dismissed menu: None matches unbuilt actions
+            return
         if action == action_show_all_columns:
             for c in range(0, self.ui.tableWidget.columnCount()):
                 self.ui.tableWidget.setColumnHidden(c, False)
@@ -858,6 +860,8 @@ class DialogCases(QtWidgets.QDialog):
             msg = _("Hide columns starting with:")
             hide_col, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
+            if not ok or hide_col == "":  # Empty prefix matched every column
+                return
             for c in range(1, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
                 if len(h_text) >= len(hide_col) and hide_col == h_text[:len(hide_col)]:
@@ -867,6 +871,8 @@ class DialogCases(QtWidgets.QDialog):
             msg = _("Show columns starting with:")
             show_col, ok = QtWidgets.QInputDialog.getText(self, _("Show Columns"), msg,
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
+            if not ok or show_col == "":  # Cancel must not rearrange columns
+                return
             for c in range(3, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
                 if len(h_text) >= len(show_col) and show_col == h_text[:len(show_col)]:
