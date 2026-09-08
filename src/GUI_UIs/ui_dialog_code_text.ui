@@ -394,7 +394,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>773</x>
+        <x>740</x>
         <y>43</y>
         <width>24</width>
         <height>24</height>
@@ -410,9 +410,9 @@ As all assigned positions may be incorrect. </string>
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>803</x>
+        <x>770</x>
         <y>40</y>
-        <width>101</width>
+        <width>141</width>
         <height>30</height>
        </rect>
       </property>
