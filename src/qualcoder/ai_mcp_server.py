@@ -41,15 +41,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from mcp import types
+from mcp.server.context import ServerRequestContext
 from mcp.server.lowlevel import Server
-try:
-    from mcp.server.lowlevel.server import ReadResourceContents
-except ImportError:  # Quick fix
-    from mcp.server.lowlevel.helper_types import ReadResourceContents
-    """ SDK authors recommend migrating away from low-level server types. Use FastMCP, which manages these complex 
-    structural return types behind the scenes.
-    """
-
 
 from .ai_help_index import AiHelpIndex
 from .ai_memo import extract_ai_memo, merge_public_memo
@@ -141,12 +134,15 @@ class AiMcpServer:
             self.server_name,
             version=self.server_version,
             instructions=self._server_instructions(),
+            on_list_resources=self._sdk_list_resources,
+            on_list_resource_templates=self._sdk_list_resource_templates,
+            on_read_resource=self._sdk_read_resource,
+            on_list_tools=self._sdk_list_tools,
+            on_call_tool=self._sdk_call_tool,
+            on_list_prompts=self._sdk_list_prompts,
+            on_get_prompt=self._sdk_get_prompt,
         )
         self.help_index = AiHelpIndex()
-        try:
-            self._register_sdk_handlers()
-        except AttributeError:
-            print("AttributeError: 'Server' object has no attribute 'list_resources'")
 
     def _server_instructions(self) -> str:
         return (
@@ -377,11 +373,9 @@ class AiMcpServer:
             if method == "initialize":
                 result = self._initialize_result()
             elif method == "resources/list":
-                req = types.ListResourcesRequest(params=self._pagination_params(params))
-                result = self._dispatch_sdk(types.ListResourcesRequest, req)
+                result = self._dispatch_sdk("resources/list", self._pagination_params(params))
             elif method == "resources/templates/list":
-                req = types.ListResourceTemplatesRequest(params=self._pagination_params(params))
-                result = self._dispatch_sdk(types.ListResourceTemplatesRequest, req)
+                result = self._dispatch_sdk("resources/templates/list", self._pagination_params(params))
             elif method == "resources/read":
                 uri = params.get("uri")
                 if not isinstance(uri, str) or uri.strip() == "":
@@ -393,10 +387,10 @@ class AiMcpServer:
                     params.get("line_start"),
                     params.get("line_end"),
                 )
-                req = types.ReadResourceRequest(params=types.ReadResourceRequestParams(uri=uri_with_window))
-                result = self._dispatch_sdk(types.ReadResourceRequest, req)
+                request_params = types.ReadResourceRequestParams(uri=uri_with_window)
+                result = self._dispatch_sdk("resources/read", request_params)
             elif method == "tools/list":
-                result = self._list_tools_payload()
+                result = self._dispatch_sdk("tools/list", self._pagination_params(params))
             elif method == "tools/call":
                 name = str(params.get("name", "")).strip()
                 if name == "":
@@ -619,15 +613,22 @@ class AiMcpServer:
             serverInfo=types.Implementation(name=self.server_name, version=self.server_version),
             instructions=self._server_instructions(),
         )
-        return result.model_dump(mode="json", exclude_none=True)
+        return result.model_dump(mode="json", by_alias=True, exclude_none=True)
 
-    def _dispatch_sdk(self, req_type: type, req_obj: Any) -> Dict[str, Any]:
-        handler = self._sdk_server.request_handlers.get(req_type)
-        if handler is None:
-            raise RuntimeError(f"MCP handler not registered for {req_type.__name__}.")
-        server_result = asyncio.run(handler(req_obj))
+    def _dispatch_sdk(self, method: str, params: Any) -> Dict[str, Any]:
+        """Dispatch an internal bridge call through one SDK v2 handler."""
+
+        handler_entry = self._sdk_server.get_request_handler(method)
+        if handler_entry is None:
+            raise RuntimeError(f"MCP handler not registered for {method}.")
+        server_result = asyncio.run(handler_entry.handler(None, params))
         if hasattr(server_result, "model_dump"):
-            return server_result.model_dump(mode="json", exclude_none=True)
+            return server_result.model_dump(
+                mode="json",
+                by_alias=True,
+                exclude_none=True,
+                exclude_defaults=True,
+            )
         return dict(server_result)
 
     def _pagination_params(self, params: Dict[str, Any]) -> Optional[types.PaginatedRequestParams]:
@@ -704,14 +705,20 @@ class AiMcpServer:
         base_uri = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query, doseq=True), parts.fragment))
         return base_uri, window
 
-    def _register_sdk_handlers(self) -> None:
-        @self._sdk_server.list_resources()
-        async def _list_resources(_: types.ListResourcesRequest) -> types.ListResourcesResult:
-            return types.ListResourcesResult(resources=self._base_resources())
+    async def _sdk_list_resources(
+            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+    ) -> types.ListResourcesResult:
+        """Return the static resources through the SDK v2 low-level API."""
 
-        @self._sdk_server.list_resource_templates()
-        async def _list_resource_templates() -> List[types.ResourceTemplate]:
-            return [
+        return types.ListResourcesResult(resources=self._base_resources())
+
+    async def _sdk_list_resource_templates(
+            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+    ) -> types.ListResourceTemplatesResult:
+        """Return resource templates through the SDK v2 low-level API."""
+
+        return types.ListResourceTemplatesResult(
+            resourceTemplates=[
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://documents/text/{id}",
                     name="Document by id",
@@ -808,35 +815,55 @@ class AiMcpServer:
                     mimeType="application/json",
                 ),
             ]
+        )
 
-        @self._sdk_server.read_resource()
-        async def _read_resource(uri: str) -> List[ReadResourceContents]:
-            uri_str = str(uri)
-            base_uri, window = self._parse_read_window(uri_str)
-            payload = self._read_resource_payload(base_uri, window)
-            sanitized_payload = self._sanitize_memo_payload(payload)
-            return [
-                ReadResourceContents(
-                    content=json.dumps(sanitized_payload, ensure_ascii=False),
-                    mime_type="application/json",
+    async def _sdk_read_resource(
+            self, _context: ServerRequestContext[Any], params: types.ReadResourceRequestParams
+    ) -> types.ReadResourceResult:
+        """Read and sanitize one resource through the SDK v2 low-level API."""
+
+        uri = str(params.uri)
+        base_uri, window = self._parse_read_window(uri)
+        payload = self._read_resource_payload(base_uri, window)
+        sanitized_payload = self._sanitize_memo_payload(payload)
+        return types.ReadResourceResult(
+            contents=[
+                types.TextResourceContents(
+                    uri=uri,
+                    text=json.dumps(sanitized_payload, ensure_ascii=False),
+                    mimeType="application/json",
                 )
             ]
+        )
 
-        @self._sdk_server.list_tools()
-        async def _list_tools(_: types.ListToolsRequest) -> types.ListToolsResult:
-            return types.ListToolsResult.model_validate(self._list_tools_payload())
+    async def _sdk_list_tools(
+            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+    ) -> types.ListToolsResult:
+        """Return QualCoder tools through the SDK v2 low-level API."""
 
-        @self._sdk_server.call_tool()
-        async def _call_tool(_name: str, _arguments: Dict[str, Any]) -> Dict[str, Any]:
-            return self._call_tool_payload(_name, _arguments, "")
+        return types.ListToolsResult.model_validate(self._list_tools_payload())
 
-        @self._sdk_server.list_prompts()
-        async def _list_prompts(_: types.ListPromptsRequest) -> types.ListPromptsResult:
-            return types.ListPromptsResult.model_validate(self._list_prompts_payload())
+    async def _sdk_call_tool(
+            self, _context: ServerRequestContext[Any], params: types.CallToolRequestParams
+    ) -> types.CallToolResult:
+        """Call one QualCoder tool through the SDK v2 low-level API."""
 
-        @self._sdk_server.get_prompt()
-        async def _get_prompt(_name: str, _arguments: Optional[Dict[str, str]]) -> types.GetPromptResult:
-            return types.GetPromptResult.model_validate(self._get_prompt_payload(_name, _arguments))
+        payload = self._call_tool_payload(params.name, params.arguments, "")
+        return types.CallToolResult.model_validate(payload)
+
+    async def _sdk_list_prompts(
+            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+    ) -> types.ListPromptsResult:
+        """Return the intentionally empty MCP prompt catalog."""
+
+        return types.ListPromptsResult(prompts=[])
+
+    async def _sdk_get_prompt(
+            self, _context: ServerRequestContext[Any], params: types.GetPromptRequestParams
+    ) -> types.GetPromptResult:
+        """Reject prompt reads because QualCoder currently defines no MCP prompts."""
+
+        raise ValueError(f"Prompt not found: {params.name}")
 
     def _read_resource_payload(self, uri: str, window: Dict[str, Any]) -> Dict[str, Any]:
         parts = urlsplit(uri)

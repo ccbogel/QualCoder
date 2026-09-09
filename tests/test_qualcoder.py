@@ -1,4 +1,6 @@
+import asyncio
 import datetime
+import importlib.metadata
 import json
 import os
 from pathlib import Path
@@ -11,6 +13,7 @@ from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from mcp.server.lowlevel import Server
 from PyQt6 import QtWidgets
 
 from qualcoder.__main__ import App, MainWindow
@@ -695,8 +698,28 @@ class TestAiAnnotations(TestCase):
             "owner text, date text, memo text)"
         )
         cur.execute(
+            "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
+            "date text, owner text)"
+        )
+        cur.execute(
+            "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, "
+            "supercatid integer)"
+        )
+        cur.execute(
+            "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text, "
+            "date text, color text, supercid integer)"
+        )
+        cur.execute(
+            "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer, seltext text, pos0 integer, "
+            "pos1 integer, owner text, date text, memo text, avid integer, important integer)"
+        )
+        cur.execute(
             "CREATE VIEW annotation_visible AS SELECT a.* FROM annotation AS a WHERE NOT EXISTS "
             "(SELECT 1 FROM coder_names AS c WHERE c.name=a.owner AND c.visibility=0)"
+        )
+        cur.execute(
+            "CREATE VIEW code_text_visible AS SELECT ct.* FROM code_text AS ct WHERE NOT EXISTS "
+            "(SELECT 1 FROM coder_names AS c WHERE c.name=ct.owner AND c.visibility=0)"
         )
         fulltext = "Alpha beta Alpha gamma unique phrase."
         cur.execute(
@@ -710,6 +733,14 @@ class TestAiAnnotations(TestCase):
         )
         cur.execute(
             "INSERT INTO annotation (anid,fid,pos0,pos1,memo,owner,date) VALUES (2,1,17,22,'hidden','Hidden Coder','d')"
+        )
+        cur.execute(
+            "INSERT INTO code_name (cid,name,memo,catid,owner,date,color,supercid) "
+            "VALUES (1,'seed code','code public\n#####\ncode private',NULL,'default','d','#F5A9A9',NULL)"
+        )
+        cur.execute(
+            "INSERT INTO code_text (ctid,cid,fid,seltext,pos0,pos1,owner,date,memo,avid,important) "
+            "VALUES (1,1,1,'gamma',17,22,'Hidden Coder','d','coding public\n#####\ncoding private',NULL,NULL)"
         )
         conn.commit()
         conn.close()
@@ -751,6 +782,193 @@ class TestAiAnnotations(TestCase):
         self.assertEqual("Hidden Coder", hidden_one["annotation"]["owner"])
         with self.assertRaisesRegex(ValueError, "not found or is not visible"):
             self.server._read_resource_payload("qualcoder://annotations/2", {})
+
+    def test_mcp_v2_server_construction_and_discovery(self):
+        self.assertEqual("2", importlib.metadata.version("mcp").split(".", 1)[0])
+        self.assertIsInstance(self.server._sdk_server, Server)
+        for method in (
+                "resources/list",
+                "resources/templates/list",
+                "resources/read",
+                "tools/list",
+                "tools/call",
+                "prompts/list",
+                "prompts/get",
+        ):
+            with self.subTest(method=method):
+                self.assertIsNotNone(self.server._sdk_server.get_request_handler(method))
+
+        initialize = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
+        )["result"]
+        self.assertEqual("2025-06-18", initialize["protocolVersion"])
+        self.assertEqual(
+            {"prompts", "resources", "tools"},
+            set(initialize["capabilities"]),
+        )
+
+        resources = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 2, "method": "resources/list", "params": {}}
+        )["result"]
+        self.assertNotIn("resultType", resources)
+        self.assertIn("qualcoder://annotations", [item["uri"] for item in resources["resources"]])
+
+        templates = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 3, "method": "resources/templates/list", "params": {}}
+        )["result"]
+        self.assertIn(
+            "qualcoder://annotations/{anid}{?owner}",
+            [item["uriTemplate"] for item in templates["resourceTemplates"]],
+        )
+
+        tools = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 4, "method": "tools/list", "params": {}}
+        )["result"]["tools"]
+        create_annotation = next(item for item in tools if item["name"] == "annotations/create")
+        self.assertEqual(["fid", "memo"], create_annotation["inputSchema"]["required"])
+        self.assertFalse(create_annotation["inputSchema"]["additionalProperties"])
+
+        prompt_handler = self.server._sdk_server.get_request_handler("prompts/list")
+        prompt_result = asyncio.run(prompt_handler.handler(None, None))
+        self.assertEqual([], prompt_result.prompts)
+
+    def test_internal_bridge_resource_read_preserves_visibility_privacy_and_search(self):
+        cur = self.app.conn.cursor()
+        cur.execute("UPDATE annotation SET memo='public memo\n#####\nprivate memo' WHERE anid=1")
+        self.app.conn.commit()
+
+        response = self.server.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 5,
+                "method": "resources/read",
+                "params": {"uri": "qualcoder://annotations"},
+            }
+        )
+        self.assertNotIn("error", response)
+        content = response["result"]["contents"][0]
+        self.assertEqual("qualcoder://annotations", content["uri"])
+        self.assertEqual("application/json", content["mimeType"])
+        payload = json.loads(content["text"])
+        self.assertEqual([1], [item["anid"] for item in payload["annotations"]])
+        self.assertEqual("public memo\n", payload["annotations"][0]["memo"])
+        self.assertNotIn("private memo", content["text"])
+
+        search_response = self.server.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 6,
+                "method": "resources/read",
+                "params": {"uri": "qualcoder://search/regex?pattern=gamma"},
+            }
+        )
+        search_payload = json.loads(search_response["result"]["contents"][0]["text"])
+        self.assertEqual(1, search_payload["selection"]["total_hits"])
+
+    def test_internal_bridge_tool_permissions_owner_events_and_errors(self):
+        request = {
+            "jsonrpc": "2.0",
+            "id": 7,
+            "method": "tools/call",
+            "params": {
+                "name": "annotations/create",
+                "arguments": {"fid": 1, "quote": "unique phrase", "memo": "agent note"},
+                "_ai_change_set_id": "bridge-change-set",
+            },
+        }
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
+        readable = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 70, "method": "resources/read",
+             "params": {"uri": "qualcoder://annotations"}}
+        )
+        self.assertNotIn("error", readable)
+        denied = self.server.handle_request(request)
+        self.assertTrue(denied["result"]["isError"])
+        self.assertEqual(
+            "ai_permissions_denied",
+            denied["result"]["structuredContent"]["error"]["code"],
+        )
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        validation_failure = self.server.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 71,
+                "method": "tools/call",
+                "params": {
+                    "name": "annotations/create",
+                    "arguments": {"fid": 1, "quote": "Alpha", "memo": "ambiguous"},
+                },
+            }
+        )
+        self.assertEqual(-32602, validation_failure["error"]["code"])
+        self.assertEqual(2, self.app.conn.execute("SELECT count(*) FROM annotation").fetchone()[0])
+
+        created = self.server.handle_request(request)
+        created_payload = created["result"]["structuredContent"]
+        self.assertTrue(created_payload["created"])
+        self.assertEqual("AI Agent", created_payload["annotation"]["owner"])
+        self.assertEqual("bridge-change-set", self.app.ai.operations[-1][0])
+        self.assertIn((["annotation"], "ai_agent"), self.app.project_events.calls)
+
+        update_request = {
+            "jsonrpc": "2.0",
+            "id": 8,
+            "method": "tools/call",
+            "params": {
+                "name": "annotations/update",
+                "arguments": {"anid": created_payload["annotation"]["anid"], "memo": "updated"},
+            },
+        }
+        denied_update = self.server.handle_request(update_request)
+        self.assertTrue(denied_update["result"]["isError"])
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        self.assertTrue(
+            self.server.handle_request(update_request)["result"]["structuredContent"]["updated"]
+        )
+
+        invalid_arguments = self.server.handle_request({
+            "jsonrpc": "2.0",
+            "id": 9,
+            "method": "tools/call",
+            "params": {"name": "annotations/create", "arguments": []},
+        })
+        self.assertEqual(-32602, invalid_arguments["error"]["code"])
+        unknown_tool = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": {"name": "missing/tool"}}
+        )
+        self.assertEqual(-32602, unknown_tool["error"]["code"])
+        unknown_resource = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 11, "method": "resources/read",
+             "params": {"uri": "qualcoder://missing"}}
+        )
+        self.assertEqual(-32602, unknown_resource["error"]["code"])
+
+    def test_dangerous_delete_preview_confirmation_is_single_use(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        without_preview = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 12, "method": "tools/call",
+             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": ""}}}
+        )
+        self.assertEqual(-32602, without_preview["error"]["code"])
+
+        preview = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 13, "method": "tools/call",
+             "params": {"name": "codes/preview_delete_code", "arguments": {"cid": 1}}}
+        )["result"]["structuredContent"]
+        self.assertTrue(preview["requires_confirmation"])
+        token = preview["preview_token"]
+        deleted = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 14, "method": "tools/call",
+             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": token}}}
+        )
+        self.assertTrue(deleted["result"]["structuredContent"]["deleted"])
+        reused = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 15, "method": "tools/call",
+             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": token}}}
+        )
+        self.assertEqual(-32602, reused["error"]["code"])
+        self.assertIn((["code_name", "code_text"], "ai_agent"), self.app.project_events.calls)
 
     def test_create_annotation_requires_a_unique_exact_quote_or_positions(self):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
