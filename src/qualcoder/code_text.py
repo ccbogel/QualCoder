@@ -220,6 +220,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.installEventFilter(self)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.plainTextEdit.installEventFilter(self.eventFilterTT)
+        self.event_filter_installed = True
         self.ui.plainTextEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.plainTextEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.plainTextEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
@@ -2181,9 +2182,16 @@ class DialogCodeText(QtWidgets.QWidget):
             action_show_top_groupbox = menu.addAction(_("Show control panel (H)"))
         if not self.ui.groupBox.isHidden():
             action_hide_top_groupbox = menu.addAction(_("Hide control panel (H)"))
-
+        action_tooltips = menu.addAction(_("Toggle tooltips"))
         action = menu.exec(self.ui.plainTextEdit.mapToGlobal(position))
         if action is None:
+            return
+        if action == action_tooltips:
+            if self.event_filter_installed:
+                self.ui.plainTextEdit.removeEventFilter(self.eventFilterTT)
+            else:
+                self.ui.plainTextEdit.installEventFilter(self.eventFilterTT)
+            self.event_filter_installed = not self.event_filter_installed
             return
         if action == action_important:
             self.set_important(cursor.position())
