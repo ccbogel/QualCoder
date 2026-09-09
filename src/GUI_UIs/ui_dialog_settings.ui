@@ -756,13 +756,43 @@ langauge = it</string>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox_AI_enable">
-            <property name="text">
-             <string>enable AI integration</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
+           <widget class="QWidget" name="widget_AI_enable" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="checkBox_AI_enable">
+               <property name="text">
+                <string>enable AI integration</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_MCP_enable">
+               <property name="toolTip">
+                <string>This allows external AI agents such as Claude Code, Codex, OpenCode, or Hermes Agent to access the currently opened QualCoder project via MCP on localhost (127.0.0.1).
+The same AI permissions apply as for the internal AI agent (Read-Only / Sandboxed / Full Access).
+This is an experimental feature. Use it with care.</string>
+               </property>
+               <property name="text">
+                <string>allow external MCP access</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>

@@ -49,6 +49,7 @@ from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_prompt_library import DialogAiEditPrompts
 from qualcoder.app import App
 from qualcoder.error_dlg import qt_exception_hook
+from qualcoder.external_mcp import ExternalMcpController
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.code_av import DialogCodeAV
@@ -304,6 +305,8 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QApplication.instance().setStyle("Fusion")
 
         QtWidgets.QMainWindow.__init__(self)
+        self.external_mcp = ExternalMcpController(self.app, self)
+        self.external_mcp.status_changed.connect(self._external_mcp_status_changed)
         self.ai_sidebar_splitter_save_timer = QtCore.QTimer(self)
         self.ai_sidebar_splitter_save_timer.setSingleShot(True)
         self.ai_sidebar_splitter_save_timer.timeout.connect(self.persist_ai_sidebar_splitter_setting)
@@ -390,6 +393,14 @@ Click "Yes" to start now.')
             placeholder.anchorClicked.connect(self.handle_placeholder_link)
             placeholder.show()
         self.update_placeholder_tab_styles()
+
+    @QtCore.pyqtSlot(str)
+    def _external_mcp_status_changed(self, message: str) -> None:
+        """Show External MCP lifecycle information in the action log."""
+
+        logger.info(message)
+        if getattr(self, "ui", None) is not None and hasattr(self.ui, "textEdit"):
+            self.ui.textEdit.append(message)
 
     @staticmethod
     def _object_name_aliases(object_name):
@@ -2027,6 +2038,7 @@ Click "Yes" to start now.')
             return
 
         self.app.settings, self.app.ai_models = self.app.load_settings()
+        self.external_mcp.sync_with_application_state()
         self.settings_report(swith_to_action_log=False)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
@@ -2558,6 +2570,7 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
+        self.external_mcp.sync_with_application_state()
 
     def project_summary_report(self):
         """ Add a summary of the project to the text edit.
@@ -2638,6 +2651,8 @@ Click "Yes" to start now.')
         Remove widgets from tabs, clear dialog list. Close app connection.
         Delete old backups. Hide menu options. """
 
+        self.external_mcp.stop()
+        self.app.ai_mcp_server.reset_project_state()
         self.journal_display = None
         for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
             self.clear_tab_widgets(tab_widget, show_placeholder=True)

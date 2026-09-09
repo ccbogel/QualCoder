@@ -13,23 +13,54 @@ from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from mcp import ClientSession, types
+from mcp.client.streamable_http import streamable_http_client
 from mcp.server.lowlevel import Server
-from PyQt6 import QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_llm import AiLLM
-from qualcoder.ai_mcp_server import AiMcpServer
+from qualcoder.ai_mcp_server import AiMcpExecutionContext, AiMcpServer
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
 from qualcoder.code_av import DialogCodeAV
 from qualcoder.code_text import DialogCodeText
+from qualcoder.external_mcp import ExternalMcpController
+from qualcoder.settings import DialogSettings
+from qualcoder.settings import DialogSettings
 
 """ Useful insights from:
 https: // stackoverflow.com / questions / 32527861 / python - unit - test - that - uses - an - external - data - file / 32528173
 https: // www.blog.pythonlibrary.org / 2016 / 07 / 07 / python - 3 - testing - an - intro - to - unittest /
 https: // simpleit.rocks / python / test - files - creating - a - temporal - directory - in -python - unittests /
 """
+
+
+class TestExternalMcpSettingsDefaults(TestCase):
+    """External MCP settings migration defaults."""
+
+    def test_external_mcp_defaults_to_disabled_and_unacknowledged(self):
+        fake_app = SimpleNamespace(write_config_ini=MagicMock())
+        settings, _models = App.check_and_add_additional_settings(
+            fake_app, {}, [{"name": "test"}]
+        )
+        self.assertEqual("False", settings["mcp_external_enabled"])
+        self.assertEqual("False", settings["external_mcp_notice_acknowledged"])
+        self.assertEqual(47363, settings["mcp_external_port"])
+
+    def test_enabled_without_notice_acknowledgement_is_normalized_off(self):
+        fake_app = SimpleNamespace(write_config_ini=MagicMock())
+        settings, _models = App.check_and_add_additional_settings(
+            fake_app,
+            {
+                "mcp_external_enabled": "True",
+                "external_mcp_notice_acknowledged": "False",
+                "mcp_external_port": 47363,
+            },
+            [{"name": "test"}],
+        )
+        self.assertEqual("False", settings["mcp_external_enabled"])
 
 
 class TestApp(TestCase):
@@ -943,6 +974,219 @@ class TestAiAnnotations(TestCase):
              "params": {"uri": "qualcoder://missing"}}
         )
         self.assertEqual(-32602, unknown_resource["error"]["code"])
+
+    def test_external_context_owner_source_permissions_and_isolation(self):
+        external_context = AiMcpExecutionContext(
+            source="external_mcp", owner="MCP: Codex", client_name="Codex"
+        )
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
+        denied = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "external denied"}, ""
+            ),
+        )
+        self.assertTrue(denied["isError"])
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        external = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "external code"}, ""
+            ),
+        )
+        internal = self.server._call_tool_payload(
+            "codes/create_code", {"name": "internal code"}, ""
+        )
+        self.assertEqual("MCP: Codex", external["structuredContent"]["code"]["owner"])
+        self.assertEqual("AI Agent", internal["structuredContent"]["code"]["owner"])
+        self.assertIn((["code_name"], "external_mcp"), self.app.project_events.calls)
+        self.assertIn((["code_name"], "ai_agent"), self.app.project_events.calls)
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        updated = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/update_code", {"cid": 1, "memo": "changed externally"}, ""
+            ),
+        )
+        self.assertTrue(updated["structuredContent"]["updated"])
+        owner = self.app.conn.execute("SELECT owner FROM code_name WHERE cid=1").fetchone()[0]
+        self.assertEqual("default", owner)
+
+        barrier = threading.Barrier(2)
+        observed_owners = []
+
+        def observe_external_owner():
+            observed_owners.append(self.server.run_with_execution_context(
+                external_context,
+                lambda: (barrier.wait(), self.server.request_owner)[1],
+            ))
+
+        external_thread = threading.Thread(target=observe_external_owner)
+        external_thread.start()
+        barrier.wait()
+        observed_owners.append(self.server.request_owner)
+        external_thread.join()
+        self.assertCountEqual(["MCP: Codex", "AI Agent"], observed_owners)
+
+    def test_external_client_name_sanitization(self):
+        self.assertIsNone(self.server.sanitize_external_client_name("\x00\n\t"))
+        self.assertEqual(
+            "Claude Code unsafe",
+            self.server.sanitize_external_client_name(" Claude\nCode\x00unsafe "),
+        )
+        sanitized = self.server.sanitize_external_client_name("x" * 200)
+        self.assertEqual(72, len(sanitized))
+        request_context = SimpleNamespace(
+            session=SimpleNamespace(
+                client_params=SimpleNamespace(
+                    client_info=SimpleNamespace(name="Claude Code")
+                )
+            )
+        )
+        context = self.server.external_execution_context(request_context)
+        self.assertEqual("external_mcp", context.source)
+        self.assertEqual("MCP: Claude Code", context.owner)
+
+    def test_external_mcp_first_use_notice_and_checkbox_state(self):
+        qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+        checkbox = QtWidgets.QCheckBox()
+        dialog = SimpleNamespace(
+            settings={
+                "mcp_external_enabled": "False",
+                "external_mcp_notice_acknowledged": "False",
+            },
+            ui=SimpleNamespace(checkBox_MCP_enable=checkbox),
+        )
+        DialogSettings.load_external_mcp_setting(dialog)
+        self.assertFalse(checkbox.isChecked())
+        dialog.settings["mcp_external_enabled"] = "True"
+        DialogSettings.load_external_mcp_setting(dialog)
+        self.assertTrue(checkbox.isChecked())
+        checkbox.setChecked(False)
+        dialog.settings["mcp_external_enabled"] = "False"
+        checkbox.toggled.connect(
+            lambda checked: DialogSettings.external_mcp_toggled(dialog, checked)
+        )
+        with patch.object(
+                QtWidgets.QMessageBox, "warning",
+                return_value=QtWidgets.QMessageBox.StandardButton.No
+        ):
+            checkbox.setChecked(True)
+        qt_app.processEvents()
+        self.assertFalse(checkbox.isChecked())
+        self.assertEqual("False", dialog.settings["mcp_external_enabled"])
+
+        with patch.object(
+                QtWidgets.QMessageBox, "warning",
+                return_value=QtWidgets.QMessageBox.StandardButton.Yes
+        ) as warning:
+            checkbox.setChecked(True)
+        self.assertTrue(checkbox.isChecked())
+        self.assertEqual("True", dialog.settings["mcp_external_enabled"])
+        self.assertEqual("True", dialog.settings["external_mcp_notice_acknowledged"])
+        self.assertEqual(1, warning.call_count)
+
+        checkbox.setChecked(False)
+        with patch.object(QtWidgets.QMessageBox, "warning") as warning:
+            checkbox.setChecked(True)
+        self.assertEqual(0, warning.call_count)
+        self.assertEqual("True", dialog.settings["mcp_external_enabled"])
+
+    def test_streamable_http_transport_round_trip(self):
+        qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+        self.app.conn.execute(
+            "UPDATE annotation SET memo=? WHERE anid=1",
+            ("HTTP public\n#####\nHTTP private",)
+        )
+        self.app.conn.commit()
+        self.app.ai_mcp_server = self.server
+        self.app.settings.update({
+            "mcp_external_enabled": "True",
+            "mcp_external_port": 47364,
+            "ai_permissions": AiMcpServer.AI_PERMISSION_SANDBOXED,
+        })
+        controller = ExternalMcpController(self.app)
+        controller.start()
+        deadline = time.monotonic() + 5
+        while not controller.is_running and time.monotonic() < deadline:
+            qt_app.processEvents()
+            time.sleep(0.02)
+        self.assertTrue(controller.is_running)
+
+        result = {}
+        error = []
+
+        async def client_round_trip():
+            async with streamable_http_client(controller.endpoint) as streams:
+                async with ClientSession(
+                        streams[0], streams[1],
+                        client_info=types.Implementation(name="Claude Code", version="test")
+                ) as session:
+                    result["initialize"] = await session.initialize()
+                    result["tools"] = await session.list_tools()
+                    result["resource"] = await session.read_resource("qualcoder://annotations")
+                    result["write"] = await session.call_tool(
+                        "codes/create_code", {"name": "HTTP code"}
+                    )
+
+        def run_client():
+            try:
+                asyncio.run(client_round_trip())
+            except Exception as err:
+                error.append(err)
+
+        client_thread = threading.Thread(target=run_client)
+        client_thread.start()
+        deadline = time.monotonic() + 10
+        while client_thread.is_alive() and time.monotonic() < deadline:
+            qt_app.processEvents()
+            time.sleep(0.01)
+        client_thread.join(timeout=1)
+        controller.stop()
+        shutdown_deadline = time.monotonic() + 3
+        while controller._thread is not None and controller._thread.is_alive() \
+                and time.monotonic() < shutdown_deadline:
+            qt_app.processEvents()
+            time.sleep(0.01)
+
+        self.assertFalse(client_thread.is_alive())
+        if error:
+            raise error[0]
+        server_info = result["initialize"].server_info
+        self.assertEqual("qualcoder-mcp", server_info.name)
+        self.assertEqual("QualCoder MCP", server_info.title)
+        self.assertIn("qualitative data analysis", server_info.description)
+        self.assertIn("project currently open", result["initialize"].instructions)
+        self.assertIn("codes/create_code", [tool.name for tool in result["tools"].tools])
+        self.assertFalse(result["write"].is_error)
+        resource_payload = json.loads(result["resource"].contents[0].text)
+        self.assertEqual([1], [item["anid"] for item in resource_payload["annotations"]])
+        self.assertEqual("HTTP public\n", resource_payload["annotations"][0]["memo"])
+        self.assertNotIn("HTTP private", result["resource"].contents[0].text)
+        owner = self.app.conn.execute(
+            "SELECT owner FROM code_name WHERE name='HTTP code'"
+        ).fetchone()[0]
+        # The SDK's legacy stateless client does not repeat initialize clientInfo
+        # on later requests, so the required fallback applies on this transport.
+        self.assertEqual("External MCP", owner)
+        self.assertIn((["code_name"], "external_mcp"), self.app.project_events.calls)
+
+    def test_project_reset_invalidates_preview_tokens(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        preview = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 110, "method": "tools/call",
+             "params": {"name": "codes/preview_delete_code", "arguments": {"cid": 1}}}
+        )["result"]["structuredContent"]
+        token = preview["preview_token"]
+        self.server.reset_project_state()
+        rejected = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 111, "method": "tools/call",
+             "params": {"name": "codes/delete_code",
+                        "arguments": {"cid": 1, "preview_token": token}}}
+        )
+        self.assertEqual(-32602, rejected["error"]["code"])
 
     def test_dangerous_delete_preview_confirmation_is_single_use(self):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS

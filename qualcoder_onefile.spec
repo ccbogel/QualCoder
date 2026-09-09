@@ -30,6 +30,8 @@ datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('transformers')
 hiddenimports += collect_submodules('pydantic')
+hiddenimports += collect_submodules('mcp')
+hiddenimports += collect_submodules('uvicorn')
 hiddenimports += ['scipy._external.array_api_compat.numpy.fft']
 
 a = Analysis(
