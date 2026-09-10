@@ -1,4 +1,6 @@
+import asyncio
 import datetime
+import importlib.metadata
 import json
 import os
 from pathlib import Path
@@ -11,22 +13,54 @@ from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from PyQt6 import QtWidgets
+from mcp import ClientSession, types
+from mcp.client.streamable_http import streamable_http_client
+from mcp.server.lowlevel import Server
+from PyQt6 import QtCore, QtWidgets
 
 from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_llm import AiLLM
-from qualcoder.ai_mcp_server import AiMcpServer
+from qualcoder.ai_mcp_server import AiMcpExecutionContext, AiMcpServer
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
 from qualcoder.code_av import DialogCodeAV
 from qualcoder.code_text import DialogCodeText
+from qualcoder.external_mcp import ExternalMcpController
+from qualcoder.settings import DialogSettings
+from qualcoder.settings import DialogSettings
 
 """ Useful insights from:
 https: // stackoverflow.com / questions / 32527861 / python - unit - test - that - uses - an - external - data - file / 32528173
 https: // www.blog.pythonlibrary.org / 2016 / 07 / 07 / python - 3 - testing - an - intro - to - unittest /
 https: // simpleit.rocks / python / test - files - creating - a - temporal - directory - in -python - unittests /
 """
+
+
+class TestExternalMcpSettingsDefaults(TestCase):
+    """External MCP settings migration defaults."""
+
+    def test_external_mcp_defaults_to_disabled_and_unacknowledged(self):
+        fake_app = SimpleNamespace(write_config_ini=MagicMock())
+        settings, _models = App.check_and_add_additional_settings(
+            fake_app, {}, [{"name": "test"}]
+        )
+        self.assertEqual("False", settings["mcp_external_enabled"])
+        self.assertEqual("False", settings["external_mcp_notice_acknowledged"])
+        self.assertEqual(47363, settings["mcp_external_port"])
+
+    def test_enabled_without_notice_acknowledgement_is_normalized_off(self):
+        fake_app = SimpleNamespace(write_config_ini=MagicMock())
+        settings, _models = App.check_and_add_additional_settings(
+            fake_app,
+            {
+                "mcp_external_enabled": "True",
+                "external_mcp_notice_acknowledged": "False",
+                "mcp_external_port": 47363,
+            },
+            [{"name": "test"}],
+        )
+        self.assertEqual("False", settings["mcp_external_enabled"])
 
 
 class TestApp(TestCase):
@@ -666,7 +700,12 @@ class TestAiAnnotations(TestCase):
     class FakeApp:
         def __init__(self, project_path):
             self.project_path = project_path
-            self.settings = {"ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS}
+            self.project_name = "MCP test.qda"
+            self.version = "3.7-test"
+            self.settings = {
+                "ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS,
+                "codername": "Kai",
+            }
             self.delete_backup = True
             self.project_events = TestAiAnnotations.FakeEvents()
             self.ai = TestAiAnnotations.FakeAi()
@@ -679,6 +718,13 @@ class TestAiAnnotations(TestCase):
         cur = conn.cursor()
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, memo text, owner text, date text)"
+        )
+        cur.execute(
+            "CREATE TABLE project (databaseversion text, memo text)"
+        )
+        cur.execute(
+            "INSERT INTO project (databaseversion, memo) VALUES (?, ?)",
+            ("v17", "Project public\n#####\nProject private"),
         )
         cur.execute(
             "CREATE TABLE annotation (anid integer primary key, fid integer, pos0 integer, pos1 integer, memo text, "
@@ -695,8 +741,28 @@ class TestAiAnnotations(TestCase):
             "owner text, date text, memo text)"
         )
         cur.execute(
+            "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
+            "date text, owner text)"
+        )
+        cur.execute(
+            "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, "
+            "supercatid integer)"
+        )
+        cur.execute(
+            "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text, "
+            "date text, color text, supercid integer)"
+        )
+        cur.execute(
+            "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer, seltext text, pos0 integer, "
+            "pos1 integer, owner text, date text, memo text, avid integer, important integer)"
+        )
+        cur.execute(
             "CREATE VIEW annotation_visible AS SELECT a.* FROM annotation AS a WHERE NOT EXISTS "
             "(SELECT 1 FROM coder_names AS c WHERE c.name=a.owner AND c.visibility=0)"
+        )
+        cur.execute(
+            "CREATE VIEW code_text_visible AS SELECT ct.* FROM code_text AS ct WHERE NOT EXISTS "
+            "(SELECT 1 FROM coder_names AS c WHERE c.name=ct.owner AND c.visibility=0)"
         )
         fulltext = "Alpha beta Alpha gamma unique phrase."
         cur.execute(
@@ -710,6 +776,14 @@ class TestAiAnnotations(TestCase):
         )
         cur.execute(
             "INSERT INTO annotation (anid,fid,pos0,pos1,memo,owner,date) VALUES (2,1,17,22,'hidden','Hidden Coder','d')"
+        )
+        cur.execute(
+            "INSERT INTO code_name (cid,name,memo,catid,owner,date,color,supercid) "
+            "VALUES (1,'seed code','code public\n#####\ncode private',NULL,'default','d','#F5A9A9',NULL)"
+        )
+        cur.execute(
+            "INSERT INTO code_text (ctid,cid,fid,seltext,pos0,pos1,owner,date,memo,avid,important) "
+            "VALUES (1,1,1,'gamma',17,22,'Hidden Coder','d','coding public\n#####\ncoding private',NULL,NULL)"
         )
         conn.commit()
         conn.close()
@@ -751,6 +825,575 @@ class TestAiAnnotations(TestCase):
         self.assertEqual("Hidden Coder", hidden_one["annotation"]["owner"])
         with self.assertRaisesRegex(ValueError, "not found or is not visible"):
             self.server._read_resource_payload("qualcoder://annotations/2", {})
+
+    def test_mcp_v2_server_construction_and_discovery(self):
+        self.assertEqual("2", importlib.metadata.version("mcp").split(".", 1)[0])
+        self.assertIsInstance(self.server._sdk_server, Server)
+        for method in (
+                "resources/list",
+                "resources/templates/list",
+                "resources/read",
+                "tools/list",
+                "tools/call",
+                "prompts/list",
+                "prompts/get",
+        ):
+            with self.subTest(method=method):
+                self.assertIsNotNone(self.server._sdk_server.get_request_handler(method))
+
+        initialize = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
+        )["result"]
+        self.assertEqual("2025-06-18", initialize["protocolVersion"])
+        self.assertEqual(
+            {"prompts", "resources", "tools"},
+            set(initialize["capabilities"]),
+        )
+        self.assertEqual("qualcoder-mcp", initialize["serverInfo"]["name"])
+        self.assertEqual("QualCoder MCP", initialize["serverInfo"]["title"])
+        self.assertNotIn("description", initialize["serverInfo"])
+        self.assertEqual(self.server._server_instructions(), initialize["instructions"])
+        self.assertNotIn("resources/list", initialize["instructions"])
+
+        resources = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 2, "method": "resources/list", "params": {}}
+        )["result"]
+        self.assertNotIn("resultType", resources)
+        self.assertIn("qualcoder://annotations", [item["uri"] for item in resources["resources"]])
+
+        templates = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 3, "method": "resources/templates/list", "params": {}}
+        )["result"]
+        self.assertIn(
+            "qualcoder://annotations/{anid}{?owner}",
+            [item["uriTemplate"] for item in templates["resourceTemplates"]],
+        )
+        self.assertIn(
+            "qualcoder://codes/segments/{cid}"
+            "{?strategy,max_segments,max_chars,cursor,file_ids,case_ids,owner}",
+            [item["uriTemplate"] for item in templates["resourceTemplates"]],
+        )
+
+        tools = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 4, "method": "tools/list", "params": {}}
+        )["result"]["tools"]
+        create_annotation = next(item for item in tools if item["name"] == "annotations/create")
+        self.assertEqual(["fid", "memo"], create_annotation["inputSchema"]["required"])
+        self.assertFalse(create_annotation["inputSchema"]["additionalProperties"])
+        self.assertIn("codes_get_tree", [item["name"] for item in tools])
+        self.assertNotIn("project_get_status", [item["name"] for item in tools])
+
+        prompt_handler = self.server._sdk_server.get_request_handler("prompts/list")
+        prompt_result = asyncio.run(prompt_handler.handler(None, None))
+        self.assertEqual([], prompt_result.prompts)
+
+    def test_external_project_status_and_shared_enriched_code_tree(self):
+        external_context = AiMcpExecutionContext(
+            source="external_mcp", owner="MCP: Codex", client_name="Codex"
+        )
+        internal_tool_names = [
+            item["name"] for item in self.server._list_tools_payload()["tools"]
+        ]
+        external_tool_names = self.server.run_with_execution_context(
+            external_context,
+            lambda: [
+                item["name"] for item in self.server._list_tools_payload()["tools"]
+            ],
+        )
+        self.assertNotIn("project_get_status", internal_tool_names)
+        self.assertIn("project_get_status", external_tool_names)
+        self.assertIn("codes_get_tree", internal_tool_names)
+        self.assertIn("codes_get_tree", external_tool_names)
+
+        with self.assertRaisesRegex(ValueError, "Unknown tool name"):
+            self.server._call_tool_payload("project_get_status", {}, "")
+        status_result = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload("project_get_status", {}, ""),
+        )
+        status = status_result["structuredContent"]
+        self.assertEqual("MCP test", status["project_name"])
+        self.assertEqual("Project public\n", status["project_memo"])
+        self.assertNotIn("Project private", json.dumps(status))
+        self.assertEqual("Kai", status["active_coder"])
+        self.assertEqual("full_access", status["ai_permission_level"])
+        self.assertEqual("v17", status["database_version"])
+        self.assertEqual("3.7-test", status["qualcoder_version"])
+        self.assertEqual("0.1.0", status["mcp_server_version"])
+
+        self.app.conn.executemany(
+            "INSERT INTO code_cat (catid,name,owner,date,memo,supercatid) VALUES (?,?,?,?,?,?)",
+            [
+                (10, "Research", "Kai", "d", "", None),
+                (11, "Work", "Kai", "d", "", 10),
+            ],
+        )
+        self.app.conn.execute("UPDATE code_name SET catid=11 WHERE cid=1")
+        self.app.conn.execute(
+            "INSERT INTO code_name (cid,name,memo,catid,owner,date,color,supercid) "
+            "VALUES (2,'child code','',NULL,'Kai','d','#F5A9A9',1)"
+        )
+        self.app.conn.execute(
+            "INSERT INTO code_text (ctid,cid,fid,seltext,pos0,pos1,owner,date,memo,avid,important) "
+            "VALUES (2,1,1,'beta',6,10,'Visible Coder','d','',NULL,NULL)"
+        )
+        self.app.conn.commit()
+
+        resource_response = self.server.handle_request({
+            "jsonrpc": "2.0",
+            "id": 41,
+            "method": "resources/read",
+            "params": {"uri": "qualcoder://codes/tree"},
+        })
+        resource_tree = json.loads(resource_response["result"]["contents"][0]["text"])
+        tool_tree = self.server._call_tool_payload(
+            "codes_get_tree", {}, ""
+        )["structuredContent"]
+        self.assertEqual(resource_tree["categories"], tool_tree["categories"])
+        self.assertEqual(resource_tree["codes"], tool_tree["codes"])
+        seed_code = next(item for item in tool_tree["codes"] if item["cid"] == 1)
+        child_code = next(item for item in tool_tree["codes"] if item["cid"] == 2)
+        self.assertEqual(1, seed_code["text_coding_count"])
+        self.assertEqual(1, seed_code["child_count"])
+        self.assertEqual(
+            [
+                {"type": "category", "id": 10, "name": "Research"},
+                {"type": "category", "id": 11, "name": "Work"},
+            ],
+            seed_code["path_nodes"],
+        )
+        self.assertEqual(0, child_code["text_coding_count"])
+        self.assertEqual(0, child_code["child_count"])
+        self.assertEqual(
+            [
+                {"type": "category", "id": 10, "name": "Research"},
+                {"type": "category", "id": 11, "name": "Work"},
+                {"type": "code", "id": 1, "name": "seed code"},
+            ],
+            child_code["path_nodes"],
+        )
+
+    def test_internal_bridge_resource_read_preserves_visibility_privacy_and_search(self):
+        cur = self.app.conn.cursor()
+        cur.execute("UPDATE annotation SET memo='public memo\n#####\nprivate memo' WHERE anid=1")
+        self.app.conn.commit()
+
+        response = self.server.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 5,
+                "method": "resources/read",
+                "params": {"uri": "qualcoder://annotations"},
+            }
+        )
+        self.assertNotIn("error", response)
+        content = response["result"]["contents"][0]
+        self.assertEqual("qualcoder://annotations", content["uri"])
+        self.assertEqual("application/json", content["mimeType"])
+        payload = json.loads(content["text"])
+        self.assertEqual([1], [item["anid"] for item in payload["annotations"]])
+        self.assertEqual("public memo\n", payload["annotations"][0]["memo"])
+        self.assertNotIn("private memo", content["text"])
+
+        search_response = self.server.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 6,
+                "method": "resources/read",
+                "params": {"uri": "qualcoder://search/regex?pattern=gamma"},
+            }
+        )
+        search_payload = json.loads(search_response["result"]["contents"][0]["text"])
+        self.assertEqual(1, search_payload["selection"]["total_hits"])
+
+    def test_internal_bridge_tool_permissions_owner_events_and_errors(self):
+        request = {
+            "jsonrpc": "2.0",
+            "id": 7,
+            "method": "tools/call",
+            "params": {
+                "name": "annotations/create",
+                "arguments": {"fid": 1, "quote": "unique phrase", "memo": "agent note"},
+                "_ai_change_set_id": "bridge-change-set",
+            },
+        }
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
+        readable = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 70, "method": "resources/read",
+             "params": {"uri": "qualcoder://annotations"}}
+        )
+        self.assertNotIn("error", readable)
+        denied = self.server.handle_request(request)
+        self.assertTrue(denied["result"]["isError"])
+        self.assertEqual(
+            "ai_permissions_denied",
+            denied["result"]["structuredContent"]["error"]["code"],
+        )
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        validation_failure = self.server.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 71,
+                "method": "tools/call",
+                "params": {
+                    "name": "annotations/create",
+                    "arguments": {"fid": 1, "quote": "Alpha", "memo": "ambiguous"},
+                },
+            }
+        )
+        self.assertEqual(-32602, validation_failure["error"]["code"])
+        self.assertEqual(2, self.app.conn.execute("SELECT count(*) FROM annotation").fetchone()[0])
+
+        created = self.server.handle_request(request)
+        created_payload = created["result"]["structuredContent"]
+        self.assertTrue(created_payload["created"])
+        self.assertEqual("AI Agent", created_payload["annotation"]["owner"])
+        self.assertEqual("bridge-change-set", self.app.ai.operations[-1][0])
+        self.assertIn((["annotation"], "ai_agent"), self.app.project_events.calls)
+
+        update_request = {
+            "jsonrpc": "2.0",
+            "id": 8,
+            "method": "tools/call",
+            "params": {
+                "name": "annotations/update",
+                "arguments": {"anid": created_payload["annotation"]["anid"], "memo": "updated"},
+            },
+        }
+        denied_update = self.server.handle_request(update_request)
+        self.assertTrue(denied_update["result"]["isError"])
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        self.assertTrue(
+            self.server.handle_request(update_request)["result"]["structuredContent"]["updated"]
+        )
+
+        invalid_arguments = self.server.handle_request({
+            "jsonrpc": "2.0",
+            "id": 9,
+            "method": "tools/call",
+            "params": {"name": "annotations/create", "arguments": []},
+        })
+        self.assertEqual(-32602, invalid_arguments["error"]["code"])
+        unknown_tool = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": {"name": "missing/tool"}}
+        )
+        self.assertEqual(-32602, unknown_tool["error"]["code"])
+        unknown_resource = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 11, "method": "resources/read",
+             "params": {"uri": "qualcoder://missing"}}
+        )
+        self.assertEqual(-32602, unknown_resource["error"]["code"])
+
+    def test_external_context_owner_source_permissions_and_isolation(self):
+        external_context = AiMcpExecutionContext(
+            source="external_mcp", owner="MCP: Codex", client_name="Codex"
+        )
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
+        denied = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "external denied"}, ""
+            ),
+        )
+        self.assertTrue(denied["isError"])
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
+        external = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "external code"}, ""
+            ),
+        )
+        external_operation = self.app.ai.operations[-1][1]
+        internal = self.server._call_tool_payload(
+            "codes/create_code", {"name": "internal code"}, ""
+        )
+        self.assertEqual("MCP: Codex", external["structuredContent"]["code"]["owner"])
+        self.assertEqual("AI Agent", internal["structuredContent"]["code"]["owner"])
+        self.assertEqual("external_mcp", external_operation["actor_source"])
+        self.assertEqual("MCP: Codex", external_operation["actor_owner"])
+        self.assertEqual("Codex", external_operation["actor_client_name"])
+        self.assertIn((["code_name"], "external_mcp"), self.app.project_events.calls)
+        self.assertIn((["code_name"], "ai_agent"), self.app.project_events.calls)
+
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        updated = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/update_code", {"cid": 1, "memo": "changed externally"}, ""
+            ),
+        )
+        self.assertTrue(updated["structuredContent"]["updated"])
+        owner = self.app.conn.execute("SELECT owner FROM code_name WHERE cid=1").fetchone()[0]
+        self.assertEqual("default", owner)
+
+        barrier = threading.Barrier(2)
+        observed_owners = []
+
+        def observe_external_owner():
+            observed_owners.append(self.server.run_with_execution_context(
+                external_context,
+                lambda: (barrier.wait(), self.server.request_owner)[1],
+            ))
+
+        external_thread = threading.Thread(target=observe_external_owner)
+        external_thread.start()
+        barrier.wait()
+        observed_owners.append(self.server.request_owner)
+        external_thread.join()
+        self.assertCountEqual(["MCP: Codex", "AI Agent"], observed_owners)
+
+    def test_external_write_is_available_to_ai_undo(self):
+        undo_manager = AiLLM.__new__(AiLLM)
+        undo_manager.app = self.app
+        undo_manager.ai_change_history = []
+        self.app.ai = undo_manager
+        external_context = AiMcpExecutionContext(
+            source="external_mcp", owner="MCP: Codex", client_name="Codex"
+        )
+
+        created = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "external undo code"}, ""
+            ),
+        )
+        cid = created["structuredContent"]["code"]["cid"]
+        self.assertEqual(1, len(undo_manager.ai_change_history))
+        change_set = undo_manager.ai_change_history[0]
+        self.assertTrue(change_set["id"].startswith("mcp-run-"))
+        self.assertEqual("external_mcp", change_set["actor_source"])
+        self.assertEqual("MCP: Codex", change_set["actor_owner"])
+        self.assertTrue(change_set["name"].startswith("MCP: Codex - ["))
+
+        result = undo_manager._undo_ai_change_set(change_set)
+        self.assertEqual(1, result["undone"])
+        self.assertEqual(
+            0,
+            self.app.conn.execute("SELECT count(*) FROM code_name WHERE cid=?", (cid,)).fetchone()[0],
+        )
+        self.assertIn((["code_name"], "external_mcp_undo"), self.app.project_events.calls)
+
+        created = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "externally reassigned code"}, ""
+            ),
+        )
+        cid = created["structuredContent"]["code"]["cid"]
+        self.app.conn.execute("UPDATE code_name SET owner='Kai' WHERE cid=?", (cid,))
+        self.app.conn.commit()
+        result = undo_manager._undo_ai_change_set(undo_manager.ai_change_history[-1])
+        self.assertEqual(0, result["undone"])
+        self.assertEqual(1, result["skipped_changed"])
+        self.assertEqual(
+            1,
+            self.app.conn.execute("SELECT count(*) FROM code_name WHERE cid=?", (cid,)).fetchone()[0],
+        )
+
+    def test_project_change_event_refreshes_ai_undo_button(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog.app = SimpleNamespace(
+            ai=SimpleNamespace(has_undoable_ai_changes=MagicMock(return_value=True))
+        )
+        dialog.ui = SimpleNamespace(pushButton_undo=MagicMock())
+
+        dialog._on_project_data_changed(["code_name"], "external_mcp")
+
+        dialog.ui.pushButton_undo.setEnabled.assert_called_once_with(True)
+
+    def test_external_client_name_sanitization(self):
+        self.assertIsNone(self.server.sanitize_external_client_name("\x00\n\t"))
+        self.assertEqual(
+            "Claude Code unsafe",
+            self.server.sanitize_external_client_name(" Claude\nCode\x00unsafe "),
+        )
+        sanitized = self.server.sanitize_external_client_name("x" * 200)
+        self.assertEqual(72, len(sanitized))
+        request_context = SimpleNamespace(
+            session=SimpleNamespace(
+                client_params=SimpleNamespace(
+                    client_info=SimpleNamespace(name="Claude Code")
+                )
+            )
+        )
+        context = self.server.external_execution_context(request_context)
+        self.assertEqual("external_mcp", context.source)
+        self.assertEqual("MCP: Claude Code", context.owner)
+
+    def test_external_mcp_first_use_notice_and_checkbox_state(self):
+        qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+        checkbox = QtWidgets.QCheckBox()
+        dialog = SimpleNamespace(
+            settings={
+                "mcp_external_enabled": "False",
+                "external_mcp_notice_acknowledged": "False",
+            },
+            ui=SimpleNamespace(checkBox_MCP_enable=checkbox),
+        )
+        DialogSettings.load_external_mcp_setting(dialog)
+        self.assertFalse(checkbox.isChecked())
+        dialog.settings["mcp_external_enabled"] = "True"
+        DialogSettings.load_external_mcp_setting(dialog)
+        self.assertTrue(checkbox.isChecked())
+        checkbox.setChecked(False)
+        dialog.settings["mcp_external_enabled"] = "False"
+        checkbox.toggled.connect(
+            lambda checked: DialogSettings.external_mcp_toggled(dialog, checked)
+        )
+        with patch.object(
+                QtWidgets.QMessageBox, "warning",
+                return_value=QtWidgets.QMessageBox.StandardButton.No
+        ):
+            checkbox.setChecked(True)
+        qt_app.processEvents()
+        self.assertFalse(checkbox.isChecked())
+        self.assertEqual("False", dialog.settings["mcp_external_enabled"])
+
+        with patch.object(
+                QtWidgets.QMessageBox, "warning",
+                return_value=QtWidgets.QMessageBox.StandardButton.Yes
+        ) as warning:
+            checkbox.setChecked(True)
+        self.assertTrue(checkbox.isChecked())
+        self.assertEqual("True", dialog.settings["mcp_external_enabled"])
+        self.assertEqual("True", dialog.settings["external_mcp_notice_acknowledged"])
+        self.assertEqual(1, warning.call_count)
+
+        checkbox.setChecked(False)
+        with patch.object(QtWidgets.QMessageBox, "warning") as warning:
+            checkbox.setChecked(True)
+        self.assertEqual(0, warning.call_count)
+        self.assertEqual("True", dialog.settings["mcp_external_enabled"])
+
+    def test_streamable_http_transport_round_trip(self):
+        qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+        self.app.conn.execute(
+            "UPDATE annotation SET memo=? WHERE anid=1",
+            ("HTTP public\n#####\nHTTP private",)
+        )
+        self.app.conn.commit()
+        self.app.ai_mcp_server = self.server
+        self.app.settings.update({
+            "mcp_external_enabled": "True",
+            "mcp_external_port": 47364,
+            "ai_permissions": AiMcpServer.AI_PERMISSION_SANDBOXED,
+        })
+        controller = ExternalMcpController(self.app)
+        controller.start()
+        deadline = time.monotonic() + 5
+        while not controller.is_running and time.monotonic() < deadline:
+            qt_app.processEvents()
+            time.sleep(0.02)
+        self.assertTrue(controller.is_running)
+
+        result = {}
+        error = []
+
+        async def client_round_trip():
+            async with streamable_http_client(controller.endpoint) as streams:
+                async with ClientSession(
+                        streams[0], streams[1],
+                        client_info=types.Implementation(name="Claude Code", version="test")
+                ) as session:
+                    result["initialize"] = await session.initialize()
+                    result["tools"] = await session.list_tools()
+                    result["resource"] = await session.read_resource("qualcoder://annotations")
+                    result["status"] = await session.call_tool("project_get_status", {})
+                    result["write"] = await session.call_tool(
+                        "codes/create_code", {"name": "HTTP code"}
+                    )
+
+        def run_client():
+            try:
+                asyncio.run(client_round_trip())
+            except Exception as err:
+                error.append(err)
+
+        client_thread = threading.Thread(target=run_client)
+        client_thread.start()
+        deadline = time.monotonic() + 10
+        while client_thread.is_alive() and time.monotonic() < deadline:
+            qt_app.processEvents()
+            time.sleep(0.01)
+        client_thread.join(timeout=1)
+        controller.stop()
+        shutdown_deadline = time.monotonic() + 3
+        while controller._thread is not None and controller._thread.is_alive() \
+                and time.monotonic() < shutdown_deadline:
+            qt_app.processEvents()
+            time.sleep(0.01)
+
+        self.assertFalse(client_thread.is_alive())
+        if error:
+            raise error[0]
+        server_info = result["initialize"].server_info
+        self.assertEqual("qualcoder-mcp", server_info.name)
+        self.assertEqual("QualCoder MCP", server_info.title)
+        self.assertIsNone(server_info.description)
+        self.assertIn("project currently open", result["initialize"].instructions)
+        tool_names = [tool.name for tool in result["tools"].tools]
+        self.assertIn("project_get_status", tool_names)
+        self.assertIn("codes_get_tree", tool_names)
+        self.assertIn("codes/create_code", tool_names)
+        self.assertFalse(result["status"].is_error)
+        status_payload = result["status"].structured_content
+        self.assertEqual("Project public\n", status_payload["project_memo"])
+        self.assertNotIn("Project private", json.dumps(status_payload))
+        self.assertFalse(result["write"].is_error)
+        resource_payload = json.loads(result["resource"].contents[0].text)
+        self.assertEqual([1], [item["anid"] for item in resource_payload["annotations"]])
+        self.assertEqual("HTTP public\n", resource_payload["annotations"][0]["memo"])
+        self.assertNotIn("HTTP private", result["resource"].contents[0].text)
+        owner = self.app.conn.execute(
+            "SELECT owner FROM code_name WHERE name='HTTP code'"
+        ).fetchone()[0]
+        # The SDK's legacy stateless client does not repeat initialize clientInfo
+        # on later requests, so the required fallback applies on this transport.
+        self.assertEqual("External MCP", owner)
+        self.assertIn((["code_name"], "external_mcp"), self.app.project_events.calls)
+
+    def test_project_reset_invalidates_preview_tokens(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        preview = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 110, "method": "tools/call",
+             "params": {"name": "codes/preview_delete_code", "arguments": {"cid": 1}}}
+        )["result"]["structuredContent"]
+        token = preview["preview_token"]
+        self.server.reset_project_state()
+        rejected = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 111, "method": "tools/call",
+             "params": {"name": "codes/delete_code",
+                        "arguments": {"cid": 1, "preview_token": token}}}
+        )
+        self.assertEqual(-32602, rejected["error"]["code"])
+
+    def test_dangerous_delete_preview_confirmation_is_single_use(self):
+        self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
+        without_preview = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 12, "method": "tools/call",
+             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": ""}}}
+        )
+        self.assertEqual(-32602, without_preview["error"]["code"])
+
+        preview = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 13, "method": "tools/call",
+             "params": {"name": "codes/preview_delete_code", "arguments": {"cid": 1}}}
+        )["result"]["structuredContent"]
+        self.assertTrue(preview["requires_confirmation"])
+        token = preview["preview_token"]
+        deleted = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 14, "method": "tools/call",
+             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": token}}}
+        )
+        self.assertTrue(deleted["result"]["structuredContent"]["deleted"])
+        reused = self.server.handle_request(
+            {"jsonrpc": "2.0", "id": 15, "method": "tools/call",
+             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": token}}}
+        )
+        self.assertEqual(-32602, reused["error"]["code"])
+        self.assertIn((["code_name", "code_text"], "ai_agent"), self.app.project_events.calls)
 
     def test_create_annotation_requires_a_unique_exact_quote_or_positions(self):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED

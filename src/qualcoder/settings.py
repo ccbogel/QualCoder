@@ -271,6 +271,8 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.checkBox_AI_enable.setChecked(False)
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
+        self.load_external_mcp_setting()
+        self.ui.checkBox_MCP_enable.toggled.connect(self.external_mcp_toggled)
         self.ui.comboBox_reasoning.addItems(['default', 'low', 'medium', 'high'])
         self.ui.comboBox_ai_profile.clear()
         self.load_ai_profiles()
@@ -324,6 +326,49 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.widget_ai.setStyleSheet('')
 
         self.load_ai_permissions()
+
+    def load_external_mcp_setting(self) -> None:
+        """Restore the canonical External MCP checkbox from persisted settings."""
+
+        with QtCore.QSignalBlocker(self.ui.checkBox_MCP_enable):
+            self.ui.checkBox_MCP_enable.setChecked(
+                _setting_is_true(self.settings.get('mcp_external_enabled', 'False'))
+            )
+
+    def external_mcp_toggled(self, checked: bool) -> None:
+        """Show the first-use privacy notice before enabling External MCP.
+
+        Args:
+            checked: The checkbox's requested state.
+        """
+
+        if not checked:
+            self.settings['mcp_external_enabled'] = 'False'
+            return
+        acknowledged = _setting_is_true(
+            self.settings.get('external_mcp_notice_acknowledged', 'False')
+        )
+        if not acknowledged:
+            message = _(
+                'External MCP allows third-party AI applications to access data from the currently '
+                'opened project. Data returned by MCP tools may be transmitted to the AI provider '
+                'configured in that application.\n\nOnly enable External MCP if you trust the '
+                'connected application and understand how it handles your data.'
+            )
+            reply = QtWidgets.QMessageBox.warning(
+                self,
+                _('External MCP privacy warning'),
+                message,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                QtWidgets.QMessageBox.StandardButton.No,
+            )
+            if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                with QtCore.QSignalBlocker(self.ui.checkBox_MCP_enable):
+                    self.ui.checkBox_MCP_enable.setChecked(False)
+                self.settings['mcp_external_enabled'] = 'False'
+                return
+            self.settings['external_mcp_notice_acknowledged'] = 'True'
+        self.settings['mcp_external_enabled'] = 'True'
 
     def load_ai_permissions(self):
         ai_permissions = self.settings.get('ai_permissions', 1)
@@ -938,6 +983,9 @@ class DialogSettings(QtWidgets.QDialog):
         ai_model_index = self.ui.comboBox_ai_profile.currentIndex() 
         self.settings['ai_model_index'] = ai_model_index
         self.settings['ai_permissions'] = self.current_ai_permissions()
+        self.settings['mcp_external_enabled'] = (
+            'True' if self.ui.checkBox_MCP_enable.isChecked() else 'False'
+        )
         if self.settings['ai_enable'] == 'True' and ai_model_index < 0:
             msg = _('Please select an AI profile or disable the AI altogether.')
             Message(self.app, _('AI profile'), msg).exec()

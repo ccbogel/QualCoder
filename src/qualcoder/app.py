@@ -39,6 +39,7 @@ import webbrowser
 import zipfile
 from copy import copy
 
+from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
 from qualcoder.helpers import get_default_user_directory, Message
 from qualcoder.speakers import speaker_coder_name
@@ -126,6 +127,7 @@ class App(object):
         # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
         self.ai_embedding_function = None
         self.project_events = ProjectEventBus()
+        self.ai_mcp_server = AiMcpServer(self)
 
     def read_previous_project_paths(self):
         """ Recent project paths are stored in .qualcoder/recent_projects.txt
@@ -892,6 +894,7 @@ class App(object):
                 'ai_enable', 'ai_first_startup', 'ai_model_index', 'ai_chat_sidebar',
                 'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
                 'ai_model_upgrade_offer_pending',
+                'mcp_external_enabled', 'external_mcp_notice_acknowledged', 'mcp_external_port',
                 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
                 ]
         for key in keys:
@@ -932,6 +935,12 @@ class App(object):
                     settings_data[key] = ''
                 if key == 'ai_model_upgrade_offer_pending':
                     settings_data[key] = ''
+                if key == 'mcp_external_enabled':
+                    settings_data[key] = 'False'
+                if key == 'external_mcp_notice_acknowledged':
+                    settings_data[key] = 'False'
+                if key == 'mcp_external_port':
+                    settings_data[key] = 47363
                 if key == 'ai_chat_sidebar':
                     settings_data[key] = 'False'
                 if key == 'ai_chat_sidebar_width':
@@ -948,6 +957,14 @@ class App(object):
         ai_permissions = settings_data.get('ai_permissions', 1)
         if ai_permissions not in (0, 1, 2):
             settings_data['ai_permissions'] = 1
+            settings_updated = True
+
+        mcp_enabled = str(settings_data.get('mcp_external_enabled', 'False')).lower() == 'true'
+        notice_acknowledged = str(
+            settings_data.get('external_mcp_notice_acknowledged', 'False')
+        ).lower() == 'true'
+        if mcp_enabled and not notice_acknowledged:
+            settings_data['mcp_external_enabled'] = 'False'
             settings_updated = True
 
         # Check AI models
@@ -1357,6 +1374,9 @@ class App(object):
             'ai_extended_logging': 'False',
             'ai_model_upgrade_offers_seen': '',
             'ai_model_upgrade_offer_pending': '',
+            'mcp_external_enabled': 'False',
+            'external_mcp_notice_acknowledged': 'False',
+            'mcp_external_port': 47363,
             'ai_chat_sidebar': 'False',
             'ai_chat_sidebar_width': 320,
             'ai_chat_splitter_output_bottom': 80

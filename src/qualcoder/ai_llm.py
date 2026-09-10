@@ -2890,7 +2890,13 @@ class AiLLM():
                 title += time_label
             else:
                 title += "[" + time_label + "]"
-        first_line = title if title != "" else ", ".join(parts)
+        actor_source = str(change_set.get("actor_source", "ai_agent")).strip()
+        actor_owner = str(change_set.get("actor_owner", "")).strip()
+        if actor_source == "external_mcp":
+            actor_label = actor_owner if actor_owner != "" else "External MCP"
+            first_line = actor_label + (" - " + title if title != "" else "")
+        else:
+            first_line = title if title != "" else ", ".join(parts)
         lines = [first_line]
         shown_summaries = operation_summaries[:4]
         for summary in shown_summaries:
@@ -2932,13 +2938,45 @@ class AiLLM():
             return
         history = self._ensure_ai_change_history()
         normalized_set_id = str(change_set_id).strip()
+        actor_source = str(operation.get("actor_source", "ai_agent")).strip() or "ai_agent"
         if normalized_set_id == "":
-            normalized_set_id = "ai-run-" + datetime.now().astimezone().strftime("%Y%m%d%H%M%S%f")
+            prefix = "mcp-run-" if actor_source == "external_mcp" else "ai-run-"
+            normalized_set_id = prefix + datetime.now().astimezone().strftime("%Y%m%d%H%M%S%f")
         change_set = self._ensure_ai_change_set(history, normalized_set_id)
         op_copy = dict(operation)
         op_copy["change_set_id"] = normalized_set_id
         change_set["operations"].append(op_copy)
+        if "actor_source" not in change_set:
+            change_set["actor_source"] = actor_source
+        actor_owner = str(op_copy.get("actor_owner", "")).strip()
+        if actor_owner != "" and "actor_owner" not in change_set:
+            change_set["actor_owner"] = actor_owner
+        actor_client_name = str(op_copy.get("actor_client_name", "")).strip()
+        if actor_client_name != "" and "actor_client_name" not in change_set:
+            change_set["actor_client_name"] = actor_client_name
         self._refresh_ai_change_set_name(change_set)
+
+    @staticmethod
+    def _operation_actor_owner(operation: dict) -> str:
+        """Return the owner that performed a recorded operation."""
+
+        owner = str(operation.get("owner", "")).strip()
+        if owner == "":
+            owner = str(operation.get("actor_owner", "AI Agent")).strip()
+        return owner if owner != "" else "AI Agent"
+
+    def _change_set_actor_owner(self, change_set: dict) -> str:
+        """Return the owner responsible for a recorded change set."""
+
+        owner = str(change_set.get("actor_owner", "")).strip()
+        if owner != "":
+            return owner
+        operations = change_set.get("operations", [])
+        if isinstance(operations, list):
+            for operation in operations:
+                if isinstance(operation, dict):
+                    return self._operation_actor_owner(operation)
+        return "AI Agent"
 
     def _table_exists(self, table_name: str) -> bool:
         cur = self.app.conn.cursor()
@@ -2956,7 +2994,7 @@ class AiLLM():
         expected_name = str(op.get("name", "")).strip()
         if expected_name != "" and row[1] != expected_name:
             return False, "changed", row
-        if str(row[2]) != "AI Agent":
+        if str(row[2]) != self._operation_actor_owner(op):
             return False, "changed", row
         return True, "ok", row
 
@@ -2971,7 +3009,7 @@ class AiLLM():
         expected_name = str(op.get("name", "")).strip()
         if expected_name != "" and row[1] != expected_name:
             return False, "changed", row
-        if str(row[2]) != "AI Agent":
+        if str(row[2]) != self._operation_actor_owner(op):
             return False, "changed", row
         expected_catid = op.get("catid", None)
         expected_supercid = op.get("supercid", None)
@@ -3060,7 +3098,7 @@ class AiLLM():
         expected_name = str(op.get("name", "")).strip()
         if expected_name != "" and str(row[1]) != expected_name:
             return False, "changed", row
-        if str(row[2]) != "AI Agent":
+        if str(row[2]) != self._operation_actor_owner(op):
             return False, "changed", row
         return True, "ok", row
 
@@ -3227,7 +3265,8 @@ class AiLLM():
         row = cur.fetchone()
         if row is None:
             return False, "missing", None
-        if str(row[1]) != "AI Agent":
+        expected_owner = self._operation_actor_owner(op)
+        if str(row[1]) != expected_owner:
             return False, "changed", row
         if str(row[2]) != target_type:
             return False, "changed", row
@@ -3237,9 +3276,9 @@ class AiLLM():
         cur.execute(
             "SELECT count(*), "
             "sum(case when length(ifnull(value,'')) > 0 then 1 else 0 end), "
-            "sum(case when ifnull(owner,'') != 'AI Agent' then 1 else 0 end) "
+            "sum(case when ifnull(owner,'') != ? then 1 else 0 end) "
             "FROM attribute WHERE name=? AND attr_type=?",
-            (attr_name, target_type),
+            (expected_owner, attr_name, target_type),
         )
         attr_row = cur.fetchone() or (0, 0, 0)
         if int(attr_row[1] or 0) > 0 or int(attr_row[2] or 0) > 0:
@@ -3445,15 +3484,15 @@ class AiLLM():
             changed_tables.append(name)
         return changed_tables
 
-    def _count_code_codings(self, cur, cid: int) -> tuple[int, int]:
+    def _count_code_codings(self, cur, cid: int, actor_owner: str = "AI Agent") -> tuple[int, int]:
         total = 0
         non_ai = 0
         for table in ("code_text", "code_av", "code_image"):
             if not self._table_exists(table):
                 continue
             cur.execute(
-                f"SELECT count(*), sum(case when owner != 'AI Agent' then 1 else 0 end) FROM {table} WHERE cid=?",
-                (cid,),
+                f"SELECT count(*), sum(case when owner != ? then 1 else 0 end) FROM {table} WHERE cid=?",
+                (actor_owner, cid),
             )
             row = cur.fetchone()
             if row is None:
@@ -3504,6 +3543,7 @@ class AiLLM():
         if not isinstance(operations, list) or len(operations) == 0:
             return ""
         cur = self.app.conn.cursor()
+        actor_owner = self._change_set_actor_owner(change_set)
 
         code_ids = set()
         category_ids = set()
@@ -3726,7 +3766,7 @@ class AiLLM():
         code_codings_total = 0
         code_codings_non_ai = 0
         for cid in code_ids:
-            ct_total, ct_non_ai = self._count_code_codings(cur, cid)
+            ct_total, ct_non_ai = self._count_code_codings(cur, cid, actor_owner)
             code_codings_total += ct_total
             code_codings_non_ai += ct_non_ai
 
@@ -3746,7 +3786,7 @@ class AiLLM():
             if row is None:
                 continue
             standalone_codings_total += 1
-            if str(row[0]) != "AI Agent":
+            if str(row[0]) != actor_owner:
                 standalone_codings_non_ai += 1
 
         lines = []
@@ -3758,7 +3798,7 @@ class AiLLM():
             if code_codings_non_ai > 0:
                 lines.append(
                     _("Warning: ") + str(code_codings_non_ai) +
-                    _(" of these codings are not owned by 'AI Agent'.")
+                    _(" of these codings are owned by someone else.")
                 )
         if len(category_ids) > 0:
             lines.append(
@@ -3773,7 +3813,7 @@ class AiLLM():
             if standalone_codings_non_ai > 0:
                 lines.append(
                     _("Warning: ") + str(standalone_codings_non_ai) +
-                    _(" standalone coding(s) are not owned by 'AI Agent'.")
+                    _(" standalone coding(s) are owned by someone else.")
                 )
         if len(case_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
@@ -3856,6 +3896,7 @@ class AiLLM():
         remaining_operations = []
         project_table_changes = set()
         cur = self.app.conn.cursor()
+        actor_owner = self._change_set_actor_owner(change_set)
         try:
             for op in reversed(operations):
                 if not isinstance(op, dict):
@@ -3951,7 +3992,7 @@ class AiLLM():
                             stats["removed_skipped"] += 1
                         continue
                     cid = int(row[0])
-                    coding_total, coding_non_ai = self._count_code_codings(cur, cid)
+                    coding_total, coding_non_ai = self._count_code_codings(cur, cid, actor_owner)
                     stats["deleted_code_codings"] += coding_total
                     stats["deleted_code_codings_non_ai"] += coding_non_ai
                     changed_tables = []
@@ -4451,7 +4492,12 @@ class AiLLM():
             self.app.conn.commit()
             self.app.delete_backup = False
             if len(project_table_changes) > 0:
-                self._emit_project_table_changes(sorted(project_table_changes), source="ai_agent_undo")
+                undo_source = (
+                    "external_mcp_undo"
+                    if str(change_set.get("actor_source", "")).strip() == "external_mcp"
+                    else "ai_agent_undo"
+                )
+                self._emit_project_table_changes(sorted(project_table_changes), source=undo_source)
         except Exception:
             self.app.conn.rollback()
             raise
@@ -4460,7 +4506,7 @@ class AiLLM():
         return stats
 
     def undo_ai_agent_changes(self):
-        """Undo one or more selected AI-agent change sets from the current app session."""
+        """Undo selected internal-agent or external-MCP changes from this app session."""
 
         history = self._ensure_ai_change_history()
         options = []
@@ -4552,7 +4598,7 @@ class AiLLM():
             msg += _("Skipped operations removed from the list: ") + str(removed_skipped) + "\n"
         non_ai_loss = int(stats.get("deleted_code_codings_non_ai", 0))
         if non_ai_loss > 0:
-            msg += _("Warning: removed codings not owned by 'AI Agent': ") + str(non_ai_loss) + "\n"
+            msg += _("Warning: removed codings owned by someone else: ") + str(non_ai_loss) + "\n"
         if len(skip_details) > 0:
             msg += "\n" + _("Undo details:") + "\n\n" + "\n\n".join(skip_details)
         if self.parent_text_edit is not None:

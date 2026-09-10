@@ -55,7 +55,6 @@ from .ai_agent_prompts import (
     prompt_name_key,
 )
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
-from .ai_mcp_server import AiMcpServer
 from .ai_search_dialog import DialogAiSearch
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
@@ -656,7 +655,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.shortcut_undo_ai_changes.activated.connect(self._undo_ai_changes_shortcut)
         ai_chat_signal_emitter.newTextChatSignal.connect(self.new_text_chat)
         self.agent_prompts_catalog = AiAgentPromptsCatalog(self.app)
-        self.ai_mcp_server = AiMcpServer(self.app)
+        self.ai_mcp_server = self.app.ai_mcp_server
         self.ai_prompt = None
         self._multi_chat_selection_active = False
         self._setup_prompt_completion()
@@ -703,6 +702,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.scrollArea_ai_output.verticalScrollBar().valueChanged.connect(self.on_ai_output_scroll)
         self.set_sidebar_mode(False)
         QtCore.QTimer.singleShot(0, self._hide_transient_chat_overlays)
+        project_events = getattr(self.app, "project_events", None)
+        project_data_changed = getattr(project_events, "project_data_changed", None)
+        if project_data_changed is not None and hasattr(project_data_changed, "connect"):
+            project_data_changed.connect(self._on_project_data_changed)
         self._update_undo_button_state()
 
     def _setup_prompt_completion(self) -> None:
@@ -1678,7 +1681,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def init_ai_chat(self, app=None):
         if app is not None:
             self.app = app
-            self.ai_mcp_server = AiMcpServer(self.app)
+            self.ai_mcp_server = self.app.ai_mcp_server
             self.load_ai_permissions()
         self._close_chat_history_connection()
         # init chat history
@@ -1810,6 +1813,11 @@ class DialogAIChat(QtWidgets.QDialog):
             except Exception:
                 enabled = False
         self.ui.pushButton_undo.setEnabled(enabled)
+
+    def _on_project_data_changed(self, tables, source):
+        """Refresh Undo after project writes, including external MCP writes."""
+
+        self._update_undo_button_state()
 
     def _get_saved_ai_output_splitter_bottom(self):
         """Return the saved bottom pane height for the AI output splitter."""
