@@ -700,7 +700,12 @@ class TestAiAnnotations(TestCase):
     class FakeApp:
         def __init__(self, project_path):
             self.project_path = project_path
-            self.settings = {"ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS}
+            self.project_name = "MCP test.qda"
+            self.version = "3.7-test"
+            self.settings = {
+                "ai_permissions": AiMcpServer.AI_PERMISSION_FULL_ACCESS,
+                "codername": "Kai",
+            }
             self.delete_backup = True
             self.project_events = TestAiAnnotations.FakeEvents()
             self.ai = TestAiAnnotations.FakeAi()
@@ -713,6 +718,13 @@ class TestAiAnnotations(TestCase):
         cur = conn.cursor()
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, memo text, owner text, date text)"
+        )
+        cur.execute(
+            "CREATE TABLE project (databaseversion text, memo text)"
+        )
+        cur.execute(
+            "INSERT INTO project (databaseversion, memo) VALUES (?, ?)",
+            ("v17", "Project public\n#####\nProject private"),
         )
         cur.execute(
             "CREATE TABLE annotation (anid integer primary key, fid integer, pos0 integer, pos1 integer, memo text, "
@@ -837,6 +849,11 @@ class TestAiAnnotations(TestCase):
             {"prompts", "resources", "tools"},
             set(initialize["capabilities"]),
         )
+        self.assertEqual("qualcoder-mcp", initialize["serverInfo"]["name"])
+        self.assertEqual("QualCoder MCP", initialize["serverInfo"]["title"])
+        self.assertNotIn("description", initialize["serverInfo"])
+        self.assertEqual(self.server._server_instructions(), initialize["instructions"])
+        self.assertNotIn("resources/list", initialize["instructions"])
 
         resources = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 2, "method": "resources/list", "params": {}}
@@ -851,6 +868,11 @@ class TestAiAnnotations(TestCase):
             "qualcoder://annotations/{anid}{?owner}",
             [item["uriTemplate"] for item in templates["resourceTemplates"]],
         )
+        self.assertIn(
+            "qualcoder://codes/segments/{cid}"
+            "{?strategy,max_segments,max_chars,cursor,file_ids,case_ids,owner}",
+            [item["uriTemplate"] for item in templates["resourceTemplates"]],
+        )
 
         tools = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 4, "method": "tools/list", "params": {}}
@@ -858,10 +880,98 @@ class TestAiAnnotations(TestCase):
         create_annotation = next(item for item in tools if item["name"] == "annotations/create")
         self.assertEqual(["fid", "memo"], create_annotation["inputSchema"]["required"])
         self.assertFalse(create_annotation["inputSchema"]["additionalProperties"])
+        self.assertIn("codes_get_tree", [item["name"] for item in tools])
+        self.assertNotIn("project_get_status", [item["name"] for item in tools])
 
         prompt_handler = self.server._sdk_server.get_request_handler("prompts/list")
         prompt_result = asyncio.run(prompt_handler.handler(None, None))
         self.assertEqual([], prompt_result.prompts)
+
+    def test_external_project_status_and_shared_enriched_code_tree(self):
+        external_context = AiMcpExecutionContext(
+            source="external_mcp", owner="MCP: Codex", client_name="Codex"
+        )
+        internal_tool_names = [
+            item["name"] for item in self.server._list_tools_payload()["tools"]
+        ]
+        external_tool_names = self.server.run_with_execution_context(
+            external_context,
+            lambda: [
+                item["name"] for item in self.server._list_tools_payload()["tools"]
+            ],
+        )
+        self.assertNotIn("project_get_status", internal_tool_names)
+        self.assertIn("project_get_status", external_tool_names)
+        self.assertIn("codes_get_tree", internal_tool_names)
+        self.assertIn("codes_get_tree", external_tool_names)
+
+        with self.assertRaisesRegex(ValueError, "Unknown tool name"):
+            self.server._call_tool_payload("project_get_status", {}, "")
+        status_result = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload("project_get_status", {}, ""),
+        )
+        status = status_result["structuredContent"]
+        self.assertEqual("MCP test", status["project_name"])
+        self.assertEqual("Project public\n", status["project_memo"])
+        self.assertNotIn("Project private", json.dumps(status))
+        self.assertEqual("Kai", status["active_coder"])
+        self.assertEqual("full_access", status["ai_permission_level"])
+        self.assertEqual("v17", status["database_version"])
+        self.assertEqual("3.7-test", status["qualcoder_version"])
+        self.assertEqual("0.1.0", status["mcp_server_version"])
+
+        self.app.conn.executemany(
+            "INSERT INTO code_cat (catid,name,owner,date,memo,supercatid) VALUES (?,?,?,?,?,?)",
+            [
+                (10, "Research", "Kai", "d", "", None),
+                (11, "Work", "Kai", "d", "", 10),
+            ],
+        )
+        self.app.conn.execute("UPDATE code_name SET catid=11 WHERE cid=1")
+        self.app.conn.execute(
+            "INSERT INTO code_name (cid,name,memo,catid,owner,date,color,supercid) "
+            "VALUES (2,'child code','',NULL,'Kai','d','#F5A9A9',1)"
+        )
+        self.app.conn.execute(
+            "INSERT INTO code_text (ctid,cid,fid,seltext,pos0,pos1,owner,date,memo,avid,important) "
+            "VALUES (2,1,1,'beta',6,10,'Visible Coder','d','',NULL,NULL)"
+        )
+        self.app.conn.commit()
+
+        resource_response = self.server.handle_request({
+            "jsonrpc": "2.0",
+            "id": 41,
+            "method": "resources/read",
+            "params": {"uri": "qualcoder://codes/tree"},
+        })
+        resource_tree = json.loads(resource_response["result"]["contents"][0]["text"])
+        tool_tree = self.server._call_tool_payload(
+            "codes_get_tree", {}, ""
+        )["structuredContent"]
+        self.assertEqual(resource_tree["categories"], tool_tree["categories"])
+        self.assertEqual(resource_tree["codes"], tool_tree["codes"])
+        seed_code = next(item for item in tool_tree["codes"] if item["cid"] == 1)
+        child_code = next(item for item in tool_tree["codes"] if item["cid"] == 2)
+        self.assertEqual(1, seed_code["text_coding_count"])
+        self.assertEqual(1, seed_code["child_count"])
+        self.assertEqual(
+            [
+                {"type": "category", "id": 10, "name": "Research"},
+                {"type": "category", "id": 11, "name": "Work"},
+            ],
+            seed_code["path_nodes"],
+        )
+        self.assertEqual(0, child_code["text_coding_count"])
+        self.assertEqual(0, child_code["child_count"])
+        self.assertEqual(
+            [
+                {"type": "category", "id": 10, "name": "Research"},
+                {"type": "category", "id": 11, "name": "Work"},
+                {"type": "code", "id": 1, "name": "seed code"},
+            ],
+            child_code["path_nodes"],
+        )
 
     def test_internal_bridge_resource_read_preserves_visibility_privacy_and_search(self):
         cur = self.app.conn.cursor()
@@ -1127,6 +1237,7 @@ class TestAiAnnotations(TestCase):
                     result["initialize"] = await session.initialize()
                     result["tools"] = await session.list_tools()
                     result["resource"] = await session.read_resource("qualcoder://annotations")
+                    result["status"] = await session.call_tool("project_get_status", {})
                     result["write"] = await session.call_tool(
                         "codes/create_code", {"name": "HTTP code"}
                     )
@@ -1157,9 +1268,16 @@ class TestAiAnnotations(TestCase):
         server_info = result["initialize"].server_info
         self.assertEqual("qualcoder-mcp", server_info.name)
         self.assertEqual("QualCoder MCP", server_info.title)
-        self.assertIn("qualitative data analysis", server_info.description)
+        self.assertIsNone(server_info.description)
         self.assertIn("project currently open", result["initialize"].instructions)
-        self.assertIn("codes/create_code", [tool.name for tool in result["tools"].tools])
+        tool_names = [tool.name for tool in result["tools"].tools]
+        self.assertIn("project_get_status", tool_names)
+        self.assertIn("codes_get_tree", tool_names)
+        self.assertIn("codes/create_code", tool_names)
+        self.assertFalse(result["status"].is_error)
+        status_payload = result["status"].structured_content
+        self.assertEqual("Project public\n", status_payload["project_memo"])
+        self.assertNotIn("Project private", json.dumps(status_payload))
         self.assertFalse(result["write"].is_error)
         resource_payload = json.loads(result["resource"].contents[0].text)
         self.assertEqual([1], [item["anid"] for item in resource_payload["annotations"]])

@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 
 """
-Internal MCP server for QualCoder.
+Shared MCP server for QualCoder.
 
 This module uses the official MCP Python SDK (low-level server) and exposes
 an in-process JSON-RPC bridge (`handle_request`) so the current chat flow can
@@ -74,10 +74,6 @@ class AiMcpServer:
     protocol_version = "2025-06-18"
     server_name = "qualcoder-mcp"
     server_title = "QualCoder MCP"
-    server_description = (
-        "Access and analyze the project currently open in QualCoder, an open-source "
-        "qualitative data analysis application."
-    )
     server_version = "0.1.0"
     max_read_length = 12000
     default_read_length = 4000
@@ -161,7 +157,6 @@ class AiMcpServer:
             self.server_name,
             version=self.server_version,
             title=self.server_title,
-            description=self.server_description,
             instructions=self._server_instructions(),
             on_list_resources=self._sdk_list_resources,
             on_list_resource_templates=self._sdk_list_resource_templates,
@@ -253,32 +248,18 @@ class AiMcpServer:
 
         return _execution_context.get().owner
 
+    @property
+    def request_source(self) -> str:
+        """Return the source for the current request."""
+
+        return _execution_context.get().source
+
     def _server_instructions(self) -> str:
         return (
-            "QualCoder is an open-source qualitative data analysis application. "
-            "This server provides access to the project currently open in the running "
-            "QualCoder application. "
-            "Use resources/list, resources/read, tools/list, and tools/call. "
-            "Available resources: text documents list (qualcoder://documents), document text by id "
-            "(qualcoder://documents/text/{id}, with optional start/length or line_start/line_end), "
-            "cases list (qualcoder://cases), case details by id (qualcoder://cases/{id}), "
-            "and case text segments by case id (qualcoder://cases/text/{id}), "
-            "text annotations (qualcoder://annotations) and annotation details by id "
-            "(qualcoder://annotations/{anid}), "
-            "code tree (qualcoder://codes/tree), and coded text segments by code id "
-            "(qualcoder://codes/segments/{cid}) with optional filters file_ids, case_ids, and owner, "
-            "semantic vector search "
-            "(qualcoder://vector/search?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
-            "BM25 chunk search "
-            "(qualcoder://search/bm25?q=...) with optional filters file_ids, case_ids, and exclude_cids, "
-            "and regular-expression search "
-            "(qualcoder://search/regex?pattern=...) with optional filters file_ids, case_ids, and exclude_cids. "
-            "It also provides cached access to the English QualCoder help wiki: page list "
-            "(qualcoder://help/pages), help search (qualcoder://help/search?q=...), and help page reads "
-            "(qualcoder://help/page/{slug}). "
-            "Available tools include preview and write operations for categories, codes, text codings, "
-            "case attributes, document attributes, cases, and text annotations. "
-            "Delete actions on categories or codes should be previewed before execution."
+            "QualCoder is an open-source application for computer-assisted qualitative data analysis. "
+            "It is used to organize, code, retrieve, and analyze qualitative research data. "
+            "This MCP server provides access to the project currently open in the running "
+            "QualCoder application."
         )
 
     def _current_ai_permissions(self) -> int:
@@ -722,7 +703,11 @@ class AiMcpServer:
                 tools=types.ToolsCapability(listChanged=False),
                 prompts=types.PromptsCapability(listChanged=False),
             ),
-            serverInfo=types.Implementation(name=self.server_name, version=self.server_version),
+            serverInfo=types.Implementation(
+                name=self.server_name,
+                title=self.server_title,
+                version=self.server_version,
+            ),
             instructions=self._server_instructions(),
         )
         return result.model_dump(mode="json", by_alias=True, exclude_none=True)
@@ -870,7 +855,10 @@ class AiMcpServer:
                     mimeType="application/json",
                 ),
                 types.ResourceTemplate(
-                    uriTemplate="qualcoder://codes/segments/{cid}",
+                    uriTemplate=(
+                        "qualcoder://codes/segments/{cid}"
+                        "{?strategy,max_segments,max_chars,cursor,file_ids,case_ids,owner}"
+                    ),
                     name="Coded text segments by code id",
                     description=(
                         "Read coded text segments for a code id, including coding memo. Optional query params: strategy "
@@ -1152,8 +1140,20 @@ class AiMcpServer:
         ]
 
     def _list_tools_payload(self) -> Dict[str, Any]:
-        return {
+        payload = {
             "tools": [
+                {
+                    "name": "codes_get_tree",
+                    "description": (
+                        "Get the code hierarchy with visible text-coding counts and ancestor paths. "
+                        "Requires Read-only, Sandboxed, or Full access."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
+                },
                 {
                     "name": "codes/create_category",
                     "description": (
@@ -1582,6 +1582,23 @@ class AiMcpServer:
                 },
             ]
         }
+        if self.request_source == "external_mcp":
+            payload["tools"].insert(
+                0,
+                {
+                    "name": "project_get_status",
+                    "description": (
+                        "Get the open QualCoder project's identity, public memo, active coder, "
+                        "permissions, and version information. External MCP only."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": False,
+                    },
+                },
+            )
+        return payload
 
     def _call_tool_payload(self, name: str, arguments: Optional[Dict[str, Any]], change_set_id: str) -> Dict[str, Any]:
         if arguments is None:
@@ -1591,11 +1608,19 @@ class AiMcpServer:
         tool_name = str(name).strip()
         if tool_name == "":
             raise ValueError("Missing tool name.")
+        if tool_name == "project_get_status" and self.request_source != "external_mcp":
+            raise ValueError(f"Unknown tool name: {tool_name}")
+        if tool_name in ("project_get_status", "codes_get_tree") and len(arguments) > 0:
+            raise ValueError(f"Tool {tool_name} does not accept arguments.")
         required_permission = self._tool_required_permission(tool_name)
         if self._current_ai_permissions() < required_permission:
             return self._tool_permission_error(tool_name, required_permission)
 
-        if tool_name == "codes/create_category":
+        if tool_name == "project_get_status":
+            payload = self._tool_project_get_status()
+        elif tool_name == "codes_get_tree":
+            payload = {"tool": tool_name, **self._codes_tree()}
+        elif tool_name == "codes/create_category":
             payload = self._tool_create_category(arguments, change_set_id)
         elif tool_name == "codes/create_code":
             payload = self._tool_create_code(arguments, change_set_id)
@@ -1651,6 +1676,34 @@ class AiMcpServer:
             raise ValueError(f"Unknown tool name: {tool_name}")
 
         return self._tool_result_payload(payload)
+
+    def _tool_project_get_status(self) -> Dict[str, Any]:
+        """Return current project context for an external MCP client."""
+
+        project_row = self._fetchone(
+            "SELECT databaseversion, ifnull(memo,'') FROM project LIMIT 1"
+        )
+        if project_row is None:
+            raise RuntimeError("The open project has no project metadata.")
+        project_name = str(getattr(self.app, "project_name", "")).strip()
+        if project_name.lower().endswith(".qda"):
+            project_name = project_name[:-4]
+        permission_names = {
+            self.AI_PERMISSION_READ_ONLY: "read_only",
+            self.AI_PERMISSION_SANDBOXED: "sandboxed",
+            self.AI_PERMISSION_FULL_ACCESS: "full_access",
+        }
+        permission_level = self._current_ai_permissions()
+        return {
+            "tool": "project_get_status",
+            "project_name": project_name,
+            "project_memo": self._memo_public_text(project_row[1]),
+            "active_coder": str(self.app.settings.get("codername", "")),
+            "ai_permission_level": permission_names[permission_level],
+            "database_version": str(project_row[0] if project_row[0] is not None else ""),
+            "qualcoder_version": str(getattr(self.app, "version", "")),
+            "mcp_server_version": self.server_version,
+        }
 
     def _tool_create_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
@@ -3930,6 +3983,76 @@ class AiMcpServer:
                     "supercid": row[6],
                 }
             )
+
+        visible_text_coding_counts: Dict[int, int] = {}
+        if self._view_exists("code_text_visible"):
+            visible_text_coding_counts = {
+                int(row[0]): int(row[1])
+                for row in self._fetchall(
+                    "SELECT cid, count(*) FROM code_text_visible GROUP BY cid"
+                )
+            }
+
+        categories_by_id = {
+            int(category["catid"]): category
+            for category in categories
+            if self._to_int(category.get("catid"), -1) > 0
+        }
+        codes_by_id = {
+            int(code["cid"]): code
+            for code in codes
+            if self._to_int(code.get("cid"), -1) > 0
+        }
+        direct_child_counts: Dict[int, int] = {}
+        for code in codes:
+            parent_id = self._to_int(code.get("supercid"), -1)
+            if parent_id > 0:
+                direct_child_counts[parent_id] = direct_child_counts.get(parent_id, 0) + 1
+
+        def category_path_nodes(catid: Any) -> List[Dict[str, Any]]:
+            nodes: List[Dict[str, Any]] = []
+            visited: set[int] = set()
+            current_id = self._to_int(catid, -1)
+            while current_id > 0 and current_id not in visited:
+                visited.add(current_id)
+                category = categories_by_id.get(current_id)
+                if category is None:
+                    break
+                nodes.append({
+                    "type": "category",
+                    "id": current_id,
+                    "name": str(category.get("name", "")),
+                })
+                current_id = self._to_int(category.get("supercatid"), -1)
+            nodes.reverse()
+            return nodes
+
+        def code_path_nodes(code: Dict[str, Any]) -> List[Dict[str, Any]]:
+            code_nodes: List[Dict[str, Any]] = []
+            visited: set[int] = {self._to_int(code.get("cid"), -1)}
+            current = code
+            parent_id = self._to_int(current.get("supercid"), -1)
+            while parent_id > 0 and parent_id not in visited:
+                visited.add(parent_id)
+                parent = codes_by_id.get(parent_id)
+                if parent is None:
+                    break
+                code_nodes.append({
+                    "type": "code",
+                    "id": parent_id,
+                    "name": str(parent.get("name", "")),
+                })
+                current = parent
+                parent_id = self._to_int(current.get("supercid"), -1)
+            code_nodes.reverse()
+            return category_path_nodes(current.get("catid")) + code_nodes
+
+        for code in codes:
+            code_id = self._to_int(code.get("cid"), -1)
+            code["text_coding_count"] = visible_text_coding_counts.get(code_id, 0)
+            code["child_count"] = direct_child_counts.get(code_id, 0)
+            code["path_nodes"] = code_path_nodes(code)
+
         speaker_prefix = "\U0001F4CC "
         speaker_categories = []
         for cat in categories:
