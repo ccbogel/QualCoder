@@ -5576,6 +5576,11 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Sonal import</source>
+        <translation>Importer depuis Sonal</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>Agent sidebar view</source>
         <translation>Affichage de la barre latérale de l’agent</translation>
     </message>
