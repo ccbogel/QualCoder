@@ -86,6 +86,7 @@ from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 from qualcoder.taguette_import import TaguetteImport
+from qualcoder.sonal_import import SonalImport
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
@@ -703,6 +704,7 @@ Click "Yes" to start now.')
         self.ui.actionREFI_QDA_Project_import.triggered.connect(self.refi_project_import)
         self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
         self.ui.actionTaguette_import.triggered.connect(self.taguette_project_import)
+        self.ui.actionSonal_import.triggered.connect(self.sonal_project_import)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
         self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
         self.ui.actionExit.triggered.connect(self.close)
@@ -883,6 +885,7 @@ Click "Yes" to start now.')
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionTaguette_import.setEnabled(True)
+        self.ui.actionSonal_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
         self.ui.actionImport_plain_text_codes_list.setEnabled(False)
         # Manage menu
@@ -933,6 +936,7 @@ Click "Yes" to start now.')
         self.ui.actionREFI_Codebook_import.setEnabled(True)
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
+        self.ui.actionSonal_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         self.ui.actionImport_plain_text_codes_list.setEnabled(True)
         # Manage menu
@@ -1786,7 +1790,23 @@ Click "Yes" to start now.')
             return
         TaguetteImport(self.app, self.ui.textEdit)
         self.project_summary_report()
+    
+    def sonal_project_import(self):
+        """ Import a Sonal (SonalPi) project into a new project space. """
 
+        self.close_project()
+        self.ui.textEdit.append(_("IMPORTING SONAL PROJECT"))
+        msg = _(
+            "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the Sonal corpus file (.crp or .zip).")
+        Message(self.app, _('Sonal import steps'), msg).exec()
+        self.new_project()
+        # Check project created successfully
+        if self.app.project_name == "":
+            Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec()
+            return
+        SonalImport(self.app, self.ui.textEdit)
+        self.project_summary_report()
+  
     def rqda_project_import(self):
         """ Import an RQDA format project into a new project space. """
 

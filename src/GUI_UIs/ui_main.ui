@@ -210,6 +210,7 @@
      <addaction name="actionREFI_QDA_Project_import"/>
      <addaction name="actionTaguette_import"/>
      <addaction name="actionRQDA_Project_import"/>
+     <addaction name="actionSonal_import"/>
      <addaction name="actionImport_plain_text_codes_list"/>
     </widget>
     <addaction name="actionCreate_New_Project"/>
@@ -689,6 +690,11 @@
   <action name="actionTaguette_import">
    <property name="text">
     <string>Taguette import</string>
+   </property>
+  </action>
+  <action name="actionSonal_import">
+   <property name="text">
+    <string>Sonal import</string>
    </property>
   </action>
   <action name="actionAI_Agent_Sidebar">
