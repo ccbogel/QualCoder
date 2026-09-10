@@ -3949,7 +3949,13 @@ class AiMcpServer:
     def _record_ai_change(self, change_set_id: str, operation: Dict[str, Any]) -> None:
         ai = getattr(self.app, "ai", None)
         if ai is not None and hasattr(ai, "record_ai_change"):
-            ai.record_ai_change(change_set_id, operation)
+            context = _execution_context.get()
+            recorded_operation = dict(operation)
+            recorded_operation["actor_source"] = context.source
+            recorded_operation["actor_owner"] = context.owner
+            if context.client_name is not None:
+                recorded_operation["actor_client_name"] = context.client_name
+            ai.record_ai_change(change_set_id, recorded_operation)
 
     def _codes_tree(self) -> Dict[str, Any]:
         categories = []

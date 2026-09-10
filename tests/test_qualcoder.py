@@ -1105,11 +1105,15 @@ class TestAiAnnotations(TestCase):
                 "codes/create_code", {"name": "external code"}, ""
             ),
         )
+        external_operation = self.app.ai.operations[-1][1]
         internal = self.server._call_tool_payload(
             "codes/create_code", {"name": "internal code"}, ""
         )
         self.assertEqual("MCP: Codex", external["structuredContent"]["code"]["owner"])
         self.assertEqual("AI Agent", internal["structuredContent"]["code"]["owner"])
+        self.assertEqual("external_mcp", external_operation["actor_source"])
+        self.assertEqual("MCP: Codex", external_operation["actor_owner"])
+        self.assertEqual("Codex", external_operation["actor_client_name"])
         self.assertIn((["code_name"], "external_mcp"), self.app.project_events.calls)
         self.assertIn((["code_name"], "ai_agent"), self.app.project_events.calls)
 
@@ -1139,6 +1143,65 @@ class TestAiAnnotations(TestCase):
         observed_owners.append(self.server.request_owner)
         external_thread.join()
         self.assertCountEqual(["MCP: Codex", "AI Agent"], observed_owners)
+
+    def test_external_write_is_available_to_ai_undo(self):
+        undo_manager = AiLLM.__new__(AiLLM)
+        undo_manager.app = self.app
+        undo_manager.ai_change_history = []
+        self.app.ai = undo_manager
+        external_context = AiMcpExecutionContext(
+            source="external_mcp", owner="MCP: Codex", client_name="Codex"
+        )
+
+        created = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "external undo code"}, ""
+            ),
+        )
+        cid = created["structuredContent"]["code"]["cid"]
+        self.assertEqual(1, len(undo_manager.ai_change_history))
+        change_set = undo_manager.ai_change_history[0]
+        self.assertTrue(change_set["id"].startswith("mcp-run-"))
+        self.assertEqual("external_mcp", change_set["actor_source"])
+        self.assertEqual("MCP: Codex", change_set["actor_owner"])
+        self.assertTrue(change_set["name"].startswith("MCP: Codex - ["))
+
+        result = undo_manager._undo_ai_change_set(change_set)
+        self.assertEqual(1, result["undone"])
+        self.assertEqual(
+            0,
+            self.app.conn.execute("SELECT count(*) FROM code_name WHERE cid=?", (cid,)).fetchone()[0],
+        )
+        self.assertIn((["code_name"], "external_mcp_undo"), self.app.project_events.calls)
+
+        created = self.server.run_with_execution_context(
+            external_context,
+            lambda: self.server._call_tool_payload(
+                "codes/create_code", {"name": "externally reassigned code"}, ""
+            ),
+        )
+        cid = created["structuredContent"]["code"]["cid"]
+        self.app.conn.execute("UPDATE code_name SET owner='Kai' WHERE cid=?", (cid,))
+        self.app.conn.commit()
+        result = undo_manager._undo_ai_change_set(undo_manager.ai_change_history[-1])
+        self.assertEqual(0, result["undone"])
+        self.assertEqual(1, result["skipped_changed"])
+        self.assertEqual(
+            1,
+            self.app.conn.execute("SELECT count(*) FROM code_name WHERE cid=?", (cid,)).fetchone()[0],
+        )
+
+    def test_project_change_event_refreshes_ai_undo_button(self):
+        dialog = DialogAIChat.__new__(DialogAIChat)
+        dialog.app = SimpleNamespace(
+            ai=SimpleNamespace(has_undoable_ai_changes=MagicMock(return_value=True))
+        )
+        dialog.ui = SimpleNamespace(pushButton_undo=MagicMock())
+
+        dialog._on_project_data_changed(["code_name"], "external_mcp")
+
+        dialog.ui.pushButton_undo.setEnabled.assert_called_once_with(True)
 
     def test_external_client_name_sanitization(self):
         self.assertIsNone(self.server.sanitize_external_client_name("\x00\n\t"))

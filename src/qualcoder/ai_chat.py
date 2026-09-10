@@ -702,6 +702,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.scrollArea_ai_output.verticalScrollBar().valueChanged.connect(self.on_ai_output_scroll)
         self.set_sidebar_mode(False)
         QtCore.QTimer.singleShot(0, self._hide_transient_chat_overlays)
+        project_events = getattr(self.app, "project_events", None)
+        project_data_changed = getattr(project_events, "project_data_changed", None)
+        if project_data_changed is not None and hasattr(project_data_changed, "connect"):
+            project_data_changed.connect(self._on_project_data_changed)
         self._update_undo_button_state()
 
     def _setup_prompt_completion(self) -> None:
@@ -1809,6 +1813,11 @@ class DialogAIChat(QtWidgets.QDialog):
             except Exception:
                 enabled = False
         self.ui.pushButton_undo.setEnabled(enabled)
+
+    def _on_project_data_changed(self, tables, source):
+        """Refresh Undo after project writes, including external MCP writes."""
+
+        self._update_undo_button_state()
 
     def _get_saved_ai_output_splitter_bottom(self):
         """Return the saved bottom pane height for the AI output splitter."""
