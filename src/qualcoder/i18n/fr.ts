@@ -5279,7 +5279,7 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>Code text</source>
-        <translation>Codage de texte</translation>
+        <translation>Coder du texte</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
@@ -5370,7 +5370,7 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>Code image</source>
-        <translation>Codage d’image</translation>
+        <translation>Coder de l’image</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
@@ -5385,7 +5385,7 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>Code audio/video</source>
-        <translation>Code audio/vidéo</translation>
+        <translation>Coder de l’audio/vidéo</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
@@ -5506,7 +5506,7 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>Code pdf</source>
-        <translation>Codage de PDF</translation>
+        <translation>Coder du PDF</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
