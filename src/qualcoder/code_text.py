@@ -3127,6 +3127,18 @@ class DialogCodeText(QtWidgets.QWidget):
         
         norm_fmt = QtGui.QTextCharFormat()
         norm_fmt.setFontPointSize(12)
+        ref_fmt = QtGui.QTextCharFormat()
+        ref_fmt.setFontPointSize(9)
+        ref_fmt.setFontItalic(True)
+        # Add reference, if any
+        cur = self.app.conn.cursor()
+        cur.execute("select risid from source where source.id=?", [self.file_['id']])
+        ris_res = cur.fetchone()
+        if ris_res and ris_res[0]:
+            ris = Ris(self.app)
+            ris.get_references(ris_res[0])
+            if ris.refs:
+                cursor.insertText(_("Reference: ") + ris.refs[0]['apa'].replace('\n', ' ') + "\n\n", ref_fmt)
 
         # Content by mode
         if mode == "highlight":
@@ -3259,12 +3271,28 @@ class DialogCodeText(QtWidgets.QWidget):
         normal_st.addElement(odf_style.TextProperties(fontsize="12pt"))
         doc.styles.addElement(normal_st)
 
+        ref_st = odf_style.Style(name="ExportRef", family="paragraph")
+        ref_st.addElement(odf_style.TextProperties(fontsize="9pt", fontstyle="italic"))
+        doc.styles.addElement(ref_st)
+
         # Header
         doc.text.addElement(odf_text.P(stylename=header_st, text=project_header))
         doc.text.addElement(odf_text.P(stylename=header_st, text=_("File: ") + self.file_['name']))
         report_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         doc.text.addElement(odf_text.P(stylename=header_st, text=_("Generated report: ") + report_date))
         doc.text.addElement(odf_text.P(stylename=normal_st, text=""))
+
+        # Add reference, if any
+        cur = self.app.conn.cursor()
+        cur.execute("select risid from source where source.id=?", [self.file_['id']])
+        ris_res = cur.fetchone()
+        if ris_res and ris_res[0]:
+            ris = Ris(self.app)
+            ris.get_references(ris_res[0])
+            if ris.refs:
+                ref_text =_("Reference: ") + ris.refs[0]['apa'].replace('\n', ' ')
+                doc.text.addElement(odf_text.P(stylename=ref_st, text=ref_text))
+                doc.text.addElement(odf_text.P(stylename=normal_st, text=""))
 
         # Prepare annotation boundaries
         ann_counter = 0
