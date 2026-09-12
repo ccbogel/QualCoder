@@ -29,6 +29,7 @@ from operator import itemgetter
 from shutil import copyfile
 import qtawesome as qta
 import re
+import webbrowser
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 
@@ -247,12 +248,26 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_file_view = menu.addAction(_("View file"))
         action_files_asc = menu.addAction(_("Ascending"))
         action_files_desc = menu.addAction(_("Descending"))
+        action_url = None
+        row = self.ui.tableWidget_refs.currentRow()
+        ref_text = self.ui.tableWidget_refs.item(row, 0).text()
+        if ref_text is None:
+            ref_text = ""
+        # Regex HTTP HTTPS protocol
+        regex_http = QtCore.QRegularExpression(
+            r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
+        # Regex Protocol optional
+        regex_no_protocol = QtCore.QRegularExpression(r"www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)")
+        if regex_no_protocol.match(ref_text).hasMatch() or regex_http.match(ref_text).hasMatch():
+            action_url = menu.addAction(_("Open URL"))
         action_show_all_rows = None
         if self.table_files_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
         action = menu.exec(self.ui.tableWidget_files.mapToGlobal(position))
         if action is None:  # Dismissed menu: None matches unbuilt actions
             return
+        if action == action_url:
+            print("fggdgd")
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_files.rowCount()):
                 self.ui.tableWidget_files.setRowHidden(r, False)
@@ -648,6 +663,21 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_copy_apa_to_clipboard = menu.addAction(_("Copy to clipboard.  APA style"))
         action_edit_reference = menu.addAction(_("Edit reference"))
         action_delete_reference = menu.addAction(_("Delete"))
+        action_url = None
+        url = None
+        for ref in self.refs:
+            ref_id = self.ui.tableWidget_refs.item(row, REF_ID).text()
+            if int(ref_id) == ref['risid']:
+                url = ref.get("UR")
+                # Regex HTTP HTTPS protocol
+                regex_http = QtCore.QRegularExpression(
+                    r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+                # Regex Protocol optional
+                regex_no_protocol = QtCore.QRegularExpression(
+                    r"^www\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$")
+                if url and (regex_no_protocol.match(url).hasMatch() or regex_http.match(url).hasMatch()):
+                    action_url = menu.addAction(_("Open URL"))
+
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action is None:  # Dismissed menu: None matches unbuilt actions
             return
@@ -688,6 +718,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self.edit_reference()
         if action == action_delete_reference:
             self.delete_reference()
+        if action == action_url:
+            webbrowser.open(url)
+            return
 
     def import_references(self):
         """
@@ -1133,9 +1166,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
             ris_item = QtWidgets.QTableWidgetItem(key)
             ris_item.setFlags(ris_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             for tagkey in TAG_KEY_MAPPING:
-                # print(tk, TAG_KEY_MAPPING[tk])
                 if key == tagkey:
-                    ris_item.setToolTip(TAG_KEY_MAPPING[tagkey])
+                    tooltip_longtag = TAG_KEY_MAPPING[tagkey]
+                    ris_item.setToolTip(tooltip_longtag)
             ui_re.tableWidget.setItem(row, 0, ris_item)
             value_item = QtWidgets.QTableWidgetItem(short_dict[key])
             ui_re.tableWidget.setItem(row, 1, value_item)
@@ -1149,6 +1182,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         ref_edited = False
         for row, key in enumerate(short_dict):
+            # Check if key is present in ris table, if not, insert it
+            cur.execute("select tag from ris where risid=? and tag=?", [ris_id, key])
+            key_exists = cur.fetchone()
+            if not key_exists:
+                cur.execute("insert into ris (risid,tag,longtag,value) values(?,?,?,'')", [ris_id, key,tooltip_longtag])
+                self.app.conn.commit()
             if ui_re.tableWidget.item(row, 1).text() != short_dict[key]:
                 cur.execute("update ris set value=? where risid=? and tag=?",
                             [ui_re.tableWidget.item(row, 1).text(), ris_id, key])
