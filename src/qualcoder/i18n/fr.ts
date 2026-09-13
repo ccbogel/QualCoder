@@ -4388,6 +4388,20 @@ language = it</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>This allows external AI agents such as Claude Code, Codex, OpenCode, or Hermes Agent to access the currently opened QualCoder project via MCP on localhost (127.0.0.1).
+The same AI permissions apply as for the internal AI agent (Read-Only / Sandboxed / Full Access).
+This is an experimental feature. Use it with care.</source>
+        <translation>Cela permet à des agents IA externes tels que Claude Code, Codex, OpenCode ou Hermes Agent d&apos;accéder au projet QualCoder actuellement ouvert via MCP sur localhost (127.0.0.1).
+Les autorisations d&apos;accès à l’IA sont les mêmes que pour l’agent IA interne (lecture seule / mode sandbox / accès complet).
+Il s&apos;agit d’une fonctionnalité expérimentale. À utiliser avec prudence.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>allow external MCP access</source>
+        <translation>autoriser l&apos;accès externe au MCP</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
         <source>API key</source>
         <translation>Clé API</translation>
     </message>
