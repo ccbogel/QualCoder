@@ -88,7 +88,7 @@
      <widget class="QPushButton" name="pushButton_delete_ref">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>600</x>
         <y>8</y>
         <width>30</width>
         <height>30</height>
@@ -128,22 +128,6 @@
       </property>
       <property name="toolTip">
        <string>Unlink selected files from references</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_delete_unused_refs">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>8</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Delete all references that are not assigned to files</string>
       </property>
       <property name="text">
        <string/>
@@ -201,6 +185,22 @@ Review after applying the function.</string>
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_export">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export references</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -215,7 +215,6 @@ Review after applying the function.</string>
   <tabstop>pushButton_edit_ref</tabstop>
   <tabstop>pushButton_import</tabstop>
   <tabstop>pushButton_delete_ref</tabstop>
-  <tabstop>pushButton_delete_unused_refs</tabstop>
  </tabstops>
  <resources/>
  <connections/>
