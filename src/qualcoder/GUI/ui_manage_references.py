@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_manage_references.ui'
+# Form implementation generated from reading ui file 'ui_manage_references.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -44,7 +44,7 @@ class Ui_Dialog_manage_references(object):
         self.checkBox_hide_refs.setGeometry(QtCore.QRect(20, 40, 301, 23))
         self.checkBox_hide_refs.setObjectName("checkBox_hide_refs")
         self.pushButton_delete_ref = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_delete_ref.setGeometry(QtCore.QRect(560, 8, 30, 30))
+        self.pushButton_delete_ref.setGeometry(QtCore.QRect(600, 8, 30, 30))
         self.pushButton_delete_ref.setText("")
         self.pushButton_delete_ref.setObjectName("pushButton_delete_ref")
         self.pushButton_link = QtWidgets.QPushButton(parent=self.groupBox)
@@ -55,10 +55,6 @@ class Ui_Dialog_manage_references(object):
         self.pushButton_unlink_files.setGeometry(QtCore.QRect(410, 8, 30, 30))
         self.pushButton_unlink_files.setText("")
         self.pushButton_unlink_files.setObjectName("pushButton_unlink_files")
-        self.pushButton_delete_unused_refs = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_delete_unused_refs.setGeometry(QtCore.QRect(600, 8, 30, 30))
-        self.pushButton_delete_unused_refs.setText("")
-        self.pushButton_delete_unused_refs.setObjectName("pushButton_delete_unused_refs")
         self.pushButton_edit_ref = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_edit_ref.setGeometry(QtCore.QRect(450, 8, 30, 30))
         self.pushButton_edit_ref.setText("")
@@ -71,6 +67,10 @@ class Ui_Dialog_manage_references(object):
         self.pushButton_auto_link.setGeometry(QtCore.QRect(490, 8, 30, 30))
         self.pushButton_auto_link.setText("")
         self.pushButton_auto_link.setObjectName("pushButton_auto_link")
+        self.pushButton_export = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_export.setGeometry(QtCore.QRect(530, 8, 30, 30))
+        self.pushButton_export.setText("")
+        self.pushButton_export.setObjectName("pushButton_export")
         self.gridLayout.addWidget(self.groupBox, 4, 0, 1, 1)
 
         self.retranslateUi(Dialog_manage_references)
@@ -83,7 +83,6 @@ class Ui_Dialog_manage_references(object):
         Dialog_manage_references.setTabOrder(self.pushButton_unlink_files, self.pushButton_edit_ref)
         Dialog_manage_references.setTabOrder(self.pushButton_edit_ref, self.pushButton_import)
         Dialog_manage_references.setTabOrder(self.pushButton_import, self.pushButton_delete_ref)
-        Dialog_manage_references.setTabOrder(self.pushButton_delete_ref, self.pushButton_delete_unused_refs)
 
     def retranslateUi(self, Dialog_manage_references):
         _translate = QtCore.QCoreApplication.translate
@@ -94,7 +93,6 @@ class Ui_Dialog_manage_references(object):
         self.pushButton_delete_ref.setToolTip(_translate("Dialog_manage_references", "Delete selected reference"))
         self.pushButton_link.setToolTip(_translate("Dialog_manage_references", "Link selected files to selected reference"))
         self.pushButton_unlink_files.setToolTip(_translate("Dialog_manage_references", "Unlink selected files from references"))
-        self.pushButton_delete_unused_refs.setToolTip(_translate("Dialog_manage_references", "Delete all references that are not assigned to files"))
         self.pushButton_edit_ref.setToolTip(_translate("Dialog_manage_references", "Edit reference"))
         self.pushButton_import.setToolTip(_translate("Dialog_manage_references", "Import references. RIS or NBIB (PubMed) format."))
         self.pushButton_auto_link.setToolTip(_translate("Dialog_manage_references", "Automatically link references to unassigned file names.\n"
@@ -102,3 +100,14 @@ class Ui_Dialog_manage_references(object):
 "Strong matches with 70% or more matching words are linked.\n"
 "Linking may be incorrect.\n"
 "Review after applying the function."))
+        self.pushButton_export.setToolTip(_translate("Dialog_manage_references", "Export references"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog_manage_references = QtWidgets.QDialog()
+    ui = Ui_Dialog_manage_references()
+    ui.setupUi(Dialog_manage_references)
+    Dialog_manage_references.show()
+    sys.exit(app.exec())
