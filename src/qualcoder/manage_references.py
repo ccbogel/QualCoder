@@ -26,12 +26,11 @@ import os
 from rispy import TAG_KEY_MAPPING
 import logging
 from operator import itemgetter
-from shutil import copyfile
+from PyQt6 import QtWidgets, QtCore, QtGui
 import qtawesome as qta
 import re
+from shutil import copyfile
 import webbrowser
-
-from PyQt6 import QtWidgets, QtCore, QtGui
 
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_manage_references import Ui_Dialog_manage_references
@@ -42,6 +41,7 @@ from .pdf_preview import DialogPdfPreview
 from .manage_references_import import ATTACHMENT_EXTENSIONS, existing_reference_signatures, \
     reference_signature
 from .ris import Ris, RisImport
+from .select_items import DialogSelectItems
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
 
@@ -662,6 +662,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_copy_to_clipboard = menu.addAction(_("Copy to clipboard"))
         action_copy_apa_to_clipboard = menu.addAction(_("Copy to clipboard.  APA style"))
         action_edit_reference = menu.addAction(_("Edit reference"))
+        action_add_field = menu.addAction(_("Add fields"))
         action_delete_reference = menu.addAction(_("Delete"))
         action_url = None
         url = None
@@ -716,11 +717,49 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     return
         if action == action_edit_reference:
             self.edit_reference()
+            return
         if action == action_delete_reference:
             self.delete_reference()
+            return
         if action == action_url:
             webbrowser.open(url)
             return
+        if action == action_add_field:
+            self.add_fields()
+
+    def add_fields(self):
+        """ Add extra fields to RIS data. """
+
+        ris_id = self.ui.tableWidget_refs.item(self.ui.tableWidget_refs.currentRow(), REF_ID).text()
+        reference = None
+        for r in self.refs:
+            if r['risid'] == int(ris_id):
+                reference = r
+        if reference is None:  # Same guard.
+            return
+        unused_fields = []
+        selection_options =[]
+        for tagkey in TAG_KEY_MAPPING:
+            if tagkey not in reference and tagkey not in ["A4","C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "ER", "ID", "JA","JF", "L1", "L2","L4", "UK"]:
+                unused_fields.append({tagkey:TAG_KEY_MAPPING[tagkey]})
+                selection_options.append({"name": f"{tagkey}: {TAG_KEY_MAPPING[tagkey]}"})
+
+        ui = DialogSelectItems(self.app, selection_options, _("Add fields to reference"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        cur = self.app.conn.cursor()
+        for s in selection:
+            print(s)
+            short_tag, long_tag = s['name'].split(": ")
+            cur.execute("insert into ris (risid,tag,longtag, value) values(?,?,?,'')", [int(ris_id), short_tag, long_tag])
+            self.app.conn.commit()
+        self.get_data()
+        self.app.delete_backup = False
+        self._emit_project_table_changes(['attribute_type'])
 
     def import_references(self):
         """
