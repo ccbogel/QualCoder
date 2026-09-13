@@ -23,11 +23,12 @@ https://qualcoder.org/
 
 import datetime
 import os
+from pathlib import Path
 from rispy import TAG_KEY_MAPPING
 import logging
 from operator import itemgetter
 from PyQt6 import QtWidgets, QtCore, QtGui
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 from shutil import copyfile
 import webbrowser
@@ -36,7 +37,7 @@ from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
 from .information import DialogInformation
-from .helpers import Message, extract_epub_fulltext
+from .helpers import Message, extract_epub_fulltext, ExportDirectoryPathDialog
 from .pdf_preview import DialogPdfPreview
 from .manage_references_import import ATTACHMENT_EXTENSIONS, existing_reference_signatures, \
     reference_signature
@@ -113,12 +114,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.pushButton_edit_ref.pressed.connect(self.edit_reference)
         self.ui.pushButton_delete_ref.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_ref.pressed.connect(self.delete_reference)
-        self.ui.pushButton_delete_unused_refs.setIcon(
-            qta.icon('mdi6.file-document-remove-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_delete_unused_refs.setEnabled(False)
-        self.ui.pushButton_delete_unused_refs.hide()
         self.ui.pushButton_auto_link.setIcon(qta.icon('mdi6.magic-staff', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_export.pressed.connect(self.export_references)
 
         self.get_data()
         self.ui.tableWidget_refs.setTabKeyNavigation(False)
@@ -753,13 +752,42 @@ class DialogReferenceManager(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         for s in selection:
-            print(s)
             short_tag, long_tag = s['name'].split(": ")
             cur.execute("insert into ris (risid,tag,longtag, value) values(?,?,?,'')", [int(ris_id), short_tag, long_tag])
             self.app.conn.commit()
         self.get_data()
         self.app.delete_backup = False
         self._emit_project_table_changes(['attribute_type'])
+
+    def export_references(self):
+        """ Export references to .ris file. """
+
+        exp_directory = ExportDirectoryPathDialog(self.app, "QC_references.ris")
+        filepath = exp_directory.filepath
+        if filepath is None:
+            return
+        lines = []
+        cur = self.app.conn.cursor()
+        cur.execute("select distinct risid from ris order by risid asc")
+        ris_ids = cur.fetchall()
+        for ris_id in ris_ids:
+            # First RIS key value is TY
+            cur.execute("SELECT value from ris where tag='TY' and risid=?", [ris_id[0]])
+            ty = cur.fetchone()
+            if ty:
+                lines.append(f"TY  - {ty[0]}")
+            else:
+                lines.append("TY  - JOUR")  # JOUR a default value
+            cur.execute("SELECT tag,value from ris where tag != 'TY' and risid=?", [ris_id[0]])
+            res = cur.fetchall()
+            for r in res:
+                lines.append(f"{r[0]}  - {r[1]}")
+            lines.append("ER  - ")  # End record
+        with open(filepath, 'w', encoding='utf-8') as f:
+            for line in lines:
+                print(line, file=f)
+        self.parent_text_edit.append(_("References exported: ") + filepath)
+        Message(self.app, _("References exported"), filepath).exec()
 
     def import_references(self):
         """
