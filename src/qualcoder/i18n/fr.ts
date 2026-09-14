@@ -3462,11 +3462,6 @@ Par exemple, de C:/users/OldUser/Images vers C:/usersNewUser/Images</translation
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
-        <source>Delete all references that are not assigned to files</source>
-        <translation>Supprimer toutes les références qui ne sont pas affectées à des fichiers</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
         <source>Edit reference</source>
         <translation>Modifier la référence</translation>
     </message>
@@ -3487,6 +3482,11 @@ La correspondance des mots utilise les mots du titre de référence.
 Les correspondances fortes avec 70 % ou plus de mots correspondants sont liées.
 La liaison peut être incorrecte.
 Vérifiez après avoir appliqué la fonction.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
+        <source>Export references</source>
+        <translation>Exporter les références</translation>
     </message>
 </context>
 <context>
@@ -3790,27 +3790,27 @@ La sélection d’un attribut a priorité sur les dossiers ou les cas sélection
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>html</source>
-        <translation></translation>
+        <translation>HTML</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>txt</source>
-        <translation>Txt</translation>
+        <translation>TXT</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>odt</source>
-        <translation></translation>
+        <translation>ODT</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>xlsx</source>
-        <translation>xxx</translation>
+        <translation>XLSX</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>csv</source>
-        <translation></translation>
+        <translation>CSV</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
