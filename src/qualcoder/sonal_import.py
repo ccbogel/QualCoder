@@ -15,6 +15,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 If not, see <https://www.gnu.org/licenses/>.
 
 Authors: Colin Curtain C, Kai Droege, Justin Missaghieh--Poncet, Lorenzo Salomon
+Improvements to this script : M Beligné
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
@@ -35,6 +36,39 @@ from PyQt6 import QtWidgets
 from .helpers import Message
 
 logger = logging.getLogger(__name__)
+
+
+def _normalise_id(value):
+    """Normalise IDs that Sonal may serialise as either numbers or strings."""
+    return "" if value is None else str(value).strip()
+
+
+def _speaker_name(name):
+    """Remove the trailing question mark used by Sonal to mark interviewers."""
+    name = str(name or "").strip()
+    return name[:-1].rstrip() if name.endswith("?") else name
+
+
+def _speaker_roles(tab_loc):
+    """Return interviewer and interviewee indexes using Sonal's naming rule."""
+    interviewers = []
+    interviewees = []
+    for index, name in enumerate(tab_loc or []):
+        if index == 0 or not str(name or "").strip():
+            continue
+        if str(name).strip().endswith("?"):
+            interviewers.append(index)
+        else:
+            interviewees.append(index)
+    return interviewers, interviewees
+
+
+def _is_inside_folder(path, folder):
+    """Return False for traversal paths and paths on another Windows drive."""
+    try:
+        return os.path.commonpath([folder, path]) == folder
+    except ValueError:
+        return False
 
 
 class SonalImport:
@@ -134,9 +168,11 @@ class SonalImport:
         self.app.conn.commit()
         self.parent_textEdit.append(_("Project memo imported"))
 
-        cid_by_code = self.import_thematiques(cur_qc, tab_thm, owner, nowdate)
+        used_thematiques = self.find_used_thematiques(tab_ent, base_folder)
+        cid_by_code = self.import_thematiques(
+            cur_qc, tab_thm, owner, nowdate, used_thematiques)
 
-        attr_name_by_v, dic_label_by_vm = self.import_variables(
+        attr_info_by_v, dic_label_by_vm = self.import_variables(
             cur_qc, tab_var, tab_dic, owner, nowdate)
 
         nb_docs = 0
@@ -147,7 +183,13 @@ class SonalImport:
             name = ent.get("nom", "")
             if not name:
                 name = os.path.splitext(os.path.basename(rtr_path))[0]
-            sonal_path = os.path.join(base_folder, rtr_path)
+            base_path = os.path.abspath(base_folder)
+            sonal_path = os.path.abspath(os.path.join(base_path, rtr_path))
+            if not _is_inside_folder(sonal_path, base_path):
+                self.parent_textEdit.append(
+                    _("Sonal path outside the corpus folder, skipped: ") + rtr_path)
+                nb_skipped += 1
+                continue
             if not os.path.isfile(sonal_path):
                 self.parent_textEdit.append(
                     _("Sonal file not found, skipped: ") + rtr_path)
@@ -156,8 +198,11 @@ class SonalImport:
             with open(sonal_path, 'r', encoding='utf-8-sig') as fh:
                 sonal_html = fh.read()
 
-            fulltext, codings, tab_dat, notes = self.parse_sonal_html(
-                sonal_html, cid_by_code)
+            tab_loc = ent.get("tabLoc", []) or []
+            tab_dat = ent.get("tabDat", []) or []
+            notes = ent.get("notes", "") or ""
+            fulltext, codings = self.parse_sonal_html(
+                sonal_html, cid_by_code, tab_loc)
 
             fid, inserted = self.insert_source(
                 cur_qc, name, fulltext, notes, owner, nowdate)
@@ -166,21 +211,20 @@ class SonalImport:
             nb_docs += 1
             self.app.conn.commit()
 
-            # Import attribute values for this interview (tabDat).
-            for dat in tab_dat or []:
-                v = dat.get("v")
-                m = dat.get("m")
-                attr_name = attr_name_by_v.get(v)
-                if attr_name is None or m is None:
-                    continue
-                value = dic_label_by_vm.get((v, m), str(m))
-                try:
-                    cur_qc.execute(
-                        "insert into attribute (name, value, id, owner, date, "
-                        "attr_type) values (?,?,?,?,?,?)",
-                        [attr_name, value, fid, owner, nowdate, "file"])
-                except sqlite3.IntegrityError:
-                    pass
+            # Import one file value per variable. Speaker variables only use
+            # respondents, as interviewers are marked by a trailing question mark.
+            interviewer_indexes, interviewee_indexes = _speaker_roles(tab_loc)
+            if tab_loc and not interviewer_indexes:
+                self.parent_textEdit.append(
+                    _("No interviewer marked with a trailing '?' in: ") + name)
+            values = self.attribute_values(
+                tab_dat, attr_info_by_v, dic_label_by_vm,
+                interviewee_indexes, tab_loc)
+            for attr_name, value in values.items():
+                cur_qc.execute(
+                    "insert into attribute (name, value, id, owner, date, "
+                    "attr_type) values (?,?,?,?,?,?)",
+                    [attr_name, value, fid, owner, nowdate, "file"])
             self.app.conn.commit()
 
             # Insert codings (cid, seltext, pos0, pos1) for this document.
@@ -204,12 +248,34 @@ class SonalImport:
         Message(self.app, _("Sonal imported"), _("Sonal imported")).exec()
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
 
-    def import_thematiques(self, cur_qc, tab_thm, owner, nowdate):
+    def find_used_thematiques(self, tab_ent, base_folder):
+        """ Return thematic CSS classes actually used in the transcriptions. """
+
+        used = set()
+        class_pattern = re.compile(r'class=["\']([^"\']*)["\']', re.IGNORECASE)
+        base_path = os.path.abspath(base_folder)
+        for ent in tab_ent:
+            rtr_path = ent.get("rtrPath", "")
+            sonal_path = os.path.abspath(os.path.join(base_path, rtr_path))
+            if not rtr_path or not _is_inside_folder(sonal_path, base_path):
+                continue
+            if not os.path.isfile(sonal_path):
+                continue
+            with open(sonal_path, 'r', encoding='utf-8-sig') as fh:
+                contenu = self._extract_contenu_text(fh.read())
+            for match in class_pattern.finditer(contenu):
+                used.update(cls for cls in match.group(1).split()
+                            if cls.startswith("cat_"))
+        return used
+
+    def import_thematiques(self, cur_qc, tab_thm, owner, nowdate,
+                           used_thematiques):
         """ Import Sonal thematiques as QualCoder codes and categories.
 
         Sonal thematiques form a tree through the ``rang`` indentation level
-        (0 = top level). Parent thematiques become QualCoder categories; every
-        thematique also becomes a code, placed in its parent's category.
+        (0 = top level). Parent thematiques become QualCoder categories. Their
+        twin code is only created when the parent is directly used in text.
+        Leaf codes remain available even when they have not been used yet.
 
         Returns:
             cid_by_code : mapping of Sonal category code -> QualCoder code id
@@ -271,17 +337,24 @@ class SonalImport:
         self.parent_textEdit.append(
             str(len(catid_by_code)) + _(" code categories imported"))
 
-        # Create a code for every thematique, placed in its parent's category.
+        # Leaf codes are always imported.
+        # A parent gets a twin code only when its CSS class occurs in a transcription.
         cid_by_code = {}
         default_color = "#DDE600"
         for thm in ordered_thm:
             code = thm.get("code", "")
             if not code:
                 continue
+            is_parent = code in has_children
+            if is_parent and code not in used_thematiques:
+                continue
             name = thm.get("nom", code)
             color = thm.get("couleur", "") or default_color
-            parent = parent_of.get(code)
-            catid = catid_by_code.get(parent) if parent else None
+            if is_parent:
+                catid = catid_by_code.get(code)
+            else:
+                parent = parent_of.get(code)
+                catid = catid_by_code.get(parent) if parent else None
             try:
                 cur_qc.execute(
                     "insert into code_name (name, memo, catid, owner, date, color) "
@@ -298,18 +371,18 @@ class SonalImport:
         return cid_by_code
 
     def import_variables(self, cur_qc, tab_var, tab_dic, owner, nowdate):
-        """ Import Sonal variables (tabVar) and dictionary (tabDic) as attributes.
+        """ Import global Sonal variable definitions as file attributes.
 
         Returns:
-            attr_name_by_v : mapping of variable id -> attribute name
+            attr_info_by_v : mapping of variable id -> name and scope
             dic_label_by_vm: mapping of (variable id, modality id) -> label
         """
 
-        attr_name_by_v = {}
+        attr_info_by_v = {}
         for var in tab_var:
-            v = var.get("v")
+            v = _normalise_id(var.get("v"))
             lib = var.get("lib", "")
-            if v is None or not lib:
+            if not v or not lib:
                 continue
             try:
                 cur_qc.execute(
@@ -318,19 +391,73 @@ class SonalImport:
                     [lib, "character", "file", "", owner, nowdate])
             except sqlite3.IntegrityError:
                 pass
-            attr_name_by_v[v] = lib
+            attr_info_by_v[v] = {
+                "name": lib,
+                "scope": str(var.get("champ", "gen") or "gen").lower(),
+            }
         self.app.conn.commit()
         self.parent_textEdit.append(
-            str(len(attr_name_by_v)) + _(" attribute types imported"))
+            str(len(attr_info_by_v)) + _(" attribute types imported"))
 
         dic_label_by_vm = {}
         for entry in tab_dic:
-            v = entry.get("v")
-            m = entry.get("m")
-            lib = entry.get("lib")
-            if v is not None and m is not None and lib:
-                dic_label_by_vm[(v, m)] = lib
-        return attr_name_by_v, dic_label_by_vm
+            v = _normalise_id(entry.get("v"))
+            m = _normalise_id(entry.get("m"))
+            if v and m:
+                dic_label_by_vm[(v, m)] = entry.get("lib", "") or ""
+        return attr_info_by_v, dic_label_by_vm
+
+    @staticmethod
+    def attribute_values(tab_dat, attr_info_by_v, dic_label_by_vm,
+                         interviewee_indexes, tab_loc):
+        """ Build one file-level value for each variable in an interview. """
+
+        rows_by_v = {}
+        for dat in tab_dat or []:
+            key = _normalise_id(dat.get("v"))
+            if key in attr_info_by_v:
+                rows_by_v.setdefault(key, []).append(dat)
+
+        values = {}
+        for v, info in attr_info_by_v.items():
+            rows = rows_by_v.get(v, [])
+            if info["scope"] == "gen":
+                row = next(
+                    (item for item in rows
+                     if _normalise_id(item.get("l")).lower() == "all"),
+                    None)
+                values[info["name"]] = SonalImport.modality_label(
+                    v, row, dic_label_by_vm)
+                continue
+
+            speaker_values = []
+            for index in interviewee_indexes:
+                row = next(
+                    (item for item in rows
+                     if _normalise_id(item.get("l")) == str(index)),
+                    None)
+                value = SonalImport.modality_label(v, row, dic_label_by_vm)
+                if value:
+                    name = _speaker_name(tab_loc[index])
+                    speaker_values.append((name, value))
+            distinct = {value for _, value in speaker_values}
+            if len(speaker_values) <= 1 or len(distinct) == 1:
+                values[info["name"]] = speaker_values[0][1] if speaker_values else ""
+            else:
+                values[info["name"]] = "; ".join(
+                    f"{name}: {value}" for name, value in speaker_values)
+        return values
+
+    @staticmethod
+    def modality_label(variable_id, row, dic_label_by_vm):
+        """ Resolve a modality, keeping Sonal's zero modality empty. """
+
+        if row is None:
+            return ""
+        modality = _normalise_id(row.get("m"))
+        if modality in ("", "0"):
+            return ""
+        return dic_label_by_vm.get((variable_id, modality), str(row.get("m")))
 
     def insert_source(self, cur_qc, name, fulltext, notes, owner, nowdate):
         """ Insert a transcription as a QualCoder source, handling name clashes.
@@ -341,116 +468,66 @@ class SonalImport:
         """
 
         memo = notes or ""
-        try:
-            cur_qc.execute(
-                "insert into source (name, fulltext, memo, owner, date, mediapath) "
-                "values (?,?,?,?,?,?)",
-                [name, fulltext, memo, owner, nowdate, None])
-            return cur_qc.lastrowid, True
-        except sqlite3.IntegrityError:
-            pass
-        # Duplicate file name: append a counter until it is unique.
+        unique_name = name
         i = 1
-        while True:
+        cur_qc.execute("select id from source where name=?", [unique_name])
+        while cur_qc.fetchone() is not None:
             unique_name = f"{name}_{i}"
+            i += 1
             cur_qc.execute("select id from source where name=?", [unique_name])
-            if cur_qc.fetchone() is not None:
-                i += 1
-                continue
-            try:
-                cur_qc.execute(
-                    "insert into source (name, fulltext, memo, owner, date, "
-                    "mediapath) values (?,?,?,?,?,?)",
-                    [unique_name, fulltext, memo, owner, nowdate, None])
-                return cur_qc.lastrowid, True
-            except sqlite3.IntegrityError:
-                i += 1
 
-    def parse_sonal_html(self, html_text, cid_by_code):
-        """ Parse a ``.sonal`` HTML document.
+        # The name is known to be free. Any integrity error now represents a
+        # real database problem and must not be retried forever.
+        cur_qc.execute(
+            "insert into source (name, fulltext, memo, owner, date, mediapath) "
+            "values (?,?,?,?,?,?)",
+            [unique_name, fulltext, memo, owner, nowdate, None])
+        return cur_qc.lastrowid, True
 
-        Rebuild the plain transcription text from the word spans while tracking
-        the character position of every span, then turn the ``cat_XXX`` classes
-        carried by each word span into contiguous (cid, seltext, pos0, pos1)
-        codings.
+    def parse_sonal_html(self, html_text, cid_by_code, tab_loc):
+        """ Parse transcription text and codings from a ``.sonal`` document.
 
-        Args:
-            html_text  : full content of the ``.sonal`` file
-            cid_by_code: mapping of Sonal category code -> QualCoder code id
-        Returns:
-            (fulltext, codings, tab_dat, notes)
-            fulltext  : reconstructed plain text
-            codings   : list of (cid, seltext, pos0, pos1)
-            tab_dat   : list of attribute value entries for this interview
-            notes     : interview notes string (may be "")
+        Metadata and speaker names come from the corpus ``.crp``. The HTML is
+        only used for the transcription structure and thematic CSS classes.
         """
 
-        tab_dat = []
-        json_blocks = self._extract_script_blocks(html_text)
-        dat_json = json_blocks.get("dat-json")
-        if dat_json:
-            try:
-                parsed = json.loads(dat_json)
-                if isinstance(parsed, dict):
-                    tab_dat = parsed.get("tabDat", []) or []
-                elif isinstance(parsed, list):
-                    tab_dat = parsed
-            except json.JSONDecodeError:
-                tab_dat = []
-
-        notes = self._extract_notes(html_text)
         contenu = self._extract_contenu_text(html_text)
-
-        parser = _SonalContentParser(cid_by_code)
+        parser = _SonalContentParser(cid_by_code, tab_loc)
         parser.feed(contenu)
         parser.close()
         fulltext = parser.fulltext
         codings = self._merge_codings(fulltext, parser.ranges_by_code)
-        return fulltext, codings, tab_dat, notes
+        return fulltext, codings
 
     def _merge_codings(self, fulltext, ranges_by_code):
-        """ Merge contiguous/overlapping ranges per code into codings. """
+        """ Merge ranges, keeping whitespace only when it connects coded text. """
 
         codings = []
         for cid, ranges in ranges_by_code.items():
-            ranges.sort()
+            ranges = sorted(
+                (start, end) for start, end in ranges if end > start)
             merged = []
+            component_end = None
+            text_start = None
+            text_end = None
             for start, end in ranges:
-                if merged and start <= merged[-1][1]:
-                    m_start, _ = merged[-1]
-                    new_end = max(merged[-1][1], end)
-                    merged[-1] = (m_start, new_end)
+                if component_end is None or start > component_end:
+                    if text_start is not None:
+                        merged.append((text_start, text_end))
+                    component_end = end
+                    text_start = None
+                    text_end = None
                 else:
-                    merged.append((start, end))
+                    component_end = max(component_end, end)
+                if fulltext[start:end].strip():
+                    if text_start is None:
+                        text_start = start
+                    text_end = max(text_end or end, end)
+            if text_start is not None:
+                merged.append((text_start, text_end))
             for start, end in merged:
-                if end > start:
-                    codings.append((cid, fulltext[start:end], start, end))
+                codings.append((cid, fulltext[start:end], start, end))
         return codings
-
-    @staticmethod
-    def _extract_script_blocks(html_text):
-        """ Return a dict of ``id -> json text`` for every
-        ``<script id="*-json" type="application/json">`` block. """
-
-        blocks = {}
-        pattern = re.compile(
-            r'<script[^>]*id="([^"]*-json)"[^>]*>(.*?)</script>',
-            re.DOTALL | re.IGNORECASE)
-        for match in pattern.finditer(html_text):
-            blocks[match.group(1)] = match.group(2).strip()
-        return blocks
-
-    @staticmethod
-    def _extract_notes(html_text):
-        """ Extract the interview notes from the ``#txtnotes`` div. """
-
-        match = re.search(
-            r'<div[^>]*id="txtnotes"[^>]*>(.*?)</div>',
-            html_text, re.DOTALL | re.IGNORECASE)
-        if not match:
-            return ""
-        inner = re.sub(r'<[^>]+>', '', match.group(1))
-        return inner.strip()
 
     @staticmethod
     def _extract_contenu_text(html_text):
@@ -471,24 +548,29 @@ class SonalImport:
 class _SonalContentParser(HTMLParser):
     """ Walk the segment/word spans and rebuild plain text + coded ranges.
 
-    The Sonal structure is::
+    The current Sonal structure is::
 
-        <span class="lblseg ..." ...>
-            <span class="ligloc" ...>Speaker</span>
+        <span class="lblseg ... ligloc" data-loc="1" ...>
             <span data-rk="1" ... class="cat_001">word</span>
             <span data-rk="2" ...>word2</span>
             ...
         </span>
 
-    Word spans carry coded text through ``cat_XXX`` CSS classes. The lblseg
-    container and the ligloc/anon helper spans are walked but only the word
-    spans contribute codings; ligloc (speaker) and anon (anonymised) spans
-    contribute their text so the transcription stays readable.
+    ``data-loc`` is an index into ``tabEnt[].tabLoc`` for the current interview
+    in the ``.crp`` file. The ``ligloc`` class marks a segment where the speaker
+    changes; it is normally carried by the outer ``lblseg`` span, rather than by
+    a nested speaker span.
+
+    Word spans carry codings through ``cat_XXX`` CSS classes. Anonymised word
+    spans contribute their displayed text normally. Speaker prefixes are read
+    from ``tabEnt[].tabLoc`` and inserted before text positions are recorded.
     """
 
-    def __init__(self, cid_by_code):
+    def __init__(self, cid_by_code, tab_loc):
         super().__init__(convert_charrefs=True)
         self.cid_by_code = cid_by_code
+        self.tab_loc = tab_loc or []
+        self.current_loc = None
         self.fulltext_parts = []
         self._fulltext_len = 0
         # Stack of open span frames: {"word": bool, "text": bool, "start": int,
@@ -510,13 +592,31 @@ class _SonalContentParser(HTMLParser):
         ad = dict(attrs)
         classes = (ad.get("class") or "").split()
         is_lblseg = "lblseg" in classes
-        if is_lblseg and self.fulltext_parts:
-            # Insert a line break between segments so words do not run together.
-            self.fulltext_parts.append("\n")
-            self._fulltext_len += 1
+        if is_lblseg:
+            if self.fulltext_parts:
+                self.fulltext_parts.append("\n")
+                self._fulltext_len += 1
+            raw_loc = ad.get("data-loc")
+            loc = self.current_loc
+            if raw_loc not in (None, ""):
+                try:
+                    loc = int(raw_loc)
+                except (TypeError, ValueError):
+                    pass
+            if loc is None:
+                loc = 0
+            if loc != self.current_loc:
+                if 0 <= loc < len(self.tab_loc) and self.tab_loc[loc]:
+                    speaker = _speaker_name(self.tab_loc[loc])
+                else:
+                    speaker = f"Speaker {loc}"
+                prefix = f"{speaker}: "
+                self.fulltext_parts.append(prefix)
+                self._fulltext_len += len(prefix)
+                self.current_loc = loc
         is_word = ("data-rk" in ad) and not is_lblseg and ("ligloc" not in classes)
-        # Anything that is not the lblseg container contributes its text.
-        produces_text = not is_lblseg
+        # Speaker helper spans are not repeated because the prefix comes from .crp.
+        produces_text = not is_lblseg and ("ligloc" not in classes)
         frame = {
             "word": is_word,
             "text": produces_text,
@@ -546,8 +646,8 @@ class _SonalContentParser(HTMLParser):
         end = self._fulltext_len
         for cid in frame["codes"]:
             self.ranges_by_code.setdefault(cid, []).append((frame["start"], end))
-        if frame.get("ligloc") and not self.fulltext_parts[-1].endswith(("\n", " ")):
-            # Separate the speaker label from the words that follow.
+        if (frame.get("ligloc") and self.fulltext_parts
+                and not self.fulltext_parts[-1].endswith(("\n", " "))):
             self.fulltext_parts.append(" ")
             self._fulltext_len += 1
 

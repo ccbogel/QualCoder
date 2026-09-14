@@ -3595,7 +3595,18 @@ class DialogCodeText(QtWidgets.QWidget):
         current_fid = self.file_['id']
         offset = self.file_['start']
         codes_in_file = [c for c in self.code_text if c['fid'] == current_fid]
- 
+
+        # Add reference, if any
+        reference = ""
+        cur = self.app.conn.cursor()
+        cur.execute("select risid from source where source.id=?", [self.file_['id']])
+        ris_res = cur.fetchone()
+        if ris_res and ris_res[0]:
+            ris = Ris(self.app)
+            ris.get_references(ris_res[0])
+            if ris.refs:
+                reference = html.escape(_("Reference: ") + ris.refs[0]['apa'])
+
         boundaries = {0, len(plain_text)}
         for c in codes_in_file:
             p0 = max(0, int(c['pos0']) - offset)
@@ -3685,6 +3696,7 @@ class DialogCodeText(QtWidgets.QWidget):
         {html_body}
     </div>
     <div class="footer">
+        <p>{reference}</p>
         <b>{_("Software citation")}</b><br>
         {escaped_apa}
     </div>
