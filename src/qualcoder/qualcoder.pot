@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 19:26+0200\n"
+"POT-Creation-Date: 2026-09-14 18:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -771,7 +771,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3005
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3868
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5197
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6348
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6362
 msgid "Page"
 msgstr ""
 
@@ -1687,9 +1687,9 @@ msgid "Restructure layout"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5915
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6254
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6314
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6349
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6268
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6328
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6363
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:804
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:820
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:840
@@ -1733,7 +1733,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5967
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6151
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6402
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6416
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3533
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3570
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4215
@@ -1860,7 +1860,7 @@ msgid "Highlighted PDF exported: "
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6148
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6399
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6413
 msgid "Success"
 msgstr ""
 
@@ -1868,7 +1868,7 @@ msgstr ""
 msgid "Export ODT Report"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6206
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6210
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:239
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:2082
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:2088
@@ -1878,7 +1878,7 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6207
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6211
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:239
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:396
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1500
@@ -1887,62 +1887,71 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4709
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:7305
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:7334
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:777
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:805
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:188
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:600
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1643
 msgid "File"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6209
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6213
 msgid "Generated report"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6237
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6223
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4339
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2608
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3141
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3293
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3608
+msgid "Reference: "
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6251
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3411
 msgid "Code Frequency Table"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6254
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6268
 msgid "Frequency"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6254
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6268
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3433
 msgid "Coder(s)"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6275
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6289
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3461
 msgid "Code Co-occurrences"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6279
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6293
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3474
 msgid "Code A"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6279
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6293
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3474
 msgid "Code B"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6279
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6293
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3474
 msgid "Co-occurrence frequency"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6291
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6305
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3485
 msgid "No co-occurrences found in this file."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6294
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6308
 msgid "Coded Text Segments"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6314
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6349
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6328
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6363
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:220
@@ -1964,32 +1973,32 @@ msgstr ""
 msgid "Coder"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6321
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6379
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6335
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6393
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3565
 msgid "Co-occurring codes"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6325
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6383
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6339
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6397
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_exact_matches.py:534
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3558
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3560
 msgid "Coded memo"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6328
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6342
 msgid "Coded Areas (Pages)"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6389
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6403
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3182
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3700
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3775
 msgid "Software citation"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6397
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6411
 msgid "ODT Report exported: "
 msgstr ""
 
@@ -2091,7 +2100,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:396
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4486
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4634
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:432
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:431
 msgid "Type"
 msgstr ""
 
@@ -2212,8 +2221,8 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:330
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1112
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:262
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:680
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:261
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:679
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:924
 msgid "Open URL"
 msgstr ""
@@ -2229,6 +2238,25 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:464
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:487
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:228
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:520
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:525
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:530
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:535
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:540
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:545
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:550
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:555
+msgid "Ascending"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:249
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:521
@@ -2239,25 +2267,6 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:546
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:551
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:556
-msgid "Ascending"
-msgstr ""
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:230
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:250
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:522
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:527
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:532
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:537
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:542
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:547
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:552
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:557
 msgid "Descending"
 msgstr ""
 
@@ -2294,8 +2303,8 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1190
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:277
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:697
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:696
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:247
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:268
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:289
@@ -4303,7 +4312,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_prompt_library.py:1273
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1093
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:665
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:489
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:786
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_sql.py:463
@@ -4631,7 +4640,7 @@ msgid "Hide values like"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1061
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:657
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:656
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:907
 msgid "Show this value"
 msgstr ""
@@ -4848,14 +4857,14 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2368
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2579
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:326
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:355
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:383
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:325
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:354
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:382
 msgid "Bad link or non-existent file "
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2382
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:366
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:365
 msgid "view AV error"
 msgstr ""
 
@@ -5123,12 +5132,12 @@ msgid "Cannot import "
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3399
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:987
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1015
 msgid " imported"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3420
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1012
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1040
 msgid "PDF highlights"
 msgstr ""
 
@@ -6028,7 +6037,7 @@ msgid "Generating waveform..."
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2736
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:434
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:433
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_av.py:1769
 msgid "Volume"
 msgstr ""
@@ -6114,7 +6123,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:3997
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2729
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3389
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:662
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:661
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2160
 msgid "Copy to clipboard"
 msgstr ""
@@ -6163,14 +6172,6 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:971
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2503
 msgid "Memo for Coded text: "
-msgstr ""
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4339
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2608
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3141
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3293
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3608
-msgid "Reference: "
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4431
@@ -8187,7 +8188,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4879
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:55
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:152
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:781
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:809
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:493
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:673
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2180
@@ -9293,7 +9294,7 @@ msgid "Help"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/information.py:303
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:247
 msgid "View file"
 msgstr ""
 
@@ -9331,7 +9332,7 @@ msgid "Export all"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/information.py:305
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:664
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:663
 msgid "Edit reference"
 msgstr ""
 
@@ -9349,7 +9350,7 @@ msgid "Delete journal"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/information.py:306
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:774
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:802
 msgid "Import references"
 msgstr ""
 
@@ -9375,8 +9376,8 @@ msgid "Export file"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/information.py:312
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:265
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:661
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:264
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:660
 msgid "Show all rows"
 msgstr ""
 
@@ -11150,94 +11151,102 @@ msgid ""
 "subcodes and all codings that use any code in the subtree."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:247
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:658
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:246
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:657
 msgid "Show value like"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:277
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:697
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:696
 msgid "Show value like:"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:345
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:344
 msgid "VLC not installed cannot play audio or video."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:346
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:345
 msgid "View AV error"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:423
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:422
 msgid "Matches: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:424
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:423
 msgid "Files linked to references"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:432
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:431
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references_import.py:158
 msgid "Reference"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:432
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:431
 msgid "Year"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:432
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:431
 msgid "Authors"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:433
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:432
 msgid "Journal or Publication Title"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:434
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:433
 msgid "Issue"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:434
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:433
 msgid "Keywords"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:663
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:662
 msgid "Copy to clipboard.  APA style"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:665
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:664
 msgid "Add fields"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:747
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:746
 msgid "Add fields to reference"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:775
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:789
+msgid "References exported: "
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:790
+msgid "References exported"
+msgstr ""
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:803
 msgid "Import references from:"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:778
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:806
 msgid "RIS, TXT or PubMed NBIB file"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:779
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:807
 msgid "Zotero"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:780
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:808
 msgid "Local Zotero install (experimental)"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1249
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1277
 msgid "Reference edited."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1263
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1291
 msgid "Delete this reference."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1288
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1316
 msgid "Reference deleted."
 msgstr ""
 
