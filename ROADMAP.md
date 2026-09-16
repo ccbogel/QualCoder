@@ -11,10 +11,11 @@
 
 ## 4.1
 - Create memo managers [#1263](https://github.com/ccbogel/QualCoder/issues/1263)
+-  Implanting folder structure for files [#1584](https://github.com/ccbogel/QualCoder/issues/1584)
 
 ## Features
 
 *Features under discussion; implementation is hypothetical.* 
 
-- Enhance interface
+- Enhance interface (UX)
 - Working team from server [#1575](https://github.com/ccbogel/QualCoder/issues/1575)
