@@ -879,7 +879,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         """Collect the infos needed for the ai based search and the filters applied 
         (selected files, cases, attributes), then close the dialog. 
         """    
-        ai_status = self.app.ai.get_status()
+        ai_status = self.app.get_ai_status()
         if ai_status != 'ready':
             msg = _('The AI ist not ready to fulfill your request (status: ') + ai_status + _(').')
             Message(self.app, _('AI not ready'), msg, "warning").exec()

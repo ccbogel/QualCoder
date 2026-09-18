@@ -65,9 +65,10 @@ from .ai_runtime import (
     AI_FAILED,
     AI_INITIALIZING,
     AI_LOADING,
-    AI_NOT_STARTED,
-    ai_runtime_ready,
-    show_ai_runtime_not_ready,
+    AI_READY,
+    AI_UNLOADED,
+    ensure_ai_loaded,
+    ensure_ai_ready,
 )
 from .ai_signals import ai_chat_signal_emitter
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
@@ -2096,8 +2097,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _popup_new_chat_menu(self, highlight_target: Optional[str] = None) -> None:
         """Show the New-session menu below the button and optionally highlight one entry."""
 
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("AI Agent"))
+        if not ensure_ai_loaded(self.app, _("AI Agent")):
             return
         if self._new_chat_popup_menu is not None:
             self._new_chat_popup_menu.close()
@@ -2536,8 +2536,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _can_start_general_chat(self) -> bool:
         """Return whether a general AI chat session can be started now."""
 
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("AI Agent"))
+        if not ensure_ai_loaded(self.app, _("AI Agent")):
             return False
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -2575,7 +2574,7 @@ class DialogAIChat(QtWidgets.QDialog):
             msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
             Message(self.app, _('AI busy'), msg, "warning").exec()
             return
-        if not self.app.ai.is_ready():
+        if self.app.get_ai_status() != AI_READY:
             msg = _('The AI not yet fully loaded. Please wait and retry.')
             Message(self.app, _('AI not ready'), msg, "warning").exec()
             return
@@ -2631,7 +2630,7 @@ class DialogAIChat(QtWidgets.QDialog):
             msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
             Message(self.app, _('AI busy'), msg, "warning").exec()
             return
-        if not self.app.ai.is_ready():
+        if self.app.get_ai_status() != AI_READY:
             msg = _('The AI not yet fully loaded. Please wait and retry.')
             Message(self.app, _('AI not ready'), msg, "warning").exec()
             return
@@ -4710,8 +4709,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_text_analysis(self):
         """analyze a piece of text from an empirical document"""
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("AI Text Analysis"))
+        if not ensure_ai_loaded(self.app, _("AI Text Analysis")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -4739,8 +4737,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_code_analysis(self):
         """Start a new code analysis as an MCP-backed AI agent chat."""
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("Code analysis"))
+        if not ensure_ai_loaded(self.app, _("Code analysis")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -4817,8 +4814,7 @@ data collected. This information will accompany every prompt sent to the AI, res
  
     def new_topic_exploration(self):
         """Start a new topic exploration as an MCP-backed AI agent chat."""
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("Topic exploration"))
+        if not ensure_ai_loaded(self.app, _("Topic exploration")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -5524,8 +5520,7 @@ data collected. This information will accompany every prompt sent to the AI, res
     def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt):
         """Start one text analysis chat for the selected text passage."""
 
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("AI Text Analysis"))
+        if not ensure_ai_loaded(self.app, _("AI Text Analysis")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -5646,20 +5641,18 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.ui.progressBar_ai.setRange(0, 0)  # Starts the animation
         # Repeating the loading state here restores it after temporary menu
         # status tips disappear.
-        runtime_state = getattr(self.app, "ai_runtime_state", AI_NOT_STARTED)
-        if runtime_state in (AI_NOT_STARTED, AI_LOADING, AI_INITIALIZING):
+        ai_status = self.app.get_ai_status()
+        if ai_status in (AI_UNLOADED, AI_LOADING, AI_INITIALIZING):
             self.main_window.statusBar().showMessage(_("AI: Starting up..."))
-        elif runtime_state == AI_DISABLED:
+        elif ai_status == AI_DISABLED:
             self.main_window.statusBar().showMessage(_("AI: ") + _("disabled"))
-        elif runtime_state == AI_FAILED:
+        elif ai_status == AI_FAILED:
             self.main_window.statusBar().showMessage(_("AI: Components could not be loaded."))
-        elif self.app.ai is not None:
-            if self.app.ai.get_status() == 'reading data' and self.app.ai.sources_vectorstore.reading_doc != '':
+        else:
+            if ai_status == 'reading data' and self.app.ai.sources_vectorstore.reading_doc != '':
                 self.main_window.statusBar().showMessage(_('AI: ') + _('reading data') + ' (' + self.app.ai.sources_vectorstore.reading_doc + ')')
             else:
-                self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
-        else: 
-            self.main_window.statusBar().showMessage('')
+                self.main_window.statusBar().showMessage(_('AI: ') + _(ai_status))
 
     def on_ai_output_scroll(self, value):
         """Normally, if the AI is generating text, the scrollArea_ai_output scrolls to the bottom
@@ -6891,20 +6884,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.send_user_question()
                     
     def send_user_question(self):
-        if not ai_runtime_ready(self.app):
-            show_ai_runtime_not_ready(self.app, _("AI Agent"))
-            return
-        if self.app.settings['ai_enable'] != 'True':
-            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
-            Message(self.app, _('AI not enabled'), msg, "warning").exec()
-            return
-        elif self.app.ai.is_busy():
+        if self.app.get_ai_status() == 'busy':
             msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
             Message(self.app, _('AI busy'), msg, "warning").exec()
             return
-        elif not self.app.ai.is_ready():
-            msg = _('The AI not yet fully loaded. Please wait and retry.')
-            Message(self.app, _('AI not ready'), msg, "warning").exec()
+        if not ensure_ai_ready(self.app, _("AI Agent")):
             return
         self.ai_output_autoscroll = True
         self._dismiss_prompt_completion(accept=False)

@@ -41,6 +41,7 @@ from copy import copy
 
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
+from qualcoder.ai_runtime import AI_DISABLED, AI_INITIALIZING, AI_READY, AI_UNLOADED
 from qualcoder.helpers import get_default_user_directory, Message
 from qualcoder.speakers import speaker_coder_name
 
@@ -124,7 +125,7 @@ class App(object):
         self.ai_runtime_error = ""
         self.settings, self.ai_models = self.load_settings()
         self.ai_runtime_state = (
-            "not_started" if self.settings['ai_enable'] == 'True' else "disabled"
+            AI_UNLOADED if self.settings['ai_enable'] == 'True' else AI_DISABLED
         )
         self.last_export_directory = copy(self.settings['directory'])
         self.ai = None
@@ -132,6 +133,15 @@ class App(object):
         self.ai_embedding_function = None
         self.project_events = ProjectEventBus()
         self.ai_mcp_server = AiMcpServer(self)
+
+    def get_ai_status(self) -> str:
+        """Return one status covering both runtime loading and AI operation."""
+
+        if self.ai_runtime_state != AI_READY:
+            return self.ai_runtime_state
+        if self.ai is None:
+            return AI_INITIALIZING
+        return self.ai.get_status()
 
     def read_previous_project_paths(self):
         """ Recent project paths are stored in .qualcoder/recent_projects.txt

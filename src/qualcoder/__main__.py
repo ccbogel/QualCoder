@@ -55,6 +55,8 @@ from qualcoder.ai_runtime import (
     AI_READY,
     AiImportThread,
     ai_runtime_ready,
+    ensure_ai_loaded,
+    ensure_ai_ready,
     show_ai_runtime_not_ready,
 )
 from qualcoder.error_dlg import qt_exception_hook
@@ -474,14 +476,6 @@ Click "Yes" to start now.')
             self.ai_setup_wizard()
         self.app.settings['ai_first_startup'] = 'False'
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
-
-    def require_ai_runtime(self, title: str = "AI") -> bool:
-        """Return true when AI is ready; otherwise show a retry-later message."""
-
-        if ai_runtime_ready(self.app):
-            return True
-        show_ai_runtime_not_ready(self.app, title)
-        return False
 
     def init_placeholder_tab_layouts(self):
         """Put the startup placeholder browsers into real tab layouts."""
@@ -1607,12 +1601,6 @@ Click "Yes" to start now.')
     def open_ai_chat_sidebar_from_tab_button(self):
         """Switch AI chat to sidebar mode from the tab button."""
 
-        if not self.require_ai_runtime(_("AI Agent")):
-            return
-        if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('AI Agent'), msg).exec()
-            return
         self.ui.actionAI_Agent_Sidebar.setChecked(True)
 
     def _ensure_widget_layout(self, widget):
@@ -1788,11 +1776,6 @@ Click "Yes" to start now.')
     def toggle_ai_chat_sidebar(self, checked):
         """Handle menu toggle for AI chat sidebar mode."""
 
-        if checked and not self.require_ai_runtime(_("AI Agent")):
-            self.ui.actionAI_Agent_Sidebar.blockSignals(True)
-            self.ui.actionAI_Agent_Sidebar.setChecked(False)
-            self.ui.actionAI_Agent_Sidebar.blockSignals(False)
-            return
         self.set_ai_chat_sidebar_mode(checked)
         if bool(self.ai_chat_sidebar_mode) != bool(checked):
             self._sync_ai_chat_sidebar_action()
@@ -2925,7 +2908,7 @@ Click "Yes" to start now.')
         self.ai_chat_window.refresh_placeholder_if_visible()
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
         if self.app.settings['ai_enable'] == 'True':
-            ai_status = self.app.ai.get_status()
+            ai_status = self.app.get_ai_status()
             if ai_status == 'reading data':
                 msg = _('The AI setup is complete. The AI is now reading your project data in the background.')
             elif ai_status == 'ready':
@@ -2940,16 +2923,8 @@ Click "Yes" to start now.')
 
     def ai_rebuild_memory(self):
         """ Action triggered by AI Rebuild Internal Memory menu item."""
-        if not self.require_ai_runtime(_("Rebuild AI Memory")):
+        if not ensure_ai_ready(self.app, _("Rebuild AI Memory")):
             return
-        if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it in Settings.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
-            return
-        if not self.app.ai.is_ready():
-            msg = _('The AI is busy or not set up correctly.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec()
-            return 
         
         msg = _('This will re-read all of your empirical documents, which may take some time. Do you want to continue?')
         mb = QtWidgets.QMessageBox(self)
@@ -2964,8 +2939,6 @@ Click "Yes" to start now.')
     
     def ai_prompts(self, initial_prompt_name: str = "", initial_prompt_scope: str = ""):
         """ Action triggered by AI Prompts menu item."""
-        if not self.require_ai_runtime(_("AI Prompts")):
-            return
         from qualcoder.ai_prompt_library import DialogAiEditPrompts
 
         DialogAiEditPrompts(
@@ -2976,12 +2949,6 @@ Click "Yes" to start now.')
 
     def ai_go_chat(self):
         """Action triggered by AI Agent menu item."""
-        if not self.require_ai_runtime(_("AI Agent")):
-            return
-        if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up in Settings.')
-            Message(self.app, _('AI Agent'), msg).exec()
-            return
         if self.ai_chat_sidebar_mode:
             self.set_ai_chat_sidebar_mode(True, persist=False)
         else:
@@ -2991,7 +2958,7 @@ Click "Yes" to start now.')
     def ai_go_analysis(self) -> None:
         """Start the AI analysis selected in the Analysis menu."""
 
-        if not self.require_ai_runtime(_("AI Analysis")):
+        if not ensure_ai_loaded(self.app, _("AI Analysis")):
             return
         if self.ai_chat_window is None:
             return
@@ -3013,7 +2980,7 @@ Click "Yes" to start now.')
     def ai_check_project_readiness(self) -> None:
         """Start an AI Agent chat that assesses the current project."""
 
-        if not self.require_ai_runtime(_("AI Agent")):
+        if not ensure_ai_loaded(self.app, _("AI Agent")):
             return
         if self.ai_chat_window is None:
             return
@@ -3024,7 +2991,7 @@ Click "Yes" to start now.')
     def ai_go_help_support(self):
         """Action triggered by Help > Ask the AI Agent."""
 
-        if not self.require_ai_runtime(_("AI Agent")):
+        if not ensure_ai_loaded(self.app, _("AI Agent")):
             return
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
@@ -3039,7 +3006,7 @@ Click "Yes" to start now.')
 
     def ai_go_search(self):
         """ Action triggered by AI Search and Coding menu item."""
-        if not self.require_ai_runtime(_("AI Search")):
+        if not ensure_ai_loaded(self.app, _("AI Search")):
             return
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
