@@ -52,7 +52,7 @@ from .ai_agent_prompts import (
     prompt_name_fits_filesystem,
     prompt_name_key,
 )
-from .ai_icons import (
+from .ai_ui import (
     code_analysis_icon,
     general_chat_icon,
     prompt_icon,

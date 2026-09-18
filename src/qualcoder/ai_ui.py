@@ -1,9 +1,19 @@
-"""Lightweight shared icons for AI chats, analyses, and prompts."""
+"""Lightweight Qt helpers shared by AI views."""
 
 from typing import Any
 
-from PyQt6 import QtGui
+from PyQt6 import QtCore, QtGui
 import qtawesome as qta
+
+
+class AIChatSignalEmitter(QtCore.QObject):
+    """Relay requests from coding views to the AI chat."""
+
+    newTextChatSignal = QtCore.pyqtSignal(int, str, str, int, object)
+
+
+# Construct the QObject on the GUI thread during normal application imports.
+ai_chat_signal_emitter = AIChatSignalEmitter()
 
 
 def code_analysis_icon(app: Any) -> QtGui.QIcon:

@@ -54,7 +54,7 @@ from .speakers import DialogSpeakers, speaker_coder_name
 from .ris import Ris
 from .ai_agent_prompts import AiAgentPromptsCatalog
 from .ai_runtime import ensure_ai_ready
-from .ai_signals import ai_chat_signal_emitter
+from .ai_ui import ai_chat_signal_emitter
 from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
     waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
 

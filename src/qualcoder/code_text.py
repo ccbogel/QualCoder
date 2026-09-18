@@ -47,7 +47,7 @@ from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean me
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
 from .ai_runtime import AI_READY, ensure_ai_ready
-from .ai_signals import ai_chat_signal_emitter
+from .ai_ui import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH, MINIMUM_CODING_MARGIN_WIDTH,
                                       MINIMUM_CODING_MARGIN_LABEL_WIDTH)

@@ -42,7 +42,8 @@ from PyQt6 import QtWidgets
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
 from .ai_async_worker import Worker
-from .ai_icons import (
+from .ai_memo import extract_ai_memo as extract_public_ai_memo
+from .ai_ui import (
     code_analysis_icon,
     general_chat_icon,
     prompt_icon,
@@ -51,7 +52,6 @@ from .ai_icons import (
     text_analysis_icon,
     topic_exploration_icon,
 )
-from .ai_memo import extract_ai_memo as extract_public_ai_memo
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
 from .helpers import Message

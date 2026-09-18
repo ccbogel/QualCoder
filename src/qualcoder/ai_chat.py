@@ -54,12 +54,7 @@ from .ai_agent_prompts import (
     prompt_name_and_scope,
     prompt_name_key,
 )
-from .ai_icons import (
-    code_analysis_icon,
-    general_chat_icon,
-    text_analysis_icon,
-    topic_exploration_icon,
-)
+from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_runtime import (
     AI_DISABLED,
     AI_FAILED,
@@ -68,9 +63,14 @@ from .ai_runtime import (
     AI_UNLOADED,
     ensure_ai_ready,
 )
-from .ai_signals import ai_chat_signal_emitter
-from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_search_dialog import DialogAiSearch
+from .ai_ui import (
+    ai_chat_signal_emitter,
+    code_analysis_icon,
+    general_chat_icon,
+    text_analysis_icon,
+    topic_exploration_icon,
+)
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat

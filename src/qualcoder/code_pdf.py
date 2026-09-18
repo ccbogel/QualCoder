@@ -55,7 +55,7 @@ from .select_items import DialogSelectItems
 # AI
 from .ai_agent_prompts import AiAgentPromptsCatalog  # PromptsList removed; new Markdown-based catalog
 from .ai_runtime import ensure_ai_ready
-from .ai_signals import ai_chat_signal_emitter
+from .ai_ui import ai_chat_signal_emitter
 # Shared PDF helpers live in pdf_utils, so lighter modules do not import this one.
 from .pdf_utils import W_X0, W_Y0, W_X1, W_Y1, W_POS0, W_POS1, W_LINE, \
     _page_words_raw, _build_page_text
