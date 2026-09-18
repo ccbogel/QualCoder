@@ -54,10 +54,16 @@ from qualcoder.ai_runtime import (
     AI_LOADING,
     AI_READY,
     AiImportThread,
+    VECTORSTORE_DISABLED,
+    VECTORSTORE_FAILED,
+    VECTORSTORE_LOADING,
+    VECTORSTORE_UNLOADED,
+    VectorstoreImportThread,
     ai_runtime_ready,
     ensure_ai_loaded,
     ensure_ai_ready,
     show_ai_runtime_not_ready,
+    vectorstore_required,
 )
 from qualcoder.error_dlg import qt_exception_hook
 from qualcoder.external_mcp import ExternalMcpController
@@ -304,6 +310,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal_display = None
         self.ai_chat_window = None
         self.ai_import_thread = None
+        self.vectorstore_import_thread = None
         self.ai_initialize_llm_after_load = True
         self.ai_chat_sidebar_mode = False
         self.ai_chat_tab_label = None
@@ -352,8 +359,87 @@ class MainWindow(QtWidgets.QMainWindow):
         self._show_pending_ai_model_upgrade_offer()
         # Start expensive AI imports only after this constructor returns and
         # the normal Qt event loop can keep the visible window responsive.
+        QtCore.QTimer.singleShot(0, self.start_vectorstore_background_loading)
         QtCore.QTimer.singleShot(0, self.start_ai_background_loading)
         QtCore.QTimer.singleShot(0, self._offer_first_ai_setup)
+
+    def start_vectorstore_background_loading(self) -> None:
+        """Load and initialize the shared vectorstore when a consumer needs it."""
+
+        if not vectorstore_required(self.app):
+            if getattr(self.app, "vectorstore", None) is not None:
+                self.app.vectorstore.close()
+            self.app.vectorstore_runtime_state = VECTORSTORE_DISABLED
+            self.app.vectorstore_runtime_error = ""
+            return
+        if getattr(self.app, "vectorstore", None) is not None:
+            self._initialize_shared_vectorstore()
+            return
+        # The full AI loader also imports and constructs the vectorstore. The
+        # dedicated loader is only needed for the MCP-only configuration.
+        if self.app.settings['ai_enable'] == 'True':
+            return
+        if (
+                self.vectorstore_import_thread is not None
+                and self.vectorstore_import_thread.isRunning()
+        ):
+            return
+
+        self.app.vectorstore_runtime_state = VECTORSTORE_LOADING
+        self.app.vectorstore_runtime_error = ""
+        self.ui.textEdit.append(_("Search: Loading components in the background..."))
+        self.vectorstore_import_thread = VectorstoreImportThread(self)
+        self.vectorstore_import_thread.loaded.connect(
+            self._finish_vectorstore_runtime_initialization
+        )
+        self.vectorstore_import_thread.failed.connect(
+            self._vectorstore_runtime_loading_failed
+        )
+        self.vectorstore_import_thread.start(QtCore.QThread.Priority.LowPriority)
+
+    @QtCore.pyqtSlot()
+    def _finish_vectorstore_runtime_initialization(self) -> None:
+        """Construct and initialize the shared vectorstore on the GUI thread."""
+
+        if not vectorstore_required(self.app):
+            self.app.vectorstore_runtime_state = VECTORSTORE_DISABLED
+            self.app.vectorstore_runtime_error = ""
+            return
+        try:
+            from qualcoder.ai_vectorstore import AiVectorstore
+
+            if getattr(self.app, "vectorstore", None) is None:
+                self.app.vectorstore = AiVectorstore(
+                    self.app,
+                    self.ui.textEdit,
+                    "qualcoder",
+                )
+                self.app.vectorstore_runtime_state = VECTORSTORE_UNLOADED
+                self.app.vectorstore_runtime_error = ""
+            self._initialize_shared_vectorstore()
+        except Exception as err:
+            self._vectorstore_runtime_loading_failed(
+                "".join(traceback.format_exception(type(err), err, err.__traceback__))
+            )
+
+    def _initialize_shared_vectorstore(self) -> None:
+        """Open the project index unless it is already open or being prepared."""
+
+        vectorstore = getattr(self.app, "vectorstore", None)
+        if vectorstore is None or vectorstore.is_open() or vectorstore.ai_worker_running():
+            return
+        vectorstore.init_vectorstore()
+
+    @QtCore.pyqtSlot(str)
+    def _vectorstore_runtime_loading_failed(self, error_text: str) -> None:
+        """Record a failure while importing or constructing the vectorstore."""
+
+        self.app.vectorstore_runtime_state = VECTORSTORE_FAILED
+        self.app.vectorstore_runtime_error = error_text
+        logger.error("Vectorstore background loading failed:\n%s", error_text)
+        self.ui.textEdit.append(
+            _("Search: Components could not be loaded. See the log for details.")
+        )
 
     def start_ai_background_loading(
             self, force: bool = False, initialize_llm_after_load: bool = True) -> None:
@@ -2192,6 +2278,7 @@ Click "Yes" to start now.')
             self.app.ai.close()
         else:
             self.app.ai_runtime_state = AI_DISABLED
+        self.start_vectorstore_background_loading()
         self._show_pending_ai_model_upgrade_offer()
         self.update_ai_menu_options()
         if self.ai_chat_window is not None:
@@ -2709,6 +2796,7 @@ Click "Yes" to start now.')
         # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
         if self.app.ai is not None:
             self.app.ai.init_llm(self)
+        self.start_vectorstore_background_loading()
         if self.ai_chat_window is not None:
             self.ai_chat_window.init_ai_chat(self.app)
         msg = f"{_('Project Opened: ')}{self.app.project_name}"

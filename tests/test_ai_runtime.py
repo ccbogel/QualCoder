@@ -2,7 +2,7 @@ import subprocess
 import sys
 from types import SimpleNamespace
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from qualcoder.ai_runtime import (
     AI_DISABLED,
@@ -11,9 +11,11 @@ from qualcoder.ai_runtime import (
     AI_LOADING,
     AI_READY,
     AI_UNLOADED,
+    VECTORSTORE_LOADING,
     ai_runtime_ready,
     ensure_ai_ready,
     show_ai_runtime_not_ready,
+    vectorstore_required,
 )
 from qualcoder.app import App
 from qualcoder.__main__ import MainWindow
@@ -82,6 +84,64 @@ class TestAiRuntime(TestCase):
 
         self.assertEqual(AI_DISABLED, app.ai_runtime_state)
         self.assertIsNone(window.ai_import_thread)
+
+    def test_external_mcp_starts_vectorstore_only_loader(self):
+        app = SimpleNamespace(
+            settings={
+                'ai_enable': 'False',
+                'mcp_external_enabled': 'True',
+            },
+            vectorstore=None,
+            vectorstore_runtime_state='unloaded',
+            vectorstore_runtime_error='',
+        )
+        import_thread = MagicMock()
+        import_thread.isRunning.return_value = False
+        window = SimpleNamespace(
+            app=app,
+            vectorstore_import_thread=None,
+            ui=SimpleNamespace(textEdit=SimpleNamespace(append=MagicMock())),
+            _finish_vectorstore_runtime_initialization=MagicMock(),
+            _vectorstore_runtime_loading_failed=MagicMock(),
+        )
+
+        with patch(
+                'qualcoder.__main__.VectorstoreImportThread',
+                return_value=import_thread,
+        ) as thread_class:
+            MainWindow.start_vectorstore_background_loading(window)
+
+        thread_class.assert_called_once_with(window)
+        self.assertEqual(VECTORSTORE_LOADING, app.vectorstore_runtime_state)
+        import_thread.start.assert_called_once()
+
+    def test_vectorstore_is_required_by_ai_or_external_mcp(self):
+        app = SimpleNamespace(
+            settings={"ai_enable": "False", "mcp_external_enabled": "False"}
+        )
+        self.assertFalse(vectorstore_required(app))
+
+        app.settings["ai_enable"] = "True"
+        self.assertTrue(vectorstore_required(app))
+
+        app.settings["ai_enable"] = "False"
+        app.settings["mcp_external_enabled"] = "True"
+        self.assertTrue(vectorstore_required(app))
+
+    def test_vectorstore_import_does_not_load_llm_provider_stack(self):
+        code = (
+            "import sys; import qualcoder.ai_vectorstore; "
+            "assert 'qualcoder.ai_llm' not in sys.modules; "
+            "assert 'langchain_openai' not in sys.modules; "
+            "assert 'openai' not in sys.modules"
+        )
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
 
     def test_lightweight_ai_llm_import_excludes_model_stack(self):
         code = (

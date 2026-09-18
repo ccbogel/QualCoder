@@ -41,10 +41,17 @@ from copy import copy
 
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
-from qualcoder.ai_runtime import AI_DISABLED, AI_INITIALIZING, AI_READY, AI_UNLOADED
+from qualcoder.ai_runtime import (
+    AI_DISABLED,
+    AI_INITIALIZING,
+    AI_READY,
+    AI_UNLOADED,
+    VECTORSTORE_DISABLED,
+    VECTORSTORE_UNLOADED,
+    vectorstore_required,
+)
 from qualcoder.helpers import get_default_user_directory, Message
 from qualcoder.speakers import speaker_coder_name
-from qualcoder.vectorstore_runtime import VECTORSTORE_DISABLED, VECTORSTORE_UNLOADED
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
 logger = logging.getLogger(__name__)
@@ -133,12 +140,8 @@ class App(object):
         # The project vectorstore is shared by AI and external MCP. Expensive
         # dependencies are imported only when a consumer constructs the store.
         self.vectorstore = None
-        vectorstore_required = (
-            self.settings['ai_enable'] == 'True'
-            or self.settings['mcp_external_enabled'] == 'True'
-        )
         self.vectorstore_runtime_state = (
-            VECTORSTORE_UNLOADED if vectorstore_required else VECTORSTORE_DISABLED
+            VECTORSTORE_UNLOADED if vectorstore_required(self) else VECTORSTORE_DISABLED
         )
         self.vectorstore_runtime_error = ""
         # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.

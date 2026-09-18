@@ -17,6 +17,23 @@ AI_INITIALIZING = "initializing"
 AI_READY = "ready"
 AI_FAILED = "failed"
 
+VECTORSTORE_DISABLED = "disabled"
+VECTORSTORE_UNLOADED = "unloaded"
+VECTORSTORE_LOADING = "loading"
+VECTORSTORE_INDEXING = "indexing"
+VECTORSTORE_READY = "ready"
+VECTORSTORE_FAILED = "failed"
+
+
+def vectorstore_required(app: Any) -> bool:
+    """Return whether AI or External MCP currently requires the vectorstore."""
+
+    settings = getattr(app, "settings", {})
+    return (
+        str(settings.get("ai_enable", "False")).lower() == "true"
+        or str(settings.get("mcp_external_enabled", "False")).lower() == "true"
+    )
+
 
 class AiImportThread(QtCore.QThread):
     """Import expensive AI modules without blocking the GUI event loop."""
@@ -34,6 +51,25 @@ class AiImportThread(QtCore.QThread):
         except Exception:
             error_text = traceback.format_exc()
             logger.exception("Could not load the AI runtime")
+            self.failed.emit(error_text)
+            return
+        self.loaded.emit()
+
+
+class VectorstoreImportThread(QtCore.QThread):
+    """Import vectorstore dependencies without loading the LLM runtime."""
+
+    loaded = QtCore.pyqtSignal()
+    failed = QtCore.pyqtSignal(str)
+
+    def run(self) -> None:
+        """Import the vectorstore module in this worker thread."""
+
+        try:
+            from . import ai_vectorstore  # noqa: F401
+        except Exception:
+            error_text = traceback.format_exc()
+            logger.exception("Could not load the vectorstore runtime")
             self.failed.emit(error_text)
             return
         self.loaded.emit()

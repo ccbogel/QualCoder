@@ -57,15 +57,15 @@ from PyQt6 import QtCore, QtWidgets
 import sentence_transformers  # Keep a reference so it is not garbage collected in subthreads.
 
 from qualcoder.ai_async_worker import AIException, GuiThreadRelay, Worker, WorkerSignals
-from qualcoder.error_dlg import show_error_dlg
-from qualcoder.helpers import Message
-from qualcoder.vectorstore_runtime import (
+from qualcoder.ai_runtime import (
     VECTORSTORE_FAILED,
     VECTORSTORE_INDEXING,
     VECTORSTORE_LOADING,
     VECTORSTORE_READY,
     VECTORSTORE_UNLOADED,
 )
+from qualcoder.error_dlg import show_error_dlg
+from qualcoder.helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -417,14 +417,14 @@ class AiVectorstore:
         if not self.embedding_model_is_cached():
             self._set_runtime_state(VECTORSTORE_LOADING)
             model_download_msg = _(
-                'Since you are using the AI integration for the first time, '
+                'Since you are using the AI-powered search for the first time, '
                 'QualCoder needs to download and install some '
                 'additional components. \n\n'
                 'This will download about 2.5 GB of data. Do you \n'
                 'want to continue?'
             )
             mb = QtWidgets.QMessageBox(parent=parent_window)
-            mb.setWindowTitle(_('Download AI components'))
+            mb.setWindowTitle(_('Download search components'))
             mb.setText(model_download_msg)
             mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Abort)
             mb.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')
@@ -436,7 +436,7 @@ class AiVectorstore:
                     parent=parent_window,
                 )
                 pd.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')
-                pd.setWindowTitle(_('Download AI components'))
+                pd.setWindowTitle(_('Download search components'))
                 pd.setAutoClose(False)
                 pd.setModal(True)
                 pd.show()

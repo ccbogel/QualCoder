@@ -4,8 +4,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from qualcoder import ai_llm
+from qualcoder.ai_runtime import VECTORSTORE_INDEXING
 from qualcoder.ai_vectorstore import AiVectorstore
-from qualcoder.vectorstore_runtime import VECTORSTORE_INDEXING
 
 
 class TestVectorstoreOwnership(TestCase):
