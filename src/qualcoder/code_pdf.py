@@ -30,15 +30,14 @@ import pymupdf
 import logging
 import os
 from pathlib import Path
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush, QColor
 import qtawesome as qta  # https://pictogrammers.com/library/mdi/
 import re
 import sqlite3
 import weakref
 import webbrowser # For: Open original file
-
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush, QColor
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
@@ -51,8 +50,9 @@ from .helpers import Message, init_persistent_tree_header, \
 from .GUI.ui_dialog_code_pdf import Ui_Dialog_code_pdf
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
+from .ris import Ris
 from .select_items import DialogSelectItems
-# IA
+# AI
 from .ai_agent_prompts import AiAgentPromptsCatalog  # PromptsList removed; new Markdown-based catalog
 from .ai_runtime import ai_runtime_ready, show_ai_runtime_not_ready
 from .ai_signals import ai_chat_signal_emitter
@@ -6191,6 +6191,10 @@ class DialogCodePdf(QtWidgets.QWidget):
 
             norm_fmt = QtGui.QTextCharFormat()
             norm_fmt.setFontPointSize(12)
+
+            ref_fmt = QtGui.QTextCharFormat()
+            ref_fmt.setFontPointSize(9)
+            ref_fmt.setFontItalic(True)
             
             it_fmt = QtGui.QTextCharFormat(norm_fmt)
             it_fmt.setFontItalic(True)
@@ -6215,6 +6219,16 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.insertText(f"{_('File')}: {self.file_['name']}\n", header_fmt)
             report_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             cursor.insertText(f"{_('Generated report')}: {report_date}\n\n", header_fmt)
+
+            # Add reference, if any
+            cur = self.app.conn.cursor()
+            cur.execute("select risid from source where source.id=?", [self.file_['id']])
+            ris_res = cur.fetchone()
+            if ris_res and ris_res[0]:
+                ris = Ris(self.app)
+                ris.get_references(ris_res[0])
+                if ris.refs:
+                    cursor.insertText(_("Reference: ") + ris.refs[0]['apa'].replace('\n', ' ') + "\n\n", ref_fmt)
 
             seg_co_occurrences = defaultdict(set)
             area_co_occurrences = defaultdict(set)

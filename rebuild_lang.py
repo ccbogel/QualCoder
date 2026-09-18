@@ -92,9 +92,9 @@ def extract_pot_file(directory: str, pot_filename: str) -> None:
     if not py_files:
         print("No Python files found to extract translatable strings from.")
         return
-
+	# Justin: /usr/local/bin/xgettext
     run_subprocess(
-        ["xgettext", "--language=Python", "--keyword=_", "--output", pot_filename] + py_files
+        ["/usr/local/bin/xgettext", "--language=Python", "--keyword=_", "--output", pot_filename] + py_files
     )
     print(f"Extracted POT file: {pot_filename}")
 
