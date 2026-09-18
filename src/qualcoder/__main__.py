@@ -2958,7 +2958,7 @@ Click "Yes" to start now.')
     def ai_go_analysis(self) -> None:
         """Start the AI analysis selected in the Analysis menu."""
 
-        if not ensure_ai_loaded(self.app, _("AI Analysis")):
+        if not ensure_ai_ready(self.app, _("AI Analysis")):
             return
         if self.ai_chat_window is None:
             return
@@ -2980,7 +2980,7 @@ Click "Yes" to start now.')
     def ai_check_project_readiness(self) -> None:
         """Start an AI Agent chat that assesses the current project."""
 
-        if not ensure_ai_loaded(self.app, _("AI Agent")):
+        if not ensure_ai_ready(self.app, _("AI Agent")):
             return
         if self.ai_chat_window is None:
             return
@@ -2991,7 +2991,7 @@ Click "Yes" to start now.')
     def ai_go_help_support(self):
         """Action triggered by Help > Ask the AI Agent."""
 
-        if not ensure_ai_loaded(self.app, _("AI Agent")):
+        if not ensure_ai_ready(self.app, _("AI Agent")):
             return
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')

@@ -65,9 +65,7 @@ from .ai_runtime import (
     AI_FAILED,
     AI_INITIALIZING,
     AI_LOADING,
-    AI_READY,
     AI_UNLOADED,
-    ensure_ai_loaded,
     ensure_ai_ready,
 )
 from .ai_signals import ai_chat_signal_emitter
@@ -2097,7 +2095,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _popup_new_chat_menu(self, highlight_target: Optional[str] = None) -> None:
         """Show the New-session menu below the button and optionally highlight one entry."""
 
-        if not ensure_ai_loaded(self.app, _("AI Agent")):
+        if not ensure_ai_ready(self.app, _("AI Agent")):
             return
         if self._new_chat_popup_menu is not None:
             self._new_chat_popup_menu.close()
@@ -2536,7 +2534,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _can_start_general_chat(self) -> bool:
         """Return whether a general AI chat session can be started now."""
 
-        if not ensure_ai_loaded(self.app, _("AI Agent")):
+        if not ensure_ai_ready(self.app, _("AI Agent")):
             return False
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -2570,15 +2568,6 @@ class DialogAIChat(QtWidgets.QDialog):
 
         if not self._can_start_general_chat():
             return
-        if self.app.ai.is_busy():
-            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
-            Message(self.app, _('AI busy'), msg, "warning").exec()
-            return
-        if self.app.get_ai_status() != AI_READY:
-            msg = _('The AI not yet fully loaded. Please wait and retry.')
-            Message(self.app, _('AI not ready'), msg, "warning").exec()
-            return
-
         prompt_name = "Check-project-AI-readiness"
         readiness_prompt = self.agent_prompts_catalog.get_prompt(prompt_name)
         if readiness_prompt is None:
@@ -2626,15 +2615,6 @@ class DialogAIChat(QtWidgets.QDialog):
 
         if not self._can_start_general_chat():
             return
-        if self.app.ai.is_busy():
-            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
-            Message(self.app, _('AI busy'), msg, "warning").exec()
-            return
-        if self.app.get_ai_status() != AI_READY:
-            msg = _('The AI not yet fully loaded. Please wait and retry.')
-            Message(self.app, _('AI not ready'), msg, "warning").exec()
-            return
-
         support_prompt = self.agent_prompts_catalog.get_internal_prompt(self._support_chat_prompt_name())
         if support_prompt is None:
             msg = _('The internal AI support prompt "_help.md" could not be found.')
@@ -4709,7 +4689,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_text_analysis(self):
         """analyze a piece of text from an empirical document"""
-        if not ensure_ai_loaded(self.app, _("AI Text Analysis")):
+        if not ensure_ai_ready(self.app, _("AI Text Analysis")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -4737,7 +4717,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_code_analysis(self):
         """Start a new code analysis as an MCP-backed AI agent chat."""
-        if not ensure_ai_loaded(self.app, _("Code analysis")):
+        if not ensure_ai_ready(self.app, _("Code analysis")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -4814,7 +4794,7 @@ data collected. This information will accompany every prompt sent to the AI, res
  
     def new_topic_exploration(self):
         """Start a new topic exploration as an MCP-backed AI agent chat."""
-        if not ensure_ai_loaded(self.app, _("Topic exploration")):
+        if not ensure_ai_ready(self.app, _("Topic exploration")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')
@@ -5520,7 +5500,7 @@ data collected. This information will accompany every prompt sent to the AI, res
     def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt):
         """Start one text analysis chat for the selected text passage."""
 
-        if not ensure_ai_loaded(self.app, _("AI Text Analysis")):
+        if not ensure_ai_ready(self.app, _("AI Text Analysis")):
             return
         if self.app.project_name == "":
             msg = _('No project open.')

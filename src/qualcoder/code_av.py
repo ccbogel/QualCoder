@@ -53,7 +53,7 @@ from .select_items import DialogSelectItems
 from .speakers import DialogSpeakers, speaker_coder_name
 from .ris import Ris
 from .ai_agent_prompts import AiAgentPromptsCatalog
-from .ai_runtime import ensure_ai_loaded
+from .ai_runtime import ensure_ai_ready
 from .ai_signals import ai_chat_signal_emitter
 from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
     waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
@@ -4106,7 +4106,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.display_handles_for_code(cursor.position())
             return
         if action.property('submenu') == 'ai_text_analysis':
-            if not ensure_ai_loaded(self.app, _("AI Text Analysis")):
+            if not ensure_ai_ready(self.app, _("AI Text Analysis")):
                 return
             if self.transcription is None:
                 Message(self.app, _('Warning'), _("No transcript for this file."), "warning").exec()
