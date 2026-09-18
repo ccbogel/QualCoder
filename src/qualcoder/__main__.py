@@ -2810,6 +2810,8 @@ Click "Yes" to start now.')
             self.ai_chat_window.close()
         if self.app.ai is not None:
             self.app.ai.close()
+        if getattr(self.app, "vectorstore", None) is not None:
+            self.app.vectorstore.close()
         
         if self.app.conn is not None:
             try:

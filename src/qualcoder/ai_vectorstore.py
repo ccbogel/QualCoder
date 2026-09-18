@@ -59,6 +59,13 @@ import sentence_transformers  # Keep a reference so it is not garbage collected 
 from qualcoder.ai_async_worker import AIException, GuiThreadRelay, Worker, WorkerSignals
 from qualcoder.error_dlg import show_error_dlg
 from qualcoder.helpers import Message
+from qualcoder.vectorstore_runtime import (
+    VECTORSTORE_FAILED,
+    VECTORSTORE_INDEXING,
+    VECTORSTORE_LOADING,
+    VECTORSTORE_READY,
+    VECTORSTORE_UNLOADED,
+)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -379,6 +386,17 @@ class AiVectorstore:
 
         self._ui_relay.post_message(message)
 
+    def _set_runtime_state(self, state: str, error_text: str = "") -> None:
+        """Update the application-owned vectorstore runtime state.
+
+        Args:
+            state: New vectorstore runtime state.
+            error_text: Optional diagnostic text for a failed state.
+        """
+
+        self.app.vectorstore_runtime_state = state
+        self.app.vectorstore_runtime_error = error_text
+
     def _worker_generation_snapshot(self) -> int:
         """Return the generation assigned to newly queued work."""
 
@@ -397,6 +415,7 @@ class AiVectorstore:
 
     def prepare_embedding_model(self, parent_window=None) -> bool:
         if not self.embedding_model_is_cached():
+            self._set_runtime_state(VECTORSTORE_LOADING)
             model_download_msg = _(
                 'Since you are using the AI integration for the first time, '
                 'QualCoder needs to download and install some '
@@ -425,7 +444,10 @@ class AiVectorstore:
                 while self.download_model_running:
                     if pd.wasCanceled():
                         self.download_model_cancel = True
-                        self.app.settings['ai_enable'] = 'False'
+                        self._set_runtime_state(
+                            VECTORSTORE_FAILED,
+                            "Embedding model download was cancelled.",
+                        )
                         return False
                     msg = self.download_model_msg
                     msgs = msg.split(':')
@@ -439,10 +461,16 @@ class AiVectorstore:
                     time.sleep(0.01)
                 pd.close()
                 if not self.embedding_model_is_cached():
-                    self.app.settings['ai_enable'] = 'False'
+                    error_text = self.download_model_error
+                    if error_text == "":
+                        error_text = "Embedding model download did not complete."
+                    self._set_runtime_state(VECTORSTORE_FAILED, error_text)
                     return False
             else:
-                self.app.settings['ai_enable'] = 'False'
+                self._set_runtime_state(
+                    VECTORSTORE_FAILED,
+                    "Embedding model download was declined.",
+                )
                 return False
         return True
 
@@ -513,8 +541,11 @@ class AiVectorstore:
         if self.embedding_model_is_cached():
             msg = _('AI: Success, components downloaded and installed.')
         else:
-            self.app.settings['ai_enable'] = 'False'
-            msg = _("AI: Could not download all the necessary components, the AI integration will be disabled.")
+            error_text = getattr(self, "download_model_error", "")
+            if error_text == "":
+                error_text = "Could not download all required embedding-model components."
+            self._set_runtime_state(VECTORSTORE_FAILED, error_text)
+            msg = _("AI: Could not download all the necessary components.")
         self._post_message(msg)
         logger.debug(msg)
 
@@ -522,6 +553,7 @@ class AiVectorstore:
         """Record and display a background download error."""
 
         self.download_model_error = str(value)
+        self._set_runtime_state(VECTORSTORE_FAILED, self.download_model_error)
         self._ui_relay.post_error(exception_type, value, tb_obj)
 
     def download_embedding_model(self):
@@ -1069,25 +1101,28 @@ class AiVectorstore:
             self._chunk_ids_by_pos = []
             logger.debug(f'Project path "{self.app.project_path}" not found.')
             raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
-        self.app.ai._status = ''
 
-    def init_vectorstore(self, rebuild=False):
+    def init_vectorstore(self, rebuild: bool = False) -> bool:
+        """Prepare the embedding model and open the current project's index.
+
+        Args:
+            rebuild: Whether to rebuild all indexed project documents.
+        """
+
         with self._state_lock:
             self._is_closing = False
-        self.prepare_embedding_model()
-        if self.app.settings['ai_enable'] == 'False':
-            self.close()
-            self.app.ai._status = ''
-            return
+        if not self.prepare_embedding_model():
+            return False
         if self.app.project_name == '':
             self.close()
             self._post_message(_('AI: Finished loading (no project open).'))
-            self.app.ai._status = ''
+            return False
         else:
-            self.app.ai._status = ''
+            self._set_runtime_state(VECTORSTORE_INDEXING)
             self.open_db(rebuild)
+            return True
 
-    def open_db(self, rebuild=False):
+    def open_db(self, rebuild: bool = False) -> None:
         worker_generation = self._worker_generation_snapshot()
         worker = Worker(
             self._open_db,
@@ -1098,7 +1133,7 @@ class AiVectorstore:
         worker.signals.finished.connect(
             lambda generation=worker_generation: self._finish_vectorstore_worker(generation)
         )
-        worker.signals.error.connect(self._ui_relay.post_error)
+        worker.signals.error.connect(self._vectorstore_worker_error)
         worker.signals.progress.connect(self.open_progress)
         self.threadpool.start(worker)
 
@@ -1125,6 +1160,19 @@ class AiVectorstore:
             return
         if self.vectorstore_workers_count > 0:
             self.vectorstore_workers_count -= 1
+        if (
+                self.vectorstore_workers_count == 0
+                and self.is_open()
+                and getattr(self.app, "vectorstore_runtime_state", "") != VECTORSTORE_FAILED
+        ):
+            self._set_runtime_state(VECTORSTORE_READY)
+
+    def _vectorstore_worker_error(
+            self, exception_type: object, value: object, tb_obj: object) -> None:
+        """Record a vectorstore worker failure and forward it to the UI."""
+
+        self._set_runtime_state(VECTORSTORE_FAILED, str(value))
+        self._ui_relay.post_error(exception_type, value, tb_obj)
 
     def _query_embedding(self, query: str) -> np.ndarray:
         vector = self.app.ai_embedding_function.embed_query(query)
@@ -1281,6 +1329,7 @@ class AiVectorstore:
         self.reading_doc = ''
 
     def import_document(self, id_: int, name: str, text: Optional[str]) -> None:
+        self._set_runtime_state(VECTORSTORE_INDEXING)
         worker_generation = self._worker_generation_snapshot()
         worker = Worker(
             self._import_document,
@@ -1293,7 +1342,7 @@ class AiVectorstore:
             lambda generation=worker_generation: self.finished_import(generation)
         )
         worker.signals.progress.connect(self.progress_import)
-        worker.signals.error.connect(self._ui_relay.post_error)
+        worker.signals.error.connect(self._vectorstore_worker_error)
         self.import_workers_count += 1
         self.vectorstore_workers_count += 1
         self.threadpool.start(worker)
@@ -1302,7 +1351,6 @@ class AiVectorstore:
                             signals=None) -> None:
         if self.cancelled(worker_generation):
             return
-        self.app.ai._status = ''
         self._ensure_embedding_function()
         if self.cancelled(worker_generation):
             return
@@ -1320,7 +1368,8 @@ class AiVectorstore:
         finally:
             conn.close()
 
-    def update_vectorstore(self):
+    def update_vectorstore(self) -> None:
+        self._set_runtime_state(VECTORSTORE_INDEXING)
         worker_generation = self._worker_generation_snapshot()
         worker = Worker(
             self._update_vectorstore,
@@ -1330,44 +1379,55 @@ class AiVectorstore:
         worker.signals.finished.connect(
             lambda generation=worker_generation: self._finish_vectorstore_worker(generation)
         )
-        worker.signals.error.connect(self._ui_relay.post_error)
+        worker.signals.error.connect(self._vectorstore_worker_error)
         self.threadpool.start(worker)
 
-    def rebuild_vectorstore(self):
+    def rebuild_vectorstore(self) -> None:
         worker_generation = self._worker_generation_snapshot()
-        self.app.ai._status = ''
-        self._ensure_embedding_function()
-        self._set_project_paths()
-        conn = self._connect_search_db()
+        self._set_runtime_state(VECTORSTORE_INDEXING)
         try:
-            self._ensure_search_schema(conn)
-            self._set_meta_build_state(conn, "building")
-            self._reset_search_store(conn)
-            self._refresh_sources(conn, worker_generation=worker_generation)
-            with self._index_write_lock:
-                if self.cancelled(worker_generation):
-                    return
-                self._rebuild_faiss_index_from_db(conn)
-                self._set_meta_build_state(conn, "ready")
-        finally:
-            conn.close()
-
-    def delete_document(self, id_: int) -> None:
-        """Remove all indexed data for a source deleted from the project database."""
-
-        source_id = int(id_)
-        with self._index_write_lock:
+            self._ensure_embedding_function()
             self._set_project_paths()
             conn = self._connect_search_db()
             try:
                 self._ensure_search_schema(conn)
                 self._set_meta_build_state(conn, "building")
-                self._delete_source_rows(conn, source_id)
-                conn.commit()
-                self._rebuild_faiss_index_from_db(conn)
-                self._set_meta_build_state(conn, "ready")
+                self._reset_search_store(conn)
+                self._refresh_sources(conn, worker_generation=worker_generation)
+                with self._index_write_lock:
+                    if self.cancelled(worker_generation):
+                        return
+                    self._rebuild_faiss_index_from_db(conn)
+                    self._set_meta_build_state(conn, "ready")
             finally:
                 conn.close()
+        except Exception as err:
+            self._set_runtime_state(VECTORSTORE_FAILED, str(err))
+            raise
+        self._set_runtime_state(VECTORSTORE_READY)
+
+    def delete_document(self, id_: int) -> None:
+        """Remove all indexed data for a source deleted from the project database."""
+
+        self._set_runtime_state(VECTORSTORE_INDEXING)
+        source_id = int(id_)
+        try:
+            with self._index_write_lock:
+                self._set_project_paths()
+                conn = self._connect_search_db()
+                try:
+                    self._ensure_search_schema(conn)
+                    self._set_meta_build_state(conn, "building")
+                    self._delete_source_rows(conn, source_id)
+                    conn.commit()
+                    self._rebuild_faiss_index_from_db(conn)
+                    self._set_meta_build_state(conn, "ready")
+                finally:
+                    conn.close()
+        except Exception as err:
+            self._set_runtime_state(VECTORSTORE_FAILED, str(err))
+            raise
+        self._set_runtime_state(VECTORSTORE_READY)
 
     def _register_quit_hook(self):
         """
@@ -1408,6 +1468,7 @@ class AiVectorstore:
         self._chunk_ids_by_pos = []
         self.faiss_db = None
         self.reading_doc = ''
+        self._set_runtime_state(VECTORSTORE_UNLOADED)
         with self._state_lock:
             self._is_closing = False
 

@@ -1523,7 +1523,11 @@ class AiLLM():
         self.parent_text_edit = parent_text_edit
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(2)
-        self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
+        if getattr(self.app, "vectorstore", None) is None:
+            self.app.vectorstore = AiVectorstore(
+                self.app, self.parent_text_edit, self.sources_collection
+            )
+        self.sources_vectorstore = self.app.vectorstore
         self.ai_change_history = []  # Session-scoped AI write operations for undo
         self._runs_lock = threading.RLock()
         self._runs_by_id = {}
@@ -4914,7 +4918,6 @@ class AiLLM():
         self.cancel_all_runs(wait_ms=5000)
         if not self.threadpool.waitForDone(5000):
             logger.warning("AI LLM worker still running after 5s, cancellation left in place")
-        self.sources_vectorstore.close()
         self._large_llm_params = None
         self._fast_llm_params = None
         self._large_llm_factory = None

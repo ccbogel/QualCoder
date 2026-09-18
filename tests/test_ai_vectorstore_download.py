@@ -154,11 +154,13 @@ class TestEmbeddingModelDownload(TestCase):
     def test_failed_download_is_not_reported_as_successful(self):
         self.store.app = SimpleNamespace(settings={"ai_enable": "True"})
         self.store.download_model_running = True
+        self.store.download_model_error = ""
         self.store.embedding_model_is_cached = lambda: False
 
         with patch.object(ai_vectorstore, "_", lambda text: text, create=True):
             self.store._download_embedding_model_finished()
 
         self.assertFalse(self.store.download_model_running)
-        self.assertEqual("False", self.store.app.settings["ai_enable"])
+        self.assertEqual("True", self.store.app.settings["ai_enable"])
+        self.assertEqual("failed", self.store.app.vectorstore_runtime_state)
         self.assertIn("Could not download", self.messages[0])
