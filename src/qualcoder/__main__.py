@@ -359,6 +359,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._show_pending_ai_model_upgrade_offer()
         # Start expensive AI imports only after this constructor returns and
         # the normal Qt event loop can keep the visible window responsive.
+        QtCore.QTimer.singleShot(0, self.external_mcp.sync_with_application_state)
         QtCore.QTimer.singleShot(0, self.start_vectorstore_background_loading)
         QtCore.QTimer.singleShot(0, self.start_ai_background_loading)
         QtCore.QTimer.singleShot(0, self._offer_first_ai_setup)
@@ -2029,6 +2030,7 @@ Click "Yes" to start now.')
         if self.ai_import_thread is not None and self.ai_import_thread.isRunning():
             self.ai_import_thread.wait()
 
+        self.external_mcp.stop()
         self.close_project()
 
         self.app.settings['mainwindow_geometry'] = (
@@ -2884,7 +2886,6 @@ Click "Yes" to start now.')
         Remove widgets from tabs, clear dialog list. Close app connection.
         Delete old backups. Hide menu options. """
 
-        self.external_mcp.stop()
         self.app.ai_mcp_server.reset_project_state()
         self.journal_display = None
         for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):

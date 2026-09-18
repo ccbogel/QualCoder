@@ -9,6 +9,7 @@ import sqlite3
 import tempfile
 import threading
 import time
+from concurrent.futures import Future
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -715,6 +716,35 @@ class TestAiMemoPolicy(TestCase):
 
         with self.assertRaisesRegex(RuntimeError, "Instruct the user to open or create a project"):
             self.server._require_open_project()
+
+    def test_external_mcp_listener_is_enabled_without_project(self):
+        self.server.app.ai_mcp_server = self.server
+        self.server.app.conn = None
+        self.server.app.project_path = ""
+        self.server.app.settings["mcp_external_enabled"] = "True"
+        controller = ExternalMcpController(self.server.app)
+
+        with patch.object(controller, "start") as start, patch.object(controller, "stop") as stop:
+            controller.sync_with_application_state()
+
+        start.assert_called_once_with()
+        stop.assert_not_called()
+
+    def test_external_mcp_executor_allows_non_project_operations(self):
+        self.server.app.ai_mcp_server = self.server
+        self.server.app.conn = None
+        self.server.app.project_path = ""
+        controller = ExternalMcpController(self.server.app)
+        controller._active = True
+        future = Future()
+        context = AiMcpExecutionContext(
+            source="external_mcp",
+            owner="External MCP",
+        )
+
+        controller._execute_on_qt_thread(lambda: "available", context, future)
+
+        self.assertEqual("available", future.result())
 
     def test_mcp_memo_reads_and_updates_preserve_private_suffix(self):
         documents_payload = self.server._sanitize_memo_payload(self.server._read_resource_payload("qualcoder://documents", {}))

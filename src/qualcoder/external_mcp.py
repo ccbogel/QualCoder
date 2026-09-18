@@ -69,11 +69,10 @@ class ExternalMcpController(QtCore.QObject):
         )
 
     def sync_with_application_state(self) -> None:
-        """Start or stop the listener from current setting/project state."""
+        """Start or stop the listener from the current MCP setting."""
 
         enabled = str(self.app.settings.get("mcp_external_enabled", "False")).lower() == "true"
-        project_open = self.app.conn is not None and self.app.project_path != ""
-        if enabled and project_open:
+        if enabled:
             self.start()
         else:
             self._restart_requested = False
@@ -87,8 +86,6 @@ class ExternalMcpController(QtCore.QObject):
         if self._thread is not None and self._thread.is_alive():
             self._restart_requested = True
             QtCore.QTimer.singleShot(100, self._retry_start_after_stop)
-            return
-        if self.app.conn is None or self.app.project_path == "":
             return
 
         try:
@@ -125,7 +122,7 @@ class ExternalMcpController(QtCore.QObject):
             QtCore.QTimer.singleShot(100, self._retry_start_after_stop)
             return
         enabled = str(self.app.settings.get("mcp_external_enabled", "False")).lower() == "true"
-        if enabled and self.app.conn is not None and self.app.project_path != "":
+        if enabled:
             self.start()
         else:
             self._restart_requested = False
@@ -211,10 +208,6 @@ class ExternalMcpController(QtCore.QObject):
         if not self._active:
             if not future.done():
                 future.set_exception(RuntimeError("External MCP is disabled."))
-            return
-        if self.app.conn is None or self.app.project_path == "":
-            if not future.done():
-                future.set_exception(RuntimeError("No QualCoder project is currently open."))
             return
         try:
             result = self.mcp_server.run_with_execution_context(execution_context, operation)

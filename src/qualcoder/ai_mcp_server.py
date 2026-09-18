@@ -266,7 +266,8 @@ class AiMcpServer:
             "QualCoder is an open-source application for computer-assisted qualitative data analysis. "
             "It is used to organize, code, retrieve, and analyze qualitative research data. "
             "This MCP server provides access to the project currently open in the running "
-            "QualCoder application."
+            "QualCoder application. If no project is open, instruct the user to open or create "
+            "a project in QualCoder before retrying project operations."
         )
 
     def _current_ai_permissions(self) -> int:
