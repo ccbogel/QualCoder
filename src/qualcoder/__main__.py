@@ -371,7 +371,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_initialize_llm_after_load = initialize_llm_after_load
         self.app.ai_runtime_state = AI_LOADING
         self.ui.textEdit.append(_("AI: Loading components in the background..."))
-        self.statusBar().showMessage(_("AI: Starting up..."))
         self.ai_import_thread = AiImportThread(self)
         self.ai_import_thread.loaded.connect(self._finish_ai_runtime_initialization)
         self.ai_import_thread.failed.connect(self._ai_runtime_loading_failed)
@@ -394,7 +393,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.app.ai.init_llm(self)
             self.app.write_config_ini(self.app.settings, self.app.ai_models)
             self.ui.textEdit.append(_("AI: Components loaded."))
-            self._clear_ai_startup_status_message()
         except Exception as err:
             self._ai_runtime_loading_failed(
                 "".join(traceback.format_exception(type(err), err, err.__traceback__))
@@ -407,15 +405,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.ai_runtime_state = AI_FAILED
         self.app.ai_runtime_error = error_text
         logger.error("AI background loading failed:\n%s", error_text)
-        self._clear_ai_startup_status_message()
         self.ui.textEdit.append(_("AI: Components could not be loaded. See the log for details."))
-
-    def _clear_ai_startup_status_message(self) -> None:
-        """Clear our startup text without overwriting a newer status message."""
-
-        status_bar = self.statusBar()
-        if status_bar.currentMessage() == _("AI: Starting up..."):
-            status_bar.clearMessage()
 
     def load_ai_runtime_modal(
             self, title: str, parent: Optional[QtWidgets.QWidget] = None) -> bool:
