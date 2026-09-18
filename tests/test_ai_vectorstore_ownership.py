@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 from qualcoder import ai_llm
 from qualcoder.ai_runtime import VECTORSTORE_INDEXING
-from qualcoder.ai_vectorstore import AiVectorstore
+from qualcoder.ai_vectorstore import AiVectorstore, SearchChunkDocument
 
 
 class TestVectorstoreOwnership(TestCase):
@@ -52,3 +52,30 @@ class TestVectorstoreOwnership(TestCase):
         self.assertTrue(started)
         self.assertEqual(VECTORSTORE_INDEXING, store.app.vectorstore_runtime_state)
         store.open_db.assert_called_once_with(True)
+
+    def test_shared_vectorstore_performs_ranked_retrieval(self):
+        first = SearchChunkDocument(
+            page_content="first",
+            metadata={"id": 1, "start_index": 0},
+            id="first",
+        )
+        second = SearchChunkDocument(
+            page_content="second",
+            metadata={"id": 2, "start_index": 10},
+            id="second",
+        )
+        store = object.__new__(AiVectorstore)
+        store.faiss_db = SimpleNamespace(
+            similarity_search_with_relevance_scores=MagicMock(
+                side_effect=[
+                    [(first, 0.8), (second, 0.7)],
+                    [(first, 0.6)],
+                ]
+            )
+        )
+
+        result = store.retrieve_similar_documents(["query one", "query two"])
+
+        self.assertEqual([first, second], result)
+        self.assertAlmostEqual(3.4, first.metadata["score"])
+        self.assertAlmostEqual(1.7, second.metadata["score"])

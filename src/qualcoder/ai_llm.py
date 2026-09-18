@@ -5384,73 +5384,13 @@ class AiLLM():
     
     def _retrieve_from_vectorstore(self, search_strings, doc_ids=None, progress_callback=None, signals=None,
                                    score_threshold=0.5, k=50) -> list:
-        # Use the list of search_strings to retrieve related data from the vectorstore
-        try:
-            threshold = float(score_threshold)
-        except (TypeError, ValueError):
-            threshold = 0.5
-        threshold = max(0.0, min(threshold, 1.0))
-
-        try:
-            top_k = int(k)
-        except (TypeError, ValueError):
-            top_k = 50
-        top_k = max(1, min(top_k, 500))
-
-        search_kwargs = {'score_threshold': threshold, 'k': top_k}
-        chunks_meta_list = []
-        for _str in search_strings:
-            self._raise_if_run_canceled()
-            res = self.sources_vectorstore.faiss_db.similarity_search_with_relevance_scores(_str, **search_kwargs)
-            if doc_ids is not None and len(doc_ids) > 0:
-                # filter results by document ids
-                res_filtered = []
-                for chunk in res:
-                    if chunk[0].metadata['id'] in doc_ids:
-                        res_filtered.append(chunk)
-                chunks_meta_list.append(res_filtered)
-            else: 
-                chunks_meta_list.append(res)
-
-        # Consolidate and rank results:
-        # Flatten the lists of chunks in chunks_lists and collect all the chunks in a master list.
-        # Duplicate chunks are collected only once. The list is sorted by the frequency 
-        # of a chunk counted over all lists + the similarity score that faiss returns.
-        # This way, frequent and relevant chunks should be sorted to the top
-        # (see: "Reciprocal Rank Fusion" (https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf))
-
-        def chunk_unique_str(chunk_item):
-            # helper
-            chunk_key = str(chunk_item.metadata['id']) + ", "
-            chunk_key += str(chunk_item.metadata['start_index']) + ", "
-            return chunk_key
-            
-        # Flatten the lists and count the frequency of each chunk
-        chunk_count_list = {}  # contains the chunk count
-        chunk_master_list = []  # contains all chunks from all lists but no doubles
-        for lst in chunks_meta_list:
-            self._raise_if_run_canceled()
-            for chunk in lst:            
-                chunk_doc = chunk[0]
-                chunk_score = chunk[1]
-                chunk_str = chunk_unique_str(chunk_doc)
-                chunk_in_count_list = chunk_count_list.get(chunk_str, None)
-                if chunk_in_count_list: 
-                    chunk_count_list[chunk_str] += 1 + chunk_score
-                else:
-                    chunk_count_list[chunk_str] = 1 + chunk_score
-                    chunk_master_list.append(chunk_doc)
-                    
-        # add scores
-        for chunk_doc in chunk_master_list:
-            chunk_doc.metadata['score'] = chunk_count_list[chunk_unique_str(chunk_doc)]
-        
-        # Sort the common items by their score in descending order
-        chunk_master_list.sort(key=lambda chunk: chunk.metadata['score'], reverse=True)
-                                
-        logger.debug('First 10 chunks of retrieved data:\n' + str(chunk_master_list[:10]))
-        
-        return chunk_master_list
+        return self.sources_vectorstore.retrieve_similar_documents(
+            search_strings,
+            doc_ids=doc_ids,
+            score_threshold=score_threshold,
+            k=k,
+            cancel_check=self._raise_if_run_canceled,
+        )
     
     def search_analyze_chunk(self, result_callback, chunk, code_name, code_memo, search_prompt: AgentPromptRecord,
                              scope_type: str = '', scope_id=None, group_id: str = '',

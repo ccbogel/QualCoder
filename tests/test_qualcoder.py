@@ -690,6 +690,32 @@ class TestAiMemoPolicy(TestCase):
         )
         self.assertEqual("Updated only", merge_public_memo("Visible only", "Updated only#####ignore this"))
 
+    def test_mcp_search_uses_application_vectorstore_without_ai(self):
+        vectorstore = SimpleNamespace(
+            is_open=lambda: True,
+            is_ready=lambda: True,
+        )
+        self.server.app.ai = None
+        self.server.app.vectorstore = vectorstore
+        self.server.app.vectorstore_runtime_state = "ready"
+
+        self.assertIs(vectorstore, self.server._require_ready_vectorstore())
+
+    def test_mcp_search_reports_vectorstore_loading(self):
+        self.server.app.ai = None
+        self.server.app.vectorstore = None
+        self.server.app.vectorstore_runtime_state = "loading"
+
+        with self.assertRaisesRegex(RuntimeError, "currently being prepared"):
+            self.server._require_ready_vectorstore()
+
+    def test_mcp_missing_project_instructs_agent_to_ask_user(self):
+        self.server.app.conn = None
+        self.server.app.project_path = ""
+
+        with self.assertRaisesRegex(RuntimeError, "Instruct the user to open or create a project"):
+            self.server._require_open_project()
+
     def test_mcp_memo_reads_and_updates_preserve_private_suffix(self):
         documents_payload = self.server._sanitize_memo_payload(self.server._read_resource_payload("qualcoder://documents", {}))
         self.assertEqual("Document memo\n", documents_payload["documents"][0]["memo"])

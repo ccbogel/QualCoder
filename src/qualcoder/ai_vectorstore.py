@@ -36,7 +36,7 @@ import weakref
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 os.environ['FAISS_NO_AVX2'] = '1'
 # Setting the env 'FAISS_OPT_LEVEL' to '' will create a 'generic' index. It is a poorly documented 
@@ -1177,6 +1177,77 @@ class AiVectorstore:
     def _query_embedding(self, query: str) -> np.ndarray:
         vector = self.app.ai_embedding_function.embed_query(query)
         return np.asarray(vector, dtype=np.float32)
+
+    def retrieve_similar_documents(
+            self,
+            search_strings: List[str],
+            doc_ids: Optional[List[int]] = None,
+            score_threshold: float = 0.5,
+            k: int = 50,
+            cancel_check: Optional[Callable[[], None]] = None,
+    ) -> List[SearchChunkDocument]:
+        """Retrieve, consolidate, and rank matching project chunks.
+
+        Args:
+            search_strings: Semantic queries to run against the index.
+            doc_ids: Optional source ids used to filter results.
+            score_threshold: Minimum relevance score between zero and one.
+            k: Maximum matches requested for each query.
+            cancel_check: Optional callback that raises when work should stop.
+        """
+
+        try:
+            threshold = float(score_threshold)
+        except (TypeError, ValueError):
+            threshold = 0.5
+        threshold = max(0.0, min(threshold, 1.0))
+        try:
+            top_k = int(k)
+        except (TypeError, ValueError):
+            top_k = 50
+        top_k = max(1, min(top_k, 500))
+
+        search_kwargs = {"score_threshold": threshold, "k": top_k}
+        results_by_query = []
+        for search_string in search_strings:
+            if cancel_check is not None:
+                cancel_check()
+            results = self.faiss_db.similarity_search_with_relevance_scores(
+                search_string,
+                **search_kwargs,
+            )
+            if doc_ids:
+                results = [
+                    result for result in results
+                    if result[0].metadata.get("id") in doc_ids
+                ]
+            results_by_query.append(results)
+
+        chunk_scores: Dict[str, float] = {}
+        chunks: List[SearchChunkDocument] = []
+        for results in results_by_query:
+            if cancel_check is not None:
+                cancel_check()
+            for chunk_doc, chunk_score in results:
+                chunk_key = (
+                    f'{chunk_doc.metadata.get("id")}, '
+                    f'{chunk_doc.metadata.get("start_index")}, '
+                )
+                if chunk_key in chunk_scores:
+                    chunk_scores[chunk_key] += 1 + chunk_score
+                else:
+                    chunk_scores[chunk_key] = 1 + chunk_score
+                    chunks.append(chunk_doc)
+
+        for chunk_doc in chunks:
+            chunk_key = (
+                f'{chunk_doc.metadata.get("id")}, '
+                f'{chunk_doc.metadata.get("start_index")}, '
+            )
+            chunk_doc.metadata["score"] = chunk_scores[chunk_key]
+        chunks.sort(key=lambda chunk: chunk.metadata["score"], reverse=True)
+        logger.debug('First 10 chunks of retrieved data:\n%s', chunks[:10])
+        return chunks
 
     def _fetch_documents_by_chunk_ids(self, chunk_ids: List[int]) -> Dict[int, SearchChunkDocument]:
         result: Dict[int, SearchChunkDocument] = {}
