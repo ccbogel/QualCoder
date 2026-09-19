@@ -3886,7 +3886,7 @@ class AiLLM():
             if code_codings_non_ai > 0:
                 lines.append(
                     _("Warning: ") + str(code_codings_non_ai) +
-                    _(" of these codings are owned by someone else.")
+                    _(" of these codings belong to another user or agent and will also be deleted.")
                 )
         if len(category_ids) > 0:
             lines.append(
@@ -3901,7 +3901,7 @@ class AiLLM():
             if standalone_codings_non_ai > 0:
                 lines.append(
                     _("Warning: ") + str(standalone_codings_non_ai) +
-                    _(" standalone coding(s) are owned by someone else.")
+                    _(" standalone coding(s) belong to another user or agent and will also be deleted.")
                 )
         if len(case_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
@@ -4686,7 +4686,7 @@ class AiLLM():
             msg += _("Skipped operations removed from the list: ") + str(removed_skipped) + "\n"
         non_ai_loss = int(stats.get("deleted_code_codings_non_ai", 0))
         if non_ai_loss > 0:
-            msg += _("Warning: removed codings owned by someone else: ") + str(non_ai_loss) + "\n"
+            msg += _("Warning: codings belonging to another user or agent were also deleted: ") + str(non_ai_loss) + "\n"
         if len(skip_details) > 0:
             msg += "\n" + _("Undo details:") + "\n\n" + "\n\n".join(skip_details)
         if self.parent_text_edit is not None:
