@@ -3894,7 +3894,7 @@ class DialogAIChat(QtWidgets.QDialog):
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
-            result["error"] = _('Error during MCP-based topic exploration bootstrap: ') + str(err)
+            result["error"] = _('Error during MCP-based topic exploration bootstrap: ') + self.app.ai._exception_summary(err)
             return result
         finally:
             if ai_change_set_id != "":
@@ -4677,7 +4677,7 @@ class DialogAIChat(QtWidgets.QDialog):
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
-            result["error"] = _('Error during MCP-based code analysis bootstrap: ') + str(err)
+            result["error"] = _('Error during MCP-based code analysis bootstrap: ') + self.app.ai._exception_summary(err)
             return result
         finally:
             if ai_change_set_id != "":
@@ -5487,7 +5487,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
-            result["error"] = _('Error during MCP-based text analysis bootstrap: ') + str(err)
+            result["error"] = _('Error during MCP-based text analysis bootstrap: ') + self.app.ai._exception_summary(err)
             return result
         finally:
             if ai_change_set_id != "":
@@ -9225,7 +9225,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
         except Exception as err:
-            result["error"] = _('Error during MCP-based AI agent chat: ') + str(err)
+            result["error"] = _('Error during MCP-based AI agent chat: ') + self.app.ai._exception_summary(err)
         finally:
             if ai_change_set_id != "":
                 self._discard_empty_ai_change_set(ai_change_set_id)
@@ -9444,7 +9444,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.process_message('info', _('Error: The AI returned an empty result. This may indicate that the AI model is not available at the moment. Try again later or choose a different model.'), chat_idx)
             
     def ai_error_callback(self, exception_type, value, tb_obj):
-        """Called if the AI returns an error"""
+        """Display AI errors and their underlying causes in the chat."""
         self._cancel_pending_stream_render()
         run_id = str(getattr(self, 'current_streaming_run_id', '')).strip()
         partial_response = str(self.app.ai.get_streaming_output(run_id))
@@ -9486,10 +9486,16 @@ data collected. This information will accompany every prompt sent to the AI, res
                 fallback_to_current=True,
             )
             msg = _('Error communicating with ' + ai_model_name + '\n')
-            msg += exception_type.__name__ + ': ' + html_to_text(_safe_to_text(value))
+            if isinstance(value, BaseException):
+                msg += html_to_text(self.app.ai._exception_summary(value))
+            else:
+                msg += exception_type.__name__ + ': ' + html_to_text(_safe_to_text(value))
             if hasattr(value, 'message'):
                 msg += f' {_safe_to_text(getattr(value, "message", ""))}'
-            tb = '\n'.join(traceback.format_tb(tb_obj))
+            if isinstance(value, BaseException):
+                tb = ''.join(traceback.format_exception(exception_type, value, tb_obj))
+            else:
+                tb = '\n'.join(traceback.format_tb(tb_obj))
             if hasattr(value, 'body'):
                 tb += f'\n{_safe_to_text(getattr(value, "body", ""))}\n'
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)

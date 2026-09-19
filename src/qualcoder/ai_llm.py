@@ -1817,6 +1817,26 @@ class AiLLM():
                     return _chatgpt_oauth_reauth_message()
         return ''
 
+    def _exception_summary(self, err: BaseException) -> str:
+        """Include nested causes in an error message without traceback frames.
+
+        Args:
+            err: The exception reported by the model provider.
+        """
+        lines = []
+        seen = set()
+        current = err
+        while current is not None and id(current) not in seen:
+            seen.add(id(current))
+            detail = f'{type(current).__name__}: {self._safe_to_text(current)}'
+            if not lines or detail != lines[-1]:
+                lines.append(detail)
+            cause = current.__cause__
+            current = cause if cause is not None else (
+                None if current.__suppress_context__ else current.__context__
+            )
+        return '\n'.join(lines)
+
     def _write_ai_log(self, text: str):
         if not self._ensure_ai_log_logger():
             return
@@ -1867,11 +1887,11 @@ class AiLLM():
         """Log one LLM error for traceability."""
 
         model_name = self._llm_name_for_log(llm)
-        error_text = self._safe_to_text(err)
+        error_text = self._exception_summary(err)
         line = f'[#{req_id}] ERROR model="{model_name}"'
         if context.strip() != '':
             line += f' context="{context.strip()}"'
-        line += f' {err.__class__.__name__}: {error_text}'
+        line += f' {error_text}'
         self._write_ai_log(line)
 
     def _exception_chain(self, err: BaseException):
@@ -4787,7 +4807,7 @@ class AiLLM():
                 fast_model = curr_model['fast_model']
                 self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
                 ensure_chatgpt_oauth_profile_defaults(curr_model)
-                api_base = curr_model['api_base']
+                api_base = str(curr_model.get('api_base') or '').strip()
                 api_key = curr_model['api_key']
                 is_chatgpt_oauth = is_chatgpt_oauth_api_base(api_base)
                 if api_key == '' and not is_chatgpt_oauth:
@@ -4857,7 +4877,8 @@ class AiLLM():
                     large_llm_params = {
                         'model': large_model, 
                         'openai_api_key': api_key, 
-                        'openai_api_base': api_base, 
+                        # None preserves the client's default URL for blank profiles.
+                        'openai_api_base': api_base or None,
                         'cache': False,
                         'temperature': temp,
                         'top_p': top_p,
@@ -5000,11 +5021,16 @@ class AiLLM():
                 auth_message = self._chatgpt_oauth_user_error(value)
             if auth_message != '':
                 msg = _('AI Error:\n') + auth_message
+            elif isinstance(value, BaseException):
+                msg = _('AI Error:\n') + html_to_text(self._exception_summary(value))
             else:
                 value_text = html_to_text(self._safe_to_text(value))
                 msg = _('AI Error:\n')
                 msg += exception_type.__name__ + ': ' + str(value_text)
-            tb = '\n'.join(traceback.format_tb(tb_obj))
+            if isinstance(value, BaseException):
+                tb = ''.join(traceback.format_exception(exception_type, value, tb_obj))
+            else:
+                tb = '\n'.join(traceback.format_tb(tb_obj))
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
             # Trigger message box show
             qt_exception_hook._exception_caught.emit(msg, tb)
