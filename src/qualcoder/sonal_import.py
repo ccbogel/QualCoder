@@ -69,8 +69,7 @@ class SonalImport:
         self.parent_textEdit.append(self.selected_path)
         try:
             self.load_and_import()
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.update_vectorstore()
+            self.app.vectorstore_update()
         except Exception as exc:
             logger.warning("Sonal import failed", exc_info=True)
             self.parent_textEdit.append(

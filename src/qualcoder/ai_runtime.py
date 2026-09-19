@@ -90,13 +90,17 @@ def show_ai_not_ready(app: Any, title: str = "AI") -> None:
         if callable(get_ai_status)
         else getattr(app, "ai_runtime_state", AI_UNLOADED)
     )
-    if status == AI_FAILED:
+    if getattr(app, "project_path", None) == "":
+        text = _("No project is open. Open or create a project in QualCoder, then try again.")
+    elif status == AI_FAILED:
         text = _("The AI components could not be loaded. Please restart QualCoder or check the log for details.")
     elif status == AI_DISABLED:
         text = _("The AI is disabled. Enable it in the AI Setup Wizard or AI Settings.")
     elif status == "busy":
         text = _("The AI is busy. Please wait a moment and retry.")
-    elif status in ("no data", "reading data"):
+    elif status == "no data":
+        text = _("The project search index is not available yet. Please retry in a moment.")
+    elif status == "reading data":
         text = _("The AI is still preparing the project data. Please retry in a moment.")
     else:
         text = _("The AI components are still loading in the background. Please retry in a moment.")
@@ -122,6 +126,9 @@ def ensure_ai_loaded(app: Any, title: str = "AI") -> bool:
 def ensure_ai_ready(app: Any, title: str = "AI") -> bool:
     """Return whether the AI can accept a request, otherwise explain why."""
 
+    if getattr(app, "project_path", None) == "":
+        show_ai_not_ready(app, title)
+        return False
     if app.get_ai_status() == AI_READY:
         return True
     show_ai_not_ready(app, title)

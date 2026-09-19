@@ -534,8 +534,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                             logger.debug(e_)
 
                     # Add doc to vectorstore
-                    if self.app.settings['ai_enable'] == 'True':
-                        self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext)
+                    self.app.vectorstore_import_document(fid, qual_file_name, fulltext)
 
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))

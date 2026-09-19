@@ -17,6 +17,7 @@ from qualcoder.ai_runtime import (
     show_ai_runtime_not_ready,
     vectorstore_required,
 )
+from qualcoder.ai_llm import AiLLM
 from qualcoder.app import App
 from qualcoder.__main__ import MainWindow
 
@@ -46,6 +47,44 @@ class TestAiRuntime(TestCase):
         app.ai = SimpleNamespace(get_status=lambda: AI_READY)
         self.assertEqual(AI_READY, app.get_ai_status())
 
+    def test_llm_startup_clears_starting_state_while_index_opens(self):
+        app = SimpleNamespace(
+            settings={"ai_enable": "True", "ai_model_index": 0},
+            ai_models=[{
+                "large_model": "test-large",
+                "large_model_context_window": 4096,
+                "fast_model": "test-fast",
+                "fast_model_context_window": 4096,
+                "api_base": "http://localhost",
+                "api_key": "test-key",
+            }],
+        )
+        store = SimpleNamespace(
+            is_open=MagicMock(return_value=False),
+            ai_worker_running=MagicMock(return_value=False),
+            init_vectorstore=MagicMock(),
+        )
+        service = object.__new__(AiLLM)
+        service.app = app
+        service.parent_text_edit = SimpleNamespace(append=MagicMock())
+        service.sources_vectorstore = store
+        service._migrate_legacy_prompts_for_current_scope = MagicMock()
+
+        with patch("qualcoder.ai_llm.QtWidgets.QApplication.processEvents"):
+            service.init_llm(SimpleNamespace())
+
+        store.init_vectorstore.assert_called_once_with(False)
+        self.assertEqual("", service._status)
+        store.ai_worker_running.return_value = True
+        self.assertEqual("reading data", service.get_status())
+
+        store.init_vectorstore.reset_mock()
+        with patch("qualcoder.ai_llm.QtWidgets.QApplication.processEvents"):
+            service.init_llm(SimpleNamespace())
+
+        store.init_vectorstore.assert_not_called()
+        self.assertEqual("", service._status)
+
     def test_operational_guard_uses_combined_status(self):
         app = App.__new__(App)
         app.ai_runtime_state = AI_LOADING
@@ -60,6 +99,43 @@ class TestAiRuntime(TestCase):
             show_ai_runtime_not_ready(app, "AI Agent")
         self.assertIn("retry", message_class.call_args.args[2].lower())
         message_class.return_value.exec.assert_called_once_with()
+
+    def test_new_chat_without_project_asks_to_open_one(self):
+        app = SimpleNamespace(
+            project_path="",
+            get_ai_status=lambda: "no data",
+        )
+
+        with patch("qualcoder.ai_runtime.Message") as message_class:
+            self.assertFalse(ensure_ai_ready(app, "AI Agent"))
+
+        message = message_class.call_args.args[2]
+        self.assertIn("Open or create a project", message)
+        self.assertNotIn("preparing the project data", message)
+
+    def test_new_chat_without_project_rejects_even_ready_ai(self):
+        app = SimpleNamespace(
+            project_path="",
+            get_ai_status=lambda: AI_READY,
+        )
+
+        with patch("qualcoder.ai_runtime.Message") as message_class:
+            self.assertFalse(ensure_ai_ready(app, "AI Agent"))
+
+        self.assertIn("Open or create a project", message_class.call_args.args[2])
+
+    def test_open_project_without_search_index_reports_index_status(self):
+        app = SimpleNamespace(
+            project_path="project.qda",
+            get_ai_status=lambda: "no data",
+        )
+
+        with patch("qualcoder.ai_runtime.Message") as message_class:
+            self.assertFalse(ensure_ai_ready(app, "AI Agent"))
+
+        message = message_class.call_args.args[2]
+        self.assertIn("search index", message)
+        self.assertNotIn("Open or create a project", message)
 
     def test_failure_message_does_not_claim_loading(self):
         app = SimpleNamespace(ai_runtime_state=AI_FAILED)

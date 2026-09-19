@@ -608,8 +608,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         # update doc in vectorstore
         if self.has_changed:
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.import_document(self.fid, self.name, self.text)
+            self.app.vectorstore_import_document(self.fid, self.name, self.text)
         super(DialogEditTextFile, self).accept()
 
     def _emit_project_table_changes(self, tables):

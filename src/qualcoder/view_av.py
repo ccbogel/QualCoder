@@ -1991,9 +1991,10 @@ class DialogViewAV(QtWidgets.QDialog):
             self.casetext = []
             self.app.conn.commit()  # Commit all changes in one go to prevent database inconsistencies
             # Update transcript in vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                name = self.transcription[2]
-                self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, current_text)
+            name = self.transcription[2]
+            self.app.vectorstore_import_document(
+                self.transcription[0], name, current_text
+            )
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()

@@ -5905,8 +5905,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ed_update_annotations()
             self.ed_update_casetext()
             # Update vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text)
+            self.app.vectorstore_import_document(
+                self.file_['id'], self.file_['name'], self.text
+            )
 
         self.ui.plainTextEdit.setTextInteractionFlags(
             # make the textEdit read only by removing the 'TextEditable' flag

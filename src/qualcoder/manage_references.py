@@ -79,7 +79,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.parent_text_edit = parent_text_edit
         # Per import session tri-state: code the highlights of attached PDFs.
         self.pdf_import_code_highlights = None
-        # Attachments imported in the current batch, to update the AI memory once.
+        # Attachments imported in the current batch, to update the search index once.
         self.attachments_imported = 0
         self.files = []
         self.av_dialog_open = None
@@ -815,19 +815,17 @@ class DialogReferenceManager(QtWidgets.QDialog):
         elif clicked == button_zotero:
             self.import_from_zotero()
 
-    def _update_ai_vectorstore(self):
+    def _update_vectorstore(self):
         """
-        A single pass over the AI memory when the batch is done, instead of one per attachment.
+        A single pass over the search index when the batch is done, instead of one per attachment.
         update_vectorstore() reindexes everything missing in the project in one worker, so it
         covers every imported attachment and queues one job instead of one per file.
         """
 
         if not self.attachments_imported:
             return
-        if self.app.settings.get('ai_enable') != 'True':
-            return
         try:
-            self.app.ai.sources_vectorstore.update_vectorstore()
+            self.app.vectorstore_update()
         except Exception as err:
             logger.warning(f"Attachment vectorstore update failed: {err}")
 
@@ -839,7 +837,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.pdf_import_code_highlights = None  # Asked once.
         self.attachments_imported = 0
         RisImport(self.app, self.parent_text_edit, self)  # self: For dialog and db.
-        self._update_ai_vectorstore()
+        self._update_vectorstore()
         self.get_data()
 
     def import_from_zotero(self):
@@ -851,7 +849,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.attachments_imported = 0
         from .manage_references_import_zotero import ZoteroImport
         ZoteroImport(self.app, self.parent_text_edit, self).run()
-        self._update_ai_vectorstore()
+        self._update_vectorstore()
 
     def _reference_signature(self, tag_value_pairs):
         """
@@ -1006,9 +1004,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
             cur.execute("insert into attribute (name, attr_type, value, id, date, owner) "
                         "values(?,'file','',?,?,?)", [a[0], fid, now, self.app.settings['codername']])
         self.app.conn.commit()
-        # The AI memory is not touched per file: import_document queues a worker that rebuilds the
+        # The search index is not touched per file: import_document queues a worker that rebuilds the
         # whole FAISS index, and a batch would queue one rebuild per attachment. Counted here only;
-        # _update_ai_vectorstore does the single pass when the batch ends.
+        # _update_vectorstore does the single pass when the batch ends.
         self.attachments_imported += 1
         if notify:
             self._emit_project_table_changes(['source', 'attribute'])

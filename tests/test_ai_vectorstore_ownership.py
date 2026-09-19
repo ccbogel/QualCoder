@@ -4,6 +4,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from qualcoder import ai_llm
+from qualcoder.app import App
 from qualcoder.ai_runtime import VECTORSTORE_INDEXING
 from qualcoder.ai_vectorstore import AiVectorstore, SearchChunkDocument
 
@@ -52,6 +53,41 @@ class TestVectorstoreOwnership(TestCase):
         self.assertTrue(started)
         self.assertEqual(VECTORSTORE_INDEXING, store.app.vectorstore_runtime_state)
         store.open_db.assert_called_once_with(True)
+
+    def test_mcp_only_document_changes_use_shared_vectorstore(self):
+        app = object.__new__(App)
+        app.settings = {
+            "ai_enable": "False",
+            "mcp_external_enabled": "True",
+        }
+        app.ai = None
+        app.vectorstore = MagicMock()
+
+        app.vectorstore_import_document(7, "Interview", "Updated text")
+        app.vectorstore_update()
+        app.vectorstore_delete_document(7)
+
+        app.vectorstore.import_document.assert_called_once_with(
+            7, "Interview", "Updated text"
+        )
+        app.vectorstore.update_vectorstore.assert_called_once_with()
+        app.vectorstore.delete_document.assert_called_once_with(7)
+
+    def test_document_changes_skip_vectorstore_without_a_consumer(self):
+        app = object.__new__(App)
+        app.settings = {
+            "ai_enable": "False",
+            "mcp_external_enabled": "False",
+        }
+        app.vectorstore = MagicMock()
+
+        app.vectorstore_import_document(7, "Interview", "Updated text")
+        app.vectorstore_update()
+        app.vectorstore_delete_document(7)
+
+        app.vectorstore.import_document.assert_not_called()
+        app.vectorstore.update_vectorstore.assert_not_called()
+        app.vectorstore.delete_document.assert_not_called()
 
     def test_shared_vectorstore_performs_ranked_retrieval(self):
         first = SearchChunkDocument(

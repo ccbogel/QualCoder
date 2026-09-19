@@ -4895,10 +4895,10 @@ class AiLLM():
                 self.app.settings['ai_enable'] = 'True'
                 
                 # init vectorstore
-                if not self.sources_vectorstore.is_open():
+                if not self.sources_vectorstore.is_open() and not self.sources_vectorstore.ai_worker_running():
                     self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
-                else:
-                    self._status = ''
+                self._status = ''
+                if self.sources_vectorstore.is_open() and not self.sources_vectorstore.ai_worker_running():
                     self.parent_text_edit.append(_('AI: Ready'))
             else:
                 self.close()
