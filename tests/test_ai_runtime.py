@@ -1,5 +1,7 @@
+import gettext
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -14,9 +16,11 @@ from qualcoder.ai_runtime import (
     VECTORSTORE_LOADING,
     ai_runtime_ready,
     ensure_ai_ready,
+    runtime_status_bar_text,
     show_ai_runtime_not_ready,
     vectorstore_required,
 )
+from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_llm import AiLLM
 from qualcoder.app import App
 from qualcoder.__main__ import MainWindow
@@ -28,6 +32,72 @@ class TestAiRuntime(TestCase):
     def test_ready_state(self):
         self.assertTrue(ai_runtime_ready(SimpleNamespace(ai_runtime_state=AI_READY)))
         self.assertFalse(ai_runtime_ready(SimpleNamespace(ai_runtime_state=AI_LOADING)))
+
+    def test_status_bar_adds_mcp_only_for_running_listener(self):
+        app = SimpleNamespace(get_ai_status=lambda: AI_DISABLED)
+
+        self.assertEqual("AI: Disabled", runtime_status_bar_text(app))
+        self.assertEqual(
+            "AI: Disabled | MCP active",
+            runtime_status_bar_text(app, mcp_active=True),
+        )
+
+    def test_status_bar_translates_operational_states(self):
+        mo_path = Path(__file__).resolve().parents[1] / "src/qualcoder/i18n/de.mo"
+        with mo_path.open("rb") as translation_file:
+            translator = gettext.GNUTranslations(translation_file)
+        app = SimpleNamespace(get_ai_status=lambda: "ready")
+
+        with patch("qualcoder.ai_runtime._", translator.gettext, create=True):
+            for ai_status, expected in (
+                ("ready", "KI: Bereit"),
+                ("busy", "KI: Beschäftigt"),
+                ("no data", "KI: Keine Daten"),
+                ("closed", "KI: Geschlossen"),
+                ("closing", "KI: Wird geschlossen"),
+                ("reading data", "KI: Daten werden gelesen"),
+                ("disabled", "KI: Deaktiviert"),
+                ("failed", "KI: Komponenten konnten nicht geladen werden."),
+            ):
+                with self.subTest(ai_status=ai_status):
+                    app.get_ai_status = lambda status=ai_status: status
+                    self.assertEqual(expected, runtime_status_bar_text(app))
+
+            app.get_ai_status = lambda: "ready"
+            self.assertEqual("KI: Bereit | MCP aktiv", runtime_status_bar_text(app, True))
+
+    def test_ai_chat_status_includes_running_mcp_listener(self):
+        status_bar = MagicMock()
+        controller = SimpleNamespace(is_running=True)
+        dialog = SimpleNamespace(
+            app=SimpleNamespace(
+                ai=None,
+                get_ai_status=lambda: AI_READY,
+                highlight_color=lambda: "#123456",
+            ),
+            ui=SimpleNamespace(
+                pushButton_question=MagicMock(),
+                progressBar_ai=MagicMock(),
+            ),
+            main_window=SimpleNamespace(
+                external_mcp=controller,
+                statusBar=lambda: status_bar,
+            ),
+            _chat_scope_active=lambda: False,
+        )
+
+        with patch("qualcoder.ai_chat.qta.icon"):
+            DialogAIChat.update_ai_busy(dialog)
+            status_bar.showMessage.assert_called_with("AI: Ready | MCP active")
+
+            dialog.app.get_ai_status = lambda: AI_DISABLED
+            DialogAIChat.update_ai_busy(dialog)
+            status_bar.showMessage.assert_called_with("AI: Disabled | MCP active")
+
+            controller.is_running = False
+            DialogAIChat.update_ai_busy(dialog)
+
+        status_bar.showMessage.assert_called_with("AI: Disabled")
 
     def test_app_status_covers_runtime_and_operational_state(self):
         app = App.__new__(App)

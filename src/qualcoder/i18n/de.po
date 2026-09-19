@@ -19,6 +19,38 @@ msgstr ""
 "X-Language: de_DE\n"
 "X-Source-Language: en_US\n"
 
+#: src/qualcoder/ai_runtime.py
+msgid "AI: Disabled"
+msgstr "KI: Deaktiviert"
+
+#: src/qualcoder/ai_runtime.py
+msgid "AI: Busy"
+msgstr "KI: Beschäftigt"
+
+#: src/qualcoder/ai_runtime.py
+msgid "AI: No data"
+msgstr "KI: Keine Daten"
+
+#: src/qualcoder/ai_runtime.py
+msgid "AI: Closed"
+msgstr "KI: Geschlossen"
+
+#: src/qualcoder/ai_runtime.py
+msgid "AI: Closing"
+msgstr "KI: Wird geschlossen"
+
+#: src/qualcoder/ai_runtime.py
+msgid "AI: Reading data"
+msgstr "KI: Daten werden gelesen"
+
+#: src/qualcoder/ai_runtime.py
+msgid "AI: Components could not be loaded."
+msgstr "KI: Komponenten konnten nicht geladen werden."
+
+#: src/qualcoder/ai_runtime.py
+msgid "MCP active"
+msgstr "MCP aktiv"
+
 #: C:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\qualcoder\add_attribute.py:75
 msgid "This attribute name already exists in cases, files or journals."
 msgstr ""

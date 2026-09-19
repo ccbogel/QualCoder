@@ -81,6 +81,45 @@ def ai_runtime_ready(app: Any) -> bool:
     return getattr(app, "ai_runtime_state", AI_UNLOADED) == AI_READY
 
 
+def runtime_status_bar_text(app: Any, mcp_active: bool = False) -> str:
+    """Describe the AI state and an optional running external MCP listener.
+
+    Args:
+        app: Current QualCoder application state.
+        mcp_active: Whether the external MCP listener is accepting requests.
+    """
+
+    ai_status = app.get_ai_status()
+    if ai_status in (AI_UNLOADED, AI_LOADING, AI_INITIALIZING, "starting"):
+        status_text = _("AI: Starting up...")
+    elif ai_status == AI_DISABLED:
+        status_text = _("AI: Disabled")
+    elif ai_status == AI_FAILED:
+        status_text = _("AI: Components could not be loaded.")
+    elif ai_status == "reading data":
+        vectorstore = getattr(getattr(app, "ai", None), "sources_vectorstore", None)
+        reading_doc = getattr(vectorstore, "reading_doc", "")
+        status_text = _("AI: Reading data")
+        if reading_doc:
+            status_text += f" ({reading_doc})"
+    elif ai_status == "ready":
+        status_text = _("AI: Ready")
+    elif ai_status == "busy":
+        status_text = _("AI: Busy")
+    elif ai_status == "no data":
+        status_text = _("AI: No data")
+    elif ai_status == "closed":
+        status_text = _("AI: Closed")
+    elif ai_status == "closing":
+        status_text = _("AI: Closing")
+    else:
+        status_text = _("AI: ") + str(ai_status)
+
+    if mcp_active:
+        status_text += " | " + _("MCP active")
+    return status_text
+
+
 def show_ai_not_ready(app: Any, title: str = "AI") -> None:
     """Explain why the AI cannot handle the requested action yet."""
 

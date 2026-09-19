@@ -56,12 +56,8 @@ from .ai_agent_prompts import (
 )
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
 from .ai_runtime import (
-    AI_DISABLED,
-    AI_FAILED,
-    AI_INITIALIZING,
-    AI_LOADING,
-    AI_UNLOADED,
     ensure_ai_ready,
+    runtime_status_bar_text,
 )
 from .ai_search_dialog import DialogAiSearch
 from .ai_ui import (
@@ -5619,20 +5615,12 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.ui.pushButton_question.setIcon(spin_icon)
                 self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
                 self.ui.progressBar_ai.setRange(0, 0)  # Starts the animation
-        # Repeating the loading state here restores it after temporary menu
-        # status tips disappear.
-        ai_status = self.app.get_ai_status()
-        if ai_status in (AI_UNLOADED, AI_LOADING, AI_INITIALIZING):
-            self.main_window.statusBar().showMessage(_("AI: Starting up..."))
-        elif ai_status == AI_DISABLED:
-            self.main_window.statusBar().showMessage(_("AI: ") + _("disabled"))
-        elif ai_status == AI_FAILED:
-            self.main_window.statusBar().showMessage(_("AI: Components could not be loaded."))
-        else:
-            if ai_status == 'reading data' and self.app.ai.sources_vectorstore.reading_doc != '':
-                self.main_window.statusBar().showMessage(_('AI: ') + _('reading data') + ' (' + self.app.ai.sources_vectorstore.reading_doc + ')')
-            else:
-                self.main_window.statusBar().showMessage(_('AI: ') + _(ai_status))
+        # Restore the runtime status after temporary menu status tips disappear.
+        external_mcp = getattr(self.main_window, "external_mcp", None)
+        mcp_active = bool(getattr(external_mcp, "is_running", False))
+        self.main_window.statusBar().showMessage(
+            runtime_status_bar_text(self.app, mcp_active)
+        )
 
     def on_ai_output_scroll(self, value):
         """Normally, if the AI is generating text, the scrollArea_ai_output scrolls to the bottom
