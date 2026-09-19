@@ -379,8 +379,9 @@ class ReplaceTextFile:
              self.old_file['id']))
         self.app.conn.commit()
         # Update vectorstore
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.import_document(self.old_file['id'], self.new_file['name'], self.new_file['fulltext'])
+        self.app.vectorstore_import_document(
+            self.old_file['id'], self.new_file['name'], self.new_file['fulltext']
+        )
 
     def get_item_and_hierarchy(self, page, lobj: Any):
         """ Get text item details add to page_dict, with descendants.

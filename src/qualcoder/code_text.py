@@ -46,9 +46,8 @@ from odf import text as odf_text, office as odf_office, dc as odf_dc, style as o
 from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
-from .ai_prompt_library import DialogAiEditPrompts
-from .ai_search_dialog import DialogAiSearch
-from .ai_chat import ai_chat_signal_emitter
+from .ai_runtime import AI_READY, ensure_ai_ready
+from .ai_ui import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH, MINIMUM_CODING_MARGIN_WIDTH,
                                       MINIMUM_CODING_MARGIN_LABEL_WIDTH)
@@ -2247,6 +2246,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.mark_with_new_code(in_vivo=True)
             return
         if action.property('submenu') == 'ai_text_analysis':
+            if not ensure_ai_ready(self.app, _("AI Text Analysis")):
+                return
             if self.file_ is None:
                 Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
                 return
@@ -2259,6 +2260,8 @@ class DialogCodeText(QtWidgets.QWidget):
                                                           action.data())
             return
         if action.property('submenu') == 'ai_text_analysis_prompts':
+            from .ai_prompt_library import DialogAiEditPrompts
+
             DialogAiEditPrompts(self.app, 'text_analysis').exec()
             return
         # Remaining actions will be the submenu codes
@@ -5902,8 +5905,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ed_update_annotations()
             self.ed_update_casetext()
             # Update vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text)
+            self.app.vectorstore_import_document(
+                self.file_['id'], self.file_['name'], self.text
+            )
 
         self.ui.plainTextEdit.setTextInteractionFlags(
             # make the textEdit read only by removing the 'TextEditable' flag
@@ -6360,23 +6364,16 @@ class DialogCodeText(QtWidgets.QWidget):
         This will open a DialogAISearch to collect the search parameters and then 
         start phase 1 of the search, looking for suitable chunks of data in the vectorstore.
         """
+        if not ensure_ai_ready(self.app, _("AI Search")):
+            return
         if self.edit_mode:
             msg = _('Please finish editing the text before starting an AI search.')
-            Message(self.app, _('AI Search'), msg, "warning").exec()
-            return
-        if self.app.ai.get_status() == 'disabled':
-            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
             return
         if self.ai_search_running:
             msg = _('The AI is already performing a search. Please stop it before starting a new one.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
             return
-        if not self.app.ai.is_ready():
-            msg = _('The AI is busy, please wait a moment and retry.')
-            Message(self.app, _('AI Search'), msg, "warning").exec()
-            return
-
         # Get currently selected item in code tree
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None:  # nothing selected
@@ -6390,6 +6387,8 @@ class DialogCodeText(QtWidgets.QWidget):
             selected_is_code = True
 
         # Sort option lives in the shared code tree controller
+        from .ai_search_dialog import DialogAiSearch
+
         ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code, self.code_tree.tree_sort_option)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
@@ -6659,7 +6658,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if self.ai_search_chunks_pos >= len(self.ai_search_similar_chunk_list):
                     msg = _('There are no more pieces of data to analyze for this search. Please start a new search.')
                     Message(self.app, _('AI Search'), msg, "warning").exec()
-                elif self.ai_search_running or (not self.app.ai.is_ready()):
+                elif self.ai_search_running or self.app.get_ai_status() != AI_READY:
                     msg = _('The AI is busy. Please wait a moment and retry.')
                     Message(self.app, _('AI Search'), msg, "warning").exec()
                 else:

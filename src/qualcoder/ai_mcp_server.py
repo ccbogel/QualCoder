@@ -49,6 +49,13 @@ from mcp.server.lowlevel import Server
 
 from .ai_help_index import AiHelpIndex
 from .ai_memo import extract_ai_memo, merge_public_memo
+from .ai_runtime import (
+    VECTORSTORE_DISABLED,
+    VECTORSTORE_FAILED,
+    VECTORSTORE_INDEXING,
+    VECTORSTORE_LOADING,
+    VECTORSTORE_UNLOADED,
+)
 from .color_selector import color_matcher, colors
 
 
@@ -259,7 +266,8 @@ class AiMcpServer:
             "QualCoder is an open-source application for computer-assisted qualitative data analysis. "
             "It is used to organize, code, retrieve, and analyze qualitative research data. "
             "This MCP server provides access to the project currently open in the running "
-            "QualCoder application."
+            "QualCoder application. If no project is open, instruct the user to open or create "
+            "a project in QualCoder before retrying project operations."
         )
 
     def _current_ai_permissions(self) -> int:
@@ -987,7 +995,10 @@ class AiMcpServer:
         """Reject project operations when no current project is open."""
 
         if getattr(self.app, "conn", None) is None or getattr(self.app, "project_path", "") == "":
-            raise RuntimeError("No QualCoder project is currently open.")
+            raise RuntimeError(
+                "No QualCoder project is currently open. "
+                "Instruct the user to open or create a project in QualCoder, then retry this operation."
+            )
 
     def _read_resource_payload(self, uri: str, window: Dict[str, Any]) -> Dict[str, Any]:
         parts = urlsplit(uri)
@@ -4538,16 +4549,42 @@ class AiMcpServer:
             "exclude_cids": exclude_cids,
         }
 
+    def _require_ready_vectorstore(self) -> Any:
+        """Return the shared vectorstore or raise an actionable MCP error."""
+
+        state = str(getattr(self.app, "vectorstore_runtime_state", "")).strip().lower()
+        vectorstore = getattr(self.app, "vectorstore", None)
+        if state == VECTORSTORE_FAILED:
+            raise RuntimeError(
+                "The QualCoder search index could not be prepared. "
+                "Instruct the user to check QualCoder for details and retry the initialization."
+            )
+        if state == VECTORSTORE_DISABLED:
+            raise RuntimeError(
+                "The QualCoder search index is disabled. "
+                "Instruct the user to enable External MCP or AI-powered search in QualCoder, "
+                "then retry this operation."
+            )
+        if vectorstore is None or state in (
+                VECTORSTORE_UNLOADED,
+                VECTORSTORE_LOADING,
+                VECTORSTORE_INDEXING,
+        ):
+            raise RuntimeError(
+                "The QualCoder search index is currently being prepared. "
+                "Wait briefly, then retry this operation. Other project tools remain available."
+            )
+        is_open = getattr(vectorstore, "is_open", None)
+        is_ready = getattr(vectorstore, "is_ready", None)
+        if not callable(is_open) or not is_open() or not callable(is_ready) or not is_ready():
+            raise RuntimeError(
+                "The QualCoder search index is currently being prepared. "
+                "Wait briefly, then retry this operation. Other project tools remain available."
+            )
+        return vectorstore
+
     def _read_vector_search(self, options: Dict[str, Any]) -> Dict[str, Any]:
-        ai = getattr(self.app, "ai", None)
-        if ai is None:
-            raise RuntimeError("AI integration is not initialized.")
-        vectorstore = getattr(ai, "sources_vectorstore", None)
-        if vectorstore is None or getattr(vectorstore, "faiss_db", None) is None:
-            raise RuntimeError("Vectorstore is not initialized.")
-        is_ready_fn = getattr(vectorstore, "is_ready", None)
-        if callable(is_ready_fn) and not is_ready_fn():
-            raise RuntimeError("Vectorstore is currently updating. Please try again shortly.")
+        vectorstore = self._require_ready_vectorstore()
 
         queries = options.get("queries", [])
         if not isinstance(queries, list) or len(queries) == 0:
@@ -4721,15 +4758,7 @@ class AiMcpServer:
             conn.close()
 
     def _read_bm25_search(self, options: Dict[str, Any]) -> Dict[str, Any]:
-        ai = getattr(self.app, "ai", None)
-        if ai is None:
-            raise RuntimeError("AI integration is not initialized.")
-        vectorstore = getattr(ai, "sources_vectorstore", None)
-        if vectorstore is None or not getattr(vectorstore, "is_open", lambda: False)():
-            raise RuntimeError("Vectorstore is not initialized.")
-        is_ready_fn = getattr(vectorstore, "is_ready", None)
-        if callable(is_ready_fn) and not is_ready_fn():
-            raise RuntimeError("Vectorstore is currently updating. Please try again shortly.")
+        vectorstore = self._require_ready_vectorstore()
 
         queries = options.get("queries", [])
         if not isinstance(queries, list) or len(queries) == 0:
@@ -5186,11 +5215,9 @@ class AiMcpServer:
                                    vectorstore_sig: str, queries: List[str], file_ids: List[int],
                                    case_ids: List[int], exclude_cids: List[int], score_threshold: float,
                                    k_per_query: int) -> Tuple[int, int]:
-        ai = getattr(self.app, "ai", None)
-        if ai is None:
-            raise RuntimeError("AI integration is not initialized.")
+        vectorstore = self._require_ready_vectorstore()
         doc_filter = file_ids if len(file_ids) > 0 else None
-        chunks = ai._retrieve_from_vectorstore(
+        chunks = vectorstore.retrieve_similar_documents(
             queries,
             doc_ids=doc_filter,
             score_threshold=score_threshold,
@@ -5532,14 +5559,13 @@ class AiMcpServer:
         return flags
 
     def _vectorstore_signature(self) -> str:
-        ai = getattr(self.app, "ai", None)
-        vectorstore = getattr(ai, "sources_vectorstore", None) if ai is not None else None
+        vectorstore = getattr(self.app, "vectorstore", None)
         faiss_path = getattr(vectorstore, "faiss_db_path", None) if vectorstore is not None else None
         if faiss_path is None or str(faiss_path).strip() == "":
             project_path = getattr(self.app, "project_path", "")
             if project_path is None or project_path == "":
                 return "missing"
-            faiss_path = os.path.join(project_path, "ai_data", "vectorstore", "faiss_store.bin")
+            faiss_path = os.path.join(project_path, "ai_data", "search.sqlite")
         if not os.path.exists(faiss_path):
             return "missing"
         try:
@@ -5550,8 +5576,7 @@ class AiMcpServer:
 
     def _fetch_cached_documents_by_docstore_id(self, docstore_ids: List[str]) -> Dict[str, Any]:
         result: Dict[str, Any] = {}
-        ai = getattr(self.app, "ai", None)
-        vectorstore = getattr(ai, "sources_vectorstore", None) if ai is not None else None
+        vectorstore = getattr(self.app, "vectorstore", None)
         if vectorstore is None:
             return result
         try:

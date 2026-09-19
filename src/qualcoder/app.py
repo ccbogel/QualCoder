@@ -27,20 +27,31 @@ import datetime
 import locale as py_locale
 import logging
 import os
-from pathlib import Path
 import platform
-from PyQt6 import QtCore, QtGui, QtWidgets
 import shutil
-import sys
 import sqlite3
-import urllib.request
+import sys
 import urllib.error as urllib_err
+import urllib.request
 import webbrowser
 import zipfile
 from copy import copy
+from pathlib import Path
+from typing import Any, Optional
+
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
+from qualcoder.ai_runtime import (
+    AI_DISABLED,
+    AI_INITIALIZING,
+    AI_READY,
+    AI_UNLOADED,
+    VECTORSTORE_DISABLED,
+    VECTORSTORE_UNLOADED,
+    vectorstore_required,
+)
 from qualcoder.helpers import get_default_user_directory, Message
 from qualcoder.speakers import speaker_coder_name
 
@@ -121,13 +132,84 @@ class App(object):
         self.configpath = str(qc_config_folder / 'config.ini')
         self.persist_path = str(qc_config_folder / 'recent_projects.txt')
         self.pending_ai_model_upgrade_offer = None
+        self.ai_runtime_error = ""
         self.settings, self.ai_models = self.load_settings()
+        self.ai_runtime_state = (
+            AI_UNLOADED if self.settings['ai_enable'] == 'True' else AI_DISABLED
+        )
         self.last_export_directory = copy(self.settings['directory'])
         self.ai = None
+        # The project vectorstore is shared by AI and external MCP. Expensive
+        # dependencies are imported only when a consumer constructs the store.
+        self.vectorstore = None
+        self.vectorstore_runtime_state = (
+            VECTORSTORE_UNLOADED if vectorstore_required(self) else VECTORSTORE_DISABLED
+        )
+        self.vectorstore_runtime_error = ""
         # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
         self.ai_embedding_function = None
         self.project_events = ProjectEventBus()
         self.ai_mcp_server = AiMcpServer(self)
+
+    def get_ai_status(self) -> str:
+        """Return one status covering both runtime loading and AI operation."""
+
+        if self.ai_runtime_state != AI_READY:
+            return self.ai_runtime_state
+        if self.ai is None:
+            return AI_INITIALIZING
+        return self.ai.get_status()
+
+    def _active_vectorstore(self) -> Optional[Any]:
+        """Return the shared vectorstore when a configured consumer needs it."""
+
+        if not vectorstore_required(self):
+            return None
+        return self.vectorstore
+
+    def vectorstore_import_document(
+            self, source_id: int, source_name: str, text: Optional[str]) -> None:
+        """Queue one changed source document for indexing when search is active.
+
+        Args:
+            source_id: Project source id.
+            source_name: Current source name.
+            text: Current source text.
+        """
+
+        vectorstore = self._active_vectorstore()
+        if vectorstore is None:
+            return
+        try:
+            vectorstore.import_document(source_id, source_name, text)
+        except Exception as err:
+            logger.warning("Could not update vectorstore document %s: %s", source_id, err)
+
+    def vectorstore_update(self) -> None:
+        """Queue a full synchronization of the active shared vectorstore."""
+
+        vectorstore = self._active_vectorstore()
+        if vectorstore is None:
+            return
+        try:
+            vectorstore.update_vectorstore()
+        except Exception as err:
+            logger.warning("Could not update vectorstore: %s", err)
+
+    def vectorstore_delete_document(self, source_id: int) -> None:
+        """Remove one source document from the active shared vectorstore.
+
+        Args:
+            source_id: Project source id.
+        """
+
+        vectorstore = self._active_vectorstore()
+        if vectorstore is None:
+            return
+        try:
+            vectorstore.delete_document(source_id)
+        except Exception as err:
+            logger.warning("Could not remove vectorstore document %s: %s", source_id, err)
 
     def read_previous_project_paths(self):
         """ Recent project paths are stored in .qualcoder/recent_projects.txt

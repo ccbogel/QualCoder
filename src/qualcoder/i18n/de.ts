@@ -3462,11 +3462,6 @@ z. B. von C:/users/OldUser/Images nach C:/users/NewUser/Images</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
-        <source>Delete all references that are not assigned to files</source>
-        <translation>Alle Referenzen löschen, die keinen Dateien zugeordnet sind</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
         <source>Edit reference</source>
         <translation>Referenz bearbeiten</translation>
     </message>
@@ -3487,6 +3482,11 @@ Der Wortabgleich verwendet Wörter aus dem Titel der Referenz.
 Starke Treffer mit 70 % oder mehr übereinstimmenden Wörtern werden verknüpft.
 Die Verknüpfung kann fehlerhaft sein.
 Nach Anwendung der Funktion prüfen.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
+        <source>Export references</source>
+        <translation>Literaturangaben exportieren</translation>
     </message>
 </context>
 <context>
@@ -4384,6 +4384,20 @@ langauge = it</translation>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
         <source>enable AI integration</source>
         <translation>Aktiviere KI-Integration</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>This allows external AI agents such as Claude Code, Codex, OpenCode, or Hermes Agent to access the currently opened QualCoder project via MCP on localhost (127.0.0.1).
+The same AI permissions apply as for the internal AI agent (Read-Only / Sandboxed / Full Access).
+This is an experimental feature. Use it with care.</source>
+        <translation>Dies ermöglicht externen KI-Agenten wie Claude Code, Codex, OpenCode oder Hermes Agent den Zugriff auf das aktuell geöffnete QualCoder-Projekt über MCP auf localhost (127.0.0.1).
+Es gelten dieselben KI-Berechtigungen wie für den internen KI-Agenten (Schreibgeschützt / Sandbox / Vollzugriff).
+Dies ist eine experimentelle Funktion. Verwenden Sie sie mit Vorsicht.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>allow external MCP access</source>
+        <translation>Externen MCP-Zugriff erlauben</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -5572,6 +5586,11 @@ Codieren Sie diesen Text erst, wenn Sie Codieren - Text codieren aus der Menüle
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>Taguette import</source>
         <translation>Taguette-Import</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Sonal import</source>
+        <translation>Sonal-Import</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>

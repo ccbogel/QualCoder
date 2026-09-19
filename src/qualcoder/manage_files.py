@@ -1355,8 +1355,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for a in attr_types:
             cur.execute(insert_sql, [a[0], id_, now_, self.app.settings['codername']])
         self.app.conn.commit()
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.import_document(id_, entry['name'], entry['fulltext'])
+        self.app.vectorstore_import_document(id_, entry['name'], entry['fulltext'])
         self.parent_text_edit.append(_("Text extracted from pdf to new file: ") + new_name)
         self.load_file_data()
         self.fill_table()
@@ -1522,9 +1521,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         self._emit_project_table_changes(['source'])
         # update doc in vectorstore
         id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
-        if self.app.settings['ai_enable'] == 'True':
-            docs = self.app.get_file_texts(file_ids=[id_])
-            self.app.ai.sources_vectorstore.import_document(docs[0]['id'], docs[0]['name'], docs[0]['fulltext'])
+        docs = self.app.get_file_texts(file_ids=[id_])
+        self.app.vectorstore_import_document(
+            docs[0]['id'], docs[0]['name'], docs[0]['fulltext']
+        )
 
     def undo_file_rename(self):
         """ Undo file name rename. """
@@ -1554,8 +1554,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(_("Reversed renamed database file entry: ") +
                                      f"{selection['name']} -> {selection['old_name']}")
         self.load_file_data()
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.update_vectorstore()
+        self.app.vectorstore_update()
         self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
         self._emit_project_table_changes(['source'])
         if len(self.files_renamed) == 0:
@@ -1608,8 +1607,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(msg + err_msg)
         self._emit_project_table_changes(['source'])
         # Updating vectorstore
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.update_vectorstore()
+        self.app.vectorstore_update()
 
         self.ui.pushButton_undo.setEnabled(True)
         self.load_file_data()
@@ -2418,8 +2416,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.conn.commit()
 
         # add doc to vectorstore
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'])
+        self.app.vectorstore_import_document(
+            entry['id'], entry['name'], entry['fulltext']
+        )
 
         # Add file attribute placeholders
         cur.execute('select name from attribute_type where caseOrFile ="file"')
@@ -2553,9 +2552,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 s['fulltext'] = text_
                 break
 
-        # Update the AI vectorstore if enabled
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.import_document(tr_id, tr_name, text_)
+        # Update the shared vectorstore if enabled
+        self.app.vectorstore_import_document(tr_id, tr_name, text_)
 
         self.parent_text_edit.append(_("Transcription imported into ") + tr_name)
         self.load_file_data()
@@ -3187,8 +3185,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.app.conn.commit()
 
             # add doc to vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'])
+            self.app.vectorstore_import_document(
+                entry['id'], entry['name'], entry['fulltext']
+            )
 
             # Add file attribute placeholders
             att_sql = 'select name from attribute_type where caseOrFile ="file"'
@@ -3391,8 +3390,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.app.conn.commit()
 
         # add doc to vectorstore
-        if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'])
+        self.app.vectorstore_import_document(
+            entry['id'], entry['name'], entry['fulltext']
+        )
 
         msg = entry['name']
         if link_path == "":
@@ -3598,7 +3598,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def vectorstore_delete_document_safe(self, fid:int):
         """
-        Removes the document from the AI index without letting a vectorstore lock
+        Removes the document from the search index without letting a vectorstore lock
         abort the project file deletion (e.g. "database is locked" when an embeddings
         worker is writing to search.sqlite in the background). The index is derived
         data: the next update_vectorstore prunes ids no longer in source, so failing
@@ -3608,14 +3608,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             fid: source id, Integer
         """
 
-        if self.app.settings['ai_enable'] != 'True':
-            return
         try:
-            self.app.ai.sources_vectorstore.delete_document(fid)
+            self.app.vectorstore_delete_document(fid)
         except Exception as err:
             logger.warning(f"vectorstore delete_document fid {fid}: {err}")
             self.parent_text_edit.append(
-                _("AI index is busy; the deleted file will be removed from the index "
+                _("Search index is busy; the deleted file will be removed from the index "
                   "on the next update."))
 
     def _unlink_media_with_retry(self, filepath):

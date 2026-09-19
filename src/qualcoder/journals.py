@@ -1015,8 +1015,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.conn.commit()
         self._emit_project_table_changes(['source', 'attribute_type', 'attribute'])
 
-        if self.app.settings['ai_enable'] == 'True' and getattr(self.app, 'ai', None) is not None:
-            self.app.ai.sources_vectorstore.import_document(new_source_id, source_name, journal_text)
+        self.app.vectorstore_import_document(new_source_id, source_name, journal_text)
 
         msg = _("Journal converted to source document: ") + source_name
         self.parent_text_edit.append(msg)

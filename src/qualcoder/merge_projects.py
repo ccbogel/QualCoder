@@ -285,12 +285,11 @@ class MergeProjects:
         try:
             self.progress.phase(_("Finishing"), 95, repaint=False)
             # Update vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.update_vectorstore()
+            self.app.vectorstore_update()
         except Exception as err:
             # The merge itself is committed, so report and carry on
             logger.exception("Vectorstore update after merge failed")
-            self.summary_msg += _("Could not update the AI vectorstore: ") + f"{err}\n"
+            self.summary_msg += _("Could not update the search index: ") + f"{err}\n"
         self.summary_msg += "\n" + _("Finished merging ") + f"{self.path_s}  --> {self.path_d}\n"
         self.summary_msg += _(
             "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"

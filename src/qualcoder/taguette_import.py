@@ -57,8 +57,7 @@ class TaguetteImport:
             if project is not None:
                 self.import_data(project)
                  # Update vectorstore
-                if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.update_vectorstore()
+                self.app.vectorstore_update()
             else:
                 msg = _("No project selected") + _(" from: ") + self.file_path
                 self.parent_textEdit.append(msg)

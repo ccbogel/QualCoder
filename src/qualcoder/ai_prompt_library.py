@@ -52,6 +52,14 @@ from .ai_agent_prompts import (
     prompt_name_fits_filesystem,
     prompt_name_key,
 )
+from .ai_ui import (
+    code_analysis_icon,
+    general_chat_icon,
+    prompt_icon,
+    search_icon,
+    text_analysis_icon,
+    topic_exploration_icon,
+)
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
@@ -444,18 +452,16 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
 
     def _type_icon(self, prompt_type: str):
         if prompt_type == "general":
-            return self.app.ai.general_chat_icon()
+            return general_chat_icon(self.app)
         if prompt_type == "search":
-            return self.app.ai.search_icon()
+            return search_icon(self.app)
         if prompt_type == "code_analysis":
-            return self.app.ai.code_analysis_icon()
+            return code_analysis_icon(self.app)
         if prompt_type == "topic_exploration":
-            if hasattr(self.app.ai, "topic_exploration_icon"):
-                return self.app.ai.topic_exploration_icon()
-            return self.app.ai.topic_analysis_icon()
+            return topic_exploration_icon(self.app)
         if prompt_type == "text_analysis":
-            return self.app.ai.text_analysis_icon()
-        return self.app.ai.prompt_icon()
+            return text_analysis_icon(self.app)
+        return prompt_icon(self.app)
 
     def _folder_icon(self):
         return qta.icon("mdi.folder-outline", color=self.app.highlight_color())

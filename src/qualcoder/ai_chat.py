@@ -43,7 +43,7 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from markdown_it import MarkdownIt
 from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import Qt, QEvent, QObject, pyqtSignal
+from PyQt6.QtCore import Qt, QEvent, pyqtSignal
 from PyQt6.QtGui import QCursor, QGuiApplication, QAction, QPalette, QShortcut, QKeySequence, QStandardItemModel, QStandardItem
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
@@ -55,7 +55,18 @@ from .ai_agent_prompts import (
     prompt_name_key,
 )
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
+from .ai_runtime import (
+    ensure_ai_ready,
+    runtime_status_bar_text,
+)
 from .ai_search_dialog import DialogAiSearch
+from .ai_ui import (
+    ai_chat_signal_emitter,
+    code_analysis_icon,
+    general_chat_icon,
+    text_analysis_icon,
+    topic_exploration_icon,
+)
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
@@ -161,12 +172,6 @@ def render_markdown_to_html(text: str, hr_color: str = "#e6e6e6", hr_width_px: i
         rendered_html = rendered_html.replace(old, new)
 
     return f'<div style="margin-top: 4px;">{rendered_html}</div>'
-
-class AIChatSignalEmitter(QObject):
-    newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text analysis chat
-
-ai_chat_signal_emitter = AIChatSignalEmitter()  # Create a global instance of the signal emitter
-
 
 class PrefixedComboBox(QtWidgets.QComboBox):
     """Draw a prefix in the closed combobox without changing the popup item texts."""
@@ -2027,13 +2032,13 @@ class DialogAIChat(QtWidgets.QDialog):
         """Return the icon for one New-menu target."""
 
         if target == 'new_general_chat':
-            return self.app.ai.general_chat_icon()
+            return general_chat_icon(self.app)
         if target == 'new_topic_exploration':
-            return self.app.ai.topic_exploration_icon()
+            return topic_exploration_icon(self.app)
         if target == 'new_text_analysis':
-            return self.app.ai.text_analysis_icon()
+            return text_analysis_icon(self.app)
         if target == 'new_code_analysis':
-            return self.app.ai.code_analysis_icon()
+            return code_analysis_icon(self.app)
         return QtGui.QIcon()
 
     def _create_new_chat_menu(self) -> tuple[QtWidgets.QMenu, dict[str, QtGui.QAction]]:
@@ -2086,6 +2091,8 @@ class DialogAIChat(QtWidgets.QDialog):
     def _popup_new_chat_menu(self, highlight_target: Optional[str] = None) -> None:
         """Show the New-session menu below the button and optionally highlight one entry."""
 
+        if not ensure_ai_ready(self.app, _("AI Agent")):
+            return
         if self._new_chat_popup_menu is not None:
             self._new_chat_popup_menu.close()
         menu, action_map = self._create_new_chat_menu()
@@ -2275,19 +2282,19 @@ class DialogAIChat(QtWidgets.QDialog):
 
             # Creating a new QListWidgetItem
             if str(analysis_type).strip().lower() == 'code_analysis':
-                icon = self.app.ai.code_analysis_icon()
+                icon = code_analysis_icon(self.app)
             elif str(analysis_type).strip().lower() == 'text_analysis':
-                icon = self.app.ai.text_analysis_icon()
+                icon = text_analysis_icon(self.app)
             elif str(analysis_type).strip().lower() == 'topic_exploration':
-                icon = self.app.ai.topic_exploration_icon()
+                icon = topic_exploration_icon(self.app)
             elif self._is_agent_chat_type(analysis_type):
-                icon = self.app.ai.general_chat_icon()
+                icon = general_chat_icon(self.app)
             elif analysis_type == 'topic chat':
-                icon = self.app.ai.topic_exploration_icon()
+                icon = topic_exploration_icon(self.app)
             elif analysis_type == 'text chat':
-                icon = self.app.ai.text_analysis_icon()
+                icon = text_analysis_icon(self.app)
             elif analysis_type == 'code chat':
-                icon = self.app.ai.code_analysis_icon()
+                icon = code_analysis_icon(self.app)
             else: # unknown type, ignore this chat altogether
                 continue
 
@@ -2500,6 +2507,11 @@ class DialogAIChat(QtWidgets.QDialog):
         return success
 
     def new_chat(self, name, analysis_type, summary, analysis_prompt):
+        if self.chat_history_conn is None:
+            if self.app.project_path == "":
+                Message(self.app, _('AI Agent'), _('No project open.'), "warning").exec()
+                return
+            self.init_ai_chat()
         self._clear_stream_preview_buffers()
         date = datetime.now()
         date_text = date.strftime('%Y-%m-%d %H:%M:%S')
@@ -2518,6 +2530,8 @@ class DialogAIChat(QtWidgets.QDialog):
     def _can_start_general_chat(self) -> bool:
         """Return whether a general AI chat session can be started now."""
 
+        if not ensure_ai_ready(self.app, _("AI Agent")):
+            return False
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -2550,15 +2564,6 @@ class DialogAIChat(QtWidgets.QDialog):
 
         if not self._can_start_general_chat():
             return
-        if self.app.ai.is_busy():
-            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
-            Message(self.app, _('AI busy'), msg, "warning").exec()
-            return
-        if not self.app.ai.is_ready():
-            msg = _('The AI not yet fully loaded. Please wait and retry.')
-            Message(self.app, _('AI not ready'), msg, "warning").exec()
-            return
-
         prompt_name = "Check-project-AI-readiness"
         readiness_prompt = self.agent_prompts_catalog.get_prompt(prompt_name)
         if readiness_prompt is None:
@@ -2606,15 +2611,6 @@ class DialogAIChat(QtWidgets.QDialog):
 
         if not self._can_start_general_chat():
             return
-        if self.app.ai.is_busy():
-            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
-            Message(self.app, _('AI busy'), msg, "warning").exec()
-            return
-        if not self.app.ai.is_ready():
-            msg = _('The AI not yet fully loaded. Please wait and retry.')
-            Message(self.app, _('AI not ready'), msg, "warning").exec()
-            return
-
         support_prompt = self.agent_prompts_catalog.get_internal_prompt(self._support_chat_prompt_name())
         if support_prompt is None:
             msg = _('The internal AI support prompt "_help.md" could not be found.')
@@ -3898,7 +3894,7 @@ class DialogAIChat(QtWidgets.QDialog):
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
-            result["error"] = _('Error during MCP-based topic exploration bootstrap: ') + str(err)
+            result["error"] = _('Error during MCP-based topic exploration bootstrap: ') + self.app.ai._exception_summary(err)
             return result
         finally:
             if ai_change_set_id != "":
@@ -4681,7 +4677,7 @@ class DialogAIChat(QtWidgets.QDialog):
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
-            result["error"] = _('Error during MCP-based code analysis bootstrap: ') + str(err)
+            result["error"] = _('Error during MCP-based code analysis bootstrap: ') + self.app.ai._exception_summary(err)
             return result
         finally:
             if ai_change_set_id != "":
@@ -4689,6 +4685,8 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_text_analysis(self):
         """analyze a piece of text from an empirical document"""
+        if not ensure_ai_ready(self.app, _("AI Text Analysis")):
+            return
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -4715,6 +4713,8 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_code_analysis(self):
         """Start a new code analysis as an MCP-backed AI agent chat."""
+        if not ensure_ai_ready(self.app, _("Code analysis")):
+            return
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -4790,6 +4790,8 @@ data collected. This information will accompany every prompt sent to the AI, res
  
     def new_topic_exploration(self):
         """Start a new topic exploration as an MCP-backed AI agent chat."""
+        if not ensure_ai_ready(self.app, _("Topic exploration")):
+            return
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -5485,7 +5487,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
-            result["error"] = _('Error during MCP-based text analysis bootstrap: ') + str(err)
+            result["error"] = _('Error during MCP-based text analysis bootstrap: ') + self.app.ai._exception_summary(err)
             return result
         finally:
             if ai_change_set_id != "":
@@ -5494,6 +5496,8 @@ data collected. This information will accompany every prompt sent to the AI, res
     def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt):
         """Start one text analysis chat for the selected text passage."""
 
+        if not ensure_ai_ready(self.app, _("AI Text Analysis")):
+            return
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -5611,14 +5615,12 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.ui.pushButton_question.setIcon(spin_icon)
                 self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
                 self.ui.progressBar_ai.setRange(0, 0)  # Starts the animation
-        # update ai status in the statusBar of the main window
-        if self.app.ai is not None:
-            if self.app.ai.get_status() == 'reading data' and self.app.ai.sources_vectorstore.reading_doc != '':
-                self.main_window.statusBar().showMessage(_('AI: ') + _('reading data') + ' (' + self.app.ai.sources_vectorstore.reading_doc + ')')
-            else:
-                self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
-        else: 
-            self.main_window.statusBar().showMessage('')
+        # Restore the runtime status after temporary menu status tips disappear.
+        external_mcp = getattr(self.main_window, "external_mcp", None)
+        mcp_active = bool(getattr(external_mcp, "is_running", False))
+        self.main_window.statusBar().showMessage(
+            runtime_status_bar_text(self.app, mcp_active)
+        )
 
     def on_ai_output_scroll(self, value):
         """Normally, if the AI is generating text, the scrollArea_ai_output scrolls to the bottom
@@ -6850,17 +6852,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.send_user_question()
                     
     def send_user_question(self):
-        if self.app.settings['ai_enable'] != 'True':
-            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
-            Message(self.app, _('AI not enabled'), msg, "warning").exec()
-            return
-        elif self.app.ai.is_busy():
+        if self.app.get_ai_status() == 'busy':
             msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
             Message(self.app, _('AI busy'), msg, "warning").exec()
             return
-        elif not self.app.ai.is_ready():
-            msg = _('The AI not yet fully loaded. Please wait and retry.')
-            Message(self.app, _('AI not ready'), msg, "warning").exec()
+        if not ensure_ai_ready(self.app, _("AI Agent")):
             return
         self.ai_output_autoscroll = True
         self._dismiss_prompt_completion(accept=False)
@@ -9229,7 +9225,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
         except Exception as err:
-            result["error"] = _('Error during MCP-based AI agent chat: ') + str(err)
+            result["error"] = _('Error during MCP-based AI agent chat: ') + self.app.ai._exception_summary(err)
         finally:
             if ai_change_set_id != "":
                 self._discard_empty_ai_change_set(ai_change_set_id)
@@ -9448,7 +9444,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.process_message('info', _('Error: The AI returned an empty result. This may indicate that the AI model is not available at the moment. Try again later or choose a different model.'), chat_idx)
             
     def ai_error_callback(self, exception_type, value, tb_obj):
-        """Called if the AI returns an error"""
+        """Display AI errors and their underlying causes in the chat."""
         self._cancel_pending_stream_render()
         run_id = str(getattr(self, 'current_streaming_run_id', '')).strip()
         partial_response = str(self.app.ai.get_streaming_output(run_id))
@@ -9490,10 +9486,16 @@ data collected. This information will accompany every prompt sent to the AI, res
                 fallback_to_current=True,
             )
             msg = _('Error communicating with ' + ai_model_name + '\n')
-            msg += exception_type.__name__ + ': ' + html_to_text(_safe_to_text(value))
+            if isinstance(value, BaseException):
+                msg += html_to_text(self.app.ai._exception_summary(value))
+            else:
+                msg += exception_type.__name__ + ': ' + html_to_text(_safe_to_text(value))
             if hasattr(value, 'message'):
                 msg += f' {_safe_to_text(getattr(value, "message", ""))}'
-            tb = '\n'.join(traceback.format_tb(tb_obj))
+            if isinstance(value, BaseException):
+                tb = ''.join(traceback.format_exception(exception_type, value, tb_obj))
+            else:
+                tb = '\n'.join(traceback.format_tb(tb_obj))
             if hasattr(value, 'body'):
                 tb += f'\n{_safe_to_text(getattr(value, "body", ""))}\n'
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)

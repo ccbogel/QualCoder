@@ -20,6 +20,8 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+from __future__ import annotations
+
 import asyncio
 import configparser
 import json
@@ -34,40 +36,112 @@ import time
 import traceback
 import uuid
 
-from Bio.Align import PairwiseAligner
-import httpx
-from langchain_core.callbacks.base import BaseCallbackHandler
-from langchain_community.cache import InMemoryCache  # Unused
-from langchain_core.documents.base import Document  # Unused
-from langchain_core.globals import set_llm_cache  # Unused
-from langchain_core.messages.ai import AIMessage  # Unused
-from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.system import SystemMessage
-from langchain_core.runnables.config import RunnableConfig
-from langchain_openai import ChatOpenAI, AzureChatOpenAI
-from langchain_openai.chat_models.codex import _ChatOpenAICodex
-from langchain_openai.chatgpt_oauth import (
-    _ChatGPTOAuthRefreshError,
-    _FileChatGPTOAuthTokenProvider,
-    login_chatgpt,
-)
-import json_repair
-from openai import OpenAI, BadRequestError
-from pydantic import ValidationError
 from PyQt6 import QtCore
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets
-import qtawesome as qta
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
 from .ai_async_worker import Worker
 from .ai_memo import extract_ai_memo as extract_public_ai_memo
-from .ai_vectorstore import AiVectorstore
+from .ai_ui import (
+    code_analysis_icon,
+    general_chat_icon,
+    prompt_icon,
+    prompt_scope_icon,
+    search_icon,
+    text_analysis_icon,
+    topic_exploration_icon,
+)
 from .confirm_delete import DialogConfirmDelete
 from .error_dlg import qt_exception_hook
 from .helpers import Message
 from .html_parser import html_to_text
 from .select_items import DialogSelectItems
+
+# Expensive third-party packages are loaded automatically by the background
+# AI loader after the main window is usable.  Keeping these names at module
+# scope lets the rest of this module remain unchanged while importing the
+# lightweight profile helpers above during application startup.
+PairwiseAligner = None
+httpx = None
+AIMessage = None
+HumanMessage = None
+SystemMessage = None
+RunnableConfig = None
+ChatOpenAI = None
+AzureChatOpenAI = None
+_ChatOpenAICodex = None
+_ChatGPTOAuthRefreshError = None
+_FileChatGPTOAuthTokenProvider = None
+login_chatgpt = None
+json_repair = None
+OpenAI = None
+BadRequestError = None
+ValidationError = None
+AiVectorstore = None
+
+_AI_DEPENDENCIES_LOADED = False
+_AI_DEPENDENCIES_LOCK = threading.Lock()
+
+
+def load_ai_runtime_dependencies() -> None:
+    """Import expensive AI runtime packages once.
+
+    This function is called by the background loader. It is also safe to call
+    defensively from runtime-only helpers after loading has completed.
+    """
+
+    global _AI_DEPENDENCIES_LOADED
+    global AIMessage, AiVectorstore, AzureChatOpenAI, BadRequestError
+    global ChatOpenAI, HumanMessage, OpenAI, PairwiseAligner, RunnableConfig
+    global SystemMessage, ValidationError, _ChatGPTOAuthRefreshError
+    global _ChatOpenAICodex, _FileChatGPTOAuthTokenProvider, httpx
+    global json_repair, login_chatgpt
+
+    if _AI_DEPENDENCIES_LOADED:
+        return
+    with _AI_DEPENDENCIES_LOCK:
+        if _AI_DEPENDENCIES_LOADED:
+            return
+
+        from Bio.Align import PairwiseAligner as pairwise_aligner
+        import httpx as httpx_module
+        from langchain_core.messages.ai import AIMessage as ai_message
+        from langchain_core.messages.human import HumanMessage as human_message
+        from langchain_core.messages.system import SystemMessage as system_message
+        from langchain_core.runnables.config import RunnableConfig as runnable_config
+        from langchain_openai import AzureChatOpenAI as azure_chat_open_ai
+        from langchain_openai import ChatOpenAI as chat_open_ai
+        from langchain_openai.chat_models.codex import _ChatOpenAICodex as chat_open_ai_codex
+        from langchain_openai.chatgpt_oauth import (
+            _ChatGPTOAuthRefreshError as chatgpt_oauth_refresh_error,
+            _FileChatGPTOAuthTokenProvider as file_chatgpt_oauth_token_provider,
+            login_chatgpt as login_chatgpt_function,
+        )
+        import json_repair as json_repair_module
+        from openai import BadRequestError as bad_request_error
+        from openai import OpenAI as open_ai
+        from pydantic import ValidationError as validation_error
+        from .ai_vectorstore import AiVectorstore as ai_vectorstore
+
+        PairwiseAligner = pairwise_aligner
+        httpx = httpx_module
+        AIMessage = ai_message
+        HumanMessage = human_message
+        SystemMessage = system_message
+        RunnableConfig = runnable_config
+        ChatOpenAI = chat_open_ai
+        AzureChatOpenAI = azure_chat_open_ai
+        _ChatOpenAICodex = chat_open_ai_codex
+        _ChatGPTOAuthRefreshError = chatgpt_oauth_refresh_error
+        _FileChatGPTOAuthTokenProvider = file_chatgpt_oauth_token_provider
+        login_chatgpt = login_chatgpt_function
+        json_repair = json_repair_module
+        OpenAI = open_ai
+        BadRequestError = bad_request_error
+        ValidationError = validation_error
+        AiVectorstore = ai_vectorstore
+        _AI_DEPENDENCIES_LOADED = True
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -112,12 +186,16 @@ class AiRunContext:
     provider: str = ''
         
 
-class MyCustomSyncHandler(BaseCallbackHandler):
-    def __init__(self, ai_llm):
-        self.ai_llm = ai_llm
-        
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        self.ai_llm.run_progress_count += 1
+def make_custom_sync_handler(ai_llm):
+    """Create the LangChain callback after its base class is available."""
+
+    from langchain_core.callbacks.base import BaseCallbackHandler
+
+    class MyCustomSyncHandler(BaseCallbackHandler):
+        def on_llm_new_token(self, token: str, **kwargs) -> None:
+            ai_llm.run_progress_count += 1
+
+    return MyCustomSyncHandler()
     
 
 def extract_ai_memo(memo: str) -> str:
@@ -158,6 +236,7 @@ def ensure_chatgpt_oauth_profile_defaults(model: dict | None) -> None:
 def _chatgpt_oauth_provider(timeout: float = 5.0) -> _FileChatGPTOAuthTokenProvider:
     """Return the default ChatGPT OAuth token provider."""
 
+    load_ai_runtime_dependencies()
     return _FileChatGPTOAuthTokenProvider(timeout=timeout)
 
 
@@ -197,6 +276,7 @@ def get_chatgpt_oauth_status(timeout: float = 5.0) -> tuple[bool, str]:
 def renew_chatgpt_oauth(timeout: float = 300.0) -> tuple[bool, str]:
     """Start or renew ChatGPT OAuth authentication."""
 
+    load_ai_runtime_dependencies()
     try:
         login_chatgpt(timeout=timeout)
     except Exception as err:
@@ -215,6 +295,7 @@ def _chatgpt_oauth_reauth_message() -> str:
     
 def get_available_models(app, api_base: str, api_key: str) -> list:
     """Queries the API and returns a list of all AI models available from this provider."""
+    load_ai_runtime_dependencies()
     if is_chatgpt_oauth_api_base(api_base):
         return []
     msg = None
@@ -1374,6 +1455,8 @@ def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
     Returns -1, -1 if no match is found.
     """
     
+    load_ai_runtime_dependencies()
+
     # try finding an exact match first
     start_idx = original.find(quote)
     if start_idx > -1:
@@ -1435,11 +1518,16 @@ class AiLLM():
     ai_change_history = None
     
     def __init__(self, app, parent_text_edit):
+        load_ai_runtime_dependencies()
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(2)
-        self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
+        if getattr(self.app, "vectorstore", None) is None:
+            self.app.vectorstore = AiVectorstore(
+                self.app, self.parent_text_edit, self.sources_collection
+            )
+        self.sources_vectorstore = self.app.vectorstore
         self.ai_change_history = []  # Session-scoped AI write operations for undo
         self._runs_lock = threading.RLock()
         self._runs_by_id = {}
@@ -1729,6 +1817,26 @@ class AiLLM():
                     return _chatgpt_oauth_reauth_message()
         return ''
 
+    def _exception_summary(self, err: BaseException) -> str:
+        """Include nested causes in an error message without traceback frames.
+
+        Args:
+            err: The exception reported by the model provider.
+        """
+        lines = []
+        seen = set()
+        current = err
+        while current is not None and id(current) not in seen:
+            seen.add(id(current))
+            detail = f'{type(current).__name__}: {self._safe_to_text(current)}'
+            if not lines or detail != lines[-1]:
+                lines.append(detail)
+            cause = current.__cause__
+            current = cause if cause is not None else (
+                None if current.__suppress_context__ else current.__context__
+            )
+        return '\n'.join(lines)
+
     def _write_ai_log(self, text: str):
         if not self._ensure_ai_log_logger():
             return
@@ -1779,11 +1887,11 @@ class AiLLM():
         """Log one LLM error for traceability."""
 
         model_name = self._llm_name_for_log(llm)
-        error_text = self._safe_to_text(err)
+        error_text = self._exception_summary(err)
         line = f'[#{req_id}] ERROR model="{model_name}"'
         if context.strip() != '':
             line += f' context="{context.strip()}"'
-        line += f' {err.__class__.__name__}: {error_text}'
+        line += f' {error_text}'
         self._write_ai_log(line)
 
     def _exception_chain(self, err: BaseException):
@@ -3798,7 +3906,7 @@ class AiLLM():
             if code_codings_non_ai > 0:
                 lines.append(
                     _("Warning: ") + str(code_codings_non_ai) +
-                    _(" of these codings are owned by someone else.")
+                    _(" of these codings belong to another user or agent and will also be deleted.")
                 )
         if len(category_ids) > 0:
             lines.append(
@@ -3813,7 +3921,7 @@ class AiLLM():
             if standalone_codings_non_ai > 0:
                 lines.append(
                     _("Warning: ") + str(standalone_codings_non_ai) +
-                    _(" standalone coding(s) are owned by someone else.")
+                    _(" standalone coding(s) belong to another user or agent and will also be deleted.")
                 )
         if len(case_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
@@ -4598,7 +4706,7 @@ class AiLLM():
             msg += _("Skipped operations removed from the list: ") + str(removed_skipped) + "\n"
         non_ai_loss = int(stats.get("deleted_code_codings_non_ai", 0))
         if non_ai_loss > 0:
-            msg += _("Warning: removed codings owned by someone else: ") + str(non_ai_loss) + "\n"
+            msg += _("Warning: codings belonging to another user or agent were also deleted: ") + str(non_ai_loss) + "\n"
         if len(skip_details) > 0:
             msg += "\n" + _("Undo details:") + "\n\n" + "\n\n".join(skip_details)
         if self.parent_text_edit is not None:
@@ -4610,28 +4718,28 @@ class AiLLM():
 
     # Icons (https://pictogrammers.com/library/mdi/)
     def code_analysis_icon(self):
-        return qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color())
+        return code_analysis_icon(self.app)
 
     def topic_analysis_icon(self):
         return self.topic_exploration_icon()
 
     def topic_exploration_icon(self):
-        return qta.icon('mdi6.star-outline', color=self.app.highlight_color())
+        return topic_exploration_icon(self.app)
 
     def search_icon(self):
-        return qta.icon('mdi6.magnify', color=self.app.highlight_color())
+        return search_icon(self.app)
     
     def text_analysis_icon(self):
-        return qta.icon('mdi6.text-box-outline', color=self.app.highlight_color())
+        return text_analysis_icon(self.app)
 
     def general_chat_icon(self):
-        return qta.icon('mdi6.chat-question-outline', color=self.app.highlight_color())
+        return general_chat_icon(self.app)
 
     def prompt_scope_icon(self):
-        return qta.icon('mdi6.folder-open-outline', color=self.app.highlight_color())
+        return prompt_scope_icon(self.app)
 
     def prompt_icon(self):
-        return qta.icon('mdi6.script-text-outline', color=self.app.highlight_color())
+        return prompt_icon(self.app)
 
     def _migrate_legacy_prompts_for_current_scope(self) -> None:
         """One-time import of legacy user/project prompts into Markdown files."""
@@ -4699,7 +4807,7 @@ class AiLLM():
                 fast_model = curr_model['fast_model']
                 self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
                 ensure_chatgpt_oauth_profile_defaults(curr_model)
-                api_base = curr_model['api_base']
+                api_base = str(curr_model.get('api_base') or '').strip()
                 api_key = curr_model['api_key']
                 is_chatgpt_oauth = is_chatgpt_oauth_api_base(api_base)
                 if api_key == '' and not is_chatgpt_oauth:
@@ -4769,7 +4877,8 @@ class AiLLM():
                     large_llm_params = {
                         'model': large_model, 
                         'openai_api_key': api_key, 
-                        'openai_api_base': api_base, 
+                        # None preserves the client's default URL for blank profiles.
+                        'openai_api_base': api_base or None,
                         'cache': False,
                         'temperature': temp,
                         'top_p': top_p,
@@ -4807,10 +4916,10 @@ class AiLLM():
                 self.app.settings['ai_enable'] = 'True'
                 
                 # init vectorstore
-                if not self.sources_vectorstore.is_open():
+                if not self.sources_vectorstore.is_open() and not self.sources_vectorstore.ai_worker_running():
                     self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
-                else:
-                    self._status = ''
+                self._status = ''
+                if self.sources_vectorstore.is_open() and not self.sources_vectorstore.ai_worker_running():
                     self.parent_text_edit.append(_('AI: Ready'))
             else:
                 self.close()
@@ -4830,7 +4939,6 @@ class AiLLM():
         self.cancel_all_runs(wait_ms=5000)
         if not self.threadpool.waitForDone(5000):
             logger.warning("AI LLM worker still running after 5s, cancellation left in place")
-        self.sources_vectorstore.close()
         self._large_llm_params = None
         self._fast_llm_params = None
         self._large_llm_factory = None
@@ -4913,11 +5021,16 @@ class AiLLM():
                 auth_message = self._chatgpt_oauth_user_error(value)
             if auth_message != '':
                 msg = _('AI Error:\n') + auth_message
+            elif isinstance(value, BaseException):
+                msg = _('AI Error:\n') + html_to_text(self._exception_summary(value))
             else:
                 value_text = html_to_text(self._safe_to_text(value))
                 msg = _('AI Error:\n')
                 msg += exception_type.__name__ + ': ' + str(value_text)
-            tb = '\n'.join(traceback.format_tb(tb_obj))
+            if isinstance(value, BaseException):
+                tb = ''.join(traceback.format_exception(exception_type, value, tb_obj))
+            else:
+                tb = '\n'.join(traceback.format_tb(tb_obj))
             logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
             # Trigger message box show
             qt_exception_hook._exception_caught.emit(msg, tb)
@@ -5236,7 +5349,7 @@ class AiLLM():
         
         # callback to show percentage done    
         config = RunnableConfig()
-        config['callbacks'] = [MyCustomSyncHandler(self)]
+        config['callbacks'] = [make_custom_sync_handler(self)]
         self.run_progress_max = round(1000 / 4)  # estimated token count of the result (1000 chars)
 
         response_format = self._get_response_format_json_schema("code_descriptions", response_schema)
@@ -5297,73 +5410,13 @@ class AiLLM():
     
     def _retrieve_from_vectorstore(self, search_strings, doc_ids=None, progress_callback=None, signals=None,
                                    score_threshold=0.5, k=50) -> list:
-        # Use the list of search_strings to retrieve related data from the vectorstore
-        try:
-            threshold = float(score_threshold)
-        except (TypeError, ValueError):
-            threshold = 0.5
-        threshold = max(0.0, min(threshold, 1.0))
-
-        try:
-            top_k = int(k)
-        except (TypeError, ValueError):
-            top_k = 50
-        top_k = max(1, min(top_k, 500))
-
-        search_kwargs = {'score_threshold': threshold, 'k': top_k}
-        chunks_meta_list = []
-        for _str in search_strings:
-            self._raise_if_run_canceled()
-            res = self.sources_vectorstore.faiss_db.similarity_search_with_relevance_scores(_str, **search_kwargs)
-            if doc_ids is not None and len(doc_ids) > 0:
-                # filter results by document ids
-                res_filtered = []
-                for chunk in res:
-                    if chunk[0].metadata['id'] in doc_ids:
-                        res_filtered.append(chunk)
-                chunks_meta_list.append(res_filtered)
-            else: 
-                chunks_meta_list.append(res)
-
-        # Consolidate and rank results:
-        # Flatten the lists of chunks in chunks_lists and collect all the chunks in a master list.
-        # Duplicate chunks are collected only once. The list is sorted by the frequency 
-        # of a chunk counted over all lists + the similarity score that faiss returns.
-        # This way, frequent and relevant chunks should be sorted to the top
-        # (see: "Reciprocal Rank Fusion" (https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf))
-
-        def chunk_unique_str(chunk_item):
-            # helper
-            chunk_key = str(chunk_item.metadata['id']) + ", "
-            chunk_key += str(chunk_item.metadata['start_index']) + ", "
-            return chunk_key
-            
-        # Flatten the lists and count the frequency of each chunk
-        chunk_count_list = {}  # contains the chunk count
-        chunk_master_list = []  # contains all chunks from all lists but no doubles
-        for lst in chunks_meta_list:
-            self._raise_if_run_canceled()
-            for chunk in lst:            
-                chunk_doc = chunk[0]
-                chunk_score = chunk[1]
-                chunk_str = chunk_unique_str(chunk_doc)
-                chunk_in_count_list = chunk_count_list.get(chunk_str, None)
-                if chunk_in_count_list: 
-                    chunk_count_list[chunk_str] += 1 + chunk_score
-                else:
-                    chunk_count_list[chunk_str] = 1 + chunk_score
-                    chunk_master_list.append(chunk_doc)
-                    
-        # add scores
-        for chunk_doc in chunk_master_list:
-            chunk_doc.metadata['score'] = chunk_count_list[chunk_unique_str(chunk_doc)]
-        
-        # Sort the common items by their score in descending order
-        chunk_master_list.sort(key=lambda chunk: chunk.metadata['score'], reverse=True)
-                                
-        logger.debug('First 10 chunks of retrieved data:\n' + str(chunk_master_list[:10]))
-        
-        return chunk_master_list
+        return self.sources_vectorstore.retrieve_similar_documents(
+            search_strings,
+            doc_ids=doc_ids,
+            score_threshold=score_threshold,
+            k=k,
+            cancel_check=self._raise_if_run_canceled,
+        )
     
     def search_analyze_chunk(self, result_callback, chunk, code_name, code_memo, search_prompt: AgentPromptRecord,
                              scope_type: str = '', scope_id=None, group_id: str = '',
@@ -5447,7 +5500,7 @@ class AiLLM():
 
         # callback to show percentage done    
         config = RunnableConfig()
-        config['callbacks'] = [MyCustomSyncHandler(self)]
+        config['callbacks'] = [make_custom_sync_handler(self)]
         self.run_progress_max = 130  # estimated average token count of the result
         
         # send the query to the llm 

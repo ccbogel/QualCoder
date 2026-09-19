@@ -9,6 +9,7 @@ import sqlite3
 import tempfile
 import threading
 import time
+from concurrent.futures import Future
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -479,6 +480,7 @@ class TestMainWindowAiActions(TestCase):
                     ui=ui,
                     sender=MagicMock(return_value=action),
                     set_ai_chat_sidebar_mode=MagicMock(),
+                    require_ai_runtime=MagicMock(return_value=True),
                 )
 
                 MainWindow.ai_go_analysis(window)
@@ -490,6 +492,78 @@ class TestMainWindowAiActions(TestCase):
                 else:
                     window.set_ai_chat_sidebar_mode.assert_not_called()
                     tab_widget.setCurrentWidget.assert_not_called()
+
+    def test_ai_action_asks_user_to_retry_while_runtime_loads(self):
+        app = SimpleNamespace(ai_runtime_state="loading")
+        window = SimpleNamespace(app=app)
+
+        with patch("qualcoder.__main__.show_ai_runtime_not_ready") as show_message:
+            ready = MainWindow.require_ai_runtime(window, "AI Agent")
+
+        self.assertFalse(ready)
+        show_message.assert_called_once_with(app, "AI Agent")
+
+    def test_deferred_ai_chat_initializes_restored_project_history(self):
+        chat_window = MagicMock()
+        app = SimpleNamespace(
+            project_path="C:/projects/example.qda",
+            settings={'ai_chat_sidebar': 'False'},
+        )
+        window = SimpleNamespace(
+            app=app,
+            ui=SimpleNamespace(textEdit=object()),
+            set_ai_chat_sidebar_mode=MagicMock(),
+        )
+
+        with patch("qualcoder.ai_chat.DialogAIChat", return_value=chat_window):
+            MainWindow.ai_chat(window)
+
+        chat_window.init_ai_chat.assert_called_once_with()
+        window.set_ai_chat_sidebar_mode.assert_called_once_with(False, persist=False)
+
+    def test_ai_startup_status_only_clears_its_own_message(self):
+        status_bar = MagicMock()
+        status_bar.currentMessage.return_value = "AI: Starting up..."
+        window = SimpleNamespace(statusBar=MagicMock(return_value=status_bar))
+
+        MainWindow._clear_ai_startup_status_message(window)
+
+        status_bar.clearMessage.assert_called_once_with()
+        status_bar.reset_mock()
+        status_bar.currentMessage.return_value = "AI: reading data"
+        MainWindow._clear_ai_startup_status_message(window)
+        status_bar.clearMessage.assert_not_called()
+
+    def test_ai_dialog_restores_startup_status_while_runtime_loads(self):
+        status_bar = MagicMock()
+        dialog = SimpleNamespace(
+            app=SimpleNamespace(
+                ai=None,
+                ai_runtime_state="loading",
+                highlight_color=MagicMock(return_value="#123456"),
+            ),
+            ui=SimpleNamespace(
+                pushButton_question=MagicMock(),
+                progressBar_ai=MagicMock(),
+            ),
+            main_window=SimpleNamespace(statusBar=MagicMock(return_value=status_bar)),
+            _chat_scope_active=MagicMock(return_value=False),
+        )
+
+        with patch("qualcoder.ai_chat.qta.icon", return_value=MagicMock()):
+            DialogAIChat.update_ai_busy(dialog)
+
+        status_bar.showMessage.assert_called_once_with("AI: Starting up...")
+
+    def test_ai_dialog_rejects_new_chat_while_runtime_loads(self):
+        app = SimpleNamespace(ai_runtime_state="loading")
+        dialog = SimpleNamespace(app=app)
+
+        with patch("qualcoder.ai_chat.show_ai_runtime_not_ready") as show_message:
+            allowed = DialogAIChat._can_start_general_chat(dialog)
+
+        self.assertFalse(allowed)
+        show_message.assert_called_once_with(app, "AI Agent")
 
     def test_text_coding_reuses_open_dialog(self):
         class FakeDialogCodeText:
@@ -616,6 +690,61 @@ class TestAiMemoPolicy(TestCase):
             merge_public_memo("Visible note\n#####\nHidden note", "Updated note"),
         )
         self.assertEqual("Updated only", merge_public_memo("Visible only", "Updated only#####ignore this"))
+
+    def test_mcp_search_uses_application_vectorstore_without_ai(self):
+        vectorstore = SimpleNamespace(
+            is_open=lambda: True,
+            is_ready=lambda: True,
+        )
+        self.server.app.ai = None
+        self.server.app.vectorstore = vectorstore
+        self.server.app.vectorstore_runtime_state = "ready"
+
+        self.assertIs(vectorstore, self.server._require_ready_vectorstore())
+
+    def test_mcp_search_reports_vectorstore_loading(self):
+        self.server.app.ai = None
+        self.server.app.vectorstore = None
+        self.server.app.vectorstore_runtime_state = "loading"
+
+        with self.assertRaisesRegex(RuntimeError, "currently being prepared"):
+            self.server._require_ready_vectorstore()
+
+    def test_mcp_missing_project_instructs_agent_to_ask_user(self):
+        self.server.app.conn = None
+        self.server.app.project_path = ""
+
+        with self.assertRaisesRegex(RuntimeError, "Instruct the user to open or create a project"):
+            self.server._require_open_project()
+
+    def test_external_mcp_listener_is_enabled_without_project(self):
+        self.server.app.ai_mcp_server = self.server
+        self.server.app.conn = None
+        self.server.app.project_path = ""
+        self.server.app.settings["mcp_external_enabled"] = "True"
+        controller = ExternalMcpController(self.server.app)
+
+        with patch.object(controller, "start") as start, patch.object(controller, "stop") as stop:
+            controller.sync_with_application_state()
+
+        start.assert_called_once_with()
+        stop.assert_not_called()
+
+    def test_external_mcp_executor_allows_non_project_operations(self):
+        self.server.app.ai_mcp_server = self.server
+        self.server.app.conn = None
+        self.server.app.project_path = ""
+        controller = ExternalMcpController(self.server.app)
+        controller._active = True
+        future = Future()
+        context = AiMcpExecutionContext(
+            source="external_mcp",
+            owner="External MCP",
+        )
+
+        controller._execute_on_qt_thread(lambda: "available", context, future)
+
+        self.assertEqual("available", future.result())
 
     def test_mcp_memo_reads_and_updates_preserve_private_suffix(self):
         documents_payload = self.server._sanitize_memo_payload(self.server._read_resource_payload("qualcoder://documents", {}))
