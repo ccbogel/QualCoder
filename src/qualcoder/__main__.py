@@ -328,6 +328,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.external_mcp = ExternalMcpController(self.app, self)
         self.external_mcp.status_changed.connect(self._external_mcp_status_changed)
+        self.external_mcp.start_failed.connect(self._external_mcp_start_failed)
         self.ai_sidebar_splitter_save_timer = QtCore.QTimer(self)
         self.ai_sidebar_splitter_save_timer.setSingleShot(True)
         self.ai_sidebar_splitter_save_timer.timeout.connect(self.persist_ai_sidebar_splitter_setting)
@@ -582,6 +583,14 @@ Click "Yes" to start now.')
         logger.info(message)
         if getattr(self, "ui", None) is not None and hasattr(self.ui, "textEdit"):
             self.ui.textEdit.append(message)
+
+    @QtCore.pyqtSlot(str)
+    def _external_mcp_start_failed(self, message: str) -> None:
+        """Make failed MCP activation visible even outside the action log."""
+
+        dialog = Message(self.app, _("External MCP"), message, "warning")
+        dialog.setTextFormat(QtCore.Qt.TextFormat.PlainText)
+        dialog.exec()
 
     @staticmethod
     def _object_name_aliases(object_name):

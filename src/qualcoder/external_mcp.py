@@ -21,6 +21,7 @@ class ExternalMcpController(QtCore.QObject):
     """Run MCP HTTP off-thread and execute project work on the Qt thread."""
 
     status_changed = QtCore.pyqtSignal(str)
+    start_failed = QtCore.pyqtSignal(str)
     _execute_requested = QtCore.pyqtSignal(object, object, object)
 
     HOST = "127.0.0.1"
@@ -35,6 +36,8 @@ class ExternalMcpController(QtCore.QObject):
         self._thread: threading.Thread | None = None
         self._active = False
         self._restart_requested = False
+        self._startup_pending = False
+        self._startup_error = ""
         self._execute_requested.connect(self._execute_on_qt_thread)
         self.mcp_server.set_external_executor(self._invoke_on_qt_thread)
 
@@ -88,6 +91,8 @@ class ExternalMcpController(QtCore.QObject):
             QtCore.QTimer.singleShot(100, self._retry_start_after_stop)
             return
 
+        self._startup_pending = True
+        self._startup_error = ""
         try:
             asgi_app = self.mcp_server.streamable_http_app()
             config = uvicorn.Config(
@@ -110,7 +115,8 @@ class ExternalMcpController(QtCore.QObject):
         except Exception as err:
             self._active = False
             logger.exception("Could not start External MCP")
-            self.status_changed.emit(f"External MCP failed to start: {err}")
+            self._startup_error = f"{type(err).__name__}: {err}"
+            self._report_start_failure()
 
     @QtCore.pyqtSlot()
     def _retry_start_after_stop(self) -> None:
@@ -132,9 +138,12 @@ class ExternalMcpController(QtCore.QObject):
 
         try:
             asyncio.run(self._serve_async())
-        except Exception as err:
+        except (Exception, SystemExit) as err:
+            # Uvicorn exits on startup failure, including an occupied port.
+            cause = err.__cause__ or err.__context__ or err
+            self._startup_error = f"{type(cause).__name__}: {cause}"
             logger.exception("External MCP listener failed")
-            self.status_changed.emit(f"External MCP failed: {err}")
+            self.status_changed.emit(f"External MCP failed: {self._startup_error}")
         finally:
             self._active = False
             self._loop = None
@@ -149,19 +158,42 @@ class ExternalMcpController(QtCore.QObject):
     def _report_start_status(self) -> None:
         """Report startup success or wait briefly for uvicorn to settle."""
 
+        if not self._startup_pending:
+            return
         if self.is_running:
+            self._startup_pending = False
             self.status_changed.emit(f"External MCP available at {self.endpoint}")
             return
         if self._thread is not None and self._thread.is_alive() and self._active:
             QtCore.QTimer.singleShot(100, self._report_start_status)
             return
-        self.status_changed.emit(
-            f"External MCP could not bind to {self.HOST}:{self.port}. The port may already be in use."
+        self._report_start_failure()
+
+    def _report_start_failure(self) -> None:
+        """Report each failed activation once, on the Qt thread."""
+
+        if not self._startup_pending:
+            return
+        self._startup_pending = False
+        message = _("The external MCP server could not be started at {endpoint}.").format(
+            endpoint=self.endpoint
         )
+        message += "\n\n" + _(
+            "The port may already be in use by another QualCoder instance, or server initialization failed."
+        )
+        if self._startup_error:
+            message += "\n\n" + self._startup_error
+        message += "\n\n" + _(
+            "MCP access to this QualCoder instance is unavailable. "
+            "You can continue using QualCoder. See the log for details."
+        )
+        self.status_changed.emit(message)
+        self.start_failed.emit(message)
 
     def stop(self) -> None:
         """Promptly reject work and ask the HTTP listener to shut down."""
 
+        self._startup_pending = False
         self._active = False
         if self._loop is not None:
             try:
