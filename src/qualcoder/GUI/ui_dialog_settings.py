@@ -317,6 +317,14 @@ class Ui_Dialog_settings(object):
         self.checkBox_MCP_enable = QtWidgets.QCheckBox(parent=self.widget_AI_enable)
         self.checkBox_MCP_enable.setObjectName("checkBox_MCP_enable")
         self.horizontalLayout_4.addWidget(self.checkBox_MCP_enable)
+        self.pushButton_mcp_claude_desktop = QtWidgets.QPushButton(parent=self.widget_AI_enable)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Maximum, QtWidgets.QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_mcp_claude_desktop.sizePolicy().hasHeightForWidth())
+        self.pushButton_mcp_claude_desktop.setSizePolicy(sizePolicy)
+        self.pushButton_mcp_claude_desktop.setObjectName("pushButton_mcp_claude_desktop")
+        self.horizontalLayout_4.addWidget(self.pushButton_mcp_claude_desktop)
         self.verticalLayout_2.addWidget(self.widget_AI_enable)
         self.widget_ai_provider = QtWidgets.QWidget(parent=self.widget_ai)
         self.widget_ai_provider.setObjectName("widget_ai_provider")
@@ -636,6 +644,10 @@ class Ui_Dialog_settings(object):
 "The same AI permissions apply as for the internal AI agent (Read-Only / Sandboxed / Full Access).\n"
 "This is an experimental feature. Use it with care."))
         self.checkBox_MCP_enable.setText(_translate("Dialog_settings", "allow external MCP access"))
+        self.pushButton_mcp_claude_desktop.setToolTip(_translate("Dialog_settings", "Create the file that installs QualCoder as an extension in Claude Desktop.\n"
+"Open the saved .mcpb file with Claude Desktop to install it.\n"
+"External MCP access must be allowed and a project must be open while Claude works with QualCoder."))
+        self.pushButton_mcp_claude_desktop.setText(_translate("Dialog_settings", "Claude Desktop extension..."))
         self.label_ai_api_key.setText(_translate("Dialog_settings", "API key"))
         self.toolButtonShowApiKey.setText(_translate("Dialog_settings", "..."))
         self.label_10.setText(_translate("Dialog_settings", "AI Profile:"))
