@@ -39,6 +39,7 @@ import os
 import random
 import re
 import sqlite3
+import time
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, TypeVar
 import unicodedata
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
@@ -72,6 +73,8 @@ INTERNAL_AI_CONTEXT = AiMcpExecutionContext(source="ai_agent", owner="AI Agent")
 _execution_context: ContextVar[AiMcpExecutionContext] = ContextVar(
     "qualcoder_ai_mcp_execution_context", default=INTERNAL_AI_CONTEXT
 )
+# Set while a tool runs: database waits then happen between attempts, never while holding a lock
+_fail_fast_database: ContextVar[bool] = ContextVar("qualcoder_mcp_fail_fast_database", default=False)
 ResultT = TypeVar("ResultT")
 
 
@@ -970,7 +973,15 @@ class AiMcpServer:
             payload = self._call_tool_payload(params.name, params.arguments, "")
             return types.CallToolResult.model_validate(payload)
 
-        return await self._run_sdk_operation(_context, call_tool)
+        try:
+            return await self._run_sdk_operation(_context, call_tool)
+        except Exception as err:
+            if _context is None:
+                raise
+            # External clients get a tool error they can read, and the SDK logs no traceback for it
+            return types.CallToolResult.model_validate(
+                {"content": [{"type": "text", "text": str(err)}], "isError": True}
+            )
 
     async def _sdk_list_prompts(
             self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
@@ -1611,7 +1622,33 @@ class AiMcpServer:
             )
         return payload
 
+    DATABASE_BUSY_WAIT_SECONDS = 8.0
+
     def _call_tool_payload(self, name: str, arguments: Optional[Dict[str, Any]], change_set_id: str) -> Dict[str, Any]:
+        """Run one tool, backing off and retrying while the project database is busy.
+
+        A write that waits inside SQLite keeps the write lock, and any GUI write during that wait fails at once
+        and leaves the GUI connection in an open transaction. Waiting between attempts holds no lock."""
+
+        deadline = time.monotonic() + self.DATABASE_BUSY_WAIT_SECONDS
+        flag = _fail_fast_database.set(True)
+        try:
+            while True:
+                preview_tokens = dict(self._preview_tokens)
+                try:
+                    return self._call_tool_payload_once(name, arguments, change_set_id)
+                except sqlite3.OperationalError as err:
+                    # Every write tool rolls back on failure, so a locked attempt changed nothing
+                    self._preview_tokens.update(preview_tokens)
+                    if "locked" not in str(err).lower() or time.monotonic() >= deadline:
+                        raise
+                    time.sleep(0.2)
+        finally:
+            _fail_fast_database.reset(flag)
+
+    def _call_tool_payload_once(
+            self, name: str, arguments: Optional[Dict[str, Any]], change_set_id: str
+    ) -> Dict[str, Any]:
         if arguments is None:
             arguments = {}
         if not isinstance(arguments, dict):
@@ -6617,6 +6654,8 @@ class AiMcpServer:
         return db_path
 
     def _connect(self) -> sqlite3.Connection:
+        if _fail_fast_database.get():
+            return sqlite3.connect(self._project_db_path(), timeout=0)
         return sqlite3.connect(self._project_db_path())
 
     def _fetchall(self, sql: str, params: Tuple[Any, ...] = ()) -> List[Tuple[Any, ...]]:
