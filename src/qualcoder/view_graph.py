@@ -192,6 +192,78 @@ def code_cooccurrences(conn, cid=None, cids=None):
     return rows
 
 
+def coding_overlaps(conn, kind, coding_id, only_cids=None):
+    """ Codings of other codes overlapping one coding ('text' ctid, 'image' imid, 'av' avid).
+    Returns dicts with cid, codename, color, memo and the position fields of that kind. """
+    cur = conn.cursor()
+    rows = []
+    if kind == 'text':
+        cur.execute("select fid, cid, pos0, pos1 from code_text where ctid=?", [coding_id])
+        r = cur.fetchone()
+        if r:
+            cur.execute("select b.cid, n.name, n.color, ifnull(b.memo,''), b.pos0, b.pos1 from code_text b "
+                        "join code_name n on n.cid=b.cid where b.fid=? and b.cid!=? and b.pos0 < ? and b.pos1 > ?",
+                        [r[0], r[1], r[3], r[2]])
+            rows = [{'cid': x[0], 'codename': x[1], 'color': x[2], 'memo': x[3], 'pos0': x[4], 'pos1': x[5]}
+                    for x in cur.fetchall()]
+    elif kind == 'image':
+        cur.execute("select id, cid, x1, y1, width, height, pdf_page from code_image where imid=?", [coding_id])
+        r = cur.fetchone()
+        if r:
+            cur.execute("select b.cid, n.name, n.color, ifnull(b.memo,''), b.x1, b.y1, b.width, b.height "
+                        "from code_image b join code_name n on n.cid=b.cid where b.id=? and b.cid!=? "
+                        "and ifnull(b.pdf_page,-1)=? and b.x1 < ? and (b.x1+b.width) > ? "
+                        "and b.y1 < ? and (b.y1+b.height) > ?",
+                        [r[0], r[1], r[6] if r[6] is not None else -1, r[2] + r[4], r[2], r[3] + r[5], r[3]])
+            rows = [{'cid': x[0], 'codename': x[1], 'color': x[2], 'memo': x[3], 'x1': x[4], 'y1': x[5],
+                     'width': x[6], 'height': x[7]} for x in cur.fetchall()]
+    elif kind == 'av':
+        cur.execute("select id, cid, pos0, pos1 from code_av where avid=?", [coding_id])
+        r = cur.fetchone()
+        if r:
+            cur.execute("select b.cid, n.name, n.color, ifnull(b.memo,''), b.pos0, b.pos1 from code_av b "
+                        "join code_name n on n.cid=b.cid where b.id=? and b.cid!=? and b.pos0 < ? and b.pos1 > ?",
+                        [r[0], r[1], r[3], r[2]])
+            rows = [{'cid': x[0], 'codename': x[1], 'color': x[2], 'memo': x[3], 'pos0': x[4], 'pos1': x[5]}
+                    for x in cur.fetchall()]
+    if only_cids is not None:
+        rows = [d for d in rows if d['cid'] in only_cids]
+    return rows
+
+
+def segment_cooc_partner_cids(segment):
+    """ Codes joined to this segment node by co-occurrence lines (the blue dotted ones). """
+    scene = segment.scene()
+    if scene is None:
+        return set()
+    cids = set()
+    for ln in scene.items():
+        if isinstance(ln, FreeLineGraphicsItem) and getattr(ln, '_is_cooc_line', False):
+            other = None
+            if ln.from_widget is segment:
+                other = ln.to_widget
+            elif ln.to_widget is segment:
+                other = ln.from_widget
+            if isinstance(other, TextGraphicsItem) and other.code_or_cat.get('cid') is not None:
+                cids.add(other.code_or_cat['cid'])
+    return cids
+
+
+def show_segment_context(app, segment, kind, coding_id, dialog):
+    """ Open the context dialog; when the segment has co-occurrence lines, the overlapping
+    codings of those codes are shown in it as well. """
+    partners = segment_cooc_partner_cids(segment)
+    if partners:
+        for d in coding_overlaps(app.conn, kind, coding_id, only_cids=partners):
+            if kind == 'text':
+                dialog.add_coded_text(d)
+            elif kind == 'image':
+                dialog.add_coded_area(d)
+            elif kind == 'av':
+                dialog.add_coded_segment(d)
+    dialog.exec()
+
+
 # shared by ViewGraph.load_graph and the graph picker preview
 def apply_saved_graph_visibility(scene):
     """ Restore collapsed state and hide segments whose code node is hidden. """
@@ -1364,8 +1436,10 @@ class DialogSelectCodedSegments(QDialog):
             display = f"[{tc['filename']}] {display}"
             if show_code:
                 display = f"{tc['codename']}: {display}"
+            display += self._cooc_suffix(tc)
             item = QtWidgets.QListWidgetItem(display)
-            item.setToolTip(f"Code: {tc['codename']}\nFile: {tc['filename']}\n{tc['name'][:300]}")
+            item.setToolTip(f"Code: {tc['codename']}\nFile: {tc['filename']}\n{tc['name'][:300]}"
+                            + self._cooc_tooltip(tc))
             self.list_text.addItem(item)
         layout.addWidget(self.list_text, stretch=3)
 
@@ -1383,9 +1457,11 @@ class DialogSelectCodedSegments(QDialog):
             display = f"[{ic['filename']}] x:{ic['x']} y:{ic['y']} w:{ic['width']} h:{ic['height']}"
             if show_code:
                 display = f"{ic['codename']}: {display}"
+            display += self._cooc_suffix(ic)
             item = QtWidgets.QListWidgetItem(display)
             item.setToolTip(
-                f"File: {ic['filename']}\nArea: x:{ic['x']} y:{ic['y']} width:{ic['width']} height:{ic['height']}")
+                f"File: {ic['filename']}\nArea: x:{ic['x']} y:{ic['y']} width:{ic['width']} height:{ic['height']}"
+                + self._cooc_tooltip(ic))
             self.list_image.addItem(item)
         v_img.addWidget(self.list_image)
         h_layout.addLayout(v_img)
@@ -1401,8 +1477,10 @@ class DialogSelectCodedSegments(QDialog):
             display = f"[{ac['filename']}] {ac['pos0']} - {ac['pos1']} msecs"
             if show_code:
                 display = f"{ac['codename']}: {display}"
+            display += self._cooc_suffix(ac)
             item = QtWidgets.QListWidgetItem(display)
-            item.setToolTip(f"File: {ac['filename']}\nDuration: {ac['pos0']} - {ac['pos1']} msecs")
+            item.setToolTip(f"File: {ac['filename']}\nDuration: {ac['pos0']} - {ac['pos1']} msecs"
+                            + self._cooc_tooltip(ac))
             self.list_av.addItem(item)
         v_av.addWidget(self.list_av)
         h_layout.addLayout(v_av)
@@ -1432,6 +1510,16 @@ class DialogSelectCodedSegments(QDialog):
         btn_layout.addWidget(self.btn_cancel)
 
         layout.addLayout(btn_layout)
+
+    @staticmethod
+    def _cooc_suffix(coding):
+        names = coding.get('cooc') or []
+        return f"   \u21c4 {', '.join(names)}" if names else ""
+
+    @staticmethod
+    def _cooc_tooltip(coding):
+        names = coding.get('cooc') or []
+        return "\n" + _("Co-occurring codes: ") + ", ".join(names) if names else ""
 
     def select_all(self):
         self.list_text.selectAll()
@@ -2806,7 +2894,7 @@ class ViewGraph(QDialog):
             keep[cid_b][kind].add(id_b)
         text_codings, image_codings, av_codings = [], [], []
         for cid, node in nodes_by_cid.items():
-            t, i, a = node.collect_coded_segments(keep=keep[cid])
+            t, i, a = node.collect_coded_segments(keep=keep[cid], partner_cids=set(nodes_by_cid))
             text_codings += t
             image_codings += i
             av_codings += a
@@ -7692,7 +7780,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 return
             data = {'cid': res[0], 'codename': res[1], 'color': res[2], 'coder': res[3], 'memo': res[4],
                     'pos0': res[5], 'pos1': res[6], 'file_or_casename': res[7], 'fid': res[8], 'file_or_case': 'File'}
-            DialogCodeInText(self.app, data).exec()
+            show_segment_context(self.app, self, 'text', text_id, DialogCodeInText(self.app, data))
         # Remove
         if action == remove_action:
             ui = DialogConfirmDelete(self.app, _("Remove this item from the graph?"))
@@ -8192,7 +8280,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             data = {'pos0': self.pos0, 'pos1': self.pos1, 'file_or_casename': self.path_, 'mediapath': self.path_,
                     'coder': res[3], 'codename': res[1], 'cid': res[0], 'color': res[2], 'memo': res[4],
                     'fid': res[5], 'file_or_case': 'File'}
-            DialogCodeInAV(self.app, data).exec()
+            show_segment_context(self.app, self, 'av', self.avid, DialogCodeInAV(self.app, data))
 
         if action == remove_action:
             ui = DialogConfirmDelete(self.app, _("Remove this item from the graph?"))
@@ -8418,7 +8506,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                     'file_or_casename': self.path_, 'mediapath': self.path_, 'coder': res[3],
                     'codename': res[1], 'cid': res[0], 'color': res[2], 'memo': res[4],
                     'fid': res[5], 'file_or_case': 'File', 'pdf_page': res[6]}
-            DialogCodeInImage(self.app, data).exec()
+            show_segment_context(self.app, self, 'image', self.imid, DialogCodeInImage(self.app, data))
 
         if action == remove_action:
             ui = DialogConfirmDelete(self.app, _("Remove this item from the graph?"))
@@ -8864,13 +8952,27 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         else:
             scene.update()
 
-    def collect_coded_segments(self, keep=None):
+    def collect_coded_segments(self, keep=None, partner_cids=None):
         """ Coded segments of this code not yet in the scene, as three lists (text, image, A/V).
-        keep: optional dict {'text': ids, 'image': ids, 'av': ids} to restrict to those coding ids. """
+        keep: optional dict {'text': ids, 'image': ids, 'av': ids} to restrict to those coding ids.
+        Each segment carries 'cooc', the names of the other codes overlapping it
+        (limited to partner_cids when given). """
 
         cur = self.app.conn.cursor()
         cid = self.code_or_cat['cid']
         code_name = self.code_or_cat['name']
+        code_names = {}
+        cur.execute("select cid, name from code_name")
+        for r in cur.fetchall():
+            code_names[r[0]] = r[1]
+        partners = {'text': {}, 'image': {}, 'av': {}}
+        for _cid_a, cid_b, kind, id_a, _id_b in code_cooccurrences(self.app.conn, cid=cid):
+            if partner_cids is not None and cid_b not in partner_cids:
+                continue
+            partners[kind].setdefault(id_a, set()).add(code_names.get(cid_b, str(cid_b)))
+
+        def cooc_names(kind, coding_id):
+            return sorted(partners[kind].get(coding_id, ()), key=str.lower)
         scene_items = list(self.scene().items()) if self.scene() is not None else []
         present_ctid = {i.ctid for i in scene_items if isinstance(i, FreeTextGraphicsItem)}
         present_imid = {i.imid for i in scene_items if isinstance(i, PixmapGraphicsItem)}
@@ -8890,6 +8992,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             text_codings.append({
                 'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3],
                 'ctid': r[4], 'filename': r[5], 'codename': code_name,
+                'cooc': cooc_names('text', r[4]),
                 'code_or_cat': {'cid': r[0], 'catid': None}, 'node': self})
         image_codings = []
         cur.execute("select code_image.cid, code_image.id, x1, y1, width, height, "
@@ -8906,6 +9009,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 'imid': r[7], 'pdf_page': r[8], 'filename': r[9],
                 'path': r[10] if r[10] else '', 'codename': code_name,
                 'name': f"{r[9]} x:{int(r[2])} y:{int(r[3])} w:{int(r[4])} h:{int(r[5])}",
+                'cooc': cooc_names('image', r[7]),
                 'code_or_cat': {'cid': r[0], 'catid': None}, 'node': self})
         av_codings = []
         cur.execute("select code_av.cid, code_av.id, code_av.pos0, code_av.pos1, "
@@ -8920,6 +9024,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 'memo': r[4], 'avid': r[5], 'filename': r[6],
                 'path': r[7] if r[7] else '', 'codename': code_name,
                 'name': f"{r[6]}: {int(r[2])} to {int(r[3])} msecs",
+                'cooc': cooc_names('av', r[5]),
                 'code_or_cat': {'cid': r[0], 'catid': None}, 'node': self})
         return text_codings, image_codings, av_codings
 
