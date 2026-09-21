@@ -1877,7 +1877,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def load_file_data(self, order_by :str=""):
         """ Documents images and audio contain the filetype suffix.
-        No suffix implies the 'file' was imported from a survey question or created internally.
+        No suffix implies the 'file' was created internally or imported from a survey by an older version.
         This also fills out the table header labels with file attribute names.
         Db versions < 5: Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
@@ -2732,6 +2732,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Needed for matching an updated data set to existing survey rows
         existing_files = self.app.get_text_filenames()
 
+        # Category for codes created by this import, made on first new code
+        survey_cat_name = _("Survey")
+        survey_catid = None
         count = 0
         for index, row in df.iterrows():
             fulltext = ""
@@ -2767,7 +2770,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             filename = base_filename
             suffix = 1
             while True:
-                cur.execute("select name from source where name=?", [filename])
+                # Also check the suffix-less names of older survey imports
+                cur.execute("select name from source where name in (?,?)", [filename + ".txt", filename])
                 if not cur.fetchone():
                     break
                 filename = f"{base_filename}_{suffix}"
@@ -2778,8 +2782,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 filepath_save = Path(self.app.project_path) / "documents" / filename_txt
                 with open(filepath_save, 'w', encoding='utf-8') as f:
                     f.write(fulltext)
+                # Named and stored like any imported .txt file
                 cur.execute("insert into source(name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
-                            (filename, fulltext, None, "", self.app.settings['codername'], now))
+                            (filename_txt, fulltext, "/docs/" + filename_txt, "", self.app.settings['codername'], now))
                 file_id = cur.lastrowid
             else:
                 file_id = None
@@ -2793,8 +2798,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                     else:
                         grays = next((colr for colr in colour_ranges if colr['name'] == 'gray'), None)
                         color = colors[randint(grays['min'], grays['max'] - 1)]
-                        cur.execute("insert into code_name (name, memo, owner, date, color) values(?,?,?,?,?)",
-                                    (col_name, "", self.app.settings['codername'], now, color))
+                        if survey_catid is None:
+                            survey_catid = self.get_or_create_category(cur, survey_cat_name, now)
+                        cur.execute("insert into code_name (name, memo, owner, date, color, catid) values(?,?,?,?,?,?)",
+                                    (col_name, "", self.app.settings['codername'], now, color, survey_catid))
                         cid = cur.lastrowid
                     if text_cols:
                         cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)",
@@ -2832,7 +2839,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 # Check if fid is None, try getting from a file name match
                 if attr_file_or_case == "file":
                     for item in existing_files:
-                        if item['name'] == base_filename:
+                        if item['name'] in (base_filename + ".txt", base_filename):
                             file_or_case_id = item['id']
                             break
 
@@ -2865,6 +2872,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             changed_tables.update({"cases", "case_text"})
         if autocode_enabled:
             changed_tables.update({"code_name", "code_text"})
+        if survey_catid is not None:
+            changed_tables.add("code_cat")
+            msg += "\n" + _("New codes placed in category: ") + survey_cat_name
         self._emit_project_table_changes(sorted(changed_tables))
         if updated_data:
             msg += "\n" + _("Some existing data updated.")
@@ -2879,6 +2889,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         if updated_data:
             dlg_msg += "\n" + _("Some existing data updated")
         Message(self.app, _("Import successful."), dlg_msg).exec()
+
+    def get_or_create_category(self, cur, name:str, date:str):
+        """ Return the catid of the named category, creating it if missing. """
+
+        cur.execute("select catid from code_cat where name=?", [name])
+        res = cur.fetchone()
+        if res:
+            return res[0]
+        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
+                    (name, "", self.app.settings['codername'], date, None))
+        return cur.lastrowid
 
     def import_files(self, link:bool=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
@@ -3663,6 +3684,23 @@ class DialogManageFiles(QtWidgets.QDialog):
             except Exception:
                 pass
 
+    def internal_text_file_path(self, docs_dir:Path, name:str):
+        """ Disk file of a text source with no mediapath, or None if there is none.
+        Survey imports are saved as name.txt while the source name has no suffix. """
+
+        p = (docs_dir / name).resolve()
+        if p.is_file():
+            return p
+        # name.txt may belong to another source with that exact name
+        cur = self.app.conn.cursor()
+        cur.execute("select id from source where name=?", [name + ".txt"])
+        if cur.fetchone():
+            return None
+        p = (docs_dir / (name + ".txt")).resolve()
+        if p.is_file():
+            return p
+        return None
+
     def delete_button_multiple_files(self):
         """ Delete files from database and update model and widget.
         Also, delete files from sub-directories, if not externally linked.
@@ -3714,8 +3752,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     docs_dir = (Path(self.app.project_path) / "documents").resolve()
                     p = None
                     if s['mediapath'] is None:
-                        # Legacy for older < 3.4 QualCoder projects
-                        p = (docs_dir / s['name']).resolve()
+                        # Legacy < 3.4 projects, survey imports and internal files
+                        p = self.internal_text_file_path(docs_dir, s['name'])
                     elif s['mediapath'][0:6] == '/docs/':
                         # elif: None cannot be sliced. Previously sliced s['name'][6:].
                         p = (docs_dir / s['mediapath'][6:]).resolve()
@@ -3850,9 +3888,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     docs_dir = (Path(self.app.project_path) / "documents").resolve()
                     p = None
                     if self.source[row]['mediapath'] is None:
-                        # Legacy for older QualCoder Projects < 3.3
-                        # The condition was inverted (deleted when mediapath was present).
-                        p = (docs_dir / self.source[row]['name']).resolve()
+                        # Legacy < 3.3 projects, survey imports and internal files
+                        p = self.internal_text_file_path(docs_dir, self.source[row]['name'])
                     elif self.source[row]['mediapath'][0:6] == '/docs/':
                         p = (docs_dir / self.source[row]['mediapath'][6:]).resolve()
                     # Never unlink outside the project documents folder (../ guard).
