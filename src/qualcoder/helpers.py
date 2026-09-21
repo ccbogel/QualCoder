@@ -455,10 +455,9 @@ class ExportDirectoryPathDialog:
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
-                                                               app.last_export_directory, options)
+                                                               str(app.last_export_directory or ""), options)
         if directory:
-            if directory != app.last_export_directory:
-                app.last_export_directory = directory
+            app.last_export_directory = directory
             self.filepath = directory + "/" + filename_only + "." + extension
             counter = 0
             while Path(self.filepath).exists():
@@ -732,6 +731,12 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
+        # filled by add_coded_segment (co-occurring codes on the same media)
+        self.label_cooc = QtWidgets.QLabel(self)
+        self.label_cooc.setWordWrap(True)
+        self.label_cooc.hide()
+        self.gridLayout.addWidget(self.label_cooc, 1, 0)
+        self.extra_segments = []
         self.mediaplayer = None
         try:
             if self.app.settings.get('av_player', 'vlc') == 'qt' or vlc is None:
@@ -787,6 +792,21 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update_ui)
         self.timer.start()
+
+    def add_coded_segment(self, data):
+        """ List another coded segment of the same media (e.g. a co-occurring code).
+        data: dictionary with codename, color, pos0, pos1 and optional memo. """
+
+        self.extra_segments.append(data)
+        lines = []
+        for d in self.extra_segments:
+            line = (f'<span style="background-color:{d["color"]}">&nbsp;{d["codename"]}&nbsp;</span> '
+                    f'{msecs_to_mins_and_secs(d["pos0"])} - {msecs_to_mins_and_secs(d["pos1"])}')
+            if d.get('memo'):
+                line += f' ({d["memo"]})'
+            lines.append(line)
+        self.label_cooc.setText(_("Co-occurring:") + "<br>" + "<br>".join(lines))
+        self.label_cooc.show()
 
     def update_ui(self):
         """ Checks for end of playing segment. """
@@ -898,47 +918,59 @@ class DialogCodeInImage(QtWidgets.QDialog):
             self.ui.horizontalSlider.setValue(slider_value)
         self.draw_scene()
 
+    def add_coded_area(self, data):
+        """ Show another coded area (e.g. a co-occurring code) on the same image.
+        data: dictionary with codename, color, x1, y1, width, height and optional memo. """
+
+        if not hasattr(self, 'extra_areas'):
+            self.extra_areas = []
+        self.extra_areas.append(data)
+        self.draw_scene()
+
     def draw_coded_area(self):
-        """ Draw the coded rectangle in the scene.
+        """ Draw the coded rectangle in the scene, plus any extra areas added with add_coded_area.
          The coded memo can be in the data as ['memo'] if data from DialogCodeText, DialogCodeImage, DialogCodeAV
          It is in the data as ['coded memo'] if data from DialogReportCodes.
          DialogReportCodes can produce various memos on output: source memo, coded memo, codename memo.
          Called by: draw_scene
          """
 
-        tooltip = self.data['codename']
-        try:
-            tooltip += "\nMemo: " + self.data['memo']
-        except KeyError:
-            pass
-        try:
-            tooltip += "\nMemo: " + self.data['coded memo']
-        except KeyError:
-            pass
+        for data in getattr(self, 'extra_areas', []):
+            self._draw_area(data, QtCore.Qt.PenStyle.DotLine)
+        self._draw_area(self.data, QtCore.Qt.PenStyle.DashLine)
 
+    def _draw_area(self, data, pen_style):
+        tooltip = data['codename']
+        try:
+            tooltip += "\nMemo: " + data['memo']
+        except KeyError:
+            pass
+        try:
+            tooltip += "\nMemo: " + data['coded memo']
+        except KeyError:
+            pass
         # Degrees 0
-        x = self.data['x1'] * self.scale
-        y = self.data['y1'] * self.scale
-        width = self.data['width'] * self.scale
-        height = self.data['height'] * self.scale
+        x = data['x1'] * self.scale
+        y = data['y1'] * self.scale
+        width = data['width'] * self.scale
+        height = data['height'] * self.scale
         if self.degrees == 90:
-            y = (self.data['x1']) * self.scale
-            x = (self.pixmap.height() - self.data['y1'] - self.data['height']) * self.scale
-            height = self.data['width'] * self.scale
-            width = self.data['height'] * self.scale
+            y = (data['x1']) * self.scale
+            x = (self.pixmap.height() - data['y1'] - data['height']) * self.scale
+            height = data['width'] * self.scale
+            width = data['height'] * self.scale
         if self.degrees == 180:
-            x = (self.pixmap.width() - self.data['x1'] - self.data['width']) * self.scale
-            y = (self.pixmap.height() - self.data['y1'] - self.data['height']) * self.scale
-            width = self.data['width'] * self.scale
-            height = self.data['height'] * self.scale
+            x = (self.pixmap.width() - data['x1'] - data['width']) * self.scale
+            y = (self.pixmap.height() - data['y1'] - data['height']) * self.scale
+            width = data['width'] * self.scale
+            height = data['height'] * self.scale
         if self.degrees == 270:
-            y = (self.pixmap.width() - self.data['x1'] - self.data['width']) * self.scale
-            x = (self.data['y1']) * self.scale
-            height = self.data['width'] * self.scale
-            width = self.data['height'] * self.scale
-
+            y = (self.pixmap.width() - data['x1'] - data['width']) * self.scale
+            x = (data['y1']) * self.scale
+            height = data['width'] * self.scale
+            width = data['height'] * self.scale
         rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        rect_item.setPen(QtGui.QPen(QtGui.QColor(self.data['color']), 2, QtCore.Qt.PenStyle.DashLine))
+        rect_item.setPen(QtGui.QPen(QtGui.QColor(data['color']), 2, pen_style))
         rect_item.setToolTip(tooltip)
         self.scene.addItem(rect_item)
 
