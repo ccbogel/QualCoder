@@ -3,8 +3,11 @@
 """Local Streamable HTTP transport for QualCoder's shared MCP server."""
 
 import asyncio
+from collections import deque
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import logging
+import re
 import sqlite3
 import threading
 from typing import Any, Callable
@@ -40,6 +43,8 @@ class ExternalMcpController(QtCore.QObject):
         self._startup_error = ""
         # One worker keeps requests in order; a busy database then waits here and not in the GUI
         self._worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="QualCoderExternalMCPWork")
+        self._traced_conn: sqlite3.Connection | None = None
+        self._gui_statements: deque[tuple[str, str]] = deque(maxlen=12)
         self.mcp_server.set_external_executor(self._invoke_off_gui_thread)
 
     @property
@@ -83,6 +88,7 @@ class ExternalMcpController(QtCore.QObject):
         """Start or stop the listener from the current MCP setting."""
 
         enabled = str(self.app.settings.get("mcp_external_enabled", "False")).lower() == "true"
+        self._trace_gui_connection(enabled)
         if enabled:
             self.start()
         else:
@@ -247,6 +253,42 @@ class ExternalMcpController(QtCore.QObject):
             self.status_changed.emit(f"External MCP request failed: {str(err)[:300]}")
             raise
 
+    def _trace_gui_connection(self, enabled: bool) -> None:
+        """Keep the last statements of the GUI connection, to name the window that holds the database."""
+
+        conn = self.app.conn if enabled else None
+        if conn is self._traced_conn:
+            return
+        try:
+            if self._traced_conn is not None:
+                self._traced_conn.set_trace_callback(None)
+        except sqlite3.Error:
+            pass
+        self._traced_conn = None
+        self._gui_statements.clear()
+        if conn is None:
+            return
+        try:
+            conn.set_trace_callback(self._remember_gui_statement)
+            self._traced_conn = conn
+        except sqlite3.Error as err:
+            logger.debug("GUI connection trace unavailable: %s", err)
+
+    def _remember_gui_statement(self, statement: str) -> None:
+        """Trace callback, runs on the GUI thread for every statement, so it only stores."""
+
+        self._gui_statements.append((datetime.now().strftime("%H:%M:%S"), statement[:240]))
+
+    def _gui_statement_trail(self) -> str:
+        """Return the remembered statements without their text values, which may be research data."""
+
+        lines = []
+        for clock, statement in list(self._gui_statements):
+            cleaned = re.sub(r"'(?:[^']|'')*'", "'?'", statement)
+            cleaned = cleaned.split("'")[0] + "'?" if cleaned.count("'") % 2 else cleaned
+            lines.append(f"  {clock} {' '.join(cleaned.split())}")
+        return "\n".join(lines)
+
     def _explain_database_error(self, err: sqlite3.OperationalError) -> Exception:
         """Turn a database lock into something the external client and the user can act on."""
 
@@ -259,9 +301,14 @@ class ExternalMcpController(QtCore.QObject):
         else:
             reason = ("Another QualCoder window is still reading the project database. "
                       "Ask the user to close open coding, report or graph windows.")
-        self.status_changed.emit(
+        message = (
             f"External MCP: nothing written, the project database is locked (unsaved changes in QualCoder: {pending})."
         )
+        trail = self._gui_statement_trail()
+        if trail != "":
+            # Stays in the local log, the external client never receives it
+            message += "\nLast statements of the QualCoder window connection, newest last:\n" + trail
+        self.status_changed.emit(message)
         return RuntimeError(
             f"The project database stayed locked and nothing was written. {reason} "
             "Do not retry until the user confirms."
