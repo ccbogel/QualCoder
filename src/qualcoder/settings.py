@@ -44,6 +44,7 @@ from .coder_names import DialogCoderNames
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import get_default_user_directory, Message
+from .modern_style import LOOK_OPTIONS
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -83,6 +84,7 @@ BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
 STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
 HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
+LOOK_LABELS = [_("Classic"), _("Modern"), _("Soft"), _("Aurora")]  # same order as LOOK_OPTIONS
 
 
 def _setting_is_true(value: Any) -> bool:
@@ -238,6 +240,8 @@ class DialogSettings(QtWidgets.QDialog):
         for index, style in enumerate(styles):
             if style == self.settings['stylesheet']:
                 self.ui.comboBox_style.setCurrentIndex(index)
+        self.ui.comboBox_look.addItems(LOOK_LABELS)
+        _set_combo_by_value(self.ui.comboBox_look, LOOK_OPTIONS, self.settings.get('ui_look', 'modern'))
         if self.settings['backup_on_open'] == 'True':
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
@@ -969,6 +973,10 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
+        look = _combo_value(self.ui.comboBox_look, LOOK_OPTIONS, 'modern')
+        if self.settings.get('ui_look') != look:
+            restart_qualcoder = True
+        self.settings['ui_look'] = look
         selected_language = self.get_selected_language_code()
         if self.settings['language'] != selected_language:
             restart_qualcoder = True
