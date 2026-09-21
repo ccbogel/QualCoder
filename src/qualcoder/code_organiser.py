@@ -1402,6 +1402,13 @@ class CodeOrganiser(QDialog):
             it.setVisible(True)
         Message(self.app, _("Image exported"), filepath).exec()
 
+    def has_unsaved_changes(self):
+        """ True if there are pending operations not yet applied. """
+
+        if getattr(self, '_changes_applied', False):
+            return False
+        return bool(self.build_pending_changes())
+
     def build_pending_changes(self):
         """ Derive the list of pending operations by comparing the current
         model against the snapshot taken when the branch was selected. Returns a list
@@ -1715,6 +1722,7 @@ class CodeOrganiser(QDialog):
             self._emit_project_table_changes(tables)
 
         # Wrap up
+        self._changes_applied = True
         self.app.delete_backup = False
         self.parent_text_edit.append(_("Code tree re-organised."))
         self.hide()

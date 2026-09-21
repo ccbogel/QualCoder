@@ -684,7 +684,15 @@ class GraphSynchronizer:
         tables = None if self._pending_full else set(self._pending_tables)
         self._pending_tables.clear()
         self._pending_full = False
+        # Changes made elsewhere in the project must not flag a saved graph as unsaved
+        try:
+            was_clean = self.vg._saved_fingerprint is not None and not self.vg.has_unsaved_changes()
+        except Exception as err:
+            logger.debug(str(err))
+            was_clean = False
         self._execute(tables)
+        if was_clean:
+            self.vg._mark_graph_saved()
 
     # ----- Pipeline -----
     def _execute(self, tables_set):
@@ -1676,6 +1684,7 @@ class ViewGraph(QDialog):
         self.show_frequencies = False  # Coded segment frequencies
         # undo history stack (scene snapshots, full visual + structural state)
         self._undo_stack = []
+        self._saved_fingerprint = None  # Scene state at last save or load
         self._undo_max_depth = 3  # 3 undo levels
         # minimap state
         self._minimap_widget = None
@@ -1817,6 +1826,39 @@ class ViewGraph(QDialog):
                                 pass
                     snapshot['lines'].append(line_data)
         return snapshot
+
+    def _graph_fingerprint(self):
+        """ Comparable summary of the scene, built from the undo snapshot. """
+
+        snapshot = self._build_undo_snapshot()
+        entries = []
+        for data in snapshot['nodes'] + snapshot['lines']:
+            entry = []
+            for key in sorted(data):
+                value = data[key]
+                if key == 'item_ref':
+                    continue
+                if key in ('from_widget', 'to_widget'):
+                    value = id(value)
+                if key == 'code_or_cat':
+                    # Identity only: memo, color and counts are stored outside the graph
+                    value = [(k, value.get(k)) for k in ('cid', 'catid', 'supercid', 'supercatid', 'name')]
+                entry.append((key, repr(value)))
+            entries.append(tuple(entry))
+        return sorted(entries)
+
+    def _mark_graph_saved(self):
+        """ Remember the scene state as the saved one. """
+
+        self._saved_fingerprint = self._graph_fingerprint()
+
+    def has_unsaved_changes(self):
+        """ True if the canvas has content that differs from the last save or load. """
+
+        fingerprint = self._graph_fingerprint()
+        if not fingerprint:
+            return False
+        return fingerprint != self._saved_fingerprint
 
     def undo_last_change(self):
         """ Restore the most recent snapshot (visual + structural).
@@ -5435,6 +5477,7 @@ class ViewGraph(QDialog):
         self.ui.label_loaded_graph.setToolTip(description)
         # Re-center after save so the user sees the canonical persisted layout
         self.finalize_graph_operation(fit_view=True)
+        self._mark_graph_saved()
 
     @staticmethod
     def line_type_to_text(line_type):
@@ -5698,6 +5741,11 @@ class ViewGraph(QDialog):
         if not selected:
             return
         graph = selected[0]
+        if self.has_unsaved_changes():
+            msg = _("The graph has unsaved changes.") + "\n"
+            msg += _("Load another graph and lose the unsaved changes?")
+            if not DialogConfirmDelete(self.app, msg, _("Unsaved graph")).exec():
+                return
         # undo history is per-graph. Loading a graph starts a fresh
         # history; undo never restores content that belonged to another graph.
         self._undo_stack.clear()
@@ -5727,6 +5775,7 @@ class ViewGraph(QDialog):
         self.ui.label_loaded_graph.setToolTip(graph['description'])
         # single consolidated refresh (sync + fit view + minimap)
         self.finalize_graph_operation(fit_view=True)
+        self._mark_graph_saved()
 
     def load_cdct_line_graphics_items(self, grid):
         """ Find the to and from widgets using matching catid and cid.
@@ -6087,6 +6136,10 @@ class ViewGraph(QDialog):
             self.app.conn.rollback()  # revert all changes
             raise
         self.app.delete_backup = False
+        # The graph on the canvas no longer exists in the project
+        if self.loaded_graph is not None and \
+                any(s['grid'] == self.loaded_graph['grid'] for s in selection):
+            self._saved_fingerprint = None
 
 
 class DialogSelectGraphBranch(QDialog):
