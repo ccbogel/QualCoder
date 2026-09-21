@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\QualCoder\Kai_QualCoder\src\GUI_UIs\ui_dialog_settings.ui'
+# Form implementation generated from reading ui file 'src/GUI_UIs/ui_dialog_settings.ui'
 #
 # Created by: PyQt6 UI code generator 6.11.0
 #
@@ -256,6 +256,13 @@ class Ui_Dialog_settings(object):
         self.comboBox_style = QtWidgets.QComboBox(parent=self.widget_ui_right)
         self.comboBox_style.setObjectName("comboBox_style")
         self.gridLayout_4.addWidget(self.comboBox_style, 1, 2, 1, 1)
+        self.label_look = QtWidgets.QLabel(parent=self.widget_ui_right)
+        self.label_look.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.label_look.setObjectName("label_look")
+        self.gridLayout_4.addWidget(self.label_look, 2, 1, 1, 1)
+        self.comboBox_look = QtWidgets.QComboBox(parent=self.widget_ui_right)
+        self.comboBox_look.setObjectName("comboBox_look")
+        self.gridLayout_4.addWidget(self.comboBox_look, 2, 2, 1, 1)
         self.checkBox = QtWidgets.QCheckBox(parent=self.widget_ui_right)
         self.checkBox.setText("")
         self.checkBox.setObjectName("checkBox")
@@ -622,6 +629,8 @@ class Ui_Dialog_settings(object):
         self.label_21.setText(_translate("Dialog_settings", "Show IDs"))
         self.label_6.setToolTip(_translate("Dialog_settings", "Used when entering speaker name in transcription"))
         self.label_6.setText(_translate("Dialog_settings", "Speaker format"))
+        self.label_look.setToolTip(_translate("Dialog_settings", "Classic keeps the current look. Modern flattens tool buttons and rounds fields. Requires restart."))
+        self.label_look.setText(_translate("Dialog_settings", "Look"))
         self.checkBox.setToolTip(_translate("Dialog_settings", "Show the identifying numbers for files, cases, codes, et cetera."))
         self.label_5.setToolTip(_translate("Dialog_settings", "Used when entering time position in transcription"))
         self.label_5.setText(_translate("Dialog_settings", "Time format"))
