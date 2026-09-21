@@ -882,7 +882,7 @@ Click "Yes" to start now.')
         self.fill_recent_projects_menu_actions()
         self.ui.actionProject_Memo.triggered.connect(self.project_memo)
         self.ui.actionProject_Memo.setShortcut('Ctrl+M')
-        self.ui.actionClose_Project.triggered.connect(self.close_project)
+        self.ui.actionClose_Project.triggered.connect(self.close_project_requested)
         self.ui.actionClose_Project.setShortcut('Alt+X')
         self.ui.actionSettings.triggered.connect(self.change_settings)
         self.ui.actionSettings.setShortcut('Alt+S')
@@ -1485,7 +1485,8 @@ Click "Yes" to start now.')
             if ui is None:
                 ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
                 ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-                self.tab_layout_helper(self.ui.tab_coding, ui)
+                if not self.tab_layout_helper(self.ui.tab_coding, ui):
+                    return
             else:
                 self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
             if task == 'documents':
@@ -1541,7 +1542,8 @@ Click "Yes" to start now.')
             self.ui.textBrowser_coding.hide()
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-            self.tab_layout_helper(self.ui.tab_coding, ui)
+            if not self.tab_layout_helper(self.ui.tab_coding, ui):
+                return
             if doc_id is not None:
                 ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
                 if task == 'mark_speakers':
@@ -1600,10 +1602,13 @@ Click "Yes" to start now.')
     def code_organiser(self):
         """ Organise codes structure. """
 
+        # Ask before building: a new organiser resets the shared model
+        if not self.confirm_leave_unsaved([self.ui.tab_reports, self.ui.tab_coding]):
+            return
         ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, None)
-        self.tab_layout_helper(self.ui.tab_coding, ui)
+        self.tab_layout_helper(self.ui.tab_coding, ui, confirm=False)
 
     def ai_chat(self):
         """Initialize AI chat and place it in tab or sidebar based on settings."""
@@ -1884,11 +1889,23 @@ Click "Yes" to start now.')
             self._remember_ai_sidebar_width()
             self.ai_sidebar_splitter_save_timer.start(400)
 
-    def tab_layout_helper(self, tab_widget, ui):
+    def tab_layout_helper(self, tab_widget, ui, confirm=True):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
          Add widget if no layout.
-         If there is a layout, then remove all widgets from it and add the new widget. """
+         If there is a layout, then remove all widgets from it and add the new widget.
+         Returns False if the user chose to keep unsaved work, so ui was discarded. """
 
+        if ui is not None and confirm and not self.confirm_leave_unsaved([tab_widget]):
+            # Closing a dialog that was never shown would store wrong splitter sizes
+            saved_settings = dict(self.app.settings)
+            ui.close()
+            ui.deleteLater()
+            if self.app.settings != saved_settings:
+                self.app.settings.clear()
+                self.app.settings.update(saved_settings)
+                self.app.write_config_ini(self.app.settings, self.app.ai_models)
+            self.ui.tabWidget.setCurrentWidget(tab_widget)
+            return False
         self.ui.tabWidget.setCurrentWidget(tab_widget)
         contents = tab_widget.layout()
         if contents is None:
@@ -1897,6 +1914,50 @@ Click "Yes" to start now.')
         self.clear_tab_widgets(tab_widget, show_placeholder=ui is None)
         if ui is not None:
             contents.addWidget(ui)
+        return True
+
+    def confirm_leave_unsaved(self, tab_widgets=None):
+        """ Ask before discarding an unsaved graph or unapplied code organiser changes.
+        Checks the given tabs, or all tabs if None. Returns True to continue. """
+
+        if tab_widgets is None:
+            tab_widgets = (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage)
+        for tab_widget in tab_widgets:
+            layout = tab_widget.layout()
+            if layout is None:
+                continue
+            for i in range(layout.count()):
+                widget = layout.itemAt(i).widget()
+                if isinstance(widget, ViewGraph):
+                    title = _("Unsaved graph")
+                    msg = _("The graph has unsaved changes.") + "\n"
+                    msg += _("Leave the graph and lose the unsaved changes?")
+                elif isinstance(widget, CodeOrganiser):
+                    title = _("Code organiser")
+                    msg = _("The code organiser has changes that were not applied.") + "\n"
+                    msg += _("Leave the code organiser and lose the changes?")
+                else:
+                    continue
+                try:
+                    if not widget.has_unsaved_changes():
+                        continue
+                except Exception as err:  # Never block closing because the check failed
+                    logger.warning(f"Unsaved changes check failed: {err}")
+                    continue
+                self.ui.tabWidget.setCurrentWidget(tab_widget)
+                reply = QtWidgets.QMessageBox.question(
+                    self, title, msg,
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                    QtWidgets.QMessageBox.StandardButton.No)
+                if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                    return False
+        return True
+
+    def close_project_requested(self):
+        """ Close project from the menu, asking first if there is unsaved work. """
+
+        if self.confirm_leave_unsaved():
+            self.close_project()
 
     def refresh_open_code_display_settings(self):
         """Apply saved code stripe and highlight settings to open code text and PDF dialogs."""
@@ -1951,6 +2012,8 @@ Click "Yes" to start now.')
          NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
         """
 
+        if not self.confirm_leave_unsaved():
+            return
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
         msg = _(
@@ -1969,6 +2032,8 @@ Click "Yes" to start now.')
     def taguette_project_import(self):
         """ Import a Taguette project into a new project space. """
 
+        if not self.confirm_leave_unsaved():
+            return
         self.close_project()
         msg = _(
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the Taguette.sqlite3 file.")
@@ -1984,6 +2049,8 @@ Click "Yes" to start now.')
     def sonal_project_import(self):
         """ Import a Sonal (SonalPi) project into a new project space. """
 
+        if not self.confirm_leave_unsaved():
+            return
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING SONAL PROJECT"))
         msg = _(
@@ -2000,6 +2067,8 @@ Click "Yes" to start now.')
     def rqda_project_import(self):
         """ Import an RQDA format project into a new project space. """
 
+        if not self.confirm_leave_unsaved():
+            return
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
         msg = _(
@@ -2026,6 +2095,9 @@ Click "Yes" to start now.')
                 QtWidgets.QMessageBox.StandardButton.No
             )
             if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                event.ignore()
+                return
+            if not self.confirm_leave_unsaved():
                 event.ignore()
                 return
 
@@ -2083,6 +2155,8 @@ Click "Yes" to start now.')
         v14 has coder_names table added to store codernames and their visibility status
         """
 
+        if not self.confirm_leave_unsaved():
+            return
         self.close_project()
         self.journal_display = None
         previous_app = self.app
@@ -2368,6 +2442,10 @@ Click "Yes" to start now.')
             return
 
         # Do not alter the active project until the selected project has been validated.
+        if newproject == "no" and (self.app.project_name != "" or self.app.conn is not None) \
+                and not self.confirm_leave_unsaved():
+            project_connection.close()
+            return
         self.journal_display = None
         if newproject == "no" and (self.app.project_name != "" or self.app.conn is not None):
             try:
