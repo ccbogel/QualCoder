@@ -108,6 +108,116 @@ def compute_edge_point(center_source, center_target, rect, is_ellipse):
     return QtCore.QPointF(center_source.x() + dx * t, center_source.y() + dy * t)
 
 
+# shared loader for coded image and PDF areas (graph nodes and the graph picker preview)
+def load_coded_image_area(project_path, path_, px, py, pwidth, pheight, pdf_page,
+                          pdf_zoom=2, max_side=800):
+    """ Return the coded area as a QImage (null on failure).
+    PDF areas are rendered only inside the clip, enlarged up to max_side. """
+    path_ = path_ or ""
+    px, py = float(px or 0), float(py or 0)
+    if pdf_page is not None:
+        source_path = ""
+        if path_[:6] == "/docs/":
+            source_path = f"{project_path}/documents/{path_[6:]}"
+        if path_[:5] == "docs:":
+            source_path = path_[5:]
+        image = QtGui.QImage()
+        try:
+            pymu_pdf = pymupdf.open(source_path)
+            try:
+                if 0 <= int(pdf_page) < len(pymu_pdf):
+                    page = pymu_pdf.load_page(int(pdf_page))
+                    width = float(pwidth or page.rect.width)
+                    height = float(pheight or page.rect.height)
+                    longest = max(width, height, 1.0)
+                    zoom = min(pdf_zoom, max_side / longest)
+                    # Coordinates are 72 dpi on the displayed page
+                    clip = pymupdf.Rect(px, py, px + width, py + height)
+                    pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), clip=clip,
+                                          alpha=False, annots=False)
+                    image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                                         QtGui.QImage.Format.Format_RGB888).copy()
+            finally:
+                pymu_pdf.close()
+        except Exception as err:
+            logger.warning(f"Graph pdf area: {source_path} {err}")
+        return image
+    abs_path_ = project_path + path_
+    if path_[0:7] == "images:":
+        abs_path_ = path_[7:]
+    image = QtGui.QImageReader(abs_path_).read()
+    if image.isNull():
+        return image
+    width = int(pwidth or image.width())
+    height = int(pheight or image.height())
+    return image.copy(int(px), int(py), width, height)
+
+
+# co-occurrences: two codings of different codes overlapping in the same file
+_COOC_SQL = {
+    'text': """select a.cid, b.cid, a.ctid, b.ctid from code_text a join code_text b
+               on a.fid = b.fid and a.cid != b.cid and a.pos0 < b.pos1 and a.pos1 > b.pos0""",
+    'image': """select a.cid, b.cid, a.imid, b.imid from code_image a join code_image b
+                on a.id = b.id and ifnull(a.pdf_page, -1) = ifnull(b.pdf_page, -1) and a.cid != b.cid
+                and a.x1 < b.x1 + b.width and a.x1 + a.width > b.x1
+                and a.y1 < b.y1 + b.height and a.y1 + a.height > b.y1""",
+    'av': """select a.cid, b.cid, a.avid, b.avid from code_av a join code_av b
+             on a.id = b.id and a.cid != b.cid and a.pos0 < b.pos1 and a.pos1 > b.pos0""",
+}
+
+
+def code_cooccurrences(conn, cid=None, cids=None):
+    """ Overlapping codings of different codes in text, images and A/V.
+    cid: pairs where the first code is cid. cids: pairs with both codes in cids (first < second).
+    Returns rows (cid_a, cid_b, kind, coding_id_a, coding_id_b). """
+    cur = conn.cursor()
+    rows = []
+    for kind, sql in _COOC_SQL.items():
+        params = []
+        if cid is not None:
+            sql += " where a.cid = ?"
+            params = [cid]
+        elif cids:
+            marks = ",".join("?" * len(cids))
+            sql += f" where a.cid < b.cid and a.cid in ({marks}) and b.cid in ({marks})"
+            params = list(cids) + list(cids)
+        else:
+            sql += " where a.cid < b.cid"
+        try:
+            cur.execute(sql, params)
+        except Exception as err:
+            logger.warning(f"Co-occurrence query ({kind}) failed: {err}")
+            continue
+        rows.extend((r[0], r[1], kind, r[2], r[3]) for r in cur.fetchall())
+    return rows
+
+
+# shared by ViewGraph.load_graph and the graph picker preview
+def apply_saved_graph_visibility(scene):
+    """ Restore collapsed state and hide segments whose code node is hidden. """
+    for item in scene.items():
+        if type(item).__name__ == "TextGraphicsItem":
+            children_names = item.code_or_cat.get('child_names', [])
+            if children_names:
+                children_items = [child for child in scene.items()
+                                  if type(child).__name__ == "TextGraphicsItem"
+                                  and child != item
+                                  and child.code_or_cat['name'] in children_names]
+                # All children hidden -> the parent was saved collapsed
+                if children_items and all(not child.isVisible() for child in children_items):
+                    item.is_collapsed = True
+        elif type(item).__name__ in ("FreeTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem"):
+            if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
+                item_cid = item.code_or_cat.get('cid')
+                if item_cid is not None:
+                    # Hide segment if its parent code node is hidden
+                    parent_node = next((node for node in scene.items()
+                                        if type(node).__name__ == "TextGraphicsItem"
+                                        and node.code_or_cat.get('cid') == item_cid), None)
+                    if parent_node and not parent_node.isVisible():
+                        item.hide()
+
+
 # DialogMemo doubles as QualCoder's generic plain-text editor; the graph
 # uses it for "Edit text" on nodes. Hide the memo-specific toolbar (clear, insert
 # date/quote/memo-link, export linked), which makes no sense on a node text.
@@ -123,18 +233,23 @@ def configure_plain_text_editor(dialog):
 
 # shared bridge to ViewGraph.toggle_segment_cooccurrence_lines from any coded segment
 def invoke_segment_cooc_toggle(scene_item):
+    return invoke_graph_method(scene_item, 'toggle_segment_cooccurrence_lines')
+
+
+# call a ViewGraph method from any scene item (scene.parent, or up the view's widget chain)
+def invoke_graph_method(scene_item, method_name):
     scene = scene_item.scene()
     if scene is None:
         return False
     parent = getattr(scene, 'parent', None)
-    if parent is not None and hasattr(parent, 'toggle_segment_cooccurrence_lines'):
-        parent.toggle_segment_cooccurrence_lines()
+    if parent is not None and hasattr(parent, method_name):
+        getattr(parent, method_name)()
         return True
     if scene.views():
         widget = scene.views()[0].parent()
         while widget is not None:
-            if hasattr(widget, 'toggle_segment_cooccurrence_lines'):
-                widget.toggle_segment_cooccurrence_lines()
+            if hasattr(widget, method_name):
+                getattr(widget, method_name)()
                 return True
             widget = widget.parent()
     return False
@@ -162,6 +277,28 @@ def link_memo_to_segment(app, segment_node, memo_source_type, memo_source_id, me
                                      line_width=2, line_type="dotted")
     line_item.arrow_mode = "none"
     scene.addItem(line_item)
+
+
+# co-occurrence line between two code nodes, labelled with the frequency.
+# Reuses an existing line between the two nodes and refreshes its label.
+def add_cooccurrence_line(scene, node_a, node_b, count):
+    if scene is None or node_a is node_b:
+        return None
+    for link in scene.items():
+        if isinstance(link, LinkGraphicsItem) and \
+                ((link.from_widget is node_a and link.to_widget is node_b) or
+                 (link.from_widget is node_b and link.to_widget is node_a)):
+            if getattr(link, '_is_cooc_line', False) or link.line_type == QtCore.Qt.PenStyle.DotLine:
+                link._is_cooc_line = True
+                build_line_label(link, str(count))
+                link.redraw()
+            return link
+    line_item = LinkGraphicsItem(node_a, node_b, line_width=2, line_type="dotted", color="blue",
+                                 isvisible=True, label=str(count))
+    line_item._is_cooc_line = True  # keep it when hierarchy lines are synced
+    scene.addItem(line_item)
+    line_item.redraw()
+    return line_item
 
 
 # anti-overlap label positioner shared by FreeLineGraphicsItem and LinkGraphicsItem.
@@ -804,44 +941,11 @@ class GraphSynchronizer:
             item.code_or_cat = {'cid': None, 'catid': None}
         item.code_or_cat['cid'] = res[3]
         if item.px != res[4] or item.py != res[5] or item.pwidth != res[6] or item.pheight != res[7]:
-            old_width = item.boundingRect().width()
+            old_width = item.display_width()
             item.px, item.py, item.pwidth, item.pheight = res[4], res[5], res[6], res[7]
             try:
-                abs_path_ = item.app.project_path + item.path_
-                if item.path_[0:7] == "images:":
-                    abs_path_ = item.path_[7:]
-                if item.pdf_page is not None:
-                    source_path = ""
-                    if item.path_[:6] == "/docs/":
-                        source_path = f"{item.app.project_path}/documents/{item.path_[6:]}"
-                    elif item.path_[:5] == "docs:":
-                        source_path = item.path_[5:]
-                    if Path(source_path).exists():
-                        pymu_pdf = pymupdf.open(source_path)
-                        page = pymu_pdf[item.pdf_page]
-                        pixmap_pdf = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
-                        abs_path_ = Path(item.app.confighome) / "tmp_pdf_page.png"
-                        pixmap_pdf.save(str(abs_path_))  # Presume method requires String
-                        pymu_pdf.close()
-                if Path(abs_path_).exists():
-                    image = QtGui.QImageReader(abs_path_).read()
-                    image = image.copy(int(item.px), int(item.py), int(item.pwidth), int(item.pheight))
-                    scaler_w = 200 / image.width() if image.width() > 200 else 1.0
-                    scaler_h = 200 / image.height() if image.height() > 200 else 1.0
-                    scaler = min(scaler_w, scaler_h)
-                    pixmap = QtGui.QPixmap().fromImage(image)
-                    pixmap = pixmap.scaled(int(image.width() * scaler), int(image.height() * scaler))
-                    item.setPixmap(pixmap)
-                    item._original_pixmap = item.pixmap()
-                    if old_width > 0 and old_width != item.boundingRect().width():
-                        scale_factor = old_width / item._original_pixmap.width()
-                        scaled = item._original_pixmap.scaled(
-                            int(item._original_pixmap.width() * scale_factor),
-                            int(item._original_pixmap.height() * scale_factor),
-                            QtCore.Qt.AspectRatioMode.KeepAspectRatio,
-                            QtCore.Qt.TransformationMode.SmoothTransformation)
-                        item.setPixmap(scaled)
-                    item.update()
+                if item.reload_image():
+                    item.set_display_width(old_width if old_width > 0 else item.base_display_width())
             except Exception as e:
                 logger.error(f"Error regenerating pixmap in GraphSynchronizer: {e}")
         return True
@@ -933,6 +1037,11 @@ class GraphSynchronizer:
                 tw = line.to_widget
                 if isinstance(fw, TextGraphicsItem) and isinstance(tw, TextGraphicsItem):
                     if getattr(line, 'label', '') != '':
+                        continue
+                    # Co-occurrence links are not hierarchy; dotted blue identifies them after reload
+                    if getattr(line, '_is_cooc_line', False):
+                        continue
+                    if line.line_type == QtCore.Qt.PenStyle.DotLine and line.color == "blue":
                         continue
                     if not (is_parent_child(fw, tw) or is_parent_child(tw, fw)):
                         self.vg.scene.removeItem(line)
@@ -1215,10 +1324,12 @@ class DialogSelectCodedSegments(QDialog):
     """ Unified window to select coded segments from text, image, and A/V.
     Displays three lists (QListWidget) in a single interface. """
 
-    def __init__(self, app, code_name, text_codings, image_codings, av_codings, parent=None):
+    def __init__(self, app, code_name, text_codings, image_codings, av_codings, parent=None,
+                 show_code=False):
         """
         param: app : Main App
         param: code_name : String - code name
+        param: show_code : Boolean - prefix each row with its code name (mixed-code lists)
         param: text_codings : list of dict with keys: name, cid, fid, memo, ctid, filename, codename
         param: image_codings : list of dict with keys: name, cid, fid, memo, imid, filename, codename, x, y, width, height, path, pdf_page
         param: av_codings : list of dict with keys: name, cid, fid, memo, avid, filename, codename, pos0, pos1, path
@@ -1251,8 +1362,10 @@ class DialogSelectCodedSegments(QDialog):
             if len(display) > 120:
                 display = display[:120] + "..."
             display = f"[{tc['filename']}] {display}"
+            if show_code:
+                display = f"{tc['codename']}: {display}"
             item = QtWidgets.QListWidgetItem(display)
-            item.setToolTip(f"File: {tc['filename']}\n{tc['name'][:300]}")
+            item.setToolTip(f"Code: {tc['codename']}\nFile: {tc['filename']}\n{tc['name'][:300]}")
             self.list_text.addItem(item)
         layout.addWidget(self.list_text, stretch=3)
 
@@ -1268,6 +1381,8 @@ class DialogSelectCodedSegments(QDialog):
         self.list_image.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         for ic in image_codings:
             display = f"[{ic['filename']}] x:{ic['x']} y:{ic['y']} w:{ic['width']} h:{ic['height']}"
+            if show_code:
+                display = f"{ic['codename']}: {display}"
             item = QtWidgets.QListWidgetItem(display)
             item.setToolTip(
                 f"File: {ic['filename']}\nArea: x:{ic['x']} y:{ic['y']} width:{ic['width']} height:{ic['height']}")
@@ -1284,6 +1399,8 @@ class DialogSelectCodedSegments(QDialog):
         self.list_av.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         for ac in av_codings:
             display = f"[{ac['filename']}] {ac['pos0']} - {ac['pos1']} msecs"
+            if show_code:
+                display = f"{ac['codename']}: {display}"
             item = QtWidgets.QListWidgetItem(display)
             item.setToolTip(f"File: {ac['filename']}\nDuration: {ac['pos0']} - {ac['pos1']} msecs")
             self.list_av.addItem(item)
@@ -1586,8 +1703,9 @@ class ViewGraph(QDialog):
                 if cls_name in ("PixmapGraphicsItem", "AVGraphicsItem"):
                     try:
                         if hasattr(item, 'pixmap') and item.pixmap() is not None:
-                            pm = item.pixmap()
-                            node_data['pixmap_size'] = (pm.width(), pm.height())
+                            # Logical size, independent of the device pixel ratio
+                            size = item.pixmap().deviceIndependentSize()
+                            node_data['pixmap_size'] = (size.width(), size.height())
                     except Exception:
                         pass
                 snapshot['nodes'].append(node_data)
@@ -1711,7 +1829,9 @@ class ViewGraph(QDialog):
                     try:
                         target_w, target_h = node_data['pixmap_size']
                         orig = item._original_pixmap
-                        if orig is not None and orig.width() > 0:
+                        if hasattr(item, 'set_display_width'):
+                            item.set_display_width(target_w)
+                        elif orig is not None and orig.width() > 0:
                             scaled = orig.scaled(int(target_w), int(target_h),
                                                  QtCore.Qt.AspectRatioMode.KeepAspectRatio,
                                                  QtCore.Qt.TransformationMode.SmoothTransformation)
@@ -1823,8 +1943,6 @@ class ViewGraph(QDialog):
         """ Global toggle for co-occurrence lines on coded segments. Invoked by
         invoke_segment_cooc_toggle from any coded segment menu; applies to ALL cooc lines. """
 
-        cur = self.app.conn.cursor()
-        segment_classes = (FreeTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem)
         existing_cooc_lines = [ln for ln in self.scene.items()
                                if isinstance(ln, FreeLineGraphicsItem)
                                and getattr(ln, '_is_cooc_line', False)]
@@ -1838,16 +1956,7 @@ class ViewGraph(QDialog):
             self._refresh_minimap()
             return
         # TOGGLE ON: gather coded segments
-        coded_segments = []
-        for seg in self.scene.items():
-            if not isinstance(seg, segment_classes):
-                continue
-            if isinstance(seg, FreeTextGraphicsItem) and getattr(seg, 'ctid', -1) > 0:
-                coded_segments.append(seg)
-            elif isinstance(seg, PixmapGraphicsItem) and getattr(seg, 'imid', -1) > 0:
-                coded_segments.append(seg)
-            elif isinstance(seg, AVGraphicsItem) and getattr(seg, 'avid', -1) > 0:
-                coded_segments.append(seg)
+        coded_segments = [seg for seg in self.scene.items() if self._is_coded_segment(seg)]
         if not coded_segments:
             Message(self.app, _("No coded segments"),
                     _("There are no coded segments in the graph.")).exec()
@@ -1859,51 +1968,67 @@ class ViewGraph(QDialog):
                     _("There are no code nodes in the graph to connect co-occurrences to.")).exec()
             return
         self._save_undo_state()
+        added = self.add_segment_cooccurrence_lines(coded_segments, code_nodes)
+        if added == 0:
+            Message(self.app, _("No co-occurrences"),
+                    _("No co-occurring codes found for the segments in the graph.")).exec()
+        self.scene.update()
+        self._refresh_minimap()
+
+    @staticmethod
+    def _is_coded_segment(item):
+        """ A segment node that comes from a saved coding (text, image or A/V). """
+        if isinstance(item, FreeTextGraphicsItem):
+            return getattr(item, 'ctid', -1) is not None and item.ctid > 0
+        if isinstance(item, PixmapGraphicsItem):
+            return getattr(item, 'imid', -1) is not None and item.imid > 0
+        if isinstance(item, AVGraphicsItem):
+            return getattr(item, 'avid', -1) is not None and item.avid > 0
+        return False
+
+    def add_segment_cooccurrence_lines(self, segments, code_nodes=None):
+        """ Blue dotted line from each coded segment to every other code node in the graph
+        whose coding overlaps it. Returns how many lines were added. """
+
+        cur = self.app.conn.cursor()
+        if code_nodes is None:
+            code_nodes = [n for n in self.scene.items()
+                          if isinstance(n, TextGraphicsItem) and n.code_or_cat.get('cid') is not None]
+        nodes_by_cid = {}
+        for n in code_nodes:
+            nodes_by_cid.setdefault(n.code_or_cat['cid'], []).append(n)
         added = 0
-        for seg in coded_segments:
-            seg_cid = seg_fid = seg_pos0 = seg_pos1 = None
+        for seg in segments:
+            if not self._is_coded_segment(seg):
+                continue
+            cooc_cids = set()
             if isinstance(seg, FreeTextGraphicsItem):
                 cur.execute("select cid, fid, pos0, pos1 from code_text where ctid=?", [seg.ctid])
                 res = cur.fetchone()
                 if res:
-                    seg_cid, seg_fid, seg_pos0, seg_pos1 = res
+                    cur.execute("select distinct cid from code_text where fid=? and cid!=? "
+                                "and pos0 < ? and pos1 > ?", [res[1], res[0], res[3], res[2]])
+                    cooc_cids = {r[0] for r in cur.fetchall()}
             elif isinstance(seg, PixmapGraphicsItem):
-                cur.execute("select cid, id from code_image where imid=?", [seg.imid])
+                cur.execute("select cid, id, x1, y1, width, height, pdf_page from code_image where imid=?",
+                            [seg.imid])
                 res = cur.fetchone()
                 if res:
-                    seg_cid, seg_fid = res[0], res[1]
+                    cur.execute("select distinct cid from code_image where id=? and cid!=? "
+                                "and ifnull(pdf_page, -1) = ? "
+                                "and x1 < ? and (x1+width) > ? and y1 < ? and (y1+height) > ?",
+                                [res[1], res[0], res[6] if res[6] is not None else -1,
+                                 res[2] + res[4], res[2], res[3] + res[5], res[3]])
+                    cooc_cids = {r[0] for r in cur.fetchall()}
             elif isinstance(seg, AVGraphicsItem):
                 cur.execute("select cid, id, pos0, pos1 from code_av where avid=?", [seg.avid])
                 res = cur.fetchone()
                 if res:
-                    seg_cid, seg_fid, seg_pos0, seg_pos1 = res
-            if seg_cid is None or seg_fid is None:
-                continue
-            cooc_cids = set()
-            if isinstance(seg, FreeTextGraphicsItem) and seg_pos0 is not None:
-                cur.execute("select distinct cid from code_text where fid=? and cid!=? "
-                            "and pos0 < ? and pos1 > ?",
-                            [seg_fid, seg_cid, seg_pos1, seg_pos0])
-                cooc_cids = {r[0] for r in cur.fetchall()}
-            elif isinstance(seg, PixmapGraphicsItem):
-                cur.execute("select x1, y1, width, height from code_image where imid=?", [seg.imid])
-                dims = cur.fetchone()
-                if dims:
-                    cur.execute("select distinct cid from code_image where id=? and cid!=? "
-                                "and x1 < ? and (x1+width) > ? and y1 < ? and (y1+height) > ?",
-                                [seg_fid, seg_cid,
-                                 dims[0] + dims[2], dims[0],
-                                 dims[1] + dims[3], dims[1]])
+                    cur.execute("select distinct cid from code_av where id=? and cid!=? "
+                                "and pos0 < ? and pos1 > ?", [res[1], res[0], res[3], res[2]])
                     cooc_cids = {r[0] for r in cur.fetchall()}
-            elif isinstance(seg, AVGraphicsItem) and seg_pos0 is not None:
-                cur.execute("select distinct cid from code_av where id=? and cid!=? "
-                            "and pos0 < ? and pos1 > ?",
-                            [seg_fid, seg_cid, seg_pos1, seg_pos0])
-                cooc_cids = {r[0] for r in cur.fetchall()}
             for cooc_cid in cooc_cids:
-                for code_node in code_nodes:
-                    if code_node.code_or_cat.get('cid') != cooc_cid:
-                        continue
+                for code_node in nodes_by_cid.get(cooc_cid, []):
                     line_exists = any(
                         isinstance(ln, FreeLineGraphicsItem) and
                         ((ln.from_widget == seg and ln.to_widget == code_node) or
@@ -1917,9 +2042,42 @@ class ViewGraph(QDialog):
                     cooc_line._is_cooc_line = True  # mark for future detection/removal
                     self.scene.addItem(cooc_line)
                     added += 1
-        if added == 0:
+        return added
+
+    def toggle_code_cooccurrence_lines(self):
+        """ Global toggle for co-occurrence lines between code nodes, labelled with the
+        frequency (overlapping codings in text, images and A/V). Invoked from any code node menu. """
+
+        existing = [ln for ln in self.scene.items()
+                    if isinstance(ln, LinkGraphicsItem) and getattr(ln, '_is_cooc_line', False)]
+        # TOGGLE OFF: remove every code-to-code cooc line
+        if existing:
+            self._save_undo_state()
+            for ln in existing:
+                if ln.scene() == self.scene:
+                    detach_line_label(ln)
+                    self.scene.removeItem(ln)
+            self.scene.update()
+            self._refresh_minimap()
+            return
+        code_nodes = [n for n in self.scene.items()
+                      if isinstance(n, TextGraphicsItem) and n.code_or_cat.get('cid') is not None
+                      and n.isVisible()]
+        nodes_by_cid = {n.code_or_cat['cid']: n for n in code_nodes}
+        if len(nodes_by_cid) < 2:
+            Message(self.app, _("No code nodes"),
+                    _("At least two code nodes are needed to show co-occurrence lines.")).exec()
+            return
+        pair_counts = {}
+        for cid_a, cid_b, _kind, _id_a, _id_b in code_cooccurrences(self.app.conn, cids=list(nodes_by_cid)):
+            pair_counts[(cid_a, cid_b)] = pair_counts.get((cid_a, cid_b), 0) + 1
+        if not pair_counts:
             Message(self.app, _("No co-occurrences"),
-                    _("No co-occurring codes found for the segments in the graph.")).exec()
+                    _("The code nodes in the graph have no overlapping segments.")).exec()
+            return
+        self._save_undo_state()
+        for (cid_a, cid_b), count in pair_counts.items():
+            add_cooccurrence_line(self.scene, nodes_by_cid[cid_a], nodes_by_cid[cid_b], count)
         self.scene.update()
         self._refresh_minimap()
 
@@ -2600,6 +2758,12 @@ class ViewGraph(QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_connect_to = menu.addAction(_("Connect to..."))
+        # two or more code nodes: bring in only the segments where they overlap
+        code_nodes = [n for n in selected_nodes if isinstance(n, TextGraphicsItem)
+                      and n.code_or_cat.get('cid') is not None]
+        action_cooc_segments = None
+        if len(code_nodes) >= 2:
+            action_cooc_segments = menu.addAction(_("Add co-occurring segments"))
         menu.addSeparator()
         # appearance, applied to the whole selection (text nodes only)
         action_bold = menu.addAction(_("Bold toggle"))
@@ -2614,12 +2778,54 @@ class ViewGraph(QDialog):
         if action == action_connect_to:
             self.connect_selected_to_node(selected_nodes)
             return True
+        if action_cooc_segments is not None and action == action_cooc_segments:
+            self.add_cooccurring_segments(code_nodes)
+            return True
         if action == action_bold:
             self.apply_appearance_to_nodes(selected_nodes, toggle_bold=True)
             return True
         if action in font_size_actions:
             self.apply_appearance_to_nodes(selected_nodes, font_size=font_size_actions[action])
         return True
+
+    def add_cooccurring_segments(self, code_nodes):
+        """ For the selected code nodes, import only the coded segments that overlap
+        a segment of another selected code (text, image or A/V), each linked to its code.
+        Each imported segment gets the blue dotted lines to the code nodes it co-occurs with,
+        as the segment co-occurrence toggle draws them. """
+
+        nodes_by_cid = {n.code_or_cat['cid']: n for n in code_nodes}
+        rows = code_cooccurrences(self.app.conn, cids=list(nodes_by_cid.keys()))
+        if not rows:
+            Message(self.app, _("No co-ocurrences"),
+                    _("The selected codes have no overlapping segments.")).exec()
+            return
+        keep = {cid: {'text': set(), 'image': set(), 'av': set()} for cid in nodes_by_cid}
+        for cid_a, cid_b, kind, id_a, id_b in rows:
+            keep[cid_a][kind].add(id_a)
+            keep[cid_b][kind].add(id_b)
+        text_codings, image_codings, av_codings = [], [], []
+        for cid, node in nodes_by_cid.items():
+            t, i, a = node.collect_coded_segments(keep=keep[cid])
+            text_codings += t
+            image_codings += i
+            av_codings += a
+        if not text_codings and not image_codings and not av_codings:
+            Message(self.app, _("No segments"),
+                    _("The co-occurring segments are already in the graph.")).exec()
+            return
+        ui = DialogSelectCodedSegments(self.app, _("Co-occurring segments"), text_codings,
+                                       image_codings, av_codings, self, show_code=True)
+        if not ui.exec():
+            return
+        self._save_undo_state()
+        imported = []
+        for node in nodes_by_cid.values():
+            imported += node.import_segments([s for s in ui.selected_text if s['node'] is node],
+                                             [s for s in ui.selected_image if s['node'] is node],
+                                             [s for s in ui.selected_av if s['node'] is node])
+        self.add_segment_cooccurrence_lines(imported, code_nodes)
+        self.finalize_graph_operation(fit_view=False)
 
     def apply_appearance_to_nodes(self, nodes, toggle_bold=False, font_size=None):
         """ Apply Bold / Font size to every text node in nodes,
@@ -4048,6 +4254,7 @@ class ViewGraph(QDialog):
         image.fill(QtCore.Qt.GlobalColor.transparent)
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
         self.scene.render(painter, QtCore.QRectF(image.rect()), rect)
         painter.end()
         image.save(filepath)
@@ -4117,7 +4324,13 @@ class ViewGraph(QDialog):
                 if item_type == "PixmapGraphicsItem":
                     buffer = QtCore.QBuffer()
                     buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
-                    item.pixmap().toImage().save(buffer, "PNG")
+                    # Full resolution crop; Draw.io keeps the on-canvas size from the geometry
+                    source_pixmap = getattr(item, '_hires_pixmap', None)
+                    if source_pixmap is None or source_pixmap.isNull():
+                        source_pixmap = item.pixmap()
+                    image_out = source_pixmap.toImage()
+                    image_out.setDevicePixelRatio(1.0)
+                    image_out.save(buffer, "PNG")
                     b64_data = buffer.data().toBase64().data().decode('ascii').replace('\n', '').replace('\r', '')
                     style = f"shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;aspect=fixed;image=data:image/png,{b64_data};"
                     if getattr(item, 'imid', -1) is not None and getattr(item, 'imid', -1) > 0:
@@ -4234,6 +4447,7 @@ class ViewGraph(QDialog):
         pdf_writer.setPageSize(page_size)
         painter = QtGui.QPainter(pdf_writer)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
         self.scene.render(
             painter,
             QtCore.QRectF(0, 0, bounding_rect.width(), bounding_rect.height()),
@@ -4249,20 +4463,11 @@ class ViewGraph(QDialog):
         coding frequencies per code, and a software citation.
         """
 
-        # 1. Choose output path
-        default_dir = getattr(self.app, 'last_export_directory', str(Path('~').expanduser()))
-        filename, ok = QtWidgets.QFileDialog.getSaveFileName(
-            self,
-            _("Save graph analytical summary"),
-            default_dir,
-            "OpenDocument Text (*.odt)"
-        )
-        if not ok or not filename:
+        # 1. Choose output folder, same as the other graph exports (no overwrite, adds _0, _1...)
+        e_dir = ExportDirectoryPathDialog(self.app, "Graph_summary.odt")
+        filename = e_dir.filepath
+        if filename is None:
             return
-        if not filename.endswith('.odt'):
-            filename += '.odt'
-        if hasattr(self.app, 'last_export_directory'):
-            self.app.last_export_directory = Path(filename).parent
 
         # 2. Build the ODT document and register named styles
         doc = OpenDocumentText()
@@ -4340,10 +4545,19 @@ class ViewGraph(QDialog):
         if rect.width() > 0 and rect.height() > 0:
             self._hide_all_handles()
             try:
-                pixmap = QtGui.QPixmap(int(rect.width() + 40), int(rect.height() + 40))
+                # Margin in scene units, so the render keeps the graph proportions
+                rect = rect.adjusted(-20, -20, 20, 20)
+                # Render for ~300 dpi at the 16 cm frame width, within a safe pixel budget
+                scale = max(1.0, min(6.0, 1890.0 / rect.width()))
+                max_side = 8000.0
+                scale = min(scale, max_side / rect.width(), max_side / rect.height())
+                scale = max(scale, 0.1)
+                pixmap = QtGui.QPixmap(max(1, int(rect.width() * scale)), max(1, int(rect.height() * scale)))
                 pixmap.fill(QtCore.Qt.GlobalColor.white)
                 painter = QtGui.QPainter(pixmap)
                 painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+                painter.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing)
+                painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
                 self.scene.render(painter, QtCore.QRectF(pixmap.rect()), rect)
                 painter.end()
                 temp_img = Path(tempfile.gettempdir()) / f"qc_graph_{uuid.uuid4().hex}.png"
@@ -5417,28 +5631,7 @@ class ViewGraph(QDialog):
         # Load lines
         self.load_cdct_line_graphics_items(grid)
         self.load_free_line_graphics_items(grid)
-        # restore collapsed state and segment visibility after loading
-        for item in self.scene.items():
-            if type(item).__name__ == "TextGraphicsItem":
-                children_names = item.code_or_cat.get('child_names', [])
-                if children_names:
-                    children_items = [child for child in self.scene.items()
-                                      if type(child).__name__ == "TextGraphicsItem"
-                                      and child != item
-                                      and child.code_or_cat['name'] in children_names]
-                    # All children hidden -> the parent was saved collapsed
-                    if children_items and all(not child.isVisible() for child in children_items):
-                        item.is_collapsed = True
-            elif type(item).__name__ in ("FreeTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem"):
-                if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
-                    item_cid = item.code_or_cat.get('cid')
-                    if item_cid is not None:
-                        # Hide segment if its parent code node is hidden
-                        parent_node = next((node for node in self.scene.items()
-                                            if type(node).__name__ == "TextGraphicsItem"
-                                            and node.code_or_cat.get('cid') == item_cid), None)
-                        if parent_node and not parent_node.isVisible():
-                            item.hide()
+        apply_saved_graph_visibility(self.scene)
         if err_msg != "":
             Message(self.app, _("Load graph errors"), err_msg).exec()
         label = _("Changing to another report will lose unsaved graph.") + "\n" + graph['name']
@@ -5908,8 +6101,53 @@ class DialogSelectGraphBranch(QDialog):
         super().accept()
 
 
+class _GraphPreviewLoader:
+    """ Minimal stand-in for ViewGraph so the saved-graph loaders can fill any scene.
+    The loaders only touch self.app, self.scene and named_children_of_node. """
+
+    def __init__(self, app, scene):
+        self.app = app
+        self.scene = scene
+
+    named_children_of_node = ViewGraph.named_children_of_node
+    load_code_or_cat_text_graphics_items = ViewGraph.load_code_or_cat_text_graphics_items
+    load_file_text_graphics_items = ViewGraph.load_file_text_graphics_items
+    load_case_text_graphics_items = ViewGraph.load_case_text_graphics_items
+    load_free_text_graphics_items = ViewGraph.load_free_text_graphics_items
+    load_pixmap_graphics_items = ViewGraph.load_pixmap_graphics_items
+    load_av_graphics_items = ViewGraph.load_av_graphics_items
+    load_memo_graphics_items = ViewGraph.load_memo_graphics_items
+    load_cdct_line_graphics_items = ViewGraph.load_cdct_line_graphics_items
+    load_free_line_graphics_items = ViewGraph.load_free_line_graphics_items
+
+    def load(self, grid):
+        """ Same order as ViewGraph.load_graph. Returns the loader error text. """
+        err_msg = self.load_code_or_cat_text_graphics_items(grid)
+        err_msg += self.load_file_text_graphics_items(grid)
+        err_msg += self.load_case_text_graphics_items(grid)
+        err_msg += self.load_free_text_graphics_items(grid)
+        err_msg += self.load_pixmap_graphics_items(grid)
+        err_msg += self.load_av_graphics_items(grid)
+        err_msg += self.load_memo_graphics_items(grid)
+        self.load_cdct_line_graphics_items(grid)
+        self.load_free_line_graphics_items(grid)
+        apply_saved_graph_visibility(self.scene)
+        # On the canvas the lines are redrawn (and their labels placed) by later events
+        for item in list(self.scene.items()):
+            if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
+                try:
+                    item.redraw()
+                except RuntimeError:
+                    pass
+        return err_msg
+
+
 class DialogGraphPicker(QDialog):
-    """ Picker for Load graph / Delete graphs with live preview. """
+    """ Picker for Load graph / Delete graphs. The preview is the saved graph itself,
+    built with the same item classes as the canvas and shown read-only, fitted to the view. """
+
+    PREVIEW_MARGIN = 20
+    PREVIEW_MAX_SCALE = 1.0  # never enlarge a small graph
 
     def __init__(self, app, title, multi=False, order_option="Alphabet ascending", parent=None):
         super().__init__(parent)
@@ -5926,6 +6164,7 @@ class DialogGraphPicker(QDialog):
                 QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.preview_scene = QtWidgets.QGraphicsScene(self)
         self.ui.graphicsView_preview.setScene(self.preview_scene)
+        self._setup_preview_view()
         # sort options now live inside the picker itself,
         # initialized from the load-button menu option and changeable on the fly.
         self._order_keys = ["Alphabet ascending", "Alphabet descending",
@@ -5940,6 +6179,29 @@ class DialogGraphPicker(QDialog):
         self.ui.buttonBox.accepted.connect(self.accept)
         self.ui.buttonBox.rejected.connect(self.reject)
         self._populate_list()
+
+    def _setup_preview_view(self):
+        """ Read-only view, larger and with smooth drawing. """
+        view = self.ui.graphicsView_preview
+        view.setInteractive(False)
+        view.setRenderHints(QtGui.QPainter.RenderHint.Antialiasing
+                            | QtGui.QPainter.RenderHint.TextAntialiasing
+                            | QtGui.QPainter.RenderHint.SmoothPixmapTransform)
+        view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        view.setViewportUpdateMode(QtWidgets.QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
+        self.preview_scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor("#FFFFFF")))
+        self._line_widths = []  # (line item, saved width) to keep lines visible when shrunk
+        # Give most of the width to the preview
+        self.ui.splitter.setStretchFactor(0, 0)
+        self.ui.splitter.setStretchFactor(1, 1)
+        screen = self.screen().availableGeometry() if self.screen() is not None else None
+        width, height = 1150, 720
+        if screen is not None:
+            width = min(width, int(screen.width() * 0.9))
+            height = min(height, int(screen.height() * 0.9))
+        self.resize(max(self.width(), width), max(self.height(), height))
+        self.ui.splitter.setSizes([260, max(420, self.width() - 260)])
 
     def _populate_list(self, *_args):
         """ Fill (or re-fill) the graph list using the selected sort order. """
@@ -5963,7 +6225,7 @@ class DialogGraphPicker(QDialog):
         if self.ui.listWidget_graphs.count() > 0:
             self.ui.listWidget_graphs.setCurrentRow(0)
         else:
-            self.preview_scene.clear()
+            self._clear_preview()
             self.ui.label_description.setText("")
 
     def get_selected(self):
@@ -5976,445 +6238,70 @@ class DialogGraphPicker(QDialog):
 
     def _on_current_changed(self, current, _previous):
         if current is None:
-            self.preview_scene.clear()
+            self._clear_preview()
             self.ui.label_description.setText("")
             return
         data = current.data(QtCore.Qt.ItemDataRole.UserRole)
         self.ui.label_description.setText(data.get('description') or "")
         self._render_preview(data['grid'])
 
-    def _preview_text(self, text, font_size=9, bold=False, text_color="#000000", max_len=40):
-        text = str(text or "")
-        if len(text) > max_len:
-            text = text[:max_len - 2] + "\u2026"
-        t = QtWidgets.QGraphicsSimpleTextItem(text)
-        f = QtGui.QFont()
-        f.setPointSize(max(6, int(font_size or 9)))
-        f.setBold(bool(bold))
-        t.setFont(f)
-        try:
-            t.setBrush(QtGui.QBrush(QtGui.QColor(text_color)))
-        except Exception:
-            t.setBrush(QtGui.QBrush(QtGui.QColor("#000000")))
-        return t
-
-    def _preview_code_or_cat(self, x, y, text, color_hex, font_size, bold, is_category):
-        """ TextGraphicsItem look: solid color rect (white for categories),
-        contrast text color, categories default to bold. """
-        if is_category:
-            color_hex = "#FFFFFF"
-        try:
-            contrast = TextColor(color_hex).recommendation
-        except Exception:
-            contrast = "#000000"
-        t = self._preview_text(text, font_size, bold or is_category, contrast)
-        br = t.boundingRect()
-        rect = QtWidgets.QGraphicsRectItem(br.adjusted(-3, -2, 3, 2))
-        rect.setBrush(QtGui.QBrush(QtGui.QColor(color_hex)))
-        rect.setPen(QtGui.QPen(QtGui.QColor("#B0B0B0"), 0.5) if is_category
-                    else QtGui.QPen(QtCore.Qt.PenStyle.NoPen))
-        rect.setPos(x, y)
-        t.setParentItem(rect)
-        rect.setZValue(1)
-        self.preview_scene.addItem(rect)
-        return rect.sceneBoundingRect()
-
-    def _preview_case(self, x, y, text, font_size, bold, text_color):
-        """ CaseTextGraphicsItem look: rounded rect, orange border, light bg. """
-        t = self._preview_text(text, font_size, bold, text_color if text_color != "white" else "#FFFFFF")
-        br = t.boundingRect().adjusted(-6, -4, 6, 4)
-        path = QtGui.QPainterPath()
-        path.addRoundedRect(br, 12, 12)
-        shape = QtWidgets.QGraphicsPathItem(path)
-        shape.setBrush(QtGui.QBrush(QtGui.QColor("#101010" if text_color == "white" else "#fafafa")))
-        shape.setPen(QtGui.QPen(QtGui.QColor("#F57C00"), 2))
-        shape.setPos(x, y)
-        t.setParentItem(shape)
-        shape.setZValue(1)
-        self.preview_scene.addItem(shape)
-        return shape.sceneBoundingRect()
-
-    def _preview_file(self, x, y, text, font_size, bold, text_color):
-        """ FileTextGraphicsItem look: folded-corner note, blue border. """
-        t = self._preview_text(text, font_size, bold, text_color if text_color != "white" else "#FFFFFF")
-        br = t.boundingRect().adjusted(-4, -3, 8, 3)
-        w, h, fold = br.width(), br.height(), 8
-        poly = QtGui.QPolygonF([
-            QtCore.QPointF(br.left(), br.top()),
-            QtCore.QPointF(br.left() + w - fold, br.top()),
-            QtCore.QPointF(br.left() + w, br.top() + fold),
-            QtCore.QPointF(br.left() + w, br.top() + h),
-            QtCore.QPointF(br.left(), br.top() + h)])
-        shape = QtWidgets.QGraphicsPolygonItem(poly)
-        shape.setBrush(QtGui.QBrush(QtGui.QColor("#101010" if text_color == "white" else "#fafafa")))
-        shape.setPen(QtGui.QPen(QtGui.QColor("#1976D2"), 2))
-        shape.setPos(x, y)
-        fold_line = QtWidgets.QGraphicsLineItem(
-            br.left() + w - fold, br.top(), br.left() + w - fold, br.top() + fold, shape)
-        fold_line.setPen(QtGui.QPen(QtGui.QColor("#1976D2"), 2))
-        t.setParentItem(shape)
-        shape.setZValue(1)
-        self.preview_scene.addItem(shape)
-        return shape.sceneBoundingRect()
-
-    def _preview_free_text(self, x, y, text, font_size, bold, text_color):
-        """ FreeTextGraphicsItem look: plain rect, #fafafa bg (dark if the text
-        color is white), the stored color is the TEXT color. """
-        tc = text_color or "black"
-        t = self._preview_text(text, font_size, bold,
-                               "#FFFFFF" if tc == "white" else tc, max_len=60)
-        br = t.boundingRect().adjusted(-3, -2, 3, 2)
-        rect = QtWidgets.QGraphicsRectItem(br)
-        rect.setBrush(QtGui.QBrush(QtGui.QColor("#101010" if tc == "white" else "#fafafa")))
-        rect.setPen(QtGui.QPen(QtGui.QColor("#909090"), 0.5))
-        rect.setPos(x, y)
-        t.setParentItem(rect)
-        rect.setZValue(1)
-        self.preview_scene.addItem(rect)
-        return rect.sceneBoundingRect()
-
-    def _preview_memo(self, x, y, memo_source_type, memo_source_id, font_size):
-        """ MemoGraphicsItem look: light blue rounded rect, dashed blue border,
-        blue text, body read live from the source table. """
-        type_map = {
-            'code': "select ifnull(memo,'') from code_name where cid=?",
-            'category': "select ifnull(memo,'') from code_cat where catid=?",
-            'code_text': "select ifnull(memo,'') from code_text where ctid=?",
-            'code_image': "select ifnull(memo,'') from code_image where imid=?",
-            'code_av': "select ifnull(memo,'') from code_av where avid=?",
-            'case': "select ifnull(memo,'') from cases where caseid=?",
-            'file': "select ifnull(memo,'') from source where id=?",
-        }
-        body = ""
-        sql = type_map.get(memo_source_type)
-        if sql:
-            try:
-                cur = self.app.conn.cursor()
-                cur.execute(sql, [memo_source_id])
-                res = cur.fetchone()
-                body = res[0] if res else ""
-            except Exception:
-                body = ""
-        t = QtWidgets.QGraphicsTextItem()  # wrapping text like the real memo node
-        f = QtGui.QFont()
-        f.setPointSize(max(6, int(font_size or 9)))
-        t.setFont(f)
-        t.setDefaultTextColor(safe_color("blue"))
-        display = body[:120] + "\u2026" if len(body) > 120 else (body or _("Memo"))
-        t.setPlainText(display)
-        t.setTextWidth(180)
-        br = t.boundingRect().adjusted(-4, -3, 4, 3)
-        path = QtGui.QPainterPath()
-        path.addRoundedRect(br, 6, 6)
-        shape = QtWidgets.QGraphicsPathItem(path)
-        shape.setBrush(QtGui.QBrush(QtGui.QColor("#E3F2FD")))
-        pen = QtGui.QPen(QtGui.QColor("#1565C0"), 1)
-        pen.setStyle(QtCore.Qt.PenStyle.DashLine)
-        shape.setPen(pen)
-        shape.setPos(x, y)
-        t.setParentItem(shape)
-        shape.setZValue(1)
-        self.preview_scene.addItem(shape)
-        return shape.sceneBoundingRect()
-
-    def _preview_pixmap(self, x, y, px, py, w, h, filepath, pdf_page):
-        """ PixmapGraphicsItem look: the actual image, cropped and scaled to a
-        maximum of 200px like the real item. Falls back to a gray placeholder. """
-        try:
-            abs_path_ = self.app.project_path + (filepath or "")
-            if (filepath or "")[0:7] == "images:":
-                abs_path_ = filepath[7:]
-            if pdf_page is not None:
-                source_path = ""
-                if (filepath or "")[:6] == "/docs/":
-                    source_path = f"{self.app.project_path}/documents/{filepath[6:]}"
-                if (filepath or "")[:5] == "docs:":
-                    source_path = filepath[5:]
-                pymu_pdf = pymupdf.open(source_path)
-                page = pymu_pdf[pdf_page]
-                pm = page.get_pixmap(annots=False)  # PDF highlights/notes not painted
-                abs_path_ = Path(self.app.confighome) / "tmp_preview_pdf_page.png"
-                pm.save(str(abs_path_))  # Assume needs String
-            image = QtGui.QImageReader(abs_path_).read()
-            if image.isNull():
-                raise ValueError("null image")
-            image = image.copy(int(px or 0), int(py or 0), int(w or image.width()), int(h or image.height()))
-            scaler = min(1.0, 200 / image.width() if image.width() > 200 else 1.0,
-                         200 / image.height() if image.height() > 200 else 1.0)
-            pixmap = QtGui.QPixmap().fromImage(image)
-            pixmap = pixmap.scaled(int(image.width() * scaler), int(image.height() * scaler))
-            item = QtWidgets.QGraphicsPixmapItem(pixmap)
-            item.setPos(x, y)
-            item.setZValue(1)
-            self.preview_scene.addItem(item)
-            return item.sceneBoundingRect()
-        except Exception:
-            rect = QtWidgets.QGraphicsRectItem(0, 0, max(30, (w or 90) / 3), max(20, (h or 60) / 3))
-            rect.setBrush(QtGui.QBrush(QtGui.QColor("#E8E8E8")))
-            rect.setPen(QtGui.QPen(QtGui.QColor("#909090"), 0.5))
-            rect.setPos(x, y)
-            rect.setZValue(1)
-            self.preview_scene.addItem(rect)
-            return rect.sceneBoundingRect()
-
-    def _preview_av(self, x, y, color):
-        """ AVGraphicsItem look: colored chip with a play marker. """
-        t = self._preview_text("\u25B6 A/V", 9, False, "#000000")
-        br = t.boundingRect().adjusted(-4, -2, 4, 2)
-        rect = QtWidgets.QGraphicsRectItem(br)
-        try:
-            rect.setBrush(QtGui.QBrush(QtGui.QColor(color if (color or "").startswith("#") else "#FFFFFF")))
-        except Exception:
-            rect.setBrush(QtGui.QBrush(QtGui.QColor("#FFFFFF")))
-        rect.setPen(QtGui.QPen(QtGui.QColor("#909090"), 0.5))
-        rect.setPos(x, y)
-        t.setParentItem(rect)
-        rect.setZValue(1)
-        self.preview_scene.addItem(rect)
-        return rect.sceneBoundingRect()
-
-    @staticmethod
-    def _trim_to_rect(p_from, rect_to):
-        """ Move the endpoint from a node center to that node's border, like the
-        real perimeter-intersection line drawing. """
-        center = rect_to.center()
-        dx = center.x() - p_from.x()
-        dy = center.y() - p_from.y()
-        if dx == 0 and dy == 0:
-            return center
-        # parametric intersection of segment (p_from -> center) with rect borders
-        candidates = []
-        if dx != 0:
-            for edge_x in (rect_to.left(), rect_to.right()):
-                t = (edge_x - p_from.x()) / dx
-                if 0 < t <= 1:
-                    y = p_from.y() + t * dy
-                    if rect_to.top() - 0.5 <= y <= rect_to.bottom() + 0.5:
-                        candidates.append(t)
-        if dy != 0:
-            for edge_y in (rect_to.top(), rect_to.bottom()):
-                t = (edge_y - p_from.y()) / dy
-                if 0 < t <= 1:
-                    x = p_from.x() + t * dx
-                    if rect_to.left() - 0.5 <= x <= rect_to.right() + 0.5:
-                        candidates.append(t)
-        if not candidates:
-            return center
-        t = min(candidates)
-        return QtCore.QPointF(p_from.x() + t * dx, p_from.y() + t * dy)
-
-    def _preview_line(self, rect1, rect2, color_name, line_width=2,
-                      dotted=False, arrow_mode="none", label=""):
-        if rect1 is None or rect2 is None:
-            return
-        c1, c2 = rect1.center(), rect2.center()
-        p1 = self._trim_to_rect(c2, rect1)
-        p2 = self._trim_to_rect(c1, rect2)
-        color_obj = safe_color(color_name or "gray")
-        pen = QtGui.QPen(color_obj, max(1.0, float(line_width or 2)))
-        if dotted:
-            pen.setStyle(QtCore.Qt.PenStyle.DotLine)
-        line = QtWidgets.QGraphicsLineItem(p1.x(), p1.y(), p2.x(), p2.y())
-        line.setPen(pen)
-        line.setZValue(0)
-        self.preview_scene.addItem(line)
-        # arrowheads, same triangle geometry as the real lines (size 12)
-        theta = math.atan2(p1.y() - p2.y(), p1.x() - p2.x())
-        arrow_size = 12
-
-        def _arrow(tip, angle):
-            tri = QtGui.QPolygonF([
-                tip,
-                QtCore.QPointF(tip.x() + arrow_size * math.cos(angle + math.pi / 6),
-                               tip.y() + arrow_size * math.sin(angle + math.pi / 6)),
-                QtCore.QPointF(tip.x() + arrow_size * math.cos(angle - math.pi / 6),
-                               tip.y() + arrow_size * math.sin(angle - math.pi / 6))])
-            head = QtWidgets.QGraphicsPolygonItem(tri)
-            head.setBrush(QtGui.QBrush(color_obj))
-            head.setPen(QtGui.QPen(color_obj, 1))
-            head.setZValue(0)
-            self.preview_scene.addItem(head)
-
-        if arrow_mode in ("forward", "both"):
-            _arrow(p2, theta)
-        if arrow_mode in ("backward", "both"):
-            _arrow(p1, theta + math.pi)
-        if arrow_mode == "circle":
-            r = 4
-            dot = QtWidgets.QGraphicsEllipseItem(p2.x() - r, p2.y() - r, 2 * r, 2 * r)
-            dot.setBrush(QtGui.QBrush(color_obj))
-            dot.setPen(QtGui.QPen(color_obj, 1))
-            self.preview_scene.addItem(dot)
-        # relation label: italic blue text on a borderless white chip, like the graph
-        if label:
-            # Traducido al mostrar, igual que en el lienzo. Translated at display time, as on the canvas.
-            lt = QtWidgets.QGraphicsTextItem(_(str(label)))
-            f = QtGui.QFont()
-            f.setPointSize(9)
-            f.setItalic(True)
-            lt.setFont(f)
-            lt.setDefaultTextColor(QtGui.QColor("#0000CD"))
-            br = lt.boundingRect()
-            mid = QtCore.QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
-            lt.setPos(mid.x() - br.width() / 2, mid.y() - br.height() / 2)
-            lt.setZValue(3)
-            chip = QtWidgets.QGraphicsRectItem(br.adjusted(-4, -1, 4, 1), lt)
-            chip.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, True)
-            chip.setBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255, 235)))
-            chip.setPen(QtGui.QPen(QtCore.Qt.PenStyle.NoPen))
-            self.preview_scene.addItem(lt)
+    def _clear_preview(self):
+        self._line_widths = []
+        self.preview_scene.clear()
 
     def _render_preview(self, grid):
-        self.preview_scene.clear()
-        self.preview_scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor("#FFFFFF")))
-        cur = self.app.conn.cursor()
-        code_pos, cat_pos, case_pos, file_pos = {}, {}, {}, {}
-        free_pos, pix_pos, av_pos, memo_pos = {}, {}, {}, {}
+        """ Load the saved graph into the preview scene with the canvas item classes. """
+        self._clear_preview()
         try:
-            # codes and categories
-            cur.execute("select x, y, catid, cid, font_size, bold, isvisible, ifnull(displaytext,'') "
-                        "from gr_cdct_text_item where grid=?", [grid])
-            for x, y, catid, cid, fsize, bold, isvisible, displaytext in cur.fetchall():
-                if not isvisible or x is None or y is None:
-                    continue
-                if cid is not None:
-                    cur.execute("select name, color from code_name where cid=?", [cid])
-                    res = cur.fetchone()
-                    if res is None:
-                        continue
-                    rect = self._preview_code_or_cat(x, y, displaytext or res[0], res[1],
-                                                     fsize, bold, is_category=False)
-                    code_pos[cid] = rect
-                else:
-                    cur.execute("select name from code_cat where catid=?", [catid])
-                    res = cur.fetchone()
-                    if res is None:
-                        continue
-                    rect = self._preview_code_or_cat(x, y, displaytext or res[0], "#FFFFFF",
-                                                     fsize, bold, is_category=True)
-                    cat_pos[catid] = rect
-            # cases
-            cur.execute("select x, y, caseid, font_size, bold, ifnull(color,'black'), "
-                        "ifnull(displaytext,'') from gr_case_text_item where grid=?", [grid])
-            for x, y, caseid, fsize, bold, color, displaytext in cur.fetchall():
-                if x is None or y is None:
-                    continue
-                name = displaytext
-                if not name:
-                    cur.execute("select name from cases where caseid=?", [caseid])
-                    res = cur.fetchone()
-                    name = res[0] if res else "case"
-                case_pos[caseid] = self._preview_case(x, y, name, fsize, bold, color)
-            # files
-            cur.execute("select x, y, fid, font_size, bold, ifnull(color,'black'), "
-                        "ifnull(displaytext,'') from gr_file_text_item where grid=?", [grid])
-            for x, y, fid, fsize, bold, color, displaytext in cur.fetchall():
-                if x is None or y is None:
-                    continue
-                name = displaytext
-                if not name:
-                    cur.execute("select name from source where id=?", [fid])
-                    res = cur.fetchone()
-                    name = res[0] if res else "file"
-                file_pos[fid] = self._preview_file(x, y, name, fsize, bold, color)
-            # free text
-            cur.execute("select freetextid, x, y, ifnull(free_text,''), font_size, bold, "
-                        "ifnull(color,'black') from gr_free_text_item where grid=?", [grid])
-            for freetextid, x, y, free_text, fsize, bold, color in cur.fetchall():
-                if x is None or y is None:
-                    continue
-                free_pos[freetextid] = self._preview_free_text(x, y, free_text, fsize, bold, color)
-            # images and A/V
-            cur.execute("select imid, x, y, px, py, w, h, filepath, pdf_page "
-                        "from gr_pix_item where grid=?", [grid])
-            for imid, x, y, px, py, w, h, filepath, pdf_page in cur.fetchall():
-                if x is None or y is None:
-                    continue
-                pix_pos[imid] = self._preview_pixmap(x, y, px, py, w, h, filepath, pdf_page)
-            cur.execute("select avid, x, y, ifnull(color,'white') from gr_av_item where grid=?", [grid])
-            for avid, x, y, color in cur.fetchall():
-                if x is None or y is None:
-                    continue
-                av_pos[avid] = self._preview_av(x, y, color)
-            # memo nodes (v17)
-            try:
-                cur.execute("select gmemoid, memo_source_type, memo_source_id, x, y, "
-                            "ifnull(font_size,9) from gr_memo_item where grid=?", [grid])
-                for gmemoid, src_type, src_id, x, y, fsize in cur.fetchall():
-                    if x is None or y is None:
-                        continue
-                    memo_pos[gmemoid] = self._preview_memo(x, y, src_type, src_id, fsize)
-            except sqlite3.OperationalError:
-                pass  # pre-v17 project
-            # hierarchy lines (label + arrow_mode are v17 columns, tolerate their absence)
-            try:
-                cur.execute("select fromcatid, fromcid, tocatid, tocid, ifnull(color,'gray'), "
-                            "ifnull(linewidth,2), ifnull(linetype,'solid'), isvisible, "
-                            "ifnull(label,''), ifnull(arrow_mode,'none') "
-                            "from gr_cdct_line_item where grid=?", [grid])
-                cdct_lines = cur.fetchall()
-            except sqlite3.OperationalError:
-                cur.execute("select fromcatid, fromcid, tocatid, tocid, ifnull(color,'gray'), "
-                            "ifnull(linewidth,2), ifnull(linetype,'solid'), isvisible, "
-                            "'', 'none' from gr_cdct_line_item where grid=?", [grid])
-                cdct_lines = cur.fetchall()
-            for fromcatid, fromcid, tocatid, tocid, color, lw, linetype, isvisible, label, arrow in cdct_lines:
-                if not isvisible:
-                    continue
-                r1 = code_pos.get(fromcid) if fromcid is not None else cat_pos.get(fromcatid)
-                r2 = code_pos.get(tocid) if tocid is not None else cat_pos.get(tocatid)
-                self._preview_line(r1, r2, color, lw, linetype == "dotted", arrow, label)
-
-            def free_endpoint(freetextid, catid, cid, caseid, fid, imid, avid):
-                if freetextid is not None and freetextid >= _MEMO_LINE_ID_OFFSET:
-                    return memo_pos.get(freetextid - _MEMO_LINE_ID_OFFSET)
-                for value, positions in ((freetextid, free_pos), (cid, code_pos),
-                                         (catid, cat_pos), (caseid, case_pos),
-                                         (fid, file_pos), (imid, pix_pos), (avid, av_pos)):
-                    if value is not None and value in positions:
-                        return positions[value]
-                return None
-
-            # relation / free lines
-            try:
-                cur.execute("select fromfreetextid, fromcatid, fromcid, fromcaseid, fromfileid, "
-                            "fromimid, fromavid, tofreetextid, tocatid, tocid, tocaseid, tofileid, "
-                            "toimid, toavid, ifnull(color,'gray'), ifnull(linewidth,2), "
-                            "ifnull(linetype,'solid'), ifnull(label,''), ifnull(arrow_mode,'forward') "
-                            "from gr_free_line_item where grid=?", [grid])
-                free_lines = cur.fetchall()
-            except sqlite3.OperationalError:
-                cur.execute("select fromfreetextid, fromcatid, fromcid, fromcaseid, fromfileid, "
-                            "fromimid, fromavid, tofreetextid, tocatid, tocid, tocaseid, tofileid, "
-                            "toimid, toavid, ifnull(color,'gray'), ifnull(linewidth,2), "
-                            "ifnull(linetype,'solid'), '', 'forward' "
-                            "from gr_free_line_item where grid=?", [grid])
-                free_lines = cur.fetchall()
-            for r in free_lines:
-                r1 = free_endpoint(r[0], r[1], r[2], r[3], r[4], r[5], r[6])
-                r2 = free_endpoint(r[7], r[8], r[9], r[10], r[11], r[12], r[13])
-                self._preview_line(r1, r2, r[14], r[15], r[16] == "dotted", r[18], r[17])
+            _GraphPreviewLoader(self.app, self.preview_scene).load(grid)
         except Exception as err:
             logger.warning("Graph preview failed for grid %s: %s", grid, err)
-        rect = self.preview_scene.itemsBoundingRect().adjusted(-20, -20, 20, 20)
+        for item in self.preview_scene.items():
+            if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
+                try:
+                    self._line_widths.append((item, item.pen().widthF()))
+                except (AttributeError, RuntimeError):
+                    pass
+        rect = self.preview_scene.itemsBoundingRect()
         if rect.isValid():
-            self.preview_scene.setSceneRect(rect)
-            self.ui.graphicsView_preview.fitInView(rect, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
+            self.preview_scene.setSceneRect(rect.adjusted(-self.PREVIEW_MARGIN, -self.PREVIEW_MARGIN,
+                                                          self.PREVIEW_MARGIN, self.PREVIEW_MARGIN))
+        self._fit_preview()
+
+    def _fit_preview(self):
+        """ Show the whole graph, keeping proportions, without enlarging small graphs. """
+        view = self.ui.graphicsView_preview
+        rect = self.preview_scene.sceneRect()
+        if not rect.isValid() or rect.width() <= 0 or rect.height() <= 0:
+            return
+        viewport = view.viewport().rect()
+        if viewport.width() <= 2 or viewport.height() <= 2:
+            return
+        scale = min((viewport.width() - 2) / rect.width(), (viewport.height() - 2) / rect.height())
+        scale = max(0.01, min(scale, self.PREVIEW_MAX_SCALE))
+        view.resetTransform()
+        view.scale(scale, scale)
+        view.centerOn(rect.center())
+        self._keep_lines_visible(scale)
+
+    def _keep_lines_visible(self, scale):
+        """ Same proportions as the canvas, but never thinner than one screen pixel. """
+        for line, width in self._line_widths:
+            try:
+                pen = line.pen()
+                pen.setWidthF(max(width, 1.0 / scale))
+                line.setPen(pen)
+            except RuntimeError:
+                pass
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        rect = self.preview_scene.sceneRect()
-        if rect.isValid():
-            self.ui.graphicsView_preview.fitInView(rect, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
+        self._fit_preview()
 
     def showEvent(self, event):
-        # first fitInView only works once the view has real geometry
+        # first fit only works once the view has real geometry
         super().showEvent(event)
-        rect = self.preview_scene.sceneRect()
-        if rect.isValid():
-            QtCore.QTimer.singleShot(
-                0, lambda: self.ui.graphicsView_preview.fitInView(
-                    rect, QtCore.Qt.AspectRatioMode.KeepAspectRatio))
+        QtCore.QTimer.singleShot(0, self._fit_preview)
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
@@ -6571,8 +6458,9 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 if cls_name in ("PixmapGraphicsItem", "AVGraphicsItem"):
                     try:
                         if hasattr(item, 'pixmap') and item.pixmap() is not None:
-                            pm = item.pixmap()
-                            node_data['pixmap_size'] = (pm.width(), pm.height())
+                            # Logical size, independent of the device pixel ratio
+                            size = item.pixmap().deviceIndependentSize()
+                            node_data['pixmap_size'] = (size.width(), size.height())
                     except Exception:
                         pass
                 snapshot['nodes'].append(node_data)
@@ -6602,17 +6490,32 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     def adjust_for_negative_positions(self):
         """ Move all items if negative positions. """
 
+        # Only top-level nodes move; children (label chips, handles) follow their parent.
+        # Lines and their labels are redrawn from the moved nodes afterwards.
+        movable = [i for i in self.items()
+                   if i.parentItem() is None
+                   and not isinstance(i, (LinkGraphicsItem, FreeLineGraphicsItem))
+                   and not getattr(i, '_is_line_label', False)]
         min_adjust_x = 0
         min_adjust_y = 0
-        for i in self.items():
+        for i in movable:
             if i.pos().x() < min_adjust_x:
                 min_adjust_x = i.pos().x()
-            if i.pos().y() < min_adjust_x:
+            if i.pos().y() < min_adjust_y:
                 min_adjust_y = i.pos().y()
         if min_adjust_x < 0 or min_adjust_y < 0:
-            for i in self.items():
-                if not (isinstance(i, LinkGraphicsItem) or isinstance(i, FreeLineGraphicsItem)):
-                    i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
+            for i in movable:
+                i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
+                if getattr(i, 'code_or_cat', None) is not None and 'x' in i.code_or_cat:
+                    i.code_or_cat['x'] = i.pos().x()
+                    i.code_or_cat['y'] = i.pos().y()
+            for line in self.items():
+                if isinstance(line, (LinkGraphicsItem, FreeLineGraphicsItem)):
+                    try:
+                        line.redraw()
+                    except RuntimeError:
+                        pass
+            self.update()
 
     def suggested_scene_size(self):
         """ Calculate the actual size of the scene, allowing margins for free panning. """
@@ -6806,6 +6709,8 @@ class ResizeHandleItem(QtWidgets.QGraphicsRectItem):
             if hasattr(self.parent_item, 'textWidth'):
                 tw = self.parent_item.textWidth()
                 self._drag_start_width = tw if tw > 0 else self.parent_item.boundingRect().width()
+            elif hasattr(self.parent_item, 'display_width'):
+                self._drag_start_width = self.parent_item.display_width()
             elif hasattr(self.parent_item, 'pixmap'):
                 self._drag_start_width = self.parent_item.boundingRect().width()
             # capture the pre-resize state; pushed on release only if changed
@@ -6825,6 +6730,9 @@ class ResizeHandleItem(QtWidgets.QGraphicsRectItem):
         new_width = max(60, min(600, self._drag_start_width + delta_x))
         if hasattr(self.parent_item, 'setTextWidth'):
             self.parent_item.setTextWidth(new_width)
+            self._reposition()
+        elif hasattr(self.parent_item, 'set_display_width'):
+            self.parent_item.set_display_width(new_width)
             self._reposition()
         elif hasattr(self.parent_item, 'pixmap') and hasattr(self.parent_item, '_original_pixmap'):
             orig_pixmap = self.parent_item._original_pixmap
@@ -6851,6 +6759,8 @@ class ResizeHandleItem(QtWidgets.QGraphicsRectItem):
                 if hasattr(self.parent_item, 'textWidth'):
                     tw = self.parent_item.textWidth()
                     current_w = tw if tw > 0 else self.parent_item.boundingRect().width()
+                elif hasattr(self.parent_item, 'display_width'):
+                    current_w = self.parent_item.display_width()
                 else:
                     current_w = self.parent_item.boundingRect().width()
                 if abs(current_w - self._drag_start_width) > 1:
@@ -8337,6 +8247,10 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
 
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
+    BASE_SIDE = 200
+    PDF_RENDER_ZOOM = 2
+    HIRES_MAX_SIDE = 800  # sharp enough at normal zoom, light on memory
+    OVERSAMPLE = 2.0
 
     def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None,
                  pdf_page=None):
@@ -8374,53 +8288,12 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.grpixid = grpixid  # gr_pix_item table id. id for database stored free pixmap graph ite
         self.pdf_page = pdf_page
 
-        # Image jpg, png
-        abs_path_ = self.app.project_path + path_
-        if path_[0:7] == "images:":
-            abs_path_ = path_[7:]
-
-        # Pdf image
-        if self.pdf_page is not None:
-            source_path = ""
-            if path_[:6] == "/docs/":
-                source_path = f"{self.app.project_path}/documents/{path_[6:]}"
-            if path_[:5] == "docs:":
-                source_path = path_[5:]
-            # In-memory render, range-guarded, document always closed (the old
-            # code crashed on out-of-range pages and leaked the handle/temp file).
-            image = QtGui.QImage()
-            try:
-                pymu_pdf = pymupdf.open(source_path)
-                try:
-                    if 0 <= self.pdf_page < len(pymu_pdf):
-                        page = pymu_pdf.load_page(self.pdf_page)
-                        pix = page.get_pixmap(alpha=False, annots=False)  # PDF highlights/notes not painted
-                        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
-                                             QtGui.QImage.Format.Format_RGB888).copy()
-                finally:
-                    pymu_pdf.close()
-            except Exception as err:
-                logger.warning(f"Graph pdf area: {source_path} {err}")
-        else:
-            image = QtGui.QImageReader(abs_path_).read()
-        image = image.copy(int(px), int(py), int(pwidth), int(pheight))
-
-        # Scale to max 200 wide or high. (TODO Perhaps add option to change maximum limits)
-        scaler_w = 1.0
-        scaler_h = 1.0
-        if image.width() > 200:
-            scaler_w = 200 / image.width()
-        if image.height() > 200:
-            scaler_h = 200 / image.height()
-        if scaler_w < scaler_h:
-            scaler = scaler_w
-        else:
-            scaler = scaler_h
-        pixmap = QtGui.QPixmap().fromImage(image)
-        pixmap = pixmap.scaled(int(image.width() * scaler), int(image.height() * scaler))
-        self.setPixmap(pixmap)
-        # keep the base pixmap so _scale_graph can resize without quality loss
-        self._original_pixmap = pixmap
+        # Keep a high-resolution crop and show it downsampled, so zoom and resize stay sharp
+        self.setTransformationMode(QtCore.Qt.TransformationMode.SmoothTransformation)
+        self._hires_pixmap = QtGui.QPixmap()
+        self._original_pixmap = None
+        self.reload_image()
+        self.set_display_width(self.base_display_width())
         self.setPos(x, y)
         self.settings = app.settings
         self.project_path = app.project_path
@@ -8428,6 +8301,64 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+
+    def _load_segment_image(self):
+        """ Return the coded area as a full resolution QImage. """
+        return load_coded_image_area(self.app.project_path, self.path_, self.px, self.py,
+                                     self.pwidth, self.pheight, self.pdf_page,
+                                     self.PDF_RENDER_ZOOM, self.HIRES_MAX_SIDE)
+
+    def reload_image(self):
+        """ Rebuild the high-resolution pixmap from the source file. Returns True on success. """
+        image = self._load_segment_image()
+        if image.isNull() or image.width() <= 0 or image.height() <= 0:
+            # Keep the previous picture if the source cannot be read now
+            self._original_pixmap = self._hires_pixmap
+            return False
+        longest = max(image.width(), image.height())
+        if longest > self.HIRES_MAX_SIDE:
+            image = image.scaled(self.HIRES_MAX_SIDE, self.HIRES_MAX_SIDE,
+                                 QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+                                 QtCore.Qt.TransformationMode.SmoothTransformation)
+        self._hires_pixmap = QtGui.QPixmap.fromImage(image)
+        # Kept for code that only checks the attribute exists
+        self._original_pixmap = self._hires_pixmap
+        return True
+
+    def display_width(self):
+        """ Current on-canvas width, without the smooth-mode bounding margin. """
+        return self.pixmap().deviceIndependentSize().width()
+
+    def base_display_width(self):
+        """ Default on-canvas width, fitting the segment inside BASE_SIDE. """
+        if self.pwidth <= 0 or self.pheight <= 0:
+            return self.BASE_SIDE
+        scaler = min(1.0, self.BASE_SIDE / self.pwidth, self.BASE_SIDE / self.pheight)
+        return max(1.0, self.pwidth * scaler)
+
+    def set_display_width(self, width):
+        """ Show the segment at a logical width using extra pixels for sharpness. """
+        hires = self._hires_pixmap
+        if hires.isNull() or hires.width() <= 0:
+            self.setPixmap(hires)
+            return
+        if width is None or width <= 0:
+            width = self.base_display_width()
+        width = float(width)
+        target_w = int(round(min(hires.width(), width * self.OVERSAMPLE)))
+        target_h = int(round(target_w * hires.height() / hires.width()))
+        if target_w < 1 or target_h < 1:
+            return
+        if target_w == hires.width():
+            pixmap = QtGui.QPixmap(hires)
+        else:
+            pixmap = hires.scaled(target_w, target_h, QtCore.Qt.AspectRatioMode.IgnoreAspectRatio,
+                                  QtCore.Qt.TransformationMode.SmoothTransformation)
+        # Device pixel ratio keeps the on-canvas size at width x height
+        pixmap.setDevicePixelRatio(pixmap.width() / width)
+        self.prepareGeometryChange()
+        self.setPixmap(pixmap)
+        self.update()
 
     def __repr__(self):
         txt = f"PixmapGraphicsItem imid:{self.imid} grpxid:{self.grpixid} Path:{self.path_}"
@@ -8556,7 +8487,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
-        self.setPlainText(self.code_or_cat['name'])
+        self.setPlainText(self.text)  # saved display text, falling back to the code name
         if not isvisible:
             self.hide()
         self.code_or_cat['memo'] = ""
@@ -8717,9 +8648,15 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 collapse_action = menu.addAction(_('Expand'))
             else:
                 collapse_action = menu.addAction(_('Collapse'))
+        toggle_cooc_action = None
+        if self.code_or_cat['cid'] is not None:
+            toggle_cooc_action = menu.addAction(_('Toggle co-occurrence lines'))
         hide_action = menu.addAction(_('Hide'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
+            return
+        if toggle_cooc_action is not None and action == toggle_cooc_action:
+            invoke_graph_method(self, 'toggle_code_cooccurrence_lines')
             return
         # unified undo snapshot. Actions in _self_snapshot_actions manage
         # their own snapshot (after user confirmation) or are read-only dialogs.
@@ -8927,109 +8864,78 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         else:
             scene.update()
 
-    def add_coded_segments(self):
-        """ Window to import coded segments from text, image, and A/V associated with this code.
-        Generates automatic dotted links using the FreeLineGraphicsItem.
-        """
+    def collect_coded_segments(self, keep=None):
+        """ Coded segments of this code not yet in the scene, as three lists (text, image, A/V).
+        keep: optional dict {'text': ids, 'image': ids, 'av': ids} to restrict to those coding ids. """
 
         cur = self.app.conn.cursor()
         cid = self.code_or_cat['cid']
         code_name = self.code_or_cat['name']
+        scene_items = list(self.scene().items()) if self.scene() is not None else []
+        present_ctid = {i.ctid for i in scene_items if isinstance(i, FreeTextGraphicsItem)}
+        present_imid = {i.imid for i in scene_items if isinstance(i, PixmapGraphicsItem)}
+        present_avid = {i.avid for i in scene_items if isinstance(i, AVGraphicsItem)}
 
-        # Collect TEXT segments
-        sql_text = ("select code_text.cid, code_text.fid, code_text.seltext, "
+        def wanted(kind, coding_id):
+            return keep is None or coding_id in keep.get(kind, ())
+
+        text_codings = []
+        cur.execute("select code_text.cid, code_text.fid, code_text.seltext, "
                     "ifnull(code_text.memo,''), code_text.ctid, source.name "
                     "from code_text join source on source.id = code_text.fid "
-                    "where code_text.cid=?")
-        cur.execute(sql_text, [cid])
-        res_text = cur.fetchall()
-        text_codings = []
-        for r in res_text:
-            already_present = any(isinstance(item, FreeTextGraphicsItem) and item.ctid == r[4]
-                          for item in self.scene().items())
-            if not already_present:
-                # To fix error in save graph: 2034, in save_graph
-                # i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
-                code_or_cat = {'cid':r[0], 'catid': None}
-                text_codings.append({
-                    'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3],
-                    'ctid': r[4], 'filename': r[5], 'codename': code_name,
-                    'code_or_cat': code_or_cat
-                })
-
-        # Collect IMAGE segments
-        sql_img = ("select code_image.cid, code_image.id, x1, y1, width, height, "
-                   "ifnull(code_image.memo,''), code_image.imid, code_image.pdf_page, "
-                   "source.name, source.mediapath "
-                   "from code_image join source on source.id = code_image.id "
-                   "where code_image.cid=?")
-        cur.execute(sql_img, [cid])
-        res_img = cur.fetchall()
+                    "where code_text.cid=?", [cid])
+        for r in cur.fetchall():
+            if r[4] in present_ctid or not wanted('text', r[4]):
+                continue
+            text_codings.append({
+                'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3],
+                'ctid': r[4], 'filename': r[5], 'codename': code_name,
+                'code_or_cat': {'cid': r[0], 'catid': None}, 'node': self})
         image_codings = []
-        for r in res_img:
-            already_present = any(isinstance(item, PixmapGraphicsItem) and item.imid == r[7]
-                          for item in self.scene().items())
-            if not already_present:
-                # To fix error in save graph: 2034, in save_graph
-                # i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
-                code_or_cat = {'cid': r[0], 'catid': None}
-                image_codings.append({
-                    'cid': r[0], 'fid': r[1], 'x': int(r[2]), 'y': int(r[3]),
-                    'width': int(r[4]), 'height': int(r[5]), 'memo': r[6],
-                    'imid': r[7], 'pdf_page': r[8], 'filename': r[9],
-                    'path': r[10] if r[10] else '', 'codename': code_name,
-                    'name': f"{r[9]} x:{int(r[2])} y:{int(r[3])} w:{int(r[4])} h:{int(r[5])}",
-                    'code_or_cat': code_or_cat
-                })
-
-        # Collect A/V segments
-        sql_av = ("select code_av.cid, code_av.id, code_av.pos0, code_av.pos1, "
-                  "ifnull(code_av.memo,''), code_av.avid, source.name, source.mediapath "
-                  "from code_av join source on source.id = code_av.id "
-                  "where code_av.cid=?")
-        cur.execute(sql_av, [cid])
-        res_av = cur.fetchall()
+        cur.execute("select code_image.cid, code_image.id, x1, y1, width, height, "
+                    "ifnull(code_image.memo,''), code_image.imid, code_image.pdf_page, "
+                    "source.name, source.mediapath "
+                    "from code_image join source on source.id = code_image.id "
+                    "where code_image.cid=?", [cid])
+        for r in cur.fetchall():
+            if r[7] in present_imid or not wanted('image', r[7]):
+                continue
+            image_codings.append({
+                'cid': r[0], 'fid': r[1], 'x': int(r[2]), 'y': int(r[3]),
+                'width': int(r[4]), 'height': int(r[5]), 'memo': r[6],
+                'imid': r[7], 'pdf_page': r[8], 'filename': r[9],
+                'path': r[10] if r[10] else '', 'codename': code_name,
+                'name': f"{r[9]} x:{int(r[2])} y:{int(r[3])} w:{int(r[4])} h:{int(r[5])}",
+                'code_or_cat': {'cid': r[0], 'catid': None}, 'node': self})
         av_codings = []
-        for r in res_av:
-            already_present = any(isinstance(item, AVGraphicsItem) and item.avid == r[5]
-                          for item in self.scene().items())
-            if not already_present:
-                # To fix error in save graph: 2034, in save_graph
-                # i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
-                code_or_cat = {'cid': r[0], 'catid': None}
-                av_codings.append({
-                    'cid': r[0], 'fid': r[1], 'pos0': int(r[2]), 'pos1': int(r[3]),
-                    'memo': r[4], 'avid': r[5], 'filename': r[6],
-                    'path': r[7] if r[7] else '', 'codename': code_name,
-                    'name': f"{r[6]}: {int(r[2])} to {int(r[3])} msecs",
-                    'code_or_cat': code_or_cat
-                })
+        cur.execute("select code_av.cid, code_av.id, code_av.pos0, code_av.pos1, "
+                    "ifnull(code_av.memo,''), code_av.avid, source.name, source.mediapath "
+                    "from code_av join source on source.id = code_av.id "
+                    "where code_av.cid=?", [cid])
+        for r in cur.fetchall():
+            if r[5] in present_avid or not wanted('av', r[5]):
+                continue
+            av_codings.append({
+                'cid': r[0], 'fid': r[1], 'pos0': int(r[2]), 'pos1': int(r[3]),
+                'memo': r[4], 'avid': r[5], 'filename': r[6],
+                'path': r[7] if r[7] else '', 'codename': code_name,
+                'name': f"{r[6]}: {int(r[2])} to {int(r[3])} msecs",
+                'code_or_cat': {'cid': r[0], 'catid': None}, 'node': self})
+        return text_codings, image_codings, av_codings
 
-        if not text_codings and not image_codings and not av_codings:
-            Message(self.app, _("No segments"),
-                    _("There are no new coded segments for this code.")).exec()
-            return
+    def import_segments(self, selected_text, selected_image, selected_av):
+        """ Add the chosen segments to the scene, linked to this code node with dotted lines.
+        No undo snapshot here; callers take it after the dialog is confirmed. """
 
-        # Show unified dialog to select text, image, A/V segments
-        ui = DialogSelectCodedSegments(
-            self.app, code_name, text_codings, image_codings, av_codings, self.scene().views()[0]
-        )
-        if not ui.exec():
-            return
-        # snapshot AFTER confirmation, so Cancel never pollutes the undo stack
         scene = self.scene()
-        if scene is not None and getattr(scene, 'parent', None) is not None:
-            if hasattr(scene.parent, '_save_undo_state'):
-                scene.parent._save_undo_state()
-
+        cid = self.code_or_cat['cid']
         x = self.pos().x() + 180
         y = self.pos().y()
-
-        # Import selected TEXT segments
-        for s in ui.selected_text:
+        created = []
+        for s in selected_text:
             y += 40
             freetextid = 1
-            for item in self.scene().items():
+            for item in scene.items():
                 if isinstance(item, FreeTextGraphicsItem) and item.freetextid >= freetextid:
                     freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, "black", False, s['ctid'])
@@ -9038,12 +8944,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 msg += f"\nMemo: {s['memo']}"
             item.setToolTip(msg)
             item.code_or_cat['cid'] = cid
-            self.scene().addItem(item)
-            line_item = FreeLineGraphicsItem(self, item, line_width=2, line_type="dotted", color="gray")
-            self.scene().addItem(line_item)
-
-        # Import selected IMAGE segments
-        for s in ui.selected_image:
+            scene.addItem(item)
+            scene.addItem(FreeLineGraphicsItem(self, item, line_width=2, line_type="dotted", color="gray"))
+            created.append(item)
+        for s in selected_image:
             y += 40
             item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'],
                                       s['path'], None, s['pdf_page'])
@@ -9052,12 +8956,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 msg += f"\nMemo: {s['memo']}"
             item.setToolTip(msg)
             item.code_or_cat['cid'] = cid
-            self.scene().addItem(item)
-            line_item = FreeLineGraphicsItem(self, item, line_width=2, line_type="dotted", color="gray")
-            self.scene().addItem(line_item)
-
-        # Import selected A/V segments
-        for s in ui.selected_av:
+            scene.addItem(item)
+            scene.addItem(FreeLineGraphicsItem(self, item, line_width=2, line_type="dotted", color="gray"))
+            created.append(item)
+        for s in selected_av:
             y += 40
             item = AVGraphicsItem(self.app, s['avid'], x, y, s['pos0'], s['pos1'], s['path'])
             msg = f"AVID:{s['avid']} File: {s['filename']}\nCode: {s['codename']}"
@@ -9066,51 +8968,70 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 msg += f"\nMemo: {s['memo']}"
             item.setToolTip(msg)
             item.code_or_cat['cid'] = cid
-            self.scene().addItem(item)
-            line_item = FreeLineGraphicsItem(self, item, line_width=2, line_type="dotted", color="gray")
-            self.scene().addItem(line_item)
+            scene.addItem(item)
+            scene.addItem(FreeLineGraphicsItem(self, item, line_width=2, line_type="dotted", color="gray"))
+            created.append(item)
+        return created
 
-    def add_cooccurring_codes(self):
-        """ Importa códigos co-ocurrentes desde un nodo específico sin duplicados.
-         Import co-occurring codes from a specific node without duplicates.
-         """
-
-        cur = self.app.conn.cursor()
-        sql = """
-        SELECT c2.cid, n2.name, n2.color, COUNT(c2.cid) as overlap_count
-        FROM code_text c1
-        JOIN code_text c2 ON c1.fid = c2.fid AND c1.cid != c2.cid AND c1.pos0 < c2.pos1 AND c1.pos1 > c2.pos0
-        JOIN code_name n2 ON c2.cid = n2.cid
-        WHERE c1.cid = ?
-        GROUP BY c2.cid, n2.name, n2.color
+    def add_coded_segments(self):
+        """ Window to import coded segments from text, image, and A/V associated with this code.
+        Generates automatic dotted links using the FreeLineGraphicsItem.
         """
-        cur.execute(sql, [self.code_or_cat['cid']])
-        res = cur.fetchall()
-        if not res:
-            Message(self.app, _("No co-ocurrences"), "No overlapping codes for this code in the text.").exec()
-            return
 
-        cooc_list = [
-            {'cid': r[0], 'name': f"{r[1]} (Co-occ freq: {r[3]})", 'raw_name': r[1], 'color': r[2], 'count': r[3]} for r
-            in res]
-        ui = DialogSelectItems(self.app, cooc_list, "Select codes", "multi")
+        text_codings, image_codings, av_codings = self.collect_coded_segments()
+        if not text_codings and not image_codings and not av_codings:
+            Message(self.app, _("No segments"),
+                    _("There are no new coded segments for this code.")).exec()
+            return
+        ui = DialogSelectCodedSegments(
+            self.app, self.code_or_cat['name'], text_codings, image_codings, av_codings,
+            self.scene().views()[0])
         if not ui.exec():
             return
-        selected = ui.get_selected()
         # snapshot AFTER confirmation, so Cancel never pollutes the undo stack
         scene = self.scene()
         if scene is not None and getattr(scene, 'parent', None) is not None:
             if hasattr(scene.parent, '_save_undo_state'):
                 scene.parent._save_undo_state()
-        # redundant "import math" removed (math imported at module level)
+        self.import_segments(ui.selected_text, ui.selected_image, ui.selected_av)
+
+    def add_cooccurring_codes(self):
+        """ Import co-occurring codes for this code node without duplicates.
+        Counts overlapping codings in text, images and A/V; the frequency is shown
+        as the label of the blue dotted co-occurrence line. """
+
+        counts = {}
+        for _cid_a, cid_b, _kind, _id_a, _id_b in code_cooccurrences(self.app.conn, cid=self.code_or_cat['cid']):
+            counts[cid_b] = counts.get(cid_b, 0) + 1
+        if not counts:
+            Message(self.app, _("No co-ocurrences"), _("No overlapping codes for this code.")).exec()
+            return
+        cur = self.app.conn.cursor()
+        cooc_list = []
+        for other_cid, count in counts.items():
+            cur.execute("select name, color from code_name where cid=?", [other_cid])
+            row = cur.fetchone()
+            if row is None:
+                continue
+            cooc_list.append({'cid': other_cid, 'name': f"{row[0]} (Co-occ freq: {count})",
+                              'raw_name': row[0], 'color': row[1], 'count': count})
+        cooc_list.sort(key=lambda c: (-c['count'], c['raw_name'].lower()))
+        ui = DialogSelectItems(self.app, cooc_list, "Select codes", "multi")
+        if not ui.exec():
+            return
+        selected = ui.get_selected()
+        if not selected:
+            return
+        # snapshot AFTER confirmation, so Cancel never pollutes the undo stack
+        scene = self.scene()
+        if scene is not None and getattr(scene, 'parent', None) is not None:
+            if hasattr(scene.parent, '_save_undo_state'):
+                scene.parent._save_undo_state()
         radius = 250
         angle_step = (2 * math.pi) / max(1, len(selected))
         for i, s in enumerate(selected):
-            # CORRECCIÓN: Uso estricto de str(). CORRECTION: Strict use of str().
-            target_node = next((item for item in self.scene().items() if
-                                type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(
-                                    s['cid'])), None)
-            if not target_node:
+            target_node = self._find_node_in_scene(cid=s['cid'])
+            if target_node is None:
                 angle = i * angle_step
                 cx = self.pos().x() + radius * math.cos(angle)
                 cy = self.pos().y() + radius * math.sin(angle)
@@ -9121,15 +9042,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                              'x': cx, 'y': cy, 'color': s['color'], 'memo': "", 'child_names': []}
                 target_node = TextGraphicsItem(self.app, code_data)
                 self.scene().addItem(target_node)
-
-            line_exists = any(type(link).__name__ == "LinkGraphicsItem" and
-                              ((link.from_widget == self and link.to_widget == target_node) or
-                               (link.from_widget == target_node and link.to_widget == self))
-                              for link in self.scene().items())
-            if not line_exists:
-                line_item = LinkGraphicsItem(self, target_node, line_width=2, line_type="dotted", color="blue",
-                                             isvisible=True)
-                self.scene().addItem(line_item)
+            add_cooccurrence_line(self.scene(), self, target_node, s['count'])
 
     def add_edit_memo(self):
         """ Add or edit memos for codes and categories. """
