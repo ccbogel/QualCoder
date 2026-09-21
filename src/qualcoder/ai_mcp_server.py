@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Shared MCP server for QualCoder.
@@ -1925,7 +1925,7 @@ class AiMcpServer:
 
             pos0, pos1 = self._quote_search(quote, fulltext)
             if pos0 < 0 or pos1 <= pos0:
-                raise ValueError("quote could not be matched in the document text.")
+                raise ValueError(self._quote_not_matched_message(fid))
             seltext = fulltext[pos0:pos1]
 
             existing = cur.execute(
@@ -3927,19 +3927,89 @@ class AiMcpServer:
         return str(random.choice(colors))
 
     def _quote_search(self, quote: str, fulltext: str) -> Tuple[int, int]:
-        """Find quote boundaries, preferring ai_llm.ai_quote_search with graceful fallback."""
+        """Find quote boundaries: exact, then layout tolerant, then ai_llm.ai_quote_search."""
 
+        quote_text = str(quote).strip()
+        if quote_text == "":
+            return -1, -1
+        start = fulltext.find(quote_text)
+        if start >= 0:
+            return start, start + len(quote_text)
+        pos0, pos1 = self._layout_tolerant_quote_search(quote_text, fulltext)
+        if pos0 >= 0:
+            return pos0, pos1
         try:
             from .ai_llm import ai_quote_search as _ai_quote_search
+            self._approximate_search_error = ""
             return _ai_quote_search(quote, fulltext)
-        except Exception:
-            quote_text = str(quote).strip()
-            if quote_text == "":
-                return -1, -1
-            start = fulltext.find(quote_text)
-            if start < 0:
-                return -1, -1
-            return start, start + len(quote_text)
+        except Exception as err:
+            # Kept for the error message, a missing AI runtime used to fail silently here
+            self._approximate_search_error = f"{type(err).__name__}: {err}"
+            return -1, -1
+
+    _QUOTE_CHAR_MAP = {
+        "\u201c": '"', "\u201d": '"', "\u00ab": '"', "\u00bb": '"', "\u2018": "'", "\u2019": "'",
+        "\u2013": "-", "\u2014": "-", "\u2212": "-", "\u00a0": " ",
+        "\ufb00": "ff", "\ufb01": "fi", "\ufb02": "fl", "\ufb03": "ffi", "\ufb04": "ffl",
+    }
+
+    def _layout_normalized(self, text: str) -> Tuple[str, List[int]]:
+        """Return text without PDF layout noise, plus the source index of every kept character."""
+
+        chars: List[str] = []
+        index_map: List[int] = []
+        length = len(text)
+        i = 0
+        while i < length:
+            char = text[i]
+            if char in "-\u00ad":
+                j = i + 1
+                while j < length and text[j].isspace():
+                    j += 1
+                broken_line = "\n" in text[i + 1:j] or "\r" in text[i + 1:j]
+                # Hyphens inside words are dropped on both sides, so split and compound words compare equal
+                if chars and chars[-1].isalpha() and j < length and text[j].isalpha() and (j == i + 1 or broken_line):
+                    i = j
+                    continue
+                if char == "\u00ad":
+                    i += 1
+                    continue
+            if char.isspace():
+                if chars and chars[-1] != " ":
+                    chars.append(" ")
+                    index_map.append(i)
+                i += 1
+                continue
+            for piece in self._QUOTE_CHAR_MAP.get(char, char).lower():
+                chars.append(piece)
+                index_map.append(i)
+            i += 1
+        return "".join(chars), index_map
+
+    def _layout_tolerant_quote_search(self, quote: str, fulltext: str) -> Tuple[int, int]:
+        """Match a quote ignoring line breaks, soft hyphens, split words, ligatures, quote marks and case."""
+
+        needle = self._layout_normalized(quote)[0].strip()
+        if needle == "":
+            return -1, -1
+        haystack, index_map = self._layout_normalized(fulltext)
+        start = haystack.find(needle)
+        if start < 0:
+            return -1, -1
+        return index_map[start], index_map[start + len(needle) - 1] + 1
+
+    def _quote_not_matched_message(self, fid: int) -> str:
+        """Explain a failed quote match so the agent can correct the quote by itself."""
+
+        message = (
+            "quote could not be matched in the document text. Copy the words exactly as they appear in "
+            f"qualcoder://documents/text/{fid} without paraphrasing, shortening or using ellipses. "
+            "Line breaks, split words and quote marks may differ."
+        )
+        reason = getattr(self, "_approximate_search_error", "")
+        if reason != "":
+            message += f" Approximate matching is unavailable in this QualCoder ({reason})."
+        return message
 
     def _exact_quote_positions(self, quote: str, fulltext: str) -> List[int]:
         """Return every exact start position for a quote, including overlapping matches."""
