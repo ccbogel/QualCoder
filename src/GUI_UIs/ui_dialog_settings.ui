@@ -792,6 +792,24 @@ This is an experimental feature. Use it with care.</string>
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_mcp_claude_desktop">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>Create the file that installs QualCoder as an extension in Claude Desktop.
+Open the saved .mcpb file with Claude Desktop to install it.
+External MCP access must be allowed and a project must be open while Claude works with QualCoder.</string>
+               </property>
+               <property name="text">
+                <string>Claude Desktop extension...</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
