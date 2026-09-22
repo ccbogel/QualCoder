@@ -43,7 +43,7 @@ from .ai_runtime import ai_runtime_ready, show_ai_runtime_not_ready
 from .coder_names import DialogCoderNames
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
-from .helpers import ExportDirectoryPathDialog, get_default_user_directory, Message
+from .helpers import get_default_user_directory, Message
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -278,7 +278,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
         self.load_external_mcp_setting()
         self.ui.checkBox_MCP_enable.toggled.connect(self.external_mcp_toggled)
-        self.ui.pushButton_mcp_claude_desktop.clicked.connect(self.export_claude_desktop_extension)
         self.ui.comboBox_reasoning.addItems(['default', 'low', 'medium', 'high'])
         self.ui.comboBox_ai_profile.clear()
         self.load_ai_profiles()
@@ -375,27 +374,6 @@ class DialogSettings(QtWidgets.QDialog):
                 return
             self.settings['external_mcp_notice_acknowledged'] = 'True'
         self.settings['mcp_external_enabled'] = 'True'
-
-    def export_claude_desktop_extension(self) -> None:
-        """Save the Claude Desktop extension file."""
-
-        from .external_mcp_bundle import build_claude_desktop_bundle  # Only needed on click
-
-        title = _('Claude Desktop extension')
-        export_path = ExportDirectoryPathDialog(self.app, 'QualCoder.mcpb').filepath
-        if export_path is None:
-            return
-        try:
-            build_claude_desktop_bundle(self.app, export_path)
-        except Exception as err:
-            logger.exception('Could not create the Claude Desktop extension')
-            Message(self.app, title, _('The file could not be created: ') + str(err), 'warning').exec()
-            return
-        message = _('Extension saved: ') + export_path + '\n\n' + _(
-            'To install it, open this file with Claude Desktop, or drag it into Settings > Extensions. '
-            'While Claude works with QualCoder, keep QualCoder open and external MCP access allowed.'
-        )
-        Message(self.app, title, message).exec()
 
     def load_ai_permissions(self):
         ai_permissions = self.settings.get('ai_permissions', 1)
