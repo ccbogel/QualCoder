@@ -22,17 +22,209 @@ https://qualcoder.org/
 """
 
 from copy import copy
+import csv
+import datetime
 import html
 import logging
 import os
 from pathlib import Path
+from random import randint
+import re
+import sqlite3
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .color_selector import colors
 from .helpers import ExportDirectoryPathDialog, Message
 
 path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
+
+# Plain text codebook format, shared by every importer and exporter:
+#   category>>category>>code[TAB]memo      >> = the segment before is a category
+#   code>>>subcode>>>subcode[TAB]memo      >>> = the segment before is a code
+#   category>>code>>>subcode               mixed paths are allowed
+# The last segment is always a code. A category cannot hang under a code.
+CAT_SEP = ">>"
+CODE_SEP = ">>>"
+_SEP_RE = re.compile(r"(>{3,}|>>)")
+
+
+def parse_codebook_path(path_text):
+    """ Split a codebook path into [(name, kind), ...], kind is 'cat' or 'code'.
+    Returns [] for an empty path. A >> after a code is read as >>> (no category under a code). """
+
+    tokens = _SEP_RE.split(path_text.strip())
+    seps = tokens[1::2] + [None]
+    items = [(n.strip(), sep) for n, sep in zip(tokens[0::2], seps) if n.strip()]
+    result = []
+    under_code = False
+    for i, (name, sep) in enumerate(items):
+        if i == len(items) - 1:
+            kind = "code"
+        else:
+            kind = "code" if (under_code or sep.startswith(CODE_SEP)) else "cat"
+        if kind == "code":
+            under_code = True
+        result.append((name, kind))
+    return result
+
+
+def read_codebook_rows(filepath):
+    """ Read a .txt (tab separated) or .csv codebook file as [(path, memo), ...].
+    In .txt, the memo follows a tab; two or more spaces also work as separator. """
+
+    rows = []
+    with open(filepath, 'r', encoding='utf-8-sig') as file_:
+        if filepath.lower().endswith('.csv'):
+            for row in csv.reader(file_):
+                if not row or not row[0].strip():
+                    continue
+                memo = row[1].strip().strip('"') if len(row) > 1 else ""
+                rows.append((row[0].strip(), memo))
+            return rows
+        for line in file_:
+            line = line.rstrip('\n\r')
+            if not line.strip():
+                continue
+            parts = line.split('\t', 1)
+            if len(parts) == 1:
+                # two or more spaces also split path and memo, unless they pad a separator
+                parts = re.split(r"(?<![>\s])\s{2,}(?![\s>])", line.strip(), maxsplit=1)
+            memo = parts[1].strip().strip('"').replace('\t', ' ') if len(parts) > 1 else ""
+            if parts[0].strip():
+                rows.append((parts[0].strip(), memo))
+    return rows
+
+
+def build_codebook_path(code, codes, categories):
+    """ Path string for a code dict: categories joined with >>, parent codes with >>>.
+    codes and categories are the lists from app.get_codes_categories(). """
+
+    by_cid = {c['cid']: c for c in codes}
+    by_catid = {c['catid']: c for c in categories}
+    code_chain = [code['name']]
+    node = code
+    guard = 0
+    while node.get('supercid') is not None and guard < 1000:
+        node = by_cid.get(node['supercid'])
+        if node is None:
+            break
+        code_chain.insert(0, node['name'])
+        guard += 1
+    cat_chain = []
+    catid = node['catid'] if node is not None else None
+    guard = 0
+    while catid is not None and guard < 1000:
+        cat = by_catid.get(catid)
+        if cat is None:
+            break
+        cat_chain.insert(0, cat['name'])
+        catid = cat['supercatid']
+        guard += 1
+    text = CODE_SEP.join(code_chain)
+    if cat_chain:
+        text = CAT_SEP.join(cat_chain) + CAT_SEP + text
+    return text
+
+
+class ImportPlainTextCodes:
+    """ Import a plain text (.txt or .csv) codebook into the open project.
+    See the format notes at the top of this module. Existing names are reused so
+    later rows can nest under them; duplicate codes are reported and skipped. """
+
+    def __init__(self, app, text_edit):
+        self.app = app
+        self.text_edit = text_edit
+        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select plain text codes file'),
+                                                          self.app.settings['directory'], "Text (*.txt *.csv)",
+                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                          )
+        filepath = response[0]
+        if not filepath:
+            self.text_edit.append(_("Codes list text file not imported"))
+            return
+        filepath = filepath[0]  # List to string of file path
+        self.text_edit.append("\n" + _("Importing codes from: ") + filepath)
+        try:
+            rows = read_codebook_rows(filepath)
+        except Exception as e_:
+            logger.error(f"Codebook read failed: {e_}")
+            Message(self.app, _("Import error"), str(e_), "warning").exec()
+            return
+        self.cur = self.app.conn.cursor()
+        self.imported_tables = set()  # only tables that really got a row
+        for path_text, memo in rows:
+            self.import_row(path_text, memo)
+        # One event for the whole import, not one per row
+        if self.imported_tables:
+            self._emit_project_table_changes(sorted(self.imported_tables))
+
+    def import_row(self, path_text, memo):
+        """ Insert the categories, parent codes and the final code of one row. """
+
+        segments = parse_codebook_path(path_text)
+        if not segments:
+            return
+        parent_catid = None
+        parent_cid = None
+        for name, kind in segments[:-1]:
+            if kind == "cat":
+                parent_catid = self.get_or_create_category(name, parent_catid)
+            else:
+                parent_cid = self.get_or_create_code(name, "", parent_catid, parent_cid, is_parent=True)
+                parent_catid = None
+        name = segments[-1][0]
+        self.get_or_create_code(name, memo, parent_catid, parent_cid)
+
+    def get_or_create_category(self, name, supercatid):
+        """ Return catid for name, inserting the category if absent. """
+
+        self.cur.execute("select catid from code_cat where name=?", [name])
+        res = self.cur.fetchone()
+        if res:
+            return res[0]
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            self.cur.execute("insert into code_cat (name,memo,owner,date,supercatid) values(?,?,?,?,?)",
+                             (name, "", self.app.settings['codername'], now_date, supercatid))
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            return None
+        self.imported_tables.add('code_cat')
+        self.text_edit.append(_("Imported category: ") + name)
+        return self.cur.lastrowid
+
+    def get_or_create_code(self, name, memo, catid, supercid, is_parent=False):
+        """ Return cid for name, inserting the code if absent.
+        catid and supercid are mutually exclusive: a sub-code only keeps supercid. """
+
+        self.cur.execute("select cid from code_name where name=?", [name])
+        res = self.cur.fetchone()
+        if res:
+            if not is_parent:
+                self.text_edit.append(_("Duplicate code not imported: ") + name)
+            return res[0]
+        if supercid is not None:
+            catid = None
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        color = colors[randint(0, len(colors) - 1)]
+        try:
+            self.cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,?,?,?,?,?)",
+                             (name, memo, self.app.settings['codername'], now_date, catid, color, supercid))
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            self.text_edit.append(_("Duplicate code not imported: ") + name)
+            return None
+        self.imported_tables.add('code_name')
+        self.text_edit.append(_("Imported code: ") + name)
+        return self.cur.lastrowid
+
+    def _emit_project_table_changes(self, tables):
+        """ Notify other open dialogs about changed project tables. """
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
 
 class Codebook:
@@ -237,49 +429,21 @@ class Codebook:
         self.parent_textEdit.append(_("Codebook exported to ") + filepath)
 
     def export_plaintext(self):
-        """ Export codes to a plain text file, filename will have .txt ending. 
-        OLD method not used. """
+        """ Export the codebook as an importable plain text file (codebook.txt).
+        One code per line: category>>code>>>subcode[TAB]memo. Not called by the menu. """
 
         filename = "codebook.txt"
-        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-                                                               _("Select directory to save file"),
-                                                               self.app.settings['directory'], options)
-        if directory == "":
+        exp_path = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_path.filepath
+        if filepath is None:
             return
-        filepath = Path(directory) / filename
-        data = f"{_('Codebook for')} {self.app.project_name}\n========"
-        it = QtWidgets.QTreeWidgetItemIterator(self.tree)
-        item = it.value()
-        while item:
-            self.depthgauge(item)
-            cat = False
-            if item.text(1).split(':')[0] == "catid":
-                cat = True
-            id_ = int(item.text(1).split(':')[1])
-            memo = ""
-            owner = ""
-            prefix = ""
-            for i in range(0, self.depthgauge(item)):
-                prefix += "--"
-            if cat:
-                data += f"\n{prefix}{_('Category:')}{item.text(0)}, {item.text(1)}"
-                for i in self.categories:
-                    if i['catid'] == id_:
-                        memo = i['memo']
-                        owner = i['owner']
-            else:
-                data += f"\n{prefix}{_('Code:')} {item.text(0)}, {item.text(1)}"
-                data += f", Frq: {item.text(3)}"
-                for i in self.code_names:
-                    if i['cid'] == id_:
-                        memo = i['memo']
-                        owner = i['owner']
-            data += f", Owner: {owner}\n{prefix}Memo: {memo}"
-            it += 1
-            item = it.value()
+        lines = []
+        for code in self.code_names:
+            memo = str(code.get('memo', '')).replace('\n', ' ').strip() if self.memos else ""
+            lines.append(build_codebook_path(code, self.code_names, self.categories) + "\t" + memo)
+        lines.sort()
         with open(filepath, 'w', encoding='utf-8') as file_:
-            file_.write(data)
+            file_.write("\n".join(lines))
         Message(self.app, _('Codebook exported'), f"Codebook exported:\n{filepath}").exec()
         self.parent_textEdit.append(_("Codebook exported to ") + filepath)
 

@@ -32,13 +32,11 @@ Get start and end marks - used to automatically assign to selected case or a cod
 Code in text - View the coded text in context of the original file
 Code in A/V - View the coded A/V and text in context of the original file
 Code in image - View the coded image in context of the original file
-Import plain text codes - import from codebook file
 Markdown highlighter
 Number bar - display line numbers alongside text content
 Code resize handles for text coding
 """
 
-import csv
 import datetime
 import pymupdf
 from io import BytesIO
@@ -46,12 +44,10 @@ import logging
 from pathlib import Path
 from PIL import Image, ImageOps, ImageFilter
 import platform
-from random import randint
-import sqlite3
 
 from PyQt6 import QtCore, QtGui, QtWidgets, sip  # sip: detect deleted C++ objects in deferred callbacks
 
-from .color_selector import TextColor, colors
+from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
@@ -1134,103 +1130,6 @@ class DialogCodeInImage(QtWidgets.QDialog):
         image.setText("Description", self.data['codename'])
         image.save(filepath)
         Message(self.app, _("Image exported"), filepath).exec()
-
-
-class ImportPlainTextCodes:
-    """ Import a list of plain text codes codebook.
-        The codebook is a plain text file or csv file.
-        In plain text file, Tab separates the codename from the code description.
-        The >> symbol is used to assign code to category:
-        category>>code
-        category>>category>>code
-        code
-            """
-
-    def __init__(self, app, text_edit):
-        self.app = app
-        self.text_edit = text_edit
-        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select plain text codes file'),
-                                                          self.app.settings['directory'], "Text (*.txt *.csv)",
-                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                                          )
-        filepath = response[0]
-        if not filepath:
-            self.text_edit.append(_("Codes list text file not imported"))
-            return
-        filepath = filepath[0]  # List to string of file path
-        self.text_edit.append("\n" + _("Importing codes from: ") + filepath)
-        with open(filepath, 'r', encoding='UTF-8-sig') as file_:
-            rows = []
-            if filepath[-4:].lower() == ".csv":
-                reader = csv.reader(file_, delimiter=",", quoting=csv.QUOTE_MINIMAL)
-                for row in reader:
-                    rows.append(row)
-            else:
-                reader = csv.reader(file_, delimiter="\t", quoting=csv.QUOTE_MINIMAL)
-                for row in reader:
-                    if row:
-                        rows.append(row)
-        cur = self.app.conn.cursor()
-        imported_tables = set()  # only tables that really got a row
-        # Insert categories
-        for row in rows:
-            categories = row[0].split(">>")
-            if len(categories) < 2 or categories[0] == "":
-                continue
-            categories.pop()  # Remove code name
-            for i, category in enumerate(categories):
-                supercatid = None
-                if i >= 1:
-                    cur.execute("select catid from code_cat where name=?", [categories[i - 1].strip()])
-                    res = cur.fetchone()
-                    if res:
-                        supercatid = res[0]
-                try:
-                    cur.execute("insert into code_cat (name,memo,owner,date,supercatid) values(?,?,?,?,?)",
-                                (category.strip(), "", self.app.settings['codername'],
-                                 datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), supercatid))
-                    self.app.conn.commit()
-                    imported_tables.add('code_cat')
-                    self.text_edit.append(_("Imported category: ") + category)
-                except sqlite3.IntegrityError:
-                    pass
-        # Insert codes
-        for row in rows:
-            memo = ""
-            if len(row) > 1:
-                memo = row[1]
-            code_name = row[0].strip()  # only code name
-            category_name = None
-            if ">>" in code_name:
-                code_name = row[0].split(">>")[-1].strip()
-                category_name = row[0].split(">>")[-2].strip()
-            if code_name == "":
-                continue
-            catid = None
-            if category_name:
-                cur.execute("select catid from code_cat where name=?", [category_name])
-                res = cur.fetchone()
-                if res:
-                    catid = res[0]
-            date_ = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-            color = colors[randint(0, len(colors) - 1)]
-            try:
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                            (code_name, memo, self.app.settings['codername'], date_, catid, color))
-                self.app.conn.commit()
-                imported_tables.add('code_name')
-                self.text_edit.append(_("Imported code: ") + code_name)
-            except sqlite3.IntegrityError:
-                self.text_edit.append(_("Duplicate code not imported: ") + code_name)
-        # One event for the whole import, not one per row
-        if imported_tables:
-            self._emit_project_table_changes(sorted(imported_tables))
-    def _emit_project_table_changes(self, tables):
-        """Notify other open dialogs about changed project tables."""
-
-        if getattr(self.app, "project_events", None) is not None:
-            self.app.project_events.emit_table_changes(tables, source=self)
-
 
 
 class MarkdownHighlighter(QtGui.QSyntaxHighlighter):

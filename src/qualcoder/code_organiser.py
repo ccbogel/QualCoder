@@ -20,7 +20,6 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
 https://qualcoder.org/
 """
-import csv  # codebook import
 import logging  # was missing; apply/transaction paths log debug and errors
 import math  # perimeter line geometry
 import sqlite3
@@ -36,6 +35,7 @@ from PyQt6.QtWidgets import QDialog
 
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
+from .codebook import parse_codebook_path, read_codebook_rows
 from .color_selector import TextColor, colors as valid_colors
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
@@ -1052,10 +1052,9 @@ class CodeOrganiser(QDialog):
                     if n:
                         names.add(n.strip())
         else:
-            for path_part, _memo in self._read_path_rows(filepath):
-                for seg in path_part.split('>>'):
-                    if seg.strip():
-                        names.add(seg.strip())
+            for path_part, _memo in read_codebook_rows(filepath):
+                for name, _kind in parse_codebook_path(path_part):
+                    names.add(name)
         return names
 
     def _suffixed_name(self, base):
@@ -1213,30 +1212,49 @@ class CodeOrganiser(QDialog):
                 parse_code_element(el, None, None)
 
     def _parse_path_rows(self, rows, stats, policy='reuse'):
-        """ Shared TXT/CSV engine with refi.py-style reuse. Each row:
-        (path, memo); path uses Category>>SubCategory>>Code; no >> means a free code.
-        Existing category names anchor nesting via their real id; existing code
-        names are skipped (reused), never duplicated. """
+        """ Shared TXT/CSV engine with refi.py-style reuse. Each row is (path, memo);
+        path uses Category>>SubCategory>>Code>>>SubCode (see codebook.py); no separator
+        means a free code. Existing category and code names anchor nesting via their
+        real id; an existing final code is skipped (reused), never duplicated. """
 
         global model  # noqa: F824
         for path_part, memo in rows:
-            segments = [s.strip() for s in path_part.split('>>') if s.strip()]
+            segments = parse_codebook_path(path_part)
             if not segments:
                 continue
             parent_catid = None
-            for i in range(len(segments) - 1):
-                cat_name = segments[i]
-                catid = self._find_existing_category(cat_name)
-                if catid is not None and policy == 'copy':  # import as copy
-                    cat_name = self._suffixed_name(cat_name)
-                    catid = None
-                if catid is None:
-                    new_cat = self._new_category_entry(cat_name, '', parent_catid)
-                    model.append(new_cat)
-                    catid = new_cat['catid']
-                    stats['cats'] += 1
-                parent_catid = catid
-            code_name = segments[-1]
+            parent_cid = None
+            for name, kind in segments[:-1]:
+                if kind == "cat":
+                    catid = self._find_existing_category(name)
+                    if catid is not None and policy == 'copy':  # import as copy
+                        name = self._suffixed_name(name)
+                        catid = None
+                    if catid is None:
+                        new_cat = self._new_category_entry(name, '', parent_catid)
+                        model.append(new_cat)
+                        catid = new_cat['catid']
+                        stats['cats'] += 1
+                    parent_catid = catid
+                    continue
+                # parent code: reused if present, otherwise created without memo
+                cid = self._find_existing_code(name)
+                if cid is not None and policy == 'copy':  # import as copy
+                    name = self._suffixed_name(name)
+                    cid = None
+                if cid is None:
+                    new_code = self._new_code_entry(
+                        self._code_display_name(name), '',
+                        catid=parent_catid if parent_cid is None else None,
+                        supercid=parent_cid, x=None, y=None)
+                    model.append(new_code)
+                    cid = new_code['cid']
+                    stats['codes'] += 1
+                else:
+                    stats['reused'] += 1
+                parent_cid = cid
+                parent_catid = None
+            code_name = segments[-1][0]
             if self._find_existing_code(code_name) is not None:
                 if policy != 'copy':
                     stats['reused'] += 1
@@ -1245,43 +1263,20 @@ class CodeOrganiser(QDialog):
             display_name = self._code_display_name(code_name)
             new_code = self._new_code_entry(
                 display_name, memo,
-                catid=parent_catid if len(segments) > 1 else None, x=None, y=None)
+                catid=parent_catid if parent_cid is None else None,
+                supercid=parent_cid, x=None, y=None)
             model.append(new_code)
             stats['codes'] += 1
 
-    def _read_path_rows(self, filepath):
-        """ Read TXT/CSV codebook rows as (path, memo) pairs; shared by the
-        collision pre-check and the importer. """
-
-        rows = []
-        if filepath.lower().endswith('.txt'):
-            with open(filepath, 'r', encoding='utf-8-sig') as f:
-                for line in f.readlines():
-                    line = line.rstrip('\n\r')
-                    if not line.strip():
-                        continue
-                    parts = line.split('\t', 1)
-                    memo = parts[1].strip().strip('"') if len(parts) > 1 else ""
-                    if parts[0].strip():
-                        rows.append((parts[0].strip(), memo))
-        else:
-            with open(filepath, 'r', encoding='utf-8-sig') as f:
-                for row in csv.reader(f):
-                    if not row or not row[0].strip():
-                        continue
-                    memo = row[1].strip().strip('"') if len(row) > 1 else ""
-                    rows.append((row[0].strip(), memo))
-        return rows
-
     def _import_txt_codebook(self, filepath, stats, policy='reuse'):
-        """ QualCoder plain-text codebook: Category>>Code[TAB]"Memo" per line. """
+        """ Plain-text codebook: Category>>Code>>>SubCode[TAB]"Memo" per line. """
 
-        self._parse_path_rows(self._read_path_rows(filepath), stats, policy)
+        self._parse_path_rows(read_codebook_rows(filepath), stats, policy)
 
     def _import_csv_codebook(self, filepath, stats, policy='reuse'):
-        """ CSV codebook: column 1 = Category>>Code path, column 2 = memo. """
+        """ CSV codebook: column 1 = Category>>Code>>>SubCode path, column 2 = memo. """
 
-        self._parse_path_rows(self._read_path_rows(filepath), stats, policy)
+        self._parse_path_rows(read_codebook_rows(filepath), stats, policy)
 
     def apply_frequency_labels(self):
         """ Show or hide coding-frequency suffixes "[n]" on every node.
@@ -1401,6 +1396,13 @@ class CodeOrganiser(QDialog):
         for it in hidden_handles:  # restore the handle on the still-selected node
             it.setVisible(True)
         Message(self.app, _("Image exported"), filepath).exec()
+
+    def has_unsaved_changes(self):
+        """ True if there are pending operations not yet applied. """
+
+        if getattr(self, '_changes_applied', False):
+            return False
+        return bool(self.build_pending_changes())
 
     def build_pending_changes(self):
         """ Derive the list of pending operations by comparing the current
@@ -1715,6 +1717,7 @@ class CodeOrganiser(QDialog):
             self._emit_project_table_changes(tables)
 
         # Wrap up
+        self._changes_applied = True
         self.app.delete_backup = False
         self.parent_text_edit.append(_("Code tree re-organised."))
         self.hide()
