@@ -74,11 +74,11 @@ from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_organiser import CodeOrganiser
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
-from qualcoder.codebook import Codebook
+from qualcoder.codebook import Codebook, ImportPlainTextCodes
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import get_default_user_directory, Message, ImportPlainTextCodes
+from qualcoder.helpers import get_default_user_directory, Message
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.information import manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
@@ -1384,10 +1384,8 @@ Click "Yes" to start now.')
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def import_plain_text_codes(self):
-        """ Import a list of plain text codes codebook.
-        The codebook is a plain text file or csv file.
-        In plain text file, Tab separates the codename from the code description.
-        The >> symbol is used to assign code to category:  code>>category
+        """ Import a plain text or csv codebook. Tab separates the code path from its memo.
+        category>>code assigns a code to a category, code>>>subcode nests a code under a code.
         """
 
         ImportPlainTextCodes(self.app, self.ui.textEdit)
