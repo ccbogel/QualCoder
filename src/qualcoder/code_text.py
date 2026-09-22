@@ -52,6 +52,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH, MINIMUM_CODING_MARGIN_WIDTH,
                                       MINIMUM_CODING_MARGIN_LABEL_WIDTH)
 from .code_tree import CodeTreeController
+from .codebook import build_codebook_path
 from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
@@ -3791,7 +3792,7 @@ class DialogCodeText(QtWidgets.QWidget):
     # Export a codebook text file
     def export_codebook(self):
         """ Export a codebook text file with only codes used in the current file.
-        Format: Category>>CodeName[TAB]Memo """
+        Format: Category>>SubCategory>>Code>>>SubCode[TAB]Memo (importable). """
 
         if self.file_ is None:
             return
@@ -3806,14 +3807,9 @@ class DialogCodeText(QtWidgets.QWidget):
         for cid in used_cids:
             for code in self.codes:
                 if code['cid'] == cid:
-                    cat_path = ""
-                    if code['catid'] is not None:
-                        for cat in self.categories:
-                            if cat['catid'] == code['catid']:
-                                cat_path = cat['name'] + " >> "
-                                break
                     memo = str(code.get('memo', '')).replace('\n', ' ').strip()
-                    lines.append(f"{cat_path}{code['name']}\t{memo}")
+                    code_path = build_codebook_path(code, self.codes, self.categories)
+                    lines.append(f"{code_path}\t{memo}")
                     break
         lines.sort()
         text_content = "\n".join(lines)
