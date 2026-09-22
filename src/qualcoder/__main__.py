@@ -3355,4 +3355,8 @@ def install_noto_sans():
 if __name__ == "__main__":
     # Pyinstaller fix
     multiprocessing.freeze_support()
+    if "--mcp-stdio" in sys.argv[1:]:
+        # Headless stdio bridge to a running QualCoder, no GUI; e.g. qualcoder --mcp-stdio --port 47363
+        from qualcoder.mcp_stdio import main as mcp_stdio_main
+        sys.exit(mcp_stdio_main([a for a in sys.argv[1:] if a != "--mcp-stdio"]))
     sys.exit(gui())
