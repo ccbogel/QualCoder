@@ -15,7 +15,7 @@ from typing import Any, Callable
 from PyQt6 import QtCore
 import uvicorn
 
-from .ai_mcp_server import AiMcpExecutionContext, AiMcpServer
+from .ai_mcp_server import AiMcpExecutionContext, AiMcpServer, EXPECTED_TOOL_ERRORS, ProjectDatabaseLockedError
 
 
 logger = logging.getLogger(__name__)
@@ -246,11 +246,15 @@ class ExternalMcpController(QtCore.QObject):
             raise RuntimeError("External MCP is disabled.")
         try:
             return self.mcp_server.run_with_execution_context(execution_context, operation)
-        except sqlite3.OperationalError as err:
-            raise self._explain_database_error(err) from err
+        except ProjectDatabaseLockedError as err:
+            self._report_database_lock(err)
+            raise
+        except EXPECTED_TOOL_ERRORS as err:
+            # The server turns these into isError results; one line in the action log is enough
+            self.status_changed.emit(f"External MCP request rejected: {str(err)[:300]}")
+            raise
         except Exception as err:
-            # Visible in the action log, so a failed external request needs no log hunting
-            self.status_changed.emit(f"External MCP request failed: {str(err)[:300]}")
+            self.status_changed.emit(f"External MCP request failed: {type(err).__name__}: {str(err)[:300]}")
             raise
 
     def _trace_gui_connection(self, enabled: bool) -> None:
@@ -289,27 +293,14 @@ class ExternalMcpController(QtCore.QObject):
             lines.append(f"  {clock} {' '.join(cleaned.split())}")
         return "\n".join(lines)
 
-    def _explain_database_error(self, err: sqlite3.OperationalError) -> Exception:
-        """Turn a database lock into something the external client and the user can act on."""
+    def _report_database_lock(self, err: ProjectDatabaseLockedError) -> None:
+        """Log a persistent lock with the GUI statements that may explain it; the client only gets err."""
 
-        if "locked" not in str(err).lower():
-            return err
-        pending = bool(getattr(self.app.conn, "in_transaction", False))
-        if pending:
-            reason = ("A QualCoder window has changes that are not saved to the project yet. "
-                      "Ask the user to finish or close that window in QualCoder.")
-        else:
-            reason = ("Another QualCoder window is still reading the project database. "
-                      "Ask the user to close open coding, report or graph windows.")
         message = (
-            f"External MCP: nothing written, the project database is locked (unsaved changes in QualCoder: {pending})."
+            "External MCP: nothing written, the project database is locked "
+            f"(unsaved changes in QualCoder: {err.gui_transaction_pending})."
         )
         trail = self._gui_statement_trail()
         if trail != "":
-            # Stays in the local log, the external client never receives it
             message += "\nLast statements of the QualCoder window connection, newest last:\n" + trail
         self.status_changed.emit(message)
-        return RuntimeError(
-            f"The project database stayed locked and nothing was written. {reason} "
-            "Do not retry until the user confirms."
-        )
