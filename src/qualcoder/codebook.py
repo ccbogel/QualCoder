@@ -54,18 +54,16 @@ def parse_codebook_path(path_text):
     """ Split a codebook path into [(name, kind), ...], kind is 'cat' or 'code'.
     Returns [] for an empty path. A >> after a code is read as >>> (no category under a code). """
 
-    tokens = [t.strip() for t in _SEP_RE.split(path_text.strip())]
-    names = tokens[0::2]
-    seps = tokens[1::2]
+    tokens = _SEP_RE.split(path_text.strip())
+    seps = tokens[1::2] + [None]
+    items = [(n.strip(), sep) for n, sep in zip(tokens[0::2], seps) if n.strip()]
     result = []
     under_code = False
-    for i, name in enumerate(names):
-        if name == "":
-            continue
-        if i == len(names) - 1:
+    for i, (name, sep) in enumerate(items):
+        if i == len(items) - 1:
             kind = "code"
         else:
-            kind = "code" if (under_code or seps[i].startswith(CODE_SEP)) else "cat"
+            kind = "code" if (under_code or sep.startswith(CODE_SEP)) else "cat"
         if kind == "code":
             under_code = True
         result.append((name, kind))
@@ -91,8 +89,9 @@ def read_codebook_rows(filepath):
                 continue
             parts = line.split('\t', 1)
             if len(parts) == 1:
-                parts = re.split(r"\s{2,}", line.strip(), maxsplit=1)
-            memo = parts[1].strip().strip('"') if len(parts) > 1 else ""
+                # two or more spaces also split path and memo, unless they pad a separator
+                parts = re.split(r"(?<![>\s])\s{2,}(?![\s>])", line.strip(), maxsplit=1)
+            memo = parts[1].strip().strip('"').replace('\t', ' ') if len(parts) > 1 else ""
             if parts[0].strip():
                 rows.append((parts[0].strip(), memo))
     return rows
