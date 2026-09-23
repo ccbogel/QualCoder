@@ -77,6 +77,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_transpose.setIcon(qta.icon('mdi6.rotate-right', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_transpose.pressed.connect(self.transpose_data)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
+        self.ui.checkBox_group_selection.setEnabled(False)
+        self.ui.checkBox_group_selection.stateChanged.connect(self.group_selection_changed)
         self.ui.listWidget.itemPressed.connect(self.show_list_item)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -89,6 +91,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.code_selection_mode = "all"
         self.selected_category_ids = []
         self.files = self.app.get_text_filenames()
+        self.columns = []  # Table columns: one per file, or one per group when summing
         self.attributes = []
         self._load_attributes()
 
@@ -218,7 +221,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             cur.execute(sql, [attribute['true_name']])
             res = cur.fetchall()
             for r in res:
-                self.files.append({'id': r[0], 'name': f"{attribute['true_name']}: {r[3]}\nCase: {r[2]}\n{r[1]}", 'memo': ""})
+                group = f"{attribute['true_name']}: {r[3]}"
+                self.files.append({'id': r[0], 'name': f"{group}\nCase: {r[2]}\n{r[1]}", 'memo': "", 'group': group})
 
         if attribute['caseOrFile'] == 'case' and attribute['valuetype'] == 'numeric':
             sql = "select fid, source.name, cases.name, cast(value as real) from attribute " \
@@ -237,7 +241,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     attr_split_msg += f"= {split_value}"
                 else:
                     attr_split_msg += f"> {split_value}"
-                self.files.append({'id': r[0], 'name': f"{attr_split_msg}\nCase: {r[2]}\n{r[1]}", 'memo': ""})
+                self.files.append({'id': r[0], 'name': f"{attr_split_msg}\nCase: {r[2]}\n{r[1]}", 'memo': "",
+                                   'group': attr_split_msg})
 
         if attribute['caseOrFile'] == 'file' and attribute['valuetype'] == 'character':
             sql = "select source.id, source.name, value from attribute " \
@@ -247,7 +252,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             cur.execute(sql, [attribute['true_name']])
             res = cur.fetchall()
             for r in res:
-                self.files.append({'id': r[0], 'name': f"{attribute['true_name']}: {r[2]}\n{r[1]}", 'memo': ""})
+                group = f"{attribute['true_name']}: {r[2]}"
+                self.files.append({'id': r[0], 'name': f"{group}\n{r[1]}", 'memo': "", 'group': group})
 
         if attribute['caseOrFile'] == 'file' and attribute['valuetype'] == 'numeric':
             sql = "select source.id, source.name, cast(value as real) from attribute " \
@@ -264,7 +270,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     attr_split_msg += f"= {split_value}"
                 else:
                     attr_split_msg += f"> {split_value}"
-                self.files.append({'id': r[0], 'name': f"{attr_split_msg}\n{r[1]}", 'memo': ""})
+                self.files.append({'id': r[0], 'name': f"{attr_split_msg}\n{r[1]}", 'memo': "", 'group': attr_split_msg})
 
         if not self.files:
             self.clear_table_and_data()
@@ -324,6 +330,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
         self.ui.checkBox_hide_blanks.setChecked(False)
         self.ui.splitter.setSizes([500, 0])
+        self.transposed = False
+        self.build_columns()
 
         # Create data matrices zeroed, codes are ordered alphabetically by name
         self.data_counts = []
@@ -331,64 +339,20 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_colors = []
         self.data = []
         for row in self.codes:
-            self.data_counts.append([0] * len(self.files))
-            self.data_colors.append([""] * len(self.files))
-            self.data.append(["."] * len(self.files))
+            self.data_counts.append([0] * len(self.columns))
+            self.data_colors.append([""] * len(self.columns))
+            self.data.append(["."] * len(self.columns))
 
-        cur = self.app.conn.cursor()
         for row, code_ in enumerate(self.codes):
-            for col, file_ in enumerate(self.files):
-                # Text results
-                sql = "select source.id,source.name, code_text.cid, code_name.name, code_name.color, pos0, pos1," \
-                      "ctid,seltext, ifnull(code_text.memo,''), " \
-                      "code_text.owner, 'file', 'text' from code_text " \
-                      "join code_name on code_name.cid=code_text.cid " \
-                      "join source on code_text.fid=source.id " \
-                      "where code_text.fid=? and code_text.cid=? order by code_text.ctid"
-                cur.execute(sql, [file_['id'], code_['cid']])
-                results_text = cur.fetchall()
-                keys_text = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'pos0', 'pos1', 'ctid', 'text', \
-                    'memo', 'owner', 'file_or_case', 'result_type'
-                text_data = []
-                for res in results_text:
-                    text_data.append(dict(zip(keys_text, res)))
-
-                # Image results
-                sql = "select source.id,source.name, code_image.cid, code_name.name, code_name.color, x1,y1," \
-                      "width,height, ifnull(code_image.memo,''), " \
-                      "code_image.owner, mediapath, 'file', 'image', pdf_page from code_image " \
-                      "join code_name on code_name.cid=code_image.cid " \
-                      "join source on code_image.id=source.id " \
-                      "where code_image.id=? and code_image.cid=? order by code_image.imid"
-                cur.execute(sql, [file_['id'], code_['cid']])
-                results_image = cur.fetchall()
-                keys_image = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'x1', 'y1', 'width', 'height', \
-                    'memo', 'owner', 'mediapath', 'file_or_case', 'result_type', 'pdf_page'
-                image_data = []
-                for res in results_image:
-                    image_data.append(dict(zip(keys_image, res)))
-
-                # Audio /video results
-                sql = "select source.id,source.name, code_av.cid, code_name.name, code_name.color, pos0,pos1, " \
-                      "ifnull(code_av.memo,''), " \
-                      "code_av.owner, mediapath, 'file', 'av' from code_av " \
-                      "join code_name on code_name.cid=code_av.cid " \
-                      "join source on code_av.id=source.id " \
-                      "where code_av.id=? and code_av.cid=? order by code_av.avid"
-                cur.execute(sql, [file_['id'], code_['cid']])
-                results_av = cur.fetchall()
-                keys_av = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'pos0', 'pos1', \
-                    'memo', 'owner', 'mediapath', 'file_or_case', 'result_type'
-                av_data = []
-                for res in results_av:
-                    av_data.append(dict(zip(keys_av, res)))
-
-                result_length = len(results_text) + len(results_image) + len(results_av)
+            for col, column in enumerate(self.columns):
+                cell_data = []
+                for fid in column['ids']:
+                    cell_data += self.get_codings(fid, code_['cid'])
+                result_length = len(cell_data)
                 if result_length > self.max_count:
                     self.max_count = result_length
                 self.data_counts[row][col] = result_length
-
-                self.data[row][col] = text_data + image_data + av_data
+                self.data[row][col] = cell_data
 
         # Color heat map for spread across 5 colours
         colors = self.colours[self.color_choice]
@@ -400,6 +364,83 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
+
+    def build_columns(self):
+        """ Set self.columns from self.files.
+        One column per file, or one column per group (case or attribute value)
+        when the group selection checkbox is checked. """
+
+        groupable = bool(self.files) and all('group' in f for f in self.files)
+        self.ui.checkBox_group_selection.setEnabled(groupable)
+        if not groupable:
+            self.ui.checkBox_group_selection.blockSignals(True)
+            self.ui.checkBox_group_selection.setChecked(False)
+            self.ui.checkBox_group_selection.blockSignals(False)
+        if not groupable or not self.ui.checkBox_group_selection.isChecked():
+            self.columns = [{'name': f['name'], 'ids': [f['id']]} for f in self.files]
+            return
+        groups = {}
+        for f in self.files:
+            groups.setdefault(f['group'], []).append(f['id'])
+        self.columns = []
+        for group_name, ids in groups.items():
+            files_label = _("files") if len(ids) != 1 else _("file")
+            self.columns.append({'name': f"{group_name}\n({len(ids)} {files_label})", 'ids': ids})
+
+    def group_selection_changed(self):
+        """ Checkbox toggled: recalculate the table if there is something to show. """
+
+        if not self.files or not self.codes:
+            return
+        if not self.data_counts and self.ui.tableWidget.rowCount() == 0:
+            return
+        self.process_files_data()
+
+    def get_codings(self, fid, cid):
+        """ Get text, image and A/V codings of one code in one file.
+
+        Args:
+            fid: Source id
+            cid: Code id
+
+        Returns:
+            list of dictionaries, one per coded segment
+        """
+
+        cur = self.app.conn.cursor()
+        sql = "select source.id,source.name, code_text.cid, code_name.name, code_name.color, pos0, pos1," \
+              "ctid,seltext, ifnull(code_text.memo,''), " \
+              "code_text.owner, 'file', 'text' from code_text " \
+              "join code_name on code_name.cid=code_text.cid " \
+              "join source on code_text.fid=source.id " \
+              "where code_text.fid=? and code_text.cid=? order by code_text.ctid"
+        cur.execute(sql, [fid, cid])
+        keys_text = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'pos0', 'pos1', 'ctid', 'text', \
+            'memo', 'owner', 'file_or_case', 'result_type'
+        text_data = [dict(zip(keys_text, res)) for res in cur.fetchall()]
+
+        sql = "select source.id,source.name, code_image.cid, code_name.name, code_name.color, x1,y1," \
+              "width,height, ifnull(code_image.memo,''), " \
+              "code_image.owner, mediapath, 'file', 'image', pdf_page from code_image " \
+              "join code_name on code_name.cid=code_image.cid " \
+              "join source on code_image.id=source.id " \
+              "where code_image.id=? and code_image.cid=? order by code_image.imid"
+        cur.execute(sql, [fid, cid])
+        keys_image = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'x1', 'y1', 'width', 'height', \
+            'memo', 'owner', 'mediapath', 'file_or_case', 'result_type', 'pdf_page'
+        image_data = [dict(zip(keys_image, res)) for res in cur.fetchall()]
+
+        sql = "select source.id,source.name, code_av.cid, code_name.name, code_name.color, pos0,pos1, " \
+              "ifnull(code_av.memo,''), " \
+              "code_av.owner, mediapath, 'file', 'av' from code_av " \
+              "join code_name on code_name.cid=code_av.cid " \
+              "join source on code_av.id=source.id " \
+              "where code_av.id=? and code_av.cid=? order by code_av.avid"
+        cur.execute(sql, [fid, cid])
+        keys_av = 'fid', 'file_or_casename', 'cid', 'codename', 'color', 'pos0', 'pos1', \
+            'memo', 'owner', 'mediapath', 'file_or_case', 'result_type'
+        av_data = [dict(zip(keys_av, res)) for res in cur.fetchall()]
+        return text_data + image_data + av_data
 
     def select_cases(self):
         """ Select cases to display relevant files. """
@@ -425,7 +466,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             cur.execute(sql, [case['id']])
             res = cur.fetchall()
             for r in res:
-                self.files.append({'id': r[0], 'name': f"{case['name']}\n{r[1]}", 'memo': r[2]})
+                self.files.append({'id': r[0], 'name': f"{case['name']}\n{r[1]}", 'memo': r[2], 'group': case['name']})
         msg = f"Selection\nCases: {len(cases)}. Files: {len(self.files)}"
         Message(self.app, _("Selection"), msg).exec()
         if not self.files:
@@ -566,7 +607,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 v_cell2 = ws2.cell(row=row + 2, column=1)
                 v_cell2.value = row_name
             # Column header
-            for col, file_ in enumerate(self.files):
+            for col, file_ in enumerate(self.columns):
                 h_cell = ws.cell(row=1, column=col + 2)
                 h_cell.value = file_['name']
                 h_cell2 = ws2.cell(row=1, column=col + 2)
@@ -575,7 +616,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 ws2.column_dimensions[get_column_letter(col + 1)].width = 20
         else: # Transposed
             # Row header
-            for row, file_ in enumerate(self.files):
+            for row, file_ in enumerate(self.columns):
                 h_cell = ws.cell(row=row + 2, column=1)
                 h_cell.value = file_['name']
                 h_cell2 = ws2.cell(row=row + 2, column=1)
@@ -718,7 +759,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         row_header = []
 
         if not self.transposed:
-            for item in self.files:
+            for item in self.columns:
                 column_header.append(item['name'])
             self.ui.tableWidget.setColumnCount(len(column_header))
             self.ui.tableWidget.setHorizontalHeaderLabels(column_header)
@@ -728,7 +769,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             self.ui.tableWidget.setRowCount(len(row_header))
             self.ui.tableWidget.setVerticalHeaderLabels(row_header)
         else:
-            for item in self.files:
+            for item in self.columns:
                 row_header.append(item['name'])
             self.ui.tableWidget.setRowCount(len(row_header))
             self.ui.tableWidget.setVerticalHeaderLabels(row_header)
@@ -770,9 +811,10 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 if col_sum == 0:
                     self.ui.tableWidget.hideColumn(col)
         if not self.ui.checkBox_hide_blanks.isChecked():
-            for row, row_data in enumerate(self.data_counts):
+            for row in range(len(self.data_counts)):
                 self.ui.tableWidget.showRow(row)
-                self.ui.tableWidget.showColumn(row)
+            for col in range(len(self.data_counts[0])):
+                self.ui.tableWidget.showColumn(col)
 
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
