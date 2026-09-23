@@ -36,6 +36,7 @@ from PyQt6.QtWidgets import QDialog
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .codebook import parse_codebook_path, read_codebook_rows
+from .coding_undo import CODE_TREE_TABLES
 from .color_selector import TextColor, colors as valid_colors
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
@@ -1556,6 +1557,7 @@ class CodeOrganiser(QDialog):
             if item['catid'] is not None and item['catid'] < 0 and item['cid'] is None:
                 new_categories.append(item)
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(_("Apply code organiser changes"), CODE_TREE_TABLES)
         try:
             # Insert new categories, update links to codes and pre-existing categories
             for category in new_categories:
@@ -1702,6 +1704,7 @@ class CodeOrganiser(QDialog):
                          self.app.settings['codername'], now_date])
 
             self.app.conn.commit()  # single transaction commit
+            self.app.coding_undo.end(undo_token)
         except Exception as e_:
             self.app.conn.rollback()  # nothing half-applied
             logger.error(f"Code organiser apply failed, rolled back: {e_}")

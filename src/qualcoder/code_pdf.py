@@ -41,6 +41,7 @@ import webbrowser # For: Open original file
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
+from .coding_undo import undo_label
 from .color_selector import DialogColorSelect
 from .color_selector import TextColor
 from .coder_names import DialogCoderNames  # Coder change as in code_text
@@ -1581,8 +1582,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.margin_side = 'left'
         self.code_text = []   # Text codings of the current file.
         self.code_areas = []  # Area codings (code_image with pdf_page).
-        self.undo_deleted_codes = []
-        self.undo_deleted_areas = []
         self.pages = []           # Word map per page (from the worker)
         self._page_starts = []
         self.text = ""            # Extracted full text (== DB when extracted_ok)
@@ -2800,11 +2799,14 @@ class DialogCodePdf(QtWidgets.QWidget):
                     (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         if cur.fetchall():
             return
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Code"), self._code_name(cid), self.file_['name']), "code_text", coded['fid'])
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important) "
                     "values(?,?,?,?,?,?,?,?,?)",
                     (coded['cid'], coded['fid'], coded['seltext'], coded['pos0'], coded['pos1'],
                      coded['owner'], coded['memo'], coded['date'], coded['important']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_project_table_changes(['code_text'])
         self.app.delete_backup = False
         self._update_recent_codes(cid)
@@ -2830,12 +2832,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                 'owner': self.app.settings['codername'], 'important': None,
                 'pdf_page': int(page_idx)}
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Code area"), self._code_name(cid), self.file_['name']), "code_image", item['id'])
         cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,date,owner,"
                     "important,pdf_page) values(?,?,?,?,?,?,?,?,?,?,?)",
                     (item['id'], item['x1'], item['y1'], item['width'], item['height'],
                      item['cid'], item['memo'], item['date'], item['owner'],
                      item['important'], item['pdf_page']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_project_table_changes(['code_image'])
         self.app.delete_backup = False
         self._update_recent_codes(cid)
@@ -2843,6 +2848,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
         self.fill_code_label()
+
+    def _code_name(self, cid):
+        """ Code name for history labels, empty when unknown. """
+
+        return next((c['name'] for c in self.codes if c['cid'] == cid), "")
 
     def remove_deleted_codes_from_recent(self, cids):
         """ Drop deleted codes from the recent codes list. Called from the
@@ -2993,6 +3003,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         
         cur = self.app.conn.cursor()
         changed = set()
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Coding memo"), None, self.file_['name']), ["code_text", "code_image"], self.file_['id'])
         for entry in selected:
             ref = entry['ref']
             # Memo header by type: text -> positions, area -> page and rect.
@@ -3013,6 +3025,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     cur.execute("update code_image set memo=? where imid=?", (ui.memo, ref['imid']))
                     changed.add('code_image')
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_text_update_eventfilter_tooltips()
         if changed:
             self._emit_project_table_changes(sorted(changed))
@@ -3125,58 +3138,22 @@ class DialogCodePdf(QtWidgets.QWidget):
         
         cur = self.app.conn.cursor()
         changed = set()
-        # Save what is deleted
-        # BEFORE deleting: without this the undo lists stayed empty forever and
-        # "Undo last unmark" never showed in the menu.
-        self.undo_deleted_codes = []
-        self.undo_deleted_areas = []
+        code_name = selected[0]['ref'].get('name') if len(selected) == 1 else None
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Unmark"), code_name, self.file_['name']), ["code_text", "code_image"], self.file_['id'])
         for entry in selected:
             if entry['type'] == 'text':
-                self.undo_deleted_codes.append(dict(entry['ref']))
                 cur.execute("delete from code_text where ctid=?", [entry['ref']['ctid']])
                 changed.add('code_text')
             else:
-                self.undo_deleted_areas.append(dict(entry['ref']))
                 cur.execute("delete from code_image where imid=?", [entry['ref']['imid']])
                 changed.add('code_image')
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         if changed:
             self._emit_project_table_changes(sorted(changed))
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-
-    def undo_last_unmarked_code(self):
-        """        Restores the last deleted codings (text and area).
-        """
-
-        if not self.undo_deleted_codes and not self.undo_deleted_areas:
-            return
-        cur = self.app.conn.cursor()
-        changed = set()
-        for item in self.undo_deleted_codes:
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important) "
-                        "values(?,?,?,?,?,?,?,?,?)",
-                        (item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'],
-                         item['owner'], item['memo'],
-                         datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                         item['important']))
-            changed.add('code_text')
-        for item in self.undo_deleted_areas:
-            cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,date,owner,"
-                        "important,pdf_page) values(?,?,?,?,?,?,?,?,?,?,?)",
-                        (item['id'], item['x1'], item['y1'], item['width'], item['height'],
-                         item['cid'], item['memo'],
-                         datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                         item['owner'], item['important'], item['pdf_page']))
-            changed.add('code_image')
-        self.app.conn.commit()
-        if changed:
-            self._emit_project_table_changes(sorted(changed))
-        self.undo_deleted_codes = []
-        self.undo_deleted_areas = []
-        self.get_coded_text_update_eventfilter_tooltips()
-        self.fill_code_counts_in_tree()
-        self.update_file_tooltip()
 
     def toggle_important(self, texts_here=None, areas_here=None):
         """        Toggles the "important" flag on the selected codings (text or area). Shortcut I.
@@ -3189,6 +3166,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         
         cur = self.app.conn.cursor()
         changed = set()
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Toggle important"), None, self.file_['name']), ["code_text", "code_image"], self.file_['id'])
         for entry in selected:
             ref = entry['ref']
             new_flag = None if ref['important'] == 1 else 1
@@ -3199,6 +3178,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cur.execute("update code_image set important=? where imid=?", (new_flag, ref['imid']))
                 changed.add('code_image')
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_text_update_eventfilter_tooltips()
         if changed:
             self._emit_project_table_changes(sorted(changed))
@@ -3231,6 +3211,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         new_cid = replacement_code['cid']
         cur = self.app.conn.cursor()
         changed = None
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Change code to"), replacement_code['name'], self.file_['name']),
+            ["code_text", "code_image"], self.file_['id'])
         if area_item is not None:
             try:
                 cur.execute("update code_image set cid=? where imid=?", [new_cid, area_item['imid']])
@@ -3249,6 +3232,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                         _("That text segment is already coded with the chosen code."), "warning").exec()
                 return
             changed = 'code_text'
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         if changed:
             self._emit_project_table_changes([changed])
@@ -3451,6 +3435,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         found_instances = 0
         undo_list = []
+        undo_token = self.app.coding_undo.begin(undo_label(_("Autocode text"), code_item.text(0)), "code_text")
         msg = _("Autocode Text") + f": {self.autocode_all_first_last_within} : {find_texts}"
         if self.ui.checkBox_auto_regex.isChecked():
             msg += " : Using REGEX"
@@ -3524,6 +3509,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             logger.error(f"auto_code rollback. {err}")
             self.parent_textEdit.append(_("Autocoding error: ") + str(err))
             raise
+        self.app.coding_undo.end(undo_token)
         if len(undo_list) > 0:
             name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
             name += _("\nWith: ") + find_text
@@ -3586,6 +3572,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         msg = ""
         undo_list = []
+        undo_token = self.app.coding_undo.begin(undo_label(_("Autocode sentences"), item.text(0)), "code_text")
         regex_pattern = None
         if self.ui.checkBox_auto_regex.isChecked():
             try:
@@ -3650,6 +3637,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             print(e_)
             self.app.conn.rollback()  # Revert all changes
             raise
+        self.app.coding_undo.end(undo_token)
         if len(undo_list) > 0:
             name = _("Sentence coding: ") + _("\nCode: ") + item.text(0)
             name += _("\nWith: ") + find_text + _("\nUsing line ending: ") + ending
@@ -3702,6 +3690,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         already_assigned = 0
         entries = 0
         undo_list = []
+        undo_token = self.app.coding_undo.begin(undo_label(_("Autocode surround"), item.text(0)), "code_text")
         for f in files:
             # self.files has no fulltext, fetch from DB
             cur.execute("select fulltext from source where id=?", [f['id']])
@@ -3744,6 +3733,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 print(e_)
                 self.app.conn.rollback()  # Revert all changes
                 raise
+        self.app.coding_undo.end(undo_token)
         if len(undo_list) > 0:
             name = _("Coding using start and end marks") + _("\nCode: ") + item.text(0)
             name += _("\nWith start mark: ") + start_mark + _("\nEnd mark: ") + end_mark
@@ -3770,6 +3760,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if not ok:
             return
         undo = ui.get_selected()
+        undo_token = self.app.coding_undo.begin(_("Undo autocoding"), "code_text")
         cur = self.app.conn.cursor()
         try:
             for i in undo['sql_list']:
@@ -3779,6 +3770,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             print(e_)
             self.app.conn.rollback()  # Revert all changes
             raise
+        self.app.coding_undo.end(undo_token)
         self.autocode_history.remove(undo)
         self.parent_textEdit.append(_("Undo autocoding: ") + f"{undo['name']}\n")
         self._after_autocode_refresh()
@@ -4296,8 +4288,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     submenu_ai_text_analysis.setEnabled(False)
 
         action_undo = None
-        if self.undo_deleted_codes or self.undo_deleted_areas:
-            action_undo = menu.addAction(_("Undo last unmark"))
+        if self.app.coding_undo.stack.canUndo():
+            action_undo = menu.addAction(_("Undo") + " " + self.app.coding_undo.stack.undoText())
         menu.addSeparator()
         margin_menu = menu.addMenu(_("Code stripes margin"))
         if self.show_margin_stripes:
@@ -4392,7 +4384,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             QtWidgets.QApplication.clipboard().setText(self.text[pos0:pos1])
             return
         if action == action_undo:
-            self.undo_last_unmarked_code()
+            self.app.coding_undo.stack.undo()
             return
         if action == action_margin_visibility:
             self._toggle_margin_visibility_only()
@@ -5677,10 +5669,13 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.rebuild_marks()
             return
         seltext = res[0]
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coding"), code_item.get('name'), self.file_['name']), "code_text", code_item['fid'])
         try:
             cur.execute("update code_text set pos0=?, pos1=?, seltext=? where ctid=?",
                         [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self._emit_project_table_changes(['code_text'])
             self.app.delete_backup = False
         except sqlite3.IntegrityError:
@@ -5767,10 +5762,13 @@ class DialogCodePdf(QtWidgets.QWidget):
             if y + h > page_h:
                 h = int(page_h) - y
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coded area"), area.get('name'), self.file_['name']), "code_image", self.file_['id'])
         try:
             cur.execute("update code_image set x1=?, y1=?, width=?, height=? where imid=?",
                         (x, y, w, h, area['imid']))
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self._emit_project_table_changes(['code_image'])
             self.app.delete_backup = False
         except sqlite3.IntegrityError:
@@ -5973,6 +5971,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     "warning").exec()
             return
         self.app.delete_backup = False
+        self.app.coding_undo.clear()  # rewritten text moved codings outside the history
         self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         # Report
         msg = _("File restructured to the new method.") + "\n"

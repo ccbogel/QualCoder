@@ -43,6 +43,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
+from qualcoder.coding_undo import CodingUndoManager
 from qualcoder.ai_runtime import (
     AI_DISABLED,
     AI_INITIALIZING,
@@ -149,6 +150,7 @@ class App(object):
         # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
         self.ai_embedding_function = None
         self.project_events = ProjectEventBus()
+        self.coding_undo = CodingUndoManager(self)
         self.ai_mcp_server = AiMcpServer(self)
 
     def get_ai_status(self) -> str:

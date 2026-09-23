@@ -40,6 +40,7 @@ from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
+from .coding_undo import undo_label
 from .coder_names import DialogCoderNames
 from .color_selector import DialogColorSelect
 from .color_selector import colour_ranges, show_codes_of_colour_range
@@ -76,7 +77,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.categories = []
         self.files = []
         self.code_areas = []
-        self.undo_deleted_code = None  # Undo last deleted code
         self.file_ = None    # Dictionary with name, memo, id, mediapath
         self.pixmap = None
         self.log = ""
@@ -1453,7 +1453,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Ctrl 0 to Ctrl 5 Buttons and Help
         Ctrl G - Gray image with highlighted codings
         L Show codes like
-        Ctrl Z Undo last unmarking
+        Ctrl Z Undo last coding change (Edit menu, project-wide)
         Code Tree:
             F2 Rename code or category
             F3 Code / Cat Memo
@@ -1480,9 +1480,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Show codes like
         if key == QtCore.Qt.Key.Key_L:
             self.show_codes_like()
-        # Ctrl Z undo last unmarked coding
+        # Ctrl Z undo and Ctrl Y redo the last coding change
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.undo_last_unmarked_code()
+            self.app.coding_undo.stack.undo()
+            return
+        if key == QtCore.Qt.Key.Key_Y and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.app.coding_undo.stack.redo()
             return
         if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
             self.zoom_out()
@@ -1914,10 +1917,13 @@ class DialogCodeImage(QtWidgets.QDialog):
         if item['y1'] + item['height'] > self.pixmap.height():
             overreach = item['y1'] + item['height'] - self.pixmap.height()
             item['height'] -= overreach + 1
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Move or resize coded area"), item.get('name'), self.file_['name']), "code_image", item['id'])
         cur = self.app.conn.cursor()
         cur.execute("update code_image set x1=?,y1=?,width=?,height=? where imid=?",
                     (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_code_image_changed()
         self.redraw_scene()
         self.app.delete_backup = False
@@ -1995,9 +2001,13 @@ class DialogCodeImage(QtWidgets.QDialog):
         if important:
             importance = 1
         item['important'] = importance
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Mark important") if important else _("Unmark important"), item.get('name'),
+                       self.file_['name']), "code_image", item['id'])
         cur = self.app.conn.cursor()
         cur.execute('update code_image set important=? where imid=?', (importance, item['imid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_code_image_changed()
         self.app.delete_backup = False
         self.draw_coded_areas()
@@ -2013,44 +2023,28 @@ class DialogCodeImage(QtWidgets.QDialog):
         memo = ui.memo
         if memo != item['memo']:
             item['memo'] = memo
+            undo_token = self.app.coding_undo.begin(
+                undo_label(_("Coded area memo"), item.get('name'), self.file_['name']), "code_image", item['id'])
             cur = self.app.conn.cursor()
             cur.execute('update code_image set memo=? where imid=?', (ui.memo, item['imid']))
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self._emit_code_image_changed()
             self.app.delete_backup = False
         # Re-draw to update memos in tooltips
         self.draw_coded_areas()
-
-    def undo_last_unmarked_code(self):
-        """ Restore the last deleted code.
-        Requires self.undo_deleted_code """
-
-        if not self.undo_deleted_code:
-            return
-        item = self.undo_deleted_code
-        cur = self.app.conn.cursor()
-        cur.execute(
-            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important, pdf_page) "
-            "values(?,?,?,?,?,?,?,?,?,?,?)",
-            (item['id'], item['x1'], item['y1'], item['width'], item['height'], item['cid'], item['memo'],
-             item['date'], item['owner'], item['important'], item['pdf_page']))
-        self.app.conn.commit()
-        self._emit_code_image_changed()
-        self.undo_deleted_code = []
-        self.get_coded_areas()
-        self.redraw_scene()
-        self.fill_code_counts_in_tree()
-        self.app.delete_backup = False
 
     def unmark(self, item):
         """ Remove coded area.
         Args:
             item : dictionary of coded area """
 
-        self.undo_deleted_code = deepcopy(item)
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Unmark area"), item.get('name'), self.file_['name']), "code_image", item['id'])
         cur = self.app.conn.cursor()
         cur.execute("delete from code_image where imid=?", [item['imid'], ])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_code_image_changed()
         self.get_coded_areas()
         self.redraw_scene()
@@ -2134,6 +2128,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         for c in self.codes:
             if c['cid'] == cid:
                 item['color'] = c['color']
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Code area"), code_name, self.file_['name']), "code_image", item['id'])
         cur = self.app.conn.cursor()
         cur.execute(
             "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important, pdf_page) values(?,?,?,?,?,?"
@@ -2141,6 +2137,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             (item['id'], item['x1'], item['y1'], item['width'], item['height'], cid, item['memo'],
              item['date'], item['owner'], self.pdf_page))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         cur.execute("select last_insert_rowid()")
         imid = cur.fetchone()[0]
         item['imid'] = imid
@@ -2268,11 +2265,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         
         # Execute SQL statement to permanently update SQLite
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coded area"), item.get('name'), self.file_['name']), "code_image", item['id'])
         # Prevent app crash if the user resizes the segment to perfectly match an existing identical one
         try:
             cur.execute("update code_image set x1=?, y1=?, width=?, height=? where imid=?",
                         (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self._emit_code_image_changed()
         except sqlite3.IntegrityError:
             self.app.conn.rollback()

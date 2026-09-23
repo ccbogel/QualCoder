@@ -642,9 +642,11 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(_("Resize coding"), "code_text", self.data['fid'])
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_code_text_change()
         self.draw_initial_coded_text()
 
@@ -658,10 +660,12 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(_("Resize coding"), "code_text", self.data['fid'])
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql,
                     (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_code_text_change()
         self.draw_initial_coded_text()
 
@@ -675,9 +679,11 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(_("Resize coding"), "code_text", self.data['fid'])
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_code_text_change()
         self.draw_initial_coded_text()
 
@@ -691,9 +697,11 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(_("Resize coding"), "code_text", self.data['fid'])
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_code_text_change()
         self.draw_initial_coded_text()
 

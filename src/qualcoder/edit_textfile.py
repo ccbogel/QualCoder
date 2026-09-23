@@ -601,6 +601,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.update_annotations()
             self.update_casetext()
             self.app.conn.commit()  # Commit all changes in one go to prevent database inconsistencies
+            self.app.coding_undo.clear()  # edited text moved codings outside the history
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()

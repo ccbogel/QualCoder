@@ -41,6 +41,7 @@ from PyQt6.QtGui import QBrush, QColor
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
+from .coding_undo import undo_label
 from .coder_names import DialogCoderNames
 from .color_selector import TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
@@ -110,9 +111,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.text_for_segment = {}  # When linking text to segment
 
         # Variables for codes and categories
-        self.undo_deleted_codes = []  # Undo last deleted segment code, or text code(s).
-        self.undo_deleted_av_mirrors = []  # Wave segments removed as text-coding mirrors, for symmetric undo.
-        self.undo_deleted_text_mirrors = []  # Text codings removed when deleting a segment in mirror mode.
         self.codes = []
         self.categories = []
         self.get_codes_and_categories()
@@ -528,6 +526,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         found_instances = 0
         undo_list = []
         msg = _("Autocode transcript") + f": {find_texts}\n"
+        undo_token = self._undo_begin(undo_label(_("Autocode text"), code_item.text(0)))
         try:
             for find_txt in find_texts:
                 text_starts = [m.start() for m in re.finditer(re.escape(find_txt), file_text)]
@@ -558,6 +557,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         logger.debug(_("Autocode insert error ") + str(err))
                     self.app.delete_backup = False
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
         except Exception as err:
             self.app.conn.rollback()
             logger.error(f"auto_code rollback. {err}")
@@ -722,6 +722,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         files_ = [{'id': self.transcription[0], 'name': self.transcription[2]}]
         ui_speaker = DialogSpeakers(self.app, files_)
+        undo_token = self.app.coding_undo.begin(
+            _("Mark speakers"), ("code_cat", "code_name", "code_av", "code_text"),
+            file_id={"code_av": self.file_['id'] if self.file_ else None, "code_text": self.transcription[0]})
         # Snapshot to make this run undoable via autocode undo.
         cur_before = self.app.conn.cursor()
         cur_before.execute("select ctid from code_text where fid=? and owner=?",
@@ -748,6 +751,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     # One event for the whole speaker run, not one per turn
                     self._emit_project_table_changes(['code_av', 'code_text'])
             self._record_speakers_undo(ctids_before)
+            self.app.coding_undo.end(undo_token)
             if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(
                     only_visible=True):
                 msg = _(
@@ -2085,12 +2089,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         avid = item.get('avid')
         if avid:
             cur = self.app.conn.cursor()
-            # Capture the row first so Ctrl+Z can restore the band together with the text code
-            cur.execute("select id, pos0, pos1, cid, memo, date, owner, important "
-                        "from code_av where avid=?", [avid])
-            row = cur.fetchone()
-            if row is not None:
-                self.undo_deleted_av_mirrors.append({'text_key': text_key, 'row': row})
             cur.execute("delete from code_av where avid=?", [avid])
             deleted = cur.rowcount
             self.app.conn.commit()
@@ -2119,20 +2117,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             ms1 = max(ms0 + 1, min(ms1, dur))
         owner = self.app.settings['codername']
         cur = self.app.conn.cursor()
-
-        def _capture(where_sql, params):
-            """ Stash the rows about to be deleted, for symmetric Ctrl+Z restore. """
-            if text_key is None:
-                return
-            cur.execute("select id, pos0, pos1, cid, memo, date, owner, important "
-                        "from code_av where " + where_sql, params)
-            for row_ in cur.fetchall():
-                self.undo_deleted_av_mirrors.append({'text_key': text_key, 'row': row_})
-
         # First try exact range match (un-resized mirror segment)
         exact_where = "id=? and cid=? and pos0=? and pos1=? and owner=?"
         exact_params = [self.file_['id'], cid, int(ms0), int(ms1), owner]
-        _capture(exact_where, exact_params)
         cur.execute("delete from code_av where " + exact_where, exact_params)
         deleted = cur.rowcount
         if not deleted:
@@ -2140,7 +2127,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             # the timestamp range of the text coding.
             overlap_where = "id=? and cid=? and owner=? and pos0 < ? and pos1 > ?"
             overlap_params = [self.file_['id'], cid, owner, int(ms1), int(ms0)]
-            _capture(overlap_where, overlap_params)
             cur.execute("delete from code_av where " + overlap_where, overlap_params)
             deleted = cur.rowcount
         self.app.conn.commit()
@@ -2531,11 +2517,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         selection = ui_dsi.get_selected()
         if not selection:
             return
+        undo_token = self._undo_begin(_("Code segment"))
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
         cur.execute(sql, [segment['id'], segment['pos0'], segment['pos1'], selection['id'], "",
                           datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                           self.app.settings['codername']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self.fill_code_counts_in_tree()
@@ -3062,6 +3050,13 @@ class DialogCodeAV(QtWidgets.QDialog):
                 any_visible_descendant = True
         return any_visible_descendant
 
+    def _undo_begin(self, text):
+        """ One undo step over this file's segments and its transcript's codings. """
+
+        scope = {"code_av": self.file_['id'] if self.file_ else None,
+                 "code_text": self.transcription[0] if self.transcription else None}
+        return self.app.coding_undo.begin(text, ("code_av", "code_text"), file_id=scope)
+
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
 
@@ -3257,14 +3252,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
-            # Restore unmarked code(s) if undo code is present
+            # Undo and redo the last coding change of the project
             if key == QtCore.Qt.Key.Key_Z:
-                if not self.undo_deleted_codes:
-                    return
-                if self.undo_deleted_codes[0].get('is_segment'):
-                    self.restore_unmarked_segment()
-                else:
-                    self.restore_unmarked_text_codes()
+                self.app.coding_undo.stack.undo()
+                return
+            if key == QtCore.Qt.Key.Key_Y:
+                self.app.coding_undo.stack.redo()
                 return
         if not self.ui.plainTextEdit.hasFocus():
             return
@@ -3655,11 +3648,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self._undo_begin(_("Resize coding"))
         sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
                     (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'],
                      self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -3674,11 +3669,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self._undo_begin(_("Resize coding"))
         sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
                     (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1,
                      self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -3693,11 +3690,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self._undo_begin(_("Resize coding"))
         sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
                     (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1,
                      self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -3712,11 +3711,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self._undo_begin(_("Resize coding"))
         sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
                     (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'],
                      self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -3776,6 +3777,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.file_ is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
             self.clear_segment()
             return
+        undo_token = self._undo_begin(_("Code segment"))
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
         values = [self.file_['id'], self.segment['start_msecs'],
                   self.segment['end_msecs'], cid, self.segment['memo'],
@@ -3788,6 +3790,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Reverse mirror: also code the transcript text spanning this segment's times
         mirrored = self._create_text_code_from_av_segment(cid, self.segment['start_msecs'],
                                                           self.segment['end_msecs'])
+        self.app.coding_undo.end(undo_token)
         self.clear_segment()
         self.app.delete_backup = False
         self.fill_code_counts_in_tree()
@@ -4165,6 +4168,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if not replacement_code:
             return
         cur = self.app.conn.cursor()
+        undo_token = self._undo_begin(_("Change code"))
         sql = "update code_text set cid=? where ctid=?"
         try:
             cur.execute(sql, [replacement_code['cid'], text_item['ctid']])
@@ -4175,6 +4179,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                              datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                              text_item['avid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
         except sqlite3.IntegrityError:
             # A coding with the replacement code already exists at this exact position.
             # Do not fail silently: it made "Replace code" look broken.
@@ -4235,11 +4240,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         if important:
             importance = 1
         cur = self.app.conn.cursor()
+        undo_token = self._undo_begin(_("Toggle important"))
         for item in text_items:
             cur.execute(
                 "update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
                 (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'], item['owner']))
             self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -4278,10 +4285,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         if memo == text_item['memo']:
             return
         cur = self.app.conn.cursor()
+        undo_token = self._undo_begin(_("Coded text memo"))
         cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
                     (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'],
                      text_item['pos1'], text_item['owner']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         for i in self.code_text:
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
                     and text_item['pos1'] == i['pos1'] and text_item['owner'] == i['owner']:
@@ -4465,6 +4474,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Should not get sqlite3.IntegrityError:
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
+        undo_token = self._undo_begin(_("Code transcript"))
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
@@ -4504,106 +4514,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         recent_codes_string = recent_codes_string[1:]
         cur.execute("update project set recently_used_codes=?", [recent_codes_string])
         self.app.conn.commit()
-
-    def restore_unmarked_segment(self):
-        """ Restore the last deleted coded segment.
-        The event filer method checks for text or segment coding.
-        Requires self.undo_deleted_codes """
-
-        item = self.undo_deleted_codes[0]
-        cur = self.app.conn.cursor()
-        try:
-            # Skip if an identical segment already exists (repeated Ctrl+Z or re-marked
-            # segment). Prevents silent duplicates in code_av.
-            cur.execute("select 1 from code_av where id=? and cid=? and pos0=? and pos1=? and owner=?",
-                        [item['id'], item['cid'], item['pos0'], item['pos1'], item['owner']])
-            if cur.fetchone() is None:
-                sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) " \
-                      "values(?,?,?,?,?,?,?,?)"
-                values = [item['id'], item['pos0'], item['pos1'], item['cid'], item['memo'],
-                          item['date'], item['owner'], item['important']]
-                cur.execute(sql, values)
-                cur.execute("select last_insert_rowid()")
-                new_avid = cur.fetchone()[0]
-                # Restore the text codings that delete_segment removed in mirror mode,
-                # re-linked to the new avid.
-                for tr in getattr(self, 'undo_deleted_text_mirrors', []):
-                    # tr: cid, fid, seltext, pos0, pos1, owner, memo, date, important
-                    cur.execute("select 1 from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                (tr[0], tr[1], tr[3], tr[4], tr[5]))
-                    if cur.fetchone() is not None:
-                        continue
-                    cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,memo,date,important,avid) "
-                                "values(?,?,?,?,?,?,?,?,?,?)", list(tr) + [new_avid])
-            self.app.conn.commit()
-        except Exception as e_:
-            self.app.conn.rollback()
-            logger.warning(f"restore_unmarked_segment: {e_}")
-        finally:
-            self.undo_deleted_codes = []
-            self.undo_deleted_text_mirrors = []
-        self.load_segments()
-        self.clear_segment()
-        self.get_coded_text_update_eventfilter_tooltips()
-        self.app.delete_backup = False
-        self.fill_code_counts_in_tree()
-        self._emit_project_table_changes(['code_av', 'code_text'])
-
-    def restore_unmarked_text_codes(self):
-        """ Restore the last deleted code(s).
-        One code or multiple, depends on what was selected when the unmark method was used.
-        The event filer method checks for text or segment coding.
-        Requires self.undo_deleted_codes """
-
-        if not self.undo_deleted_codes:
-            return
-        cur = self.app.conn.cursor()
-        # Mirror wave segments captured by the unmark helpers, grouped per text coding
-        mirrors_by_key = {}
-        for m in getattr(self, 'undo_deleted_av_mirrors', []):
-            mirrors_by_key.setdefault(m['text_key'], []).append(m['row'])
-        av_restored = False
-        try:
-            for item in self.undo_deleted_codes:
-                # Skip if an identical coding exists (re-mark, stale undo buffer, repeated Ctrl+Z).
-                # Prevents IntegrityError on the code_text UNIQUE constraint.
-                cur.execute("select 1 from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                            (item['cid'], item['fid'], item['pos0'], item['pos1'], item['owner']))
-                if cur.fetchone() is not None:
-                    continue
-                key = (item['cid'], item['fid'], item['pos0'], item['pos1'])
-                new_avid = None
-                for row in mirrors_by_key.pop(key, []):
-                    # row: id, pos0, pos1, cid, memo, date, owner, important
-                    cur.execute("select 1 from code_av where id=? and pos0=? and pos1=? and cid=? and owner=?",
-                                (row[0], row[1], row[2], row[3], row[6]))
-                    if cur.fetchone() is not None:
-                        continue  # mirror segment already present, avoid duplicating it
-                    cur.execute("insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) "
-                                "values(?,?,?,?,?,?,?,?)", list(row))
-                    cur.execute("select last_insert_rowid()")
-                    new_avid = cur.fetchone()[0]
-                    av_restored = True
-                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                    memo,date, important, avid) values(?,?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
-                                                                       item['seltext'], item['pos0'], item['pos1'],
-                                                                       item['owner'],
-                                                                       item['memo'], item['date'], item['important'],
-                                                                       new_avid))
-            self.app.conn.commit()
-        except Exception as e_:
-            self.app.conn.rollback()
-            logger.warning(f"restore_unmarked_text_codes: {e_}")
-        finally:
-            # Always clear the undo buffers, so a failed restore cannot be retried
-            # against a partially applied transaction.
-            self.undo_deleted_codes = []
-            self.undo_deleted_av_mirrors = []
-        if av_restored:
-            self.load_segments()
-        self.get_coded_text_update_eventfilter_tooltips()
-        self.fill_code_counts_in_tree()
-        self._emit_project_table_changes(['code_av', 'code_text'] if av_restored else ['code_text'])
+        self.app.coding_undo.end(undo_token)
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file.
@@ -4632,12 +4543,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             to_unmark = ui.get_selected()
         if not to_unmark:
             return
-        self.undo_deleted_codes = deepcopy(to_unmark)
-        self.undo_deleted_av_mirrors = []  # will be filled by the mirror-delete helpers
 
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         av_removed = False
+        undo_token = self._undo_begin(_("Unmark"))
         for item in to_unmark:
             cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
                         (item['cid'], item['pos0'], item['pos1'], item['owner'], item['fid']))
@@ -4646,6 +4556,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if self._delete_linked_av_segment(item):
                 av_removed = True
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         if av_removed:
             self.load_segments()
 
@@ -4807,12 +4718,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         if cur.fetchone() is not None:
             Message(self.app, _("Duplicate"), _("This segment is already coded with this code.")).exec()
             return
+        undo_token = self._undo_begin(_("Code segment"))
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
         values = [segment['id'], segment['pos0'], segment['pos1'], cid, "",
                   datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                   self.app.settings['codername']]
         cur.execute(sql, values)
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self.fill_code_counts_in_tree()
@@ -4834,6 +4747,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         cid = replacement_code['cid']
         cur = self.app.conn.cursor()
+        undo_token = self._undo_begin(_("Change segment code"))
         cur.execute("update code_av set cid=?, date=? where avid=?",
                     [cid, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                      segment['avid']])
@@ -4844,6 +4758,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             # Same text span already coded with the new code by this coder: unlink instead.
             cur.execute("update code_text set avid=null where avid=?", [segment['avid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self.get_coded_text_update_eventfilter_tooltips()
@@ -4861,10 +4776,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             importance = 1
         segment['important'] = importance
         cur = self.app.conn.cursor()
+        undo_token = self._undo_begin(_("Toggle segment important"))
         sql = "update code_av set important=?, date=? where avid=?"
         values = [importance, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), segment['avid']]
         cur.execute(sql, values)
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self.load_segments()
@@ -4880,12 +4797,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         if segment['memo'] == ui.memo:
             return
         segment['memo'] = ui.memo
+        undo_token = self._undo_begin(_("Segment memo"))
         sql = "update code_av set memo=?, date=? where avid=?"
         values = [segment['memo'],
                   datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), segment['avid']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self._emit_project_table_changes(['code_av'])
@@ -4912,10 +4831,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             return
-        tmp_seg = deepcopy(segment)  # the deleted segment, not the selection dict
-        tmp_seg['is_segment'] = True  # Need to distinguish from text coding
-        self.undo_deleted_codes = [tmp_seg]
-        self.undo_deleted_text_mirrors = []
+        undo_token = self._undo_begin(_("Delete segment"))
         sql = "delete from code_av where avid=?"
         values = [segment['avid']]
         cur = self.app.conn.cursor()
@@ -4923,14 +4839,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Mirror (consistent both ways): if Text<->wave is on, also remove the linked text
         # coding; otherwise keep QualCoder's native behaviour of just unlinking it.
         if getattr(self, 'text_to_av_coding', True):
-            # Capture the linked text codings first so Ctrl+Z restores them too.
-            cur.execute("select cid, fid, seltext, pos0, pos1, owner, ifnull(memo,''), date, important "
-                        "from code_text where avid=?", values)
-            self.undo_deleted_text_mirrors = cur.fetchall()
             cur.execute("delete from code_text where avid=?", values)
         else:
             cur.execute("update code_text set avid=null where avid=?", values)
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_text_update_eventfilter_tooltips()
         self.app.delete_backup = False
         self.load_segments()
@@ -4948,10 +4861,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         if i < 1:
             return
         segment['pos0'] = i
+        undo_token = self._undo_begin(_("Edit segment start"))
         sql = "update code_av set pos0=? where avid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [i, segment['avid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self._emit_project_table_changes(['code_av'])
@@ -4969,10 +4884,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         if i < 1:
             return
         segment['pos1'] = i
+        undo_token = self._undo_begin(_("Edit segment end"))
         sql = "update code_av set pos1=? where avid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [i, segment['avid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self._emit_project_table_changes(['code_av'])
@@ -4986,9 +4903,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         if avid is None or new_pos1 <= new_pos0:
             return
         cur = self.app.conn.cursor()
+        undo_token = self._undo_begin(_("Resize segment"))
         cur.execute("update code_av set pos0=?, pos1=? where avid=?",
                     [int(new_pos0), int(new_pos1), avid])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.load_segments()
         self._emit_project_table_changes(['code_av'])
@@ -5108,10 +5027,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         seltext = res[0]
 
+        undo_token = self._undo_begin(_("Resize coding"))
         try:
             sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
             cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.app.delete_backup = False
             self._emit_project_table_changes(['code_text'])
         except sqlite3.IntegrityError:
@@ -5334,12 +5255,14 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             Message(self.app, _("No selection"), _("No code selected in tree")).exec()
             return
         cid = int(item.split(":")[1])
+        undo_token = self.code_av_dialog._undo_begin(_("Code segment"))
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
         values = [self.segment['id'], self.segment['pos0'], self.segment['pos1'], cid, "",
                   datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.code_av_dialog.load_segments()
         self.app.delete_backup = False
         self.code_av_dialog.fill_code_counts_in_tree()
@@ -5415,10 +5338,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             importance = 1
         self.segment['important'] = importance
         cur = self.app.conn.cursor()
+        undo_token = self.code_av_dialog._undo_begin(_("Toggle segment important"))
         sql = "update code_av set important=?, date=? where avid=?"
         values = [importance, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
         cur.execute(sql, values)
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.code_av_dialog._emit_project_table_changes(['code_av'])
@@ -5448,12 +5373,14 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             Message(self.app, _('Already Coded'), _("This segment has already been coded with this code."),
                     "warning").exec()
             return
+        undo_token = self.code_av_dialog._undo_begin(_("Link segment to text"))
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (seg['cid'],
                                                           seg['fid'], seg['seltext'], seg['pos0'], seg['pos1'],
                                                           seg['owner'], seg['memo'], seg['date'], seg['avid']))
             self.code_av_dialog.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.app.delete_backup = False
             self.code_av_dialog._emit_project_table_changes(['code_text'])
         except Exception as e_:
@@ -5476,10 +5403,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if i < 1:
             return
         self.segment['pos0'] = i
+        undo_token = self.code_av_dialog._undo_begin(_("Edit segment start"))
         sql = "update code_av set pos0=? where avid=?"
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, [i, self.segment['avid']])
         self.code_av_dialog.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.draw_segment()
         self.app.delete_backup = False
         self.code_av_dialog._emit_project_table_changes(['code_av'])
@@ -5497,10 +5426,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if i < 1:
             return
         self.segment['pos1'] = i
+        undo_token = self.code_av_dialog._undo_begin(_("Edit segment end"))
         sql = "update code_av set pos1=? where avid=?"
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, [i, self.segment['avid']])
         self.code_av_dialog.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.draw_segment()
         self.app.delete_backup = False
         self.code_av_dialog._emit_project_table_changes(['code_av'])
@@ -5527,10 +5458,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         ok = ui.exec()
         if not ok:
             return
-        tmp_seg = deepcopy(self.segment)
-        tmp_seg['is_segment'] = True  # Need to distinguish from text coding
-        self.code_av_dialog.undo_deleted_codes = [tmp_seg]
-        self.code_av_dialog.undo_deleted_text_mirrors = []  # This path only unlinks text codings
 
         self.setToolTip("")
         self.setLine(-100, -100, -100, -100)
@@ -5539,6 +5466,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.segment['pos1'] = -100
         self.segment['y'] = -100
         self.reload_segment = True
+        undo_token = self.code_av_dialog._undo_begin(_("Delete segment"))
         sql = "delete from code_av where avid=?"
         values = [self.segment['avid']]
         cur = self.code_av_dialog.app.conn.cursor()
@@ -5546,6 +5474,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         sql = "update code_text set avid=null where avid=?"
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.app.delete_backup = False
         self.code_av_dialog._emit_project_table_changes(['code_av', 'code_text'])
@@ -5561,12 +5490,14 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             return
         self.reload_segment = True
         self.segment['memo'] = ui.memo
+        undo_token = self.code_av_dialog._undo_begin(_("Segment memo"))
         sql = "update code_av set memo=?, date=? where avid=?"
         values = [self.segment['memo'],
                   datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.code_av_dialog._emit_project_table_changes(['code_av'])
         self.set_segment_tooltip()

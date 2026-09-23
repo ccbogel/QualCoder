@@ -95,6 +95,7 @@ class ReplaceTextFile:
         errs = self.update_annotation_positions()
         errs += self.update_code_positions()
         errs += self.update_case_positions()
+        self.app.coding_undo.clear()  # replaced text moved codings outside the history
         self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.\n")
         msg += _("Function works by identifying the first matching text segment for each coding and annotation.")
