@@ -1,0 +1,6 @@
+Trajectory>>migration>>>departure
+Trajectory>>migration>>>departure>>>farewell	Farewell scenes
+Trajectory>>migration>>>return
+Trajectory>>Networks>>family>>>siblings
+Trajectory>>Networks>>family>>>parents
+Trajectory>>Networks>>friends
