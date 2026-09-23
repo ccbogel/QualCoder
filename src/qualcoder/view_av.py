@@ -2002,6 +2002,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.text = current_text
         self.prev_text = copy(self.text)
         self.app.delete_backup = False
+        self.app.coding_undo.clear()  # edited transcript moved codings outside the history
         self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
 
     def _emit_project_table_changes(self, tables):

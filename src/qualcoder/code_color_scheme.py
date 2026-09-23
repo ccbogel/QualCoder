@@ -31,6 +31,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
+from .coding_undo import TREE_TABLES
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
 
@@ -105,10 +106,12 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         """  """
 
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(_("Revert color scheme"), TREE_TABLES)
         sql = "update code_name set color=? where cid=?"
         for c in self.original_code_colors:
             cur.execute(sql, [c['color'], c['cid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_project_table_changes(['code_name'])
         self.get_codes_and_categories()
         self.perspective_idx = 0
@@ -128,6 +131,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         while len(color_list) < len(code_items):
             color_list += self.selected_colors
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(_("Apply color scheme"), TREE_TABLES)
         sql = "update code_name set color=? where cid=?"
         i = -1
         for ci in code_items:
@@ -142,6 +146,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                     ci.setForeground(0, QBrush(QtGui.QColor(color)))
                     cur.execute(sql, [color_list[i], int(ci.text(1)[4:])])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self._emit_project_table_changes(['code_name'])
         self.perspective_idx = 4
         self.change_perspective()

@@ -53,6 +53,7 @@ from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH,
                                       MINIMUM_CODING_MARGIN_LABEL_WIDTH)
 from .code_tree import CodeTreeController
 from .codebook import build_codebook_path
+from .coding_undo import undo_label
 from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
@@ -93,7 +94,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes = []  # List of recent codes (up to 5) for textedit context menu
         self.file_ = None  # Contains current filename and file id
         self.code_text = []  # List of coded segments for the curent file
-        self.undo_deleted_codes = []  # To restore recently deleted codes
         self.attributes = []  # Show selected files using these attributes in list widget
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
         self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
@@ -947,12 +947,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None or code is None or code.get('ctid') is None:
             return
         self.clear_edit_variables()
-        # Locate the live item in self.code_text by ctid (deepcopy for undo)
-        target = next((c for c in self.code_text if c.get('ctid') == code['ctid']), code)
-        self.undo_deleted_codes = deepcopy([target])
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Unmark"), code.get('name'), self.file_['name']), "code_text", self.file_['id'])
         cur = self.app.conn.cursor()
         cur.execute("delete from code_text where ctid=?", [code['ctid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
@@ -973,9 +973,12 @@ class DialogCodeText(QtWidgets.QWidget):
         memo = ui.memo
         if memo == text_item['memo']:
             return
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Coded text memo"), text_item.get('name'), self.file_['name']), "code_text", self.file_['id'])
         cur = self.app.conn.cursor()
         cur.execute("update code_text set memo=? where ctid=?", (memo, text_item['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         text_item['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -999,6 +1002,8 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cur = self.app.conn.cursor()
         changed = False
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Change code to"), replacement_code['name'], self.file_['name']), "code_text", self.file_['id'])
         try:
             cur.execute("update code_text set cid=? where ctid=?", [replacement_code['cid'], code['ctid']])
             self.app.conn.commit()
@@ -1008,6 +1013,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         if changed:
+            self.app.coding_undo.end(undo_token)
             self._emit_project_table_changes(['code_text'])
 
     def _margin_annotate_ctid(self, code):  # <- L
@@ -1810,10 +1816,13 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             return
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Delete all codings"), None, self.file_['name']), "code_text", self.file_['id'])
         cur = self.app.conn.cursor()
         sql = "delete from code_text where fid=? and owner=?"
         cur.execute(sql, (self.file_['id'], self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_text_update_eventfilter_tooltips()
         self.app.delete_backup = False
         msg = _("All codes by ") + self.app.settings['codername'] + _(" deleted from ") + self.file_['name']
@@ -2348,6 +2357,8 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         sql = "update code_text set cid=? where ctid=?"
         changed = False
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Change code to"), replacement_code['name'], self.file_['name']), "code_text", self.file_['id'])
         try:
             cur.execute(sql, [replacement_code['cid'], text_item['ctid']])
             self.app.conn.commit()
@@ -2357,6 +2368,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         if changed:
+            self.app.coding_undo.end(undo_token)
             self._emit_project_table_changes(['code_text'])
 
     def recursive_set_current_item(self, item, text_):
@@ -2426,11 +2438,15 @@ class DialogCodeText(QtWidgets.QWidget):
         importance = None
         if important:
             importance = 1
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Mark important") if important else _("Unmark important"), None, self.file_['name']),
+            "code_text", self.file_['id'])
         cur = self.app.conn.cursor()
         sql = "update code_text set important=? where ctid=?"
         for item in text_items:
             cur.execute(sql, [importance, item['ctid']])
             self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -2509,12 +2525,15 @@ class DialogCodeText(QtWidgets.QWidget):
         memo = ui.memo
         if memo == text_item['memo']:
             return
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Coded text memo"), text_item['name'], self.file_['name']), "code_text", self.file_['id'])
         cur = self.app.conn.cursor()
         cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
                     (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'],
                      text_item['pos1'],
                      text_item['owner']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         for i in self.code_text:
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] \
                     and text_item['pos0'] == i['pos0'] and text_item['pos1'] == i['pos1'] \
@@ -2564,6 +2583,8 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute(length_sql, [self.file_['id']])
         fulltext_length = cur.fetchone()[0]
         text_sql = "select substr(fulltext,?,?), length(fulltext) from source where id=?"
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Shift code positions"), None, self.file_['name']), "code_text", self.file_['id'])
         # Update code_text rows in database
         for coded in code_list:
             # print(coded['seltext'], coded['pos0'], coded['pos1'])
@@ -2578,6 +2599,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
                 cur.execute(sql, [new_pos0, new_pos1, seltext, coded['ctid']])
                 self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -2837,7 +2859,7 @@ class DialogCodeText(QtWidgets.QWidget):
         S search text - may include current selection
         U Unmark at selected location
         V assign 'in vivo' code to selected text
-        Ctrl Z Undo last unmarking
+        Ctrl Z Undo last coding change (Edit menu, project-wide)
 
         Ctrl 0 to Ctrl 9 - button presses
         ! Display Clicked character position
@@ -2858,9 +2880,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
             return
-        # Ctrl Z undo last unmarked coding # TODO expand function
+        # Ctrl Z undo and Ctrl Y / Ctrl Shift Z redo the last coding change
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.undo_last_unmarked_code()
+            self.app.coding_undo.stack.undo()
+            return
+        if key == QtCore.Qt.Key.Key_Y and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.app.coding_undo.stack.redo()
             return
         # Ctrl R Display Right to Left (Arabic, Hebrew).
         if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -3888,6 +3913,18 @@ class DialogCodeText(QtWidgets.QWidget):
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
                 return False
+            # Undo and redo of codings; the editable text widget would swallow these keys
+            if first_key_press and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                if key == QtCore.Qt.Key.Key_Z:
+                    self.app.coding_undo.stack.undo()
+                    return True
+                if key == QtCore.Qt.Key.Key_Y:
+                    self.app.coding_undo.stack.redo()
+                    return True
+            if first_key_press and key == QtCore.Qt.Key.Key_Z and mod == (
+                    QtCore.Qt.KeyboardModifier.ControlModifier | QtCore.Qt.KeyboardModifier.ShiftModifier):
+                self.app.coding_undo.stack.redo()
+                return True
             cursor_pos = self.ui.plainTextEdit.textCursor().position()
             codes_here = []
             for item in self.code_text:
@@ -3939,9 +3976,13 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coding"), code_.get('name'), self.file_['name']), "code_text", code_['fid'],
+            merge_key=("resize", code_['ctid']))
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (code_['pos0'], seltext, code_['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -3961,10 +4002,14 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coding"), code_.get('name'), self.file_['name']), "code_text", code_['fid'],
+            merge_key=("resize", code_['ctid']))
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql,
                     (code_['pos1'], seltext, code_['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -3984,9 +4029,13 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coding"), code_.get('name'), self.file_['name']), "code_text", code_['fid'],
+            merge_key=("resize", code_['ctid']))
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql, (code_['pos1'], seltext, code_['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -4006,9 +4055,13 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coding"), code_.get('name'), self.file_['name']), "code_text", code_['fid'],
+            merge_key=("resize", code_['ctid']))
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
         cur.execute(sql, (code_['pos0'], seltext, code_['ctid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
         self._emit_project_table_changes(['code_text'])
@@ -5004,6 +5057,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(result) > 0:
             # The event can trigger multiple times, so do not present a warning to the user
             return
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Code"), coded.get('name'), self.file_['name']), "code_text", coded['fid'])
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                                                                coded['seltext'], coded['pos0'], coded['pos1'],
@@ -5043,6 +5098,7 @@ class DialogCodeText(QtWidgets.QWidget):
                          coded['owner']))
                     self.app.conn.commit()
                     self.code_text[len(self.code_text) - 1]['memo'] = memo
+        self.app.coding_undo.end(undo_token)
 
         # Replace the full cascade <- L
         # (get_coded_text_update_eventfilter_tooltips -> unlight -> highlight)
@@ -5076,28 +5132,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_file_tooltip()  # Number of codes applied
         self._emit_project_table_changes(['code_text'])
 
-    def undo_last_unmarked_code(self):
-        """ Restore the last deleted code(s).
-        One code or multiple, depends on what was selected when the unmark method was used.
-        Requires self.undo_deleted_codes
-        Called by : ? """
-
-        if not self.undo_deleted_codes:
-            return
-        self.clear_edit_variables()
-        cur = self.app.conn.cursor()
-        for item in self.undo_deleted_codes:
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                memo,date, important) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
-                                                                   item['seltext'], item['pos0'], item['pos1'],
-                                                                   item['owner'],
-                                                                   item['memo'], item['date'], item['important']))
-        self.app.conn.commit()
-        self.undo_deleted_codes = []
-        self.get_coded_text_update_eventfilter_tooltips()
-        self.fill_code_counts_in_tree()
-        self._emit_project_table_changes(['code_text'])
-
     def unmark(self, location):
         """ Remove code marking by all visible coders from selected text in current file.
         Called by text_edit_context_menu
@@ -5128,12 +5162,15 @@ class DialogCodeText(QtWidgets.QWidget):
             to_unmark = ui.get_selected()
         if to_unmark is None:
             return
-        self.undo_deleted_codes = deepcopy(to_unmark)
+        code_name = to_unmark[0].get('name') if len(to_unmark) == 1 else None
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Unmark"), code_name, self.file_['name']), "code_text", self.file_['id'])
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         for item in to_unmark:
             cur.execute("delete from code_text where ctid=?", [item['ctid']])
             self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -5287,6 +5324,7 @@ class DialogCodeText(QtWidgets.QWidget):
         already_assigned = 0
         entries = 0
         undo_list = []
+        undo_token = self.app.coding_undo.begin(undo_label(_("Autocode surround"), item.text(0)), "code_text")
         for f in files:
             text_starts = [match.start() for match in re.finditer(re.escape(start_mark), f['fulltext'])]
             text_ends = [match.start() for match in re.finditer(re.escape(end_mark), f['fulltext'])]
@@ -5337,6 +5375,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 print(e_)
                 self.app.conn.rollback()  # Revert all changes
                 raise
+        self.app.coding_undo.end(undo_token)
         # Add to undo auto-coding history
         if len(undo_list) > 0:
             name = _("Coding using start and end marks") + _("\nCode: ") + item.text(0)
@@ -5369,6 +5408,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         self.clear_edit_variables()
         undo = ui.get_selected()
+        undo_token = self.app.coding_undo.begin(_("Undo autocoding"), "code_text")
         # Run all sqls
         cur = self.app.conn.cursor()
         try:
@@ -5379,6 +5419,7 @@ class DialogCodeText(QtWidgets.QWidget):
             print(e_)
             self.app.conn.rollback()  # Revert all changes
             raise
+        self.app.coding_undo.end(undo_token)
         self.autocode_history.remove(undo)
         self.parent_textEdit.append(_("Undo autocoding: ") + f"{undo['name']}\n")
 
@@ -5440,6 +5481,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         msg = ""
         undo_list = []
+        undo_token = self.app.coding_undo.begin(undo_label(_("Autocode sentences"), item.text(0)), "code_text")
 
         # Regex
         regex_pattern = None
@@ -5521,6 +5563,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.conn.rollback()  # revert all changes
             # undo_list = []
             raise
+        self.app.coding_undo.end(undo_token)
         if len(undo_list) > 0:
             name = _("Sentence coding: ") + _("\nCode: ") + item.text(0)
             name += _("\nWith: ") + find_text + _("\nUsing line ending: ") + ending
@@ -5602,6 +5645,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         found_instances = 0
         undo_list = []
+        undo_token = self.app.coding_undo.begin(undo_label(_("Autocode text"), code_item.text(0)), "code_text")
         msg = _("Autocode Text") + f": {self.autocode_all_first_last_within} : {find_texts}"
         if self.ui.checkBox_auto_regex.isChecked():
             msg += " : Using REGEX"
@@ -5704,6 +5748,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.parent_textEdit.append(_("Autocoding error: ") + str(err))
             # undo_list = []
             raise
+        self.app.coding_undo.end(undo_token)
         if len(undo_list) > 0:
             name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
             name += _("\nWith: ") + find_text
@@ -5743,6 +5788,7 @@ class DialogCodeText(QtWidgets.QWidget):
                            [ca[1], ca[2], ca[0]])
         self.app.conn.commit()
         self.app.delete_backup = False
+        self.app.coding_undo.clear()  # edited text moved codings outside the history
         self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
         self.clear_edit_variables()
         self.ui.plainTextEdit.installEventFilter(self.eventFilterTT)
@@ -5929,6 +5975,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # must reload and re-verify the page mapping; without this it keeps stale
         # text and positions in memory. Only when something was actually edited.
         if text_edited:
+            self.app.coding_undo.clear()  # edited text moved codings outside the history
             self._emit_project_table_changes(['source', 'code_text', 'annotation', 'case_text'])
 
     def edit_mode_find(self, direction:str="next"):
@@ -6894,10 +6941,13 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         seltext = res[0]
 
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Resize coding"), code_item.get('name'), self.file_['name']), "code_text", code_item['fid'])
         try:
             sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
             cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.app.delete_backup = False
             self._emit_project_table_changes(['code_text'])
         except sqlite3.IntegrityError:

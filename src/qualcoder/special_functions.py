@@ -131,6 +131,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
         mp = MergeProjects(self.app, self.merge_project_path)
         self.parent_text_edit.append(mp.summary_msg)
+        self.app.coding_undo.clear()  # merged rows stay outside the history
         # Sticky: a later cancelled merge must not undo the refresh owed to an earlier one
         if mp.projects_merged:
             self.projects_merged = True

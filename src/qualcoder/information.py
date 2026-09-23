@@ -283,6 +283,8 @@ Alt F (macOS Option F) {_("Manage files")}</td></tr>\n\
 <tr><td>Alt 4 {_("Open Reports menu")}</td><td>Ctrl M {_("Project memo")}</td><td>Alt A {_("Manage attributes")}</td></tr>\n\
 <tr><td>Alt 5 {_("Open Help menu")}</td><td>Alt S {_("Settings")}</td><td>Alt R {_("Manage references")}</td></tr>\n\
 <tr><td><br/></td><td>Ctrl Q (macOS Cmd Q) {_("Exit")}</td><td></td></tr>\n\
+<tr><td></td><td>Ctrl Z (macOS Cmd Z) {_("Undo coding")}</td><td></td></tr>\n\
+<tr><td></td><td>Ctrl Y (macOS Cmd Shift Z) {_("Redo coding")}</td><td></td></tr>\n\
 </table><br/><table>\n\
 <tr><td><b>{_("Coding menu shortcuts")}</b></td><td><b>{_("Reports menu shortcuts")}</b></td><td><b>{_("Help menu shortcuts")}</b></td></tr>\n\
 <tr><td>Alt T {_("Code text")}</td><td>Alt K {_("Code retrieval")}</td><td>Alt H {_("Help contents")}</td></tr>\n\
@@ -354,7 +356,8 @@ Ctrl 8 {_("Show all codes in text ( if selected code previous or next has been u
 Ctrl 9 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
 Ctrl F {_("Jump to search box")}<br />\
-Ctrl Z {_("The last code that was unmarked, restore that coding")}<br />\
+Ctrl Z {_("Undo the last coding change")}<br />\
+Ctrl Y {_("Redo the last undone coding change")}<br />\
 Ctrl E {_("Enter and Exit Edit mode")}<br />\
 A {_("Annotate - Current text selection")}<br />\
 B {_("Create bookmark - at clicked position")}<br />\
@@ -398,7 +401,8 @@ Q {_("Quick Mark with code - for current selection")}<br />\
 R {_("Opens a context menu for recently used codes for marking text")}<br />\
 U {_("Unmark At clicked position in the text")}<br />\
 V {_("assign in vivo code to selected text")}<br />\
-Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
+Ctrl Z {_("Undo the last coding change")}<br />\
+Ctrl Y {_("Redo the last undone coding change")}<br />\
 Minus {_("Zoom out")}<br />\
 Plus {_("Zoom in")}<br />\
 ! {_("Describes clicked text character position")}<br />'
@@ -412,7 +416,8 @@ Ctrl 5 {_("Show codes marked important")}<br />\
 Ctrl 0 {_("Help - opens in browser")}<br />\
 C {_("Create new category. If a category is already selected, the new category will be underneath")}<br />\
 L {_("Show codes like (when coding area is in focus)")}<br />\
-Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
+Ctrl Z {_("Undo the last coding change")}<br />\
+Ctrl Y {_("Redo the last undone coding change")}<br />\
 Ctrl G {_("Create a grayed-out image with coloured coded highlights (Wait a few seconds)")}<br />\
 Minus or Q {_("Zoom out")}<br />\
 Plus or W {_("Zoom in")}<br />\
@@ -439,7 +444,8 @@ S {_("Search text - may include current selection")}<br />\
 R {_("Opens a context menu for recently used codes for marking text")}<br />\
 ! {_("Shows cursor position in text area")}<br />\
 5 {_("Go forward 5 seconds.")}<br />\
-Ctrl Z {_("Restore last unmarked code(s) - text code(s) or segment code")}<br />\
+Ctrl Z {_("Undo the last coding change")}<br />\
+Ctrl Y {_("Redo the last undone coding change")}<br />\
 Alt - {_("Rewind 30 seconds")}<br />\
 Ctrl R {_("Rewind 5 seconds")}<br />\
 Alt + {_("Forward 30 seconds")}<br />\

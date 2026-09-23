@@ -1819,6 +1819,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         row = cur.fetchone()
         current_catid = row[0] if row is not None else None
         collisions = []
+        undo_token = self.app.coding_undo.begin(_("Mark speakers"), ("code_cat", "code_name", "code_text"))
         for name in planned:
             cur.execute("select catid from code_name where name = ?", (name,))
             existing = cur.fetchone()
@@ -1974,6 +1975,7 @@ class DialogSpeakers(QtWidgets.QDialog):
             if inserted_codings > 0:  # hubo codificaciones nuevas # new codings were written
                 self.app.delete_backup = False
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
         except Exception as e_:
             logger.exception(e_)  # antes print(); registra el traceback.  Was print(); logs the traceback
             self.app.conn.rollback()  # Revert all changes

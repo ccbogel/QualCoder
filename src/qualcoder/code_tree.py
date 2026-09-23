@@ -34,6 +34,7 @@ from PyQt6.QtGui import QBrush, QColor
 #from .__main__ import App
 from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect, colors, TextColor
+from .coding_undo import CODE_TREE_TABLES, TREE_TABLES, undo_label
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, restore_persistent_tree_widths
 from .memo import DialogMemo
@@ -563,10 +564,13 @@ class CodeTreeController(QtCore.QObject):
                             _("Cannot move a category under one of its own sub-categories.")).exec()
                     return
                 self.categories[found]['supercatid'] = supercatid
+            undo_token = self.app.coding_undo.begin(
+                undo_label(_("Move category"), self.categories[found]['name']), TREE_TABLES)
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set supercatid=? where catid=?",
                         [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.app.delete_backup = False
             self.codes_changed.emit(["code_cat"])
             return
@@ -608,11 +612,14 @@ class CodeTreeController(QtCore.QObject):
                     self.codes[found]['catid'] = catid
                     self.codes[found]['supercid'] = None
 
+            undo_token = self.app.coding_undo.begin(
+                undo_label(_("Move code"), self.codes[found]['name']), TREE_TABLES)
             cur = self.app.conn.cursor()
             cur.execute("update code_name set catid=?, supercid=? where cid=?",
                         [self.codes[found]['catid'], self.codes[found].get('supercid'),
                          self.codes[found]['cid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.app.delete_backup = False
             self.codes_changed.emit(["code_name"])
 
@@ -749,6 +756,7 @@ class CodeTreeController(QtCore.QObject):
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
                 'color': code_color, 'supercid': supercid}
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(undo_label(_("New code"), item['name']), TREE_TABLES)
         try:
             cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,?,?,?,?,?)",
                         (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color'],
@@ -758,6 +766,7 @@ class CodeTreeController(QtCore.QObject):
             cur.execute("select last_insert_rowid()")
             cid = cur.fetchone()[0]
             item['cid'] = cid
+            self.app.coding_undo.end(undo_token)
             self.parent_textEdit.append(_("New code: ") + item['name'])
         except sqlite3.IntegrityError:
             # Can occur with in vivo coding
@@ -783,10 +792,12 @@ class CodeTreeController(QtCore.QObject):
         item = {'name': new_category_name, 'cid': None, 'memo': "",
                 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+        undo_token = self.app.coding_undo.begin(undo_label(_("New category"), item['name']), TREE_TABLES)
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
                     (item['name'], item['memo'], item['owner'], item['date'], supercatid))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.parent_textEdit.append(_("New category: ") + item['name'])
         self.codes_changed.emit(["code_cat"])
@@ -845,6 +856,10 @@ class CodeTreeController(QtCore.QObject):
         ok = ui.exec()
         if not ok:
             return
+        label = undo_label(_("Delete code"), code_['name'])
+        if len(cids) > 1:
+            label += " " + _("and sub-codes")
+        undo_token = self.app.coding_undo.begin(label, CODE_TREE_TABLES, code_ids=cids)
         cur = self.app.conn.cursor()
         try:
             for cid in cids:
@@ -875,6 +890,7 @@ class CodeTreeController(QtCore.QObject):
             self.app.conn.rollback()  # Revert all changes
             self.codes_changed.emit([])
             raise
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Code(s) deleted: ") + names + "\n")
         # Let the host clean its own caches, such as the recent codes list.
@@ -954,7 +970,7 @@ class CodeTreeController(QtCore.QObject):
         msg += _("Categories to delete") + f": {len(catids)}\n"
         msg += _("Codes to delete") + f": {len(cids)}\n"
         msg += _("Codings to delete") + f": {codings}\n\n"
-        msg += _("Make a project backup first. This action cannot be undone.")
+        msg += _("Make a project backup first. Edit > Undo can reverse this only during the current session.")
         ui = DialogConfirmDelete(self.app, msg)
         # Cancel is the default button here, so a stray Enter cannot wipe out the branch.
         button_box = ui.findChild(QtWidgets.QDialogButtonBox)
@@ -971,6 +987,8 @@ class CodeTreeController(QtCore.QObject):
         ok = ui.exec()
         if not ok:
             return
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Delete category branch"), category['name']), CODE_TREE_TABLES, code_ids=cids)
         try:
             for cid in cids:
                 cur.execute("delete from code_text where cid=?", [cid, ])
@@ -1013,6 +1031,7 @@ class CodeTreeController(QtCore.QObject):
             self.app.conn.rollback()  # Revert all changes
             self.codes_changed.emit([])
             raise
+        self.app.coding_undo.end(undo_token)
         # Let the host clean its own caches, such as the recent codes list.
         if self.on_codes_deleted is not None:
             self.on_codes_deleted(cids)
@@ -1048,8 +1067,11 @@ class CodeTreeController(QtCore.QObject):
             if memo != self.codes[found]['memo']:
                 self.codes[found]['memo'] = memo
                 cur = self.app.conn.cursor()
+                undo_token = self.app.coding_undo.begin(
+                    undo_label(_("Code memo"), self.codes[found]['name']), TREE_TABLES)
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
                 self.app.conn.commit()
+                self.app.coding_undo.end(undo_token)
                 self.app.delete_backup = False
                 changed_tables = ["code_name"]
             if memo == "":
@@ -1074,8 +1096,11 @@ class CodeTreeController(QtCore.QObject):
             if memo != self.categories[found]['memo']:
                 self.categories[found]['memo'] = memo
                 cur = self.app.conn.cursor()
+                undo_token = self.app.coding_undo.begin(
+                    undo_label(_("Category memo"), self.categories[found]['name']), TREE_TABLES)
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
+                self.app.coding_undo.end(undo_token)
                 self.app.delete_backup = False
                 changed_tables = ["code_cat"]
             if memo == "":
@@ -1115,8 +1140,10 @@ class CodeTreeController(QtCore.QObject):
             # dialog list can still collide: fail cleanly instead of crashing.
             cur = self.app.conn.cursor()
             try:
+                undo_token = self.app.coding_undo.begin(undo_label(_("Rename code to"), new_name), TREE_TABLES)
                 cur.execute("update code_name set name=? where cid=?", (new_name, found_code['cid']))
                 self.app.conn.commit()
+                self.app.coding_undo.end(undo_token)
             except sqlite3.IntegrityError:
                 self.app.conn.rollback()
                 Message(self.app, _("Name in use"), new_name + " " + _("is already in use")).exec()
@@ -1148,8 +1175,10 @@ class CodeTreeController(QtCore.QObject):
             old_name = found_cat['name']
             # Update category list and database
             cur = self.app.conn.cursor()
+            undo_token = self.app.coding_undo.begin(undo_label(_("Rename category to"), new_name), TREE_TABLES)
             cur.execute("update code_cat set name=? where catid=?", (new_name, found_cat['catid']))
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.app.delete_backup = False
             self.parent_textEdit.append(_("Category renamed from: ") + f"{old_name} --> {new_name}")
             self.codes_changed.emit(["code_cat"])
@@ -1178,9 +1207,12 @@ class CodeTreeController(QtCore.QObject):
         # Update codes list, database and color markings
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Change color of"), self.codes[found]['name']), TREE_TABLES)
         cur.execute("update code_name set color=? where cid=?",
                     (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.codes_changed.emit(["code_name"])
 
@@ -1231,6 +1263,7 @@ class CodeTreeController(QtCore.QObject):
         destination = ui.get_selected()
         selected_cid = int(selected.text(1)[4:])
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(undo_label(_("Move code"), selected.text(0)), TREE_TABLES)
         if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
             cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
         elif destination['cid'] > 0:  # Move under another code
@@ -1244,6 +1277,7 @@ class CodeTreeController(QtCore.QObject):
         else:  # Move under a category
             cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], selected_cid])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.codes_changed.emit(["code_name"])
 
@@ -1307,6 +1341,7 @@ class CodeTreeController(QtCore.QObject):
             return
         destination = selected[0]
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(_("Move codes"), TREE_TABLES)
         for code_ in source_codes:
             if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
                 cur.execute("update code_name set catid=null, supercid=null where cid=?", [code_['cid']])
@@ -1323,6 +1358,7 @@ class CodeTreeController(QtCore.QObject):
                 cur.execute("update code_name set catid=?, supercid=null where cid=?", [destination['catid'], code_['cid']])
             self.parent_textEdit.append(_("Code moved.") + destination['name'].replace(" ← ", "/") + " → " + code_['name'])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.codes_changed.emit(["code_name"])
 
@@ -1351,6 +1387,7 @@ class CodeTreeController(QtCore.QObject):
             return
         category = ui.get_selected()
         current_cat_name = self.tree.currentItem().text(0)
+        undo_token = self.app.coding_undo.begin(undo_label(_("Move category"), current_cat_name), TREE_TABLES)
         if category['name'] == '':
             cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
             self.app.conn.commit()
@@ -1365,6 +1402,7 @@ class CodeTreeController(QtCore.QObject):
             cur.execute("update code_cat set supercatid=? where catid=?", [category['catid'], catid])
             self.app.conn.commit()
             self.parent_textEdit.append(_("Moved category: ") + current_cat_name + " → " + category['name'])
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.codes_changed.emit(["code_cat"])
 
@@ -1393,6 +1431,11 @@ class CodeTreeController(QtCore.QObject):
         if not ok:
             return
         category = ui.get_selected()
+        source_name = next((c['name'] for c in self.categories if c['catid'] == catid), "")
+        label = undo_label(_("Merge category"), source_name)
+        if category['catid'] is not None:
+            label += " " + _("into") + f" '{category['name']}'"
+        undo_token = self.app.coding_undo.begin(label, CODE_TREE_TABLES)
         try:
             # Always record merge info in target category memo
             source_cat = None
@@ -1441,6 +1484,7 @@ class CodeTreeController(QtCore.QObject):
             self.app.conn.rollback()  # Revert all changes
             self.codes_changed.emit([])
             raise
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         self.codes_changed.emit(["code_cat", "code_name"])
 
@@ -1524,6 +1568,9 @@ class CodeTreeController(QtCore.QObject):
             if c['cid'] == new_cid:
                 target_code = c
                 break
+        undo_token = self.app.coding_undo.begin(
+            undo_label(_("Merge code"), item['name']) + " " + _("into") + f" '{parent.text(0)}'",
+            CODE_TREE_TABLES, code_ids=[old_cid, new_cid])
         try:
             if target_code is not None:
                 merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
@@ -1579,6 +1626,7 @@ class CodeTreeController(QtCore.QObject):
             logger.warning(e_)
             self.app.conn.rollback()  # Revert all changes
             raise
+        self.app.coding_undo.end(undo_token)
         self.app.delete_backup = False
         # Let the host clean its own caches, such as the recent codes list.
         if self.on_codes_deleted is not None:

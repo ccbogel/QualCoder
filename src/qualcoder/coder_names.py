@@ -413,6 +413,7 @@ class DialogCoderNames(QtWidgets.QDialog):
         if self.do_commit and self.app.conn is not None:
             self.app.conn.commit()  # this writes all the changes finally to the database
             if self.coder_names_changed:
+                self.app.coding_undo.clear()  # owners rewritten in bulk, outside the history
                 # Renaming or merging a coder rewrites owner across the coded tables
                 self._emit_project_table_changes(
                     ['coder_names', 'code_text', 'code_image', 'code_av', 'annotation'])

@@ -30,6 +30,7 @@ from typing import Any
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .coding_undo import CODING_TABLES
 from .color_selector import TextColor
 from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
     ExportDirectoryPathDialog, Message
@@ -390,6 +391,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 item = {'type': 'image', 'res': row}
                 break
         # Check the position for an a/v result
+        undo_token = self.app.coding_undo.begin(_("Unmark"), CODING_TABLES)
         for row in self.av_results:
             if row['textedit_start'] <= pos < row['textedit_end']:
                 item = {'type': 'av', 'res': row}
@@ -429,6 +431,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             if item['type'] == "av":
                 cur.execute("delete from code_av where avid=?", [item['res']['avid']])
                 self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
             self.get_coded_segments_all_files()
             self.app.delete_backup = False
             self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
@@ -448,12 +451,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
+            undo_token = self.app.coding_undo.begin(_("Mark important"), CODING_TABLES)
             cur.execute("update code_text set important=1 where ctid=?", (item['res']['ctid'],))
         if item['type'] == 'image':
             cur.execute("update code_image set important=1 where imid=?", (item['res']['imid'],))
         if item['type'] == 'av':
             cur.execute("update code_av set important=1 where avid=?", (item['res']['avid'],))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
         self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
@@ -462,12 +467,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
+            undo_token = self.app.coding_undo.begin(_("Unmark important"), CODING_TABLES)
             cur.execute("update code_text set important=null where ctid=?", (item['res']['ctid'],))
         if item['type'] == 'image':
             cur.execute("update code_image set important=null where imid=?", (item['res']['imid'],))
         if item['type'] == 'av':
             cur.execute("update code_av set important=null where avid=?", (item['res']['avid'],))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
         self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
@@ -485,12 +492,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         if item['type'] == 'text':
+            undo_token = self.app.coding_undo.begin(_("Coding memo"), CODING_TABLES)
             cur.execute("update code_text set memo=? where ctid=?", (memo, item['res']['ctid']))
         if item['type'] == 'image':
             cur.execute("update code_image set memo=? where imid=?", (memo, item['res']['imid']))
         if item['type'] == 'av':
             cur.execute("update code_av set memo=? where avid=?", (memo, item['res']['avid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.get_coded_segments_all_files()
         self.app.delete_backup = False
         self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))
@@ -526,6 +535,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             return
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
+        undo_token = self.app.coding_undo.begin(_("Code with another code"), CODING_TABLES)
         for i, s in enumerate(selection):
             if item['type'] == "text":
                 try:
@@ -557,6 +567,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                               s['cid'], "", now_date, self.app.settings['codername']]
                     cur.execute(sql, values)
                     self.app.conn.commit()
+                    self.app.coding_undo.end(undo_token)
                 except sqlite3.IntegrityError:
                     pass
         self._emit_project_table_changes(self.CODED_TABLES.get(item['type'], []))

@@ -899,6 +899,8 @@ Click "Yes" to start now.')
         self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionExit.setShortcut('Ctrl+Q')
         self.ui.actionImport_plain_text_codes_list.triggered.connect(self.import_plain_text_codes)
+        # Edit menu
+        self.init_coding_undo_ui()
         # Manage menu
         self.ui.actionManage_files.setShortcut('Alt+F')
         self.ui.actionManage_files.triggered.connect(self.manage_files)
@@ -1040,6 +1042,38 @@ Click "Yes" to start now.')
                 action5 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action5)
                 action5.triggered.connect(self.project5)
+
+    def init_coding_undo_ui(self):
+        """ Edit menu undo and redo of coding and code tree changes. """
+
+        undo = self.app.coding_undo
+        self.ui.actionUndo_coding.setShortcuts(QtGui.QKeySequence.StandardKey.Undo)
+        self.ui.actionRedo_coding.setShortcuts(QtGui.QKeySequence.StandardKey.Redo)
+        self.ui.actionUndo_coding.setEnabled(False)
+        self.ui.actionRedo_coding.setEnabled(False)
+        self.ui.actionUndo_coding.triggered.connect(undo.stack.undo)
+        self.ui.actionRedo_coding.triggered.connect(undo.stack.redo)
+        undo.stack.canUndoChanged.connect(self.ui.actionUndo_coding.setEnabled)
+        undo.stack.canRedoChanged.connect(self.ui.actionRedo_coding.setEnabled)
+        undo.stack.undoTextChanged.connect(self.update_coding_undo_texts)
+        undo.stack.redoTextChanged.connect(self.update_coding_undo_texts)
+        undo.invalidated.connect(self.coding_history_invalidated)
+        self.update_coding_undo_texts()
+
+    def update_coding_undo_texts(self):
+        """ Show the description of the next step to undo or redo in the Edit menu. """
+
+        stack = self.app.coding_undo.stack
+        undo_text = stack.undoText()
+        redo_text = stack.redoText()
+        self.ui.actionUndo_coding.setText(_("Undo") + " " + undo_text if undo_text else _("Undo coding"))
+        self.ui.actionRedo_coding.setText(_("Redo") + " " + redo_text if redo_text else _("Redo coding"))
+
+    def coding_history_invalidated(self, message):
+        """ The undo stack found the database changed elsewhere and discarded the history. """
+
+        self.ui.textEdit.append(message)
+        Message(self.app, _("Undo"), message, "warning").exec()
 
     def project0(self):
         self.open_project(self.recent_projects[0])
@@ -1389,6 +1423,7 @@ Click "Yes" to start now.')
         """
 
         ImportPlainTextCodes(self.app, self.ui.textEdit)
+        self.app.coding_undo.clear()  # bulk code tree changes stay outside the history
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
@@ -2002,6 +2037,7 @@ Click "Yes" to start now.')
          """
 
         RefiImport(self.app, self.ui.textEdit, "qdc")
+        self.app.coding_undo.clear()  # bulk code tree changes stay outside the history
 
     def refi_project_import(self):
         """ Import a qpdx QDA project into a new project space.
@@ -2371,6 +2407,7 @@ Click "Yes" to start now.')
         if ui.coder_names_changes:
             if current_coder != self.app.settings['codername']:
                 self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
+                self.app.coding_undo.clear()
             for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
                 self.clear_tab_widgets(tab_widget, show_placeholder=True)
                     
@@ -2457,6 +2494,7 @@ Click "Yes" to start now.')
         self.app.project_path = proj_path
         self.app.project_name = Path(proj_path).name
         self.app.conn = project_connection
+        self.app.coding_undo.clear()
 
         cur = self.app.conn.cursor()
 
@@ -2972,6 +3010,7 @@ Click "Yes" to start now.')
         Delete old backups. Hide menu options. """
 
         self.app.ai_mcp_server.reset_project_state()
+        self.app.coding_undo.clear()
         self.journal_display = None
         for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
             self.clear_tab_widgets(tab_widget, show_placeholder=True)

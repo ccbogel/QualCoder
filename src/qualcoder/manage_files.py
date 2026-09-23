@@ -3828,6 +3828,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
+        self.app.coding_undo.clear()  # deleted files take their codings outside the history
         self._emit_project_table_changes(['source', 'code_text', 'code_image', 'code_av', 'annotation', 'case_text', 'attribute'])
 
     @staticmethod
@@ -3959,6 +3960,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(_("Deleted: ") + filenames)
         self.load_file_data()
         self.app.delete_backup = False
+        self.app.coding_undo.clear()  # deleted files take their codings outside the history
         self._emit_project_table_changes(['source', 'code_text', 'code_image', 'code_av', 'annotation', 'case_text', 'attribute'])
 
     def get_tooltip_values(self, attribute_name:str):

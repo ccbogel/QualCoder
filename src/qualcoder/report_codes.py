@@ -46,6 +46,7 @@ from PyQt6.QtGui import QBrush
 from .code_in_all_files import DialogCodedIds
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
+from .coding_undo import CODING_TABLES
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths, \
@@ -2789,12 +2790,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         if code['result_type'] == 'text':
+            undo_token = self.app.coding_undo.begin(_("Toggle important"), CODING_TABLES)
             cur.execute("update code_text set important=1 where ctid=?", [code['ctid']])
         if code['result_type'] == 'image':
             cur.execute("update code_image set important=1 where imid=?", [code['imid']])
         if code['result_type'] == 'av':
             cur.execute("update code_av set important=1 where avid=?", [code['avid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_coding_change(code['result_type'])
         self.app.delete_backup = False
         # Remove widgets from coding layout, reload to update
@@ -2821,6 +2824,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if memo == new_memo:
             return
         if code['result_type'] == 'text':
+            undo_token = self.app.coding_undo.begin(_("Coding memo"), CODING_TABLES)
             cur.execute("update code_text set memo=? where ctid=?", [new_memo, code['ctid']])
             self.parent_textEdit.append(_("Text memo updated for ctid: ") + str(code['ctid']))
         if code['result_type'] == 'image':
@@ -2830,6 +2834,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute("update code_av set memo=? where avid=?", [new_memo, code['avid']])
             self.parent_textEdit.append(_("AV memo updated for avid: ") + str(code['avid']))
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_coding_change(code['result_type'])
         self.app.delete_backup = False
         # Remove widgets from coding layout, reload to update
@@ -2845,6 +2850,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Get replacement code
         codes_list = deepcopy(self.code_names)
         to_hide = None
+        undo_token = self.app.coding_undo.begin(_("Change code"), CODING_TABLES)
         for code_ in codes_list:
             if code_['cid'] == existing_code['cid']:
                 to_hide = code_
@@ -2867,6 +2873,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if existing_code['result_type'] == 'av':
                 cur.execute("update code_av set cid=? where avid=?", [replacement_code['cid'], existing_code['avid']])
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
         except sqlite3.IntegrityError:
             Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
             return
@@ -2886,6 +2893,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Get additional code
         codes_list = deepcopy(self.code_names)
         to_hide = None
+        undo_token = self.app.coding_undo.begin(_("Code with another code"), CODING_TABLES)
         for code_ in codes_list:
             if code_['cid'] == existing_code['cid']:
                 to_hide = code_
@@ -2925,6 +2933,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                              now_date, owner))
 
             self.app.conn.commit()
+            self.app.coding_undo.end(undo_token)
         except sqlite3.IntegrityError:
             Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
             return
@@ -2950,12 +2959,14 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         if code['result_type'] == 'text':
+            undo_token = self.app.coding_undo.begin(_("Unmark"), CODING_TABLES)
             cur.execute("delete from code_text where ctid=?", [code['ctid']])
         if code['result_type'] == 'image':
             cur.execute("delete from code_image where imid=?", [code['imid']])
         if code['result_type'] == 'av':
             cur.execute("delete from code_av where avid=?", [code['avid']])
         self.app.conn.commit()
+        self.app.coding_undo.end(undo_token)
         self.emit_coding_change(code['result_type'])  # before result_type is overwritten
         self.app.delete_backup = False
         code['result_type'] = "deleted"
