@@ -50,64 +50,52 @@
         <attribute name="title">
          <string>Manage</string>
         </attribute>
-        <widget class="QTextBrowser" name="textBrowser_manage">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>780</width>
-           <height>500</height>
-          </rect>
-         </property>
-         <property name="plainText">
-          <string>Select an option from the Manage menu</string>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_manage">
+         <item>
+          <widget class="QTextBrowser" name="textBrowser_manage">
+           <property name="plainText">
+            <string>Select an option from the Manage menu</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab_coding">
         <attribute name="title">
          <string>Coding</string>
         </attribute>
-        <widget class="QTextBrowser" name="textBrowser_coding">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>780</width>
-           <height>500</height>
-          </rect>
-         </property>
-         <property name="plainText">
-          <string>Select an option from the coding menu</string>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_coding">
+         <item>
+          <widget class="QTextBrowser" name="textBrowser_coding">
+           <property name="plainText">
+            <string>Select an option from the coding menu</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab_reports">
         <attribute name="title">
          <string>Reports</string>
         </attribute>
-        <widget class="QTextBrowser" name="textBrowser_reports">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>780</width>
-           <height>500</height>
-          </rect>
-         </property>
-         <property name="plainText">
-          <string>Select an option from the Analysis or Reports menu</string>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_reports">
+         <item>
+          <widget class="QTextBrowser" name="textBrowser_reports">
+           <property name="plainText">
+            <string>Select an option from the Analysis or Reports menu</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab_ai_agent">
         <attribute name="title">

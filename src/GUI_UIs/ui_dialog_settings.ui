@@ -636,6 +636,22 @@ langauge = it</string>
              <item row="1" column="2">
               <widget class="QComboBox" name="comboBox_style"/>
              </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="label_look">
+               <property name="toolTip">
+                <string>Classic keeps the current look. Modern flattens tool buttons and rounds fields. Requires restart.</string>
+               </property>
+               <property name="text">
+                <string>Look</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QComboBox" name="comboBox_look"/>
+             </item>
              <item row="0" column="2">
               <widget class="QCheckBox" name="checkBox">
                <property name="toolTip">

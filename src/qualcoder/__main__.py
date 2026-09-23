@@ -87,6 +87,7 @@ from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
 from qualcoder.manage_references import DialogReferenceManager
 from qualcoder.memo import DialogMemo
+from qualcoder.modern_style import install_modern_look
 from qualcoder.refi import RefiExport, RefiImport
 from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
@@ -324,6 +325,7 @@ class MainWindow(QtWidgets.QMainWindow):
             # The default 'Windows' style seems partially broken at the moment, in combination with the native dark mode.
             # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
             QtWidgets.QApplication.instance().setStyle("Fusion")
+            install_modern_look(QtWidgets.QApplication.instance(), self.app.settings, qc_config_folder)
 
         QtWidgets.QMainWindow.__init__(self)
         self.external_mcp = ExternalMcpController(self.app, self)
@@ -3238,6 +3240,7 @@ def gui():
     install_droid_sans_mono()
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
+    install_modern_look(app, settings, qc_config_folder)
     qta.reset_cache()
     qta.set_defaults(
         color=qual_app.qtawesome_icon_color,

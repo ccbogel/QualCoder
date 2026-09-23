@@ -977,7 +977,8 @@ class App(object):
                 'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
                 'ai_model_upgrade_offer_pending',
                 'mcp_external_enabled', 'external_mcp_notice_acknowledged', 'mcp_external_port',
-                'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
+                'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom',
+                'ui_look'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -991,6 +992,8 @@ class App(object):
                     settings_data[key] = "[]"
                 if key == "backup_num":
                     settings_data[key] = 5
+                if key == 'ui_look':
+                    settings_data[key] = 'modern'
                 if key == 'showids':
                     settings_data[key] = False
                 if key == 'codetext_show_margin_stripes':
@@ -1357,6 +1360,8 @@ class App(object):
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
             result['stylesheet'] = "native"
+        if result.get('ui_look', 0) in (0, ''):
+            result['ui_look'] = 'modern'
         return result, ai_models
 
     @property
@@ -1447,6 +1452,7 @@ class App(object):
             'dialogreportcodercomparisons_tree_widths': '',
             'dialogcodecolorscheme_tree_widths': '',
             'stylesheet': 'native',
+            'ui_look': 'modern',
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',
             'ai_enable': 'False',
