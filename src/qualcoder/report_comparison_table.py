@@ -108,6 +108,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_counts = []
         self.data_colors = []
         self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
+        self.columns = []
         self.ui.tableWidget.setRowCount(0)
         self.ui.tableWidget.setColumnCount(0)
         self.ui.listWidget.clear()
@@ -213,7 +214,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.files = []
         cur = self.app.conn.cursor()
         if attribute['caseOrFile'] == 'case' and attribute['valuetype'] == 'character':
-            sql = "select fid, source.name, cases.name, value from attribute join cases on cases.caseid=attribute.id " \
+            sql = "select distinct fid, source.name, cases.name, value from attribute join cases on cases.caseid=attribute.id " \
                   "join case_text on cases.caseid=case_text.caseid " \
                   "join source on source.id=case_text.fid " \
                   "where attr_type='case' and attribute.name=? " \
@@ -225,7 +226,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 self.files.append({'id': r[0], 'name': f"{group}\nCase: {r[2]}\n{r[1]}", 'memo': "", 'group': group})
 
         if attribute['caseOrFile'] == 'case' and attribute['valuetype'] == 'numeric':
-            sql = "select fid, source.name, cases.name, cast(value as real) from attribute " \
+            sql = "select distinct fid, source.name, cases.name, cast(value as real) from attribute " \
                   "join cases on cases.caseid=attribute.id " \
                   "join case_text on cases.caseid=case_text.caseid " \
                   "join source on source.id=case_text.fid " \
@@ -309,6 +310,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
     def transpose_data(self):
 
+        if not self.data_counts:
+            return
         self.transposed = not(self.transposed)
         self.data_counts = [[row[i] for row in self.data_counts] for i in range(len(self.data_counts[0]))]
         self.data_colors = [[row[i] for row in self.data_colors] for i in range(len(self.data_colors[0]))]
@@ -381,11 +384,12 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             return
         groups = {}
         for f in self.files:
-            groups.setdefault(f['group'], []).append(f['id'])
+            ids = groups.setdefault(f['group'], [])
+            if f['id'] not in ids:  # A file may be linked to a group more than once
+                ids.append(f['id'])
         self.columns = []
         for group_name, ids in groups.items():
-            files_label = _("files") if len(ids) != 1 else _("file")
-            self.columns.append({'name': f"{group_name}\n({len(ids)} {files_label})", 'ids': ids})
+            self.columns.append({'name': f"{group_name}\n{_('Files')}: {len(ids)}", 'ids': ids})
 
     def group_selection_changed(self):
         """ Checkbox toggled: recalculate the table if there is something to show. """
@@ -460,7 +464,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 cases.append(item)
         self.files = []
         cur = self.app.conn.cursor()
-        sql = "select case_text.fid, source.name, source.memo from case_text " \
+        sql = "select distinct case_text.fid, source.name, source.memo from case_text " \
               "join source on source.id=case_text.fid where case_text.caseid=?"
         for case in cases:
             cur.execute(sql, [case['id']])
@@ -792,29 +796,28 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
         self.ui.tableWidget.resizeRowsToContents()
+        self.show_or_hide_empty_rows_and_cols()  # Keep hidden state in sync after transposing
 
     def show_or_hide_empty_rows_and_cols(self):
         """ Unchecked - show all rows and columns.
-        Checked - hide rows and columns with no code co-occurrences. """
+        Checked - hide rows and columns with no code counts. """
 
         if not self.data_counts:
             return
-        if self.ui.checkBox_hide_blanks.isChecked():
-            for row, row_data in enumerate(self.data_counts):
-                if sum(row_data) == 0:
-                    self.ui.tableWidget.hideRow(row)
-
-            for col in range(len(self.data_counts[0])):
-                col_sum = 0
-                for row, row_data in enumerate(self.data_counts):
-                    col_sum += row_data[col]
-                if col_sum == 0:
-                    self.ui.tableWidget.hideColumn(col)
+        rows = len(self.data_counts)
+        cols = len(self.data_counts[0])
+        for row in range(rows):
+            self.ui.tableWidget.showRow(row)
+        for col in range(cols):
+            self.ui.tableWidget.showColumn(col)
         if not self.ui.checkBox_hide_blanks.isChecked():
-            for row in range(len(self.data_counts)):
-                self.ui.tableWidget.showRow(row)
-            for col in range(len(self.data_counts[0])):
-                self.ui.tableWidget.showColumn(col)
+            return
+        for row, row_data in enumerate(self.data_counts):
+            if sum(row_data) == 0:
+                self.ui.tableWidget.hideRow(row)
+        for col in range(cols):
+            if sum(row_data[col] for row_data in self.data_counts) == 0:
+                self.ui.tableWidget.hideColumn(col)
 
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
