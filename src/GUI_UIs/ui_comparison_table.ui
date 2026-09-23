@@ -28,13 +28,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>54</height>
+       <height>62</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>50</height>
+       <height>62</height>
       </size>
      </property>
      <property name="title">
@@ -103,13 +103,29 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>38</y>
         <width>211</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string>Hide blank lines</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_group_selection">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>38</y>
+        <width>261</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Sum the code counts per case or per attribute value, instead of showing each file separately.</string>
+      </property>
+      <property name="text">
+       <string>Sum counts by case / attribute</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_select_files">
