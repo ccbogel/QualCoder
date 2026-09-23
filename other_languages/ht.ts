@@ -1166,6 +1166,16 @@ Klase pa non fichye ak non kòd.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_comparison_table.ui" line="0"/>
+      <source>Sum the code counts per case or per attribute value, instead of showing each file separately.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_comparison_table.ui" line="0"/>
+      <source>Sum counts by case / attribute</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_comparison_table.ui" line="0"/>
       <source>Select files</source>
       <translation type="unfinished">Chwazi fichye</translation>
     </message>

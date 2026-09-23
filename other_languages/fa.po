@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 14:23+0200\n"
+"POT-Creation-Date: 2026-09-23 10:45+0200\n"
 "PO-Revision-Date: 2026-08-28 13:04+0200\n"
 "Last-Translator: Auto-translated via Argostranslate (EN -> FA)\n"
 "Language-Team: FA <LL@li.org>\n"
@@ -6375,6 +6375,7 @@ msgstr "حداکثر:"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4004
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4006
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:551
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:392
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/information.py:300
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:935
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:942
@@ -6741,7 +6742,7 @@ msgid "unlinked"
 msgstr "Unlinked"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1454
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:671
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:716
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/pdf_utils.py:552
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:761
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1065
@@ -7514,7 +7515,7 @@ msgstr "موقعیت ویدئو به Timetamp"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4148
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4227
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:443
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:488
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3582
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3654
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3785
@@ -8306,12 +8307,12 @@ msgid ""
 "QualCoder. See the log for details."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:196
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:200
 #, fuzzy
 msgid "Select Attribute"
 msgstr "انتخاب ویژگی"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:280
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:287
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3779
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4301
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:227
@@ -8324,8 +8325,8 @@ msgstr "انتخاب ویژگی"
 msgid "Select files"
 msgstr "فایل های انتخاب شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:287
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:293
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:294
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:300
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:235
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:246
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:252
@@ -8333,7 +8334,7 @@ msgstr "فایل های انتخاب شده"
 msgid "Files selected"
 msgstr "فایل های انتخاب شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:287
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:294
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:235
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:236
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_relations.py:138
@@ -8341,20 +8342,20 @@ msgstr "فایل های انتخاب شده"
 msgid "All files selected"
 msgstr "تمام فایل های انتخاب شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:411
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:456
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4343
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:861
 #, fuzzy
 msgid "Select cases"
 msgstr "انتخاب موارد"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:430
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:475
 #, fuzzy
 msgid "Selection"
 msgstr "انتخاب انتخاب"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:453
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:462
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:498
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:507
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:334
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:343
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:344
@@ -8362,72 +8363,72 @@ msgstr "انتخاب انتخاب"
 msgid "Codes selected"
 msgstr "کدهای انتخاب شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:453
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:482
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:498
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:527
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:334
 #, fuzzy
 msgid "All codes selected"
 msgstr "تمام کدهای انتخاب شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:475
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:520
 #, fuzzy
 msgid "Select one category"
 msgstr "انتخاب یک دسته"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:482
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:527
 #, fuzzy
 msgid "Everything selected"
 msgstr "همه چیز انتخاب شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:624
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:669
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:921
 #, fuzzy
 msgid "Co-occurrence exported: "
 msgstr "صادرات Co-occurrence"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:625
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:670
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:922
 #, fuzzy
 msgid "Co-occurrence exported"
 msgstr "صادرات Co-occurrence"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:643
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:688
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1035
 #, fuzzy
 msgid "Merge into new code"
 msgstr "در کد جدید"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:651
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:696
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1046
 #, fuzzy
 msgid "New code"
 msgstr "کد جدید"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:652
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:697
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1046
 #, fuzzy
 msgid "Edit name:"
 msgstr "نام ویرایش:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:654
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:699
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1048
 #, fuzzy
 msgid "Merged: "
 msgstr "نام:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:660
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:705
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1054
 #, fuzzy
 msgid "Code name exists"
 msgstr "نام کد وجود دارد"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:660
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:705
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:1054
 #, fuzzy
 msgid "Choose another code name"
 msgstr "نام کد دیگری را انتخاب کنید"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:749
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:794
 #, fuzzy
 msgid ""
 "Left-click for details.\n"
@@ -8436,7 +8437,7 @@ msgstr ""
 "چپ کلیک: نشان دادن متن کد شده\n"
 "کلیک راست: کدهای ادغام شده"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:810
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:855
 #, fuzzy
 msgid "Click item for context"
 msgstr "گزینه Click Case for context"
