@@ -1,2 +1,4 @@
 These files can be used to test file imort, survey import, attribute import.
 The jpg , the ID1 and ID2 files are sample text and image files that can be coded.
+bibliography.ris can be imported i nthe manage References
+The plain_text_categories_codes can be imported from Project > Import  to set up a codes tree from a plain text file.
