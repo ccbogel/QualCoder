@@ -3,26 +3,29 @@
 """Local Streamable HTTP transport for QualCoder's shared MCP server."""
 
 import asyncio
-from concurrent.futures import Future
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import logging
+import re
+import sqlite3
 import threading
 from typing import Any, Callable
 
 from PyQt6 import QtCore
 import uvicorn
 
-from .ai_mcp_server import AiMcpExecutionContext, AiMcpServer
+from .ai_mcp_server import AiMcpExecutionContext, AiMcpServer, EXPECTED_TOOL_ERRORS, ProjectDatabaseLockedError
 
 
 logger = logging.getLogger(__name__)
 
 
 class ExternalMcpController(QtCore.QObject):
-    """Run MCP HTTP off-thread and execute project work on the Qt thread."""
+    """Run MCP HTTP and project work off the GUI thread, like the internal AI agent does."""
 
     status_changed = QtCore.pyqtSignal(str)
     start_failed = QtCore.pyqtSignal(str)
-    _execute_requested = QtCore.pyqtSignal(object, object, object)
 
     HOST = "127.0.0.1"
     DEFAULT_PORT = 47363
@@ -38,8 +41,11 @@ class ExternalMcpController(QtCore.QObject):
         self._restart_requested = False
         self._startup_pending = False
         self._startup_error = ""
-        self._execute_requested.connect(self._execute_on_qt_thread)
-        self.mcp_server.set_external_executor(self._invoke_on_qt_thread)
+        # One worker keeps requests in order; a busy database then waits here and not in the GUI
+        self._worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="QualCoderExternalMCPWork")
+        self._traced_conn: sqlite3.Connection | None = None
+        self._gui_statements: deque[tuple[str, str]] = deque(maxlen=12)
+        self.mcp_server.set_external_executor(self._invoke_off_gui_thread)
 
     @property
     def endpoint(self) -> str:
@@ -47,17 +53,24 @@ class ExternalMcpController(QtCore.QObject):
 
         return f"http://{self.HOST}:{self.port}/mcp"
 
+    @staticmethod
+    def port_from_settings(settings: Any) -> int:
+        """Return a normalized TCP port from application settings."""
+
+        default_port = ExternalMcpController.DEFAULT_PORT
+        try:
+            port = int(settings.get("mcp_external_port", default_port))
+        except (TypeError, ValueError):
+            port = default_port
+        if not 1024 <= port <= 65535:
+            return default_port
+        return port
+
     @property
     def port(self) -> int:
         """Return a normalized configured TCP port."""
 
-        try:
-            port = int(self.app.settings.get("mcp_external_port", self.DEFAULT_PORT))
-        except (TypeError, ValueError):
-            port = self.DEFAULT_PORT
-        if not 1024 <= port <= 65535:
-            return self.DEFAULT_PORT
-        return port
+        return self.port_from_settings(self.app.settings)
 
     @property
     def is_running(self) -> bool:
@@ -75,6 +88,7 @@ class ExternalMcpController(QtCore.QObject):
         """Start or stop the listener from the current MCP setting."""
 
         enabled = str(self.app.settings.get("mcp_external_enabled", "False")).lower() == "true"
+        self._trace_gui_connection(enabled)
         if enabled:
             self.start()
         else:
@@ -215,37 +229,78 @@ class ExternalMcpController(QtCore.QObject):
             listener.close()
         self._uvicorn_server.should_exit = True
 
-    async def _invoke_on_qt_thread(
+    async def _invoke_off_gui_thread(
             self, operation: Callable[[], Any], execution_context: AiMcpExecutionContext
     ) -> Any:
-        """Queue a synchronous project operation on Qt and await its result."""
+        """Queue a synchronous project operation on the worker and await its result."""
 
         if not self._active:
             raise RuntimeError("External MCP is disabled.")
-        future: Future[Any] = Future()
-        self._execute_requested.emit(operation, execution_context, future)
+        future = self._worker.submit(self._execute, operation, execution_context)
         return await asyncio.wrap_future(future)
 
-    @QtCore.pyqtSlot(object, object, object)
-    def _execute_on_qt_thread(
-            self,
-            operation: Callable[[], Any],
-            execution_context: AiMcpExecutionContext,
-            future: Future[Any],
-    ) -> None:
-        """Execute one queued request against the currently open project."""
+    def _execute(self, operation: Callable[[], Any], execution_context: AiMcpExecutionContext) -> Any:
+        """Execute one queued request; the MCP server itself reports a missing project."""
 
-        if future.cancelled():
-            return
         if not self._active:
-            if not future.done():
-                future.set_exception(RuntimeError("External MCP is disabled."))
+            raise RuntimeError("External MCP is disabled.")
+        try:
+            return self.mcp_server.run_with_execution_context(execution_context, operation)
+        except ProjectDatabaseLockedError as err:
+            self._report_database_lock(err)
+            raise
+        except EXPECTED_TOOL_ERRORS as err:
+            # The server turns these into isError results; one line in the action log is enough
+            self.status_changed.emit(f"External MCP request rejected: {str(err)[:300]}")
+            raise
+        except Exception as err:
+            self.status_changed.emit(f"External MCP request failed: {type(err).__name__}: {str(err)[:300]}")
+            raise
+
+    def _trace_gui_connection(self, enabled: bool) -> None:
+        """Keep the last statements of the GUI connection, to name the window that holds the database."""
+
+        conn = self.app.conn if enabled else None
+        if conn is self._traced_conn:
             return
         try:
-            result = self.mcp_server.run_with_execution_context(execution_context, operation)
-        except Exception as err:
-            if not future.done():
-                future.set_exception(err)
-        else:
-            if not future.done():
-                future.set_result(result)
+            if self._traced_conn is not None:
+                self._traced_conn.set_trace_callback(None)
+        except sqlite3.Error:
+            pass
+        self._traced_conn = None
+        self._gui_statements.clear()
+        if conn is None:
+            return
+        try:
+            conn.set_trace_callback(self._remember_gui_statement)
+            self._traced_conn = conn
+        except sqlite3.Error as err:
+            logger.debug("GUI connection trace unavailable: %s", err)
+
+    def _remember_gui_statement(self, statement: str) -> None:
+        """Trace callback, runs on the GUI thread for every statement, so it only stores."""
+
+        self._gui_statements.append((datetime.now().strftime("%H:%M:%S"), statement[:240]))
+
+    def _gui_statement_trail(self) -> str:
+        """Return the remembered statements without their text values, which may be research data."""
+
+        lines = []
+        for clock, statement in list(self._gui_statements):
+            cleaned = re.sub(r"'(?:[^']|'')*'", "'?'", statement)
+            cleaned = cleaned.split("'")[0] + "'?" if cleaned.count("'") % 2 else cleaned
+            lines.append(f"  {clock} {' '.join(cleaned.split())}")
+        return "\n".join(lines)
+
+    def _report_database_lock(self, err: ProjectDatabaseLockedError) -> None:
+        """Log a persistent lock with the GUI statements that may explain it; the client only gets err."""
+
+        message = (
+            "External MCP: nothing written, the project database is locked "
+            f"(unsaved changes in QualCoder: {err.gui_transaction_pending})."
+        )
+        trail = self._gui_statement_trail()
+        if trail != "":
+            message += "\nLast statements of the QualCoder window connection, newest last:\n" + trail
+        self.status_changed.emit(message)
