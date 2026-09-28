@@ -5,7 +5,7 @@ if [ -z "$1" ]; then
     echo "Usage: $0 <version> (ex: 3.8.3)"
     exit 1
 fi
-
+cd "$(dirname "$0")/.." || exit 1
 VERSION="$1"
 NEW_DIR="qualcoder-${VERSION}"
 
@@ -24,7 +24,7 @@ fi
 
 #  Create .deb
 echo "Copy template ${NEW_DIR}..."
-cp -r "qualcoder-debian" "$NEW_DIR"
+cp -r "dev/qualcoder-debian" "$NEW_DIR"
 
 mkdir -p "${NEW_DIR}/src"
 cp "dist/QualCoder" "${NEW_DIR}/src/qualcoder"

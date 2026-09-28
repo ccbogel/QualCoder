@@ -2,9 +2,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 from unittest.mock import patch
-
 from lxml import etree
-
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import rebuild_lang
 
 

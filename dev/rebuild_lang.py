@@ -41,7 +41,7 @@ import polib
 from lxml import etree
 
 # --- Constants ---
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 I18N_DIR = os.path.join(PROJECT_ROOT, "src", "qualcoder", "i18n")
 OTHER_LANGS_DIR = os.path.join(PROJECT_ROOT, "other_languages")
 GUI_UI_DIR = os.path.join(PROJECT_ROOT, "src", "GUI_UIs")

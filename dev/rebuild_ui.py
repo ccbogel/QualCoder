@@ -33,7 +33,7 @@ https://qualcoder.org/
 import os
 import subprocess
 
-project_root = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # path to .ui-files
 ui_dir = os.path.join(project_root, "src", "GUI_UIs")
