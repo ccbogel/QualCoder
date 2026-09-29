@@ -305,7 +305,7 @@ Also, if you like Qualcoder a lot and want to advertise interest in its use, ple
 
 ## Other sources of information about QualCoder 
 
-Literature about QualCoder. Literature from authors not listed above may potneitally be inaccurate.
+Literature about QualCoder. Literature from authors not listed above may potentially be inaccurate or relate to older versions.
 
 Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page or the Codeberg equivalent: https://codeberg.org/qualcoder.
 
