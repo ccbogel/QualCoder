@@ -3208,6 +3208,21 @@ Cochez Tous les journaux pour rechercher dans tous les journaux</translation>
         <source>jid</source>
         <translation>JID</translation>
     </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_journals.ui" line="0"/>
+        <source>Insert current date and time at the cursor position</source>
+        <translation>Insérer la date et l’heure actuelles à la position du curseur</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_journals.ui" line="0"/>
+        <source>Insert coded segments from any file, case or code in the project</source>
+        <translation>Insérez des segments codés provenant de n&apos;importe quel fichier, dossier ou code dans le projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_journals.ui" line="0"/>
+        <source>Insert a bibliographic reference from the project</source>
+        <translation>Insérer une référence bibliographique du projet</translation>
+    </message>
 </context>
 <context>
     <name>Dialog_manage_attributes</name>
