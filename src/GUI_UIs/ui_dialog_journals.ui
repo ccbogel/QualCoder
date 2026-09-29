@@ -327,7 +327,95 @@ check All journals for searching all journals</string>
        </property>
       </column>
      </widget>
-     <widget class="QTextEdit" name="textEdit"/>
+     <widget class="QWidget" name="widget_editor" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_editor">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox_editor">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <widget class="QPushButton" name="pushButton_insert_datetime">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>2</y>
+            <width>28</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Insert current date and time at the cursor position</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_insert_coded_segment">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>2</y>
+            <width>28</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Insert coded segments from any file, case or code in the project</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_insert_reference">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>2</y>
+            <width>28</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Insert a bibliographic reference from the project</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="textEdit"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -341,6 +429,9 @@ check All journals for searching all journals</string>
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
   <tabstop>tableWidget</tabstop>
+  <tabstop>pushButton_insert_datetime</tabstop>
+  <tabstop>pushButton_insert_coded_segment</tabstop>
+  <tabstop>pushButton_insert_reference</tabstop>
   <tabstop>textEdit</tabstop>
   <tabstop>checkBox_search_all_journals</tabstop>
   <tabstop>pushButton_help</tabstop>
