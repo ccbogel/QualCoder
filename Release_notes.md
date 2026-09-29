@@ -224,6 +224,8 @@ Can resize coded areas using rightclick menu option and resize using handles.
 
 ## Code Audio / Video
 
+VLC is now optional. There is an option to open audio/video using the Qt Player which is a part of the Qt interface that QualCoder uses. 
+
 A bookmark option has been added. So after it is applied, in code A/V and view A/V (from manage files) the ime position in the A/V will be restored and the text position will be restored. Key presses are B (make bookmark) and Shift B (go to bookmark).
 
 ## Co-occurrence report
