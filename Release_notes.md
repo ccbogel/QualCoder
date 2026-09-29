@@ -1,6 +1,4 @@
-# QualCoder 4.0-beta Beta Release version
-
-## Beta release will be released late August and be available for approximately 6 weeks, prior to the final 4.0 repease candidate.
+# QualCoder 4.0
 
 We have jumped to version 4.0 as there are quite a few changes in this release.
 
@@ -192,6 +190,7 @@ A new menu option Analysis has been added. Menu items have been re-organised bet
 
 Export are now to ODT format. Right-click on a journal name to have an option to convert a journal to a file for coding within the QualCoder project.
 Right-click on a URL to open a URL from the journal text. URLs must start with: http, https or www.
+Once a journal is opened, ther eare additional buttons that allow insert of a timestamp, a bibliographic reference, and coded text.
 
 ## Manage files
 
