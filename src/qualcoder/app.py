@@ -28,6 +28,7 @@ import locale as py_locale
 import logging
 import os
 import platform
+from PyQt6 import QtCore, QtGui, QtWidgets
 import shutil
 import sqlite3
 import sys
@@ -38,8 +39,6 @@ import zipfile
 from copy import copy
 from pathlib import Path
 from typing import Any, Optional
-
-from PyQt6 import QtCore, QtGui, QtWidgets
 
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
@@ -117,7 +116,7 @@ class App(object):
     """
 
     def __init__(self):
-        self.version = "QualCoder 4.0 Beta"  # Must start with 'QualCoder '
+        self.version = "QualCoder 4.0"  # Must start with 'QualCoder '
         self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
         self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
         self.conn = None
