@@ -37,7 +37,7 @@ from PyQt6.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
 from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message, init_persistent_tree_header, \
-    restore_persistent_tree_widths
+    restore_persistent_tree_widths, setup_search_shortcuts
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
@@ -89,6 +89,12 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_boxplots.pressed.connect(self.create_boxplots)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.clicked.connect(self.search_text)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search_results,
+            next_callback=self.search_text,
+            prev_callback=None,
+            parent_widget=self
+        )
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
