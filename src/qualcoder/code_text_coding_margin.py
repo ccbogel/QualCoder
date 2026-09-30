@@ -103,10 +103,12 @@ class CodingMargin(QtWidgets.QWidget):
 
         current_fid = self.dialog.file_['id']
         important_only = getattr(self.dialog, 'important', False)
+        hidden_cids = getattr(self.dialog.app, 'hidden_cids', set())
 
         sorted_codes = sorted(
             [c for c in self.dialog.code_text
              if c.get('fid') == current_fid
+               and c.get('cid') not in hidden_cids
              and (not important_only or c.get('important') == 1)],
             key=lambda x: x.get('pos0', 0)
         )
@@ -236,6 +238,7 @@ class CodingMargin(QtWidgets.QWidget):
         background_color = self.editor.viewport().palette().color(QtGui.QPalette.ColorRole.Base)
 
         important_only = getattr(self.dialog, 'important', False)
+        hidden_cids = getattr(self.dialog.app, 'hidden_cids', set())
         layout = block.layout()
 
         bar_w = 3
@@ -243,6 +246,8 @@ class CodingMargin(QtWidgets.QWidget):
 
         for code in self.dialog.code_text:
             if code.get('fid') != current_fid:
+                continue
+            if code.get('cid') in hidden_cids:
                 continue
             if important_only and code.get('important') != 1:
                 continue
@@ -343,6 +348,7 @@ class CodingMargin(QtWidgets.QWidget):
         block = self.editor.firstVisibleBlock()
         file_start = self.dialog.file_.get('start', 0)
         important_only = getattr(self.dialog, 'important', False)
+        hidden_cids = getattr(self.dialog.app, 'hidden_cids', set())
 
         stripe_hit = None
         label_hit = None
@@ -367,6 +373,8 @@ class CodingMargin(QtWidgets.QWidget):
 
             for code in self.dialog.code_text:
                 if code.get('fid') != current_fid:
+                    continue
+                if code.get('cid') in hidden_cids:
                     continue
                 if important_only and code.get('important') != 1:
                     continue

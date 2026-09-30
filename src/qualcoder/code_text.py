@@ -195,6 +195,8 @@ class DialogCodeText(QtWidgets.QWidget):
         
         # For Code Resize Handles Experimental
         self.active_handles = []
+        self.last_resized_ctid = None
+        self.last_resized_time = datetime.datetime.min
 
         # Setup up widgets
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -365,6 +367,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.code_tree.show_codes_like_callback = self.show_codes_like
         self.code_tree.show_codes_of_colour_callback = self.show_codes_of_color
         self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
+        self.code_tree.code_visibility_changed.connect(self.on_code_visibility_changed)
 
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         init_persistent_tree_header(self.ui.treeWidget, self.app, 'dialogcodetext_tree_widths')
@@ -1738,8 +1741,28 @@ class DialogCodeText(QtWidgets.QWidget):
     def tree_item_clicked(self, item, column):
         """ Use to quicky open memo. """
 
-        if column == 2:
+        if column == 3:
             self.code_tree.add_edit_cat_or_code_memo(item)
+
+    def on_code_visibility_changed(self):
+        """Refresh editor and margin presentation after a visibility change."""
+
+        visible_code_text = [
+            item for item in self.code_text
+            if item.get('cid') not in getattr(self.app, 'hidden_cids', set())
+        ]
+        if self.important:
+            visible_code_text = [item for item in visible_code_text if item.get('important') == 1]
+        self.eventFilterTT.set_codes_and_annotations(
+            self.app, visible_code_text, self.codes, self.annotations, self.file_)
+        self.ui.plainTextEdit.setUpdatesEnabled(False)
+        try:
+            self.unlight()
+            self.highlight()
+        finally:
+            self.ui.plainTextEdit.setUpdatesEnabled(True)
+        self.overlapping_codes_in_text()
+        self.coding_margin.update()
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.
@@ -2596,6 +2619,8 @@ class DialogCodeText(QtWidgets.QWidget):
             text += f"\nFile: {self.file_['name']} [{start_pos} - {end_pos}] "
             codes = ""
             for coded in self.code_text:
+                if coded.get('cid') in getattr(self.app, 'hidden_cids', set()):
+                    continue
                 if coded['pos0'] <= start_pos <= coded['pos1'] or coded['pos0'] <= end_pos <= coded['pos1'] or \
                         (start_pos <= coded['pos0'] and coded['pos1'] <= end_pos):
                     codes += f"{coded['name']}; "
@@ -3889,8 +3914,11 @@ class DialogCodeText(QtWidgets.QWidget):
             if self.edit_mode:
                 return False
             cursor_pos = self.ui.plainTextEdit.textCursor().position()
+            hidden_cids = getattr(self.app, 'hidden_cids', set())
             codes_here = []
             for item in self.code_text:
+                if item.get('cid') in hidden_cids:
+                    continue
                 if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
                     codes_here.append(item)
             code_ = None
@@ -3899,17 +3927,22 @@ class DialogCodeText(QtWidgets.QWidget):
             if len(codes_here) > 1 and mod in (
                     QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
                     and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
-                ui = DialogSelectItems(self.app, codes_here, _("Select a code"), "single")
-                ok = ui.exec()
-                if not ok:
-                    return True
-                code_ = ui.get_selected()
-                if not code_:
-                    return True
+                elapsed = (now - self.last_resized_time).total_seconds()
+                code_ = next((item for item in codes_here if item.get('ctid') == self.last_resized_ctid), None)
+                if elapsed >= 2.0 or code_ is None:
+                    ui = DialogSelectItems(self.app, codes_here, _("Select a code"), "single")
+                    ok = ui.exec()
+                    if not ok:
+                        return True
+                    code_ = ui.get_selected()
+                    if not code_:
+                        return True
             if len(codes_here) == 1:
                 code_ = codes_here[0]
             # Key event can be too sensitive, adjusted  for 150 millisecond gap
             self.code_resize_timer = datetime.datetime.now()
+            self.last_resized_ctid = code_.get('ctid') if code_ else None
+            self.last_resized_time = now
             if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
                 self.shrink_to_left(code_)
                 return True
@@ -5110,8 +5143,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         self.clear_edit_variables()
+        hidden_cids = getattr(self.app, 'hidden_cids', set())
         unmarked_list = []
         for item in self.code_text:
+            if item.get('cid') in hidden_cids:
+                continue
             if item['pos0'] <= location + self.file_['start'] <= item['pos1']:
                 unmarked_list.append(item)
         if not unmarked_list:
@@ -6823,7 +6859,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         coded_text_list = []
+        hidden_cids = getattr(self.app, 'hidden_cids', set())
         for item in self.code_text:
+            if item.get('cid') in hidden_cids:
+                continue
             if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
                 coded_text_list.append(item)
         if not coded_text_list:

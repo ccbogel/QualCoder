@@ -1,0 +1,57 @@
+from types import SimpleNamespace
+
+from PyQt6 import QtCore, QtWidgets
+
+from qualcoder.code_tree import CodeTreeController
+
+
+_qt_app = None
+
+
+def _controller():
+    global _qt_app
+    _qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    app = SimpleNamespace(
+        hidden_cids=set(),
+        pre_solo_hidden_cids=None,
+        collapsed_categories=set(),
+        settings={"showids": True},
+    )
+    host = SimpleNamespace(
+        codes=[
+            {"cid": 1, "name": "Alpha", "memo": "", "color": "#ff0000", "catid": 10},
+            {"cid": 2, "name": "Beta", "memo": "", "color": "#00ff00", "catid": 10},
+        ],
+        categories=[
+            {"catid": 10, "name": "Group", "memo": "", "supercatid": None},
+        ],
+        parent_textEdit=None,
+    )
+    tree = QtWidgets.QTreeWidget()
+    controller = CodeTreeController(app, tree, host)
+    controller.fill_tree()
+    return app, tree, controller
+
+
+def test_code_visibility_controller_uses_column_zero_and_cascades():
+    app, tree, controller = _controller()
+
+    assert tree.columnCount() == 5
+    assert tree.treePosition() == 1
+    assert tree.columnWidth(0) == 28
+    assert controller.is_code_visible(1)
+
+    code_item = tree.findItems(
+        "Alpha", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    controller.toggle_code_visibility(1)
+    assert app.hidden_cids == {1}
+    assert not controller.is_code_visible(1)
+    assert code_item.icon(0).isNull() is False
+
+    controller.toggle_category_visibility(10)
+    assert app.hidden_cids == {1, 2}
+
+    controller.toggle_all_visibility()
+    assert app.hidden_cids == set()
+    controller.toggle_all_visibility()
+    assert app.hidden_cids == {1, 2}
