@@ -3207,6 +3207,21 @@ check All journals for searching all journals</source>
       <source>jid</source>
       <translation>jid</translation>
     </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert current date and time at the cursor position</source>
+      <translation type="unfinished">カーソル位置の現在の日付と時刻を入力</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert coded segments from any file, case or code in the project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert a bibliographic reference from the project</source>
+      <translation type="unfinished"/>
+    </message>
   </context>
   <context>
     <name>Dialog_manage_attributes</name>

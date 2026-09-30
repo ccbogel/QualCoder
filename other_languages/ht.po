@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 10:45+0200\n"
+"POT-Creation-Date: 2026-09-30 15:12+0200\n"
 "PO-Revision-Date: 2026-09-23 10:53+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: HT <LL@li.org>\n"
@@ -708,11 +708,11 @@ msgstr "Memo pou dosye a:"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5596
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6081
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6095
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:828
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:887
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:654
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:658
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:661
@@ -2247,7 +2247,7 @@ msgstr "Segman kode"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6332
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6367
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:220
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:233
@@ -2520,7 +2520,7 @@ msgstr "Pwojè Taguette enpòte"
 msgid "Taguette imported"
 msgstr "Tagèt enpòte"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:365
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:73
@@ -2537,38 +2537,61 @@ msgstr "Tagèt enpòte"
 msgid "Name"
 msgstr "Non"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #, fuzzy
 msgid "Modified"
 msgstr "Modifye"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #, fuzzy
 msgid "jid"
 msgstr "pran"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:204
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:536
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:551
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:574
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:596
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:766
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:213
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:595
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:633
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:655
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:825
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:863
 #, fuzzy
 msgid "Journal: "
 msgstr "Jounal:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #, fuzzy
 msgid "Attribute added to journals:"
 msgstr "Atribit ajoute nan ka yo:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2192
 msgid "type"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:330
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
+#, fuzzy
+msgid "Insert quotes"
+msgstr "Mete Liy"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#, fuzzy
+msgid "No coded segments found in this project."
+msgstr "Pa gen okenn segman kode pou chwazi"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
+#, fuzzy
+msgid "Insert reference"
+msgstr "Modifye referans"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
+#, fuzzy
+msgid "No references found in this project."
+msgstr "Pa gen okenn fichye tèks nan pwojè sa a."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:389
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1112
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:261
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:679
@@ -2577,18 +2600,18 @@ msgstr ""
 msgid "Open URL"
 msgstr "Ouvri URL"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:398
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:457
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2944
 #, fuzzy
 msgid "Journals: "
 msgstr "Jounal:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:410
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:415
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:420
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:464
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:487
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:469
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:474
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:479
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:523
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:546
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:228
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:520
@@ -2603,12 +2626,12 @@ msgstr "Jounal:"
 msgid "Ascending"
 msgstr "Anlè"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:475
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:480
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:524
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:530
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:547
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:249
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:521
@@ -2623,43 +2646,43 @@ msgstr "Anlè"
 msgid "Descending"
 msgstr "Desandan"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:466
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:525
 #, fuzzy
 msgid "Show name like"
 msgstr "Montre non tankou"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:478
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:537
 #, fuzzy
 msgid "Show this coder"
 msgstr "Montre kòd sa a"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:484
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:543
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1059
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:906
 #, fuzzy
 msgid "Show values like"
 msgstr "Montre valè tankou"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:486
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1078
 #, fuzzy
 msgid "Enter date"
 msgstr "Antre dat"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:491
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:550
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1104
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:916
 #, fuzzy
 msgid "Show all rows Ctrl A"
 msgstr "Montre tout ranje yo Ctrl A"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:495
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:554
 #, fuzzy
 msgid "Convert journal to source file"
 msgstr "Konvèti jounal la an dosye sous"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
@@ -2677,121 +2700,121 @@ msgstr "Konvèti jounal la an dosye sous"
 msgid "Text filter"
 msgstr "Filtre tèks"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
 #, fuzzy
 msgid "Show names like:"
 msgstr "Montre non tankou:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:955
 #, fuzzy
 msgid "Show values like:"
 msgstr "Montre valè yo konsa:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:608
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:667
 #, fuzzy
 msgid "Collated journals exported: "
 msgstr "Jounal konpile ki ekspòte:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:669
 #, fuzzy
 msgid "Collated journals exported"
 msgstr "Jounal yo konbine ekspòte"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 #, fuzzy
 msgid "New Journal"
 msgstr "Jounal Nouvo"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 #, fuzzy
 msgid "Journal name"
 msgstr "Non jounal la"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:688
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:747
 #, fuzzy
 msgid "Journal created: "
 msgstr "Jounal kreye:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:719
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:778
 #, fuzzy
 msgid "Journal exported to:"
 msgstr "Ekspòtasyon jounal"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:720
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:779
 #, fuzzy
 msgid "Journal export"
 msgstr "Ekspòtasyon jounal"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:740
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:799
 #, fuzzy
 msgid "Journal deleted: "
 msgstr "Jounal efase:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
 #, fuzzy
 msgid "No name was entered"
 msgstr "Okenn non pa t antre"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
 #, fuzzy
 msgid "Journal name in use"
 msgstr "Non jounal an itilizasyon"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:792
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:851
 #, fuzzy
 msgid "Warning - invalid characters"
 msgstr "Avètisman - karaktè ki pa valab"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:793
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:852
 #, fuzzy
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "Nan non jounal la sèvi ak sèlman: a-z, A-z 0-9 - espas"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:802
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:861
 #, fuzzy
 msgid "Journal name changed from: "
 msgstr "Non jounal la chanje soti nan:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:827
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:886
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2266
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:739
 #, fuzzy
 msgid "This attribute is numeric"
 msgstr "Atribit sa a se nimerik"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
 #, fuzzy
 msgid "No journal selected"
 msgstr "Pa gen jounal chwazi"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 #, fuzzy
 msgid "Journal is empty. Nothing to convert."
 msgstr "Jounal la vid. Pa gen anyen pou konvèti."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:951
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1010
 #, fuzzy
 msgid "Converted from journal: "
 msgstr "Konvèti soti nan jounal:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1064
 #, fuzzy
 msgid "Skipping non-numeric value for attribute "
 msgstr "Sote valè ki pa nimerik pou yon atribi"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1014
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1073
 #, fuzzy
 msgid "Could not insert attribute: "
 msgstr "Pa t ka mete atribi a:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1020
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1079
 #, fuzzy
 msgid "Journal converted to source document: "
 msgstr "Jounal konvèti an dokiman sous:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1022
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1081
 #, fuzzy
 msgid "Journal converted to source document"
 msgstr "Jounal la konvèti an dokiman sous."
@@ -7659,25 +7682,10 @@ msgstr "Segman sa a deja kode ak kòd sa a."
 msgid "LINKED TEXT: "
 msgstr "Tèks ki lye a:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
-#, fuzzy
-msgid "Insert quotes"
-msgstr "Mete Liy"
-
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:140
 #, fuzzy
 msgid "No coded segments found for this item."
 msgstr "Pa gen okenn segman kode pou chwazi"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
-#, fuzzy
-msgid "Insert reference"
-msgstr "Modifye referans"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
-#, fuzzy
-msgid "No references found in this project."
-msgstr "Pa gen okenn fichye tèks nan pwojè sa a."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:207
 #, fuzzy
@@ -17037,7 +17045,7 @@ msgstr "Dènye Sòti:"
 msgid "This version may be a pre-release version."
 msgstr "Vèsyon sa a ka yon vèsyon pre-lansman."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 #, fuzzy
 msgid ""
 "Cannot load config.ini.\n"
@@ -17048,29 +17056,29 @@ msgstr ""
 "Erè dechifre karaktè.\n"
 "Ap itilize paramèt pa defo QualCoder."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 #, fuzzy
 msgid "Cannot load config.ini file"
 msgstr "Pa ka chaje fichye config.ini a."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 #, fuzzy
 msgid "There is already a backup with this name"
 msgstr "Gen deja yon sovgad ki gen non sa a."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 #, fuzzy
 msgid "Project backup could not be fully created."
 msgstr "Kopi sekou pwojè a pa t ka kreye nèt."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 #, fuzzy
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr "AVÈTISMAN: Fichye odyo ak videyo PA gen sovgad. Gade paramèt yo."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 #, fuzzy
 msgid "Project backup created: "
 msgstr "Kopi sekou pwojè a kreye:"

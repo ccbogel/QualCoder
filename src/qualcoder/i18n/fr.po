@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-29 08:36+0200\n"
+"POT-Creation-Date: 2026-09-30 15:10+0200\n"
 "PO-Revision-Date: 2026-09-29 08:36+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
@@ -14854,7 +14854,7 @@ msgstr "Dernière mise à jour : "
 msgid "This version may be a pre-release version."
 msgstr "Cette version peut être une version préliminaire."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -14864,26 +14864,26 @@ msgstr ""
 "Erreur de décodage de caractères.\n"
 "Utilisation des paramètres par défaut de QualCoder."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 msgid "Cannot load config.ini file"
 msgstr "Impossible de charger le fichier config.ini"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 msgid "There is already a backup with this name"
 msgstr "Il existe déjà une sauvegarde à ce nom"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 msgid "Project backup could not be fully created."
 msgstr "La sauvegarde du projet n’a pas pu être entièrement créée."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "AVERTISSEMENT : fichiers audio et vidéo NON sauvegardés. Voir les paramètres."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 msgid "Project backup created: "
 msgstr "Création d’une sauvegarde de projet : "
 
