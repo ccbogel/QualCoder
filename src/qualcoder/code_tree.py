@@ -1060,6 +1060,7 @@ class CodeTreeController(QtCore.QObject):
             raise
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Code(s) deleted: ") + names + "\n")
+        self._cleanup_deleted_visibility(cids)
         # Let the host clean its own caches, such as the recent codes list.
         if self.on_codes_deleted is not None:
             self.on_codes_deleted(cids)
@@ -1197,6 +1198,7 @@ class CodeTreeController(QtCore.QObject):
             self.codes_changed.emit([])
             raise
         # Let the host clean its own caches, such as the recent codes list.
+        self._cleanup_deleted_visibility(cids)
         if self.on_codes_deleted is not None:
             self.on_codes_deleted(cids)
         self.app.delete_backup = False

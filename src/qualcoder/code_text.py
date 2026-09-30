@@ -1281,8 +1281,8 @@ class DialogCodeText(QtWidgets.QWidget):
         matches = []
         while iterator.value():
             item = iterator.value()
-            if "cid" in item.text(1):
-                cid = int(item.text(1)[4:])
+            if "cid" in item.text(2):
+                cid = int(item.text(2)[4:])
                 code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
                 if search_text in code_['name']:
                     matches.append(code_)
@@ -1309,8 +1309,8 @@ class DialogCodeText(QtWidgets.QWidget):
         iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         while iterator.value():
             item = iterator.value()
-            if "cid" in item.text(1):
-                cid = int(item.text(1)[4:])
+            if "cid" in item.text(2):
+                cid = int(item.text(2)[4:])
                 if cid == selected['cid']:
                     self.ui.treeWidget.setCurrentItem(item)
                     break
@@ -1351,12 +1351,12 @@ class DialogCodeText(QtWidgets.QWidget):
         other areas of the app. """
 
         # print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
-        if item.text(1)[:3] == "cid":
+        if item.text(2)[:3] == "cid":
             return
-        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
-            self.app.collapsed_categories.append(item.text(1))
-        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
-            self.app.collapsed_categories.remove(item.text(1))
+        if not item.isExpanded() and item.text(2) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(2))
+        if item.isExpanded() and item.text(2) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(2))
 
     def get_files(self, ids=None, sort="name asc", preserve_current_file: bool = False):
         """ Get files with additional details and fill list widget.
@@ -1575,7 +1575,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Do not overwrite journal or project memo views
         if self.code_rule:
             self.show_code_rule()
-        if current.text(1)[0:3] == 'cat':
+        if current.text(2)[0:3] == 'cat':
             style = f"QLabel {{background-color:transparent;}}"
             self.ui.label_code.setStyleSheet(style)
             tooltip = ""
@@ -1587,7 +1587,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # Set background colour of label to code color, and store current code for underlining
         for c in self.codes:
-            if int(current.text(1)[4:]) == c['cid']:
+            if int(current.text(2)[4:]) == c['cid']:
                 fg_color = TextColor(c['color']).recommendation
                 style = f"QLabel {{background-color:{c['color']}; color: {fg_color};}}"
                 self.ui.label_code.setStyleSheet(style)
@@ -1624,7 +1624,7 @@ class DialogCodeText(QtWidgets.QWidget):
             iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             while iterator.value():
                 item = iterator.value()
-                item.setText(3, '')
+                item.setText(4, '')
                 iterator += 1  # Move to the next item
             return
 
@@ -1723,19 +1723,19 @@ class DialogCodeText(QtWidgets.QWidget):
         iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         while iterator.value():
             item = iterator.value()
-            if item.text(1).startswith("catid"):
-                catid = int(item.text(1)[6:])
+            if item.text(2).startswith("catid"):
+                catid = int(item.text(2)[6:])
                 for category in categories:
                     if catid == category['catid']:
-                        item.setText(3, str(category['count']))
+                        item.setText(4, str(category['count']))
             else:
-                cid = int(item.text(1)[4:])
+                cid = int(item.text(2)[4:])
                 own_n = own_count.get(cid, 0)
                 if cid in children_of:
                     total_n = _code_total(cid)
-                    item.setText(3, f"{own_n} ({total_n})" if total_n != own_n else str(own_n))
+                    item.setText(4, f"{own_n} ({total_n})" if total_n != own_n else str(own_n))
                 else:
-                    item.setText(3, str(own_n))
+                    item.setText(4, str(own_n))
             iterator += 1  # Move to the next item
 
     def tree_item_clicked(self, item, column):
@@ -1775,7 +1775,7 @@ class DialogCodeText(QtWidgets.QWidget):
             item for item in self.code_text
             if item.get('cid') not in hidden_cids
             and item['pos0'] <= document_position <= item['pos1']
-            and (important is None or (item['important'] == 1 if important else item['important'] != 1))
+              and (important is None or (item['important'] == 1 if important else item['important'] != 1))
         ]
 
     def get_codes_and_categories(self):
@@ -1794,16 +1794,16 @@ class DialogCodeText(QtWidgets.QWidget):
         self.project_memo = False
         self.code_rule = True
         self.ui.textEdit_info.setReadOnly(True)
-        self.ui.label_info.setText(selected.text(0))
+        self.ui.label_info.setText(selected.text(1))
         txt = ""
-        if selected.text(1)[0:3] == 'cat':
+        if selected.text(2)[0:3] == 'cat':
             for c in self.categories:
-                if c['catid'] == int(selected.text(1)[6:]):
+                if c['catid'] == int(selected.text(2)[6:]):
                     txt += c['memo']
                     break
         else:  # Code is selected
             for c in self.codes:
-                if c['cid'] == int(selected.text(1)[4:]):
+                if c['cid'] == int(selected.text(2)[4:]):
                     txt += c['memo']
                     break
             self.ui.textEdit_info.show()
@@ -1812,7 +1812,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cur = self.app.conn.cursor()
             cur.execute(
                 "select seltext from code_text_visible where length(seltext) > 0 and cid=? order by random() limit 3",
-                [int(selected.text(1)[4:])])
+                [int(selected.text(2)[4:])])
             res = cur.fetchall()
             for i, r in enumerate(res):
                 txt += f"{i + 1}: {r[0]}\n"
@@ -2314,8 +2314,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # Get selected category, if any
         tree_item = self.ui.treeWidget.currentItem()
         catid = None
-        if tree_item is not None and tree_item.text(1)[0:3] == 'cat':
-            catid = int(tree_item.text(1)[6:])
+        if tree_item is not None and tree_item.text(2)[0:3] == 'cat':
+            catid = int(tree_item.text(2)[6:])
         codes_copy = deepcopy(self.codes)
         if not in_vivo:
             self.code_tree.add_code(catid)
@@ -2407,8 +2407,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_
-                                                        or item.child(i).toolTip(0) == text_):
+            if item.child(i).text(2)[0:3] == "cid" and (item.child(i).text(1) == text_
+                                                        or item.child(i).toolTip(1) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
@@ -2439,7 +2439,7 @@ class DialogCodeText(QtWidgets.QWidget):
             position = self.ui.plainTextEdit.textCursor().position()
         if self.file_ is None:
             return
-        coded_text_list = self.visible_code_text_at(position, important=important)
+        coded_text_list = self.visible_code_text_at(position, important=not important)
         if not coded_text_list:
             return
         text_items = []
@@ -2825,7 +2825,7 @@ class DialogCodeText(QtWidgets.QWidget):
         any_visible_descendant = False
         for i in range(child_count):
             child = item.child(i)
-            is_code = "cid:" in child.text(1)
+            is_code = "cid:" in child.text(2)
             # Recurse first so we know whether any descendant matches. <- L
             descendant_match = self.recursive_traverse(child, text_, case_sensitive)
             if text_ == "":
@@ -2835,7 +2835,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 continue
             self_match = False
             if is_code:
-                cid = int(child.text(1)[4:])
+                cid = int(child.text(2)[4:])
                 c = next((cc for cc in self.codes if cc['cid'] == cid), None)
                 if c is not None:
                     if case_sensitive:
@@ -2989,8 +2989,8 @@ class DialogCodeText(QtWidgets.QWidget):
             # if category already selected, add new category to that
             supercatid = None
             selected = self.ui.treeWidget.currentItem()
-            if selected is not None and selected.text(1)[0:3] == 'cat':
-                supercatid = int(selected.text(1)[6:])
+            if selected is not None and selected.text(2)[0:3] == 'cat':
+                supercatid = int(selected.text(2)[6:])
             self.code_tree.add_category(supercatid)
             return
         # Hide unHide top groupbox
@@ -4092,9 +4092,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
-        if item is None or item.text(1)[0:3] == 'cat':
+        if item is None or item.text(2)[0:3] == 'cat':
             return
-        cid = int(item.text(1)[4:])
+        cid = int(item.text(2)[4:])
         # Index list has to be dynamic, as a new code_text item could be created before this method is called again
         # Develop indices and tooltip coded text list
         indexes = []
@@ -4167,9 +4167,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
-        if item is None or item.text(1)[0:3] == 'cat':
+        if item is None or item.text(2)[0:3] == 'cat':
             return
-        cid = int(item.text(1)[4:])
+        cid = int(item.text(2)[4:])
         # Index list has to be dynamic, as a new code_text item could be created before this method is called again
         # Develop indexes and tooltip coded text list
         indexes = []
@@ -5060,9 +5060,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if item is None:
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
-        if item.text(1).split(':')[0] == 'catid':  # Cannot mark with category
+        if item.text(2).split(':')[0] == 'catid':  # Cannot mark with category
             return
-        cid = int(item.text(1).split(':')[1])
+        cid = int(item.text(2).split(':')[1])
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         pos0 = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
         pos1 = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
@@ -5343,7 +5343,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.clear_edit_variables()
         item = self.ui.treeWidget.currentItem()
-        if item is None or item.text(1)[0:3] == 'cat':
+        if item is None or item.text(2)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
         ui = DialogGetStartAndEndMarks("Autocoding", "Autocoding surround")
@@ -5371,7 +5371,7 @@ class DialogCodeText(QtWidgets.QWidget):
         msg = _("Code text using start and end marks: ")
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
         cur = self.app.conn.cursor()
-        cid = int(item.text(1)[4:])
+        cid = int(item.text(2)[4:])
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
 
         # Find text chunks and insert coded into database
@@ -5430,7 +5430,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 raise
         # Add to undo auto-coding history
         if len(undo_list) > 0:
-            name = _("Coding using start and end marks") + _("\nCode: ") + item.text(0)
+            name = _("Coding using start and end marks") + _("\nCode: ") + item.text(1)
             name += _("\nWith start mark: ") + start_mark + _("\nEnd mark: ") + end_mark
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
@@ -5492,11 +5492,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(files) == 0:
             return
         item = self.ui.treeWidget.currentItem()
-        if item is None or item.text(1)[0:3] == 'cat':
+        if item is None or item.text(2)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
         self.clear_edit_variables()
-        cid = int(item.text(1).split(':')[1])
+        cid = int(item.text(2).split(':')[1])
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Code sentence"))
@@ -5613,12 +5613,12 @@ class DialogCodeText(QtWidgets.QWidget):
             # undo_list = []
             raise
         if len(undo_list) > 0:
-            name = _("Sentence coding: ") + _("\nCode: ") + item.text(0)
+            name = _("Sentence coding: ") + _("\nCode: ") + item.text(1)
             name += _("\nWith: ") + find_text + _("\nUsing line ending: ") + ending
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
         self.parent_textEdit.append(_("Automatic code sentence in files:")
-                                    + _("\nCode: ") + item.text(0)
+                                    + _("\nCode: ") + item.text(1)
                                     + _("\nWith text fragment: ")
                                     + find_text
                                     + _("\nUsing line ending: ")
@@ -5638,10 +5638,10 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         code_item = self.ui.treeWidget.currentItem()
-        if code_item is None or code_item.text(1)[0:3] == 'cat':
+        if code_item is None or code_item.text(2)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
-        cid = int(code_item.text(1).split(':')[1])
+        cid = int(code_item.text(2).split(':')[1])
         # Input dialog too narrow, so code below to widen dialog
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
@@ -5650,9 +5650,9 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dialog.setToolTip(_("Use | to code multiple texts"))
         if self.ui.checkBox_auto_regex.isChecked():
-            dialog.setLabelText(_("Auto code files with the current code using Regex:") + "\n" + code_item.text(0))
+            dialog.setLabelText(_("Auto code files with the current code using Regex:") + "\n" + code_item.text(1))
         else:
-            dialog.setLabelText(_("Auto code files with the current code for this text:") + "\n" + code_item.text(0))
+            dialog.setLabelText(_("Auto code files with the current code for this text:") + "\n" + code_item.text(1))
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
@@ -5796,7 +5796,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # undo_list = []
             raise
         if len(undo_list) > 0:
-            name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
+            name = _("Text coding: ") + _("\nCode: ") + code_item.text(1)
             name += _("\nWith: ") + find_text
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
@@ -6466,11 +6466,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if code_item is None:  # nothing selected
             selected_id = -1
             selected_is_code = False
-        elif code_item.text(1)[0:3] == 'cat':  # category selected
-            selected_id = int(code_item.text(1).split(':')[1])
+        elif code_item.text(2)[0:3] == 'cat':  # category selected
+            selected_id = int(code_item.text(2).split(':')[1])
             selected_is_code = False
         else:  # code selected
-            selected_id = int(code_item.text(1).split(':')[1])
+            selected_id = int(code_item.text(2).split(':')[1])
             selected_is_code = True
 
         # Sort option lives in the shared code tree controller
