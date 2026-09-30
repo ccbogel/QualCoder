@@ -4,6 +4,7 @@ from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import Qt
 
 from qualcoder.code_tree import CodeTreeController
+from qualcoder.code_text import DialogCodeText
 
 
 _qt_app = None
@@ -182,3 +183,21 @@ def test_header_and_context_menu_toggle_all_are_clear_first(monkeypatch):
     controller.tree_menu(tree.visualItemRect(tree.topLevelItem(0)).center())
     assert selected_action["label"] == "Hide all codes"
     assert app.hidden_cids == {1, 2}
+
+
+def test_in_text_action_candidates_exclude_hidden_codes():
+    dialog = SimpleNamespace()
+    dialog.app = SimpleNamespace(hidden_cids={2})
+    dialog.file_ = {"start": 100}
+    dialog.code_text = [
+        {"cid": 1, "ctid": 11, "pos0": 105, "pos1": 120, "important": 1},
+        {"cid": 2, "ctid": 12, "pos0": 105, "pos1": 120, "important": 1},
+        {"cid": 3, "ctid": 13, "pos0": 105, "pos1": 120, "important": None},
+    ]
+
+    visible_code_text_at = DialogCodeText.visible_code_text_at
+    assert [item["cid"] for item in visible_code_text_at(dialog, 10)] == [1, 3]
+    assert [item["cid"] for item in visible_code_text_at(dialog, 10, important=1)] == [1]
+
+    dialog.app.hidden_cids = {1, 2, 3}
+    assert visible_code_text_at(dialog, 10) == []
