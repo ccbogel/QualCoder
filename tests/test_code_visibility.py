@@ -1,8 +1,9 @@
 from types import SimpleNamespace
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
+import qualcoder.code_text as code_text_module
 from qualcoder.code_tree import CodeTreeController
 from qualcoder.code_text import DialogCodeText
 
@@ -201,3 +202,107 @@ def test_in_text_action_candidates_exclude_hidden_codes():
 
     dialog.app.hidden_cids = {1, 2, 3}
     assert visible_code_text_at(dialog, 10) == []
+
+
+def test_boundary_nudge_prefers_active_handle_target_without_prompt(monkeypatch):
+    editor = QtWidgets.QPlainTextEdit()
+    editor.setPlainText("overlapping text")
+    cursor = editor.textCursor()
+    cursor.setPosition(5)
+    editor.setTextCursor(cursor)
+    first = {"cid": 1, "ctid": 11, "pos0": 0, "pos1": 10}
+    second = {"cid": 2, "ctid": 12, "pos0": 2, "pos1": 12}
+    dialog = SimpleNamespace(
+        ui=SimpleNamespace(plainTextEdit=editor),
+        app=SimpleNamespace(hidden_cids=set()),
+        file_={"start": 0},
+        code_text=[first, second],
+        edit_mode=False,
+        code_resize_timer=__import__("datetime").datetime.now()
+        - __import__("datetime").timedelta(seconds=1),
+        last_resized_ctid=None,
+        last_resized_time=__import__("datetime").datetime.min,
+        active_handles=[SimpleNamespace(code_item=second)],
+    )
+    dialog.ui.treeWidget = SimpleNamespace(viewport=lambda: editor)
+    nudged = []
+    dialog.extend_right = lambda code: nudged.append(code)
+
+    def fail_selection(*_args, **_kwargs):
+        raise AssertionError("DialogSelectItems should not be opened")
+
+    monkeypatch.setattr(code_text_module, "DialogSelectItems", fail_selection)
+    event = QtGui.QKeyEvent(
+        QtCore.QEvent.Type.KeyPress,
+        Qt.Key.Key_Right,
+        Qt.KeyboardModifier.ShiftModifier,
+    )
+
+    assert DialogCodeText.eventFilter(dialog, editor, event) is True
+    assert nudged == [second]
+
+
+def test_boundary_nudge_refreshes_editor_margin_and_handle_coordinates():
+    class FakeHandle:
+        def __init__(self, is_start):
+            self.is_start = is_start
+            self.code_item = {"ctid": 11, "pos0": 0, "pos1": 5}
+            self.positions = []
+
+        def move(self, x, y):
+            self.positions.append((x, y))
+
+        def width(self):
+            return 20
+
+    code = {"ctid": 11, "cid": 1, "fid": 1, "pos0": 0, "pos1": 5}
+    dialog = SimpleNamespace(
+        app=SimpleNamespace(
+            conn=SimpleNamespace(),
+            delete_backup=True,
+        ),
+        ui=SimpleNamespace(plainTextEdit=QtWidgets.QPlainTextEdit()),
+        file_={"start": 0},
+        code_text=[code],
+        active_handles=[FakeHandle(True), FakeHandle(False)],
+    )
+    dialog.ui.plainTextEdit.setPlainText("abcdef")
+    dialog.get_coded_text_update_eventfilter_tooltips = lambda: setattr(
+        dialog, "refreshed", True
+    )
+    dialog._emit_project_table_changes = lambda tables: setattr(dialog, "tables", tables)
+
+    class Cursor:
+        def __init__(self, position):
+            self.position = position
+
+        def setPosition(self, position):
+            self.position = position
+
+    dialog.ui.plainTextEdit.textCursor = lambda: Cursor(0)
+    dialog.ui.plainTextEdit.cursorRect = lambda cursor: QtCore.QRect(cursor.position, 7, 1, 1)
+    dialog.update_handle_positions = lambda: DialogCodeText.update_handle_positions(dialog)
+
+    class CursorConnection:
+        def cursor(self):
+            return self
+
+        def execute(self, *_args):
+            return None
+
+        def fetchone(self):
+            return ("abcde",)
+
+        def commit(self):
+            return None
+
+    connection = CursorConnection()
+    dialog.app.conn.cursor = connection.cursor
+    dialog.app.conn.commit = connection.commit
+    DialogCodeText.extend_right(dialog, code)
+
+    assert code["pos1"] == 6
+    assert dialog.refreshed is True
+    assert dialog.tables == ["code_text"]
+    assert all(handle.code_item is code for handle in dialog.active_handles)
+    assert all(handle.positions for handle in dialog.active_handles)

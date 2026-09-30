@@ -3932,8 +3932,13 @@ class DialogCodeText(QtWidgets.QWidget):
                     QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
                     and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
                 elapsed = (now - self.last_resized_time).total_seconds()
-                code_ = next((item for item in codes_here if item.get('ctid') == self.last_resized_ctid), None)
-                if elapsed >= 2.0 or code_ is None:
+                handle_ctid = None
+                if getattr(self, 'active_handles', []):
+                    handle_ctid = self.active_handles[0].code_item.get('ctid')
+                code_ = next((item for item in codes_here if item.get('ctid') == handle_ctid), None)
+                if code_ is None and elapsed < 2.0:
+                    code_ = next((item for item in codes_here if item.get('ctid') == self.last_resized_ctid), None)
+                if code_ is None:
                     ui = DialogSelectItems(self.app, codes_here, _("Select a code"), "single")
                     ok = ui.exec()
                     if not ok:
@@ -3961,6 +3966,29 @@ class DialogCodeText(QtWidgets.QWidget):
                 return True
         return False
 
+    def update_handle_positions(self):
+        """Keep visible resize handles aligned with the current coded segment."""
+
+        if not getattr(self, 'active_handles', []):
+            return
+        handle_ctid = self.active_handles[0].code_item.get('ctid')
+        code_item = next((item for item in self.code_text if item.get('ctid') == handle_ctid), None)
+        if code_item is None:
+            return
+        cursor_start = self.ui.plainTextEdit.textCursor()
+        cursor_start.setPosition(max(0, code_item['pos0'] - self.file_['start']))
+        rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
+        cursor_end = self.ui.plainTextEdit.textCursor()
+        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()),
+                                   code_item['pos1'] - self.file_['start']))
+        rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
+        for handle in self.active_handles:
+            handle.code_item = code_item
+            if handle.is_start:
+                handle.move(rect_start.x() - handle.width(), rect_start.y())
+            else:
+                handle.move(rect_end.x(), rect_end.y())
+
     def extend_left(self, code_):
         """ Shift left arrow.
         Args:
@@ -3981,6 +4009,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_handle_positions()
         self._emit_project_table_changes(['code_text'])
 
     def extend_right(self, code_):
@@ -4004,6 +4033,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_handle_positions()
         self._emit_project_table_changes(['code_text'])
 
     def shrink_to_left(self, code_):
@@ -4026,6 +4056,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_handle_positions()
         self._emit_project_table_changes(['code_text'])
 
     def shrink_to_right(self, code_):
@@ -4048,6 +4079,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_handle_positions()
         self._emit_project_table_changes(['code_text'])
 
     def show_selected_code_in_text_next(self):
