@@ -357,7 +357,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # Shared code tree controller: tree loading, common context menu, drag and drop
         # reparenting, F2-F6 shortcuts and category branch deletion live in code_tree.py,
         # so the four coding pages no longer duplicate this logic by hand.
-        self.code_tree = CodeTreeController(self.app, self.ui.treeWidget, self)
+        self.code_tree = CodeTreeController(
+            self.app, self.ui.treeWidget, self, visibility_enabled=True)
         self.ui.treeWidget.customContextMenuRequested.connect(self.code_tree.tree_menu)
         self.code_tree.fill_counts_callback = self.fill_code_counts_in_tree
         self.code_tree.coded_files_callback = self.coded_media_dialog

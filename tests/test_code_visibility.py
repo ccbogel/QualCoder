@@ -11,7 +11,7 @@ from qualcoder.code_text import DialogCodeText
 _qt_app = None
 
 
-def _controller():
+def _controller(visibility_enabled=True):
     global _qt_app
     _qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
     app = SimpleNamespace(
@@ -31,7 +31,8 @@ def _controller():
         parent_textEdit=None,
     )
     tree = QtWidgets.QTreeWidget()
-    controller = CodeTreeController(app, tree, host)
+    controller = CodeTreeController(
+        app, tree, host, visibility_enabled=visibility_enabled)
     controller.fill_tree()
     return app, tree, controller
 
@@ -60,6 +61,18 @@ def test_code_visibility_controller_uses_column_zero_and_cascades():
     assert app.hidden_cids == {1, 2}
 
 
+def test_shared_controller_preserves_legacy_columns_without_visibility():
+    _app, tree, controller = _controller(visibility_enabled=False)
+
+    assert tree.columnCount() == 4
+    assert tree.treePosition() == 0
+    code_item = tree.findItems(
+        "Alpha", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 0)[0]
+    assert code_item.text(0) == "Alpha"
+    assert code_item.text(1) == "cid:1"
+    assert controller.COL_VIS is None
+
+
 def test_category_visibility_cascades_through_nested_categories_and_subcodes():
     global _qt_app
     _qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
@@ -82,7 +95,7 @@ def test_category_visibility_cascades_through_nested_categories_and_subcodes():
         parent_textEdit=None,
     )
     tree = QtWidgets.QTreeWidget()
-    controller = CodeTreeController(app, tree, host)
+    controller = CodeTreeController(app, tree, host, visibility_enabled=True)
     controller.fill_tree()
     root_item = tree.findItems(
         "Root", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
@@ -131,6 +144,32 @@ def test_alt_click_solos_code_and_second_click_restores_exact_visibility(monkeyp
     controller.handle_item_clicked(code_item, controller.COL_VIS)
     assert app.hidden_cids == set()
     assert app.pre_solo_hidden_cids is None
+
+
+def test_solo_restore_survives_controller_recreation(monkeypatch):
+    app, _tree, controller = _controller()
+    alpha_item = controller.tree.findItems(
+        "Alpha", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    monkeypatch.setattr(
+        QtWidgets.QApplication,
+        "keyboardModifiers",
+        staticmethod(lambda: Qt.KeyboardModifier.AltModifier),
+    )
+
+    controller.handle_item_clicked(alpha_item, controller.COL_VIS)
+    assert app.hidden_cids == {2}
+
+    reopened_tree = QtWidgets.QTreeWidget()
+    reopened_controller = CodeTreeController(
+        app, reopened_tree, controller.host, visibility_enabled=True)
+    reopened_controller.fill_tree()
+    reopened_alpha = reopened_tree.findItems(
+        "Alpha", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    reopened_controller.handle_item_clicked(reopened_alpha, reopened_controller.COL_VIS)
+
+    assert app.hidden_cids == set()
+    assert app.pre_solo_hidden_cids is None
+    assert app.solo_visibility_target is None
 
 
 def test_alt_click_solos_category_and_switches_target(monkeypatch):
