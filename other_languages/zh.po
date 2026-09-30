@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 10:45+0200\n"
+"POT-Creation-Date: 2026-09-30 15:12+0200\n"
 "PO-Revision-Date: 2026-08-28 13:07+0200\n"
 "Last-Translator: Auto-translated via Argostranslate (EN -> ZH)\n"
 "Language-Team: ZH <LL@li.org>\n"
@@ -669,11 +669,11 @@ msgstr "文件备忘录 :"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5596
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6081
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6095
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:828
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:887
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:654
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:658
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:661
@@ -2146,7 +2146,7 @@ msgstr "编码文本段"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6332
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6367
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:220
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:233
@@ -2400,7 +2400,7 @@ msgstr "Taguette项目进口"
 msgid "Taguette imported"
 msgstr "进口塔盖特"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:365
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:73
@@ -2416,36 +2416,59 @@ msgstr "进口塔盖特"
 msgid "Name"
 msgstr "名称"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "Modified"
 msgstr "改装"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "jid"
 msgstr "jid"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:204
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:536
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:551
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:574
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:596
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:766
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:213
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:595
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:633
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:655
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:825
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:863
 #, fuzzy
 msgid "Journal: "
 msgstr "日刊:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #, fuzzy
 msgid "Attribute added to journals:"
 msgstr "为文件添加属性："
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2192
 msgid "type"
 msgstr "类型"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:330
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
+#, fuzzy
+msgid "Insert quotes"
+msgstr "插入引号"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#, fuzzy
+msgid "No coded segments found in this project."
+msgstr "未找到此项目的编码片段 。"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
+#, fuzzy
+msgid "Insert reference"
+msgstr "插入引用"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
+#, fuzzy
+msgid "No references found in this project."
+msgstr "在本工程中找不到参考文献 。"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:389
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1112
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:261
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:679
@@ -2453,18 +2476,18 @@ msgstr "类型"
 msgid "Open URL"
 msgstr "打开 URL"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:398
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:457
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2944
 #, fuzzy
 msgid "Journals: "
 msgstr "日记:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:410
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:415
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:420
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:464
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:487
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:469
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:474
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:479
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:523
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:546
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:228
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:520
@@ -2478,12 +2501,12 @@ msgstr "日记:"
 msgid "Ascending"
 msgstr "上升"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:475
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:480
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:524
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:530
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:547
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:249
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:521
@@ -2497,38 +2520,38 @@ msgstr "上升"
 msgid "Descending"
 msgstr "下降"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:466
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:525
 msgid "Show name like"
 msgstr "显示名称如"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:478
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:537
 msgid "Show this coder"
 msgstr "显示该编码器"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:484
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:543
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1059
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:906
 msgid "Show values like"
 msgstr "显示以下值"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:486
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1078
 msgid "Enter date"
 msgstr "输入日期"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:491
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:550
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1104
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:916
 msgid "Show all rows Ctrl A"
 msgstr "显示所有行 Ctrl A"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:495
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:554
 #, fuzzy
 msgid "Convert journal to source file"
 msgstr "将日记转换为源文件"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
@@ -2545,110 +2568,110 @@ msgstr "将日记转换为源文件"
 msgid "Text filter"
 msgstr "文本过滤器"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
 msgid "Show names like:"
 msgstr "节目名称如:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:955
 msgid "Show values like:"
 msgstr "显示数值，如"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:608
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:667
 #, fuzzy
 msgid "Collated journals exported: "
 msgstr "已整理的日记导出 :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:669
 #, fuzzy
 msgid "Collated journals exported"
 msgstr "导出合并日记"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "New Journal"
 msgstr "新期刊"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "Journal name"
 msgstr "期刊名称"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:688
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:747
 #, fuzzy
 msgid "Journal created: "
 msgstr "创建的日记 :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:719
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:778
 #, fuzzy
 msgid "Journal exported to:"
 msgstr "期刊出口"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:720
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:779
 msgid "Journal export"
 msgstr "期刊出口"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:740
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:799
 #, fuzzy
 msgid "Journal deleted: "
 msgstr "杂志已删除 :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
 msgid "No name was entered"
 msgstr "未输入姓名"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
 msgid "Journal name in use"
 msgstr "使用中的期刊名称"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:792
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:851
 msgid "Warning - invalid characters"
 msgstr "警告 - 字符无效"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:793
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:852
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "期刊名称中只能使用：a-z，A-z 0-9 - 空格"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:802
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:861
 #, fuzzy
 msgid "Journal name changed from: "
 msgstr "期刊名称改为:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:827
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:886
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2266
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:739
 msgid "This attribute is numeric"
 msgstr "该属性为数字"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
 #, fuzzy
 msgid "No journal selected"
 msgstr "未选中日记"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 msgid "Journal is empty. Nothing to convert."
 msgstr "日志为空。无内容可转换。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:951
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1010
 #, fuzzy
 msgid "Converted from journal: "
 msgstr "从日记转换 :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1064
 #, fuzzy
 msgid "Skipping non-numeric value for attribute "
 msgstr "跳过属性的非数字值"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1014
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1073
 #, fuzzy
 msgid "Could not insert attribute: "
 msgstr "无法插入属性 :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1020
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1079
 #, fuzzy
 msgid "Journal converted to source document: "
 msgstr "将日记转换为源文件 :"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1022
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1081
 msgid "Journal converted to source document"
 msgstr "日志已转换为源文档"
 
@@ -7206,25 +7229,10 @@ msgstr "本段已用此代码编码。"
 msgid "LINKED TEXT: "
 msgstr "链接的文本:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
-#, fuzzy
-msgid "Insert quotes"
-msgstr "插入引号"
-
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:140
 #, fuzzy
 msgid "No coded segments found for this item."
 msgstr "未找到此项目的编码片段 。"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
-#, fuzzy
-msgid "Insert reference"
-msgstr "插入引用"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
-#, fuzzy
-msgid "No references found in this project."
-msgstr "在本工程中找不到参考文献 。"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:207
 #, fuzzy
@@ -16086,7 +16094,7 @@ msgstr "最近发布:"
 msgid "This version may be a pre-release version."
 msgstr "这个版本可能是发行前版本."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -16096,26 +16104,26 @@ msgstr ""
 "字符解码错误。\n"
 "使用 QualCoder 默认设置。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 msgid "Cannot load config.ini file"
 msgstr "无法加载 config.ini 文件"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 msgid "There is already a backup with this name"
 msgstr "已经有一个使用此名称的备份"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 #, fuzzy
 msgid "Project backup could not be fully created."
 msgstr "无法完整创建工程备份 。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr "警告：不备份音频和视频文件。请参见设置。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 #, fuzzy
 msgid "Project backup created: "
 msgstr "创建工程备份 :"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 10:45+0200\n"
+"POT-Creation-Date: 2026-09-30 15:12+0200\n"
 "PO-Revision-Date: 2026-08-28 13:06+0200\n"
 "Last-Translator: Auto-translated via Argostranslate (EN -> RO)\n"
 "Language-Team: RO <LL@li.org>\n"
@@ -664,11 +664,11 @@ msgstr "Memorie pentru fișier:"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5596
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6081
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6095
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:828
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:887
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:654
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:658
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:661
@@ -2148,7 +2148,7 @@ msgstr "Segmente de text codificate"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6332
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6367
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:220
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:233
@@ -2408,7 +2408,7 @@ msgstr "Proiect Taguette importat"
 msgid "Taguette imported"
 msgstr "Taguette importată"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:365
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:73
@@ -2424,36 +2424,59 @@ msgstr "Taguette importată"
 msgid "Name"
 msgstr "Nume"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "Modified"
 msgstr "Modificat"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "jid"
 msgstr "jid"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:204
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:536
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:551
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:574
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:596
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:766
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:213
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:595
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:633
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:655
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:825
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:863
 #, fuzzy
 msgid "Journal: "
 msgstr "Jurnal:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #, fuzzy
 msgid "Attribute added to journals:"
 msgstr "Atribut adăugat la fișiere:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2192
 msgid "type"
 msgstr "tip"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:330
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
+#, fuzzy
+msgid "Insert quotes"
+msgstr "Inserează citat"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#, fuzzy
+msgid "No coded segments found in this project."
+msgstr "Nu se găsesc segmente codificate pentru acest articol."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
+#, fuzzy
+msgid "Insert reference"
+msgstr "Inserează referință"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
+#, fuzzy
+msgid "No references found in this project."
+msgstr "Nu s-au găsit referințe în acest proiect."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:389
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1112
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:261
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:679
@@ -2461,18 +2484,18 @@ msgstr "tip"
 msgid "Open URL"
 msgstr "Deschideți URL"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:398
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:457
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2944
 #, fuzzy
 msgid "Journals: "
 msgstr "Jurnale:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:410
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:415
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:420
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:464
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:487
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:469
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:474
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:479
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:523
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:546
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:228
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:520
@@ -2486,12 +2509,12 @@ msgstr "Jurnale:"
 msgid "Ascending"
 msgstr "Ascendent"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:475
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:480
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:524
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:530
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:547
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:249
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:521
@@ -2505,38 +2528,38 @@ msgstr "Ascendent"
 msgid "Descending"
 msgstr "Descendent"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:466
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:525
 msgid "Show name like"
 msgstr "Afișează nume precum"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:478
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:537
 msgid "Show this coder"
 msgstr "Afișați acest codator"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:484
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:543
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1059
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:906
 msgid "Show values like"
 msgstr "Afișați valori precum"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:486
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1078
 msgid "Enter date"
 msgstr "Introduceți data"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:491
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:550
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1104
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:916
 msgid "Show all rows Ctrl A"
 msgstr "Afișați toate rândurile Ctrl A"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:495
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:554
 #, fuzzy
 msgid "Convert journal to source file"
 msgstr "Schimbă jurnalul în fișier sursă"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
@@ -2553,110 +2576,110 @@ msgstr "Schimbă jurnalul în fișier sursă"
 msgid "Text filter"
 msgstr "Filtru text"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
 msgid "Show names like:"
 msgstr "Afișează nume precum:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:955
 msgid "Show values like:"
 msgstr "Afișați valori precum:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:608
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:667
 #, fuzzy
 msgid "Collated journals exported: "
 msgstr "Jurnale publicate exportate:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:669
 #, fuzzy
 msgid "Collated journals exported"
 msgstr "Jurnale publicate exportate"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "New Journal"
 msgstr "Jurnal nou"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "Journal name"
 msgstr "Nume jurnal"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:688
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:747
 #, fuzzy
 msgid "Journal created: "
 msgstr "Jurnal creat:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:719
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:778
 #, fuzzy
 msgid "Journal exported to:"
 msgstr "Export jurnal"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:720
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:779
 msgid "Journal export"
 msgstr "Export jurnal"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:740
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:799
 #, fuzzy
 msgid "Journal deleted: "
 msgstr "Jurnalul sters:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
 msgid "No name was entered"
 msgstr "Nu s-a introdus niciun nume"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
 msgid "Journal name in use"
 msgstr "Nume jurnal în uz"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:792
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:851
 msgid "Warning - invalid characters"
 msgstr "Avertisment - caractere invalide"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:793
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:852
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "În numele jurnalului utilizați doar: a-z, A-z 0-9 - spațiu"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:802
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:861
 #, fuzzy
 msgid "Journal name changed from: "
 msgstr "Nume jurnal schimbat de la:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:827
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:886
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2266
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:739
 msgid "This attribute is numeric"
 msgstr "Acest atribut este numeric"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
 #, fuzzy
 msgid "No journal selected"
 msgstr "Niciun jurnal selectat"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 msgid "Journal is empty. Nothing to convert."
 msgstr "Jurnalul este gol. Nimic de convertit."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:951
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1010
 #, fuzzy
 msgid "Converted from journal: "
 msgstr "Convertit din jurnal:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1064
 #, fuzzy
 msgid "Skipping non-numeric value for attribute "
 msgstr "Omiterea valorii nenumerice pentru atribut"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1014
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1073
 #, fuzzy
 msgid "Could not insert attribute: "
 msgstr "Nu am putut insera atributul:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1020
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1079
 #, fuzzy
 msgid "Journal converted to source document: "
 msgstr "Jurnal transformat în document sursă:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1022
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1081
 msgid "Journal converted to source document"
 msgstr "Jurnal convertit în document sursă"
 
@@ -7278,25 +7301,10 @@ msgstr "Acest segment a fost deja codat cu acest cod."
 msgid "LINKED TEXT: "
 msgstr "TEXT LINKED:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
-#, fuzzy
-msgid "Insert quotes"
-msgstr "Inserează citat"
-
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:140
 #, fuzzy
 msgid "No coded segments found for this item."
 msgstr "Nu se găsesc segmente codificate pentru acest articol."
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
-#, fuzzy
-msgid "Insert reference"
-msgstr "Inserează referință"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
-#, fuzzy
-msgid "No references found in this project."
-msgstr "Nu s-au găsit referințe în acest proiect."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:207
 #, fuzzy
@@ -16328,7 +16336,7 @@ msgstr "Ultima lansare:"
 msgid "This version may be a pre-release version."
 msgstr "Această versiune poate fi o versiune anterioară eliberării."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -16338,28 +16346,28 @@ msgstr ""
 "Eroare decodare caractere.\n"
 "Se utilizează setările implicite QualCoder."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 msgid "Cannot load config.ini file"
 msgstr "Nu se poate încărca fișierul config.ini"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 msgid "There is already a backup with this name"
 msgstr "Există deja o copie de siguranță cu acest nume"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 #, fuzzy
 msgid "Project backup could not be fully created."
 msgstr "Întăririle proiectului nu au putut fi create pe deplin."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "ATENȚIE: fișierele audio și video NU sunt copiate de siguranță. Consultați "
 "setările."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 #, fuzzy
 msgid "Project backup created: "
 msgstr "Proiect de rezervă creat:"

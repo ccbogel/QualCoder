@@ -3206,6 +3206,21 @@ kontrollera alla tidskrifter för att söka alla tidskrifter</translation>
       <source>jid</source>
       <translation>jid</translation>
     </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert current date and time at the cursor position</source>
+      <translation type="unfinished">Infoga aktuellt datum och tid på markörens position</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert coded segments from any file, case or code in the project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert a bibliographic reference from the project</source>
+      <translation type="unfinished"/>
+    </message>
   </context>
   <context>
     <name>Dialog_manage_attributes</name>

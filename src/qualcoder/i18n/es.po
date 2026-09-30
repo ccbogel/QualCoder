@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 10:45+0200\n"
+"POT-Creation-Date: 2026-09-30 15:11+0200\n"
 "PO-Revision-Date: 2026-09-02 04:43-0700\n"
 "Last-Translator: Auto-translated via Argostranslate (EN - < ES)>\n"
 "Language-Team: ES <LL@li.org>\n"
@@ -631,11 +631,11 @@ msgstr "Memo del archivo: "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5596
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6081
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6095
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:828
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:887
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:654
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:658
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:661
@@ -2009,7 +2009,7 @@ msgstr "Segmentos de texto codificados"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6332
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6367
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:220
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:233
@@ -2241,7 +2241,7 @@ msgstr "Proyecto Taguette importado"
 msgid "Taguette imported"
 msgstr "Taguette importado"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:365
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:73
@@ -2257,34 +2257,54 @@ msgstr "Taguette importado"
 msgid "Name"
 msgstr "Nombre"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "Modified"
 msgstr "Modificado"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "jid"
 msgstr "jid"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:204
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:536
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:551
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:574
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:596
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:766
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:213
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:595
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:633
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:655
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:825
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:863
 msgid "Journal: "
 msgstr "Diario: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 msgid "Attribute added to journals:"
 msgstr "Atributo añadido a los diarios:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2192
 msgid "type"
 msgstr "tipo"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:330
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
+msgid "Insert quotes"
+msgstr "Insertar citas"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#, fuzzy
+msgid "No coded segments found in this project."
+msgstr "No se encontraron segmentos codificados para este elemento."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
+msgid "Insert reference"
+msgstr "Insertar una referencia"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
+msgid "No references found in this project."
+msgstr "No hay referencias en este proyecto."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:389
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1112
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:261
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:679
@@ -2292,17 +2312,17 @@ msgstr "tipo"
 msgid "Open URL"
 msgstr "Abrir URL"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:398
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:457
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2944
 msgid "Journals: "
 msgstr "Diarios: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:410
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:415
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:420
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:464
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:487
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:469
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:474
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:479
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:523
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:546
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:228
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:520
@@ -2316,12 +2336,12 @@ msgstr "Diarios: "
 msgid "Ascending"
 msgstr "Ascendente"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:475
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:480
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:524
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:530
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:547
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:249
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:521
@@ -2335,37 +2355,37 @@ msgstr "Ascendente"
 msgid "Descending"
 msgstr "Descendente"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:466
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:525
 msgid "Show name like"
 msgstr "Mostrar nombres similares a"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:478
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:537
 msgid "Show this coder"
 msgstr "Mostrar este codificador"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:484
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:543
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1059
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:906
 msgid "Show values like"
 msgstr "Mostrar valores similares a"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:486
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1078
 msgid "Enter date"
 msgstr "Introducir fecha"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:491
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:550
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1104
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:916
 msgid "Show all rows Ctrl A"
 msgstr "Mostrar todas las filas Ctrl A"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:495
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:554
 msgid "Convert journal to source file"
 msgstr "Convertir el diario en archivo fuente"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
@@ -2382,99 +2402,99 @@ msgstr "Convertir el diario en archivo fuente"
 msgid "Text filter"
 msgstr "Filtro de texto"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
 msgid "Show names like:"
 msgstr "Mostrar nombres similares a:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:955
 msgid "Show values like:"
 msgstr "Mostrar valores similares a:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:608
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:667
 msgid "Collated journals exported: "
 msgstr "Diarios recopilados exportados: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:669
 msgid "Collated journals exported"
 msgstr "Diarios recopilados exportados"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "New Journal"
 msgstr "Nuevo diario"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "Journal name"
 msgstr "Nombre del diario"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:688
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:747
 msgid "Journal created: "
 msgstr "Diario creado: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:719
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:778
 msgid "Journal exported to:"
 msgstr "Diario exportado a:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:720
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:779
 msgid "Journal export"
 msgstr "Exportación de diario"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:740
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:799
 msgid "Journal deleted: "
 msgstr "Diario eliminado: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
 msgid "No name was entered"
 msgstr "No se ingresó ningún nombre"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
 msgid "Journal name in use"
 msgstr "El nombre del diario ya está en uso"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:792
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:851
 msgid "Warning - invalid characters"
 msgstr "Advertencia: caracteres no válidos"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:793
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:852
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "En el nombre del diario utilice únicamente: a-z, A-z 0-9 - espacio"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:802
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:861
 msgid "Journal name changed from: "
 msgstr "El nombre del diario cambió de: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:827
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:886
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2266
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:739
 msgid "This attribute is numeric"
 msgstr "Este atributo es numérico"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
 msgid "No journal selected"
 msgstr "No hay ningún diario seleccionado"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 msgid "Journal is empty. Nothing to convert."
 msgstr "El diario está vacío. Nada para convertir."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:951
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1010
 msgid "Converted from journal: "
 msgstr "Convertido desde el diario: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1064
 msgid "Skipping non-numeric value for attribute "
 msgstr "Se omite el valor no numérico del atributo "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1014
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1073
 msgid "Could not insert attribute: "
 msgstr "No se pudo insertar el atributo: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1020
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1079
 msgid "Journal converted to source document: "
 msgstr "Diario convertido en documento fuente: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1022
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1081
 msgid "Journal converted to source document"
 msgstr "Diario convertido en documento fuente"
 
@@ -6773,21 +6793,9 @@ msgstr "Este segmento ya fue codificado con este código."
 msgid "LINKED TEXT: "
 msgstr "TEXTO VINCULADO: "
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
-msgid "Insert quotes"
-msgstr "Insertar citas"
-
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:140
 msgid "No coded segments found for this item."
 msgstr "No se encontraron segmentos codificados para este elemento."
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
-msgid "Insert reference"
-msgstr "Insertar una referencia"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
-msgid "No references found in this project."
-msgstr "No hay referencias en este proyecto."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:207
 msgid "Memo export"
@@ -14937,7 +14945,7 @@ msgstr "Última versión: "
 msgid "This version may be a pre-release version."
 msgstr "Esta puede ser una versión preliminar."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -14947,27 +14955,27 @@ msgstr ""
 "Error de decodificación de caracteres.\n"
 "Se utilizará la configuración predeterminada de QualCoder."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 msgid "Cannot load config.ini file"
 msgstr "No se puede cargar el archivo config.ini"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 msgid "There is already a backup with this name"
 msgstr "Ya existe una copia de seguridad con este nombre"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 msgid "Project backup could not be fully created."
 msgstr "No se pudo crear por completo la copia de seguridad del proyecto."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "ADVERTENCIA: los archivos de audio y video NO se respaldaron. Consulte la "
 "configuración."
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 msgid "Project backup created: "
 msgstr "Copia de seguridad del proyecto creada: "
 

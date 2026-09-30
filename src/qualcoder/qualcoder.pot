@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-29 08:36+0200\n"
+"POT-Creation-Date: 2026-09-30 15:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13919,32 +13919,32 @@ msgstr ""
 msgid "This version may be a pre-release version."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
 "Using QualCoder default settings."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 msgid "Cannot load config.ini file"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 msgid "There is already a backup with this name"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 msgid "Project backup could not be fully created."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 msgid "Project backup created: "
 msgstr ""
 

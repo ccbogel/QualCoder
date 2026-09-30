@@ -3203,6 +3203,21 @@ Verificar totes los jornals per cercar dins totes los jornals</translation>
       <source>jid</source>
       <translation type="unfinished">prener</translation>
     </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert current date and time at the cursor position</source>
+      <translation type="unfinished">Insèrtar la data e l'ora actualas a la posicion del cursor</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert coded segments from any file, case or code in the project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_journals.ui" line="0"/>
+      <source>Insert a bibliographic reference from the project</source>
+      <translation type="unfinished"/>
+    </message>
   </context>
   <context>
     <name>Dialog_manage_attributes</name>

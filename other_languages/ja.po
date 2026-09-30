@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 10:45+0200\n"
+"POT-Creation-Date: 2026-09-30 15:12+0200\n"
 "PO-Revision-Date: 2026-08-28 13:05+0200\n"
 "Last-Translator: Auto-translated via Argostranslate (EN -> JA)\n"
 "Language-Team: JA <LL@li.org>\n"
@@ -672,11 +672,11 @@ msgstr "メモファイル:"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5596
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6081
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6095
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:828
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:887
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:654
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:658
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_attributes.py:661
@@ -2161,7 +2161,7 @@ msgstr "コードされたテキストセグメント"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6332
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6367
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:209
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:220
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:233
@@ -2418,7 +2418,7 @@ msgstr "Taguetteのプロジェクトは輸入しました"
 msgid "Taguette imported"
 msgstr "Taguetteは輸入しました"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:198
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:365
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:73
@@ -2434,36 +2434,59 @@ msgstr "Taguetteは輸入しました"
 msgid "Name"
 msgstr "名称"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "Modified"
 msgstr "変形"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:181
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:190
 msgid "jid"
 msgstr "jid"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:204
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:536
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:551
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:574
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:596
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:766
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:804
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:213
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:595
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:633
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:655
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:825
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:863
 #, fuzzy
 msgid "Journal: "
 msgstr "ジャーナル:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #, fuzzy
 msgid "Attribute added to journals:"
 msgstr "ファイルに属性が追加された："
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:247
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2192
 msgid "type"
 msgstr "タイプ"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:330
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
+#, fuzzy
+msgid "Insert quotes"
+msgstr "インサート引用符"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
+#, fuzzy
+msgid "No coded segments found in this project."
+msgstr "この項目のコードされたセグメントが見つかりません。"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
+#, fuzzy
+msgid "Insert reference"
+msgstr "インサート参照"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
+#, fuzzy
+msgid "No references found in this project."
+msgstr "本プロジェクトでは、参考文献が見つかりません。"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:389
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1112
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:261
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:679
@@ -2471,18 +2494,18 @@ msgstr "タイプ"
 msgid "Open URL"
 msgstr "URLを開く"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:398
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:457
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2944
 #, fuzzy
 msgid "Journals: "
 msgstr "ジャーナル:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:410
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:415
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:420
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:464
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:487
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:469
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:474
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:479
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:523
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:546
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:228
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:248
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:520
@@ -2496,12 +2519,12 @@ msgstr "ジャーナル:"
 msgid "Ascending"
 msgstr "上昇"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:411
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:416
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:421
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:465
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:471
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:488
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:470
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:475
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:480
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:524
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:530
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:547
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:229
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:249
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:521
@@ -2515,38 +2538,38 @@ msgstr "上昇"
 msgid "Descending"
 msgstr "下降"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:466
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:525
 msgid "Show name like"
 msgstr "のような名前を表示します"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:478
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:537
 msgid "Show this coder"
 msgstr "このコーダーを表示する"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:484
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:543
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1059
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:906
 msgid "Show values like"
 msgstr "のような値を表示する。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:486
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1078
 msgid "Enter date"
 msgstr "日付を入力"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:491
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:550
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1104
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:916
 msgid "Show all rows Ctrl A"
 msgstr "すべての行を表示 Ctrl A"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:495
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:554
 #, fuzzy
 msgid "Convert journal to source file"
 msgstr "ジャーナルをソースファイルに変換する"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1190
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:276
@@ -2563,110 +2586,110 @@ msgstr "ジャーナルをソースファイルに変換する"
 msgid "Text filter"
 msgstr "テキストフィルター"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:527
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:586
 msgid "Show names like:"
 msgstr "などの名前が表示される："
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:542
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1183
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:955
 msgid "Show values like:"
 msgstr "のような値を表示する："
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:608
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:667
 #, fuzzy
 msgid "Collated journals exported: "
 msgstr "出版されたジャーナル:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:610
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:669
 #, fuzzy
 msgid "Collated journals exported"
 msgstr "出版されたジャーナル"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "New Journal"
 msgstr "新しいジャーナル"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:666
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:725
 msgid "Journal name"
 msgstr "雑誌名"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:688
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:747
 #, fuzzy
 msgid "Journal created: "
 msgstr "ジャーナル作成:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:719
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:778
 #, fuzzy
 msgid "Journal exported to:"
 msgstr "ジャーナル輸出"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:720
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:779
 msgid "Journal export"
 msgstr "ジャーナル輸出"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:740
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:799
 #, fuzzy
 msgid "Journal deleted: "
 msgstr "ジャーナル削除:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:783
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:842
 msgid "No name was entered"
 msgstr "名前が入力されていない"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:787
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:846
 msgid "Journal name in use"
 msgstr "使用中のジャーナル名"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:792
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:851
 msgid "Warning - invalid characters"
 msgstr "警告 - 無効な文字"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:793
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:852
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "ジャーナル名には、a-z, A-z 0-9 - スペースのみを使用する。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:802
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:861
 #, fuzzy
 msgid "Journal name changed from: "
 msgstr "ジャーナル名:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:827
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:886
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2266
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:739
 msgid "This attribute is numeric"
 msgstr "この属性は数値である。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:912
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:971
 #, fuzzy
 msgid "No journal selected"
 msgstr "選択したジャーナルなし"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:977
 msgid "Journal is empty. Nothing to convert."
 msgstr "ジャーナルは空です。変換するデータがありません。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:951
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1010
 #, fuzzy
 msgid "Converted from journal: "
 msgstr "ジャーナルから変換:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1005
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1064
 #, fuzzy
 msgid "Skipping non-numeric value for attribute "
 msgstr "属性の非数値値をスキッピング"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1014
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1073
 #, fuzzy
 msgid "Could not insert attribute: "
 msgstr "属性をインサートできません。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1020
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1079
 #, fuzzy
 msgid "Journal converted to source document: "
 msgstr "ジャーナルはソース文書に変換:"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1022
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:1081
 msgid "Journal converted to source document"
 msgstr "属性の非数値をスキップする"
 
@@ -7302,25 +7325,10 @@ msgstr "このセグメントはすでにこのコードでコーディングさ
 msgid "LINKED TEXT: "
 msgstr "リンク集"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:139
-#, fuzzy
-msgid "Insert quotes"
-msgstr "インサート引用符"
-
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:140
 #, fuzzy
 msgid "No coded segments found for this item."
 msgstr "この項目のコードされたセグメントが見つかりません。"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
-#, fuzzy
-msgid "Insert reference"
-msgstr "インサート参照"
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:153
-#, fuzzy
-msgid "No references found in this project."
-msgstr "本プロジェクトでは、参考文献が見つかりません。"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:207
 #, fuzzy
@@ -16329,7 +16337,7 @@ msgstr "最新リリース:"
 msgid "This version may be a pre-release version."
 msgstr "このバージョンは、リリース前のバージョンになる場合があります。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:870
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -16339,28 +16347,28 @@ msgstr ""
 "文字デコードエラー。\n"
 "QualCoderのデフォルト設定を使用しています。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:872
 msgid "Cannot load config.ini file"
 msgstr "config.ini をロードできません。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1737
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1756
 msgid "There is already a backup with this name"
 msgstr "この名前のバックアップはすでにある"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1741
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1759
 #, fuzzy
 msgid "Project backup could not be fully created."
 msgstr "プロジェクトバックアップは完全に作成できませんでした。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1754
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "警告：オーディオファイルとビデオファイルはバックアップされません。設定を参照"
 "してください。"
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/app.py:1763
 #, fuzzy
 msgid "Project backup created: "
 msgstr "プロジェクトバックアップ作成:"
