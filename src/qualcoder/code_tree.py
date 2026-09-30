@@ -118,7 +118,25 @@ class CodeTreeController(QtCore.QObject):
                 if category.get('supercatid') in category_ids and category['catid'] not in category_ids:
                     category_ids.add(category['catid'])
                     changed = True
-        return {code['cid'] for code in self.codes if code.get('catid') in category_ids}
+        code_ids = {code['cid'] for code in self.codes if code.get('catid') in category_ids}
+        changed = True
+        while changed:
+            changed = False
+            for code in self.codes:
+                if code.get('supercid') in code_ids and code['cid'] not in code_ids:
+                    code_ids.add(code['cid'])
+                    changed = True
+        return code_ids
+
+    def category_visibility_state(self, catid: int) -> str:
+        """Return the aggregate visibility state for a category branch."""
+        descendant_cids = self._category_code_ids(catid)
+        visible_count = sum(self.is_code_visible(cid) for cid in descendant_cids)
+        if visible_count == 0:
+            return "hidden"
+        if visible_count == len(descendant_cids):
+            return "visible"
+        return "partial"
 
     def set_code_visibility(self, cid: int, visible: bool):
         if visible:
@@ -182,12 +200,11 @@ class CodeTreeController(QtCore.QObject):
                     for column in (self.COL_ID, self.COL_MEMO, self.COL_COUNT):
                         item.setForeground(column, QBrush(QColor('#aaaaaa' if hidden else '#000000')))
             elif item_id.startswith('catid:'):
-                descendants = self._category_code_ids(int(item_id[6:]))
-                visible_count = sum(self.is_code_visible(cid) for cid in descendants)
-                if visible_count == 0:
+                state = self.category_visibility_state(int(item_id[6:]))
+                if state == "hidden":
                     item.setIcon(self.COL_VIS, hidden_icon)
                     color = QColor('#888888')
-                elif visible_count == len(descendants):
+                elif state == "visible":
                     item.setIcon(self.COL_VIS, visible_icon)
                     color = QColor('#000000')
                 else:

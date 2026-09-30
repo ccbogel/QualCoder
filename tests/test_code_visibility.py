@@ -55,3 +55,57 @@ def test_code_visibility_controller_uses_column_zero_and_cascades():
     assert app.hidden_cids == set()
     controller.toggle_all_visibility()
     assert app.hidden_cids == {1, 2}
+
+
+def test_category_visibility_cascades_through_nested_categories_and_subcodes():
+    global _qt_app
+    _qt_app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    app = SimpleNamespace(
+        hidden_cids=set(),
+        pre_solo_hidden_cids=None,
+        collapsed_categories=set(),
+        settings={"showids": True},
+    )
+    host = SimpleNamespace(
+        codes=[
+            {"cid": 1, "name": "Parent", "memo": "", "color": "#ff0000", "catid": 10},
+            {"cid": 2, "name": "Child", "memo": "", "color": "#00ff00", "catid": None, "supercid": 1},
+            {"cid": 3, "name": "Nested", "memo": "", "color": "#0000ff", "catid": 11},
+        ],
+        categories=[
+            {"catid": 10, "name": "Root", "memo": "", "supercatid": None},
+            {"catid": 11, "name": "Branch", "memo": "", "supercatid": 10},
+        ],
+        parent_textEdit=None,
+    )
+    tree = QtWidgets.QTreeWidget()
+    controller = CodeTreeController(app, tree, host)
+    controller.fill_tree()
+    root_item = tree.findItems(
+        "Root", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    root_icon = root_item.icon(0).cacheKey()
+    assert root_item.isExpanded()
+
+    assert controller.category_visibility_state(10) == "visible"
+    controller.toggle_category_visibility(10)
+    assert app.hidden_cids == {1, 2, 3}
+    assert controller.category_visibility_state(10) == "hidden"
+    assert controller.category_visibility_state(11) == "hidden"
+    hidden_icon = root_item.icon(0).cacheKey()
+    assert hidden_icon != root_icon
+    assert root_item.isExpanded()
+
+    controller.toggle_category_visibility(10)
+    assert app.hidden_cids == set()
+    assert controller.category_visibility_state(10) == "visible"
+    assert root_item.icon(0).cacheKey() == root_icon
+
+    controller.toggle_code_visibility(1)
+    assert controller.category_visibility_state(10) == "partial"
+    partial_icon = root_item.icon(0).cacheKey()
+    assert partial_icon not in {root_icon, hidden_icon}
+    controller.toggle_category_visibility(10)
+    assert app.hidden_cids == {1, 2, 3}
+    assert controller.category_visibility_state(10) == "hidden"
+    assert root_item.icon(0).cacheKey() == hidden_icon
+    assert root_item.isExpanded()
