@@ -144,6 +144,7 @@ class CodeTreeController(QtCore.QObject):
         else:
             self.app.hidden_cids.add(cid)
         self.app.pre_solo_hidden_cids = None
+        self._last_solo_target = None
         self.update_all_eye_icons()
         self.code_visibility_changed.emit()
 
@@ -157,6 +158,7 @@ class CodeTreeController(QtCore.QObject):
         else:
             self.app.hidden_cids.difference_update(descendant_cids)
         self.app.pre_solo_hidden_cids = None
+        self._last_solo_target = None
         self.update_all_eye_icons()
         self.code_visibility_changed.emit()
 
@@ -167,6 +169,20 @@ class CodeTreeController(QtCore.QObject):
         else:
             self.app.hidden_cids = set(all_cids)
         self.app.pre_solo_hidden_cids = None
+        self._last_solo_target = None
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    def solo_visibility(self, target_cids: set[int], target_key: str):
+        """Solo a code or category branch, or restore the prior solo state."""
+        if self._last_solo_target == target_key and self.app.pre_solo_hidden_cids is not None:
+            self.app.hidden_cids = set(self.app.pre_solo_hidden_cids)
+            self.app.pre_solo_hidden_cids = None
+            self._last_solo_target = None
+        else:
+            self.app.pre_solo_hidden_cids = set(self.app.hidden_cids)
+            self.app.hidden_cids = self._all_code_ids() - target_cids
+            self._last_solo_target = target_key
         self.update_all_eye_icons()
         self.code_visibility_changed.emit()
 
@@ -213,7 +229,7 @@ class CodeTreeController(QtCore.QObject):
                 for column in (self.COL_NAME, self.COL_ID, self.COL_MEMO, self.COL_COUNT):
                     item.setForeground(column, QBrush(color))
             iterator += 1
-        self.tree.headerItem().setIcon(self.COL_VIS, visible_icon if self.app.hidden_cids else hidden_icon)
+        self.tree.headerItem().setIcon(self.COL_VIS, hidden_icon if self.app.hidden_cids else visible_icon)
         self.tree.headerItem().setToolTip(
             self.COL_VIS, _('Show all codes') if self.app.hidden_cids else _('Hide all codes'))
 
@@ -225,20 +241,15 @@ class CodeTreeController(QtCore.QObject):
         if item_id.startswith('cid:'):
             cid = int(item_id[4:])
             if modifiers & (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
-                target = {cid}
-                if self._last_solo_target == item_id and self.app.pre_solo_hidden_cids is not None:
-                    self.app.hidden_cids = set(self.app.pre_solo_hidden_cids)
-                    self.app.pre_solo_hidden_cids = None
-                else:
-                    self.app.pre_solo_hidden_cids = set(self.app.hidden_cids)
-                    self.app.hidden_cids = self._all_code_ids() - target
-                self._last_solo_target = item_id
-                self.update_all_eye_icons()
-                self.code_visibility_changed.emit()
+                self.solo_visibility({cid}, item_id)
             else:
                 self.toggle_code_visibility(cid)
         elif item_id.startswith('catid:'):
-            self.toggle_category_visibility(int(item_id[6:]))
+            catid = int(item_id[6:])
+            if modifiers & (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
+                self.solo_visibility(self._category_code_ids(catid), item_id)
+            else:
+                self.toggle_category_visibility(catid)
 
     def handle_header_clicked(self, section):
         if section == self.COL_VIS:
@@ -457,6 +468,8 @@ class CodeTreeController(QtCore.QObject):
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
         action_add_code = menu.addAction(_("Create new code"))
         action_add_category = menu.addAction(_("Create new category"))
+        action_toggle_all = menu.addAction(
+            _("Show all codes") if self.app.hidden_cids else _("Hide all codes"))
         action_add_subcode = None
         if selected is not None and selected.text(2)[0:3] == 'cid':
             action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
@@ -529,6 +542,9 @@ class CodeTreeController(QtCore.QObject):
         if action == action_cat_then_code_asc:
             self.tree_sort_option = "cat and code asc"
             self.fill_tree()
+            return
+        if action == action_toggle_all:
+            self.toggle_all_visibility()
             return
         if action == action_show_codes_like:
             self.show_codes_like_callback()

@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
 from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import Qt
 
 from qualcoder.code_tree import CodeTreeController
 
@@ -15,7 +16,7 @@ def _controller():
         hidden_cids=set(),
         pre_solo_hidden_cids=None,
         collapsed_categories=set(),
-        settings={"showids": True},
+        settings={"showids": True, "fontsize": 10},
     )
     host = SimpleNamespace(
         codes=[
@@ -64,7 +65,7 @@ def test_category_visibility_cascades_through_nested_categories_and_subcodes():
         hidden_cids=set(),
         pre_solo_hidden_cids=None,
         collapsed_categories=set(),
-        settings={"showids": True},
+        settings={"showids": True, "fontsize": 10},
     )
     host = SimpleNamespace(
         codes=[
@@ -109,3 +110,75 @@ def test_category_visibility_cascades_through_nested_categories_and_subcodes():
     assert controller.category_visibility_state(10) == "hidden"
     assert root_item.icon(0).cacheKey() == hidden_icon
     assert root_item.isExpanded()
+
+
+def test_alt_click_solos_code_and_second_click_restores_exact_visibility(monkeypatch):
+    app, tree, controller = _controller()
+    code_item = tree.findItems(
+        "Alpha", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    monkeypatch.setattr(
+        QtWidgets.QApplication,
+        "keyboardModifiers",
+        staticmethod(lambda: Qt.KeyboardModifier.AltModifier),
+    )
+
+    controller.handle_item_clicked(code_item, controller.COL_VIS)
+    assert app.hidden_cids == {2}
+    assert app.pre_solo_hidden_cids == set()
+
+    controller.handle_item_clicked(code_item, controller.COL_VIS)
+    assert app.hidden_cids == set()
+    assert app.pre_solo_hidden_cids is None
+
+
+def test_alt_click_solos_category_and_switches_target(monkeypatch):
+    app, tree, controller = _controller()
+    category_item = tree.findItems(
+        "Group", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    beta_item = tree.findItems(
+        "Beta", QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive, 1)[0]
+    monkeypatch.setattr(
+        QtWidgets.QApplication,
+        "keyboardModifiers",
+        staticmethod(lambda: Qt.KeyboardModifier.ControlModifier),
+    )
+
+    controller.handle_item_clicked(category_item, controller.COL_VIS)
+    assert app.hidden_cids == set()
+    assert app.pre_solo_hidden_cids == set()
+
+    controller.handle_item_clicked(beta_item, controller.COL_VIS)
+    assert app.hidden_cids == {1}
+    assert app.pre_solo_hidden_cids == set()
+
+    controller.handle_item_clicked(beta_item, controller.COL_VIS)
+    assert app.hidden_cids == set()
+    assert app.pre_solo_hidden_cids is None
+
+
+def test_header_and_context_menu_toggle_all_are_clear_first(monkeypatch):
+    app, tree, controller = _controller()
+    header = tree.headerItem()
+    assert header.toolTip(controller.COL_VIS) == "Hide all codes"
+    initial_icon = header.icon(controller.COL_VIS).cacheKey()
+
+    controller.handle_header_clicked(controller.COL_VIS)
+    assert app.hidden_cids == {1, 2}
+    assert header.toolTip(controller.COL_VIS) == "Show all codes"
+    assert header.icon(controller.COL_VIS).cacheKey() != initial_icon
+
+    controller.handle_header_clicked(controller.COL_VIS)
+    assert app.hidden_cids == set()
+
+    selected_action = {}
+
+    def fake_exec(menu, _position):
+        selected_action["label"] = next(
+            action.text() for action in menu.actions() if action.text() == "Hide all codes"
+        )
+        return next(action for action in menu.actions() if action.text() == "Hide all codes")
+
+    monkeypatch.setattr(QtWidgets.QMenu, "exec", fake_exec)
+    controller.tree_menu(tree.visualItemRect(tree.topLevelItem(0)).center())
+    assert selected_action["label"] == "Hide all codes"
+    assert app.hidden_cids == {1, 2}
