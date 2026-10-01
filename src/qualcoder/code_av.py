@@ -46,7 +46,7 @@ from .color_selector import TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ToolTipEventFilter, CodeResizeHandle, \
-    init_persistent_tree_header, ExportDirectoryPathDialog
+    init_persistent_tree_header, ExportDirectoryPathDialog, setup_search_shortcuts
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -283,6 +283,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
         self.ui.label_search.setPixmap(qta.icon('mdi6.magnify').pixmap(22, 22))
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search,
+            next_callback=self.move_to_next_search_text,
+            prev_callback=self.move_to_previous_search_text,
+            parent_widget=self
+        )
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)

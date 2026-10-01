@@ -49,7 +49,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths, \
-    doc_end_position, doc_position_from_index
+    doc_end_position, doc_position_from_index, setup_search_shortcuts
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
@@ -137,6 +137,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search_results,
+            next_callback=self.search_results_next,
+            prev_callback=None,
+            parent_widget=self
+        )
         self.ui.checkBox_show_refs.toggled.connect(self.select_reference_style)
         # Canonical keys in userData, labels translatable
         matrix_options = [("", ""), ("top_cat_case", _("Top categories by case")),
@@ -1369,6 +1375,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Ctrl + F jump to search box
             if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.ui.lineEdit_search_results.setFocus()
+                self.ui.lineEdit_search_results.selectAll()
                 self.ui.groupBox.setHidden(False)
                 return True
         return False

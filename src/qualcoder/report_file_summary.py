@@ -31,7 +31,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 import re
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
-from .helpers import file_typer, msecs_to_hours_mins_secs, Message
+from .helpers import file_typer, msecs_to_hours_mins_secs, Message, setup_search_shortcuts
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 from .stopwords import *
@@ -80,6 +80,12 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search_results,
+            next_callback=self.search_results_next,
+            prev_callback=None,
+            parent_widget=self
+        )
         self.ui.listWidget.setStyleSheet(treefont)
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.listWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)

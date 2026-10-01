@@ -35,7 +35,7 @@ from PyQt6.QtCore import Qt
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
-from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
+from .helpers import init_persistent_tree_header, restore_persistent_tree_widths, setup_search_shortcuts
 from .stopwords import *
 
 # If VLC not installed, it will not crash
@@ -74,6 +74,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search_results,
+            next_callback=self.search_results_next,
+            prev_callback=None,
+            parent_widget=self
+        )
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)

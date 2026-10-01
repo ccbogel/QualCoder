@@ -56,7 +56,7 @@ from .codebook import build_codebook_path
 from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
-    ToolTipEventFilter, init_persistent_tree_header
+    ToolTipEventFilter, init_persistent_tree_header, setup_search_shortcuts
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -234,7 +234,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_threshold = 3  # 3 character threshold for text search
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
-        self.ui.lineEdit_search.returnPressed.connect(self.move_to_next_search_text)
+        setup_search_shortcuts(self.ui.lineEdit_search,
+                               next_callback=self.move_to_next_search_text,
+                               prev_callback=self.move_to_previous_search_text,
+                               parent_widget=self)
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
 
@@ -2857,6 +2860,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Ctrl + F jump to search box
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
+            self.ui.lineEdit_search.selectAll()
             return
         # Ctrl Z undo last unmarked coding # TODO expand function
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
