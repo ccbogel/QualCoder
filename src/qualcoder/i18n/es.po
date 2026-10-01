@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-30 15:11+0200\n"
-"PO-Revision-Date: 2026-09-02 04:43-0700\n"
+"PO-Revision-Date: 2026-09-30 23:29-0700\n"
 "Last-Translator: Auto-translated via Argostranslate (EN - < ES)>\n"
 "Language-Team: ES <LL@li.org>\n"
 "Language: es\n"
@@ -1649,7 +1649,7 @@ msgstr "Memo del texto codificado (M)"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5430
 msgid "Toggle important"
-msgstr "Añadir marca importante"
+msgstr "Marcar o desmarcar como importante"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:5436
 msgid "Annotate"
@@ -2290,9 +2290,8 @@ msgid "Insert quotes"
 msgstr "Insertar citas"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:316
-#, fuzzy
 msgid "No coded segments found in this project."
-msgstr "No se encontraron segmentos codificados para este elemento."
+msgstr "No se encontraron segmentos codificados."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:329
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:152
@@ -2539,19 +2538,16 @@ msgid "AI: Starting up..."
 msgstr "IA: iniciando..."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:96
-#, fuzzy
 msgid "AI: Disabled"
-msgstr "IA no habilitada"
+msgstr "IA: Deshabilitada"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:98
-#, fuzzy
 msgid "AI: Components could not be loaded."
-msgstr "No se pudo guardar el archivo:"
+msgstr "IA: no se pudieron cargar los componentes."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:102
-#, fuzzy
 msgid "AI: Reading data"
-msgstr "leyendo datos"
+msgstr "IA: Leyendo datos"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:106
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4923
@@ -2559,23 +2555,20 @@ msgid "AI: Ready"
 msgstr "IA: Lista"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:108
-#, fuzzy
 msgid "AI: Busy"
-msgstr "IA: "
+msgstr "IA: Ocupada"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:110
-#, fuzzy
 msgid "AI: No data"
-msgstr "No hay datos"
+msgstr "IA: No hay datos"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:112
-#, fuzzy
 msgid "AI: Closed"
-msgstr "Cerrar"
+msgstr "IA: Cerrada"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:114
 msgid "AI: Closing"
-msgstr ""
+msgstr "IA: cerrando"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:116
 msgid "AI: "
@@ -2583,24 +2576,28 @@ msgstr "IA: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:119
 msgid "MCP active"
-msgstr ""
+msgstr "MCP activo"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:133
 msgid ""
 "No project is open. Open or create a project in QualCoder, then try again."
 msgstr ""
+"No hay ningún proyecto abierto. Abra o cree un proyecto en QualCoder y "
+"vuelva a intentarlo."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:135
 msgid ""
 "The AI components could not be loaded. Please restart QualCoder or check the "
 "log for details."
 msgstr ""
+"No se pudieron cargar los componentes de IA. Reinicie QualCoder o consulte "
+"el registro para ver los detalles."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:137
-#, fuzzy
 msgid "The AI is disabled. Enable it in the AI Setup Wizard or AI Settings."
 msgstr ""
-"La IA está deshabilitada. Vaya primero a \"IA > Asistente de configuración\"."
+"La IA está desactivada. Actívela en el Asistente de configuración de IA o en "
+"los Ajustes de IA."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:139
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:6658
@@ -2611,16 +2608,22 @@ msgstr "La IA está ocupada. Espere un momento y vuelva a intentarlo."
 msgid ""
 "The project search index is not available yet. Please retry in a moment."
 msgstr ""
+"El índice de búsqueda del proyecto aún no está disponible. Vuelva a "
+"intentarlo en un momento."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:143
 msgid "The AI is still preparing the project data. Please retry in a moment."
 msgstr ""
+"La IA todavía está preparando los datos del proyecto. Vuelva a intentarlo en "
+"un momento."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_runtime.py:145
 msgid ""
 "The AI components are still loading in the background. Please retry in a "
 "moment."
 msgstr ""
+"Los componentes de IA todavía se están cargando en segundo plano. Vuelva a "
+"intentarlo en un momento."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:256
 msgid "expires "
@@ -3002,10 +3005,11 @@ msgid "Warning: "
 msgstr "Advertencia: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3909
-#, fuzzy
 msgid ""
 " of these codings belong to another user or agent and will also be deleted."
-msgstr "El archivo lo está usando otro programa y no se eliminó:"
+msgstr ""
+" de estas codificaciones pertenecen a otro usuario o agente y también se "
+"eliminarán."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3913
 msgid " category(ies). "
@@ -3024,6 +3028,8 @@ msgid ""
 " standalone coding(s) belong to another user or agent and will also be "
 "deleted."
 msgstr ""
+" codificación(es) independiente(s) pertenece(n) a otro usuario o agente y "
+"también se eliminará(n)."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3927
 msgid " case(s)."
@@ -3163,6 +3169,8 @@ msgstr "Operaciones omitidas eliminadas de la lista: "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4709
 msgid "Warning: codings belonging to another user or agent were also deleted: "
 msgstr ""
+"Advertencia: también se eliminaron codificaciones que pertenecían a otro "
+"usuario o agente: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4711
 msgid "Undo details:"
@@ -3262,7 +3270,6 @@ msgstr "Inicialización de IA"
 msgid "Do you really want to cancel the AI operation?"
 msgstr "¿Realmente desea cancelar la operación de la IA?"
 
-# abortar > interrumpir
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:4967
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:2504
 msgid ""
@@ -3339,10 +3346,17 @@ msgid ""
 "Only enable External MCP if you trust the connected application and "
 "understand how it handles your data."
 msgstr ""
+"El MCP externo permite que aplicaciones de IA de terceros accedan a los "
+"datos del proyecto abierto actualmente. Los datos que devuelvan las "
+"herramientas MCP pueden transmitirse al proveedor de IA configurado en esa "
+"aplicación.\n"
+"\n"
+"Active el MCP externo solo si confía en la aplicación conectada y entiende "
+"cómo maneja sus datos."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:365
 msgid "External MCP privacy warning"
-msgstr ""
+msgstr "Advertencia de privacidad del MCP externo"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:419
 msgid "Close and open the software for the change in language to occur."
@@ -3398,13 +3412,12 @@ msgstr "Añadir más idiomas"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:553
 msgid "AI components are still loading."
-msgstr ""
+msgstr "Los componentes de IA todavía se están cargando."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:583
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2357
-#, fuzzy
 msgid "AI Settings"
-msgstr "Configuración"
+msgstr "Configuración de IA"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:663
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:671
@@ -3460,9 +3473,8 @@ msgid "AI top_p parameter must be between 0.0 and 1.0."
 msgstr "El parámetro top_p de la IA debe estar entre 0.0 y 1.0."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/settings.py:856
-#, fuzzy
 msgid "AI Authentication"
-msgstr "Autenticación"
+msgstr "Autenticación de IA"
 
 # Elija --> Elije
 # (parce que tout le reste du texte tutoie le lecteur)
@@ -4228,7 +4240,6 @@ msgstr "Máximo:"
 
 # Deseas
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:420
-#, fuzzy
 msgid ""
 "Since you are using the AI-powered search for the first time, QualCoder "
 "needs to download and install some additional components. \n"
@@ -4244,9 +4255,8 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:427
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:439
-#, fuzzy
 msgid "Download search components"
-msgstr "Descargar componentes de IA"
+msgstr "Descargar componentes de búsqueda"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:459
 msgid "Downloading "
@@ -4257,11 +4267,8 @@ msgid "AI: Success, components downloaded and installed."
 msgstr "IA: operación correcta, componentes descargados e instalados."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:548
-#, fuzzy
 msgid "AI: Could not download all the necessary components."
-msgstr ""
-"IA: no se pudieron descargar todos los componentes necesarios; la "
-"integración de IA se deshabilitará."
+msgstr "IA: no se pudieron descargar todos los componentes necesarios."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_vectorstore.py:806
 msgid "AI: Adding document to internal memory: "
@@ -4712,8 +4719,8 @@ msgid ""
 "Prompt names must not contain \"/\" or \"\\\". Use folders in the tree "
 "instead."
 msgstr ""
-"Los nombres propensos no deben contener \"/\" o \"\\\". Use carpetas en el "
-"árbol."
+"Los nombres de los prompts no deben contener \"/\" o \"\\\". Use carpetas en "
+"el árbol."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_prompt_library.py:1413
 msgid "Prompt names must not start with \"_\"."
@@ -5383,14 +5390,12 @@ msgstr ""
 "No hay columnas asignadas como cualitativas."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2736
-#, fuzzy
 msgid "Survey"
-msgstr "Archivo de encuesta:"
+msgstr "Encuesta"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2877
-#, fuzzy
 msgid "New codes placed in category: "
-msgstr "Códigos de la categoría: "
+msgstr "Códigos nuevos colocados en la categoría: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2880
 msgid "Some existing data updated."
@@ -5604,13 +5609,12 @@ msgid "Files exported"
 msgstr "Archivos exportados"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3637
-#, fuzzy
 msgid ""
 "Search index is busy; the deleted file will be removed from the index on the "
 "next update."
 msgstr ""
-"El índice de la IA está ocupado; el archivo eliminado se retirará del índice "
-"en la próxima actualización."
+"El índice de búsqueda está ocupado; el archivo eliminado se quitará del "
+"índice en la próxima actualización."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3649
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3767
@@ -6926,7 +6930,7 @@ msgstr "Importación del proyecto"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:368
 msgid "Parse users. Loaded: "
-msgstr "Analizando casos. Cargados: "
+msgstr "Analizando usuarios. Cargados: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:375
 msgid "Parse codes and categories. Loaded: "
@@ -6946,7 +6950,7 @@ msgstr "Casos analizados para las variables de archivo. Cargados: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:402
 msgid "Parsing sources. Loaded: "
-msgstr "Analizando casos. Cargados: "
+msgstr "Analizando fuentes. Cargadas: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:409
 msgid "Parsing Notes. Journals loaded: "
@@ -7295,19 +7299,23 @@ msgstr "Perspectiva: "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/external_mcp.py:178
 #, python-brace-format
 msgid "The external MCP server could not be started at {endpoint}."
-msgstr ""
+msgstr "No se pudo iniciar el servidor MCP externo en {endpoint}."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/external_mcp.py:182
 msgid ""
 "The port may already be in use by another QualCoder instance, or server "
 "initialization failed."
 msgstr ""
+"Es posible que otra instancia de QualCoder ya esté usando el puerto, o que "
+"haya fallado la inicialización del servidor."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/external_mcp.py:187
 msgid ""
 "MCP access to this QualCoder instance is unavailable. You can continue using "
 "QualCoder. See the log for details."
 msgstr ""
+"El acceso MCP a esta instancia de QualCoder no está disponible. Puede seguir "
+"usando QualCoder. Consulte el registro para ver los detalles."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_comparison_table.py:200
 msgid "Select Attribute"
@@ -7665,9 +7673,8 @@ msgstr ""
 "Mayús+flecha izquierda, Mayús+flecha derecha"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/helpers.py:804
-#, fuzzy
 msgid "Co-occurring:"
-msgstr "Códigos co-ocurrentes"
+msgstr "Co-ocurrentes:"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/helpers.py:896
 msgid ""
@@ -8224,9 +8231,8 @@ msgid "Memo for duration: "
 msgstr "Memo de la duración: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1530
-#, fuzzy
 msgid "Co-occurring codes: "
-msgstr "Códigos co-ocurrentes"
+msgstr "Códigos co-ocurrentes: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1602
 msgid "Add relationship line"
@@ -8293,16 +8299,14 @@ msgid "No co-occurring codes found for the segments in the graph."
 msgstr "No se encontraron códigos co-ocurrentes para los segmentos del grafo."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2199
-#, fuzzy
 msgid "At least two code nodes are needed to show co-occurrence lines."
 msgstr ""
-"No hay nodos de código en el grafo a los que conectar las co-ocurrencias."
+"Se necesitan al menos dos nodos de código para mostrar las líneas de co-"
+"ocurrencia."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2206
-#, fuzzy
 msgid "The code nodes in the graph have no overlapping segments."
-msgstr ""
-"No hay nodos de código en el grafo a los que conectar las co-ocurrencias."
+msgstr "Los nodos de código del grafo no tienen segmentos superpuestos."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2218
 msgid "Radial"
@@ -8393,9 +8397,8 @@ msgid "Connect to..."
 msgstr "Conectar con..."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2896
-#, fuzzy
 msgid "Add co-occurring segments"
-msgstr "Añadir un código al segmento"
+msgstr "Añadir segmentos co-ocurrentes"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2899
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:7199
@@ -8416,9 +8419,8 @@ msgid "No co-ocurrences"
 msgstr "Sin co-ocurrencias"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2931
-#, fuzzy
 msgid "The selected codes have no overlapping segments."
-msgstr "TODOS los códigos seleccionados deben solaparse exactamente."
+msgstr "Los códigos seleccionados no tienen segmentos superpuestos."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2944
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:9141
@@ -8426,14 +8428,12 @@ msgid "No segments"
 msgstr "Sin segmentos"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2945
-#, fuzzy
 msgid "The co-occurring segments are already in the graph."
-msgstr "Todas las categorías vinculadas ya están en el grafo."
+msgstr "Los segmentos co-ocurrentes ya están en el grafo."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2947
-#, fuzzy
 msgid "Co-occurring segments"
-msgstr "Códigos co-ocurrentes"
+msgstr "Segmentos co-ocurrentes"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3005
 msgid "Connect to"
@@ -8877,17 +8877,16 @@ msgstr "Cargar grafo"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5745
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1931
 msgid "The graph has unsaved changes."
-msgstr ""
+msgstr "El grafo tiene cambios sin guardar."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5746
 msgid "Load another graph and lose the unsaved changes?"
-msgstr ""
+msgstr "¿Cargar otro grafo y perder los cambios sin guardar?"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5747
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1930
-#, fuzzy
 msgid "Unsaved graph"
-msgstr "Guardar el grafo"
+msgstr "Grafo sin guardar"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5772
 msgid "Load graph errors"
@@ -9258,9 +9257,8 @@ msgid "There are no new coded segments for this code."
 msgstr "No hay segmentos codificados nuevos para este código."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:9165
-#, fuzzy
 msgid "No overlapping codes for this code."
-msgstr "Mostrar los códigos solapados"
+msgstr "No hay códigos superpuestos con este código."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:9210
 msgid "Memo for Code "
@@ -9451,9 +9449,8 @@ msgid "Finishing"
 msgstr "Finalizando"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:292
-#, fuzzy
 msgid "Could not update the search index: "
-msgstr "No se pudo actualizar el almacén vectorial de la IA: "
+msgstr "No se pudo actualizar el índice de búsqueda: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/merge_projects.py:293
 msgid "Finished merging "
@@ -10783,13 +10780,13 @@ msgstr ""
 "Utilice estas herramientas para examinar cómo se relacionan los códigos "
 "entre sí. Solo funcionan con archivos de texto.\n"
 "\n"
-"- [Relaciones de códigos](qualcoder://menu/analysis/code_relations) muestra "
-"la proximidad, el solapamiento, la inclusión y las coincidencias exactas "
-"entre los códigos seleccionados.\n"
+"- [Relaciones entre códigos](qualcoder://menu/analysis/code_relations) "
+"muestra la proximidad, el solapamiento, la inclusión y las coincidencias "
+"exactas entre los códigos seleccionados.\n"
 "- [Co-ocurrencia de códigos](qualcoder://menu/analysis/code_co_occurrence) "
 "se centra en los puntos donde dos códigos se solapan o se tocan "
 "directamente.\n"
-"- [Coincidencias exactas de texto codificado](qualcoder://menu/analysis/"
+"- [Coincidencias exactas del texto codificado](qualcoder://menu/analysis/"
 "code_text_exact_matches) enumera los pasajes en los que se aplicaron códigos "
 "distintos exactamente al mismo texto.\n"
 "- [Grafo](qualcoder://menu/analysis/view_graph) ofrece una vista visual, de "
@@ -10915,7 +10912,7 @@ msgstr ""
 "- También puede solicitar ayuda sobre el uso de QualCoder.\n"
 "\n"
 "\n"
-"## [Exploración de temas con IA](qualcoder://ai_agent_tab/new/"
+"## [Exploración temática con IA](qualcoder://ai_agent_tab/new/"
 "new_topic_exploration)\n"
 "\n"
 "- Busque y explore un tema o una pregunta en todo el corpus de datos del "
@@ -10924,7 +10921,7 @@ msgstr ""
 "seleccionan los datos que se incluirán en el análisis.\n"
 "\n"
 "\n"
-"## [Análisis de texto con IA](qualcoder://ai_agent_tab/new/"
+"## [Análisis de textos con IA](qualcoder://ai_agent_tab/new/"
 "new_text_analysis)\n"
 "\n"
 "- Analice en detalle un pasaje de texto seleccionado de su material "
@@ -12223,24 +12220,20 @@ msgid "Copy to clipboard.  APA style"
 msgstr "Copiar al portapapeles. Estilo APA"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:664
-#, fuzzy
 msgid "Add fields"
-msgstr "Añadir los subcódigos"
+msgstr "Añadir campos"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:746
-#, fuzzy
 msgid "Add fields to reference"
-msgstr "Editar referencia"
+msgstr "Añadir campos a la referencia"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:789
-#, fuzzy
 msgid "References exported: "
-msgstr "Referencias importadas: "
+msgstr "Referencias exportadas: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:790
-#, fuzzy
 msgid "References exported"
-msgstr "Referencias importadas: "
+msgstr "Referencias exportadas"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:803
 msgid "Import references from:"
@@ -14329,28 +14322,31 @@ msgstr "Mantener el perfil actual"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:392
 msgid "Search: Loading components in the background..."
-msgstr ""
+msgstr "Búsqueda: cargando componentes en segundo plano..."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:443
 msgid "Search: Components could not be loaded. See the log for details."
 msgstr ""
+"Búsqueda: no se pudieron cargar los componentes. Consulte el registro para "
+"ver los detalles."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:461
 msgid "AI: Loading components in the background..."
-msgstr ""
+msgstr "IA: cargando componentes en segundo plano..."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:483
 msgid "AI: Components loaded."
-msgstr ""
+msgstr "IA: componentes cargados."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:496
 msgid "AI: Components could not be loaded. See the log for details."
 msgstr ""
+"IA: no se pudieron cargar los componentes. Consulte el registro para ver los "
+"detalles."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:506
-#, fuzzy
 msgid "Loading AI components..."
-msgstr "Descargar componentes de IA"
+msgstr "Cargando componentes de IA..."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:536
 msgid ""
@@ -14375,7 +14371,7 @@ msgstr "Integración de IA"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:591
 msgid "External MCP"
-msgstr ""
+msgstr "MCP externo"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:621
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:678
@@ -14538,16 +14534,15 @@ msgstr "Mover el Agente de IA a la vista lateral"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1932
 msgid "Leave the graph and lose the unsaved changes?"
-msgstr ""
+msgstr "¿Salir del grafo y perder los cambios sin guardar?"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1935
 msgid "The code organiser has changes that were not applied."
-msgstr ""
+msgstr "El organizador de códigos tiene cambios que no se aplicaron."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:1936
-#, fuzzy
 msgid "Leave the code organiser and lose the changes?"
-msgstr "Organizador de códigos - cambios aplicados:"
+msgstr "¿Salir del organizador de códigos y perder los cambios?"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2016
 msgid "IMPORTING REFI-QDA PROJECT"
@@ -14587,7 +14582,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2038
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2074
 msgid "RQDA import steps"
-msgstr "Pasos para importación"
+msgstr "Pasos para importar desde RQDA"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2042
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2060
@@ -14596,23 +14591,20 @@ msgid "Project not successfully created"
 msgstr "El proyecto no se creó correctamente"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2053
-#, fuzzy
 msgid "IMPORTING SONAL PROJECT"
-msgstr "IMPORTACIÓN DE PROYECTO RQDA"
+msgstr "IMPORTANDO PROYECTO DE SONAL"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2055
-#, fuzzy
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Sonal corpus file (.crp or .zip)."
 msgstr ""
-"Paso 1: se le pedirá un nombre para el nuevo proyecto de QualCoder.\n"
-"Paso 2: se le pedirá el archivo QDPX."
+"Paso 1: se pedirá un nombre para el nuevo proyecto de QualCoder.\n"
+"Paso 2: se pedirá el archivo de corpus de Sonal (.crp o .zip)."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2056
-#, fuzzy
 msgid "Sonal import steps"
-msgstr "Pasos para importación"
+msgstr "Pasos para importar desde Sonal"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2071
 msgid "IMPORTING RQDA PROJECT"
@@ -14714,28 +14706,28 @@ msgid ""
 "The selected folder is not a QualCoder project folder. Its name must end "
 "with .qda."
 msgstr ""
+"La carpeta seleccionada no es una carpeta de proyecto de QualCoder. Su "
+"nombre debe terminar en .qda"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2429
-#, fuzzy
 msgid "The selected project folder does not exist or cannot be accessed."
-msgstr "No se pudo cargar el prompt de análisis de códigos seleccionado."
+msgstr ""
+"La carpeta de proyecto seleccionada no existe o no se puede acceder a ella."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2431
-#, fuzzy
 msgid "The project database could not be opened."
-msgstr "No se pudo crear por completo la copia de seguridad del proyecto."
+msgstr "No se pudo abrir la base de datos del proyecto."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2432
-#, fuzzy
 msgid ""
 "The selected folder does not contain a valid QualCoder project database."
-msgstr "El marco 'User' del archivo no contiene una lista 'relations' válida."
+msgstr ""
+"La carpeta seleccionada no contiene una base de datos de proyecto de "
+"QualCoder válida."
 
-# No se puede abrir:
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2439
-#, fuzzy
 msgid "Cannot open project"
-msgstr "No se puede abrir: "
+msgstr "No se puede abrir el proyecto"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:2470
 msgid ""
@@ -14743,8 +14735,8 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
-"Tu nombre de programador actual («{}») difiere del último utilizado en el "
-"proyecto («{}»). ¿Quieres conservar tu nombre actual o cambiar al del "
+"Su nombre de codificador actual (\"{}\") difiere del último utilizado en el "
+"proyecto (\"{}\"). ¿Quieres conservar tu nombre actual o cambiar al del "
 "proyecto?"
 
 # Nombre de código
@@ -14907,9 +14899,8 @@ msgstr ""
 "algún tiempo. ¿Desea continuar?"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3127
-#, fuzzy
 msgid "AI Analysis"
-msgstr "Análisis de texto con IA"
+msgstr "Análisis con IA"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3163
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3178
@@ -15020,40 +15011,33 @@ msgid "Convert"
 msgstr "Convertir"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:62
-#, fuzzy
 msgid "Select Sonal corpus file"
-msgstr "Seleccionar el archivo de palabras vacías"
+msgstr "Seleccionar archivo de corpus de Sonal"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:68
-#, fuzzy
 msgid "Beginning import from Sonal project"
-msgstr "Iniciando la importación desde RQDA"
+msgstr "Iniciando la importación del proyecto de Sonal"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:108
-#, fuzzy
 msgid "No .crp file found inside the selected archive"
 msgstr ""
-"No se encontró ninguna base de datos data.qda en la carpeta seleccionada."
+"No se encontró ningún archivo .crp dentro del archivo comprimido seleccionado"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:152
-#, fuzzy
 msgid "Sonal file not found, skipped: "
-msgstr "No se encontró el archivo original"
+msgstr "Archivo de Sonal no encontrado, omitido: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:201
-#, fuzzy
 msgid " Sonal files not found and skipped"
-msgstr "No se encontró el archivo original"
+msgstr " Archivos de Sonal no encontrados y omitidos"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:202
-#, fuzzy
 msgid "Sonal project imported"
-msgstr "Proyecto Taguette importado"
+msgstr "Proyecto de Sonal importado"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/sonal_import.py:203
-#, fuzzy
 msgid "Sonal imported"
-msgstr " diarios importados"
+msgstr "Sonal importado"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:237
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:248
@@ -15578,7 +15562,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:372
 msgid "Press 'Detect speakers' to scan the selected files."
-msgstr "Pulse «Detectar hablantes» para analizar los archivos seleccionados."
+msgstr "Pulse \"Detectar hablantes\" para analizar los archivos seleccionados."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:410
 msgid "Custom (regex)"
@@ -15625,7 +15609,7 @@ msgstr "No hay archivos seleccionados"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:698
 msgid "Settings changed. Press 'Detect speakers' to scan {} files."
 msgstr ""
-"La configuración cambió. Pulse «Detectar hablantes» para analizar {} "
+"La configuración cambió. Pulse \"Detectar hablantes\" para analizar {} "
 "archivos."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:767
@@ -15638,7 +15622,7 @@ msgid ""
 "the current pattern to the regex field."
 msgstr ""
 "Expresiones guardadas en este proyecto. Haga doble clic en una para "
-"editarla. «Usar» copia la expresión seleccionada al campo de la expresión "
+"editarla. \"Usar\" copia la expresión seleccionada al campo de la expresión "
 "regular."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:784
@@ -15691,8 +15675,8 @@ msgid ""
 "The combinations VARY across turns. Edit them per segment in Preview "
 "segments (right click the row)."
 msgstr ""
-"Las combinaciones VARÍAN entre turnos. Edítelas por segmento en «Vista "
-"previa de los segmentos» (haga clic derecho en la fila)."
+"Las combinaciones VARÍAN entre turnos. Edítelas por segmento en \"Vista "
+"previa de los segmentos\" (haga clic derecho en la fila)."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1370
 msgid ""
@@ -15732,7 +15716,7 @@ msgid ""
 "segments; they cannot be edited here."
 msgstr ""
 "* = no aparece en todos los turnos (inconsistente). Edítelos por segmento en "
-"«Vista previa de los segmentos»; aquí no se pueden editar."
+"\"Vista previa de los segmentos\"; aquí no se pueden editar."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1564
 msgid "speakers"
@@ -16054,7 +16038,7 @@ msgstr "Ocultar panel de control (H)"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2185
 msgid "Toggle tooltips"
-msgstr ""
+msgstr "Activar o desactivar información sobre herramientas"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2548
 msgid "Shift codings after clicked position"
@@ -16199,7 +16183,7 @@ msgstr "Texto del código: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4968
 msgid "Open a search result before coding"
-msgstr ""
+msgstr "Abra un resultado de búsqueda antes de codificar"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5024
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:6569
