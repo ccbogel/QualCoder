@@ -162,7 +162,7 @@ def color_matcher(hex_color):
     return best_match[0]
 
 
-def show_codes_of_colour_range(app, code_tree, codes, selected_color):
+def show_codes_of_colour_range(app, code_tree, codes, selected_color, id_column=1):
     """ Show all codes in colour range in code tree, or all codes if no selection.
     Show selected codes that are of a selected colour.
     Hierarchy-aware: a code stays visible if it or any of its descendant sub-codes matches,
@@ -185,8 +185,8 @@ def show_codes_of_colour_range(app, code_tree, codes, selected_color):
         for i in range(item.childCount()):
             if _process(item.child(i)):
                 any_match = True
-        if item.text(1)[:3] == 'cid':
-            cid = int(item.text(1)[4:])
+        if item.text(id_column)[:3] == 'cid':
+            cid = int(item.text(id_column)[4:])
             visible = _matches(cid) or any_match
             item.setHidden(not visible)
             return visible

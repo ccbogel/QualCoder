@@ -110,8 +110,11 @@ class CodeTreeController(QtCore.QObject):
             self.app.pre_solo_hidden_cids = None
         if not hasattr(self.app, 'solo_visibility_target'):
             self.app.solo_visibility_target = None
+        self._visibility_press = None
+        self._visibility_viewport = None
         if visibility_enabled:
-            self.tree.itemClicked.connect(self.handle_item_clicked)
+            self._visibility_viewport = self.tree.viewport()
+            self._visibility_viewport.installEventFilter(self)
             self.tree.header().sectionClicked.connect(self.handle_header_clicked)
 
     def is_code_visible(self, cid: int) -> bool:
@@ -187,13 +190,22 @@ class CodeTreeController(QtCore.QObject):
     def solo_visibility(self, target_cids: set[int], target_key: str):
         """Solo a code or category branch, or restore the prior solo state."""
         if self.app.solo_visibility_target == target_key and self.app.pre_solo_hidden_cids is not None:
-            self.app.hidden_cids = set(self.app.pre_solo_hidden_cids)
-            self.app.pre_solo_hidden_cids = None
-            self.app.solo_visibility_target = None
+            self.restore_previous_visibility()
+            return
         else:
-            self.app.pre_solo_hidden_cids = set(self.app.hidden_cids)
+            if self.app.pre_solo_hidden_cids is None:
+                self.app.pre_solo_hidden_cids = set(self.app.hidden_cids)
             self.app.hidden_cids = self._all_code_ids() - target_cids
             self.app.solo_visibility_target = target_key
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    def restore_previous_visibility(self):
+        if self.app.pre_solo_hidden_cids is None:
+            return
+        self.app.hidden_cids = set(self.app.pre_solo_hidden_cids)
+        self.app.pre_solo_hidden_cids = None
+        self.app.solo_visibility_target = None
         self.update_all_eye_icons()
         self.code_visibility_changed.emit()
 
@@ -246,20 +258,41 @@ class CodeTreeController(QtCore.QObject):
         self.tree.headerItem().setToolTip(
             self.COL_VIS, _('Show all codes') if self.app.hidden_cids else _('Hide all codes'))
 
-    def handle_item_clicked(self, item, column):
-        if column != self.COL_VIS:
-            return
+    def eventFilter(self, watched, event):
+        if watched is not getattr(self, '_visibility_viewport', None):
+            return super().eventFilter(watched, event)
+        event_type = event.type()
+        if event_type == QtCore.QEvent.Type.Hide:
+            self._visibility_press = None
+        if event_type in (QtCore.QEvent.Type.MouseButtonPress, QtCore.QEvent.Type.MouseButtonDblClick):
+            if event.button() == Qt.MouseButton.LeftButton:
+                index = self.tree.indexAt(event.position().toPoint())
+                if index.isValid() and index.column() == self.COL_VIS:
+                    self._visibility_press = (QtCore.QPersistentModelIndex(index), event.modifiers())
+                    return True
+        if self._visibility_press is not None:
+            if event_type == QtCore.QEvent.Type.MouseMove:
+                return True
+            if event_type == QtCore.QEvent.Type.MouseButtonRelease and event.button() == Qt.MouseButton.LeftButton:
+                index, modifiers = self._visibility_press
+                self._visibility_press = None
+                released_index = self.tree.indexAt(event.position().toPoint())
+                if index.isValid() and released_index == QtCore.QModelIndex(index):
+                    self._activate_visibility(self.tree.itemFromIndex(released_index), modifiers)
+                return True
+        return super().eventFilter(watched, event)
+
+    def _activate_visibility(self, item, modifiers):
         item_id = item.text(self.COL_ID)
-        modifiers = QtWidgets.QApplication.keyboardModifiers()
         if item_id.startswith('cid:'):
             cid = int(item_id[4:])
-            if modifiers & (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
+            if modifiers & Qt.KeyboardModifier.ControlModifier:
                 self.solo_visibility({cid}, item_id)
             else:
                 self.toggle_code_visibility(cid)
         elif item_id.startswith('catid:'):
             catid = int(item_id[6:])
-            if modifiers & (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
+            if modifiers & Qt.KeyboardModifier.ControlModifier:
                 self.solo_visibility(self._category_code_ids(catid), item_id)
             else:
                 self.toggle_category_visibility(catid)
@@ -488,6 +521,8 @@ class CodeTreeController(QtCore.QObject):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.tree.currentItem()
+        if self.visibility_enabled:
+            selected = self.tree.itemAt(position) or selected
         action_add_code_to_category = None
         action_add_category_to_category = None
         action_expand_collapse = None
@@ -497,9 +532,19 @@ class CodeTreeController(QtCore.QObject):
         action_add_code = menu.addAction(_("Create new code"))
         action_add_category = menu.addAction(_("Create new category"))
         action_toggle_all = None
+        action_solo = None
+        action_restore = None
         if self.visibility_enabled:
             action_toggle_all = menu.addAction(
                 _("Show all codes") if self.app.hidden_cids else _("Hide all codes"))
+            if selected is not None:
+                item_id = selected.text(self.COL_ID)
+                if item_id.startswith('cid:'):
+                    action_solo = menu.addAction(_("Show only this code"))
+                elif item_id.startswith('catid:'):
+                    action_solo = menu.addAction(_("Show only this category"))
+            if self.app.pre_solo_hidden_cids is not None:
+                action_restore = menu.addAction(_("Restore previous visibility"))
         action_add_subcode = None
         if selected is not None and selected.text(self.COL_ID)[0:3] == 'cid':
             action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
@@ -575,6 +620,12 @@ class CodeTreeController(QtCore.QObject):
             return
         if action_toggle_all is not None and action == action_toggle_all:
             self.toggle_all_visibility()
+            return
+        if action_solo is not None and action == action_solo:
+            self._activate_visibility(selected, Qt.KeyboardModifier.ControlModifier)
+            return
+        if action_restore is not None and action == action_restore:
+            self.restore_previous_visibility()
             return
         if action == action_show_codes_like:
             self.show_codes_like_callback()
@@ -1268,9 +1319,9 @@ class CodeTreeController(QtCore.QObject):
                 self.app.delete_backup = False
                 changed_tables = ["code_name"]
             if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for code: ") + self.codes[found]['name'])
 
         if selected.text(self.COL_ID)[0:3] == 'cat':
@@ -1294,9 +1345,9 @@ class CodeTreeController(QtCore.QObject):
                 self.app.delete_backup = False
                 changed_tables = ["code_cat"]
             if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
         if changed_tables:
             self.codes_changed.emit(changed_tables)

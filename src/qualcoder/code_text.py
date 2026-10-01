@@ -1563,20 +1563,20 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
 
-    def fill_code_label_with_selected_code(self):
+    def fill_code_label_with_selected_code(self, item, column):
         """ Fill code label with currently selected item's code name and colour.
          Also, if text is highlighted, assign the text to this code.
 
          Called by: treewidgetitem_clicked """
 
-        current = self.ui.treeWidget.currentItem()
-        if current is None:
+        current = item
+        if current is None or column == self.code_tree.COL_VIS:
             return
         # Only update right-hand side splitter if it was already showing code rules <- L
         # Do not overwrite journal or project memo views
         if self.code_rule:
             self.show_code_rule()
-        if current.text(2)[0:3] == 'cat':
+        if current.text(self.code_tree.COL_ID)[0:3] == 'cat':
             style = f"QLabel {{background-color:transparent;}}"
             self.ui.label_code.setStyleSheet(style)
             tooltip = ""
@@ -1588,7 +1588,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # Set background colour of label to code color, and store current code for underlining
         for c in self.codes:
-            if int(current.text(2)[4:]) == c['cid']:
+            if int(current.text(self.code_tree.COL_ID)[4:]) == c['cid']:
                 fg_color = TextColor(c['color']).recommendation
                 style = f"QLabel {{background-color:{c['color']}; color: {fg_color};}}"
                 self.ui.label_code.setStyleSheet(style)
@@ -1603,7 +1603,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.label_code.setToolTip(tooltip)
                 break
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-        if len(selected_text) > 0 and not (QtWidgets.QApplication.mouseButtons() & Qt.MouseButton.RightButton):
+        if (column == self.code_tree.COL_NAME and selected_text
+            and QtWidgets.QApplication.mouseButtons() & Qt.MouseButton.LeftButton):
             self.mark()
         # When a code is selected undo the show selected code features
         self.highlight()
@@ -2773,7 +2774,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.show_codes_colour_filter = selected['name']  # colour range name
         if self.show_codes_colour_filter == "all":
             self.show_codes_colour_filter = ""
-        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
+        show_codes_of_colour_range(
+            self.app, self.ui.treeWidget, self.codes, selected, id_column=self.code_tree.COL_ID)
         self.show_codes_like_filter = ""
         if self.show_codes_colour_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
@@ -4860,7 +4862,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # 1) Format the newly added code only (skip if 'important' filter is on
         #    and this new code is not important, to stay consistent with the
         #    filtered view and the margin). <- L
-        if not (self.important and new_coded.get('important') != 1):
+        if (new_coded.get('cid') not in getattr(self.app, 'hidden_cids', set())
+            and not (self.important and new_coded.get('important') != 1)):
             self._apply_format_to_code_item(new_coded, codes_lookup)
         # 2) Refresh tooltip event filter (uses self.code_text, already extended)
         visible_code_text = [
