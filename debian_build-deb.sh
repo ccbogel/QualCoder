@@ -24,7 +24,7 @@ fi
 
 #  Create .deb
 echo "Copy template ${NEW_DIR}..."
-cp -r "qualcoder-debian" "$NEW_DIR"
+cp -r "dev/qualcoder-debian" "$NEW_DIR"
 
 mkdir -p "${NEW_DIR}/src"
 cp "dist/QualCoder" "${NEW_DIR}/src/qualcoder"
