@@ -34,8 +34,11 @@ MCP, it attaches without opening another GUI. Otherwise it starts QualCoder sepa
 and waits up to 60 seconds for the local endpoint. External MCP access must be enabled
 in Settings > AI Integration; startup does not change this setting or its permissions.
 Use `--startup-timeout 120` for slower startup, or `--no-start` to attach without launching.
-Automatic startup only applies to local HTTP endpoints. The GUI remains open when the
-stdio client disconnects. GUI output never shares the bridge's protocol streams.
+Automatic startup only applies to local HTTP endpoints. GUI output never shares the
+bridge's protocol streams. Some Windows clients, including the Python MCP SDK, place
+the bridge in a Job Object and close all its child processes on disconnect. In that
+case the GUI started by the bridge also closes. Start QualCoder independently before
+connecting if it must remain open after the client disconnects.
 Source installations launch the GUI with the bridge's own Python interpreter and
 source directory, preserving its conda or virtual environment on Windows, macOS and
 Linux. No machine-specific launcher or Python path is required.
