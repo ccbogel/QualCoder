@@ -1,0 +1,11 @@
+{
+  "name": "qualcoder-claude-desktop-bridge",
+  "private": true,
+  "description": "Build dependencies for the QualCoder.mcpb Claude Desktop extension",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

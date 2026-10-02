@@ -3,13 +3,13 @@ import datetime
 import importlib.metadata
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import sqlite3
 import tempfile
 import threading
 import time
-from concurrent.futures import Future
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -23,7 +23,8 @@ from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_llm import AiLLM
-from qualcoder.ai_mcp_server import AiMcpExecutionContext, AiMcpServer
+from mcp.server import ServerRequestContext
+from qualcoder.ai_mcp_server import AiMcpExecutionContext, AiMcpServer, ProjectDatabaseLockedError
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
 from qualcoder.code_av import DialogCodeAV
 from qualcoder.code_text import DialogCodeText
@@ -736,15 +737,12 @@ class TestAiMemoPolicy(TestCase):
         self.server.app.project_path = ""
         controller = ExternalMcpController(self.server.app)
         controller._active = True
-        future = Future()
         context = AiMcpExecutionContext(
             source="external_mcp",
             owner="External MCP",
         )
 
-        controller._execute_on_qt_thread(lambda: "available", context, future)
-
-        self.assertEqual("available", future.result())
+        self.assertEqual("available", controller._execute(lambda: "available", context))
 
     def test_mcp_memo_reads_and_updates_preserve_private_suffix(self):
         documents_payload = self.server._sanitize_memo_payload(self.server._read_resource_payload("qualcoder://documents", {}))
@@ -771,25 +769,25 @@ class TestAiMemoPolicy(TestCase):
         self.assertEqual("Coding memo\n", code_segments_payload["segments"][0]["memo"])
 
         document_result = self.server._call_tool_payload(
-            "documents/update_document", {"fid": 1, "memo": "Updated document"}, "cs-doc"
+            "documents_update_document", {"fid": 1, "memo": "Updated document"}, "cs-doc"
         )
         self.assertTrue(document_result["structuredContent"]["updated"])
         self.assertEqual("Updated document\n", document_result["structuredContent"]["document"]["memo"])
 
         category_result = self.server._call_tool_payload(
-            "codes/update_category", {"catid": 1, "memo": "Updated category"}, "cs-cat"
+            "codes_update_category", {"catid": 1, "memo": "Updated category"}, "cs-cat"
         )
         self.assertTrue(category_result["structuredContent"]["updated"])
         self.assertEqual("Updated category\n", category_result["structuredContent"]["category"]["memo"])
 
         code_result = self.server._call_tool_payload(
-            "codes/update_code", {"cid": 1, "name": "code one updated", "memo": "Updated code"}, "cs-code"
+            "codes_update_code", {"cid": 1, "name": "code one updated", "memo": "Updated code"}, "cs-code"
         )
         self.assertTrue(code_result["structuredContent"]["updated"])
         self.assertEqual("Updated code\n", code_result["structuredContent"]["code"]["memo"])
 
         coding_result = self.server._call_tool_payload(
-            "codes/update_text_coding", {"ctid": 1, "memo": "Updated coding"}, "cs-coding"
+            "codes_update_text_coding", {"ctid": 1, "memo": "Updated coding"}, "cs-coding"
         )
         self.assertTrue(coding_result["structuredContent"]["updated"])
         self.assertEqual("Updated coding\n", coding_result["structuredContent"]["coding"]["memo"])
@@ -925,9 +923,9 @@ class TestAiAnnotations(TestCase):
 
     def test_annotation_reads_follow_visibility_and_explicit_owner(self):
         tool_names = [tool["name"] for tool in self.server._list_tools_payload()["tools"]]
-        self.assertIn("annotations/create", tool_names)
-        self.assertIn("annotations/update", tool_names)
-        self.assertIn("annotations/delete", tool_names)
+        self.assertIn("annotations_create", tool_names)
+        self.assertIn("annotations_update", tool_names)
+        self.assertIn("annotations_delete", tool_names)
         resource_uris = [str(resource.uri) for resource in self.server._base_resources()]
         self.assertIn("qualcoder://annotations", resource_uris)
         templates_response = self.server.handle_request(
@@ -1006,7 +1004,7 @@ class TestAiAnnotations(TestCase):
         tools = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 4, "method": "tools/list", "params": {}}
         )["result"]["tools"]
-        create_annotation = next(item for item in tools if item["name"] == "annotations/create")
+        create_annotation = next(item for item in tools if item["name"] == "annotations_create")
         self.assertEqual(["fid", "memo"], create_annotation["inputSchema"]["required"])
         self.assertFalse(create_annotation["inputSchema"]["additionalProperties"])
         self.assertIn("codes_get_tree", [item["name"] for item in tools])
@@ -1141,7 +1139,7 @@ class TestAiAnnotations(TestCase):
             "id": 7,
             "method": "tools/call",
             "params": {
-                "name": "annotations/create",
+                "name": "annotations_create",
                 "arguments": {"fid": 1, "quote": "unique phrase", "memo": "agent note"},
                 "_ai_change_set_id": "bridge-change-set",
             },
@@ -1166,7 +1164,7 @@ class TestAiAnnotations(TestCase):
                 "id": 71,
                 "method": "tools/call",
                 "params": {
-                    "name": "annotations/create",
+                    "name": "annotations_create",
                     "arguments": {"fid": 1, "quote": "Alpha", "memo": "ambiguous"},
                 },
             }
@@ -1186,7 +1184,7 @@ class TestAiAnnotations(TestCase):
             "id": 8,
             "method": "tools/call",
             "params": {
-                "name": "annotations/update",
+                "name": "annotations_update",
                 "arguments": {"anid": created_payload["annotation"]["anid"], "memo": "updated"},
             },
         }
@@ -1201,7 +1199,7 @@ class TestAiAnnotations(TestCase):
             "jsonrpc": "2.0",
             "id": 9,
             "method": "tools/call",
-            "params": {"name": "annotations/create", "arguments": []},
+            "params": {"name": "annotations_create", "arguments": []},
         })
         self.assertEqual(-32602, invalid_arguments["error"]["code"])
         unknown_tool = self.server.handle_request(
@@ -1222,7 +1220,7 @@ class TestAiAnnotations(TestCase):
         denied = self.server.run_with_execution_context(
             external_context,
             lambda: self.server._call_tool_payload(
-                "codes/create_code", {"name": "external denied"}, ""
+                "codes_create_code", {"name": "external denied"}, ""
             ),
         )
         self.assertTrue(denied["isError"])
@@ -1231,12 +1229,12 @@ class TestAiAnnotations(TestCase):
         external = self.server.run_with_execution_context(
             external_context,
             lambda: self.server._call_tool_payload(
-                "codes/create_code", {"name": "external code"}, ""
+                "codes_create_code", {"name": "external code"}, ""
             ),
         )
         external_operation = self.app.ai.operations[-1][1]
         internal = self.server._call_tool_payload(
-            "codes/create_code", {"name": "internal code"}, ""
+            "codes_create_code", {"name": "internal code"}, ""
         )
         self.assertEqual("MCP: Codex", external["structuredContent"]["code"]["owner"])
         self.assertEqual("AI Agent", internal["structuredContent"]["code"]["owner"])
@@ -1250,7 +1248,7 @@ class TestAiAnnotations(TestCase):
         updated = self.server.run_with_execution_context(
             external_context,
             lambda: self.server._call_tool_payload(
-                "codes/update_code", {"cid": 1, "memo": "changed externally"}, ""
+                "codes_update_code", {"cid": 1, "memo": "changed externally"}, ""
             ),
         )
         self.assertTrue(updated["structuredContent"]["updated"])
@@ -1285,7 +1283,7 @@ class TestAiAnnotations(TestCase):
         created = self.server.run_with_execution_context(
             external_context,
             lambda: self.server._call_tool_payload(
-                "codes/create_code", {"name": "external undo code"}, ""
+                "codes_create_code", {"name": "external undo code"}, ""
             ),
         )
         cid = created["structuredContent"]["code"]["cid"]
@@ -1307,7 +1305,7 @@ class TestAiAnnotations(TestCase):
         created = self.server.run_with_execution_context(
             external_context,
             lambda: self.server._call_tool_payload(
-                "codes/create_code", {"name": "externally reassigned code"}, ""
+                "codes_create_code", {"name": "externally reassigned code"}, ""
             ),
         )
         cid = created["structuredContent"]["code"]["cid"]
@@ -1431,7 +1429,7 @@ class TestAiAnnotations(TestCase):
                     result["resource"] = await session.read_resource("qualcoder://annotations")
                     result["status"] = await session.call_tool("project_get_status", {})
                     result["write"] = await session.call_tool(
-                        "codes/create_code", {"name": "HTTP code"}
+                        "codes_create_code", {"name": "HTTP code"}
                     )
 
         def run_client():
@@ -1465,7 +1463,7 @@ class TestAiAnnotations(TestCase):
         tool_names = [tool.name for tool in result["tools"].tools]
         self.assertIn("project_get_status", tool_names)
         self.assertIn("codes_get_tree", tool_names)
-        self.assertIn("codes/create_code", tool_names)
+        self.assertIn("codes_create_code", tool_names)
         self.assertFalse(result["status"].is_error)
         status_payload = result["status"].structured_content
         self.assertEqual("Project public\n", status_payload["project_memo"])
@@ -1483,17 +1481,89 @@ class TestAiAnnotations(TestCase):
         self.assertEqual("External MCP", owner)
         self.assertIn((["code_name"], "external_mcp"), self.app.project_events.calls)
 
+    def test_tool_write_waits_between_attempts_while_database_is_busy(self):
+        reader = sqlite3.connect(os.path.join(self.project_path, "data.qda"), check_same_thread=False)
+        reader.executemany("INSERT INTO code_cat (name) VALUES (?)", [("busy a",), ("busy b",)])
+        reader.commit()
+        half_read = reader.cursor()
+        half_read.execute("SELECT name FROM code_cat")
+        half_read.fetchone()
+        release = threading.Timer(0.6, half_read.close)
+        release.start()
+        try:
+            result = self.server._call_tool_payload("codes_create_code", {"name": "after the wait"}, "")
+        finally:
+            release.join()
+            reader.close()
+        self.assertTrue(result["structuredContent"]["created"])
+
+        blocker = sqlite3.connect(os.path.join(self.project_path, "data.qda"))
+        blocker.execute("UPDATE project SET memo='pending'")
+        self.server.DATABASE_BUSY_WAIT_SECONDS = 0.5
+        try:
+            with self.assertRaises(ProjectDatabaseLockedError) as caught:
+                self.server._call_tool_payload("codes_create_code", {"name": "never written"}, "")
+            self.assertFalse(caught.exception.gui_transaction_pending)
+        finally:
+            blocker.rollback()
+            blocker.close()
+        names = [row[0] for row in self.app.conn.execute("SELECT name FROM code_name").fetchall()]
+        self.assertIn("after the wait", names)
+        self.assertNotIn("never written", names)
+
+    def test_resource_tools_and_legacy_tool_names(self):
+        listing = self.server._call_tool_payload("qualcoder_list_resources", {}, "")["structuredContent"]
+        uris = [item["uri"] for item in listing["resources"]]
+        self.assertIn("qualcoder://documents", uris)
+        self.assertTrue(listing["resourceTemplates"])
+        read = self.server._call_tool_payload("qualcoder_read_resource", {"uri": "qualcoder://documents"}, "")
+        self.assertFalse(read["isError"])
+        self.assertIn("doc one", read["content"][0]["text"])
+        with self.assertRaises(ValueError):
+            self.server._call_tool_payload("qualcoder_read_resource", {"uri": "qualcoder://nope"}, "")
+        legacy = self.server._call_tool_payload("codes/create_code", {"name": "legacy name"}, "")
+        self.assertTrue(legacy["structuredContent"]["created"])
+        tool_names = [tool["name"] for tool in self.server._list_tools_payload()["tools"]]
+        self.assertTrue(all(re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) for name in tool_names))
+        self.assertIn("qualcoder_read_resource", tool_names)
+
+    def test_sdk_tool_errors_are_classified(self):
+        context = ServerRequestContext(
+            session=SimpleNamespace(client_params=None), lifespan_context=None,
+            protocol_version="2025-06-18", method="tools/call", request_id=1,
+        )
+        params = types.CallToolRequestParams(name="codes_create_code", arguments={})
+        expected = asyncio.run(self.server._sdk_call_tool(context, params))
+        self.assertTrue(expected.is_error)
+        self.assertIn("must not be empty", expected.content[0].text)
+
+        def boom():
+            raise ZeroDivisionError("internal bug")
+
+        self.server._external_executor = lambda operation, ctx: asyncio.sleep(0, boom())
+        with self.assertRaises(ZeroDivisionError):
+            asyncio.run(self.server._sdk_call_tool(context, params))
+        self.server._external_executor = None
+
+    def test_quote_search_tolerates_pdf_layout(self):
+        text = "Intro. El an\u00e1lisis socio-\npol\u00edtico de la de\ufb01ni\u00ad\nci\u00f3n legal \u201cvigente\u201d sigue. Fin."
+        quote = 'el an\u00e1lisis socio-pol\u00edtico de la definici\u00f3n legal "vigente" sigue.'
+        pos0, pos1 = self.server._quote_search(quote, text)
+        self.assertEqual(text.index("El an"), pos0)
+        self.assertEqual(text.index(" Fin."), pos1)
+        self.assertEqual((-1, -1), self.server._layout_tolerant_quote_search("otra cosa distinta", text))
+
     def test_project_reset_invalidates_preview_tokens(self):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
         preview = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 110, "method": "tools/call",
-             "params": {"name": "codes/preview_delete_code", "arguments": {"cid": 1}}}
+             "params": {"name": "codes_preview_delete_code", "arguments": {"cid": 1}}}
         )["result"]["structuredContent"]
         token = preview["preview_token"]
         self.server.reset_project_state()
         rejected = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 111, "method": "tools/call",
-             "params": {"name": "codes/delete_code",
+             "params": {"name": "codes_delete_code",
                         "arguments": {"cid": 1, "preview_token": token}}}
         )
         self.assertEqual(-32602, rejected["error"]["code"])
@@ -1502,24 +1572,24 @@ class TestAiAnnotations(TestCase):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_FULL_ACCESS
         without_preview = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 12, "method": "tools/call",
-             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": ""}}}
+             "params": {"name": "codes_delete_code", "arguments": {"cid": 1, "preview_token": ""}}}
         )
         self.assertEqual(-32602, without_preview["error"]["code"])
 
         preview = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 13, "method": "tools/call",
-             "params": {"name": "codes/preview_delete_code", "arguments": {"cid": 1}}}
+             "params": {"name": "codes_preview_delete_code", "arguments": {"cid": 1}}}
         )["result"]["structuredContent"]
         self.assertTrue(preview["requires_confirmation"])
         token = preview["preview_token"]
         deleted = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 14, "method": "tools/call",
-             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": token}}}
+             "params": {"name": "codes_delete_code", "arguments": {"cid": 1, "preview_token": token}}}
         )
         self.assertTrue(deleted["result"]["structuredContent"]["deleted"])
         reused = self.server.handle_request(
             {"jsonrpc": "2.0", "id": 15, "method": "tools/call",
-             "params": {"name": "codes/delete_code", "arguments": {"cid": 1, "preview_token": token}}}
+             "params": {"name": "codes_delete_code", "arguments": {"cid": 1, "preview_token": token}}}
         )
         self.assertEqual(-32602, reused["error"]["code"])
         self.assertIn((["code_name", "code_text"], "ai_agent"), self.app.project_events.calls)
@@ -1528,15 +1598,15 @@ class TestAiAnnotations(TestCase):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
         with self.assertRaisesRegex(ValueError, "occurs 2 times"):
             self.server._call_tool_payload(
-                "annotations/create", {"fid": 1, "quote": "Alpha", "memo": "ambiguous"}, "cs"
+                "annotations_create", {"fid": 1, "quote": "Alpha", "memo": "ambiguous"}, "cs"
             )
         with self.assertRaisesRegex(ValueError, "not found exactly"):
             self.server._call_tool_payload(
-                "annotations/create", {"fid": 1, "quote": "Unique Phrase", "memo": "wrong case"}, "cs"
+                "annotations_create", {"fid": 1, "quote": "Unique Phrase", "memo": "wrong case"}, "cs"
             )
 
         created = self.server._call_tool_payload(
-            "annotations/create", {"fid": 1, "quote": "unique phrase", "memo": "agent note"}, "cs"
+            "annotations_create", {"fid": 1, "quote": "unique phrase", "memo": "agent note"}, "cs"
         )
         payload = created["structuredContent"]
         self.assertTrue(payload["created"])
@@ -1544,16 +1614,16 @@ class TestAiAnnotations(TestCase):
         self.assertEqual("AI Agent", payload["annotation"]["owner"])
 
         positioned = self.server._call_tool_payload(
-            "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "Alpha", "memo": "first"}, "cs"
+            "annotations_create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "Alpha", "memo": "first"}, "cs"
         )
         self.assertTrue(positioned["structuredContent"]["created"])
         with self.assertRaisesRegex(ValueError, "does not match"):
             self.server._call_tool_payload(
-                "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "alpha", "memo": "bad"}, "cs"
+                "annotations_create", {"fid": 1, "pos0": 0, "pos1": 5, "quote": "alpha", "memo": "bad"}, "cs"
             )
 
         duplicate = self.server._call_tool_payload(
-            "annotations/create", {"fid": 1, "pos0": 0, "pos1": 5, "memo": "ignored"}, "cs"
+            "annotations_create", {"fid": 1, "pos0": 0, "pos1": 5, "memo": "ignored"}, "cs"
         )
         self.assertFalse(duplicate["structuredContent"]["created"])
         self.assertEqual("already_exists", duplicate["structuredContent"]["reason"])
@@ -1572,13 +1642,13 @@ class TestAiAnnotations(TestCase):
     def test_update_delete_permissions_private_memo_and_undo(self):
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_READ_ONLY
         denied = self.server._call_tool_payload(
-            "annotations/create", {"fid": 1, "quote": "unique phrase", "memo": "note"}, "cs"
+            "annotations_create", {"fid": 1, "quote": "unique phrase", "memo": "note"}, "cs"
         )
         self.assertTrue(denied["isError"])
 
         self.app.settings["ai_permissions"] = AiMcpServer.AI_PERMISSION_SANDBOXED
         denied_update = self.server._call_tool_payload(
-            "annotations/update", {"anid": 1, "memo": "not allowed"}, "cs"
+            "annotations_update", {"anid": 1, "memo": "not allowed"}, "cs"
         )
         self.assertTrue(denied_update["isError"])
 
@@ -1587,7 +1657,7 @@ class TestAiAnnotations(TestCase):
         cur.execute("UPDATE annotation SET memo=? WHERE anid=1", ("public\n#####\nprivate",))
         self.app.conn.commit()
         updated = self.server._call_tool_payload(
-            "annotations/update", {"anid": 1, "memo": "revised"}, "cs-update"
+            "annotations_update", {"anid": 1, "memo": "revised"}, "cs-update"
         )
         self.assertEqual("revised\n", updated["structuredContent"]["annotation"]["memo"])
         cur.execute("SELECT memo FROM annotation WHERE anid=1")
@@ -1601,7 +1671,7 @@ class TestAiAnnotations(TestCase):
         cur.execute("SELECT memo FROM annotation WHERE anid=1")
         self.assertEqual("public\n#####\nprivate", cur.fetchone()[0])
 
-        deleted = self.server._call_tool_payload("annotations/delete", {"anid": 1}, "cs-delete")
+        deleted = self.server._call_tool_payload("annotations_delete", {"anid": 1}, "cs-delete")
         self.assertTrue(deleted["structuredContent"]["deleted"])
         delete_operation = self.app.ai.operations[-1][1]
         undo_result = undo_manager._undo_ai_change_set({"operations": [delete_operation]})
