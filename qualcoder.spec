@@ -30,8 +30,9 @@ datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('transformers')
 hiddenimports += collect_submodules('pydantic')
-# The SDK's optional CLI exits at import time when its extras are not installed.
-hiddenimports += collect_submodules('mcp', filter=lambda name: name != 'mcp.cli' and not name.startswith('mcp.cli.'))
+hiddenimports += collect_submodules('mcp.server')
+hiddenimports += collect_submodules('mcp.client')
+hiddenimports += collect_submodules('mcp.types')
 hiddenimports += collect_submodules('uvicorn')
 hiddenimports += ['scipy._external.array_api_compat.numpy.fft']
 
