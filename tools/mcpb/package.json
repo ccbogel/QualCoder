@@ -1,0 +1,14 @@
+{
+  "name": "qualcoder-claude-desktop-bridge",
+  "private": true,
+  "description": "Build dependencies for the QualCoder.mcpb Claude Desktop extension",
+  "scripts": {
+    "test": "node --test server/bridge.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

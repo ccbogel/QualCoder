@@ -115,6 +115,24 @@ class TestExternalMcpStartup(TestCase):
         self.controller._report_start_status()
         self.assertFalse(self.failures)
 
+    def test_startup_without_console_streams(self):
+        """The pythonw launcher must start HTTP even when stdout/stderr are None."""
+
+        with socket.socket() as probe:
+            probe.bind(('127.0.0.1', 0))
+            self.controller.app.settings['mcp_external_port'] = probe.getsockname()[1]
+        with patch('sys.stdout', None), patch('sys.stderr', None):
+            self.controller.start()
+            deadline = time.monotonic() + 5
+            while self.controller._startup_pending and time.monotonic() < deadline:
+                self.qt_app.processEvents()
+                time.sleep(0.01)
+            try:
+                self.assertTrue(self.controller.is_running, self.controller._startup_error)
+                self.assertFalse(self.failures)
+            finally:
+                self._stop_controller()
+
     def test_main_window_displays_failure_as_plain_text_warning(self):
         from qualcoder.__main__ import MainWindow
 

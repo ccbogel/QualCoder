@@ -40,6 +40,13 @@ from typing import Optional
 import urllib.request
 import webbrowser
 
+if __name__ == "__main__":
+    # Handle frozen child processes and stdio before importing the GUI.
+    multiprocessing.freeze_support()
+    if "--mcp-stdio" in sys.argv[1:]:
+        from qualcoder.mcp_stdio import main as mcp_stdio_main
+        sys.exit(mcp_stdio_main([arg for arg in sys.argv[1:] if arg != "--mcp-stdio"]))
+
 # Hugging Face tokenizers otherwise creates a native Rayon thread pool which can
 # outlive the Qt window in frozen macOS builds and crash during QApplication teardown.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -3353,6 +3360,4 @@ def install_noto_sans():
 
 
 if __name__ == "__main__":
-    # Pyinstaller fix
-    multiprocessing.freeze_support()
     sys.exit(gui())
