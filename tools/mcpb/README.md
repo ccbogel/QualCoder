@@ -29,19 +29,12 @@ Other clients do not need this file. HTTP clients (Claude Code, Codex, IDEs) con
 `http://127.0.0.1:47363/mcp` directly; stdio-only clients can use
 `python -m qualcoder.mcp_stdio --port 47363` or
 `python -m qualcoder --mcp-stdio --port 47363`.
-The Python bridge first initializes the MCP endpoint. If QualCoder is already serving
-MCP, it attaches without opening another GUI. Otherwise it starts QualCoder separately
-and waits up to 60 seconds for the local endpoint. External MCP access must be enabled
-in Settings > AI Integration; startup does not change this setting or its permissions.
-Use `--startup-timeout 120` for slower startup, or `--no-start` to attach without launching.
-Automatic startup only applies to local HTTP endpoints. GUI output never shares the
-bridge's protocol streams. Some Windows clients, including the Python MCP SDK, place
-the bridge in a Job Object and close all its child processes on disconnect. In that
-case the GUI started by the bridge also closes. Start QualCoder independently before
-connecting if it must remain open after the client disconnects.
-Source installations launch the GUI with the bridge's own Python interpreter and
-source directory, preserving its conda or virtual environment on Windows, macOS and
-Linux. No machine-specific launcher or Python path is required.
+Start QualCoder first and enable external MCP access in Settings > AI Integration.
+The Python bridge verifies the running server through MCP initialization before
+serving the client. If no QualCoder server responds, it exits with status 1 and prints
+a message to stderr explaining how to enable access and reconnect. It never starts
+a GUI, so disconnecting the client cannot close QualCoder through a child-process
+relationship. The former `--no-start` and `--startup-timeout` options have been removed.
 
 Windows builds from the updated PyInstaller specs support `QualCoder.exe --mcp-stdio`:
 they retain stdin/stdout and hide a console window owned by QualCoder. Older windowed

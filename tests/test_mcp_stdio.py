@@ -7,7 +7,7 @@ import subprocess
 import sys
 from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase, TestCase
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx2
 from mcp import ClientSession, StdioServerParameters, types
@@ -15,7 +15,7 @@ from mcp.client.stdio import stdio_client
 from mcp.server.lowlevel import Server
 import uvicorn
 
-from qualcoder.mcp_stdio import QualCoderStdioBridge, QualCoderUnreachableError, launch_gui
+from qualcoder.mcp_stdio import QualCoderStdioBridge, QualCoderUnreachableError
 
 
 class TestMcpStdio(TestCase):
@@ -92,84 +92,65 @@ runpy.run_module('qualcoder', run_name='__main__')
                 main([])
         self.assertEqual(2, caught.exception.code)
 
-    def test_source_gui_launch_uses_current_environment_on_all_platforms(self):
-        source_path = Path(__file__).resolve().parents[1] / "src"
-        for platform_name in ("win32", "darwin", "linux"):
-            with self.subTest(platform=platform_name), \
-                    patch("qualcoder.mcp_stdio.sys.platform", platform_name), \
-                    patch("qualcoder.mcp_stdio.sys.frozen", False, create=True), \
-                    patch.dict(os.environ, {"PYTHONPATH": "existing-path"}), \
-                    patch("qualcoder.mcp_stdio.subprocess.Popen") as popen:
-                launch_gui()
-            self.assertEqual([sys.executable, "-m", "qualcoder"], popen.call_args.args[0])
-            options = popen.call_args.kwargs
-            self.assertEqual(str(source_path), options["cwd"])
-            self.assertEqual(
-                str(source_path) + os.pathsep + "existing-path", options["env"]["PYTHONPATH"],
-            )
-            for stream in ("stdin", "stdout", "stderr"):
-                self.assertEqual(subprocess.DEVNULL, options[stream])
-            if platform_name == "win32":
-                self.assertTrue(options["creationflags"] & subprocess.CREATE_NO_WINDOW)
-                self.assertNotIn("start_new_session", options)
-            else:
-                self.assertTrue(options["start_new_session"])
-                self.assertNotIn("creationflags", options)
+    def test_unavailable_server_exits_cleanly_without_gui_imports(self):
+        source = Path(__file__).resolve().parents[1] / "src"
+        script = """
+import importlib.abc
+import runpy
+import sys
+from unittest.mock import patch
 
-    def test_frozen_gui_launch_resets_pyinstaller_environment(self):
-        with patch("qualcoder.mcp_stdio.sys.frozen", True, create=True), \
-                patch("qualcoder.mcp_stdio.subprocess.Popen") as popen:
-            launch_gui()
-        self.assertEqual([sys.executable], popen.call_args.args[0])
-        self.assertEqual("1", popen.call_args.kwargs["env"]["PYINSTALLER_RESET_ENVIRONMENT"])
+class BlockGui(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.startswith(('PyQt6', 'qualcoder.app', 'qualcoder.ai_runtime')):
+            raise AssertionError('GUI imported: ' + fullname)
+
+sys.meta_path.insert(0, BlockGui())
+sys.argv = ['qualcoder', '--mcp-stdio', '--port', sys.argv[1]]
+with patch('subprocess.Popen', side_effect=AssertionError('GUI launched')):
+    runpy.run_module('qualcoder', run_name='__main__')
+"""
+        # Keep the port reserved without listening, so no server can answer the probe.
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            port = listener.getsockname()[1]
+            result = subprocess.run(
+                [sys.executable, "-c", script, str(port)],
+                env=dict(os.environ, PYTHONPATH=str(source)),
+                capture_output=True, text=True, timeout=30,
+            )
+        self.assertEqual(1, result.returncode, result.stderr)
+        self.assertEqual("", result.stdout)
+        self.assertIn("Start QualCoder first", result.stderr)
+        self.assertIn("Settings > AI Integration", result.stderr)
+        self.assertIn("Then reconnect the MCP client", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
 
 class TestMcpStdioStartup(IsolatedAsyncioTestCase):
-    """Exercise attach, startup, failure and cancellation without launching a real GUI."""
+    """Exercise attachment, failure and cancellation without launching a GUI."""
 
-    async def test_existing_server_does_not_start_gui(self):
+    async def test_existing_server_is_ready_before_serving(self):
         bridge = QualCoderStdioBridge("http://127.0.0.1:47363/mcp")
         with patch.object(bridge, "_probe", AsyncMock(return_value=True)), \
-                patch("qualcoder.mcp_stdio.launch_gui") as launch:
-            await bridge.ensure_server(1)
-        launch.assert_not_called()
-
-    async def test_waits_for_launched_gui_before_serving(self):
-        bridge = QualCoderStdioBridge("http://127.0.0.1:47363/mcp")
-        with patch.object(bridge, "_probe", AsyncMock(side_effect=[False, False, True])), \
-                patch.object(bridge, "serve", AsyncMock()) as serve, \
-                patch("qualcoder.mcp_stdio.launch_gui", return_value=MagicMock(poll=lambda: None)) as launch, \
-                patch("qualcoder.mcp_stdio.asyncio.sleep", AsyncMock()), \
-                patch("sys.stderr"):
-            await bridge.run(5)
-        launch.assert_called_once()
+                patch.object(bridge, "serve", AsyncMock()) as serve:
+            await bridge.run()
         serve.assert_awaited_once()
 
-    async def test_startup_timeout_does_not_stop_gui(self):
-        bridge = QualCoderStdioBridge("http://127.0.0.1:47363/mcp")
-        process = MagicMock(poll=lambda: None)
-        with patch.object(bridge, "_probe", AsyncMock(return_value=False)), \
-                patch("qualcoder.mcp_stdio.launch_gui", return_value=process), patch("sys.stderr"):
-            with self.assertRaisesRegex(QualCoderUnreachableError, "within"):
-                await bridge.ensure_server(0.01)
-        process.terminate.assert_not_called()
-
-    async def test_failed_launcher_reports_exit_code(self):
-        bridge = QualCoderStdioBridge("http://127.0.0.1:47363/mcp")
-        with patch.object(bridge, "_probe", AsyncMock(return_value=False)), \
-                patch("qualcoder.mcp_stdio.launch_gui", return_value=MagicMock(poll=lambda: 3)), \
-                patch("sys.stderr"):
-            with self.assertRaisesRegex(QualCoderUnreachableError, "code 3"):
-                await bridge.ensure_server(1)
-
-    async def test_no_start_and_remote_endpoint_never_launch_gui(self):
-        for url, auto_start in (("http://127.0.0.1:47363/mcp", False), ("https://example.com/mcp", True)):
+    async def test_unavailable_server_reports_error_without_serving(self):
+        for url in ("http://127.0.0.1:47363/mcp", "https://example.com/mcp"):
             bridge = QualCoderStdioBridge(url)
             with patch.object(bridge, "_probe", AsyncMock(return_value=False)), \
-                    patch("qualcoder.mcp_stdio.launch_gui") as launch:
-                with self.assertRaises(QualCoderUnreachableError):
-                    await bridge.ensure_server(1, auto_start)
-            launch.assert_not_called()
+                    patch.object(bridge, "serve", AsyncMock()) as serve:
+                with self.assertRaisesRegex(QualCoderUnreachableError, "Start QualCoder first"):
+                    await bridge.run()
+            serve.assert_not_awaited()
+
+    async def test_probe_timeout_is_reported_as_unavailable(self):
+        bridge = QualCoderStdioBridge("http://127.0.0.1:47363/mcp")
+        with patch.object(bridge, "_with_session", AsyncMock(side_effect=TimeoutError)):
+            with self.assertRaisesRegex(QualCoderUnreachableError, "Start QualCoder first"):
+                await bridge.ensure_server()
 
     @asynccontextmanager
     async def http_server(self, name: str = "qualcoder-mcp"):
@@ -203,13 +184,11 @@ class TestMcpStdioStartup(IsolatedAsyncioTestCase):
     async def test_real_mcp_initialization_and_stdio_round_trip(self):
         async with self.http_server() as port:
             bridge = QualCoderStdioBridge(f"http://127.0.0.1:{port}/mcp")
-            with patch("qualcoder.mcp_stdio.launch_gui") as launch:
-                await bridge.ensure_server(1)
-            launch.assert_not_called()
+            await bridge.ensure_server()
             source = Path(__file__).resolve().parents[1] / "src"
             parameters = StdioServerParameters(
                 command=sys.executable,
-                args=["-m", "qualcoder", "--mcp-stdio", "--port", str(port), "--no-start"],
+                args=["-m", "qualcoder", "--mcp-stdio", "--port", str(port)],
                 env=dict(os.environ, PYTHONPATH=str(source)),
             )
             async with asyncio.timeout(20):
@@ -220,21 +199,19 @@ class TestMcpStdioStartup(IsolatedAsyncioTestCase):
                         tools_result = await session.list_tools()
                         self.assertEqual(["test_tool"], [tool.name for tool in tools_result.tools])
 
-    async def test_other_mcp_server_does_not_trigger_gui_startup(self):
+    async def test_other_mcp_server_is_rejected(self):
         async with self.http_server("another-application") as port:
             bridge = QualCoderStdioBridge(f"http://127.0.0.1:{port}/mcp")
-            with patch("qualcoder.mcp_stdio.launch_gui") as launch:
-                # The HTTP SDK's task groups may wrap the identity error.
-                with self.assertRaises((ValueError, ExceptionGroup)) as caught:
-                    await bridge.ensure_server(1)
+            # The HTTP SDK's task groups may wrap the identity error.
+            with self.assertRaises((ValueError, ExceptionGroup)) as caught:
+                await bridge.ensure_server()
             self.assertIn("another-application", str(caught.exception) + repr(caught.exception))
-            launch.assert_not_called()
 
-    async def test_protocol_error_or_cancellation_never_launch_gui(self):
+    async def test_protocol_error_or_cancellation_never_serves(self):
         bridge = QualCoderStdioBridge("http://127.0.0.1:47363/mcp")
         for failure in (ValueError("wrong server"), asyncio.CancelledError()):
             with patch.object(bridge, "_probe", AsyncMock(side_effect=failure)), \
-                    patch("qualcoder.mcp_stdio.launch_gui") as launch:
+                    patch.object(bridge, "serve", AsyncMock()) as serve:
                 with self.assertRaises(type(failure)):
-                    await bridge.ensure_server(1)
-            launch.assert_not_called()
+                    await bridge.run()
+            serve.assert_not_awaited()

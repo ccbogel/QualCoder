@@ -22,7 +22,7 @@ https://qualcoder.org/
 
 Generic stdio to HTTP bridge for QualCoder's external MCP access.
 
-Lets stdio MCP clients attach to QualCoder, starting its GUI if needed:
+Lets stdio MCP clients attach to a running QualCoder instance:
 
     python -m qualcoder --mcp-stdio --url http://127.0.0.1:47363/mcp
     python -m qualcoder.mcp_stdio --port 47363
@@ -33,12 +33,8 @@ locks and error classification stay in QualCoder.
 
 import argparse
 import asyncio
-import os
-from pathlib import Path
-import subprocess
 import sys
 from typing import Any, Awaitable, Callable, Optional
-from urllib.parse import urlsplit
 
 import anyio
 import httpx2
@@ -51,39 +47,11 @@ from mcp.server.stdio import stdio_server
 DEFAULT_URL = "http://127.0.0.1:47363/mcp"
 BRIDGE_VERSION = "1.0.0"
 TRANSPORT_ERRORS = (httpx2.TransportError, anyio.BrokenResourceError, anyio.ClosedResourceError, ConnectionError)
-STARTUP_TIMEOUT = 60.0
 PROBE_TIMEOUT = 2.0
 
 
 class QualCoderUnreachableError(ConnectionError):
     """The HTTP transport could not reach QualCoder."""
-
-
-def launch_gui() -> subprocess.Popen:
-    """Launch a detached GUI without sharing the MCP client's standard streams."""
-
-    environment = os.environ.copy()
-    source_path = Path(__file__).resolve().parents[1]
-    working_directory = str(source_path)
-    if getattr(sys, "frozen", False):
-        command = [sys.executable]
-        working_directory = str(Path(sys.executable).parent)
-        environment["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
-    else:
-        command = [sys.executable, "-m", "qualcoder"]
-        environment["PYTHONPATH"] = os.pathsep.join(filter(None, (
-            str(source_path), environment.get("PYTHONPATH", ""),
-        )))
-    process_options: dict[str, Any] = {}
-    if sys.platform == "win32":
-        process_options["creationflags"] = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
-    else:
-        process_options["start_new_session"] = True
-    return subprocess.Popen(
-        command, cwd=working_directory, env=environment,
-        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        **process_options,
-    )
 
 
 class QualCoderStdioBridge:
@@ -93,9 +61,9 @@ class QualCoderStdioBridge:
         self.url = url
         self.instructions = "QualCoder qualitative data analysis."
         self.unreachable = (
-            f"QualCoder is not reachable at {url}. Ask the user to check that QualCoder is running, "
-            "that 'allow external MCP access' is ticked in Settings under AI Integration, "
-            "and that the port matches. Then try again."
+            f"No running QualCoder MCP server could be reached at {url}. "
+            "Start QualCoder first, enable 'allow external MCP access' in Settings > AI Integration, "
+            "and check that the port matches. Then reconnect the MCP client."
         )
         self.server = Server(
             "qualcoder",
@@ -148,49 +116,17 @@ class QualCoderStdioBridge:
         except (QualCoderUnreachableError, TimeoutError):
             return False
 
-    async def ensure_server(self, startup_timeout: float, auto_start: bool = True) -> None:
-        """Attach to an initialized server or launch the GUI and wait for its endpoint.
-
-        Args:
-            startup_timeout: Maximum seconds to wait after launching the GUI.
-            auto_start: Whether to launch a local GUI when initialization fails.
-        """
+    async def ensure_server(self) -> None:
+        """Require a running QualCoder server verified through MCP initialization."""
 
         if await self._probe():
             return
-        if not auto_start:
-            raise QualCoderUnreachableError(self.unreachable)
-        endpoint = urlsplit(self.url)
-        if endpoint.scheme != "http" or endpoint.hostname not in ("127.0.0.1", "localhost") or endpoint.path != "/mcp":
-            raise QualCoderUnreachableError(
-                self.unreachable + " Automatic startup is only supported for http://127.0.0.1:PORT/mcp."
-            )
-        print(
-            "[qualcoder-mcp-stdio] Starting QualCoder. If external MCP access is disabled, "
-            "enable it in Settings > AI Integration and check the port.",
-            file=sys.stderr, flush=True,
-        )
-        process = launch_gui()
-        loop = asyncio.get_running_loop()
-        deadline = loop.time() + startup_timeout
-        while True:
-            remaining = deadline - loop.time()
-            if remaining <= 0:
-                raise QualCoderUnreachableError(
-                    f"QualCoder did not initialize its MCP endpoint within {startup_timeout:g} seconds. "
-                    + self.unreachable
-                )
-            if await self._probe(min(PROBE_TIMEOUT, remaining)):
-                return
-            exit_code = process.poll()
-            if exit_code not in (None, 0):
-                raise QualCoderUnreachableError(f"QualCoder's launcher exited with code {exit_code}. " + self.unreachable)
-            await asyncio.sleep(min(0.5, max(0, deadline - loop.time())))
+        raise QualCoderUnreachableError(self.unreachable)
 
-    async def run(self, startup_timeout: float, auto_start: bool = True) -> None:
+    async def run(self) -> None:
         """Prepare the HTTP endpoint before serving the stdio client."""
 
-        await self.ensure_server(startup_timeout, auto_start)
+        await self.ensure_server()
         await self.serve()
 
     async def _list_tools(self, _ctx: ServerRequestContext[Any], params: Optional[types.PaginatedRequestParams]):
@@ -234,23 +170,19 @@ class QualCoderStdioBridge:
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="stdio bridge that attaches to QualCoder or starts its GUI")
+    parser = argparse.ArgumentParser(description="stdio bridge that attaches to a running QualCoder instance")
     endpoint_args = parser.add_mutually_exclusive_group()
     endpoint_args.add_argument("--url", default=None, help=f"MCP endpoint (default {DEFAULT_URL})")
     endpoint_args.add_argument("--port", type=int, default=None, help="shortcut for http://127.0.0.1:PORT/mcp")
-    parser.add_argument("--no-start", action="store_true", help="only attach to an existing MCP server")
-    parser.add_argument("--startup-timeout", type=float, default=STARTUP_TIMEOUT, help="seconds to wait for GUI startup")
     args = parser.parse_args(argv)
     if sys.stdin is None or sys.stdout is None:
         parser.error("MCP stdio requires a console-enabled Python interpreter or executable.")
     if args.port is not None and not 1024 <= args.port <= 65535:
         parser.error("--port must be between 1024 and 65535.")
-    if not 0 < args.startup_timeout < float("inf"):
-        parser.error("--startup-timeout must be a positive finite number.")
     url = args.url or (f"http://127.0.0.1:{args.port}/mcp" if args.port else DEFAULT_URL)
     print(f"[qualcoder-mcp-stdio] bridging stdio to {url}", file=sys.stderr, flush=True)
     try:
-        asyncio.run(QualCoderStdioBridge(url).run(args.startup_timeout, not args.no_start))
+        asyncio.run(QualCoderStdioBridge(url).run())
     except (QualCoderUnreachableError, OSError) as err:
         print(f"[qualcoder-mcp-stdio] {err}", file=sys.stderr, flush=True)
         return 1
