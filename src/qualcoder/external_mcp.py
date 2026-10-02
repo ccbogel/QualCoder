@@ -114,6 +114,8 @@ class ExternalMcpController(QtCore.QObject):
                 host=self.HOST,
                 port=self.port,
                 log_level="warning",
+                # Use QualCoder's logging; pythonw/windowed builds have no console streams.
+                log_config=None,
                 access_log=False,
             )
             self._uvicorn_server = uvicorn.Server(config)

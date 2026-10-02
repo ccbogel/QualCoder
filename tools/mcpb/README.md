@@ -28,8 +28,19 @@ can be changed in the extension's settings if `mcp_external_port` was changed in
 Other clients do not need this file. HTTP clients (Claude Code, Codex, IDEs) connect to
 `http://127.0.0.1:47363/mcp` directly; stdio-only clients can use
 `python -m qualcoder.mcp_stdio --port 47363` or
-`python -m qualcoder --mcp-stdio --port 47363`. Both require a running QualCoder with
-external MCP access enabled; they do not launch the GUI. Start QualCoder normally first.
-The current Windows windowed executable does not provide stdin/stdout, so use a
-console-enabled Python interpreter for stdio clients. Packaged executable support
-and automatic GUI startup are deferred.
+`python -m qualcoder --mcp-stdio --port 47363`.
+The Python bridge first initializes the MCP endpoint. If QualCoder is already serving
+MCP, it attaches without opening another GUI. Otherwise it starts QualCoder separately
+and waits up to 60 seconds for the local endpoint. External MCP access must be enabled
+in Settings > AI Integration; startup does not change this setting or its permissions.
+Use `--startup-timeout 120` for slower startup, or `--no-start` to attach without launching.
+Automatic startup only applies to local HTTP endpoints. The GUI remains open when the
+stdio client disconnects. GUI output never shares the bridge's protocol streams.
+Source installations launch the GUI with the bridge's own Python interpreter and
+source directory, preserving its conda or virtual environment on Windows, macOS and
+Linux. No machine-specific launcher or Python path is required.
+
+Windows builds from the updated PyInstaller specs support `QualCoder.exe --mcp-stdio`:
+they retain stdin/stdout and hide a console window owned by QualCoder. Older windowed
+executables still require the Python invocation. The Node extension connects to a
+running QualCoder and does not launch it automatically.
