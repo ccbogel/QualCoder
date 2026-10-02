@@ -24,7 +24,7 @@ Generic stdio to HTTP bridge for QualCoder's external MCP access.
 
 Lets MCP clients that only speak stdio use the HTTP endpoint of a running QualCoder:
 
-    qualcoder-mcp-stdio --url http://127.0.0.1:47363/mcp
+    python -m qualcoder --mcp-stdio --url http://127.0.0.1:47363/mcp
     python -m qualcoder.mcp_stdio --port 47363
 
 Built on the official MCP SDK. It only adapts the transport; tool names, permissions,
@@ -36,8 +36,9 @@ import asyncio
 import sys
 from typing import Any, Awaitable, Callable, Optional
 
+import anyio
+import httpx2
 from mcp import ClientSession, types
-from mcp.shared.exceptions import MCPError
 from mcp.client.streamable_http import streamable_http_client
 from mcp.server import ServerRequestContext
 from mcp.server.lowlevel import Server
@@ -45,6 +46,11 @@ from mcp.server.stdio import stdio_server
 
 DEFAULT_URL = "http://127.0.0.1:47363/mcp"
 BRIDGE_VERSION = "1.0.0"
+TRANSPORT_ERRORS = (httpx2.TransportError, anyio.BrokenResourceError, anyio.ClosedResourceError, ConnectionError)
+
+
+class QualCoderUnreachableError(ConnectionError):
+    """The HTTP transport could not reach QualCoder."""
 
 
 class QualCoderStdioBridge:
@@ -84,28 +90,31 @@ class QualCoderStdioBridge:
                     if init.instructions:
                         self.instructions = init.instructions
                     return await operation(session)
-        except MCPError:
-            raise  # A protocol error from QualCoder is forwarded as is
-        except Exception as err:
-            # Anything else here is transport trouble, QualCoder is not listening
-            raise ConnectionError(self.unreachable) from err
+        except TRANSPORT_ERRORS as err:
+            raise QualCoderUnreachableError(self.unreachable) from err
+        except ExceptionGroup as errors:
+            # Task groups wrap failures; mixed groups must retain implementation errors.
+            transport_errors, other_errors = errors.split(TRANSPORT_ERRORS)
+            if other_errors is not None:
+                raise
+            raise QualCoderUnreachableError(self.unreachable) from transport_errors
 
     async def _list_tools(self, _ctx: ServerRequestContext[Any], params: Optional[types.PaginatedRequestParams]):
         try:
             return await self._with_session(lambda s: s.list_tools(params=params))
-        except ConnectionError:
+        except QualCoderUnreachableError:
             return types.ListToolsResult(tools=[])
 
     async def _call_tool(self, _ctx: ServerRequestContext[Any], params: types.CallToolRequestParams):
         try:
             return await self._with_session(lambda s: s.call_tool(params.name, params.arguments or {}))
-        except ConnectionError as err:
+        except QualCoderUnreachableError as err:
             return types.CallToolResult(content=[types.TextContent(type="text", text=str(err))], isError=True)
 
     async def _list_resources(self, _ctx: ServerRequestContext[Any], params: Optional[types.PaginatedRequestParams]):
         try:
             return await self._with_session(lambda s: s.list_resources(params=params))
-        except ConnectionError:
+        except QualCoderUnreachableError:
             return types.ListResourcesResult(resources=[])
 
     async def _list_resource_templates(
@@ -115,7 +124,7 @@ class QualCoderStdioBridge:
             return await self._with_session(
                 lambda s: s.list_resource_templates(params=params)
             )
-        except ConnectionError:
+        except QualCoderUnreachableError:
             return types.ListResourceTemplatesResult(resourceTemplates=[])
 
     async def _read_resource(self, _ctx: ServerRequestContext[Any], params: types.ReadResourceRequestParams):
@@ -130,11 +139,13 @@ class QualCoderStdioBridge:
             await self.server.run(read_stream, write_stream, options)
 
 
-def main(argv: Optional[list] = None) -> int:
+def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="stdio bridge to a running QualCoder's MCP endpoint")
     parser.add_argument("--url", default=None, help=f"MCP endpoint (default {DEFAULT_URL})")
     parser.add_argument("--port", type=int, default=None, help="shortcut for http://127.0.0.1:PORT/mcp")
     args = parser.parse_args(argv)
+    if sys.stdin is None or sys.stdout is None:
+        parser.error("MCP stdio requires a console-enabled Python interpreter or executable.")
     url = args.url or (f"http://127.0.0.1:{args.port}/mcp" if args.port else DEFAULT_URL)
     print(f"[qualcoder-mcp-stdio] bridging stdio to {url}", file=sys.stderr, flush=True)
     try:

@@ -135,7 +135,8 @@ def bundle_bridge(work: str) -> str:
     if npm is None:
         raise SystemExit("npm was not found; Node and npm are required to build the bridge.")
     shutil.copy(os.path.join(HERE, "package.json"), work)
-    subprocess.run([npm, "install", "--no-audit", "--no-fund"], cwd=work, check=True)
+    shutil.copy(os.path.join(HERE, "package-lock.json"), work)
+    subprocess.run([npm, "ci", "--no-audit", "--no-fund"], cwd=work, check=True, shell=os.name == "nt")
     # The bridge resolves the SDK from where it sits, so it is bundled from inside the work dir
     source = os.path.join(work, "bridge.js")
     shutil.copy(os.path.join(HERE, "server", "bridge.js"), source)

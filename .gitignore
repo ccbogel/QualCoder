@@ -22,6 +22,8 @@ ai_readme.md
 roadmap.md
 tmp*.*
 .coverage
+tools/QualCoder.mcpb
+tools/mcpb/node_modules/
 
 .flatpak-*/
 *.flatpak

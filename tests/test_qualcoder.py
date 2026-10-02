@@ -16,6 +16,7 @@ from unittest.mock import MagicMock, patch
 
 from mcp import ClientSession, types
 from mcp.client.streamable_http import streamable_http_client
+from mcp.server import ServerRequestContext
 from mcp.server.lowlevel import Server
 from PyQt6 import QtCore, QtWidgets
 
@@ -23,13 +24,11 @@ from qualcoder.__main__ import App, MainWindow
 from qualcoder.ai_agent_prompts import AgentPromptRecord
 from qualcoder.ai_chat import DialogAIChat
 from qualcoder.ai_llm import AiLLM
-from mcp.server import ServerRequestContext
 from qualcoder.ai_mcp_server import AiMcpExecutionContext, AiMcpServer, ProjectDatabaseLockedError
 from qualcoder.ai_memo import extract_ai_memo, merge_public_memo
 from qualcoder.code_av import DialogCodeAV
 from qualcoder.code_text import DialogCodeText
 from qualcoder.external_mcp import ExternalMcpController
-from qualcoder.settings import DialogSettings
 from qualcoder.settings import DialogSettings
 
 """ Useful insights from:
@@ -1527,6 +1526,36 @@ class TestAiAnnotations(TestCase):
         self.assertTrue(all(re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) for name in tool_names))
         self.assertIn("qualcoder_read_resource", tool_names)
 
+    def test_locked_delete_preserves_confirmation_token(self):
+        preview = self.server._call_tool_payload("codes_preview_delete_code", {"cid": 1}, "")
+        token = preview["structuredContent"]["preview_token"]
+        blocker = sqlite3.connect(self.db_path)
+        blocker.execute("UPDATE project SET memo='pending'")
+        self.server.DATABASE_BUSY_WAIT_SECONDS = 0.05
+        try:
+            with self.assertRaises(ProjectDatabaseLockedError):
+                self.server._call_tool_payload("codes_delete_code", {"cid": 1, "preview_token": token}, "")
+            self.assertIn(token, self.server._preview_tokens)
+        finally:
+            blocker.rollback()
+            blocker.close()
+        deleted = self.server._call_tool_payload("codes_delete_code", {"cid": 1, "preview_token": token}, "")
+        self.assertTrue(deleted["structuredContent"]["deleted"])
+        self.assertNotIn(token, self.server._preview_tokens)
+
+    def test_sync_resource_dispatch_preserves_external_context(self):
+        context = AiMcpExecutionContext(source="external_mcp", owner="External MCP")
+
+        async def request_source():
+            return self.server.request_source
+
+        async def nested_dispatch():
+            return self.server.run_with_execution_context(
+                context, lambda: self.server._run_sync(request_source())
+            )
+
+        self.assertEqual("external_mcp", asyncio.run(nested_dispatch()))
+
     def test_sdk_tool_errors_are_classified(self):
         context = ServerRequestContext(
             session=SimpleNamespace(client_params=None), lifespan_context=None,
@@ -1537,12 +1566,13 @@ class TestAiAnnotations(TestCase):
         self.assertTrue(expected.is_error)
         self.assertIn("must not be empty", expected.content[0].text)
 
-        def boom():
-            raise ZeroDivisionError("internal bug")
+        for unexpected_error in (ZeroDivisionError, KeyError, IndexError):
+            async def fail_operation(operation, execution_context):
+                raise unexpected_error("internal bug")
 
-        self.server._external_executor = lambda operation, ctx: asyncio.sleep(0, boom())
-        with self.assertRaises(ZeroDivisionError):
-            asyncio.run(self.server._sdk_call_tool(context, params))
+            self.server._external_executor = fail_operation
+            with self.assertRaises(unexpected_error):
+                asyncio.run(self.server._sdk_call_tool(context, params))
         self.server._external_executor = None
 
     def test_quote_search_tolerates_pdf_layout(self):

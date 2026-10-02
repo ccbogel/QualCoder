@@ -49,7 +49,7 @@ function log(text) {
 
 let client = null;
 let connecting = null;
-let announced = false;
+let offlineCatalogShown = false;
 
 // One client per QualCoder lifetime; a failed call drops it so the next call reconnects
 async function connect() {
@@ -60,7 +60,9 @@ async function connect() {
     try {
       await candidate.connect(new StreamableHTTPClientTransport(URL_));
     } catch (err) {
-      throw new UnreachableError();
+      await candidate.close().catch(() => {});
+      if (isTransportFailure(err)) throw new UnreachableError();
+      throw err;
     } finally {
       connecting = null;
     }
@@ -68,12 +70,12 @@ async function connect() {
     client = candidate;
     const info = candidate.getServerVersion() || {};
     log(`Connected to ${info.name || "QualCoder"} ${info.version || ""}`.trim());
-    if (announced) {
+    if (offlineCatalogShown) {
       // QualCoder came back: ask the client to refresh its catalog instead of trusting the snapshot
       server.sendToolListChanged().catch(() => {});
       server.sendResourceListChanged().catch(() => {});
     }
-    announced = true;
+    offlineCatalogShown = false;
     return candidate;
   })();
   return connecting;
@@ -81,7 +83,7 @@ async function connect() {
 
 class UnreachableError extends Error {}
 
-async function withClient(call, retry = true) {
+async function withClient(call) {
   const active = await connect();
   try {
     return await call(active);
@@ -91,7 +93,8 @@ async function withClient(call, retry = true) {
       log(`Transport failure: ${err.message}`);
       if (client === active) client = null;
       active.close().catch(() => {});
-      if (retry) return withClient(call, false);  // QualCoder may have just restarted
+      // The server may have committed a write before its response was lost.
+      // Reconnect on the next request, but never replay this request automatically.
       throw new UnreachableError();
     }
     throw err;  // Protocol errors from QualCoder are forwarded untouched
@@ -117,7 +120,10 @@ server.setRequestHandler(ListToolsRequestSchema, async (request, extra) => {
   try {
     return await withClient((c) => c.listTools(request.params, { signal: extra.signal }));
   } catch (err) {
-    if (err instanceof UnreachableError) return { tools: snapshot.tools || [] };
+    if (err instanceof UnreachableError) {
+      offlineCatalogShown = true;
+      return { tools: snapshot.tools || [] };
+    }
     throw err;
   }
 });
@@ -126,7 +132,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
   try {
     return await withClient((c) => c.callTool(request.params, undefined, { signal: extra.signal }));
   } catch (err) {
-    if (err instanceof UnreachableError) return { content: [{ type: "text", text: UNREACHABLE }], isError: true };
+    if (err instanceof UnreachableError) return {
+      content: [{ type: "text", text: UNREACHABLE +
+        " If the connection failed during a write, it may already have completed. " +
+        "Check the project state before repeating the operation." }],
+      isError: true,
+    };
     throw err;
   }
 });
@@ -135,7 +146,10 @@ server.setRequestHandler(ListResourcesRequestSchema, async (request, extra) => {
   try {
     return await withClient((c) => c.listResources(request.params, { signal: extra.signal }));
   } catch (err) {
-    if (err instanceof UnreachableError) return { resources: snapshot.resources || [] };
+    if (err instanceof UnreachableError) {
+      offlineCatalogShown = true;
+      return { resources: snapshot.resources || [] };
+    }
     throw err;
   }
 });
@@ -144,7 +158,10 @@ server.setRequestHandler(ListResourceTemplatesRequestSchema, async (request, ext
   try {
     return await withClient((c) => c.listResourceTemplates(request.params, { signal: extra.signal }));
   } catch (err) {
-    if (err instanceof UnreachableError) return { resourceTemplates: snapshot.resourceTemplates || [] };
+    if (err instanceof UnreachableError) {
+      offlineCatalogShown = true;
+      return { resourceTemplates: snapshot.resourceTemplates || [] };
+    }
     throw err;
   }
 });

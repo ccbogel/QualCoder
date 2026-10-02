@@ -31,7 +31,7 @@ https://qualcoder.org/
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from contextvars import ContextVar
+from contextvars import ContextVar, copy_context
 from dataclasses import dataclass
 from datetime import datetime
 import hashlib
@@ -92,7 +92,7 @@ class ProjectNotOpenError(RuntimeError):
 
 
 # Failures a client can act on; anything else is an internal error and stays a protocol error
-EXPECTED_TOOL_ERRORS = (ValueError, LookupError, ProjectNotOpenError, ProjectDatabaseLockedError)
+EXPECTED_TOOL_ERRORS = (ValueError, ProjectNotOpenError, ProjectDatabaseLockedError)
 
 
 class AiMcpServer:
@@ -750,7 +750,7 @@ class AiMcpServer:
             return asyncio.run(coroutine)
         # A handler called with no request context runs inline, so a helper thread is safe here
         with ThreadPoolExecutor(max_workers=1) as pool:
-            return pool.submit(asyncio.run, coroutine).result()
+            return pool.submit(copy_context().run, asyncio.run, coroutine).result()
 
     def _dispatch_sdk(self, method: str, params: Any) -> Dict[str, Any]:
         """Dispatch an internal bridge call through one SDK v2 handler."""
