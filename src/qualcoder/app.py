@@ -116,7 +116,7 @@ class App(object):
     """
 
     def __init__(self):
-        self.version = "QualCoder 4.0"  # Must start with 'QualCoder '
+        self.version = "QualCoder 4.1"  # Must start with 'QualCoder '
         self.citation = f"Citation:\nCurtain C, Dröge K, Missaghieh--Poncet J, Salomón L. (2026) {self.version} [Computer software].\n"
         self.citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{self.version}"
         self.conn = None
