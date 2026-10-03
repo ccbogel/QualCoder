@@ -30,6 +30,7 @@ import sqlite3
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
+import qtawesome as qta
 
 #from .__main__ import App
 from .add_item_name import DialogAddItemName
@@ -61,24 +62,40 @@ class CodeTreeController(QtCore.QObject):
     menu_requested = QtCore.pyqtSignal(object, object)
     # List of changed database table names, emitted after every database change
     codes_changed = QtCore.pyqtSignal(list)
+    code_visibility_changed = QtCore.pyqtSignal()
+
+    COL_VIS = 0
+    COL_NAME = 1
+    COL_ID = 2
+    COL_MEMO = 3
+    COL_COUNT = 4
 
     def __init__(self, app, tree_widget:QtWidgets.QTreeWidget, host,
-                 column_width_factors:dict|None=None):
+                 column_width_factors:dict|None=None, visibility_enabled:bool=False):
         """
         Args:
             app: App object
             tree_widget: the QTreeWidget the dialog already owns (from its .ui)
             host: the coding dialog, see the host protocol in the class docstring
             column_width_factors: Dictionary or None, passed to restore_persistent_tree_widths
+            visibility_enabled: Add visibility controls and the dedicated visibility column
         """
 
         super().__init__(tree_widget)
         self.app = app
         self.tree = tree_widget
         self.host = host
+        self.visibility_enabled = visibility_enabled
+        if not visibility_enabled:
+            self.COL_VIS = None
+            self.COL_NAME = 0
+            self.COL_ID = 1
+            self.COL_MEMO = 2
+            self.COL_COUNT = 3
         self.tree_sort_option = "all asc"  # all asc, all desc, cat and code asc
         self.column_width_factors = column_width_factors if column_width_factors is not None \
-            else {0: 0.70, 2: 0.15, 3: 0.15}
+            else ({1: 0.70, 3: 0.15, 4: 0.15} if visibility_enabled
+                  else {0: 0.70, 2: 0.15, 3: 0.15})
         # Optional host callbacks, see class docstring
         self.fill_counts_callback = None
         self.coded_files_callback = None
@@ -87,6 +104,212 @@ class CodeTreeController(QtCore.QObject):
         self.show_codes_of_colour_callback = None
         self.on_codes_deleted = None
         self.on_code_renamed = None
+        if not hasattr(self.app, 'hidden_cids'):
+            self.app.hidden_cids = set()
+        if not hasattr(self.app, 'pre_solo_hidden_cids'):
+            self.app.pre_solo_hidden_cids = None
+        if not hasattr(self.app, 'solo_visibility_target'):
+            self.app.solo_visibility_target = None
+        self._visibility_press = None
+        self._visibility_viewport = None
+        if visibility_enabled:
+            self._visibility_viewport = self.tree.viewport()
+            self._visibility_viewport.installEventFilter(self)
+            self.tree.header().sectionClicked.connect(self.handle_header_clicked)
+
+    def is_code_visible(self, cid: int) -> bool:
+        return cid not in self.app.hidden_cids
+
+    def _all_code_ids(self) -> set[int]:
+        return {code['cid'] for code in self.codes}
+
+    def _category_code_ids(self, catid: int) -> set[int]:
+        category_ids = {catid}
+        changed = True
+        while changed:
+            changed = False
+            for category in self.categories:
+                if category.get('supercatid') in category_ids and category['catid'] not in category_ids:
+                    category_ids.add(category['catid'])
+                    changed = True
+        code_ids = {code['cid'] for code in self.codes if code.get('catid') in category_ids}
+        changed = True
+        while changed:
+            changed = False
+            for code in self.codes:
+                if code.get('supercid') in code_ids and code['cid'] not in code_ids:
+                    code_ids.add(code['cid'])
+                    changed = True
+        return code_ids
+
+    def category_visibility_state(self, catid: int) -> str:
+        """Return the aggregate visibility state for a category branch."""
+        descendant_cids = self._category_code_ids(catid)
+        visible_count = sum(self.is_code_visible(cid) for cid in descendant_cids)
+        if visible_count == 0:
+            return "hidden"
+        if visible_count == len(descendant_cids):
+            return "visible"
+        return "partial"
+
+    def set_code_visibility(self, cid: int, visible: bool):
+        if visible:
+            self.app.hidden_cids.discard(cid)
+        else:
+            self.app.hidden_cids.add(cid)
+        self.app.pre_solo_hidden_cids = None
+        self.app.solo_visibility_target = None
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    def toggle_code_visibility(self, cid: int):
+        self.set_code_visibility(cid, not self.is_code_visible(cid))
+
+    def toggle_category_visibility(self, catid: int):
+        descendant_cids = self._category_code_ids(catid)
+        if any(self.is_code_visible(cid) for cid in descendant_cids):
+            self.app.hidden_cids.update(descendant_cids)
+        else:
+            self.app.hidden_cids.difference_update(descendant_cids)
+        self.app.pre_solo_hidden_cids = None
+        self.app.solo_visibility_target = None
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    def toggle_all_visibility(self):
+        all_cids = self._all_code_ids()
+        if self.app.hidden_cids:
+            self.app.hidden_cids.clear()
+        else:
+            self.app.hidden_cids = set(all_cids)
+        self.app.pre_solo_hidden_cids = None
+        self.app.solo_visibility_target = None
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    def solo_visibility(self, target_cids: set[int], target_key: str):
+        """Solo a code or category branch, or restore the prior solo state."""
+        if self.app.solo_visibility_target == target_key and self.app.pre_solo_hidden_cids is not None:
+            self.restore_previous_visibility()
+            return
+        else:
+            if self.app.pre_solo_hidden_cids is None:
+                self.app.pre_solo_hidden_cids = set(self.app.hidden_cids)
+            self.app.hidden_cids = self._all_code_ids() - target_cids
+            self.app.solo_visibility_target = target_key
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    def restore_previous_visibility(self):
+        if self.app.pre_solo_hidden_cids is None:
+            return
+        self.app.hidden_cids = set(self.app.pre_solo_hidden_cids)
+        self.app.pre_solo_hidden_cids = None
+        self.app.solo_visibility_target = None
+        self.update_all_eye_icons()
+        self.code_visibility_changed.emit()
+
+    @staticmethod
+    def _dim_color(color: str) -> QColor:
+        source = QColor(color)
+        base = QColor('#ebebeb')
+        return QColor(
+            (source.red() + base.red() * 3) // 4,
+            (source.green() + base.green() * 3) // 4,
+            (source.blue() + base.blue() * 3) // 4,
+        )
+
+    def update_all_eye_icons(self):
+        if not self.visibility_enabled:
+            return
+        visible_icon = qta.icon('mdi6.eye-outline', color='#444444')
+        hidden_icon = qta.icon('mdi6.eye-off-outline', color='#bbbbbb')
+        partial_icon = qta.icon('mdi6.eye-minus-outline', color='#888888')
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.tree)
+        while iterator.value():
+            item = iterator.value()
+            item_id = item.text(self.COL_ID)
+            if item_id.startswith('cid:'):
+                code = next((code for code in self.codes if code['cid'] == int(item_id[4:])), None)
+                hidden = code is not None and not self.is_code_visible(code['cid'])
+                item.setIcon(self.COL_VIS, hidden_icon if hidden else visible_icon)
+                if code is not None:
+                    background = self._dim_color(code['color']) if hidden else QColor(code['color'])
+                    foreground = QColor('#888888') if hidden else QColor(TextColor(code['color']).recommendation)
+                    item.setBackground(self.COL_NAME, QBrush(background))
+                    item.setForeground(self.COL_NAME, QBrush(foreground))
+                    for column in (self.COL_ID, self.COL_MEMO, self.COL_COUNT):
+                        item.setForeground(column, QBrush(QColor('#aaaaaa' if hidden else '#000000')))
+            elif item_id.startswith('catid:'):
+                state = self.category_visibility_state(int(item_id[6:]))
+                if state == "hidden":
+                    item.setIcon(self.COL_VIS, hidden_icon)
+                    color = QColor('#888888')
+                elif state == "visible":
+                    item.setIcon(self.COL_VIS, visible_icon)
+                    color = QColor('#000000')
+                else:
+                    item.setIcon(self.COL_VIS, partial_icon)
+                    color = QColor('#000000')
+                for column in (self.COL_NAME, self.COL_ID, self.COL_MEMO, self.COL_COUNT):
+                    item.setForeground(column, QBrush(color))
+            iterator += 1
+        self.tree.headerItem().setIcon(self.COL_VIS, hidden_icon if self.app.hidden_cids else visible_icon)
+        self.tree.headerItem().setToolTip(
+            self.COL_VIS, _('Show all codes') if self.app.hidden_cids else _('Hide all codes'))
+
+    def eventFilter(self, watched, event):
+        if watched is not getattr(self, '_visibility_viewport', None):
+            return super().eventFilter(watched, event)
+        event_type = event.type()
+        if event_type == QtCore.QEvent.Type.Hide:
+            self._visibility_press = None
+        if event_type in (QtCore.QEvent.Type.MouseButtonPress, QtCore.QEvent.Type.MouseButtonDblClick):
+            if event.button() == Qt.MouseButton.LeftButton:
+                index = self.tree.indexAt(event.position().toPoint())
+                if index.isValid() and index.column() == self.COL_VIS:
+                    self._visibility_press = (QtCore.QPersistentModelIndex(index), event.modifiers())
+                    return True
+        if self._visibility_press is not None:
+            if event_type == QtCore.QEvent.Type.MouseMove:
+                return True
+            if event_type == QtCore.QEvent.Type.MouseButtonRelease and event.button() == Qt.MouseButton.LeftButton:
+                index, modifiers = self._visibility_press
+                self._visibility_press = None
+                released_index = self.tree.indexAt(event.position().toPoint())
+                if index.isValid() and released_index == QtCore.QModelIndex(index):
+                    self._activate_visibility(self.tree.itemFromIndex(released_index), modifiers)
+                return True
+        return super().eventFilter(watched, event)
+
+    def _activate_visibility(self, item, modifiers):
+        item_id = item.text(self.COL_ID)
+        if item_id.startswith('cid:'):
+            cid = int(item_id[4:])
+            if modifiers & Qt.KeyboardModifier.ControlModifier:
+                self.solo_visibility({cid}, item_id)
+            else:
+                self.toggle_code_visibility(cid)
+        elif item_id.startswith('catid:'):
+            catid = int(item_id[6:])
+            if modifiers & Qt.KeyboardModifier.ControlModifier:
+                self.solo_visibility(self._category_code_ids(catid), item_id)
+            else:
+                self.toggle_category_visibility(catid)
+
+    def handle_header_clicked(self, section):
+        if section == self.COL_VIS:
+            self.toggle_all_visibility()
+
+    def _cleanup_deleted_visibility(self, cids):
+        self.app.hidden_cids.difference_update(cids)
+        if self.app.pre_solo_hidden_cids is not None:
+            self.app.pre_solo_hidden_cids.difference_update(cids)
+
+    def _tree_item_values(self, name, item_id, memo):
+        if self.visibility_enabled:
+            return ['', name, item_id, memo, '']
+        return [name, item_id, memo, '']
 
     # Live views over the host's data, never cached here.
     @property
@@ -111,12 +334,21 @@ class CodeTreeController(QtCore.QObject):
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.tree.clear()
-        self.tree.setColumnCount(4)
-        self.tree.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
-        if not self.app.settings['showids']:
-            self.tree.setColumnHidden(1, True)
+        if self.visibility_enabled:
+            self.tree.setColumnCount(5)
+            self.tree.setHeaderLabels([_("Visibility"), _("Name"), _("Id"), _("Memo"), _("Count")])
+            self.tree.setTreePosition(self.COL_NAME)
+            self.tree.header().setSectionsClickable(True)
+            self.tree.header().setSectionResizeMode(self.COL_VIS, QtWidgets.QHeaderView.ResizeMode.Fixed)
+            self.tree.setColumnWidth(self.COL_VIS, 28)
         else:
-            self.tree.setColumnHidden(1, False)
+            self.tree.setColumnCount(4)
+            self.tree.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
+            self.tree.setTreePosition(self.COL_NAME)
+        if not self.app.settings['showids']:
+            self.tree.setColumnHidden(self.COL_ID, True)
+        else:
+            self.tree.setColumnHidden(self.COL_ID, False)
 
         # Add top level categories
         remove_list = []
@@ -125,12 +357,13 @@ class CodeTreeController(QtCore.QObject):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(2, c['memo'])
-                top_item.setToolTip(0, '')
+                top_item = QtWidgets.QTreeWidgetItem(
+                    self._tree_item_values(c['name'], 'catid:' + str(c['catid']), memo))
+                top_item.setToolTip(self.COL_MEMO, c['memo'])
+                top_item.setToolTip(self.COL_NAME, '')
                 if len(c['name']) > 52:
-                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                    top_item.setToolTip(0, c['name'])
+                    top_item.setText(self.COL_NAME, f"{c['name'][:25]}..{c['name'][-25:]}")
+                    top_item.setToolTip(self.COL_NAME, c['name'])
                 self.tree.addTopLevelItem(top_item)
                 if f"catid:{c['catid']}" in self.app.collapsed_categories:
                     top_item.setExpanded(False)
@@ -150,16 +383,17 @@ class CodeTreeController(QtCore.QObject):
                 item = it.value()
                 count2 = 0
                 while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == f"catid:{c['supercatid']}":
+                    if item.text(self.COL_ID) == f"catid:{c['supercatid']}":
                         memo = ""
                         if c['memo'] != "":
                             memo = _("Memo")
-                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                        child.setToolTip(2, c['memo'])
-                        child.setToolTip(0, '')
+                        child = QtWidgets.QTreeWidgetItem(
+                            self._tree_item_values(c['name'], f"catid:{c['catid']}", memo))
+                        child.setToolTip(self.COL_MEMO, c['memo'])
+                        child.setToolTip(self.COL_NAME, '')
                         if len(c['name']) > 52:
-                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                            child.setToolTip(0, c['name'])
+                            child.setText(self.COL_NAME, f"{c['name'][:25]}..{c['name'][-25:]}")
+                            child.setToolTip(self.COL_NAME, c['name'])
                         item.addChild(child)
                         if f"catid:{c['catid']}" in self.app.collapsed_categories:
                             child.setExpanded(False)
@@ -178,12 +412,13 @@ class CodeTreeController(QtCore.QObject):
         # Fallback: never lose a category. Any with a missing/cyclic parent goes to top level.
         for c in cats:
             memo = _("Memo") if c['memo'] != "" else ""
-            top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-            top_item.setToolTip(2, c['memo'])
-            top_item.setToolTip(0, '')
+            top_item = QtWidgets.QTreeWidgetItem(
+                self._tree_item_values(c['name'], 'catid:' + str(c['catid']), memo))
+            top_item.setToolTip(self.COL_MEMO, c['memo'])
+            top_item.setToolTip(self.COL_NAME, '')
             if len(c['name']) > 52:
-                top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                top_item.setToolTip(0, c['name'])
+                top_item.setText(self.COL_NAME, f"{c['name'][:25]}..{c['name'][-25:]}")
+                top_item.setToolTip(self.COL_NAME, c['name'])
             self.tree.addTopLevelItem(top_item)
         # Add codes, with sub-code nesting. A code is top level only when it has neither a
         # parent category (catid) nor a parent code (supercid). The rest are nested under
@@ -192,14 +427,17 @@ class CodeTreeController(QtCore.QObject):
         def _make_code_item(code_dict):
             """ Build a styled tree item for a code. Sub-codes share this styling. """
             memo_ = _("Memo") if code_dict['memo'] != "" else ""
-            code_item = QtWidgets.QTreeWidgetItem([code_dict['name'], f"cid:{code_dict['cid']}", memo_])
-            code_item.setToolTip(2, code_dict['memo'])
-            code_item.setToolTip(0, '')
+            code_item = QtWidgets.QTreeWidgetItem(
+                self._tree_item_values(code_dict['name'], f"cid:{code_dict['cid']}", memo_))
+            code_item.setToolTip(self.COL_MEMO, code_dict['memo'])
+            code_item.setToolTip(self.COL_NAME, '')
             if len(code_dict['name']) > 52:
-                code_item.setText(0, f"{code_dict['name'][:25]}..{code_dict['name'][-25:]}")
-                code_item.setToolTip(0, code_dict['name'])
-            code_item.setBackground(0, QBrush(QColor(code_dict['color']), Qt.BrushStyle.SolidPattern))
-            code_item.setForeground(0, QBrush(QColor(TextColor(code_dict['color']).recommendation)))
+                code_item.setText(self.COL_NAME, f"{code_dict['name'][:25]}..{code_dict['name'][-25:]}")
+                code_item.setToolTip(self.COL_NAME, code_dict['name'])
+            code_item.setBackground(
+                self.COL_NAME, QBrush(QColor(code_dict['color']), Qt.BrushStyle.SolidPattern))
+            code_item.setForeground(
+                self.COL_NAME, QBrush(QColor(TextColor(code_dict['color']).recommendation)))
             code_item.setFlags(
                 Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
                 Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled |
@@ -210,7 +448,7 @@ class CodeTreeController(QtCore.QObject):
         node_index = {}
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         while it.value():
-            node_index[it.value().text(1)] = it.value()
+            node_index[it.value().text(self.COL_ID)] = it.value()
             it += 1
         # Top level codes: no category and no parent code.
         remove_items = []
@@ -251,16 +489,16 @@ class CodeTreeController(QtCore.QObject):
             node_index[f"cid:{c['cid']}"] = node
 
         if self.tree_sort_option == "all asc":
-            self.tree.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+            self.tree.sortByColumn(self.COL_NAME, QtCore.Qt.SortOrder.AscendingOrder)
         if self.tree_sort_option == "all desc":
-            self.tree.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
+            self.tree.sortByColumn(self.COL_NAME, QtCore.Qt.SortOrder.DescendingOrder)
         # Show the code tree expanded from the start: sub-code branches are visible by default;
         # categories the user had collapsed are restored to their collapsed state.
         self.tree.expandAll()
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         while it.value():
             node = it.value()
-            if node.text(1) in self.app.collapsed_categories:
+            if node.text(self.COL_ID) in self.app.collapsed_categories:
                 node.setExpanded(False)
             it += 1
         if self.fill_counts_callback is not None:
@@ -269,6 +507,7 @@ class CodeTreeController(QtCore.QObject):
             self.tree,
             default_width_factors=self.column_width_factors
         )
+        self.update_all_eye_icons()
 
     # Context menu
     def tree_menu(self, position):
@@ -282,37 +521,53 @@ class CodeTreeController(QtCore.QObject):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.tree.currentItem()
+        if self.visibility_enabled:
+            selected = self.tree.itemAt(position) or selected
         action_add_code_to_category = None
         action_add_category_to_category = None
         action_expand_collapse = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
         action_add_code = menu.addAction(_("Create new code"))
         action_add_category = menu.addAction(_("Create new category"))
+        action_toggle_all = None
+        action_solo = None
+        action_restore = None
+        if self.visibility_enabled:
+            action_toggle_all = menu.addAction(
+                _("Show all codes") if self.app.hidden_cids else _("Hide all codes"))
+            if selected is not None:
+                item_id = selected.text(self.COL_ID)
+                if item_id.startswith('cid:'):
+                    action_solo = menu.addAction(_("Show only this code"))
+                elif item_id.startswith('catid:'):
+                    action_solo = menu.addAction(_("Show only this category"))
+            if self.app.pre_solo_hidden_cids is not None:
+                action_restore = menu.addAction(_("Restore previous visibility"))
         action_add_subcode = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cid':
             action_add_subcode = menu.addAction(_("Add a new sub-code to code"))
         action_cat_show_coded_files = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cat':
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
             if self.coded_files_callback is not None:
                 action_cat_show_coded_files = menu.addAction(_("Show coded files"))
-        if selected is not None and selected.text(1)[0:3] == 'cid' and selected.childCount() > 0:
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cid' and selected.childCount() > 0:
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo F3"))
         action_merge_category = None
         action_move_category = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cat':
             action_merge_category = modify_menu.addAction(_("Merge category into category F8"))
             action_move_category = modify_menu.addAction(_("Move category under category F6"))
         action_delete = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cid':
             action_delete = modify_menu.addAction(_("Delete DEL"))
         action_delete_branch = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cat':
             # Cascade deletion of the whole branch, only offered for categories.
             action_delete_branch = modify_menu.addAction(_("Delete category branch DEL"))
         action_color = None
@@ -320,7 +575,7 @@ class CodeTreeController(QtCore.QObject):
         action_move_code = None
         action_move_multi_codes = None
         action_merge_code_into_code = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
+        if selected is not None and selected.text(self.COL_ID)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color F5"))
             if self.coded_files_callback is not None:
                 action_show_coded_media = menu.addAction(_("Show coded files"))
@@ -363,6 +618,15 @@ class CodeTreeController(QtCore.QObject):
             self.tree_sort_option = "cat and code asc"
             self.fill_tree()
             return
+        if action_toggle_all is not None and action == action_toggle_all:
+            self.toggle_all_visibility()
+            return
+        if action_solo is not None and action == action_solo:
+            self._activate_visibility(selected, Qt.KeyboardModifier.ControlModifier)
+            return
+        if action_restore is not None and action == action_restore:
+            self.restore_previous_visibility()
+            return
         if action == action_show_codes_like:
             self.show_codes_like_callback()
             return
@@ -381,23 +645,23 @@ class CodeTreeController(QtCore.QObject):
             self.add_code()
             return
         if action == action_merge_category:
-            catid = int(selected.text(1).split(":")[1])
+            catid = int(selected.text(self.COL_ID).split(":")[1])
             self.merge_category(catid)
             return
         if action == action_move_category:
-            catid = int(selected.text(1).split(":")[1])
+            catid = int(selected.text(self.COL_ID).split(":")[1])
             self.move_category(catid)
             return
         if action == action_add_code_to_category:
-            catid = int(selected.text(1).split(":")[1])
+            catid = int(selected.text(self.COL_ID).split(":")[1])
             self.add_code(catid)
             return
         if action == action_add_subcode and selected is not None:
-            supercid = int(selected.text(1).split(":")[1])
+            supercid = int(selected.text(self.COL_ID).split(":")[1])
             self.add_code(supercid=supercid)
             return
         if action == action_add_category_to_category:
-            catid = int(selected.text(1).split(":")[1])
+            catid = int(selected.text(self.COL_ID).split(":")[1])
             self.add_category(catid)
             return
         if selected is not None and action == action_move_code:
@@ -424,10 +688,10 @@ class CodeTreeController(QtCore.QObject):
             return  # Avoid error as selected is now None
         if action == action_cat_show_coded_files:
             branch_codes = self.recursive_get_branch_codes(selected, [])
-            self.coded_files_callback(branch_codes, selected.text(0))
+            self.coded_files_callback(branch_codes, selected.text(self.COL_NAME))
             return
         if selected is not None and action == action_show_coded_media:
-            to_find = int(selected.text(1)[4:])
+            to_find = int(selected.text(self.COL_ID)[4:])
             found = next((code for code in self.codes if code['cid'] == to_find), None)
             if found:
                 self.coded_files_callback(found, "")
@@ -453,26 +717,26 @@ class CodeTreeController(QtCore.QObject):
             self.add_edit_cat_or_code_memo(selected)
             return True
         if key == QtCore.Qt.Key.Key_Delete or key == QtCore.Qt.Key.Key_Backspace:
-            if selected.text(1)[0:3] == 'cat':
+            if selected.text(self.COL_ID)[0:3] == 'cat':
                 self.delete_category_branch(selected)
             else:
                 self.delete_code(selected)
             return True
-        if key == QtCore.Qt.Key.Key_F5 and selected.text(1)[0:3] == 'cid':
+        if key == QtCore.Qt.Key.Key_F5 and selected.text(self.COL_ID)[0:3] == 'cid':
             self.change_code_color(selected)
             return True
         if key == QtCore.Qt.Key.Key_F6:
-            if selected.text(1)[0:3] == 'cat':
-                self.move_category(int(selected.text(1).split(":")[1]))
+            if selected.text(self.COL_ID)[0:3] == 'cat':
+                self.move_category(int(selected.text(self.COL_ID).split(":")[1]))
             else:
                 self.move_code(selected)
             return True
-        if key == QtCore.Qt.Key.Key_F7 and selected.text(1)[0:3] == 'cid':
+        if key == QtCore.Qt.Key.Key_F7 and selected.text(self.COL_ID)[0:3] == 'cid':
             self.move_multiple_codes()
             return True
         if key == QtCore.Qt.Key.Key_F8:
-            if selected.text(1)[0:3] == 'cat':
-                self.merge_category(int(selected.text(1)[6:]))
+            if selected.text(self.COL_ID)[0:3] == 'cat':
+                self.merge_category(int(selected.text(self.COL_ID)[6:]))
             else:
                 self.merge_code_into_code(selected)
             return True
@@ -539,20 +803,20 @@ class CodeTreeController(QtCore.QObject):
         if item is None:
             return
         # Find the category in the list
-        if item.text(1)[0:3] == 'cat':
+        if item.text(self.COL_ID)[0:3] == 'cat':
             found = -1
             for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(item.text(1)[6:]):
+                if self.categories[i]['catid'] == int(item.text(self.COL_ID)[6:]):
                     found = i
             if found == -1:
                 return
             if parent is None:
                 self.categories[found]['supercatid'] = None
             else:
-                if parent.text(1).split(':')[0] == 'cid':
+                if parent.text(self.COL_ID).split(':')[0] == 'cid':
                     # Parent is a code, a category cannot nest under a code.
                     return
-                supercatid = int(parent.text(1).split(':')[1])
+                supercatid = int(parent.text(self.COL_ID).split(':')[1])
                 if supercatid == self.categories[found]['catid']:
                     # Cannot be its own parent.
                     return
@@ -572,10 +836,10 @@ class CodeTreeController(QtCore.QObject):
             return
 
         # Find the code in the list
-        if item.text(1)[0:3] == 'cid':
+        if item.text(self.COL_ID)[0:3] == 'cid':
             found = -1
             for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(item.text(1)[4:]):
+                if self.codes[i]['cid'] == int(item.text(self.COL_ID)[4:]):
                     found = i
             if found == -1:
                 return
@@ -584,8 +848,8 @@ class CodeTreeController(QtCore.QObject):
                 self.codes[found]['catid'] = None
                 self.codes[found]['supercid'] = None
             else:
-                if parent.text(1).split(':')[0] == 'cid':
-                    parent_cid = int(parent.text(1).split(':')[1])
+                if parent.text(self.COL_ID).split(':')[0] == 'cid':
+                    parent_cid = int(parent.text(self.COL_ID).split(':')[1])
                     # Ctrl held while dropping a code on a code merges (previous behaviour);
                     # otherwise the code is nested as a sub-code.
                     ctrl = bool(QtWidgets.QApplication.keyboardModifiers() &
@@ -604,7 +868,7 @@ class CodeTreeController(QtCore.QObject):
                     self.codes[found]['catid'] = None
                 else:
                     # Dropped onto a category.
-                    catid = int(parent.text(1).split(':')[1])
+                    catid = int(parent.text(self.COL_ID).split(':')[1])
                     self.codes[found]['catid'] = catid
                     self.codes[found]['supercid'] = None
 
@@ -677,14 +941,14 @@ class CodeTreeController(QtCore.QObject):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cid":
-                cid = int(item.child(i).text(1)[4:])
+            if item.child(i).text(self.COL_ID)[0:3] == "cid":
+                cid = int(item.child(i).text(self.COL_ID)[4:])
                 for code_ in self.codes:
                     if cid == code_['cid']:
                         branch_codes.append(code_)
                         break
                 self.recursive_get_branch_codes(item.child(i), branch_codes)  # also gather sub-codes nested under this code (supercid)
-            if item.child(i).text(1)[0:3] == "cat":
+            if item.child(i).text(self.COL_ID)[0:3] == "cat":
                 self.recursive_get_branch_codes(item.child(i), branch_codes)
         return branch_codes
 
@@ -712,8 +976,8 @@ class CodeTreeController(QtCore.QObject):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cat":
-                no_merge_list.append(item.child(i).text(1)[6:])
+            if item.child(i).text(self.COL_ID)[0:3] == "cat":
+                no_merge_list.append(item.child(i).text(self.COL_ID)[6:])
             self.recursive_non_merge_item(item.child(i), no_merge_list)
         return no_merge_list
 
@@ -827,7 +1091,7 @@ class CodeTreeController(QtCore.QObject):
         # Find the code in the list, check to delete
         found = -1
         for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == int(selected.text(1)[4:]):
+            if self.codes[i]['cid'] == int(selected.text(self.COL_ID)[4:]):
                 found = i
         if found == -1:
             return
@@ -837,7 +1101,7 @@ class CodeTreeController(QtCore.QObject):
         names = ""
         for name in code_names:
             names += name['name'] + ", "
-        msg = _("Code: ") + selected.text(0)
+        msg = _("Code: ") + selected.text(self.COL_NAME)
         if len(cids) > 1:  # Includes this code also
             msg += f"\n{len(cids) - 1} " + _("sub-codes will also be deleted.")
             msg += "\n" + _("Move the sub-codes first. If they are needed.")
@@ -877,6 +1141,7 @@ class CodeTreeController(QtCore.QObject):
             raise
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Code(s) deleted: ") + names + "\n")
+        self._cleanup_deleted_visibility(cids)
         # Let the host clean its own caches, such as the recent codes list.
         if self.on_codes_deleted is not None:
             self.on_codes_deleted(cids)
@@ -929,10 +1194,10 @@ class CodeTreeController(QtCore.QObject):
             selected: QTreeWidgetItem
         """
 
-        if selected is None or selected.text(1)[0:3] != 'cat':
+        if selected is None or selected.text(self.COL_ID)[0:3] != 'cat':
             return
         cur = self.app.conn.cursor()
-        cur.execute("select catid, name from code_cat where catid=?", [int(selected.text(1)[6:]), ])
+        cur.execute("select catid, name from code_cat where catid=?", [int(selected.text(self.COL_ID)[6:]), ])
         res = cur.fetchone()
         if res is None:  # Already deleted elsewhere, the tree item is stale
             self.codes_changed.emit([])
@@ -1014,6 +1279,7 @@ class CodeTreeController(QtCore.QObject):
             self.codes_changed.emit([])
             raise
         # Let the host clean its own caches, such as the recent codes list.
+        self._cleanup_deleted_visibility(cids)
         if self.on_codes_deleted is not None:
             self.on_codes_deleted(cids)
         self.app.delete_backup = False
@@ -1033,11 +1299,11 @@ class CodeTreeController(QtCore.QObject):
         """
 
         changed_tables = []
-        if selected.text(1)[0:3] == 'cid':
+        if selected.text(self.COL_ID)[0:3] == 'cid':
             # Find the code in the list
             found = -1
             for i in range(0, len(self.codes)):
-                if self.codes[i]['cid'] == int(selected.text(1)[4:]):
+                if self.codes[i]['cid'] == int(selected.text(self.COL_ID)[4:]):
                     found = i
             if found == -1:
                 return
@@ -1053,16 +1319,16 @@ class CodeTreeController(QtCore.QObject):
                 self.app.delete_backup = False
                 changed_tables = ["code_name"]
             if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for code: ") + self.codes[found]['name'])
 
-        if selected.text(1)[0:3] == 'cat':
+        if selected.text(self.COL_ID)[0:3] == 'cat':
             # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
-                if self.categories[i]['catid'] == int(selected.text(1)[6:]):
+                if self.categories[i]['catid'] == int(selected.text(self.COL_ID)[6:]):
                     found = i
             if found == -1:
                 return
@@ -1079,9 +1345,9 @@ class CodeTreeController(QtCore.QObject):
                 self.app.delete_backup = False
                 changed_tables = ["code_cat"]
             if memo == "":
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
+                selected.setData(self.COL_MEMO, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
         if changed_tables:
             self.codes_changed.emit(changed_tables)
@@ -1094,11 +1360,11 @@ class CodeTreeController(QtCore.QObject):
             selected : QTreeWidgetItem
         """
 
-        if selected.text(1)[0:3] == 'cid':
+        if selected.text(self.COL_ID)[0:3] == 'cid':
             found_code = None
             check_codes = []
             for code_ in self.codes:
-                if code_['cid'] == int(selected.text(1)[4:]):
+                if code_['cid'] == int(selected.text(self.COL_ID)[4:]):
                     found_code = code_
                 else:
                     check_codes.append(code_)
@@ -1129,11 +1395,11 @@ class CodeTreeController(QtCore.QObject):
             self.codes_changed.emit(["code_name"])
             return
 
-        if selected.text(1)[0:3] == 'cat':
+        if selected.text(self.COL_ID)[0:3] == 'cat':
             found_cat = None
             check_categories = []
             for category in self.categories:
-                if category['catid'] == int(selected.text(1)[6:]):
+                if category['catid'] == int(selected.text(self.COL_ID)[6:]):
                     found_cat = category
                 else:
                     check_categories.append(category)
@@ -1160,7 +1426,7 @@ class CodeTreeController(QtCore.QObject):
             selected : QTreeWidgetItem
         """
 
-        cid = int(selected.text(1)[4:])
+        cid = int(selected.text(self.COL_ID)[4:])
         found = -1
         for i in range(0, len(self.codes)):
             if self.codes[i]['cid'] == cid:
@@ -1174,7 +1440,7 @@ class CodeTreeController(QtCore.QObject):
         new_color = ui.get_color()
         if new_color is None:
             return
-        selected.setBackground(0, QBrush(QColor(new_color), Qt.BrushStyle.SolidPattern))
+        selected.setBackground(self.COL_NAME, QBrush(QColor(new_color), Qt.BrushStyle.SolidPattern))
         # Update codes list, database and color markings
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
@@ -1204,23 +1470,23 @@ class CodeTreeController(QtCore.QObject):
             while current.parent() is not None:
                 current = current.parent()
                 depth += 1
-                if current.text(1) == selected.text(1):
+                if current.text(self.COL_ID) == selected.text(self.COL_ID):
                     can_append = False
             prefix = ""
             if depth > 0:
                 prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
-            name = prefix + item.text(0)
+            name = prefix + item.text(self.COL_NAME)
             cid = -1
             catid = -1
-            if "cid" in item.text(1):
-                cid = int(item.text(1)[4:])
+            if "cid" in item.text(self.COL_ID):
+                cid = int(item.text(self.COL_ID)[4:])
             else:
-                catid = int(item.text(1)[6:])
+                catid = int(item.text(self.COL_ID)[6:])
                 name += " " + _("[CATEGORY]")
             # Check the same item is not the same selected item
-            if item.text(1) == selected.text(1) and item.text(2) == selected.text(2):
+            if item.text(self.COL_ID) == selected.text(self.COL_ID) and item.text(self.COL_MEMO) == selected.text(self.COL_MEMO):
                 can_append = False
-            memo = item.toolTip(2)
+            memo = item.toolTip(self.COL_MEMO)
             if can_append:
                 items_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo})
             iterator += 1
@@ -1229,7 +1495,7 @@ class CodeTreeController(QtCore.QObject):
         if not ok:
             return
         destination = ui.get_selected()
-        selected_cid = int(selected.text(1)[4:])
+        selected_cid = int(selected.text(self.COL_ID)[4:])
         cur = self.app.conn.cursor()
         if destination['catid'] == -1 and destination['cid'] == -1:  # move to top level
             cur.execute("update code_name set catid=null, supercid=null where cid=?", [selected_cid])
@@ -1265,16 +1531,16 @@ class CodeTreeController(QtCore.QObject):
             prefix = ""
             if depth > 0:
                 prefix = "  " * (depth - 1) * 2 + "└─"  # U2514 U2500
-            name = prefix + item.text(0)
+            name = prefix + item.text(self.COL_NAME)
             cid = -1
             catid = -1
-            if "cid" in item.text(1):
-                cid = int(item.text(1)[4:])
+            if "cid" in item.text(self.COL_ID):
+                cid = int(item.text(self.COL_ID)[4:])
             else:
-                catid = int(item.text(1)[6:])
+                catid = int(item.text(self.COL_ID)[6:])
                 name += " " + _("[CATEGORY]")
                 destinations.append({'name': name, 'catid': catid, 'cid': -1})
-            memo = item.toolTip(2)
+            memo = item.toolTip(self.COL_MEMO)
             from_list.append({'name': name, 'catid': catid, 'cid': cid, 'memo': memo,'treeitem': item})
             iterator += 1
         ui = DialogSelectItems(self.app, from_list, _("Move: Select multiple codes"), "multi")
@@ -1350,7 +1616,7 @@ class CodeTreeController(QtCore.QObject):
         if not ok:
             return
         category = ui.get_selected()
-        current_cat_name = self.tree.currentItem().text(0)
+        current_cat_name = self.tree.currentItem().text(self.COL_NAME)
         if category['name'] == '':
             cur.execute("update code_cat set supercatid=Null where catid=?", [catid])
             self.app.conn.commit()
@@ -1454,9 +1720,9 @@ class CodeTreeController(QtCore.QObject):
             selected: QTreeWidgetItem
         """
 
-        if selected is None or selected.text(1)[0:3] != 'cid':
+        if selected is None or selected.text(self.COL_ID)[0:3] != 'cid':
             return
-        src_cid = int(selected.text(1)[4:])
+        src_cid = int(selected.text(self.COL_ID)[4:])
         source_code = next((c for c in self.codes if c['cid'] == src_cid), None)
         if source_code is None:
             return
@@ -1482,7 +1748,7 @@ class CodeTreeController(QtCore.QObject):
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         while it.value():
             node = it.value()
-            if node.text(1) == f"cid:{target['cid']}":
+            if node.text(self.COL_ID) == f"cid:{target['cid']}":
                 target_item = node
                 break
             it += 1
@@ -1500,16 +1766,16 @@ class CodeTreeController(QtCore.QObject):
         """
 
         # Check item dropped on itself
-        if item['name'] == parent.text(0):
+        if item['name'] == parent.text(self.COL_NAME):
             return
         # Prevent a supercid cycle
-        target_cid = int(parent.text(1).split(':')[1])
+        target_cid = int(parent.text(self.COL_ID).split(':')[1])
         if self.code_is_descendant(target_cid, item['cid']):
             Message(self.app, _("Cannot merge code"),
                     _("Cannot merge a code into itself or one of its own sub-codes.")).exec()
             return
         msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">'
-        msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
+        msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(self.COL_NAME) + '</p>'
         reply = QtWidgets.QMessageBox.question(self.tree, _('Merge codes'),
                                                msg, QtWidgets.QMessageBox.StandardButton.Yes,
                                                QtWidgets.QMessageBox.StandardButton.No)
@@ -1517,7 +1783,7 @@ class CodeTreeController(QtCore.QObject):
             return
         cur = self.app.conn.cursor()
         old_cid = item['cid']
-        new_cid = int(parent.text(1).split(':')[1])
+        new_cid = int(parent.text(self.COL_ID).split(':')[1])
         # Always record merge info in target code memo
         target_code = None
         for c in self.codes:
