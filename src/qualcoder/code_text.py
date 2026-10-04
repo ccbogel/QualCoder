@@ -54,6 +54,7 @@ from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH,
 from .code_tree import CodeTreeController
 from .codebook import build_codebook_path
 from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
+from .coding_common import build_code_tooltip_html, load_recent_codes, select_tree_item_by_code_name
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
     ToolTipEventFilter, init_persistent_tree_header
@@ -1324,23 +1325,7 @@ class DialogCodeText(QtWidgets.QWidget):
         recent codes are stored as space delimited text in project table.
         Add code id to recent codes list, if code is present. """
 
-        self.recent_codes = []
-        cur = self.app.conn.cursor()
-        cur.execute("select recently_used_codes from project")
-        res = cur.fetchone()
-        if not res:
-            return
-        if res[0] == "" or res[0] is None:
-            return
-        recent_codes_text = res[0].split()
-        for code_id in recent_codes_text:
-            try:
-                cid = int(code_id)
-                for code_ in self.codes:
-                    if cid == code_['cid']:
-                        self.recent_codes.append(code_)
-            except ValueError:
-                pass
+        self.recent_codes = load_recent_codes(self.app.conn, self.codes)
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
@@ -2370,12 +2355,7 @@ class DialogCodeText(QtWidgets.QWidget):
             text_ : String
         """
 
-        child_count = item.childCount()
-        for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_
-                                                        or item.child(i).toolTip(0) == text_):
-                self.ui.treeWidget.setCurrentItem(item.child(i))
-            self.recursive_set_current_item(item.child(i), text_)
+        select_tree_item_by_code_name(self.ui.treeWidget, item, text_)
 
     def is_annotated(self, position: int):
         """ Check if position is annotated to provide annotation menu option.

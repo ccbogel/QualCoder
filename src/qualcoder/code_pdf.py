@@ -43,6 +43,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
 from .color_selector import DialogColorSelect
 from .color_selector import TextColor
+from .coding_common import build_code_tooltip_html, load_recent_codes, select_tree_item_by_code_name
 from .coder_names import DialogCoderNames  # Coder change as in code_text
 from .speakers import DialogSpeakers, speaker_coder_name  # Mark speakers
 from .helpers import Message, init_persistent_tree_header, \
@@ -3065,15 +3066,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.mark()
 
     def recursive_set_current_item(self, item, text_):
-        """        Selects in the tree the code whose name matches.
         """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if item.child(i).text(1)[0:3] == "cid" and \
-                    (item.child(i).text(0) == text_ or item.child(i).toolTip(0) == text_):
-                self.ui.treeWidget.setCurrentItem(item.child(i))
-            self.recursive_set_current_item(item.child(i), text_)
+        Selects in the tree the code whose name matches.
+        """
+        select_tree_item_by_code_name(self.ui.treeWidget, item, text_)
 
     # Desmarcar, memo, importante. Unmark, memo, important.
     def _select_codings(self, texts_here, areas_here, title):
@@ -4484,24 +4480,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def get_recent_codes(self):
         """ Recently used codes, saved as space-separated ids in the project table. Requires self.codes already loaded.
         """
-
-        self.recent_codes = []
-        cur = self.app.conn.cursor()
-        try:
-            cur.execute("select recently_used_codes from project")
-            res = cur.fetchone()
-        except sqlite3.OperationalError:
-            return
-        if not res or res[0] == "" or res[0] is None:
-            return
-        for code_id in res[0].split():
-            try:
-                cid = int(code_id)
-            except ValueError:
-                continue
-            for code_ in self.codes:
-                if cid == code_['cid']:
-                    self.recent_codes.append(code_)
+        self.recent_codes = load_recent_codes(self.app.conn, self.codes)
 
     def fill_code_counts_in_tree(self):
         """ Frequency of each code and category for this coder and file.
@@ -5185,45 +5164,8 @@ class DialogCodePdf(QtWidgets.QWidget):
     # Code margin (shared with code_text)
     def _build_code_tooltip_html(self, code):
         """ HTML tooltip of a coded segment (text or image area). """
-
         is_area = 'pos0' not in code  # las areas no tienen pos0. Areas have no pos0
-        color = TextColor(code.get('color', '#cccccc')).recommendation
-        text_ = '<p style="background-color:' + code.get('color', '#cccccc') + "; color:" + color + '"><em>'
-        text_ += code.get('name', '') + "</em>"
-        if self.app.settings['showids']:
-            if is_area:
-                text_ += " [imid:" + str(code.get('imid', '')) + "]"
-            else:
-                text_ += " [ctid:" + str(code.get('ctid', '')) + "]"
-        text_ += " (" + str(code.get('owner', '')) + ")"
-        if is_area:
-            page_no = (code.get('pdf_page', 0) or 0) + 1
-            text_ += "<br />" + _("Coded area") + " - " + _("Page") + " " + str(page_no)
-        else:
-            seltext = code.get('seltext', '') or ''
-            seltext = seltext.replace("\n", "").replace("\r", "")
-            if len(seltext) > 90:
-                pre = seltext[0:40].split(' ')
-                post = seltext[len(seltext) - 40:].split(' ')
-                try:
-                    pre = pre[:-1]
-                except IndexError:
-                    pass
-                try:
-                    post = post[1:]
-                except IndexError:
-                    pass
-                seltext = " ".join(pre) + " ... " + " ".join(post)
-            text_ += "<br />" + seltext
-        if code.get('memo', '') != "":
-            memo_text = code['memo']
-            if len(memo_text) > 150:
-                memo_text = memo_text[:150] + "..."
-            text_ += "<br /><em>" + _("MEMO: ") + memo_text + "</em>"
-        if code.get('important') == 1:
-            text_ += "<br /><em>" + _("IMPORTANT") + "</em>"
-        text_ += "</p>"
-        return text_
+        return build_code_tooltip_html(code, self.app.settings['showids'], is_area=is_area)
 
     def _install_coding_margin_in_side(self, side):
         """ Moves the margin widget to the left or right container. """

@@ -43,6 +43,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
 from .coder_names import DialogCoderNames
 from .color_selector import TextColor, colour_ranges, show_codes_of_colour_range
+from .coding_common import load_recent_codes
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ToolTipEventFilter, CodeResizeHandle, \
@@ -964,23 +965,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         recent codes are stored as space delimited text in project table.
         Add code id to recent codes list, if code is present. """
 
-        self.recent_codes = []
-        cur = self.app.conn.cursor()
-        cur.execute("select recently_used_codes from project")
-        res = cur.fetchone()
-        if not res:
-            return
-        if res[0] == "" or res[0] is None:
-            return
-        recent_codes_text = res[0].split()
-        for code_id in recent_codes_text:
-            try:
-                cid = int(code_id)
-                for code_ in self.codes:
-                    if cid == code_['cid']:
-                        self.recent_codes.append(code_)
-            except ValueError:
-                pass
+        self.recent_codes = load_recent_codes(self.app.conn, self.codes)
 
     def get_files(self, ids=None, sort="name asc"):
         """ Get AV files and exclude those with bad links.
