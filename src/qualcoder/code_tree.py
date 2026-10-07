@@ -87,6 +87,10 @@ class CodeTreeController(QtCore.QObject):
         self.show_codes_of_colour_callback = None
         self.on_codes_deleted = None
         self.on_code_renamed = None
+        # Collapsed branches ("catid:n" / "cid:n") live in app.coding_tree_collapsed, shared by the
+        # coding dialogs only; app.collapsed_categories is left to the report dialogs.
+        self.tree.itemCollapsed.connect(self._on_item_collapsed)
+        self.tree.itemExpanded.connect(self._on_item_expanded)
 
     # Live views over the host's data, never cached here.
     @property
@@ -101,12 +105,20 @@ class CodeTreeController(QtCore.QObject):
     def parent_textEdit(self):
         return self.host.parent_textEdit
 
+    # Expanded / collapsed state, shared by the coding dialogs
+
+    def _on_item_collapsed(self, item):
+        self.app.coding_tree_collapsed.add(item.text(1))
+
+    def _on_item_expanded(self, item):
+        self.app.coding_tree_collapsed.discard(item.text(1))
+
     # tree fill
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         The Count column is filled by the host through fill_counts_callback.
-        Keep record of non-expanded items, then re-enact these items when tree fill is called again. """
+        Branches collapsed by the user in any coding dialog stay collapsed after a refill. """
 
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
@@ -132,10 +144,6 @@ class CodeTreeController(QtCore.QObject):
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 self.tree.addTopLevelItem(top_item)
-                if f"catid:{c['catid']}" in self.app.collapsed_categories:
-                    top_item.setExpanded(False)
-                else:
-                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -161,10 +169,6 @@ class CodeTreeController(QtCore.QObject):
                             child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         item.addChild(child)
-                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
-                            child.setExpanded(False)
-                        else:
-                            child.setExpanded(True)
                         remove_list.append(c)
                         break
                     it += 1
@@ -254,16 +258,23 @@ class CodeTreeController(QtCore.QObject):
             self.tree.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         if self.tree_sort_option == "all desc":
             self.tree.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
-        # Show the code tree expanded from the start: sub-code branches are visible by default;
-        # categories the user had collapsed are restored to their collapsed state.
+        # Expanded by default, then restore the branches the user collapsed in a coding dialog.
+        # Signals are blocked: expandAll emits itemExpanded for every node and would clear
+        # the shared set before it can be applied.
+        # Ids of branches no longer in the tree are dropped: SQLite reuses the last deleted id,
+        # so a new category or code could otherwise inherit a collapsed state.
         blocker = QtCore.QSignalBlocker(self.tree)
         self.tree.expandAll()
+        present_ids = set()
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         while it.value():
             node = it.value()
-            if node.text(1) in self.app.collapsed_categories:
+            if node.childCount() > 0:
+                present_ids.add(node.text(1))
+            if node.text(1) in self.app.coding_tree_collapsed:
                 node.setExpanded(False)
             it += 1
+        self.app.coding_tree_collapsed &= present_ids
         blocker.unblock()
         if self.fill_counts_callback is not None:
             self.fill_counts_callback()
