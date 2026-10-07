@@ -87,8 +87,7 @@ class CodeTreeController(QtCore.QObject):
         self.show_codes_of_colour_callback = None
         self.on_codes_deleted = None
         self.on_code_renamed = None
-        # Collapsed branches ("catid:n" / "cid:n") live in app.coding_tree_collapsed, shared by the
-        # coding dialogs only; app.collapsed_categories is left to the report dialogs.
+        # Collapsed branches are tracked in app.coding_tree_collapsed, shared by coding dialogs only
         self.tree.itemCollapsed.connect(self._on_item_collapsed)
         self.tree.itemExpanded.connect(self._on_item_expanded)
 
@@ -105,8 +104,6 @@ class CodeTreeController(QtCore.QObject):
     def parent_textEdit(self):
         return self.host.parent_textEdit
 
-    # Expanded / collapsed state, shared by the coding dialogs
-
     def _on_item_collapsed(self, item):
         self.app.coding_tree_collapsed.add(item.text(1))
 
@@ -118,7 +115,7 @@ class CodeTreeController(QtCore.QObject):
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         The Count column is filled by the host through fill_counts_callback.
-        Branches collapsed by the user in any coding dialog stay collapsed after a refill. """
+        Collapsed branches stay collapsed after a refill. """
 
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
@@ -258,11 +255,8 @@ class CodeTreeController(QtCore.QObject):
             self.tree.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         if self.tree_sort_option == "all desc":
             self.tree.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
-        # Expanded by default, then restore the branches the user collapsed in a coding dialog.
-        # Signals are blocked: expandAll emits itemExpanded for every node and would clear
-        # the shared set before it can be applied.
-        # Ids of branches no longer in the tree are dropped: SQLite reuses the last deleted id,
-        # so a new category or code could otherwise inherit a collapsed state.
+        # Signals blocked: expandAll emits itemExpanded and would clear the collapsed set
+        # Stale ids are dropped, SQLite reuses deleted ids
         blocker = QtCore.QSignalBlocker(self.tree)
         self.tree.expandAll()
         present_ids = set()
