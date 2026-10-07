@@ -3007,6 +3007,7 @@ Click "Yes" to start now.')
         self.app.conn = None
         self.app.project_path = ""
         self.app.project_name = ""
+        self.app.coding_tree_collapsed.clear()
         self.app.delete_backup_path_name = ""
         self.app.delete_backup = True
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
