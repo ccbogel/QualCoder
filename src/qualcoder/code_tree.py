@@ -256,6 +256,7 @@ class CodeTreeController(QtCore.QObject):
             self.tree.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
         # Show the code tree expanded from the start: sub-code branches are visible by default;
         # categories the user had collapsed are restored to their collapsed state.
+        blocker = QtCore.QSignalBlocker(self.tree)
         self.tree.expandAll()
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         while it.value():
@@ -263,6 +264,7 @@ class CodeTreeController(QtCore.QObject):
             if node.text(1) in self.app.collapsed_categories:
                 node.setExpanded(False)
             it += 1
+        blocker.unblock()
         if self.fill_counts_callback is not None:
             self.fill_counts_callback()
         restore_persistent_tree_widths(
