@@ -119,6 +119,10 @@ An Issue in GitHub is a sort of bug tracker for a project which has its own sect
 
 To make a new issue in your repository, navigate to the repository where you want to raise an issue and go to the Issues tab.
 
+- Contributions are made under the LGPLv3 License
+- 
+The "Inbound = Outbound" Default: The project is hosted on GitHub. The GitHub Terms of Service state that by submitting a pull request, the contributor licenses their code under the repository's existing open-source license, LGPLv3.
+
 
 - What is pull request ?
 
