@@ -32,7 +32,7 @@ import re
 import unicodedata
 
 from .GUI.ui_edit_text import Ui_Dialog_edit_text
-from .helpers import MarkdownHighlighter
+from .helpers import MarkdownHighlighter, setup_search_shortcuts
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +84,12 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.ui.pushButton_previous.clicked.connect(lambda pressed: self.find("previous"))
         self.ui.label_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.checkBox_case_sensitive.stateChanged.connect(lambda : self.find("next"))
+        setup_search_shortcuts(
+            self.ui.lineEdit_search,
+            next_callback=lambda: self.find("next"),
+            prev_callback=lambda: self.find("previous"),
+            parent_widget=self
+        )
 
         self.get_cases_codings_annotations()
         if self.name[-3:].lower() == ".md":
@@ -120,6 +126,10 @@ class DialogEditTextFile(QtWidgets.QDialog):
     def keyPressEvent(self, event) -> None:
         key = event.key()
         mods = event.modifiers()
+        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.ui.lineEdit_search.setFocus()
+            self.ui.lineEdit_search.selectAll()
+            return
         if self.ui.lineEdit_search.hasFocus():
             if key == QtCore.Qt.Key.Key_Return and mods == QtCore.Qt.KeyboardModifier.ShiftModifier:
                 self.find("previous")

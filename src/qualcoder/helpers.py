@@ -1575,3 +1575,72 @@ class ToolTipEventFilter(QtCore.QObject):
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
 
+
+class SearchShortcutsEventFilter(QtCore.QObject):
+    """Event filter for search QLineEdit widgets providing keyboard shortcuts.
+
+    - Enter / Return: triggers next_callback
+    - Shift + Enter / Shift + Return: triggers prev_callback (or safe no-op if None)
+    - Ctrl + F: selects all text in the search line edit
+    """
+
+    def __init__(self, line_edit, next_callback=None, prev_callback=None, parent=None):
+        super().__init__(parent or line_edit)
+        self.line_edit = line_edit
+        self.next_callback = next_callback
+        self.prev_callback = prev_callback
+
+    def eventFilter(self, watched, event):
+        if watched == self.line_edit and event.type() == QtCore.QEvent.Type.KeyPress:
+            key = event.key()
+            modifiers = event.modifiers()
+
+            # Ctrl + F while focused in the search box selects all text
+            if key == QtCore.Qt.Key.Key_F and (modifiers & QtCore.Qt.KeyboardModifier.ControlModifier):
+                self.line_edit.selectAll()
+                return True
+
+            # Enter / Return handling
+            if key in (QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter):
+                if modifiers & QtCore.Qt.KeyboardModifier.ShiftModifier:
+                    if callable(self.prev_callback):
+                        self.prev_callback()
+                    return True
+                elif modifiers in (QtCore.Qt.KeyboardModifier.NoModifier, QtCore.Qt.KeyboardModifier.KeypadModifier):
+                    if callable(self.next_callback):
+                        self.next_callback()
+                    return True
+
+        return super().eventFilter(watched, event)
+
+
+def setup_search_shortcuts(line_edit, next_callback=None, prev_callback=None, parent_widget=None):
+    """Configure search box shortcuts for next/previous navigation and Ctrl+F selection.
+
+    Args:
+        line_edit: QtWidgets.QLineEdit search box.
+        next_callback: Callable triggered on Enter / Return.
+        prev_callback: Callable triggered on Shift+Enter / Shift+Return (if available).
+        parent_widget: Optional parent QWidget (e.g. QDialog) to install window-wide Ctrl+F.
+    """
+    event_filter = SearchShortcutsEventFilter(line_edit, next_callback, prev_callback, parent=line_edit)
+    line_edit.installEventFilter(event_filter)
+    line_edit._search_event_filter = event_filter
+
+    if parent_widget is not None:
+        def _on_find_shortcut():
+            # If search box is in a hidden parent container, ensure it is shown
+            p = line_edit.parentWidget()
+            while p and p != parent_widget:
+                if p.isHidden():
+                    p.setHidden(False)
+                p = p.parentWidget()
+            line_edit.setFocus()
+            line_edit.selectAll()
+
+        shortcut = QtGui.QShortcut(QtGui.QKeySequence.StandardKey.Find, parent_widget)
+        shortcut.activated.connect(_on_find_shortcut)
+        line_edit._find_shortcut = shortcut
+
+    return event_filter
+
