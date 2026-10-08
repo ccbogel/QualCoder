@@ -32,7 +32,7 @@ This Code of Conduct applies in project and public spaces where individuals repr
 
 ## Enforcement
 
-Report incidents of abusive, harassing, or unacceptable behavior by contacting the project team at hi@taguette.org. All complaints will be reviewed and investigated, maintaining confidentiality. Specific enforcement policies may be detailed separately.
+Report incidents of abusive, harassing, or unacceptable behavior by contacting the project team at ccbogel@hotmail.com. All complaints will be reviewed and investigated, maintaining confidentiality. Specific enforcement policies may be detailed separately.
 
 Maintainers not following or enforcing the Code of Conduct in good faith may face temporary or permanent repercussions as determined by the project's leadership.
 
