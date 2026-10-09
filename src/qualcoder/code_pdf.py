@@ -1826,8 +1826,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
         self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
         self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
-        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
-        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         # Enable the tree's internal drag-and-drop. Without this the drop never reaches the
         # eventFilter, codes/sub-codes cannot be nested nor categories moved, and the cycle guards
         # never fire.
@@ -4608,16 +4606,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             if self.selection is not None:
                 self.mark()
         self.fill_code_label()
-
-    def get_collapsed(self, item):
-        """ Preserves the expanded/collapsed state of categories across dialogs. """
-
-        if item.text(1)[0:3] == "cid":
-            return
-        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
-            self.app.collapsed_categories.remove(item.text(1))
-        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
-            self.app.collapsed_categories.append(item.text(1))
 
     def coded_media_dialog(self, code_dict, category_name=""):
         """ Displays all media coded with this code (or category branch) in a
