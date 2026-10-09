@@ -14,16 +14,7 @@ Colin Curtain created QualCoder in 2019 and leads the project. The project lead:
 
 ### Maintainers
 
-Maintainers have write access to the repository. They review and merge pull requests, triage issues, answer questions in Discussions and take part in decisions about the roadmap.
-
-Current maintainers:
-
-| Name | Main areas 
-|------|------------|
-| Colin Curtain | Project lead, core application, Windows builds |
-| Kai Dröge | AI features, MCP integration, macOS builds | German translation.|
-| Justin Missaghieh-Poncet | Website (qualcoder.org), Linux builds, French translation |
-| Lorenzo Salomón | Testing, interface and module development, Spanish translation |
+Maintainers have write access to the repository. They review and merge pull requests, triage issues, answer questions in Discussions and take part in decisions about the roadmap. You can view the list of current maintainers on [this page](https://qualcoder.org/about).
 
 ### Contributors
 
@@ -31,7 +22,7 @@ Anyone who submits code, documentation, translations, bug reports, tests or supp
 
 ### Translators
 
-Translations are maintained through the `.po`/`.ts` files in `other_languages` and the `rebuild_lang.py` script. Translators are credited in the release notes.
+Translations are maintained through the `.po`/`.ts` files in `other_languages` and the `rebuild_lang.py` script. Translators are credited in the release notes. You can view the list of translation coordinators  on [this page](https://qualcoder.org/about).
 
 ## How decisions are made
 
