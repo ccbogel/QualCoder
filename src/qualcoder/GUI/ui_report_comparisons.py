@@ -18,7 +18,7 @@ class Ui_Dialog_reportComparisons(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(parent=Dialog_reportComparisons)
         self.groupBox.setMinimumSize(QtCore.QSize(0, 100))
-        self.groupBox.setMaximumSize(QtCore.QSize(16777215, 100))
+        self.groupBox.setMaximumSize(QtCore.QSize(16777215, 132))
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_export = QtWidgets.QPushButton(parent=self.groupBox)
@@ -55,6 +55,15 @@ class Ui_Dialog_reportComparisons(object):
         self.pushButton_help1.setGeometry(QtCore.QRect(400, 27, 32, 32))
         self.pushButton_help1.setText("")
         self.pushButton_help1.setObjectName("pushButton_help1")
+        self.label_files = QtWidgets.QLabel(parent=self.groupBox)
+        self.label_files.setGeometry(QtCore.QRect(10, 97, 751, 32))
+        self.label_files.setMinimumSize(QtCore.QSize(0, 32))
+        self.label_files.setMaximumSize(QtCore.QSize(16777213, 32))
+        self.label_files.setWordWrap(True)
+        self.label_files.setObjectName("label_files")
+        self.pushButton_files = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_files.setGeometry(QtCore.QRect(440, 27, 110, 32))
+        self.pushButton_files.setObjectName("pushButton_files")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(parent=Dialog_reportComparisons)
         self.groupBox_2.setTitle("")
@@ -88,6 +97,9 @@ class Ui_Dialog_reportComparisons(object):
         self.label_title.setText(_translate("Dialog_reportComparisons", "Coder comparisons - text files"))
         self.label_selections.setText(_translate("Dialog_reportComparisons", "Coders selected:"))
         self.pushButton_help1.setToolTip(_translate("Dialog_reportComparisons", "Statistics help"))
+        self.pushButton_files.setText(_translate("Dialog_reportComparisons", "Select files"))
+        self.pushButton_files.setToolTip(_translate("Dialog_reportComparisons", "Select text files for the comparison subcorpus"))
+        self.label_files.setText(_translate("Dialog_reportComparisons", "Files: all text files"))
 
 
 if __name__ == "__main__":
@@ -98,3 +110,4 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_reportComparisons)
     Dialog_reportComparisons.show()
     sys.exit(app.exec())
+
