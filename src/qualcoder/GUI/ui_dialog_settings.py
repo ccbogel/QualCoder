@@ -595,10 +595,10 @@ class Ui_Dialog_settings(object):
         self.comboBox_language.setToolTip(_translate("Dialog_settings", "Close and open the software for the change in language to occur.\n"
 "Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.\n"
 "Additional languages can be added if they are listed in the src/qualcoder/i18n folder.\n"
-"To do this update the config.ini  file to another language that is available.\n"
-"Find the line begining language =\n"
+"To do this update the config.ini file to another language that is available.\n"
+"Find the line beginning language =\n"
 "Then update it. For example:\n"
-"langauge = it"))
+"language = it"))
         self.label.setText(_translate("Dialog_settings", "General font and size"))
         self.label_3.setText(_translate("Dialog_settings", "Font size for codes tree"))
         self.label_7.setText(_translate("Dialog_settings", "Font size for documents"))
@@ -632,7 +632,7 @@ class Ui_Dialog_settings(object):
         self.checkBox.setToolTip(_translate("Dialog_settings", "Show the identifying numbers for files, cases, codes, et cetera."))
         self.label_5.setToolTip(_translate("Dialog_settings", "Used when entering time position in transcription"))
         self.label_5.setText(_translate("Dialog_settings", "Time format"))
-        self.label_20.setText(_translate("Dialog_settings", "Codesstripe view"))
+        self.label_20.setText(_translate("Dialog_settings", "Code stripe view"))
         self.label_style.setText(_translate("Dialog_settings", "Style"))
         self.label_main_tabs.setToolTip(_translate("Dialog_settings", "Where the Project, Manage, Coding, Reports and AI Agent tabs are shown"))
         self.label_main_tabs.setText(_translate("Dialog_settings", "Main tabs"))
@@ -658,7 +658,7 @@ class Ui_Dialog_settings(object):
         self.label_2.setText(_translate("Dialog_settings", "Permissions:"))
         self.label_12.setText(_translate("Dialog_settings", "Get Access:"))
         self.pushButton_ai_profile_edit.setText(_translate("Dialog_settings", "Edit Name"))
-        self.label_auth.setText(_translate("Dialog_settings", "Authentification:"))
+        self.label_auth.setText(_translate("Dialog_settings", "Authentication:"))
         self.label_11.setText(_translate("Dialog_settings", "Description:"))
         self.pushButton_renew_auth.setToolTip(_translate("Dialog_settings", "Click to open the ChatGPT sign-in page in your default browser. Use it to authorize QualCoder to access AI models through this account."))
         self.pushButton_renew_auth.setText(_translate("Dialog_settings", "Authenticate..."))
@@ -670,7 +670,7 @@ class Ui_Dialog_settings(object):
         self.lineEdit_top_p.setText(_translate("Dialog_settings", "1.0"))
         self.label_AI_temperature.setText(_translate("Dialog_settings", "Temperature:"))
         self.label_18.setText(_translate("Dialog_settings", "General Parameters:"))
-        self.lineEdit_ai_temperature.setToolTip(_translate("Dialog_settings", "Advanced option. Only change when you know whatr you are doing."))
+        self.lineEdit_ai_temperature.setToolTip(_translate("Dialog_settings", "Advanced option. Only change when you know what you are doing."))
         self.lineEdit_ai_temperature.setText(_translate("Dialog_settings", "1.0"))
         self.label_17.setText(_translate("Dialog_settings", "API Base URL:"))
         self.checkBox_AI_language_ui.setToolTip(_translate("Dialog_settings", "If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window."))
