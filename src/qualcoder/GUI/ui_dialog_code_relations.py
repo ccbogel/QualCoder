@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_code_relations.ui'
+# Form implementation generated from reading ui file 'ui_dialog_code_relations.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -164,7 +164,7 @@ class Ui_Dialog_CodeRelations(object):
         self.pushButton_boxplots.setToolTip(_translate("Dialog_CodeRelations", "Boxplots of distance between code pairs."))
         self.label_search_results.setText(_translate("Dialog_CodeRelations", "Search Results for:"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_CodeRelations", "Search results for text"))
-        self.pushButton_search_next.setToolTip(_translate("Dialog_CodeRelations", "Search for next occurence in results"))
+        self.pushButton_search_next.setToolTip(_translate("Dialog_CodeRelations", "Search for next occurrence in results"))
         self.pushButton_export_exact.setToolTip(_translate("Dialog_CodeRelations", "Export Excel report of exact text coding matches for all  files.\n"
 "Ordered by file name and code name."))
         self.pushButton_export_exact.setText(_translate("Dialog_CodeRelations", "E"))

@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_speakers.ui'
+# Form implementation generated from reading ui file 'ui_dialog_speakers.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -130,4 +130,4 @@ class Ui_Dialog_speakers(object):
         self.checkBox_include_name.setText(_translate("Dialog_speakers", "Include speaker name"))
         self.checkBox_filter_timestamps.setToolTip(_translate("Dialog_speakers", "Ignore time stamps during detection, so they are not mistaken for speaker names. Covers the transcript formats used in Code A/V: [hh:mm:ss] [mm:ss] [hh.mm.ss] [mm.ss] {hh:mm:ss} #hh:mm:ss.sss#, subtitle arrows in SRT (hh:mm:ss,sss --> hh:mm:ss,sss) and WebVTT (hh:mm:ss.sss --> hh:mm:ss.sss, hours optional), and bare hh:mm:ss / mm:ss times."))
         self.checkBox_filter_timestamps.setText(_translate("Dialog_speakers", "Filter time stamps"))
-        self.tableWidget.setToolTip(_translate("Dialog_speakers", "Doubleclick a \"code as\" name to edit"))
+        self.tableWidget.setToolTip(_translate("Dialog_speakers", "Double-click a \"code as\" name to edit"))
