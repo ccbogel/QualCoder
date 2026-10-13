@@ -92,6 +92,7 @@ from qualcoder.information import DialogInformation, menu_shortcuts_display, cod
 from qualcoder.information import project_tab_info, manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
 from qualcoder.journals import DialogJournals
 from qualcoder.main_tab_rail import MainTabRail
+from qualcoder.recent_projects_delegate import RecentProjectDelegate, DATE_ROLE, PATH_ROLE
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
 from qualcoder.manage_references import DialogReferenceManager
@@ -1037,13 +1038,36 @@ Click "Yes" to start now.')
             for child in card.findChildren(QtWidgets.QWidget):
                 child.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
                 child.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        list_widget = self.ui.listWidget_recent_projects
-        list_widget.itemActivated.connect(self.open_recent_project_from_list)
-        list_widget.viewport().installEventFilter(self)
+        combo = self.ui.comboBox_recent_projects
+        combo.setItemDelegate(RecentProjectDelegate(self.recent_project_colors, combo))
+        combo.activated.connect(self.open_recent_project_from_combo)
+        # Own chevron, so the arrow follows the theme colours
+        self.recent_projects_arrow = QtWidgets.QLabel(combo)
+        self.recent_projects_arrow.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        arrow_layout = QtWidgets.QHBoxLayout(combo)
+        arrow_layout.setContentsMargins(0, 0, 8, 0)
+        arrow_layout.addStretch()
+        arrow_layout.addWidget(self.recent_projects_arrow)
+        files_label = self.ui.label_project_summary_files
+        files_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
+        files_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
+                                            QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
+        files_label.linkActivated.connect(self.open_coding_for_file_type)
+        self.ui.label_project_summary_warning.linkActivated.connect(
+            lambda _link: self.ui.actionManage_bad_links_to_files.trigger())
+        # Project contents refresh after database changes and when the Project tab is shown
+        self.project_summary_timer = QtCore.QTimer(self)
+        self.project_summary_timer.setSingleShot(True)
+        self.project_summary_timer.setInterval(300)
+        self.project_summary_timer.timeout.connect(self.update_project_summary_panel)
+        self.project_summary_events = None
+        self.connect_project_summary_events()
+        self.ui.tabWidget.currentChanged.connect(self.schedule_project_summary_update)
         self.ui.pushButton_action_log.toggled.connect(self.set_action_log_visible)
         self.ui.pushButton_settings.clicked.connect(self.change_settings)
         self.ui.pushButton_project_memo.clicked.connect(self.project_memo)
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
+        self.build_project_summary_tiles()
         self.update_coder_display()
         self.update_project_panel_styles()
         visible = str(self.app.settings.get('action_log_visible', 'False')) == 'True'
@@ -1089,16 +1113,45 @@ Click "Yes" to start now.')
             except Exception as err:
                 logger.debug(str(err))
         for label in (self.ui.label_new_project_description, self.ui.label_open_project_description,
-                      self.ui.label_recent_projects_hint):
+                      self.ui.label_project_summary_files, self.ui.label_project_summary_empty):
             label.setStyleSheet(f"color: {secondary}; background-color: transparent; border: none;")
-        selection = f"rgba({highlight.red()}, {highlight.green()}, {highlight.blue()}, 45)"
-        hover = f"rgba({highlight.red()}, {highlight.green()}, {highlight.blue()}, 22)"
-        self.ui.listWidget_recent_projects.setStyleSheet(
-            f"QListWidget {{background-color: transparent; border: none; outline: none;}}"
-            f"QListWidget::item {{border-left: 3px solid transparent;}}"
-            f"QListWidget::item:hover {{background-color: {hover};}}"
-            f"QListWidget::item:selected {{background-color: {selection}; border-left: 3px solid {highlight.name()};}}"
+        self.project_panel_colors["highlight"] = highlight.name()
+        self.project_panel_colors["base"] = base.name()
+        tint = f"rgba({highlight.red()}, {highlight.green()}, {highlight.blue()}, 18)"
+        self.ui.comboBox_recent_projects.setStyleSheet(
+            f"QComboBox#comboBox_recent_projects {{background-color: {base.name()}; color: {text.name()};"
+            f" border: 1px solid {border}; border-radius: 8px; padding: 4px 30px 4px 10px;}}"
+            f"QComboBox#comboBox_recent_projects:hover {{border: 1px solid {highlight.name()};}}"
+            f"QComboBox#comboBox_recent_projects:focus {{border: 2px solid {highlight.name()};}}"
+            f"QComboBox#comboBox_recent_projects::drop-down {{subcontrol-origin: padding;"
+            f" subcontrol-position: center right; width: 22px; border: none;}}"
+            f"QComboBox#comboBox_recent_projects::down-arrow {{image: none; width: 0px; height: 0px;}}"
+            f"QComboBox#comboBox_recent_projects QAbstractItemView {{background-color: {base.name()};"
+            f" border: 1px solid {border}; outline: none;}}"
         )
+        self.ui.lineEdit_coder.setStyleSheet(
+            f"QLineEdit#lineEdit_coder {{background-color: {base.name()}; color: {text.name()};"
+            f" border: 1px solid {border}; border-radius: 8px; padding: 2px 8px;}}"
+            f"QLineEdit#lineEdit_coder:focus {{border: 2px solid {highlight.name()};}}"
+        )
+        self.ui.frame_project_summary.setStyleSheet(
+            f"QFrame#frame_project_summary {{background-color: {base.name()}; border: 1px solid {border};"
+            f" border-radius: 10px;}}"
+            f"QFrame#frame_project_summary QLabel {{background-color: transparent; border: none;}}"
+            f"QFrame[summary_tile=\"true\"] {{background-color: {tint}; border: 1px solid transparent;"
+            f" border-radius: 8px;}}"
+            f"QFrame[summary_tile=\"true\"][clickable=\"true\"]:hover {{border: 1px solid {highlight.name()};}}"
+            f"QFrame[summary_tile=\"true\"][clickable=\"true\"]:focus {{border: 2px solid {highlight.name()};}}"
+        )
+        self.ui.label_project_summary_warning.setStyleSheet(
+            "color: #d9534f; background-color: transparent; border: none;")
+        self.style_project_summary_tiles()
+        arrow = getattr(self, "recent_projects_arrow", None)
+        if arrow is not None:
+            try:
+                arrow.setPixmap(qta.icon('mdi6.chevron-down', color=secondary).pixmap(18, 18))
+            except Exception as err:
+                logger.debug(str(err))
         try:
             self.ui.pushButton_action_log.setIcon(qta.icon('mdi6.text-box-outline'))
             self.ui.pushButton_settings.setIcon(qta.icon('mdi6.cog'))
@@ -1128,90 +1181,202 @@ Click "Yes" to start now.')
         for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
             self.clear_tab_widgets(tab_widget, show_placeholder=True)
 
-    def fill_recent_projects_list(self):
-        """Show the recent projects as name, date and path rows in the Project tab."""
+    def recent_project_colors(self):
+        """Colours for the recent projects drop-down rows."""
 
-        list_widget = getattr(self.ui, "listWidget_recent_projects", None)
-        if list_widget is None:
+        return getattr(self, "project_panel_colors", {})
+
+    def fill_recent_projects_list(self):
+        """Fill the recent projects drop-down: name, date and path for each project."""
+
+        combo = getattr(self.ui, "comboBox_recent_projects", None)
+        if combo is None:
             return
-        list_widget.clear()
-        colors = self.project_panel_colors
-        current_item = None
-        # Explicit fonts: the window stylesheet font is not applied yet when size hints are taken
-        row_font = QtGui.QFont(self.app.settings['font'], int(self.app.settings['fontsize']))
-        name_font = QtGui.QFont(row_font)
-        name_font.setBold(True)
+        combo.blockSignals(True)
+        combo.clear()
+        current_index = -1
         for entry in self.recent_projects:
             date_text, separator, project_path = entry.partition("|")
             if not separator:  # Legacy lines only contain the path
                 date_text, project_path = "", entry
-            date_text = date_text.replace("_", " ")[:16]
-            item = QtWidgets.QListWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.UserRole, entry)
-            item.setToolTip(project_path)
-            row = QtWidgets.QWidget()
-            row.setStyleSheet("background-color: transparent;")
-            row_layout = QtWidgets.QVBoxLayout(row)
-            row_layout.setContentsMargins(8, 6, 8, 6)
-            row_layout.setSpacing(2)
-            top_row = QtWidgets.QHBoxLayout()
-            top_row.setSpacing(8)
-            name_label = QtWidgets.QLabel(Path(project_path).name)
-            name_label.setProperty("full_text", Path(project_path).name)
-            name_label.setProperty("elide_mode", int(QtCore.Qt.TextElideMode.ElideRight.value))
-            name_label.setFont(name_font)
-            name_label.setStyleSheet(f"color: {colors.get('text', '')}; font-weight: bold; border: none;")
-            date_label = QtWidgets.QLabel(date_text)
-            date_label.setFont(row_font)
-            date_label.setStyleSheet(f"color: {colors.get('secondary', '')}; border: none;")
-            top_row.addWidget(name_label, 1)
-            top_row.addWidget(date_label, 0)
-            path_label = QtWidgets.QLabel(project_path)
-            path_label.setProperty("full_text", project_path)
-            path_label.setProperty("elide_mode", int(QtCore.Qt.TextElideMode.ElideMiddle.value))
-            path_label.setFont(row_font)
-            path_label.setStyleSheet(f"color: {colors.get('secondary', '')}; border: none;")
-            row_layout.addLayout(top_row)
-            row_layout.addWidget(path_label)
-            item.setSizeHint(row.sizeHint())
-            list_widget.addItem(item)
-            list_widget.setItemWidget(item, row)
+            combo.addItem(Path(project_path).name, entry)
+            index = combo.count() - 1
+            combo.setItemData(index, date_text.replace("_", " ")[:16], DATE_ROLE)
+            combo.setItemData(index, project_path, PATH_ROLE)
+            combo.setItemData(index, project_path, QtCore.Qt.ItemDataRole.ToolTipRole)
             if project_path == self.app.project_path and self.app.project_path != "":
-                current_item = item
-        if current_item is not None:
-            list_widget.setCurrentItem(current_item)
-        self.elide_recent_project_paths()
+                current_index = index
+        combo.setCurrentIndex(current_index)
+        combo.setToolTip(self.app.project_path if current_index >= 0 else
+                         _("Choose a recently opened project to open it"))
+        combo.blockSignals(False)
+        self.update_project_summary_panel()
 
-    def elide_recent_project_paths(self):
-        """Elide long names and paths in the recent projects list to the available width."""
+    def open_recent_project_from_combo(self, index):
+        """Open the project chosen in the recent projects drop-down."""
 
-        list_widget = self.ui.listWidget_recent_projects
-        available = list_widget.viewport().width() - 24
-        if available <= 0:
+        combo = self.ui.comboBox_recent_projects
+        project_path = combo.itemData(index, PATH_ROLE)
+        if project_path and project_path != self.app.project_path:
+            self.open_project(combo.itemData(index))
+        # Show the project that is really open, also if opening was cancelled
+        self.fill_recent_projects_list()
+
+    def connect_project_summary_events(self):
+        """Listen to database changes of the current App (new_project replaces the App)."""
+
+        events = getattr(self.app, "project_events", None)
+        if events is None or events is self.project_summary_events:
             return
-        for i in range(list_widget.count()):
-            row = list_widget.itemWidget(list_widget.item(i))
-            if row is None:
-                continue
-            labels = [label for label in row.findChildren(QtWidgets.QLabel) if label.property("full_text")]
-            date_width = 0
-            for label in row.findChildren(QtWidgets.QLabel):
-                if not label.property("full_text") and label.text():
-                    date_width = label.sizeHint().width() + 8
-            for label in labels:
-                mode = QtCore.Qt.TextElideMode(label.property("elide_mode"))
-                width = available - date_width if mode == QtCore.Qt.TextElideMode.ElideRight else available
-                label.setText(label.fontMetrics().elidedText(label.property("full_text"), mode, max(40, width)))
+        if self.project_summary_events is not None:
+            try:
+                self.project_summary_events.project_data_changed.disconnect(self.schedule_project_summary_update)
+            except (TypeError, RuntimeError):
+                pass
+        events.project_data_changed.connect(self.schedule_project_summary_update)
+        self.project_summary_events = events
 
-    def open_recent_project_from_list(self, item):
-        """Open the project activated (double-click or Enter) in the recent projects list."""
+    def schedule_project_summary_update(self, *args):
+        """Refresh the project contents shortly after a change, grouping bursts of changes."""
 
-        entry = item.data(QtCore.Qt.ItemDataRole.UserRole)
-        if entry:
-            self.open_project(entry)
+        timer = getattr(self, "project_summary_timer", None)
+        if timer is not None:
+            timer.start()
+
+    def open_coding_for_file_type(self, file_type):
+        """Open the coding workspace for a file type chosen in the project contents box."""
+
+        actions = {
+            "text": self.ui.actionCodes,
+            "pdf": self.ui.actionCode_pdf,
+            "image": self.ui.actionCode_image,
+            "av": self.ui.actionCode_audio_video,
+        }
+        action = actions.get(file_type)
+        if action is not None:
+            action.trigger()
+
+    def build_project_summary_tiles(self):
+        """Create the count tiles of the project contents box once; refreshes only change the numbers."""
+
+        # Tiles with a menu action open that manager when clicked
+        specs = [
+            ("files", "mdi6.file-multiple-outline", _("Files"), self.ui.actionManage_files, _("Open the file manager")),
+            ("cases", "mdi6.briefcase-outline", _("Cases"), self.ui.actionManage_cases, _("Open the case manager")),
+            ("codes", "mdi6.tag-outline", _("Codes"), None, ""),
+            ("categories", "mdi6.tag-multiple-outline", _("Categories"), None, ""),
+            ("attributes", "mdi6.variable", _("Attributes"), self.ui.actionManage_attributes,
+             _("Open the attribute manager")),
+            ("journals", "mdi6.notebook-outline", _("Journals"), self.ui.actionManage_journals,
+             _("Open the journals")),
+        ]
+        self.project_summary_tiles = {}
+        for position, (key, icon_name, caption, action, tooltip) in enumerate(specs):
+            tile = QtWidgets.QFrame(self.ui.frame_project_summary)
+            tile.setProperty("summary_tile", True)
+            tile.setProperty("clickable", action is not None)
+            if action is not None:
+                tile.setToolTip(tooltip)
+                tile.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+                tile.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+                tile.installEventFilter(self)
+                # Same click and keyboard handling as the New and Open project cards
+                self.project_cards[tile] = action.trigger
+            tile_layout = QtWidgets.QHBoxLayout(tile)
+            tile_layout.setContentsMargins(8, 6, 8, 6)
+            tile_layout.setSpacing(8)
+            icon_label = QtWidgets.QLabel(tile)
+            tile_layout.addWidget(icon_label)
+            text_layout = QtWidgets.QVBoxLayout()
+            text_layout.setSpacing(0)
+            value_label = QtWidgets.QLabel("0", tile)
+            caption_label = QtWidgets.QLabel(caption, tile)
+            text_layout.addWidget(value_label)
+            text_layout.addWidget(caption_label)
+            tile_layout.addLayout(text_layout, 1)
+            for child in (icon_label, value_label, caption_label):
+                child.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+            self.ui.gridLayout_project_summary.addWidget(tile, position // 2, position % 2)
+            self.project_summary_tiles[key] = {"tile": tile, "icon": icon_label, "icon_name": icon_name,
+                                               "value": value_label, "caption": caption_label,
+                                               "caption_text": caption}
+
+    def style_project_summary_tiles(self):
+        """Apply theme colours and the font size to the project contents tiles."""
+
+        tiles = getattr(self, "project_summary_tiles", None)
+        if not tiles:
+            return
+        colors = self.project_panel_colors
+        # Font through the stylesheet: the window font stylesheet would override setFont
+        value_size = int(self.app.settings['fontsize']) + 3
+        for tile in tiles.values():
+            try:
+                tile["icon"].setPixmap(qta.icon(tile["icon_name"], color=colors.get("highlight")).pixmap(20, 20))
+            except Exception as err:
+                logger.debug(str(err))
+            tile["value"].setStyleSheet(
+                f"color: {colors.get('text')}; font-size: {value_size}pt; font-weight: bold;")
+            tile["caption"].setStyleSheet(f"color: {colors.get('secondary')};")
+
+    def update_project_summary_panel(self):
+        """Show counts of files, cases, codes and more for the open project in the Project tab."""
+
+        tiles = getattr(self, "project_summary_tiles", None)
+        if not tiles:
+            return
+        if hasattr(self, "project_summary_events"):
+            self.connect_project_summary_events()
+        project_open = self.app.conn is not None
+        counts = {}
+        bad_links = []
+        text_files = pdf_files = image_files = av_files = 0
+        if project_open:
+            try:
+                cur = self.app.conn.cursor()
+                for key, sql in (("cases", "select count(caseid) from cases"),
+                                 ("categories", "select count(catid) from code_cat"),
+                                 ("codes", "select count(cid) from code_name"),
+                                 ("attributes", "select count(name) from attribute_type"),
+                                 ("journals", "select count(jid) from journal")):
+                    cur.execute(sql)
+                    counts[key] = cur.fetchone()[0]
+                pdf_files = len(self.app.get_pdf_filenames())
+                text_files = len(self.app.get_text_filenames()) - pdf_files  # Text list includes PDFs
+                image_files = len(self.app.get_image_filenames())
+                av_files = len(self.app.get_av_filenames())
+                counts["files"] = text_files + pdf_files + image_files + av_files
+                bad_links = self.app.check_bad_file_links()
+            except Exception as err:  # e.g. database closed while the timer was waiting
+                logger.debug(str(err))
+                project_open = False
+        self.ui.label_project_summary_empty.setVisible(not project_open)
+        self.ui.label_project_summary_files.setVisible(project_open)
+        self.ui.label_project_summary_warning.setVisible(project_open and bool(bad_links))
+        for key, tile in tiles.items():
+            tile["tile"].setVisible(project_open)
+            value = counts.get(key, 0)
+            tile["value"].setText(str(value))
+            tile["tile"].setAccessibleName(f"{tile['caption_text']}: {value}")
+        if not project_open:
+            return
+        # Each file type opens its coding workspace; types without files stay plain text
+        link_color = self.project_panel_colors.get("secondary")
+        parts = []
+        for link, caption, count in (("text", _("Text"), text_files), ("pdf", _("PDF"), pdf_files),
+                                     ("image", _("Images"), image_files), ("av", _("Audio/video"), av_files)):
+            if count:
+                parts.append(f'<a href="{link}" style="color: {link_color};">{caption}: {count}</a>')
+            else:
+                parts.append(f"{caption}: {count}")
+        self.ui.label_project_summary_files.setText(", ".join(parts))
+        if bad_links:
+            self.ui.label_project_summary_warning.setText(
+                _("Linked files not found: {0}.").format(len(bad_links)) +
+                f' <a href="bad_links" style="color: #d9534f;">{_("Manage links")}</a>')
 
     def eventFilter(self, watched, event):
-        """Make the project cards clickable and keep the recent projects list elided."""
+        """Make the project cards clickable."""
 
         handler = self.project_cards.get(watched)
         if handler is not None:
@@ -1225,10 +1390,6 @@ Click "Yes" to start now.')
                 if event.key() in (QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter, QtCore.Qt.Key.Key_Space):
                     handler()
                     return True
-        elif (hasattr(self.ui, "listWidget_recent_projects")
-              and watched is self.ui.listWidget_recent_projects.viewport()
-              and event.type() == QtCore.QEvent.Type.Resize):
-            self.elide_recent_project_paths()
         return super().eventFilter(watched, event)
 
     def set_action_log_visible(self, visible, persist=True):
@@ -1877,36 +2038,40 @@ Click "Yes" to start now.')
         sidebar_mode = self.app.settings.get('ai_chat_sidebar', 'False') == 'True'
         self.set_ai_chat_sidebar_mode(sidebar_mode, persist=False)
 
-    def _setup_ai_chat_tab_sidebar_button(self):
-        """Add a small button in the AI chat tab to move the chat into sidebar view."""
+    def _setup_ai_chat_tab_sidebar_button(self, rail_mode=False):
+        """Add a small button in the AI chat tab to move the chat into sidebar view.
+
+        In the left icon column the button goes under the icon, otherwise beside the title.
+        """
 
         tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
         if tab_index < 0:
             return
         tab_bar = self.ui.tabWidget.tabBar()
-        tab_label = QtWidgets.QWidget(tab_bar)
-        tab_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        tab_label.setStyleSheet("QWidget {background-color: transparent; border: none;}")
-        tab_label_layout = QtWidgets.QHBoxLayout(tab_label)
-        tab_label_layout.setContentsMargins(0, 0, 0, 0)
-        tab_label_layout.setSpacing(4)
-        icon_label = QtWidgets.QLabel(tab_label)
-        icon_label.setStyleSheet("background-color: transparent; border: none;")
-        icon = tab_bar.tabIcon(tab_index)
-        if not icon.isNull():
-            icon_label.setPixmap(icon.pixmap(16, 16))
-            tab_label_layout.addWidget(icon_label)
-        text_label = QtWidgets.QLabel(_('AI Agent'), tab_label)
-        text_label.setStyleSheet("background-color: transparent; border: none;")
-        tab_label_layout.addWidget(text_label)
-        tab_label_layout.addStretch()
-        tab_bar.setTabText(tab_index, "")
-        tab_bar.setTabIcon(tab_index, QtGui.QIcon())
-        tab_bar.setTabToolTip(tab_index, _('AI Agent'))
-        tab_bar.setTabButton(
-            tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, tab_label
-        )
-        self.ai_chat_tab_label = tab_label
+        if not rail_mode:
+            tab_label = QtWidgets.QWidget(tab_bar)
+            tab_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+            tab_label.setStyleSheet("QWidget {background-color: transparent; border: none;}")
+            tab_label_layout = QtWidgets.QHBoxLayout(tab_label)
+            tab_label_layout.setContentsMargins(0, 0, 0, 0)
+            tab_label_layout.setSpacing(4)
+            icon_label = QtWidgets.QLabel(tab_label)
+            icon_label.setStyleSheet("background-color: transparent; border: none;")
+            icon = tab_bar.tabIcon(tab_index)
+            if not icon.isNull():
+                icon_label.setPixmap(icon.pixmap(16, 16))
+                tab_label_layout.addWidget(icon_label)
+            text_label = QtWidgets.QLabel(_('AI Agent'), tab_label)
+            text_label.setStyleSheet("background-color: transparent; border: none;")
+            tab_label_layout.addWidget(text_label)
+            tab_label_layout.addStretch()
+            tab_bar.setTabText(tab_index, "")
+            tab_bar.setTabIcon(tab_index, QtGui.QIcon())
+            tab_bar.setTabToolTip(tab_index, _('AI Agent'))
+            tab_bar.setTabButton(
+                tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, tab_label
+            )
+            self.ai_chat_tab_label = tab_label
         button = QtWidgets.QToolButton(tab_bar)
         button.setAutoRaise(True)
         button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
@@ -1915,8 +2080,8 @@ Click "Yes" to start now.')
         button.setFixedSize(16, 16)
         button.setStyleSheet(
             "QToolButton {background-color: transparent; border: none; padding: 0px;}"
-            "QToolButton:hover {background-color: transparent; border: 1px solid #8a8a8a;}"
-            "QToolButton:pressed {background-color: transparent; border: 1px solid #707070;}"
+            "QToolButton:hover {background-color: transparent; border: 1px solid #8a8a8a; border-radius: 3px;}"
+            "QToolButton:pressed {background-color: transparent; border: 1px solid #707070; border-radius: 3px;}"
         )
         icon_color = tab_bar.tabTextColor(tab_index)
         if not icon_color.isValid():
@@ -1929,39 +2094,41 @@ Click "Yes" to start now.')
         button.clicked.connect(self.open_ai_chat_sidebar_from_tab_button)
 
         self.ai_chat_tab_sidebar_button = button
-        tab_bar.setTabButton(
-            tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, button
-        )
+        if rail_mode:
+            self.main_tab_rail.attach_button_below_icon(self.ui.tab_ai_agent, button)
+        else:
+            tab_bar.setTabButton(tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, button)
         self._sync_ai_chat_tab_widget_visibility()
 
     def apply_main_tabs_position(self):
         """Show the main tabs on top or as an icon-only column on the left, as chosen in Settings."""
 
-        if self.app.settings.get('main_tabs_position', 'top') == 'left':
-            self._remove_ai_chat_tab_label()
-            self.main_tab_rail.set_enabled(True)
-        else:
-            self.main_tab_rail.set_enabled(False)
-            if self.ai_chat_tab_label is None:
-                self._setup_ai_chat_tab_sidebar_button()
+        left = self.app.settings.get('main_tabs_position', 'top') == 'left'
+        self._remove_ai_chat_tab_widgets()
+        self.main_tab_rail.set_enabled(left)
+        self._setup_ai_chat_tab_sidebar_button(rail_mode=left)
 
-    def _remove_ai_chat_tab_label(self):
-        """Put back the plain AI Agent tab, without the custom label and sidebar button."""
+    def _remove_ai_chat_tab_widgets(self):
+        """Take the custom label and sidebar button off the AI Agent tab."""
 
         tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
-        if self.ai_chat_tab_label is None or tab_index < 0:
+        if tab_index < 0:
             return
         tab_bar = self.ui.tabWidget.tabBar()
+        self.main_tab_rail.detach_button_below_icon(self.ui.tab_ai_agent)
         tab_bar.setTabButton(tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, None)
         tab_bar.setTabButton(tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, None)
+        had_label = self.ai_chat_tab_label is not None
         for widget in (self.ai_chat_tab_label, self.ai_chat_tab_sidebar_button):
             if widget is not None:
                 widget.deleteLater()
         self.ai_chat_tab_label = None
         self.ai_chat_tab_sidebar_button = None
-        tab_bar.setTabText(tab_index, _('AI Agent'))
-        tab_bar.setTabIcon(tab_index, self.ai_tab_icon)
-        tab_bar.setTabToolTip(tab_index, "")
+        if had_label:
+            # The label replaced the tab title and icon, so put them back
+            tab_bar.setTabText(tab_index, _('AI Agent'))
+            tab_bar.setTabIcon(tab_index, self.ai_tab_icon)
+            tab_bar.setTabToolTip(tab_index, "")
 
     def _setup_main_tab_context_menu(self):
         """Offer the AI sidebar switch from a right-click on the AI Agent tab."""
@@ -3314,6 +3481,7 @@ Click "Yes" to start now.')
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         msg += "▔" * 20 + "</p>"
         self.ui.textEdit.append(msg)
+        self.update_project_summary_panel()
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 

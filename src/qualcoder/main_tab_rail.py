@@ -46,6 +46,9 @@ class MainTabRail(QtCore.QObject):
             "stylesheet": self.bar.styleSheet(),
         }
         self.original_tooltips = {}
+        self.original_texts = {}
+        self.buttons_below_icon = {}  # tab page -> (button, spacer)
+        self.button_spacer_height = 6  # extra height that the tab grows by
 
     def set_enabled(self, enabled):
         """Show the rail (True) or the normal top tabs (False)."""
@@ -57,21 +60,32 @@ class MainTabRail(QtCore.QObject):
         if enabled:
             self.original_tooltips = {self.tab_widget.widget(i): self.bar.tabToolTip(i)
                                       for i in range(self.bar.count())}
+            self.original_texts = {self.tab_widget.widget(i): self.bar.tabText(i)
+                                   for i in range(self.bar.count())}
             self.tab_widget.setTabPosition(QtWidgets.QTabWidget.TabPosition.West)
             self.tab_widget.setIconSize(self.rail_icon_size)
             self.bar.setAttribute(QtCore.Qt.WidgetAttribute.WA_Hover, True)
             self.bar.setExpanding(False)
             self.bar.setDrawBase(False)
             self.bar.setUsesScrollButtons(True)
-            # Titles stay as tab text (for screen readers) but are only shown as tooltips
+            # Minimum size only, so a tab with a button (AI Agent) grows to fit it
             self.bar.setStyleSheet(
                 f"QTabBar {{background: transparent; border: none;}}"
-                f"QTabBar::tab {{width: {self.tab_size}px; height: {self.tab_size}px; margin: 0px;"
+                f"QTabBar::tab {{min-width: {self.tab_size}px; min-height: {self.tab_size}px; margin: 0px;"
                 f" padding: 0px; border: none; background: transparent;}}"
             )
-            self.update_tooltips()
+            # Titles move to tooltips and accessible names
+            for index in range(self.bar.count()):
+                title = self.bar.tabText(index).replace("&", "")
+                if title:
+                    self.bar.setTabToolTip(index, title)
+                    if hasattr(self.bar, "setAccessibleTabName"):
+                        self.bar.setAccessibleTabName(index, title)
+                self.bar.setTabText(index, "")
             self.bar.installEventFilter(self)
         else:
+            for page in list(self.buttons_below_icon):
+                self.detach_button_below_icon(page)
             self.bar.removeEventFilter(self)
             self.keyboard_focus = False
             self.bar.setStyleSheet(self.original["stylesheet"])
@@ -81,16 +95,13 @@ class MainTabRail(QtCore.QObject):
             self.bar.setDrawBase(self.original["draw_base"])
             self.bar.setUsesScrollButtons(self.original["scroll_buttons"])
             for index in range(self.bar.count()):
-                self.bar.setTabToolTip(index, self.original_tooltips.get(self.tab_widget.widget(index), ""))
+                widget = self.tab_widget.widget(index)
+                self.bar.setTabToolTip(index, self.original_tooltips.get(widget, ""))
+                if widget in self.original_texts:
+                    self.bar.setTabText(index, self.original_texts[widget])
+                if hasattr(self.bar, "setAccessibleTabName"):
+                    self.bar.setAccessibleTabName(index, "")
         self.bar.update()
-
-    def update_tooltips(self):
-        """Use each tab title as its tooltip."""
-
-        for index in range(self.bar.count()):
-            text = self.bar.tabText(index).replace("&", "")
-            if text:
-                self.bar.setTabToolTip(index, text)
 
     def eventFilter(self, obj, event):
         if obj is self.bar:
@@ -108,6 +119,54 @@ class MainTabRail(QtCore.QObject):
                               QtCore.QEvent.Type.Leave):
                 self.bar.update()
         return super().eventFilter(obj, event)
+
+    def attach_button_below_icon(self, page, button):
+        """Show a small button right under a tab's icon; the tab grows just enough to fit it."""
+
+        index = self.tab_widget.indexOf(page)
+        if index < 0:
+            return
+        self.detach_button_below_icon(page)
+        # An empty tab button reserves the extra height, the real button is placed by hand
+        spacer = QtWidgets.QWidget(self.bar)
+        spacer.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        spacer.setFixedSize(button.width(), self.button_spacer_height)
+        self.bar.setTabButton(index, QtWidgets.QTabBar.ButtonPosition.LeftSide, spacer)
+        button.setParent(self.bar)
+        button.show()
+        button.raise_()
+        self.buttons_below_icon[page] = (button, spacer)
+        self.bar.update()
+
+    def detach_button_below_icon(self, page):
+        """Remove the reserved space added by attach_button_below_icon."""
+
+        entry = self.buttons_below_icon.pop(page, None)
+        if entry is None:
+            return
+        index = self.tab_widget.indexOf(page)
+        if index >= 0:
+            self.bar.setTabButton(index, QtWidgets.QTabBar.ButtonPosition.LeftSide, None)
+        entry[1].deleteLater()
+
+    def icon_and_button_rects(self, index, rect, icon_size):
+        """Icon rect for a tab, plus the rect of its button below the icon if it has one."""
+
+        page = self.tab_widget.widget(index)
+        entry = self.buttons_below_icon.get(page)
+        icon_rect = QtCore.QRect(QtCore.QPoint(0, 0), icon_size)
+        if entry is None:
+            icon_rect.moveCenter(rect.center())
+            return icon_rect, None
+        button = entry[0]
+        # Icon and button stacked and centred together
+        top = rect.top() + (rect.height() - icon_size.height() - button.height()) // 2
+        icon_rect.moveCenter(rect.center())
+        icon_rect.moveTop(top)
+        button_rect = QtCore.QRect(QtCore.QPoint(0, 0), button.size())
+        button_rect.moveCenter(icon_rect.center())
+        button_rect.moveTop(icon_rect.bottom() + 1)
+        return icon_rect, button_rect
 
     def paint_rail(self):
         """Draw upright icons, a soft highlight for the current tab and a hover tint."""
@@ -146,13 +205,16 @@ class MainTabRail(QtCore.QObject):
                 fill.setAlpha(25)
                 painter.setBrush(fill)
                 painter.drawRoundedRect(box, 8, 8)
+            icon_rect, button_rect = self.icon_and_button_rects(index, rect, icon_size)
+            if button_rect is not None:
+                button = self.buttons_below_icon[self.tab_widget.widget(index)][0]
+                if button.geometry() != button_rect:
+                    button.setGeometry(button_rect)
             icon = bar.tabIcon(index)
             if icon.isNull():
                 continue
             mode = QtGui.QIcon.Mode.Normal if bar.isTabEnabled(index) else QtGui.QIcon.Mode.Disabled
             painter.setOpacity(1.0 if index == current else 0.7)
-            icon_rect = QtCore.QRect(QtCore.QPoint(0, 0), icon_size)
-            icon_rect.moveCenter(box.toRect().center())
             icon.paint(painter, icon_rect, QtCore.Qt.AlignmentFlag.AlignCenter, mode)
             painter.setOpacity(1.0)
         painter.end()
