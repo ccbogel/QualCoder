@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_manage_files.ui'
+# Form implementation generated from reading ui file 'ui_dialog_manage_files.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -155,7 +155,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_create.setToolTip(_translate("Dialog_manage_files", "Create a text file"))
         self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "Export selected file.\n"
 "Text files (from any source) are exported from the text stored in the database as .txt files.\n"
-"(You can open the project folder and copy/paste the orignal text file if preferred.)"))
+"(You can open the project folder and copy/paste the original text file if preferred.)"))
         self.pushButton_delete.setToolTip(_translate("Dialog_manage_files", "Select files for deletion"))
         self.pushButton_import.setToolTip(_translate("Dialog_manage_files", "Import file into project folder"))
         self.pushButton_add_attribute.setToolTip(_translate("Dialog_manage_files", "Add attribute"))

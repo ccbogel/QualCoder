@@ -190,20 +190,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Select text files for the comparison subcorpus</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_files">
-      <property name="geometry">
-       <rect>
-        <x>482</x>
-        <y>27</y>
-        <width>280</width>
-        <height>32</height>
-       </rect>
+       <string>Select files for comparison subcorpus.</string>
       </property>
       <property name="text">
        <string>Files: All</string>

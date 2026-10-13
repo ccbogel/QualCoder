@@ -532,7 +532,7 @@ class Ui_Dialog_code_text(object):
         self.comboBox_export.setItemText(5, _translate("Dialog_code_text", "html"))
         self.comboBox_export.setItemText(6, _translate("Dialog_code_text", "codebook"))
         self.pushButton_undo_edit.setToolTip(_translate("Dialog_code_text", "After editing the text:\n"
-"Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect."))
+"Review edited text to confirm code positions are correct. Press button to Undo edited text, if code positions are incorrect."))
         self.pushButton_default_new_code_color.setToolTip(_translate("Dialog_code_text", "Set default colour for new codes"))
         self.pushButton_right_side_pane.setToolTip(_translate("Dialog_code_text", "Show side pane"))
         self.checkBox_auto_regex.setToolTip(_translate("Dialog_code_text", "Apply REGEX to autocoding for exact text and sentences buttons.\n"
