@@ -44,6 +44,7 @@ class MainTabRail(QtCore.QObject):
             "draw_base": self.bar.drawBase(),
             "scroll_buttons": self.bar.usesScrollButtons(),
             "stylesheet": self.bar.styleSheet(),
+            "hover": self.bar.testAttribute(QtCore.Qt.WidgetAttribute.WA_Hover),
         }
         self.original_tooltips = {}
         self.original_texts = {}
@@ -94,6 +95,7 @@ class MainTabRail(QtCore.QObject):
             self.bar.setExpanding(self.original["expanding"])
             self.bar.setDrawBase(self.original["draw_base"])
             self.bar.setUsesScrollButtons(self.original["scroll_buttons"])
+            self.bar.setAttribute(QtCore.Qt.WidgetAttribute.WA_Hover, self.original["hover"])
             for index in range(self.bar.count()):
                 widget = self.tab_widget.widget(index)
                 self.bar.setTabToolTip(index, self.original_tooltips.get(widget, ""))
@@ -135,6 +137,7 @@ class MainTabRail(QtCore.QObject):
         button.setParent(self.bar)
         button.show()
         button.raise_()
+        self.position_button_below_icon(index)
         self.buttons_below_icon[page] = (button, spacer)
         self.bar.update()
 
@@ -147,7 +150,26 @@ class MainTabRail(QtCore.QObject):
         index = self.tab_widget.indexOf(page)
         if index >= 0:
             self.bar.setTabButton(index, QtWidgets.QTabBar.ButtonPosition.LeftSide, None)
+        entry[0].hide()
         entry[1].deleteLater()
+
+    def position_button_below_icon(self, index):
+        """Place a tab's button under its icon; hide it while the tab is scrolled out of view."""
+
+        page = self.tab_widget.widget(index)
+        entry = self.buttons_below_icon.get(page)
+        if entry is None or not self.bar.isTabVisible(index):
+            return
+        rect = self.bar.tabRect(index)
+        if rect.isEmpty():
+            return
+        button = entry[0]
+        button_rect = self.icon_and_button_rects(index, rect, self.tab_widget.iconSize())[1]
+        if button.geometry() != button_rect:
+            button.setGeometry(button_rect)
+        in_view = self.bar.rect().contains(button_rect)
+        if button.isVisibleTo(self.bar) != in_view:
+            button.setVisible(in_view)
 
     def icon_and_button_rects(self, index, rect, icon_size):
         """Icon rect for a tab, plus the rect of its button below the icon if it has one."""
@@ -205,11 +227,8 @@ class MainTabRail(QtCore.QObject):
                 fill.setAlpha(25)
                 painter.setBrush(fill)
                 painter.drawRoundedRect(box, 8, 8)
-            icon_rect, button_rect = self.icon_and_button_rects(index, rect, icon_size)
-            if button_rect is not None:
-                button = self.buttons_below_icon[self.tab_widget.widget(index)][0]
-                if button.geometry() != button_rect:
-                    button.setGeometry(button_rect)
+            icon_rect = self.icon_and_button_rects(index, rect, icon_size)[0]
+            self.position_button_below_icon(index)
             icon = bar.tabIcon(index)
             if icon.isNull():
                 continue

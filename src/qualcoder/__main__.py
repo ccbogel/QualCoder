@@ -25,6 +25,7 @@ https://qualcoder.org/
 import base64
 import datetime
 import gettext
+import html
 import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
@@ -1020,7 +1021,7 @@ Click "Yes" to start now.')
         except Exception as e_:
             logger.log(e_)
         self.ai_tab_icon = self.ui.tabWidget.tabIcon(self.ui.tabWidget.indexOf(self.ui.tab_ai_agent))
-        self.main_tab_rail = MainTabRail(self.ui.tabWidget, self.app.highlight_color)
+        self.main_tab_rail = MainTabRail(self.ui.tabWidget, lambda: self.app.highlight_color())
         self._setup_main_tab_context_menu()
         self.apply_main_tabs_position()
         self.init_project_panel()
@@ -1041,6 +1042,8 @@ Click "Yes" to start now.')
         combo = self.ui.comboBox_recent_projects
         combo.setItemDelegate(RecentProjectDelegate(self.recent_project_colors, combo))
         combo.activated.connect(self.open_recent_project_from_combo)
+        # Wheel and arrow keys on the closed combo must not open another project
+        combo.installEventFilter(self)
         # Own chevron, so the arrow follows the theme colours
         self.recent_projects_arrow = QtWidgets.QLabel(combo)
         self.recent_projects_arrow.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
@@ -1053,16 +1056,17 @@ Click "Yes" to start now.')
         files_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
                                             QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
         files_label.linkActivated.connect(self.open_coding_for_file_type)
-        self.ui.label_project_summary_warning.linkActivated.connect(
-            lambda _link: self.ui.actionManage_bad_links_to_files.trigger())
+        self.ui.label_project_summary_warning.linkActivated.connect(lambda _link: self.manage_bad_file_links())
         # Project contents refresh after database changes and when the Project tab is shown
         self.project_summary_timer = QtCore.QTimer(self)
         self.project_summary_timer.setSingleShot(True)
         self.project_summary_timer.setInterval(300)
         self.project_summary_timer.timeout.connect(self.update_project_summary_panel)
+        self.project_summary_dirty = True
+        self.project_summary_check_links = True
         self.project_summary_events = None
         self.connect_project_summary_events()
-        self.ui.tabWidget.currentChanged.connect(self.schedule_project_summary_update)
+        self.ui.tabWidget.currentChanged.connect(self.project_tab_shown)
         self.ui.pushButton_action_log.toggled.connect(self.set_action_log_visible)
         self.ui.pushButton_settings.clicked.connect(self.change_settings)
         self.ui.pushButton_project_memo.clicked.connect(self.project_memo)
@@ -1210,7 +1214,7 @@ Click "Yes" to start now.')
         combo.setToolTip(self.app.project_path if current_index >= 0 else
                          _("Choose a recently opened project to open it"))
         combo.blockSignals(False)
-        self.update_project_summary_panel()
+        self.request_project_summary_update()
 
     def open_recent_project_from_combo(self, index):
         """Open the project chosen in the recent projects drop-down."""
@@ -1236,12 +1240,34 @@ Click "Yes" to start now.')
         events.project_data_changed.connect(self.schedule_project_summary_update)
         self.project_summary_events = events
 
-    def schedule_project_summary_update(self, *args):
-        """Refresh the project contents shortly after a change, grouping bursts of changes."""
+    def schedule_project_summary_update(self, tables=None, source=None):
+        """React to database changes that alter the counts shown in the project contents box."""
 
-        timer = getattr(self, "project_summary_timer", None)
-        if timer is not None:
-            timer.start()
+        relevant = {"source", "cases", "code_name", "code_cat", "attribute_type", "journal"}
+        if tables is not None and not relevant.intersection(tables):
+            return
+        if tables is not None and "source" in tables:
+            self.project_summary_check_links = True
+        self.request_project_summary_update(check_links=False)
+
+    def request_project_summary_update(self, check_links=True):
+        """Mark the project contents as outdated; refresh soon if the Project tab is showing."""
+
+        if not hasattr(self, "project_summary_timer"):
+            return
+        self.project_summary_dirty = True
+        if check_links:
+            self.project_summary_check_links = True
+        if self.app.conn is None:  # Nothing to query, so clear the box at once
+            self.update_project_summary_panel()
+        elif self.ui.tabWidget.currentWidget() is self.ui.tab_action_log:
+            self.project_summary_timer.start()
+
+    def project_tab_shown(self, index):
+        """Refresh outdated project contents when the Project tab comes into view."""
+
+        if self.ui.tabWidget.widget(index) is self.ui.tab_action_log and self.project_summary_dirty:
+            self.project_summary_timer.start()
 
     def open_coding_for_file_type(self, file_type):
         """Open the coding workspace for a file type chosen in the project contents box."""
@@ -1329,7 +1355,6 @@ Click "Yes" to start now.')
             self.connect_project_summary_events()
         project_open = self.app.conn is not None
         counts = {}
-        bad_links = []
         text_files = pdf_files = image_files = av_files = 0
         if project_open:
             try:
@@ -1346,13 +1371,21 @@ Click "Yes" to start now.')
                 image_files = len(self.app.get_image_filenames())
                 av_files = len(self.app.get_av_filenames())
                 counts["files"] = text_files + pdf_files + image_files + av_files
-                bad_links = self.app.check_bad_file_links()
-            except Exception as err:  # e.g. database closed while the timer was waiting
+                # Checking links touches the disk, so only after file changes, opening or closing
+                if self.project_summary_check_links:
+                    self.project_summary_bad_links = len(self.app.check_bad_file_links())
+                    self.project_summary_check_links = False
+            except Exception as err:  # Database busy or closing: keep the last values
                 logger.debug(str(err))
-                project_open = False
+                return
+        else:
+            self.project_summary_bad_links = 0
+        self.project_summary_dirty = False
+        bad_links = getattr(self, "project_summary_bad_links", 0) if project_open else 0
+        self.ui.actionManage_bad_links_to_files.setEnabled(bool(bad_links))
         self.ui.label_project_summary_empty.setVisible(not project_open)
         self.ui.label_project_summary_files.setVisible(project_open)
-        self.ui.label_project_summary_warning.setVisible(project_open and bool(bad_links))
+        self.ui.label_project_summary_warning.setVisible(bool(bad_links))
         for key, tile in tiles.items():
             tile["tile"].setVisible(project_open)
             value = counts.get(key, 0)
@@ -1365,6 +1398,7 @@ Click "Yes" to start now.')
         parts = []
         for link, caption, count in (("text", _("Text"), text_files), ("pdf", _("PDF"), pdf_files),
                                      ("image", _("Images"), image_files), ("av", _("Audio/video"), av_files)):
+            caption = html.escape(caption)
             if count:
                 parts.append(f'<a href="{link}" style="color: {link_color};">{caption}: {count}</a>')
             else:
@@ -1372,12 +1406,24 @@ Click "Yes" to start now.')
         self.ui.label_project_summary_files.setText(", ".join(parts))
         if bad_links:
             self.ui.label_project_summary_warning.setText(
-                _("Linked files not found: {0}.").format(len(bad_links)) +
-                f' <a href="bad_links" style="color: #d9534f;">{_("Manage links")}</a>')
+                html.escape(_("Linked files not found: {0}.").format(bad_links)) +
+                f' <a href="bad_links" style="color: #d9534f;">{html.escape(_("Manage links"))}</a>')
 
     def eventFilter(self, watched, event):
-        """Make the project cards clickable."""
+        """Make the project cards clickable and keep the recent projects combo from opening projects by accident."""
 
+        if watched is getattr(self.ui, "comboBox_recent_projects", None) and not watched.view().isVisible():
+            event_type = event.type()
+            if event_type == QtCore.QEvent.Type.Wheel:
+                return True
+            if event_type == QtCore.QEvent.Type.KeyPress:
+                navigation_keys = (QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down, QtCore.Qt.Key.Key_PageUp,
+                                   QtCore.Qt.Key.Key_PageDown, QtCore.Qt.Key.Key_Home, QtCore.Qt.Key.Key_End)
+                if event.key() in navigation_keys:
+                    watched.showPopup()
+                    return True
+                if event.text().strip():  # Typing would jump to a matching project and open it
+                    return True
         handler = self.project_cards.get(watched)
         if handler is not None:
             event_type = event.type()
@@ -2146,7 +2192,9 @@ Click "Yes" to start now.')
         menu = QtWidgets.QMenu(self)
         action_sidebar = menu.addAction(_('Move AI Agent to sidebar view'))
         action_sidebar.setEnabled(self.ui.actionAI_Agent_Sidebar.isEnabled())
-        if menu.exec(tab_bar.mapToGlobal(position)) == action_sidebar:
+        chosen = menu.exec(tab_bar.mapToGlobal(position))
+        menu.deleteLater()
+        if chosen == action_sidebar:
             self.open_ai_chat_sidebar_from_tab_button()
 
     def _sync_ai_chat_tab_widget_visibility(self):
@@ -3481,7 +3529,7 @@ Click "Yes" to start now.')
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         msg += "▔" * 20 + "</p>"
         self.ui.textEdit.append(msg)
-        self.update_project_summary_panel()
+        self.request_project_summary_update()
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
