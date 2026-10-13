@@ -91,6 +91,7 @@ from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.information import project_tab_info, manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
 from qualcoder.journals import DialogJournals
+from qualcoder.main_tab_rail import MainTabRail
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
 from qualcoder.manage_references import DialogReferenceManager
@@ -1017,7 +1018,10 @@ Click "Yes" to start now.')
             self.ui.tabWidget.setTabIcon(4, qta.icon('mdi6.message-processing-outline', color=self.app.highlight_color()))  # Ai Chat
         except Exception as e_:
             logger.log(e_)
-        self._setup_ai_chat_tab_sidebar_button()
+        self.ai_tab_icon = self.ui.tabWidget.tabIcon(self.ui.tabWidget.indexOf(self.ui.tab_ai_agent))
+        self.main_tab_rail = MainTabRail(self.ui.tabWidget, self.app.highlight_color)
+        self._setup_main_tab_context_menu()
+        self.apply_main_tabs_position()
         self.init_project_panel()
         self.update_ai_menu_options()
 
@@ -1930,6 +1934,54 @@ Click "Yes" to start now.')
         )
         self._sync_ai_chat_tab_widget_visibility()
 
+    def apply_main_tabs_position(self):
+        """Show the main tabs on top or as an icon-only column on the left, as chosen in Settings."""
+
+        if self.app.settings.get('main_tabs_position', 'top') == 'left':
+            self._remove_ai_chat_tab_label()
+            self.main_tab_rail.set_enabled(True)
+        else:
+            self.main_tab_rail.set_enabled(False)
+            if self.ai_chat_tab_label is None:
+                self._setup_ai_chat_tab_sidebar_button()
+
+    def _remove_ai_chat_tab_label(self):
+        """Put back the plain AI Agent tab, without the custom label and sidebar button."""
+
+        tab_index = self.ui.tabWidget.indexOf(self.ui.tab_ai_agent)
+        if self.ai_chat_tab_label is None or tab_index < 0:
+            return
+        tab_bar = self.ui.tabWidget.tabBar()
+        tab_bar.setTabButton(tab_index, QtWidgets.QTabBar.ButtonPosition.LeftSide, None)
+        tab_bar.setTabButton(tab_index, QtWidgets.QTabBar.ButtonPosition.RightSide, None)
+        for widget in (self.ai_chat_tab_label, self.ai_chat_tab_sidebar_button):
+            if widget is not None:
+                widget.deleteLater()
+        self.ai_chat_tab_label = None
+        self.ai_chat_tab_sidebar_button = None
+        tab_bar.setTabText(tab_index, _('AI Agent'))
+        tab_bar.setTabIcon(tab_index, self.ai_tab_icon)
+        tab_bar.setTabToolTip(tab_index, "")
+
+    def _setup_main_tab_context_menu(self):
+        """Offer the AI sidebar switch from a right-click on the AI Agent tab."""
+
+        tab_bar = self.ui.tabWidget.tabBar()
+        tab_bar.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        tab_bar.customContextMenuRequested.connect(self._main_tab_context_menu)
+
+    def _main_tab_context_menu(self, position):
+        """Show the context menu for the main tab rail."""
+
+        tab_bar = self.ui.tabWidget.tabBar()
+        if self.ui.tabWidget.widget(tab_bar.tabAt(position)) != self.ui.tab_ai_agent:
+            return
+        menu = QtWidgets.QMenu(self)
+        action_sidebar = menu.addAction(_('Move AI Agent to sidebar view'))
+        action_sidebar.setEnabled(self.ui.actionAI_Agent_Sidebar.isEnabled())
+        if menu.exec(tab_bar.mapToGlobal(position)) == action_sidebar:
+            self.open_ai_chat_sidebar_from_tab_button()
+
     def _sync_ai_chat_tab_widget_visibility(self):
         """Keep custom AI tab widgets hidden when the AI tab is hidden."""
 
@@ -2604,6 +2656,7 @@ Click "Yes" to start now.')
         self.setStyleSheet(font)
         self.update_coder_display()
         self.update_placeholder_tab_styles()
+        self.apply_main_tabs_position()
         if self.ai_chat_window is not None:
             self.ai_chat_window.init_styles()
         self.refresh_open_code_display_settings()

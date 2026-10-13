@@ -686,6 +686,22 @@ langauge = it</string>
                </property>
               </widget>
              </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="label_main_tabs">
+               <property name="toolTip">
+                <string>Where the Project, Manage, Coding, Reports and AI Agent tabs are shown</string>
+               </property>
+               <property name="text">
+                <string>Main tabs</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QComboBox" name="comboBox_main_tabs"/>
+             </item>
              <item row="6" column="1">
               <widget class="QLabel" name="label_22">
                <property name="text">

@@ -83,6 +83,7 @@ BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
 STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
 HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
+MAIN_TABS_OPTIONS = ["top", "left"]
 
 
 def _setting_is_true(value: Any) -> bool:
@@ -238,6 +239,10 @@ class DialogSettings(QtWidgets.QDialog):
         for index, style in enumerate(styles):
             if style == self.settings['stylesheet']:
                 self.ui.comboBox_style.setCurrentIndex(index)
+        self.ui.comboBox_main_tabs.addItems([_("Top"), _("Left, icons only")])
+        main_tabs = self.settings.get('main_tabs_position', 'top')
+        if main_tabs in MAIN_TABS_OPTIONS:
+            self.ui.comboBox_main_tabs.setCurrentIndex(MAIN_TABS_OPTIONS.index(main_tabs))
         if self.settings['backup_on_open'] == 'True':
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
@@ -969,6 +974,7 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
+        self.settings['main_tabs_position'] = _combo_choice(self.ui.comboBox_main_tabs, MAIN_TABS_OPTIONS, 'top')
         selected_language = self.get_selected_language_code()
         if self.settings['language'] != selected_language:
             restart_qualcoder = True
