@@ -852,7 +852,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
-        self.ui.label_coders.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 28))
+        self.ui.label_selections.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 28))
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
