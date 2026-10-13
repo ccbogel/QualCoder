@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_report_codings.ui'
+# Form implementation generated from reading ui file 'ui_dialog_report_codings.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -200,7 +200,7 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_text_context.setText(_translate("Dialog_reportCodings", "Text context"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_reportCodings", "Search results for text"))
         self.label_search_results.setText(_translate("Dialog_reportCodings", "Search:"))
-        self.pushButton_search_next.setToolTip(_translate("Dialog_reportCodings", "Search for next occurence in results"))
+        self.pushButton_search_next.setToolTip(_translate("Dialog_reportCodings", "Search for next occurrence in results"))
         self.comboBox_sort.setToolTip(_translate("Dialog_reportCodings", "Code names sort order.\n"
 "Set this before running results."))
         self.comboBox_sort.setItemText(0, _translate("Dialog_reportCodings", "A - z"))

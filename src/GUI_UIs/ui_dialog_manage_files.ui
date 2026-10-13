@@ -154,7 +154,7 @@
       <property name="toolTip">
        <string>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
-(You can open the project folder and copy/paste the orignal text file if preferred.)</string>
+(You can open the project folder and copy/paste the original text file if preferred.)</string>
       </property>
       <property name="text">
        <string/>

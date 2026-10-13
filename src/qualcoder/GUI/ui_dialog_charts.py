@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_charts.ui'
+# Form implementation generated from reading ui file 'ui_dialog_charts.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -336,7 +336,7 @@ class Ui_DialogCharts(object):
         self.lineEdit_height.setToolTip(_translate("DialogCharts", "Image height"))
         self.lineEdit_max_words.setToolTip(_translate("DialogCharts", "Maximum words"))
         self.label_cumulative_bar.setText(_translate("DialogCharts", "Cumulative barchart"))
-        self.pushButton_stopwords.setToolTip(_translate("DialogCharts", "Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. \n"
+        self.pushButton_stopwords.setToolTip(_translate("DialogCharts", "Selecting a text file here will override existing stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. \n"
 "This is temporary and must be selected each time the Charts screen is opened.\n"
 "\n"
 "The file must be plain text with one word per line.\n"

@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_report_file_summary.ui'
+# Form implementation generated from reading ui file 'ui_dialog_report_file_summary.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -67,6 +67,6 @@ class Ui_Dialog_file_summary(object):
         Dialog_file_summary.setWindowTitle(_translate("Dialog_file_summary", "File summary"))
         self.label_search_results.setText(_translate("Dialog_file_summary", "Search:"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_file_summary", "Search results for text"))
-        self.pushButton_search_next.setToolTip(_translate("Dialog_file_summary", "Search for next occurence in results"))
+        self.pushButton_search_next.setToolTip(_translate("Dialog_file_summary", "Search for next occurrence in results"))
         self.label_files.setText(_translate("Dialog_file_summary", "File summary report"))
         self.comboBox_stopwords.setToolTip(_translate("Dialog_file_summary", "Select stopwords list by language"))

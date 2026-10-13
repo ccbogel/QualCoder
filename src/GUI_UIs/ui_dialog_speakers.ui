@@ -236,7 +236,7 @@
    <item>
     <widget class="QTableWidget" name="tableWidget">
      <property name="toolTip">
-      <string>Doubleclick a &quot;code as&quot; name to edit</string>
+      <string>Double-click a &quot;code as&quot; name to edit</string>
      </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>

@@ -203,7 +203,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Select files for comparions subcorpus.</string>
+       <string>Select files for comparison subcorpus.</string>
       </property>
       <property name="text">
        <string>Select Files</string>

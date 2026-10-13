@@ -95,15 +95,5 @@ class Ui_Dialog_reportComparisons(object):
         self.label_selections.setText(_translate("Dialog_reportComparisons", "Coders selected:"))
         self.pushButton_help1.setToolTip(_translate("Dialog_reportComparisons", "Statistics help"))
         self.label_files.setText(_translate("Dialog_reportComparisons", "Files: all text files"))
-        self.pushButton_files.setToolTip(_translate("Dialog_reportComparisons", "Select files for comparions subcorpus."))
+        self.pushButton_files.setToolTip(_translate("Dialog_reportComparisons", "Select files for comparison subcorpus."))
         self.pushButton_files.setText(_translate("Dialog_reportComparisons", "Select Files"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_reportComparisons = QtWidgets.QDialog()
-    ui = Ui_Dialog_reportComparisons()
-    ui.setupUi(Dialog_reportComparisons)
-    Dialog_reportComparisons.show()
-    sys.exit(app.exec())
