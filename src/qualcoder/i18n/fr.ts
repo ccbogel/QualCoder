@@ -250,16 +250,16 @@ Les calculs se font à partir du texte complet.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
-        <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+        <source>Selecting a text file here will override existing stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation>La sélection d’un fichier texte ici remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder. 
-Cette modification est temporaire et doit être sélectionnée à chaque ouverture de l’écran Graphiques.
+        <translation>Si vous sélectionnez un fichier texte ici, cela remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder. 
+Cette modification est temporaire et doit être sélectionnée à chaque fois que l&apos;écran « Charts » est ouvert.
 
 Le fichier doit être au format texte brut, avec un mot par ligne.
-Chaque mot est exclu du nuage de mots n-grams=1.</translation>
+Chaque mot est exclu du nuage de mots « n-grams=1 ».</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -1108,8 +1108,8 @@ Attention : cette action est irréversible.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
-        <source>Search for next occurence in results</source>
-        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+        <source>Search for next occurrence in results</source>
+        <translation>Rechercher la prochaine occurrence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
@@ -1216,7 +1216,7 @@ Classement par nom de fichier et nom de code.</translation>
     <name>Dialog_Coocurrence</name>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-        <source>Code Co-occurence</source>
+        <source>Code Co-occurrence</source>
         <translation>Cooccurrence des codes</translation>
     </message>
     <message>
@@ -1226,7 +1226,7 @@ Classement par nom de fichier et nom de code.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-        <source>Code co-occurence</source>
+        <source>Code co-occurrence</source>
         <translation>Cooccurrence des codes</translation>
     </message>
     <message>
@@ -1266,10 +1266,10 @@ Classement par nom de fichier et nom de code.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-        <source>Export Co-occurence Graph Image
+        <source>Export Co-occurrence Graph Image
 Right-click for format options</source>
-        <translation>Exporter l’image du graphique de cooccurrence
-Clic-droit pour  les options de formatage</translation>
+        <translation>Exporter une image du graphique des co-occurences
+Clic droit pour les options de format</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -2486,8 +2486,8 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
-        <source>Search for next occurence in results</source>
-        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+        <source>Search for next occurrence in results</source>
+        <translation>Searcher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
@@ -2692,9 +2692,9 @@ car toutes les positions assignées peuvent être incorrectes. </translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_code_text.ui" line="0"/>
         <source>After editing the text:
-Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</source>
-        <translation>Après avoir édité le texte:
-Revoir le texte édité pour confirmer que les positions des codes sont correctes. Appuyez sur le bouton pour annuler le texte édité, si les positions des codes sont incorrectes.</translation>
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code positions are incorrect.</source>
+        <translation>Après avoir édité le texte :
+Vérifiez le texte modifié pour vous assurer que les positions du code sont correctes. Appuyez sur le bouton pour annuler les modifications apportées au texte si les positions du code sont incorrectes.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_code_text.ui" line="0"/>
@@ -3048,8 +3048,8 @@ Le positionnement risque de ne pas sajuster correctement. Effectuez une copie de
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
-        <source>Search for next occurence in results</source>
-        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+        <source>Search for next occurrence in results</source>
+        <translation>Searcher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
@@ -3273,10 +3273,10 @@ Cochez Tous les journaux pour rechercher dans tous les journaux</translation>
         <location filename="../../GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
         <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
-(You can open the project folder and copy/paste the orignal text file if preferred.)</source>
+(You can open the project folder and copy/paste the original text file if preferred.)</source>
         <translation>Exporter le fichier sélectionné.
-Les fichiers texte (de toute source) sont exportés à partir du texte stocké dans la base de données sous forme de fichiers .txt.
-(Vous pouvez ouvrir le dossier du projet et copier/coller le fichier texte original si vous le préférez.)</translation>
+Les fichiers texte (quelle que soit leur origine) sont exportés à partir du texte stocké dans la base de données sous forme de fichiers .txt.
+(Vous pouvez ouvrir le dossier du projet et copier-coller le fichier texte d&apos;origine si vous le souhaitez.)</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
@@ -3907,8 +3907,8 @@ Modifiez les paramètres du nombre de caractères et du style d’affichage.</tr
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Search for next occurence in results</source>
-        <translation>Recherche de la prochaine occurrence dans les résultats</translation>
+        <source>Search for next occurrence in results</source>
+        <translation>Chercher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -4074,8 +4074,8 @@ Sélectionner 2 codeur⋅ses, 1 fichier, 1 code.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
-        <source>Select text files for the comparison subcorpus</source>
-        <translation>Sélectionner les fichiers textes pour la comparaison de sous-corpus</translation>
+        <source>Select files for comparison subcorpus.</source>
+        <translation>Sélectionnez les fichiers destinés au sous-corpus de comparaison.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
@@ -4306,15 +4306,15 @@ Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
 To do this update the config.ini  file to another language that is available.
-Find the line begining language =
+Find the line beginning language =
 Then update it. For example:
-langauge = it</source>
-        <translation>Fermez et ouvrez le logiciel pour que le changement de langue se produise.
-Les langues régulièrement mises à jour (par humain et / ou AI) sont: de, es, fr, ja, pt, sv, zh.
-Des langues supplémentaires peuvent être ajoutées si elles sont listées dans le dossier src/qualcoder/i18n.
-Pour cela mettre à jour le fichier config.ini dans une autre langue disponible.
-Trouver la ligne langue de départ =
-Alors mettez-la à jour. Par exemple:
+language = it</source>
+        <translation>Fermez puis rouvrez le logiciel pour que le changement de langue prenne effet.
+Les langues régulièrement mises à jour (par des humains et/ou par l&apos;IA) sont : de, es, fr, ja, pt, sv, zh.
+D&apos;autres langues peuvent être ajoutées si elles figurent dans le dossier src/qualcoder/i18n.
+Pour ce faire, modifiez le fichier config.ini en indiquant une autre langue disponible.
+Recherchez la ligne commençant par language =
+Puis modifiez-la. Par exemple :
 language = it</translation>
     </message>
     <message>
@@ -4436,8 +4436,8 @@ language = it</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
-        <source>Codesstripe view</source>
-        <translation>Vue avec bandes de code</translation>
+        <source>Codes stripe view</source>
+        <translation>Affichage des codes sous forme de bandes</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4541,7 +4541,7 @@ Il s&apos;agit d’une fonctionnalité expérimentale. À utiliser avec prudence
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
-        <source>Authentification:</source>
+        <source>Authentication:</source>
         <translation>Authentification :</translation>
     </message>
     <message>
@@ -4603,8 +4603,8 @@ Il s&apos;agit d’une fonctionnalité expérimentale. À utiliser avec prudence
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
-        <source>Advanced option. Only change when you know whatr you are doing.</source>
-        <translation>Option avancée. Ne modifiez que si vous savez ce que vous faites.</translation>
+        <source>Advanced option. Only change when you know what you are doing.</source>
+        <translation>Option avancée. Ne modifiez ce paramètre que si vous savez exactement ce que vous faites.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4757,8 +4757,8 @@ Il s&apos;agit d’une fonctionnalité expérimentale. À utiliser avec prudence
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_speakers.ui" line="0"/>
-        <source>Doubleclick a &quot;code as&quot; name to edit</source>
-        <translation>Double-cliquez sur un nom &quot;code comme&quot; pour modifier</translation>
+        <source>Double-click a &quot;code as&quot; name to edit</source>
+        <translation>Double-cliquez sur le nom d&apos;un « code comme » pour le modifier</translation>
     </message>
 </context>
 <context>
