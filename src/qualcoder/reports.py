@@ -842,6 +842,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
+        self.ui.pushButton_files.setIcon(qta.icon('mdi6.file-document-multiple-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_files.pressed.connect(self.select_files)
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
@@ -933,7 +934,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.selected_coders = []
         self.selected_file_ids = None
         self.ui.pushButton_run.setEnabled(False)
-        self.ui.label_files.setText(_("Files: all text files"))
+        self.ui.label_files.setText(_("Files: All"))
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:  # while there is an item in the list
@@ -998,10 +999,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.text_data = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
         self.text_data += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
         self.excel_data = []
-        files_description = _("all text files")
+        files_description = _("All")
         if self.selected_file_ids is not None:
-            files_description = ", ".join(self.file_names.get(fid, str(fid)) for fid in self.selected_file_ids)
-        self.text_data += _("Selected files: ") + files_description + "\n"
+            files_description = _("Selected files: ") + ", ".join(
+                self.file_names.get(fid, str(fid)) for fid in self.selected_file_ids)
+        self.text_data += _("Files: ") + files_description + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         row = 0
@@ -1180,14 +1182,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         if selected is None:
             return
         self.selected_file_ids = [s["id"] for s in selected]
-        if len(self.selected_file_ids) == len(self.file_summaries):
-            self.ui.label_files.setText(_("Files: all text files"))
-        elif self.selected_file_ids:
-            names = ", ".join(self.file_names.get(fid, str(fid)) for fid in self.selected_file_ids)
-            self.ui.label_files.setText(_("Files: ") + names)
-        else:
+        if not self.selected_file_ids or len(self.selected_file_ids) == len(self.file_summaries):
             self.selected_file_ids = None
-            self.ui.label_files.setText(_("Files: all text files"))
+            self.ui.label_files.setText(_("Files: All"))
+        else:
+            self.ui.label_files.setText(_("Files: ") + str(len(self.selected_file_ids)))
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
