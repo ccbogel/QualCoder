@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file '/home/qwerty/Bureau/QualCoder/src/GUI_UIs/ui_dialog_report_comparisons.ui'
+# Form implementation generated from reading ui file 'src/GUI_UIs/ui_dialog_report_comparisons.ui'
 #
 # Created by: PyQt6 UI code generator 6.6.1
 #

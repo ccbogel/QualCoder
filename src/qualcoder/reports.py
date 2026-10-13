@@ -35,7 +35,7 @@ from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
-from .GUI.ui_report_comparisons import Ui_Dialog_reportComparisons
+from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from .helpers import Message, ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
 from .information import DialogInformation

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 18:54+0200\n"
+"POT-Creation-Date: 2026-10-13 08:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3459,22 +3459,22 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_exact_matches.py:784
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:758
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:762
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1360
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1364
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1359
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1363
 msgid "Show coded files"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:369
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes_by_segments.py:594
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:752
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1354
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1353
 msgid "Expand names"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_code_summary.py:372
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes_by_segments.py:597
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:755
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1357
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1356
 msgid "Truncate names"
 msgstr ""
 
@@ -4236,6 +4236,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:3176
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:425
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:6174
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1002
 msgid "All"
 msgstr ""
 
@@ -6861,7 +6862,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1352
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_exact_matches.py:616
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_relations.py:870
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:975
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:976
 msgid "Report exported"
 msgstr ""
 
@@ -6923,7 +6924,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_relations.py:129
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_relations.py:211
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:197
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1173
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1175
 msgid "Select files"
 msgstr ""
 
@@ -7031,7 +7032,7 @@ msgid "Text file\n"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:399
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:949
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:950
 msgid "No coders selected"
 msgstr ""
 
@@ -7225,7 +7226,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_relations.py:1178
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:483
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:631
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1261
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1260
 msgid "Code Tree"
 msgstr ""
 
@@ -8038,7 +8039,7 @@ msgid "Select coded area"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3711
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1173
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1175
 msgid "No text files in this project."
 msgstr ""
 
@@ -11892,7 +11893,7 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:305
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:309
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:763
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1365
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1364
 msgid "Expand or collapse branch"
 msgstr ""
 
@@ -13813,7 +13814,8 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:403
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:405
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:491
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1187
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1006
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1189
 msgid "Files: "
 msgstr ""
 
@@ -15515,57 +15517,52 @@ msgstr ""
 msgid "Coding frequencies exported to: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:850
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:851
 msgid "Export Excel"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:936
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1184
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1190
-msgid "Files: all text files"
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:937
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1187
+msgid "Files: All"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:974
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:975
 msgid "Coder comparisons report exported: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:998
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:999
 msgid "CODER COMPARISON"
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:998
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:999
 msgid "Selected coders: "
-msgstr ""
-
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1001
-msgid "all text files"
 msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1004
 msgid "Selected files: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1020
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1022
 msgid "agreement: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1022
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1024
 msgid ", dual coded: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1024
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1026
 msgid ", uncoded: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1026
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1028
 msgid ", disagreement: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1028
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1030
 msgid ", agree coded only: "
 msgstr ""
 
-#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1176
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1178
 msgid "Select files for the comparison subcorpus"
 msgstr ""
 
