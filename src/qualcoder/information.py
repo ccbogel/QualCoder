@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -461,22 +461,25 @@ def project_tab_info():
 
     return _("""# Project
 
-The Project tab is the starting point for your work. Create or open a project with the buttons on the left,
-where you can also change [Settings](qualcoder://menu/project/settings), the [Project Memo](qualcoder://menu/project/project_memo)
-and the current coder name, or use the [Project menu](qualcoder://menu/project). The action log below records what you do during a session.
+The Project tab is the starting point for your work. Create or open a project with the cards on the left,
+and go back to your latest work from the Recent activity list. Everything else is in the [Project menu](qualcoder://menu/project).
+The action log, shown in place of this guide, records what you do during a session.
 
 
-## [Create New Project](qualcoder://menu/project/create_new_project)
+## First steps
+
+1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such as documents, PDFs, images, audio and video.
+2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/manage_cases) and describe them with [attributes](qualcoder://menu/files_and_cases/manage_attributes).
+3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or [audio and video](qualcoder://menu/coding/code_audio_video).
+4. Write your reflections in [journals](qualcoder://menu/files_and_cases/manage_journals) and the [project memo](qualcoder://menu/project/project_memo).
+5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the [AI Agent](qualcoder://menu/ai).
+
+
+## About projects
 
 - A QualCoder project is a folder ending in .qda. It contains the project database and folders for imported documents, images, audio and video.
-- Choose a name and a location, and the project folder is created for you.
+- A dated backup of the project can be made each time it is opened. See the backup options in [Settings](qualcoder://menu/project/settings).
 - [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-Project/)
-
-
-## [Open Project](qualcoder://menu/project/open_project)
-
-- Select an existing .qda project folder. Recently used projects are also listed on the left and in the [Open Recent Project](qualcoder://menu/project/open_recent_project) menu.
-- A dated backup of the project can be made each time it is opened. See the backup options in Settings.
 
 
 ## [Project Memo](qualcoder://menu/project/project_memo)
@@ -487,13 +490,13 @@ and the current coder name, or use the [Project menu](qualcoder://menu/project).
 
 ## [Settings](qualcoder://menu/project/settings)
 
-- Set your coder name, fonts, language, colour style, backups, and the AI integration.
+- Set your coder name, fonts, language, colour style, backups, and the AI integration. Settings and Help are also next to the main tabs.
 - [Help: Settings](qualcoder://help/2.2.-Settings/)
 
 
 ## [Project Summary](qualcoder://menu/project/project_summary)
 
-- Writes an overview of the open project to the action log: files, cases, codes, categories, attributes, journals, and any bad links to files.
+- Writes a detailed overview of the open project to the action log, with files, cases, codes, categories, attributes, journals, and any bad links to files.
 
 
 ## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/project/export)

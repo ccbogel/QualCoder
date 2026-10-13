@@ -49,6 +49,8 @@ class MainTabRail(QtCore.QObject):
         self.original_tooltips = {}
         self.original_texts = {}
         self.buttons_below_icon = {}  # tab page -> (button, spacer)
+        self.footer = None  # widget kept at the bottom of the rail
+        tab_widget.installEventFilter(self)
         self.button_spacer_height = 6  # extra height that the tab grows by
 
     def set_enabled(self, enabled):
@@ -105,7 +107,31 @@ class MainTabRail(QtCore.QObject):
                     self.bar.setAccessibleTabName(index, "")
         self.bar.update()
 
+    def set_footer(self, widget):
+        """Keep a widget (help and settings buttons) at the bottom of the rail; None removes it."""
+
+        if self.footer is not None and self.footer is not widget:
+            self.footer.hide()
+        self.footer = widget
+        if widget is not None:
+            widget.setParent(self.tab_widget)
+        self.place_footer()
+
+    def place_footer(self):
+        """Put the footer under the tabs, at the bottom of the rail column."""
+
+        if self.footer is None or not self.enabled:
+            return
+        hint = self.footer.sizeHint()
+        x = self.bar.x() + max(0, (self.bar.width() - hint.width()) // 2)
+        y = max(self.bar.geometry().bottom() + 8, self.tab_widget.height() - hint.height() - 8)
+        self.footer.setGeometry(x, y, hint.width(), hint.height())
+        self.footer.show()
+        self.footer.raise_()
+
     def eventFilter(self, obj, event):
+        if obj is self.tab_widget and event.type() in (QtCore.QEvent.Type.Resize, QtCore.QEvent.Type.LayoutRequest):
+            self.place_footer()
         if obj is self.bar:
             event_type = event.type()
             if event_type == QtCore.QEvent.Type.Paint:

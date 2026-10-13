@@ -595,7 +595,7 @@ class Ui_Dialog_settings(object):
         self.comboBox_language.setToolTip(_translate("Dialog_settings", "Close and open the software for the change in language to occur.\n"
 "Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.\n"
 "Additional languages can be added if they are listed in the src/qualcoder/i18n folder.\n"
-"To do this update the config.ini file to another language that is available.\n"
+"To do this update the config.ini  file to another language that is available.\n"
 "Find the line beginning language =\n"
 "Then update it. For example:\n"
 "language = it"))
@@ -632,7 +632,7 @@ class Ui_Dialog_settings(object):
         self.checkBox.setToolTip(_translate("Dialog_settings", "Show the identifying numbers for files, cases, codes, et cetera."))
         self.label_5.setToolTip(_translate("Dialog_settings", "Used when entering time position in transcription"))
         self.label_5.setText(_translate("Dialog_settings", "Time format"))
-        self.label_20.setText(_translate("Dialog_settings", "Code stripe view"))
+        self.label_20.setText(_translate("Dialog_settings", "Codes stripe view"))
         self.label_style.setText(_translate("Dialog_settings", "Style"))
         self.label_main_tabs.setToolTip(_translate("Dialog_settings", "Where the Project, Manage, Coding, Reports and AI Agent tabs are shown"))
         self.label_main_tabs.setText(_translate("Dialog_settings", "Main tabs"))

@@ -376,7 +376,7 @@ Not recommended unless you have many large files slowing the backup.</string>
                 <string>Close and open the software for the change in language to occur.
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
-To do this update the config.ini file to another language that is available.
+To do this update the config.ini  file to another language that is available.
 Find the line beginning language =
 Then update it. For example:
 language = it</string>
@@ -669,7 +669,7 @@ language = it</string>
              <item row="5" column="1">
               <widget class="QLabel" name="label_20">
                <property name="text">
-                <string>Code stripe view</string>
+                <string>Codes stripe view</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>

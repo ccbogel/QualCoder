@@ -990,7 +990,7 @@ class App(object):
                 'ai_model_upgrade_offer_pending',
                 'mcp_external_enabled', 'external_mcp_notice_acknowledged', 'mcp_external_port',
                 'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom',
-                'main_tabs_position'
+                'main_tabs_position', 'project_side_panel'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -1044,6 +1044,8 @@ class App(object):
                     settings_data[key] = 80
                 if key == 'main_tabs_position':
                     settings_data[key] = 'top'
+                if key == 'project_side_panel':
+                    settings_data[key] = 'True'
                 if key == 'dialogcodetext_coding_margin_width':
                     settings_data[key] = 100
                 if key == 'dialogcodepdf_coding_margin_width':
@@ -1477,7 +1479,8 @@ class App(object):
             'ai_chat_sidebar': 'False',
             'ai_chat_sidebar_width': 320,
             'ai_chat_splitter_output_bottom': 80,
-            'main_tabs_position': 'top'
+            'main_tabs_position': 'top',
+            'project_side_panel': 'True'
         }
 
     def get_file_texts(self, file_ids: list[int] | None = None):
