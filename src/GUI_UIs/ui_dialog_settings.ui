@@ -377,9 +377,9 @@ Not recommended unless you have many large files slowing the backup.</string>
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
 To do this update the config.ini  file to another language that is available.
-Find the line begining language =
+Find the line beginning language =
 Then update it. For example:
-langauge = it</string>
+language = it</string>
                </property>
               </widget>
              </item>
@@ -669,7 +669,7 @@ langauge = it</string>
              <item row="5" column="1">
               <widget class="QLabel" name="label_20">
                <property name="text">
-                <string>Codesstripe view</string>
+                <string>Codes stripe view</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -944,7 +944,7 @@ This is an experimental feature. Use it with care.</string>
              <item row="6" column="0">
               <widget class="QLabel" name="label_auth">
                <property name="text">
-                <string>Authentification:</string>
+                <string>Authentication:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1156,7 +1156,7 @@ This is an experimental feature. Use it with care.</string>
                 </sizepolicy>
                </property>
                <property name="toolTip">
-                <string>Advanced option. Only change when you know whatr you are doing.</string>
+                <string>Advanced option. Only change when you know what you are doing.</string>
                </property>
                <property name="text">
                 <string>1.0</string>

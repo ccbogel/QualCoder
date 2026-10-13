@@ -348,7 +348,7 @@ Change Settings for number of characters and display style.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Search for next occurence in results</string>
+       <string>Search for next occurrence in results</string>
       </property>
       <property name="text">
        <string/>
