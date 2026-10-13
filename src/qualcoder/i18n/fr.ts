@@ -2487,7 +2487,7 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
         <source>Search for next occurrence in results</source>
-        <translation>Searcher la prochaine occurence dans les résultats</translation>
+        <translation type="unfinished">Rechercher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
@@ -3049,7 +3049,7 @@ Le positionnement risque de ne pas sajuster correctement. Effectuez une copie de
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
         <source>Search for next occurrence in results</source>
-        <translation>Searcher la prochaine occurence dans les résultats</translation>
+        <translation type="unfinished">Rechercher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
