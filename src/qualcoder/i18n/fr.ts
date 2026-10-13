@@ -255,8 +255,8 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation>Si vous sélectionnez un fichier texte ici, cela remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder. 
-Cette modification est temporaire et doit être sélectionnée à chaque fois que l&apos;écran « Charts » est ouvert.
+        <translation type="unfinished">Si vous sélectionnez un fichier texte ici, cela remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder. 
+Cette modification est temporaire et doit être sélectionnée à chaque fois que l&apos;écran « Graphiques » est ouvert.
 
 Le fichier doit être au format texte brut, avec un mot par ligne.
 Chaque mot est exclu du nuage de mots « n-grams=1 ».</translation>
