@@ -33,7 +33,7 @@ Requests are handled by the maintainers by consensus, as described in [`GOVERNAN
 ## 5. Prohibited uses
 
 - Any use that suggests endorsement by the QualCoder project or its maintainers without written agreement.
-- Presenting unofficial binaries as official. Official QualCoder binaries are published **only** on the [GitHub Releases page](https://github.com/ccbogel/QualCoder/releases) and the Codeberg mirror.
+- Presenting unofficial binaries as official. Official QualCoder binaries are published **only** on the [GitHub Releases page](https://github.com/ccbogel/QualCoder/releases) and the [Codeberg mirror](https://codeberg.org/qualcoder).
 - Using the name or logo to imply that the project provides commercial support, hosting, or certification.
 
 ## 6. Future stewardship
