@@ -1735,14 +1735,14 @@ class AiLLM():
 
     def _unsupported_param_from_error(self, err: BaseException) -> str:
         for item in self._exception_chain(err):
-            param_name = str(getattr(item, 'param', '')).strip()
+            param_name = str(getattr(item, 'param', None) or '').strip()
             if param_name != '':
                 return param_name
             body = getattr(item, 'body', None)
             if isinstance(body, dict):
                 error_payload = body.get('error', body)
                 if isinstance(error_payload, dict):
-                    param_name = str(error_payload.get('param', '')).strip()
+                    param_name = str(error_payload.get('param') or '').strip()
                     if param_name != '':
                         return param_name
                     for key in ('message', 'detail'):
@@ -4841,8 +4841,11 @@ class AiLLM():
                         # Success, models were selected. But since the "change_settings" function will start 
                         # a new "init_llm" anyways, we are going to quit here
                         return
-                temp = float(self.app.settings.get('ai_temperature', '1.0'))
-                top_p = float(self.app.settings.get('ai_top_p', '1.0'))
+                sampling_params = {}
+                for setting_name, param_name in (('ai_temperature', 'temperature'), ('ai_top_p', 'top_p')):
+                    setting_value = str(self.app.settings.get(setting_name, '1.0')).strip()
+                    if setting_value != '' and (param_name != 'top_p' or not is_chatgpt_oauth):
+                        sampling_params[param_name] = float(setting_value)
                 timeout = float(self.app.settings.get('ai_timeout', '30.0'))
                 self.app.settings['ai_timeout'] = str(timeout)
                 if api_base.find('azure.com') != -1:  # using Microsoft Azure
@@ -4852,8 +4855,7 @@ class AiLLM():
                         'azure_deployment': large_model,    
                         'api_version': '2024-12-01-preview',
                         'api_key': api_key,
-                        'temperature': temp,
-                        'top_p': top_p,
+                        **sampling_params,
                         'max_tokens': None,
                         'timeout': timeout,
                         'max_retries': 2,
@@ -4867,7 +4869,7 @@ class AiLLM():
                     large_llm_params = {
                         'model': large_model,
                         'cache': False,
-                        'temperature': temp,
+                        **sampling_params,
                         'timeout': timeout,
                     }
                     fast_llm_params = large_llm_params.copy()
@@ -4880,16 +4882,16 @@ class AiLLM():
                         # None preserves the client's default URL for blank profiles.
                         'openai_api_base': api_base or None,
                         'cache': False,
-                        'temperature': temp,
-                        'top_p': top_p,
+                        **sampling_params,
                         'streaming': True,
                         'timeout': timeout,
                     }   
                     fast_llm_params = large_llm_params.copy()
                     fast_llm_params['model'] = fast_model
                     
-                if 'reasoning_effort' in curr_model and curr_model['reasoning_effort'] in ['low', 'medium', 'high']:
-                    large_llm_params['reasoning_effort'] = curr_model['reasoning_effort']
+                reasoning_effort = str(curr_model.get('reasoning_effort') or '').strip()
+                if reasoning_effort not in ('', 'default'):
+                    large_llm_params['reasoning_effort'] = reasoning_effort
                 
                 if large_model.lower().find('claude') != -1:  # Anthropic
                     # omitting top_p, since Antrhopic does not accept temperature and top_p at the same time

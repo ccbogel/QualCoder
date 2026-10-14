@@ -169,7 +169,9 @@ class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
     def validate(self, text: str, pos: int):
         state, text, pos = super().validate(text, pos)
         normalized = text.strip().replace(',', '.')
-        if normalized in ('', '.', '-', '-.', '+', '+.'):
+        if normalized == '':
+            return QtGui.QValidator.State.Acceptable, text, pos
+        if normalized in ('.', '-', '-.', '+', '+.'):
             return QtGui.QValidator.State.Intermediate, text, pos
         try:
             value = float(normalized)
@@ -316,7 +318,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_top_p.setText(self.settings.get('ai_top_p', '1.0'))
         self.ui.lineEdit_top_p.setValidator(self._create_ai_float_validator(0.0, 1.0))
         self.ui.lineEdit_top_p.editingFinished.connect(self.validate_ai_top_p)
-        self.ui.comboBox_reasoning.currentIndexChanged.connect(self.ai_model_parameters_changed)
+        self.ui.comboBox_reasoning.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.lineEdit_ai_api_base.editingFinished.connect(self.ai_api_base_changed)
         self.ui.pushButton_ai_new_profile.clicked.connect(self.new_ai_profile)
         
@@ -702,8 +704,7 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ui.comboBox_ai_profile.setCurrentText = new_name
         
     def ai_model_parameters_changed(self):
-        """Called if the selected large or fast model has changed or if one of the 
-        context window numbers has been altered."""
+        """Save changes to model names, context windows, and reasoning effort."""
         ai_model_index = int(self.settings['ai_model_index'])
         if 0 <= ai_model_index < len(self.ai_models):
             self.ai_models[ai_model_index]['large_model'] = self.ui.comboBox_AI_model_large.currentText()
@@ -716,7 +717,7 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ai_models[ai_model_index]['fast_model_context_window'] = self.ui.lineEdit_ai_fast_context_window.text()
             else:
                 self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default
-            self.ai_models[ai_model_index]['reasoning_effort'] = self.ui.comboBox_reasoning.currentText()        
+            self.ai_models[ai_model_index]['reasoning_effort'] = self.ui.comboBox_reasoning.currentText().strip()
 
     def validate_ai_api_key(self, api_key: str, focus_field: bool = False) -> bool:
         """Reject API keys that contain non-ASCII characters.
@@ -815,11 +816,11 @@ class DialogSettings(QtWidgets.QDialog):
 
     @staticmethod
     def parse_bounded_float(text: str, minimum: float, maximum: float) -> str:
-        """Normalize a user-entered float and ensure it stays within range."""
+        """Normalize an optional float and ensure nonempty values stay within range."""
 
         normalized = text.strip().replace(',', '.')
         if normalized == '':
-            raise ValueError("empty float value")
+            return ''
         value = float(normalized)
         if not (minimum <= value <= maximum):
             raise ValueError(f"float value {value} outside [{minimum}, {maximum}]")
