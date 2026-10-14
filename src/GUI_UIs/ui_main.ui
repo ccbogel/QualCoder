@@ -38,11 +38,619 @@
        </property>
        <widget class="QWidget" name="tab_action_log">
         <attribute name="title">
-         <string>Action Log</string>
+         <string>Project</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QTextEdit" name="textEdit"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_action_log">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <item>
+          <widget class="QFrame" name="frame_project_panel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Plain</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_project_panel" stretch="0,0,0,0,1">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_project_header">
+              <property name="spacing">
+               <number>12</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_project_icon">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_project_title">
+                <property name="text">
+                 <string>Project</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_project_header">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_show_side_panel">
+                <property name="minimumSize">
+                 <size>
+                  <width>28</width>
+                  <height>28</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>28</width>
+                  <height>28</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Show the action log panel</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Show the action log panel</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_project_cards">
+              <property name="spacing">
+               <number>10</number>
+              </property>
+              <item>
+               <widget class="QFrame" name="frame_new_project">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>120</height>
+                 </size>
+                </property>
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Create a new QualCoder project (Ctrl+N)</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Create new project</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_new_project">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>14</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_new_project_icon">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_new_project_title">
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>New project</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_new_project_description">
+                   <property name="text">
+                    <string>Create a new project</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_new_project">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_open_project">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>120</height>
+                 </size>
+                </property>
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Open an existing QualCoder project (Ctrl+O)</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Open project</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_open_project">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>14</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_open_project_icon">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_open_project_title">
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Open project</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_open_project_description">
+                   <property name="text">
+                    <string>Open an existing project</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_open_project">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_recent_projects">
+              <property name="text">
+               <string>Recent projects</string>
+              </property>
+              <property name="buddy">
+               <cstring>comboBox_recent_projects</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_recent_projects">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Choose a recently opened project to open it</string>
+              </property>
+              <property name="accessibleName">
+               <string>Recent projects</string>
+              </property>
+              <property name="maxVisibleItems">
+               <number>10</number>
+              </property>
+              <property name="placeholderText">
+               <string>Choose a recent project</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_activity_contents" stretch="1,1">
+              <property name="spacing">
+               <number>12</number>
+              </property>
+              <item>
+               <widget class="QFrame" name="frame_recent_activity">
+                <property name="accessibleName">
+                 <string>Recent activity</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_recent_activity_frame">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>10</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>12</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_recent_activity">
+                   <property name="text">
+                    <string>Recent activity</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_recent_activity">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_recent_activity_empty">
+                   <property name="text">
+                    <string>Your recent work in this project will appear here.</string>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_recent_activity">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_project_summary">
+                <property name="accessibleName">
+                 <string>Project contents</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_project_summary">
+                 <property name="spacing">
+                  <number>8</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>10</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>12</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_project_summary">
+                   <property name="text">
+                    <string>Project contents</string>
+                   </property>
+                   <property name="margin">
+                    <number>0</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_project_summary">
+                   <property name="horizontalSpacing">
+                    <number>8</number>
+                   </property>
+                   <property name="verticalSpacing">
+                    <number>8</number>
+                   </property>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_project_summary_files">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_project_summary_warning">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_project_summary_empty">
+                   <property name="text">
+                    <string>No project open. Its contents will appear here.</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_project_summary">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_log_panel">
+           <property name="frameShape">
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_log_panel">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_log_header">
+              <item>
+               <widget class="QPushButton" name="pushButton_hide_side_panel">
+                <property name="minimumSize">
+                 <size>
+                  <width>28</width>
+                  <height>28</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>28</width>
+                  <height>28</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Hide the action log panel</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Hide the action log panel</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_log_title">
+                <property name="text">
+                 <string>Action log</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_log_header">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_action_log">
+                <property name="minimumSize">
+                 <size>
+                  <width>28</width>
+                  <height>28</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>28</width>
+                  <height>28</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Show or hide the action log</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Show or hide the action log</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QStackedWidget" name="stackedWidget_project">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QTextBrowser" name="textBrowser_project">
+               <property name="plainText">
+                <string>Select an option from the Project menu</string>
+               </property>
+               <property name="openExternalLinks">
+                <bool>true</bool>
+               </property>
+              </widget>
+              <widget class="QTextEdit" name="textEdit">
+               <property name="accessibleName">
+                <string>Action log</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>

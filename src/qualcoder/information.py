@@ -14,7 +14,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
 
-Author: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
+Authors: Colin Curtain C, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
@@ -455,6 +455,63 @@ Ctrl + Enter {_("Run SQL query")}<br />'
 coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts
 coding_shortcuts_display += coding_image_shortcuts + coding_av_shortcuts + code_tree_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
+
+def project_tab_info():
+    """Return translated Markdown for the Project tab placeholder."""
+
+    return _("""# Project
+
+The Project tab is the starting point for your work. Create or open a project with the cards on the left,
+and go back to your latest work from the Recent activity list. Everything else is in the [Project menu](qualcoder://menu/project).
+The action log, shown in place of this guide, records what you do during a session.
+
+
+## First steps
+
+1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such as documents, PDFs, images, audio and video.
+2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/manage_cases) and describe them with [attributes](qualcoder://menu/files_and_cases/manage_attributes).
+3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or [audio and video](qualcoder://menu/coding/code_audio_video).
+4. Write your reflections in [journals](qualcoder://menu/files_and_cases/manage_journals) and the [project memo](qualcoder://menu/project/project_memo).
+5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the [AI Agent](qualcoder://menu/ai).
+
+
+## About projects
+
+- A QualCoder project is a folder ending in .qda. It contains the project database and folders for imported documents, images, audio and video.
+- A dated backup of the project can be made each time it is opened. See the backup options in [Settings](qualcoder://menu/project/settings).
+- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-Project/)
+
+
+## [Project Memo](qualcoder://menu/project/project_memo)
+
+- Describe the research topic, questions, methodology, and the participants and data collected.
+- The AI agent reads this memo to understand the context of your project.
+
+
+## [Settings](qualcoder://menu/project/settings)
+
+- Set your coder name, fonts, language, colour style, backups, and the AI integration. Settings and Help are also next to the main tabs.
+- [Help: Settings](qualcoder://help/2.2.-Settings/)
+
+
+## [Project Summary](qualcoder://menu/project/project_summary)
+
+- Writes a detailed overview of the open project to the action log, with files, cases, codes, categories, attributes, journals, and any bad links to files.
+
+
+## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/project/export)
+
+- Exchange projects and codebooks with other software through the REFI-QDA standard.
+- Import RQDA, Taguette and Sonal projects, or a plain text list of codes.
+- Export the codebook as an ODT file, with or without memos.
+- [Help: Imports and exports](qualcoder://help/6.1.-Imports-and-Exports/)
+
+
+## [Close Project](qualcoder://menu/project/close_project)
+
+- Closes the open project. Workspaces with unsaved changes are checked first, and a backup made on opening is removed if nothing changed.
+""")
+
 
 def manage_tab_info():
     """Return translated Markdown for the Manage tab placeholder."""

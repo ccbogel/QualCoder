@@ -272,15 +272,28 @@ class App(object):
 
         if new_path == "":
             return
-        nowdate = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
+        date_format = "%Y-%m-%d_%H:%M:%S"
+        now = datetime.datetime.now().astimezone().replace(microsecond=0, tzinfo=None)
         # Result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
         result = self.read_previous_project_paths()
-        dated_path = nowdate + "|" + new_path
         # The path is the last '|' field; legacy lines are bare paths without a date.
         # Remove any existing entry for this project and re-add it with a fresh date.
         # Previously, a legacy-format line at result[0] (no '|') silently skipped the
         # append forever, so new projects were never saved to the recent list.
         result = [line for line in result if line.split("|")[-1] != new_path]
+        # Entries are ordered by their date string, so the new one must be strictly newer
+        # than every other entry. Closing one project and opening another within the same
+        # second would otherwise tie and fall back to alphabetical order.
+        for line in result:
+            date_text = line.split("|", maxsplit=1)[0] if "|" in line else ""
+            try:
+                latest = datetime.datetime.strptime(date_text, date_format)
+            except ValueError:
+                continue
+            if latest >= now:
+                now = latest + datetime.timedelta(seconds=1)
+        nowdate = now.strftime(date_format)
+        dated_path = nowdate + "|" + new_path
         result.append(dated_path)
         result.sort()
         if len(result) > 8:
@@ -977,7 +990,8 @@ class App(object):
                 'ai_permissions', 'ai_extended_logging', 'ai_model_upgrade_offers_seen',
                 'ai_model_upgrade_offer_pending',
                 'mcp_external_enabled', 'external_mcp_notice_acknowledged', 'mcp_external_port',
-                'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom'
+                'ai_chat_sidebar_width', 'ai_chat_splitter_output_bottom',
+                'main_tabs_position', 'project_side_panel'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -1029,6 +1043,10 @@ class App(object):
                     settings_data[key] = 320
                 if key == 'ai_chat_splitter_output_bottom':
                     settings_data[key] = 80
+                if key == 'main_tabs_position':
+                    settings_data[key] = 'top'
+                if key == 'project_side_panel':
+                    settings_data[key] = 'True'
                 if key == 'dialogcodetext_coding_margin_width':
                     settings_data[key] = 100
                 if key == 'dialogcodepdf_coding_margin_width':
@@ -1461,7 +1479,9 @@ class App(object):
             'mcp_external_port': 47363,
             'ai_chat_sidebar': 'False',
             'ai_chat_sidebar_width': 320,
-            'ai_chat_splitter_output_bottom': 80
+            'ai_chat_splitter_output_bottom': 80,
+            'main_tabs_position': 'top',
+            'project_side_panel': 'True'
         }
 
     def get_file_texts(self, file_ids: list[int] | None = None):
