@@ -1735,14 +1735,14 @@ class AiLLM():
 
     def _unsupported_param_from_error(self, err: BaseException) -> str:
         for item in self._exception_chain(err):
-            param_name = str(getattr(item, 'param', '')).strip()
+            param_name = str(getattr(item, 'param', None) or '').strip()
             if param_name != '':
                 return param_name
             body = getattr(item, 'body', None)
             if isinstance(body, dict):
                 error_payload = body.get('error', body)
                 if isinstance(error_payload, dict):
-                    param_name = str(error_payload.get('param', '')).strip()
+                    param_name = str(error_payload.get('param') or '').strip()
                     if param_name != '':
                         return param_name
                     for key in ('message', 'detail'):
