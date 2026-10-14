@@ -168,7 +168,9 @@ class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
     def validate(self, text: str, pos: int):
         state, text, pos = super().validate(text, pos)
         normalized = text.strip().replace(',', '.')
-        if normalized in ('', '.', '-', '-.', '+', '+.'):
+        if normalized == '':
+            return QtGui.QValidator.State.Acceptable, text, pos
+        if normalized in ('.', '-', '-.', '+', '+.'):
             return QtGui.QValidator.State.Intermediate, text, pos
         try:
             value = float(normalized)
@@ -809,11 +811,11 @@ class DialogSettings(QtWidgets.QDialog):
 
     @staticmethod
     def parse_bounded_float(text: str, minimum: float, maximum: float) -> str:
-        """Normalize a user-entered float and ensure it stays within range."""
+        """Normalize an optional float and ensure nonempty values stay within range."""
 
         normalized = text.strip().replace(',', '.')
         if normalized == '':
-            raise ValueError("empty float value")
+            return ''
         value = float(normalized)
         if not (minimum <= value <= maximum):
             raise ValueError(f"float value {value} outside [{minimum}, {maximum}]")

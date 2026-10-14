@@ -4841,8 +4841,11 @@ class AiLLM():
                         # Success, models were selected. But since the "change_settings" function will start 
                         # a new "init_llm" anyways, we are going to quit here
                         return
-                temp = float(self.app.settings.get('ai_temperature', '1.0'))
-                top_p = float(self.app.settings.get('ai_top_p', '1.0'))
+                sampling_params = {}
+                for setting_name, param_name in (('ai_temperature', 'temperature'), ('ai_top_p', 'top_p')):
+                    setting_value = str(self.app.settings.get(setting_name, '1.0')).strip()
+                    if setting_value != '' and (param_name != 'top_p' or not is_chatgpt_oauth):
+                        sampling_params[param_name] = float(setting_value)
                 timeout = float(self.app.settings.get('ai_timeout', '30.0'))
                 self.app.settings['ai_timeout'] = str(timeout)
                 if api_base.find('azure.com') != -1:  # using Microsoft Azure
@@ -4852,8 +4855,7 @@ class AiLLM():
                         'azure_deployment': large_model,    
                         'api_version': '2024-12-01-preview',
                         'api_key': api_key,
-                        'temperature': temp,
-                        'top_p': top_p,
+                        **sampling_params,
                         'max_tokens': None,
                         'timeout': timeout,
                         'max_retries': 2,
@@ -4867,7 +4869,7 @@ class AiLLM():
                     large_llm_params = {
                         'model': large_model,
                         'cache': False,
-                        'temperature': temp,
+                        **sampling_params,
                         'timeout': timeout,
                     }
                     fast_llm_params = large_llm_params.copy()
@@ -4880,8 +4882,7 @@ class AiLLM():
                         # None preserves the client's default URL for blank profiles.
                         'openai_api_base': api_base or None,
                         'cache': False,
-                        'temperature': temp,
-                        'top_p': top_p,
+                        **sampling_params,
                         'streaming': True,
                         'timeout': timeout,
                     }   
