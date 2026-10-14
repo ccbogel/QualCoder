@@ -456,8 +456,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if ai_runtime_ready(self.app):
             return
-        if not initialize_llm_after_load:
-            self.ai_initialize_llm_after_load = False
+        # Joining an existing load must preserve its initialization intent.
+        # Settings may wait for startup and then be cancelled.
         if self.ai_import_thread is not None and self.ai_import_thread.isRunning():
             return
         if self.app.settings['ai_enable'] != 'True' and not force:
@@ -508,7 +508,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if ai_runtime_ready(self.app):
             return True
-        self.start_ai_background_loading(force=True, initialize_llm_after_load=False)
+        self.start_ai_background_loading(
+            force=True,
+            initialize_llm_after_load=self.app.settings['ai_enable'] == 'True',
+        )
         progress = QtWidgets.QProgressDialog(
             _("Loading AI components..."),
             "",

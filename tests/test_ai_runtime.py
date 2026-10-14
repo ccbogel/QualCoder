@@ -6,6 +6,8 @@ from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from PyQt6 import QtWidgets
+
 from qualcoder.ai_runtime import (
     AI_DISABLED,
     AI_FAILED,
@@ -230,6 +232,91 @@ class TestAiRuntime(TestCase):
 
         self.assertEqual(AI_DISABLED, app.ai_runtime_state)
         self.assertIsNone(window.ai_import_thread)
+
+    def test_joining_background_load_preserves_initialization_intent(self):
+        for original_intent in (True, False):
+            with self.subTest(original_intent=original_intent):
+                window = SimpleNamespace(
+                    app=SimpleNamespace(ai_runtime_state=AI_LOADING),
+                    ai_import_thread=MagicMock(),
+                    ai_initialize_llm_after_load=original_intent,
+                )
+                window.ai_import_thread.isRunning.return_value = True
+
+                MainWindow.start_ai_background_loading(
+                    window, force=True,
+                    initialize_llm_after_load=not original_intent,
+                )
+
+                self.assertEqual(original_intent, window.ai_initialize_llm_after_load)
+
+    def test_cancelled_settings_during_startup_still_initialize_ai(self):
+        for background_started in (True, False):
+            with self.subTest(background_started=background_started):
+                app = SimpleNamespace(
+                    settings={'ai_enable': 'True', 'codername': 'test'},
+                    ai_models=[],
+                    ai=None,
+                    ai_runtime_state=AI_LOADING if background_started else AI_UNLOADED,
+                    write_config_ini=MagicMock(),
+                )
+                import_thread = MagicMock()
+                import_thread.isRunning.return_value = background_started
+                window = SimpleNamespace(
+                    app=app,
+                    ai_import_thread=import_thread if background_started else None,
+                    ai_initialize_llm_after_load=True,
+                    ai_chat_window=SimpleNamespace(),
+                    ui=SimpleNamespace(textEdit=MagicMock()),
+                    _finish_ai_runtime_initialization=MagicMock(),
+                    _ai_runtime_loading_failed=MagicMock(),
+                )
+                window.start_ai_background_loading = lambda **kwargs: (
+                    MainWindow.start_ai_background_loading(window, **kwargs)
+                )
+                window.load_ai_runtime_modal = lambda *args: (
+                    MainWindow.load_ai_runtime_modal(window, *args)
+                )
+                service = MagicMock()
+
+                def create_settings(*args, **kwargs):
+                    self.assertTrue(kwargs['ai_runtime_loader']('AI Settings'))
+                    dialog = MagicMock()
+                    dialog.exec.return_value = QtWidgets.QDialog.DialogCode.Rejected
+                    return dialog
+
+                with patch('qualcoder.__main__.AiImportThread', return_value=import_thread), \
+                        patch('qualcoder.__main__.QtWidgets.QProgressDialog') as progress_class, \
+                        patch('qualcoder.__main__.QtCore.QTimer'), \
+                        patch('qualcoder.ai_llm.AiLLM', return_value=service), \
+                        patch('qualcoder.__main__.DialogSettings', side_effect=create_settings):
+                    progress_class.return_value.exec.side_effect = lambda: (
+                        MainWindow._finish_ai_runtime_initialization(window)
+                    )
+
+                    MainWindow.change_settings(window)
+
+                self.assertEqual(AI_READY, app.ai_runtime_state)
+                service.init_llm.assert_called_once_with(window)
+                window._ai_runtime_loading_failed.assert_not_called()
+
+    def test_modal_loading_disabled_ai_defers_initialization(self):
+        window = SimpleNamespace(
+            app=SimpleNamespace(
+                settings={'ai_enable': 'False'}, ai_runtime_state=AI_DISABLED,
+            ),
+            start_ai_background_loading=MagicMock(),
+        )
+        with patch('qualcoder.__main__.QtWidgets.QProgressDialog') as progress_class, \
+                patch('qualcoder.__main__.QtCore.QTimer'):
+            progress_class.return_value.exec.side_effect = lambda: setattr(
+                window.app, 'ai_runtime_state', AI_READY,
+            )
+            self.assertTrue(MainWindow.load_ai_runtime_modal(window, 'AI Settings'))
+
+        window.start_ai_background_loading.assert_called_once_with(
+            force=True, initialize_llm_after_load=False,
+        )
 
     def test_external_mcp_starts_vectorstore_only_loader(self):
         app = SimpleNamespace(
