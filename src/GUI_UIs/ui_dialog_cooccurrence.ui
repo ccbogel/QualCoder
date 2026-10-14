@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Code Co-occurence</string>
+   <string>Code Co-occurrence</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -65,7 +65,7 @@
        <string>Show the overlapping codes.</string>
       </property>
       <property name="text">
-       <string>Code co-occurence</string>
+       <string>Code co-occurrence</string>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
@@ -277,7 +277,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>Export Co-occurence Graph Image
+       <string>Export Co-occurrence Graph Image
 Right-click for format options</string>
       </property>
       <property name="text">

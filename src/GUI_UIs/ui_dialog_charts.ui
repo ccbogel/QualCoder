@@ -757,7 +757,7 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
    <property name="toolTip">
-    <string>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+    <string>Selecting a text file here will override existing stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.

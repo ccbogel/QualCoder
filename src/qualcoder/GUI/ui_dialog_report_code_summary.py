@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_report_code_summary.ui'
+# Form implementation generated from reading ui file 'ui_dialog_report_code_summary.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -65,7 +65,7 @@ class Ui_Dialog_code_summary(object):
     def retranslateUi(self, Dialog_code_summary):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_summary.setWindowTitle(_translate("Dialog_code_summary", "Code summary"))
-        self.pushButton_search_next.setToolTip(_translate("Dialog_code_summary", "Search for next occurence in results"))
+        self.pushButton_search_next.setToolTip(_translate("Dialog_code_summary", "Search for next occurrence in results"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_code_summary", "Search results for text"))
         self.label_search_results.setText(_translate("Dialog_code_summary", "Search:"))
         self.label_codes.setText(_translate("Dialog_code_summary", "Code summary report"))

@@ -35,7 +35,7 @@ from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
-from .GUI.ui_report_comparisons import Ui_Dialog_reportComparisons
+from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from .helpers import Message, ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
 from .information import DialogInformation
@@ -829,6 +829,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.coders = []
         self.selected_coders = []
         self.file_summaries = []
+        self.file_names = {}
+        self.selected_file_ids = None
         self.codes = []
         self.categories = []
         self.truncated_code_names = True
@@ -840,6 +842,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
+        self.ui.pushButton_files.setIcon(qta.icon('mdi6.file-document-multiple-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_files.pressed.connect(self.select_files)
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
         self.ui.pushButton_clear.setIcon(qta.icon('mdi6.refresh', options=[{'scale_factor': 1.4}]))
@@ -848,7 +852,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
-        self.ui.label_coders.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 28))
+        self.ui.label_selections.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 28))
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
@@ -874,8 +878,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
-        cur.execute("select id, length(fulltext) from source where fulltext is not null")
-        self.file_summaries = cur.fetchall()
+        cur.execute("select id, name, length(fulltext) from source where fulltext is not null")
+        rows = cur.fetchall()
+        self.file_summaries = [(row[0], row[2]) for row in rows]
+        self.file_names = {row[0]: row[1] for row in rows}
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         cur.execute(sql)
         result = cur.fetchall()
@@ -926,7 +932,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         """
 
         self.selected_coders = []
+        self.selected_file_ids = None
         self.ui.pushButton_run.setEnabled(False)
+        self.ui.label_files.setText(_("Files: All"))
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:  # while there is an item in the list
@@ -991,6 +999,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.text_data = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
         self.text_data += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
         self.excel_data = []
+        files_description = _("All")
+        if self.selected_file_ids is not None:
+            files_description = _("Selected files: ") + ", ".join(
+                self.file_names.get(fid, str(fid)) for fid in self.selected_file_ids)
+        self.text_data += _("Files: ") + files_description + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         row = 0
@@ -1053,6 +1066,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
         for f in self.file_summaries:
+            if self.selected_file_ids is not None and f[0] not in self.selected_file_ids:
+                continue
             cur.execute(sql, [f[0], cid, self.selected_coders[0]])
             result0 = cur.fetchall()
             cur.execute(sql, [f[0], cid, self.selected_coders[1]])
@@ -1106,13 +1121,13 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             try:
                 total['agree_coded_only'] = round(100 * total['dual_coded'] / (total['dual_coded'] + total['single_coded']), 2)
             except ZeroDivisionError:
-                total['agree_coded_only'] = "zero div"
+                total['agree_coded_only'] = "n/a"
         else:
-            total['agreement'] = "zero div"
-            total['dual_percent'] = "zero div"
-            total['uncoded_percent'] = "zero div"
-            total['disagreement'] = "zero div"
-            total['agree_coded_only'] = "zero div"
+            total['agreement'] = "n/a"
+            total['dual_percent'] = "n/a"
+            total['uncoded_percent'] = "n/a"
+            total['disagreement'] = "n/a"
+            total['agree_coded_only'] = "n/a"
         # Cohen's Kappa
         '''
         https://en.wikipedia.org/wiki/Cohen%27s_kappa
@@ -1137,7 +1152,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         BELOW IS BETTER - ONLY LOOKS AT PROPORTIONS OF CODED CHARACTERS
         NEED TO CONFIRM THIS IS THE CORRECT APPROACH
         '''
-        total['kappa'] = "zerodiv"
+        total['kappa'] = "n/a"
         try:
             unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
             Po = total['dual_coded'] / unique_codings
@@ -1150,6 +1165,28 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         except ZeroDivisionError:
             pass
         return total
+
+    def select_files(self):
+        """ Select a subcorpus of text files for the comparison statistics.
+        All text files are used when no subcorpus is selected. """
+
+        data = [{"id": f[0], "name": self.file_names.get(f[0], str(f[0]))} for f in self.file_summaries]
+        if not data:
+            Message(self.app, _("Select files"), _("No text files in this project.")).exec()
+            return
+        preselected = self.selected_file_ids if self.selected_file_ids is not None else [d["id"] for d in data]
+        ui = DialogSelectItems(self.app, data, _("Select files for the comparison subcorpus"), "many",
+                               preselected=preselected, with_checkboxes=True)
+        ui.exec()
+        selected = ui.get_selected()
+        if selected is None:
+            return
+        self.selected_file_ids = [s["id"] for s in selected]
+        if not self.selected_file_ids or len(self.selected_file_ids) == len(self.file_summaries):
+            self.selected_file_ids = None
+            self.ui.label_files.setText(_("Files: All"))
+        else:
+            self.ui.label_files.setText(_("Files: ") + str(len(self.selected_file_ids)))
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
@@ -1393,3 +1430,4 @@ info = "<b>Agree %</b>" \
        "</p>" \
        "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
        "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
+

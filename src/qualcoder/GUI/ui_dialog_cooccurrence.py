@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_dialog_cooccurrence.ui'
+# Form implementation generated from reading ui file 'ui_dialog_cooccurrence.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -111,9 +111,9 @@ class Ui_Dialog_Coocurrence(object):
 
     def retranslateUi(self, Dialog_Coocurrence):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_Coocurrence.setWindowTitle(_translate("Dialog_Coocurrence", "Code Co-occurence"))
+        Dialog_Coocurrence.setWindowTitle(_translate("Dialog_Coocurrence", "Code Co-occurrence"))
         self.label_selections.setToolTip(_translate("Dialog_Coocurrence", "Show the overlapping codes."))
-        self.label_selections.setText(_translate("Dialog_Coocurrence", "Code co-occurence"))
+        self.label_selections.setText(_translate("Dialog_Coocurrence", "Code co-occurrence"))
         self.pushButton_export.setToolTip(_translate("Dialog_Coocurrence", "Export to file"))
         self.checkBox_hide_blanks.setText(_translate("Dialog_Coocurrence", "Hide blank lines"))
         self.pushButton_select_files.setToolTip(_translate("Dialog_Coocurrence", "Select files"))
@@ -121,7 +121,7 @@ class Ui_Dialog_Coocurrence(object):
         self.pushButton_select_codes.setToolTip(_translate("Dialog_Coocurrence", "Select codes"))
         self.pushButton_file_attributes.setToolTip(_translate("Dialog_Coocurrence", "Select files by attributes"))
         self.pushButton_export_gephi.setToolTip(_translate("Dialog_Coocurrence", "Export to Gephi. GraphML format"))
-        self.pushButton_export_coocurrence_graph.setToolTip(_translate("Dialog_Coocurrence", "Export Co-occurence Graph Image\n"
+        self.pushButton_export_coocurrence_graph.setToolTip(_translate("Dialog_Coocurrence", "Export Co-occurrence Graph Image\n"
 "Right-click for format options"))
         self.pushButton_export_cluster_graph.setToolTip(_translate("Dialog_Coocurrence", "Export Cluster Graph Image\n"
 "Right-click for format options\n"

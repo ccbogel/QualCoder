@@ -469,7 +469,7 @@ As all assigned positions may be incorrect. </string>
       </property>
       <property name="toolTip">
        <string>After editing the text:
-Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</string>
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code positions are incorrect.</string>
       </property>
       <property name="text">
        <string/>

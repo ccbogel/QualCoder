@@ -476,8 +476,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.code_tree.fill_tree()
         # These signals after the tree is filled the first time
-        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
-        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
 
         # Variables and widgets for AI search
@@ -1341,19 +1339,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         self.recent_codes.append(code_)
             except ValueError:
                 pass
-
-    def get_collapsed(self, item):
-        """ On category collapse or expansion signal, find the collapsed parent category items.
-        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
-        other areas of the app. """
-
-        # print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
-        if item.text(1)[:3] == "cid":
-            return
-        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
-            self.app.collapsed_categories.append(item.text(1))
-        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
-            self.app.collapsed_categories.remove(item.text(1))
 
     def get_files(self, ids=None, sort="name asc", preserve_current_file: bool = False):
         """ Get files with additional details and fill list widget.

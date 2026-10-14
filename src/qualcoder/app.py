@@ -122,7 +122,8 @@ class App(object):
         self.conn = None
         self.project_path = ""
         self.project_name = ""
-        self.collapsed_categories = []  # Used across app for consistent expanded/contracted categories in codes tree.
+        self.collapsed_categories = []  # Collapsed categories in report dialogs
+        self.coding_tree_collapsed = set()  # Collapsed branches in coding dialogs, cleared on project close
         self.last_export_directory = ""  # Default export location, which may be different from the working directory
         self.delete_backup = True  # Can delete the most current back up if the project has not been altered
         self.delete_backup_path_name = ""

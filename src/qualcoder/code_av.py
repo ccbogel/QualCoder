@@ -318,9 +318,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_files()
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.code_tree.fill_tree()
-        # These signals after the tree is filled the first time
-        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
-        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
         # Video incrustado en el propio diálogo (sin ventana separada)
         self.ui.frame_video.setAutoFillBackground(True)
@@ -1288,18 +1285,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         if len(selected_text) > 0:
             self.mark()
-
-    def get_collapsed(self, item):
-        """ On category collapse or expansion signal, find the collapsed parent category items.
-        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
-        other areas of the app. """
-
-        if item.text(1)[:3] == "cid":
-            return
-        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
-            self.app.collapsed_categories.append(item.text(1))
-        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
-            self.app.collapsed_categories.remove(item.text(1))
 
     def file_menu(self, position):
         """ Context menu to select the next image alphabetically, or
