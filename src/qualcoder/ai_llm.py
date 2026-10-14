@@ -4888,8 +4888,9 @@ class AiLLM():
                     fast_llm_params = large_llm_params.copy()
                     fast_llm_params['model'] = fast_model
                     
-                if 'reasoning_effort' in curr_model and curr_model['reasoning_effort'] in ['low', 'medium', 'high']:
-                    large_llm_params['reasoning_effort'] = curr_model['reasoning_effort']
+                reasoning_effort = str(curr_model.get('reasoning_effort') or '').strip()
+                if reasoning_effort not in ('', 'default'):
+                    large_llm_params['reasoning_effort'] = reasoning_effort
                 
                 if large_model.lower().find('claude') != -1:  # Anthropic
                     # omitting top_p, since Antrhopic does not accept temperature and top_p at the same time

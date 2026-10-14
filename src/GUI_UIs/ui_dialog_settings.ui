@@ -44,7 +44,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-475</y>
         <width>806</width>
         <height>1074</height>
        </rect>
@@ -1115,7 +1115,11 @@ This is an experimental feature. Use it with care.</string>
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QComboBox" name="comboBox_reasoning"/>
+              <widget class="QComboBox" name="comboBox_reasoning">
+               <property name="editable">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
              <item row="11" column="1">
               <widget class="QLineEdit" name="lineEdit_top_p">
