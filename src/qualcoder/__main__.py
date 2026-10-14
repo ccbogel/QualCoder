@@ -128,17 +128,42 @@ except Exception as e:  # python-vlc missing: Qt backend takes over, no console 
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
 
-# Help pages for modules without their own help method
+# Help pages on qualcoder.org/doc for the modules shown in the main tabs
 MODULE_HELP_PAGES = {
-    "DialogCodePdf": "4.3.-Coding-Text-on-PDFs",
-    "DialogCodeImage": "4.4.-Coding-Images",
-    "DialogAiSearch": "4.2.-AI-Assisted-Coding",
-    "CodeOrganiser": "4.6-Code-Organiser",
-    "DialogManageAttributes": "3.4.-Attributes",
-    "DialogManageLinks": "3.2.-Files",
-    "DialogReferenceManager": "6.1.-Imports-and-Exports",
-    "ViewGraph": "5.4.-Graph",
+    # Manage
+    "DialogManageFiles": "3.2.-Files/",
+    "DialogManageLinks": "3.2.-Files/#manage-bad-links-to-files",
+    "DialogCases": "3.3.-Cases/",
+    "DialogManageAttributes": "3.4.-Attributes/",
+    "DialogReferenceManager": "3.5.-References/",
+    "DialogImportSurvey": "6.2.-Survey-Imports/",
+    # Coding
+    "DialogCodeText": "4.1.-Coding-Text/",
+    "DialogCodePdf": "4.3.-Coding-Text-on-PDFs/",
+    "DialogCodeImage": "4.4.-Coding-Images/",
+    "DialogCodeAV": "4.5.-Coding-Audio-and-Video/",
+    "CodeOrganiser": "4.6.-Code-Organiser/",
+    "DialogCodeColorScheme": "4.7.-Codes-Tree/#accessibility-and-code-colours",
+    # Analysis menu
+    "DialogReportCodes": "5.3.-Analysis/#code-retrieval",
+    "DialogReportCooccurrence": "5.3.-Analysis/#code-co-occurrence-report",
+    "DialogReportRelations": "5.3.-Analysis/#code-relations-report",
+    "DialogReportExactTextMatches": "5.3.-Analysis/#code-text-by-exact-matches-report",
+    "DialogCodesBySegments": "5.3.-Analysis/#codes-by-text-segments-report",
+    "ViewGraph": "5.5.-Graph/",
+    # Reports menu
+    "DialogReportCoderComparisons": "5.4.-Reports/#coding-comparison-report",
+    "DialogCompareCoderByFile": "5.4.-Reports/#coding-comparison-by-file-report",
+    "DialogReportComparisonTable": "5.4.-Reports/",
+    "DialogReportCodeFrequencies": "5.4.-Reports/#code-frequencies-report",
+    "DialogReportFileSummary": "5.4.-Reports/#file-summary-report",
+    "DialogReportCodeSummary": "5.4.-Reports/#code-summary-report",
+    "ViewCharts": "5.4.-Reports/#charts",
+    "DialogSQL": "5.4.-Reports/#database-queries",
+    # AI
+    "DialogAIChat": "5.1.-AI-chat-based-analysis/",
 }
+AI_ASSISTED_CODING_HELP_PAGE = "4.2.-AI-Assisted-Coding/"
 
 if not qc_config_folder.exists():
     try:
@@ -2473,19 +2498,21 @@ Click "Yes" to start now.')
         tab = self.ui.tabWidget.currentWidget()
         module = self.current_tab_module(tab)
         if module is not None:
-            if callable(getattr(module, "help", None)):
-                module.help()
-                return
             page = MODULE_HELP_PAGES.get(type(module).__name__)
+            if isinstance(module, DialogCodeText) and module.ui.tabWidget.currentIndex() == 1:
+                page = AI_ASSISTED_CODING_HELP_PAGE
             if page:
                 self.app.help_wiki(page)
                 return
+            if callable(getattr(module, "help", None)):
+                module.help()
+                return
         tab_pages = {
-            self.ui.tab_action_log: "3.1.-Creating-a-New-Project",
-            self.ui.tab_manage: "3.2.-Files",
-            self.ui.tab_coding: "4.1.-Coding-Text",
-            self.ui.tab_reports: "5.3.-Reports",
-            self.ui.tab_ai_agent: "5.1.-AI-chat-based-analysis",
+            self.ui.tab_action_log: "3.1.-Creating-a-New-Project/",
+            self.ui.tab_manage: "3.2.-Files/",
+            self.ui.tab_coding: "4.1.-Coding-Text/",
+            self.ui.tab_reports: "5.3.-Analysis/",
+            self.ui.tab_ai_agent: "5.1.-AI-chat-based-analysis/",
         }
         self.app.help_wiki(tab_pages.get(tab, ""))
 
