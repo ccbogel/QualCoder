@@ -39,7 +39,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
 
 from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
+from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog, setup_search_shortcuts
 from .html_parser import html_to_text  # Homologate transcript formats with Manage files
 from .select_items import DialogSelectItems
 from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
@@ -263,6 +263,12 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search,
+            next_callback=self.move_to_next_search_text,
+            prev_callback=self.move_to_previous_search_text,
+            parent_widget=self
+        )
         self.ui.checkBox_case_sensitive.stateChanged.connect(self.search_for_text)
         # Transcription buttons
         self.ui.pushButton_new_speaker.setIcon(qta.icon('mdi6.account-plus-outline'))

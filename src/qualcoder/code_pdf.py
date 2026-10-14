@@ -46,7 +46,7 @@ from .color_selector import TextColor
 from .coder_names import DialogCoderNames  # Coder change as in code_text
 from .speakers import DialogSpeakers, speaker_coder_name  # Mark speakers
 from .helpers import Message, init_persistent_tree_header, \
-    DialogGetStartAndEndMarks  # tree width persistence and autocode marks
+    DialogGetStartAndEndMarks, setup_search_shortcuts  # tree width persistence and autocode marks
 from .GUI.ui_dialog_code_pdf import Ui_Dialog_code_pdf
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -1729,8 +1729,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Conexiones: busqueda. Connections: search
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         # Enter: if there are no matches yet, force the search (allows <3 chars); if there are, go to the next one.
-        self.ui.lineEdit_search.returnPressed.connect(
-            lambda: self.move_to_next_search_text() if self.search_indices else self.search_for_text(force=True))
+        setup_search_shortcuts(
+            self.ui.lineEdit_search,
+            next_callback=lambda: self.move_to_next_search_text() if self.search_indices else self.search_for_text(force=True),
+            prev_callback=self.move_to_previous_search_text,
+            parent_widget=self
+        )
         self.ui.checkBox_search_case.stateChanged.connect(lambda _s: self.search_for_text(force=True))
         self.ui.pushButton_previous.clicked.connect(self.move_to_previous_search_text)
         self.ui.pushButton_next.clicked.connect(self.move_to_next_search_text)

@@ -35,7 +35,7 @@ from .add_item_name import DialogAddItemName
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_journals import Ui_Dialog_journals
-from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
+from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter, setup_search_shortcuts
 from .memo import DialogMemo, DialogSelectQuote, DialogSelectReference
 
 logger = logging.getLogger(__name__)
@@ -122,6 +122,12 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        setup_search_shortcuts(
+            self.ui.lineEdit_search,
+            next_callback=self.move_to_next_search_text,
+            prev_callback=self.move_to_previous_search_text,
+            parent_widget=self
+        )
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
         self.ui.textEdit.textChanged.connect(self.text_changed)
         #self.ui.textEdit.installEventFilter(self)
@@ -356,6 +362,7 @@ class DialogJournals(QtWidgets.QDialog):
         # Ctrl + F jump to search box
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
+            self.ui.lineEdit_search.selectAll()
             return
         # Ctrl 0 to 4
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
