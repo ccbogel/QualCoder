@@ -666,6 +666,37 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list.append(str(own))
         return display_list
 
+    def _sort_tree_by_totals(self):
+        """ Order every tree level by total descending, then by name. """
+
+        tree = self.ui.treeWidget
+        total_col = tree.columnCount() - 1
+
+        def sort_key(item):
+            text = item.text(total_col)
+            # Codes with sub-codes show 'own (branch total)': sort by the branch total
+            if "(" in text:
+                text = text.split("(")[1].rstrip(")")
+            try:
+                total = int(text)
+            except ValueError:
+                total = 0
+            name = item.toolTip(0) if item.toolTip(0) != "" else item.text(0)
+            return -total, name.lower()
+
+        def sort_children(parent):
+            children = parent.takeChildren()
+            children.sort(key=sort_key)
+            parent.addChildren(children)
+            for child in children:
+                sort_children(child)
+
+        top_items = [tree.takeTopLevelItem(0) for _i in range(tree.topLevelItemCount())]
+        top_items.sort(key=sort_key)
+        tree.addTopLevelItems(top_items)
+        for item in top_items:
+            sort_children(item)
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -776,7 +807,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self._nest_subcodes_in_tree()
-        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        if self.ui.radioButton_2.isChecked():
+            self._sort_tree_by_totals()
+        else:
+            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         restore_persistent_tree_widths(self.ui.treeWidget)
         # Show the full hierarchy expanded (categories, sub-categories, codes and
         # sub-codes), without altering the app-wide collapsed-categories memory.
