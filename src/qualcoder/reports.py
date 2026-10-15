@@ -297,7 +297,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             if cid in rollup_cache:
                 return rollup_cache[cid]
             own = code_by_cid[cid]['display_list'][2:]
-            rollup_cache[cid] = list(own)  # Seed guards against cycles
+            rollup_cache[cid] = [0] * len(own)  # Re-entry through a cycle adds nothing
             sums = list(own)
             for child_cid in self.subcode_children.get(cid, []):
                 for i, n in enumerate(rolled_counts(child_cid)):
