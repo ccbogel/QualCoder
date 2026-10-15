@@ -284,6 +284,30 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 c['display_list'].append(count)
             c['display_list'].append(total)
 
+        # Roll up each code's counts with all its nested sub-codes, as in the code tree
+        code_by_cid = {c['cid']: c for c in self.codes}
+        self.subcode_children = {}
+        for c in self.codes:
+            if c.get('supercid') is not None and c['supercid'] in code_by_cid:
+                self.subcode_children.setdefault(c['supercid'], []).append(c['cid'])
+        rollup_cache = {}
+
+        def rolled_counts(cid):
+            """ Own counts plus all descendant sub-code counts. Memoized, cycle-safe. """
+            if cid in rollup_cache:
+                return rollup_cache[cid]
+            own = code_by_cid[cid]['display_list'][2:]
+            rollup_cache[cid] = list(own)  # Seed guards against cycles
+            sums = list(own)
+            for child_cid in self.subcode_children.get(cid, []):
+                for i, n in enumerate(rolled_counts(child_cid)):
+                    sums[i] += n
+            rollup_cache[cid] = sums
+            return sums
+
+        for c in self.codes:
+            c['rollup_list'] = rolled_counts(c['cid'])
+
         # Map each code to the category of its top ancestor code, so a sub-code's codings
         # are counted under the category that its parent code belongs to.
         def effective_catid(code):
@@ -464,14 +488,21 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             cat_chain = [n for n, code_flag in chain if not code_flag]
             code_chain = [n for n, code_flag in chain if code_flag]
             values = []
+            own_values = []  # Own counts only, without the '(branch total)' suffix
             for col in visible_cols:
+                cell_text = item.text(col)
                 try:
-                    values.append(int(item.text(col)))
+                    values.append(int(cell_text))
+                    own_values.append(int(cell_text))
                 except ValueError:
-                    values.append(item.text(col))
+                    values.append(cell_text)
+                    try:
+                        own_values.append(int(cell_text.split(" (")[0]))
+                    except ValueError:
+                        own_values.append(cell_text)
             rows.append({'depth': len(ancestors), 'name': name, 'is_code': is_code,
                          'color': color, 'cat_chain': cat_chain, 'code_chain': code_chain,
-                         'values': values})
+                         'values': values, 'own_values': own_values})
             it += 1
             item = it.value()
 
@@ -545,7 +576,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 ws3.cell(column=max_cat + 1 + j, row=row_i, value=level_name)
             base = max_cat + max_code + 1  # 1-based column of Depth
             ws3.cell(column=base, row=row_i, value=r['depth'] + 1)
-            for off, value in enumerate(r['values']):
+            for off, value in enumerate(r['own_values']):
                 ws3.cell(column=base + 1 + off, row=row_i, value=value)
         for i in range(max_cat + max_code):
             ws3.column_dimensions[get_column_letter(i + 1)].width = 28
@@ -620,6 +651,20 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 taken.setExpanded(True)
                 moved = True
                 break
+
+    def _code_display_strings(self, code):
+        """ Display texts for a code row; codes with sub-codes show 'own (branch total)'. """
+
+        display_list = [str(code['display_list'][0]), str(code['display_list'][1])]
+        own_counts = code['display_list'][2:]
+        rolled = code.get('rollup_list', own_counts)
+        has_children = code['cid'] in getattr(self, 'subcode_children', {})
+        for own, total in zip(own_counts, rolled):
+            if has_children and total != own:
+                display_list.append(f"{own} ({total})")
+            else:
+                display_list.append(str(own))
+        return display_list
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -696,9 +741,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                display_list = []
-                for i in c['display_list']:
-                    display_list.append(str(i))
+                display_list = self._code_display_strings(c)
                 if self.truncated_code_names and len(display_list[0]) > 62:
                     display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
                     self.contains_long_names = True
@@ -719,9 +762,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             item = it.value()
             while item:
                 if item.text(1) == f'catid:{c["catid"]}':
-                    display_list = []
-                    for i in c['display_list']:
-                        display_list.append(str(i))
+                    display_list = self._code_display_strings(c)
                     if self.truncated_code_names and len(display_list[0]) > 62:
                         display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
                         self.contains_long_names = True
