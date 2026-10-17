@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>738</width>
+    <width>790</width>
     <height>543</height>
    </rect>
   </property>
@@ -28,13 +28,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>100</height>
+       <height>94</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>100</height>
+       <height>94</height>
       </size>
      </property>
      <property name="title">
@@ -44,8 +44,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>-1</y>
-        <width>481</width>
+        <y>2</y>
+        <width>760</width>
         <height>22</height>
        </rect>
       </property>
@@ -65,14 +65,14 @@
        <string>Code and category frequencies: overall and by coder</string>
       </property>
       <property name="wordWrap">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_exporttext">
+     <widget class="QPushButton" name="pushButton_select_codes">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>30</y>
+        <x>10</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -90,17 +90,17 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>Export text file</string>
+       <string>Select codes</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_export_excel">
+     <widget class="QPushButton" name="pushButton_select_categories">
       <property name="geometry">
        <rect>
-        <x>370</x>
-        <y>30</y>
+        <x>46</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -118,7 +118,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>Export Excel</string>
+       <string>Select categories</string>
       </property>
       <property name="text">
        <string/>
@@ -127,53 +127,8 @@
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>271</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Select files</string>
-      </property>
-      <property name="text">
-       <string>Select files</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>15</y>
-        <width>251</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Alphabetic ascending</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton_2">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>43</y>
-        <width>251</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Totals descending</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_file_attributes">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>30</y>
+        <x>90</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -191,17 +146,150 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>File Attributes</string>
+       <string>Select files</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_select_cases">
+      <property name="geometry">
+       <rect>
+        <x>126</x>
+        <y>28</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select cases</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_file_attributes">
+      <property name="geometry">
+       <rect>
+        <x>162</x>
+        <y>28</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select files by attributes</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_sort">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>29</y>
+        <width>91</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Sort order</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>A - z</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Z - a</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 - 1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1 - 10</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_exports">
+      <property name="geometry">
+       <rect>
+        <x>316</x>
+        <y>32</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_export">
+      <property name="geometry">
+       <rect>
+        <x>344</x>
+        <y>29</y>
+        <width>91</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>xlsx</string>
+       </property>
+      </item>
+     </widget>
      <widget class="QCheckBox" name="checkBox_source_breakdown">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>68</y>
+        <y>66</y>
         <width>441</width>
         <height>23</height>
        </rect>
@@ -248,11 +336,14 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>pushButton_select_codes</tabstop>
+  <tabstop>pushButton_select_categories</tabstop>
   <tabstop>pushButton_select_files</tabstop>
-  <tabstop>pushButton_exporttext</tabstop>
-  <tabstop>pushButton_export_excel</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>radioButton_2</tabstop>
+  <tabstop>pushButton_select_cases</tabstop>
+  <tabstop>pushButton_file_attributes</tabstop>
+  <tabstop>comboBox_sort</tabstop>
+  <tabstop>comboBox_export</tabstop>
+  <tabstop>checkBox_source_breakdown</tabstop>
   <tabstop>treeWidget</tabstop>
  </tabstops>
  <resources/>
