@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 09:37+0200\n"
-"PO-Revision-Date: 2026-10-13 08:50+0200\n"
+"POT-Creation-Date: 2026-10-17 10:29+0200\n"
+"PO-Revision-Date: 2026-10-17 10:43+0200\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -33,7 +33,7 @@ msgid "Exception handler"
 msgstr "Gestionnaire d’exception"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/error_dlg.py:95
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5034
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5036
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:127
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9501
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:53
@@ -174,7 +174,8 @@ msgstr "Montrer les fichiers contenant le texte. (Vide pour tous)"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:270
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1510
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:189
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:189
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:230
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:261
 msgid "Nothing found"
 msgstr "Rien n’a été trouvé"
 
@@ -188,7 +189,8 @@ msgstr "Rien n’a été trouvé"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:270
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1510
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:189
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:189
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:230
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:261
 msgid "No matching files found"
 msgstr "Aucun fichier correspondant n’a été trouvé"
 
@@ -264,10 +266,10 @@ msgstr "MÉMO : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:422
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:1018
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:544
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2314
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3231
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1371
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:401
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:490
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:619
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:713
 msgid "Date: "
 msgstr "Date : "
 
@@ -1236,7 +1238,7 @@ msgstr "Annotations pour le fichier : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1326
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1727
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2616
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:415
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
 msgid "Code: "
 msgstr "Code : "
 
@@ -1554,10 +1556,6 @@ msgstr "Sélectionner les couleurs du code"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:176
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:185
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:192
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:165
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:177
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:185
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:192
 msgid "Attributes"
 msgstr "Attributs"
 
@@ -1861,7 +1859,7 @@ msgstr "Date :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1501
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:1420
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:1539
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2316
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3233
 msgid "Coder:"
 msgstr "Codeur·se :"
 
@@ -1919,8 +1917,8 @@ msgstr "Export du rapport ODT"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:239
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2081
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2087
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2181
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2204
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3098
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3121
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3187
 msgid "Project"
 msgstr "Projet"
@@ -2014,7 +2012,7 @@ msgstr "Segments de texte codés"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/coder_names.py:387
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/coder_names.py:391
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/coder_names.py:393
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1219
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1994
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:534
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3539
 msgid "Coder"
@@ -2306,7 +2304,7 @@ msgid "Open URL"
 msgstr "Ouvrir l’URL"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/journals.py:457
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2951
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3910
 msgid "Journals: "
 msgstr "Journaux : "
 
@@ -2541,7 +2539,7 @@ msgid "AI: Reading data"
 msgstr "IA : Lecture des données"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:106
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4923
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4925
 msgid "AI: Ready"
 msgstr "IA : Prête"
 
@@ -2573,7 +2571,7 @@ msgstr "MCP actif"
 msgid ""
 "No project is open. Open or create a project in QualCoder, then try again."
 msgstr ""
-"Aucun projet n'est ouvert. Ouvrez ou créez un projet dans QualCoder, puis "
+"Aucun projet n’est ouvert. Ouvrez ou créez un projet dans QualCoder, puis "
 "réessayez."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:135
@@ -2581,14 +2579,14 @@ msgid ""
 "The AI components could not be loaded. Please restart QualCoder or check the "
 "log for details."
 msgstr ""
-"Les composants d'IA n'ont pas pu être chargés. Veuillez redémarrer QualCoder "
+"Les composants d’IA n’ont pas pu être chargés. Veuillez redémarrer QualCoder "
 "ou consulter le journal pour plus de détails."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:137
 msgid "The AI is disabled. Enable it in the AI Setup Wizard or AI Settings."
 msgstr ""
-"L’IA est désactivée.Activez cette option dans l'assistant de configuration "
-"de l'IA ou dans les paramètres de l'IA."
+"L’IA est désactivée.Activez cette option dans l’assistant de configuration "
+"de l’IA ou dans les paramètres de l’IA."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:139
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6643
@@ -2599,13 +2597,13 @@ msgstr "L’IA est surchargée. Veuillez patienter un moment et réessayer."
 msgid ""
 "The project search index is not available yet. Please retry in a moment."
 msgstr ""
-"L'index de recherche des projets n'est pas encore disponible. Veuillez "
+"L’index de recherche des projets n’est pas encore disponible. Veuillez "
 "réessayer dans quelques instants."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:143
 msgid "The AI is still preparing the project data. Please retry in a moment."
 msgstr ""
-"L'IA est encore en train de préparer les données du projet. Veuillez "
+"L’IA est encore en train de préparer les données du projet. Veuillez "
 "réessayer dans quelques instants."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:145
@@ -2613,7 +2611,7 @@ msgid ""
 "The AI components are still loading in the background. Please retry in a "
 "moment."
 msgstr ""
-"Les composants d'IA sont toujours en cours de chargement en arrière-plan. "
+"Les composants d’IA sont toujours en cours de chargement en arrière-plan. "
 "Veuillez réessayer dans quelques instants."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:256
@@ -2648,7 +2646,7 @@ msgstr ""
 "authentifier à nouveau."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:303
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:761
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:767
 msgid "AI Models"
 msgstr "Modèles d’IA"
 
@@ -2671,7 +2669,7 @@ msgstr ""
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:1354
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4781
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:298
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:339
 msgid "AI Setup"
 msgstr "Configuration de l’IA"
 
@@ -3236,7 +3234,7 @@ msgid "AI: No large/fast model selected, AI is disabled."
 msgstr ""
 "IA : Aucun modèle grand/rapide n’a été sélectionné, l’IA est désactivé."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4934
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4936
 msgid ""
 "An error occured during AI initialization. The AI features will be disabled. "
 "Click on Project > Settings to reenable them."
@@ -3244,16 +3242,16 @@ msgstr ""
 "Une erreur s’est produite lors de l’initialisation de l’IA. Les fonctions "
 "d’IA seront désactivées. Cliquez sur Projet > Paramètres pour les réactiver."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4935
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4937
 msgid "AI Initialization"
 msgstr "Initialisation de l’IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4959
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4961
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2493
 msgid "Do you really want to cancel the AI operation?"
 msgstr "Voulez-vous annuler l’opération IA ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4967
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4969
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2504
 msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
@@ -3262,31 +3260,31 @@ msgstr ""
 "L’opération de l’IA n’a pas pu être interrompue immédiatement. Il peut "
 "s’écouler un certain temps avant que l’IA ne soit à nouveau prête."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5023
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5025
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5028
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5027
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5030
 msgid "AI Error:\n"
 msgstr "Erreur IA :\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5038
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5040
 msgid "Uncaught exception while handling AI error: "
 msgstr "Exception non gérée lors du traitement d’une erreur d’IA : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5069
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5193
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:865
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5071
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5195
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:871
 msgid "Authentication"
 msgstr "Authentification"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5347
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5349
 msgid "AI generate_code_descriptions\n"
 msgstr "AI generate_code_descriptions\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5348
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5350
 msgid "Prompt:\n"
 msgstr "Instruction :\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5406
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5408
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
@@ -3294,7 +3292,7 @@ msgstr ""
 "Étape 1 :\n"
 "Recherche de données relatives à »"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5453
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5455
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
@@ -3302,25 +3300,33 @@ msgstr ""
 "Étape 2 :\n"
 "Examiner les données de plus près…"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:261
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:244
+msgid "Top"
+msgstr "Haut"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:244
+msgid "Left, icons only"
+msgstr "Gauche, icône seulement"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:268
 msgid "Bold"
 msgstr "Gras"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:261
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:268
 msgid "Italic"
 msgstr "Italique"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:261
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:268
 msgid "Bigger"
 msgstr "Plus grand"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:269
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:276
 msgid "Default folder for storing automatic backups and for file outputs."
 msgstr ""
 "Dossier par défaut pour le stockage des sauvegardes automatiques et pour les "
 "sorties de fichiers."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:358
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:365
 msgid ""
 "External MCP allows third-party AI applications to access data from the "
 "currently opened project. Data returned by MCP tools may be transmitted to "
@@ -3338,17 +3344,17 @@ msgstr ""
 "l’application connectée et que vous comprenez comment elle traite vos "
 "données."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:365
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:372
 msgid "External MCP privacy warning"
 msgstr "Avertissement relatif à la confidentialité concernant le MCP externe"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:419
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:426
 msgid "Close and open the software for the change in language to occur."
 msgstr ""
 "Fermez puis rouvrez le logiciel pour que le changement de langue prenne "
 "effet."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:420
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:427
 msgid ""
 "Additional community supported languages can be installed by selecting \"Add "
 "more languages...\" in the dropdown."
@@ -3357,30 +3363,30 @@ msgstr ""
 "communauté en sélectionnant « Ajouter d’autres langues… » dans le menu "
 "déroulant."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:450
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:501
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:505
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:457
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:508
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:512
 msgid "Add more languages..."
 msgstr "Ajouter d’autres langues…"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:506
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:513
 msgid "Could not open the user translation folder."
 msgstr "Impossible d’ouvrir le dossier de traduction de l’utilisateur."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:508
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:515
 msgid "Download additional language files from here:"
 msgstr "Télécharger des fichiers langues additionnels depuis :"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:510
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:517
 msgid "Put either the zip file or the .qm and .mo files into the folder"
 msgstr ""
 "Placez soit le fichier zip, soit les fichiers .qm et .mo dans le dossier"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:512
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:519
 msgid "Then select that language in the dropdown box."
 msgstr "Sélectionnez ensuite cette langue dans la liste déroulante."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:513
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:520
 msgid ""
 "Additional languages may not be the most current translations, and they may "
 "contain inaccurate translations."
@@ -3388,31 +3394,31 @@ msgstr ""
 "Les traductions dans d’autres langues ne sont peut-être pas les plus "
 "récentes et peuvent contenir des erreurs."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:514
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:521
 msgid "Read the README.txt file in the i18n folder for more information."
 msgstr ""
 "Pour plus d’informations, consultez le fichier README.txt situé dans le "
 "dossier i18n."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:515
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:522
 msgid "Add more languages"
 msgstr "Ajouter des langues supplémentaires"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:553
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:560
 msgid "AI components are still loading."
-msgstr "Les composants d'IA sont toujours en cours de chargement."
+msgstr "Les composants d’IA sont toujours en cours de chargement."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:583
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2364
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:590
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3282
 msgid "AI Settings"
 msgstr "Paramètres IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:663
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:671
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:670
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:678
 msgid "Edit AI profile name"
 msgstr "Modifier le nom du profil IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:663
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:670
 msgid ""
 "Select a profile first. \n"
 "You can only edit the name of an existing profile. To create a new profile "
@@ -3423,12 +3429,12 @@ msgstr ""
 "nouveau profil à partir de zéro, suivez les instructions du wiki QualCoder "
 "sur GitHub."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:672
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:917
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:679
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:923
 msgid "Enter new profile name:"
 msgstr "Saisir le nouveau nom du profil :"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:732
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:738
 msgid ""
 "The API key contains non-ASCII characters and cannot be used.\n"
 "Please paste the key again exactly as provided by your AI provider. \n"
@@ -3441,84 +3447,84 @@ msgstr ""
 "\n"
 "Caractère(s) invalide(s) : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:735
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:741
 msgid "Invalid API key"
 msgstr "Clé API invalide"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:827
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:833
 msgid "Invalid input"
 msgstr "Entrée invalide"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:839
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:845
 msgid "AI temperature parameter must be between 0.0 and 2.0."
 msgstr ""
 "Le paramètre de température de l’IA doit être compris entre 0,0 et 2,0."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:847
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:853
 msgid "AI top_p parameter must be between 0.0 and 1.0."
 msgstr "Le paramètre top_p de l’IA doit être compris entre 0,0 et 1,0."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:856
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:862
 msgid "AI Authentication"
 msgstr "Authentification IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:892
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:898
 msgid "Choose a default output folder"
 msgstr "Choisissez un dossier de sortie par défaut"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:899
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:902
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:905
 msgid "Choose another folder"
 msgstr "Choisir un autre dossier"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:896
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:902
 msgid "Do not use the QualCoder configuration folder."
 msgstr "Ne pas utiliser le dossier de configuration de QualCoder."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:899
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:905
 msgid "Do not use the QualCoder data folder."
 msgstr "Ne pas utiliser le dossier de données QualCoder."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:916
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:929
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:922
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:935
 msgid "New AI profile"
 msgstr "Nouveau profil d’IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:930
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:936
 msgid "An AI profile with this name already exists: "
 msgstr "Un profil IA portant ce nom existe déjà : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1011
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1018
 msgid "Please select an AI profile or disable the AI altogether."
 msgstr "Veuillez sélectionner un profil IA ou désactiver complètement l’IA."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1012
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1019
 msgid "AI profile"
 msgstr "Profil IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1022
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1029
 msgid "Please enter a valid API-key for the AI model."
 msgstr "Veuillez saisir une clé API valide pour le modèle d’IA."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1023
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1029
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1030
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1036
 msgid "AI model"
 msgstr "Modèle d’IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1028
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1035
 msgid "Please select a \"large\" and a \"fast\" AI model."
 msgstr ""
 "Veuillez sélectionner un modèle d’IA « grand » et un modèle d’IA « rapide »."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1053
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1060
 msgid "Restart QualCoder"
 msgstr "Redémarrer QualCoder"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1053
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1060
 msgid "Restart QualCoder to enact some changes"
 msgstr "Redémarrer QualCoder pour appliquer certains changements"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1058
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1065
 msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
@@ -3526,9 +3532,10 @@ msgstr ""
 "Les modifications des noms des codeurs⋅ses seront perdues. Êtes-vous sûr de "
 "vouloir annuler ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1059
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1066
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:284
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1218
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1993
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2487
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -3611,24 +3618,24 @@ msgstr "Compter"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:333
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:781
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:784
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:758
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:762
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1359
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1363
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1033
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1037
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1634
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1638
 msgid "Show coded files"
 msgstr "Montrer les fichiers codés"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:369
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes_by_segments.py:594
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:752
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1353
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1027
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1628
 msgid "Expand names"
 msgstr "Développer les noms"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:372
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes_by_segments.py:597
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:755
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1356
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1030
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1631
 msgid "Truncate names"
 msgstr "Tronquer les noms"
 
@@ -4356,7 +4363,8 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/attributes.py:267
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:446
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:551
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2947
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3906
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:406
 msgid "Attributes: "
 msgstr "Attributs : "
 
@@ -4422,7 +4430,7 @@ msgstr "Le dictionnaire n’a pas de clé \"nom\""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:3176
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:425
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:6174
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1002
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1277
 msgid "All"
 msgstr "Tous"
 
@@ -4751,11 +4759,13 @@ msgstr "Clic-droit sur l’entête pour masquer les colonnes"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:389
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:445
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5154
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1693
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:902
 msgid "Text"
 msgstr "Texte"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:509
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1693
 msgid "PDF"
 msgstr "PDF"
 
@@ -4766,7 +4776,7 @@ msgstr "PDF"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:251
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5154
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:187
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:902
 msgid "Image"
 msgstr "Image"
 
@@ -5211,7 +5221,7 @@ msgstr ""
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2433
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3224
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2301
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3218
 msgid " created."
 msgstr " créé."
 
@@ -5226,8 +5236,8 @@ msgstr "Fichiers de retranscription"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2496
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:689
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:405
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:482
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:402
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:705
 msgid "All files"
 msgstr "Tous les fichiers"
 
@@ -5591,6 +5601,7 @@ msgstr "Maximum : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:942
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:1008
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:1015
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1367
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:336
 msgid "Files"
 msgstr "Fichiers"
@@ -5794,7 +5805,7 @@ msgstr "Affichage ajusté et centré"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2376
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2415
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2454
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1941
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2855
 msgid "Code organiser"
 msgstr "Organiser les codes"
 
@@ -6192,7 +6203,7 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1411
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:547
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:383
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:415
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
 msgid "Category: "
 msgstr "Catégorie : "
 
@@ -6575,6 +6586,9 @@ msgstr "Position de la vidéo à l’horodatage"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:325
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2311
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2404
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:73
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:287
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:329
 msgid "Select codes"
 msgstr "Sélectionnez les codes"
 
@@ -7069,7 +7083,7 @@ msgstr "Pas de sélection des cas"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes_by_segments.py:268
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:311
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:207
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:206
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:274
 msgid "Files selected by attributes"
 msgstr "Fichiers sélectionnés par attributs"
 
@@ -7175,7 +7189,7 @@ msgstr "Rapport exporté : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1352
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:616
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:870
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:976
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1251
 msgid "Report exported"
 msgstr "Rapport exporté"
 
@@ -7210,7 +7224,7 @@ msgstr "Perspective : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:194
 #, python-brace-format
 msgid "The external MCP server could not be started at {endpoint}."
-msgstr "Le serveur MCP externe n'a pas pu être démarré à l'adresse {endpoint}."
+msgstr "Le serveur MCP externe n’a pas pu être démarré à l’adresse {endpoint}."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:198
 msgid ""
@@ -7218,14 +7232,14 @@ msgid ""
 "initialization failed."
 msgstr ""
 "Il se peut que le port soit déjà utilisé par une autre instance de "
-"QualCoder, ou que l'initialisation du serveur ait échoué."
+"QualCoder, ou que l’initialisation du serveur ait échoué."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:203
 msgid ""
 "MCP access to this QualCoder instance is unavailable. You can continue using "
 "QualCoder. See the log for details."
 msgstr ""
-"L'accès MCP à cette instance de QualCoder n'est pas disponible. Vous pouvez "
+"L’accès MCP à cette instance de QualCoder n’est pas disponible. Vous pouvez "
 "continuer à utiliser QualCoder. Consultez le journal pour plus de détails."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:200
@@ -7240,8 +7254,9 @@ msgstr "Sélectionner l’attribut"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1175
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:129
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:211
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:197
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1175
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:145
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:189
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1450
 msgid "Select files"
 msgstr "Sélectionner des fichiers"
 
@@ -7257,12 +7272,15 @@ msgstr "Fichiers sélectionnés"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:235
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:236
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:138
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:196
 msgid "All files selected"
 msgstr "Tous les fichiers sélectionnés"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:456
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:4343
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:861
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:147
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:215
 msgid "Select cases"
 msgstr "Sélectionner les cas"
 
@@ -7275,12 +7293,15 @@ msgstr "Sélection"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:334
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:343
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:344
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:299
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:408
 msgid "Codes selected"
 msgstr "Codes sélectionnés"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:498
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:527
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:334
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:294
 msgid "All codes selected"
 msgstr "Tous les codes sélectionnés"
 
@@ -7351,7 +7372,7 @@ msgid "Text file\n"
 msgstr "Fichier texte\n"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:399
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:950
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1225
 msgid "No coders selected"
 msgstr "Aucun codeur·se sélectionné"
 
@@ -7544,9 +7565,9 @@ msgstr "Désaccord total sur le texte (code unique) : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:949
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:687
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:1178
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:483
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1260
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:706
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:902
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1535
 msgid "Code Tree"
 msgstr "Arbre des codes"
 
@@ -7899,7 +7920,7 @@ msgstr "Codage par: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1614
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1620
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2943
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3902
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:263
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:264
 msgid "Codes: "
@@ -8390,7 +8411,7 @@ msgid "Select coded area"
 msgstr "Sélectionner la zone codée"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3711
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1175
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1450
 msgid "No text files in this project."
 msgstr "Ce projet ne contient aucun fichier texte."
 
@@ -8697,7 +8718,7 @@ msgstr "Nouveau"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:809
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:493
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:673
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2484
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3438
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_preview.py:302
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1018
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1892
@@ -8789,7 +8810,7 @@ msgid "Load graph"
 msgstr "Chargement du graphique"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5745
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1938
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2852
 msgid "The graph has unsaved changes."
 msgstr "Le graphe a des changements non sauvegardés."
 
@@ -8798,7 +8819,7 @@ msgid "Load another graph and lose the unsaved changes?"
 msgstr "Charger un autre graphe et perdre les changements non sauvegarder ?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5747
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1937
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2851
 msgid "Unsaved graph"
 msgstr "Graphe non sauvegardée"
 
@@ -9172,7 +9193,7 @@ msgstr "Il n’y a pas de nouveaux segments codés pour ce code."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:9165
 msgid "No overlapping codes for this code."
-msgstr "Il n'y a pas de codes qui se chevauchent pour ce code."
+msgstr "Il n’y a pas de codes qui se chevauchent pour ce code."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:9210
 msgid "Memo for Code "
@@ -9315,7 +9336,7 @@ msgid "Merge"
 msgstr "Fusionner"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:223
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2437
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3391
 msgid "No data.qda database found in the selected folder."
 msgstr ""
 "Aucune base de données data.qda n’est trouvé dans le dossier sélectionné."
@@ -9364,7 +9385,7 @@ msgstr "Fin"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:292
 msgid "Could not update the search index: "
-msgstr "Impossible de mettre à jour l'index de recherche :"
+msgstr "Impossible de mettre à jour l’index de recherche :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:293
 msgid "Finished merging "
@@ -9689,6 +9710,7 @@ msgid "New project"
 msgstr "Nouveau projet"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:280
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1707
 msgid "Manage files"
 msgstr "Gérer les fichiers"
 
@@ -9697,6 +9719,7 @@ msgid "Open Files and Cases menu"
 msgstr "Ouvrir le menu Fichiers et Cas"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:281
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3359
 msgid "Open project"
 msgstr "Ouvrir le projet"
 
@@ -9790,8 +9813,8 @@ msgid "Colour scheme"
 msgstr "Palette de couleurs"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:291
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:399
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:489
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:617
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:712
 msgid "Code frequencies"
 msgstr "Effectifs des codes"
 
@@ -9829,10 +9852,12 @@ msgstr "Raccourcis claviers du menu Gestion"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:785
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:861
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:868
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1368
 msgid "Cases"
 msgstr "Cas"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:301
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1370
 msgid "Journals"
 msgstr "Journaux"
 
@@ -10327,6 +10352,164 @@ msgstr "Exécuter la requête SQL"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:462
 msgid ""
+"# Project\n"
+"\n"
+"The Project tab is the starting point for your work. Create or open a "
+"project with the cards on the left,\n"
+"and go back to your latest work from the Recent activity list. Everything "
+"else is in the [Project menu](qualcoder://menu/project).\n"
+"The action log, shown in place of this guide, records what you do during a "
+"session.\n"
+"\n"
+"\n"
+"## First steps\n"
+"\n"
+"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such "
+"as documents, PDFs, images, audio and video.\n"
+"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/"
+"manage_cases) and describe them with [attributes](qualcoder://menu/"
+"files_and_cases/manage_attributes).\n"
+"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://"
+"menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or "
+"[audio and video](qualcoder://menu/coding/code_audio_video).\n"
+"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/"
+"manage_journals) and the [project memo](qualcoder://menu/project/"
+"project_memo).\n"
+"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the "
+"[AI Agent](qualcoder://menu/ai).\n"
+"\n"
+"\n"
+"## About projects\n"
+"\n"
+"- A QualCoder project is a folder ending in .qda. It contains the project "
+"database and folders for imported documents, images, audio and video.\n"
+"- A dated backup of the project can be made each time it is opened. See the "
+"backup options in [Settings](qualcoder://menu/project/settings).\n"
+"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-"
+"Project/)\n"
+"\n"
+"\n"
+"## [Project Memo](qualcoder://menu/project/project_memo)\n"
+"\n"
+"- Describe the research topic, questions, methodology, and the participants "
+"and data collected.\n"
+"- The AI agent reads this memo to understand the context of your project.\n"
+"\n"
+"\n"
+"## [Settings](qualcoder://menu/project/settings)\n"
+"\n"
+"- Set your coder name, fonts, language, colour style, backups, and the AI "
+"integration. Settings and Help are also next to the main tabs.\n"
+"- [Help: Settings](qualcoder://help/2.2.-Settings/)\n"
+"\n"
+"\n"
+"## [Project Summary](qualcoder://menu/project/project_summary)\n"
+"\n"
+"- Writes a detailed overview of the open project to the action log, with "
+"files, cases, codes, categories, attributes, journals, and any bad links to "
+"files.\n"
+"\n"
+"\n"
+"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/"
+"project/export)\n"
+"\n"
+"- Exchange projects and codebooks with other software through the REFI-QDA "
+"standard.\n"
+"- Import RQDA, Taguette and Sonal projects, or a plain text list of codes.\n"
+"- Export the codebook as an ODT file, with or without memos.\n"
+"- [Help: Imports and exports](qualcoder://help/6.1.-Imports-and-Exports/)\n"
+"\n"
+"\n"
+"## [Close Project](qualcoder://menu/project/close_project)\n"
+"\n"
+"- Closes the open project. Workspaces with unsaved changes are checked "
+"first, and a backup made on opening is removed if nothing changed.\n"
+msgstr ""
+"# Projet\n"
+"\n"
+"L’onglet « Projet » est le point de départ de votre travail. Créez ou ouvrez "
+"un projet à l’aide des fiches situées à gauche,\n"
+"et revenez à votre dernier travail à partir de la liste « Activité "
+"récente ». Tout le reste se trouve dans le [menu Projet](qualcoder://menu/"
+"project).\n"
+"Le journal des actions, affiché à la place de ce guide, enregistre ce que "
+"vous faites au cours d’une session.\n"
+"\n"
+"\n"
+"## Premiers pas\n"
+"\n"
+"1. [Importez vos fichiers](qualcoder://menu/files_and_cases/manage_files), "
+"tels que des documents, des PDF, des images, des fichiers audio et vidéo.\n"
+"2. Regroupez les participants ou les sites en [cas](qualcoder://menu/"
+"files_and_cases/manage_cases) et décrivez-les à l’aide d’[attributs]"
+"(qualcoder://menu/files_and_cases/manage_attributes).\n"
+"3. Commencez à [coder du texte](qualcoder://menu/coding/codes), des [PDF]"
+"(qualcoder://menu/coding/code_pdf), des [images](qualcoder://menu/coding/"
+"code_image) ou des [fichiers audio et vidéo](qualcoder://menu/coding/"
+"code_audio_video).\n"
+"4. Consignez vos réflexions dans des [journaux](qualcoder://menu/"
+"files_and_cases/manage_journals) et dans la [note de projet](qualcoder://"
+"menu/project/project_memo).\n"
+"5. Explorez les tendances dans les [rapports](qualcoder://menu/reports) ou "
+"interrogez l’[agent IA](qualcoder://menu/ai).\n"
+"\n"
+"\n"
+"## À propos des projets\n"
+"\n"
+"- Un projet QualCoder est un dossier dont l’extension est .qda. Il contient "
+"la base de données du projet ainsi que des dossiers pour les documents, "
+"images, fichiers audio et vidéo importés.\n"
+"- Une sauvegarde datée du projet peut être effectuée à chaque ouverture. "
+"Consultez les options de sauvegarde dans [Paramètres](qualcoder://menu/"
+"project/settings).\n"
+"- [Aide : Créer un nouveau projet](qualcoder://help/3.1.-Creating-a-New-"
+"Project/)\n"
+"\n"
+"\n"
+"## [Note de projet](qualcoder://menu/project/project_memo)\n"
+"\n"
+"- Décrivez le sujet de recherche, les questions, la méthodologie, ainsi que "
+"les participants et les données collectées.\n"
+"- L’agent IA lit cette note pour comprendre le contexte de votre projet.\n"
+"\n"
+"\n"
+"## [Paramètres](qualcoder://menu/project/settings)\n"
+"\n"
+"- Définissez votre nom de codeur, les polices, la langue, les styles de "
+"couleur, les sauvegardes et l’intégration de l’IA. Les paramètres et l’aide "
+"se trouvent également à côté des onglets principaux.\n"
+"- [Aide : Paramètres](qualcoder://help/2.2.-Settings/)\n"
+"\n"
+"\n"
+"## [Résumé du projet](qualcoder://menu/project/project_summary)\n"
+"\n"
+"- Génère un aperçu détaillé du projet ouvert dans le journal des actions, "
+"avec les fichiers, les cas, les codes, les catégories, les attributs, les "
+"journaux et les éventuels liens défectueux vers des fichiers.\n"
+"\n"
+"\n"
+"## [Importer](qualcoder://menu/project/import) et [Exporter](qualcoder://"
+"menu/project/export)\n"
+"\n"
+"- Échangez des projets et des livrets de codes avec d’autres logiciels via "
+"la norme REFI-QDA.\n"
+"- Importez des projets RQDA, Taguette et Sonal, ou une liste de codes au "
+"format texte brut.\n"
+"- Exportez le livret de codes sous forme de fichier ODT, avec ou sans "
+"notes.\n"
+"- [Aide : Importations et exportations](qualcoder://help/6.1.-Imports-and-"
+"Exports/)\n"
+"\n"
+"\n"
+"## [Fermer le projet](qualcoder://menu/project/close_project)\n"
+"\n"
+"- Ferme le projet ouvert. Les espaces de travail comportant des "
+"modifications non enregistrées sont d’abord vérifiés, et une sauvegarde "
+"effectuée à l’ouverture est supprimée si aucune modification n’a été "
+"apportée.\n"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:519
+msgid ""
 "# Manage\n"
 "\n"
 "The Manage tab displays workspaces for organising cases, files, attributes, "
@@ -10443,7 +10626,7 @@ msgstr ""
 "- [Aide : Importer des références](qualcoder://help/6.1.-Imports-and-"
 "Exports/)\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:511
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:568
 msgid ""
 "# Coding\n"
 "\n"
@@ -10584,7 +10767,7 @@ msgstr ""
 "codes et catégories. \n"
 "- Des palettes spéciales sont disponibles pour les utilisateurs daltoniens.\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:568
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:625
 msgid ""
 "# Reports tab\n"
 "\n"
@@ -10758,7 +10941,7 @@ msgstr ""
 "lorsque les rapports standard ne répondent pas à une question de recherche "
 "spécifique sous la forme exacte dont vous avez besoin.\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:629
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:686
 msgid ""
 "# AI Agent\n"
 "\n"
@@ -10870,7 +11053,7 @@ msgstr ""
 "lancer le [codage assisté par IA](qualcoder://menu/ai/"
 "ai_search_and_coding).\n"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:671
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:728
 msgid ""
 "\n"
 "<br />\n"
@@ -10993,8 +11176,8 @@ msgstr "Description de l’instruction : "
 msgid ""
 "Start a new chat with the AI Agent first with the \"New\" button on the left."
 msgstr ""
-"Commencez par lancer une nouvelle session avec l’agent IA en cliquant sur le "
-"bouton « Nouveau » situé à gauche."
+"Commencez par lancer une nouvelle discussion avec l’agent IA en cliquant sur "
+"le bouton « Nouveau » situé à gauche."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:1015
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2094
@@ -11011,11 +11194,12 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9885
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9912
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9929
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1650
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1656
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3157
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3168
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3172
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2430
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2436
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2577
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4118
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4129
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4133
 msgid "AI Agent"
 msgstr "Agent IA"
 
@@ -11025,7 +11209,7 @@ msgstr "Autorisations IA :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2011
 msgid "New Chat with the AI Agent"
-msgstr "Nouvelle session avec l’agent IA"
+msgstr "Nouvelle discussion avec l’agent IA"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2012
 msgid "Analyze your data together with an AI Agent."
@@ -11066,7 +11250,7 @@ msgid "Unknown AI Agent New-menu target: "
 msgstr "Agent IA inconnu – Cible du menu Nouveau : "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2123
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:745
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:795
 msgid "Cannot open link: "
 msgstr "Impossible d’ouvrir le lien : "
 
@@ -11675,7 +11859,7 @@ msgstr "(référence inconnue)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9228
 msgid "Error during MCP-based AI agent chat: "
-msgstr "Erreur lors d’une session avec un agent IA basé sur le MCP : "
+msgstr "Erreur lors d’une discussion avec un agent IA basé sur le MCP : "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9238
 msgid "Error: Invalid result from MCP AI agent chat worker."
@@ -11709,7 +11893,7 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9438
 msgid "Chat has been canceled by the user. The partial response was kept."
 msgstr ""
-"La session a été annulée par l’utilisateur. La réponse partielle a été "
+"La discussion a été annulée par l’utilisateur. La réponse partielle a été "
 "conservée."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9444
@@ -12559,6 +12743,7 @@ msgstr "Nombre cumulé de codes par code"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:1009
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:1016
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:1028
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1369
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:95
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:96
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:225
@@ -12703,8 +12888,8 @@ msgstr "Ajouter un nouveau sous-code au code"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:305
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:309
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:763
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1364
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1038
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1639
 msgid "Expand or collapse branch"
 msgstr "Déplier ou réduire la branche"
 
@@ -14215,7 +14400,7 @@ msgstr "Supprimer la relation «"
 msgid "'?"
 msgstr "» ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:289
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:330
 #, python-brace-format
 msgid ""
 "A newer default AI profile is now available for this provider.\n"
@@ -14237,43 +14422,43 @@ msgstr ""
 "Votre clé API existante (le cas échéant) sera copiée dans le nouveau profil "
 "pour plus de commodité."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:299
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:340
 msgid "Switch to new profile"
 msgstr "Passer au nouveau profil"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:300
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:341
 msgid "Keep current profile"
 msgstr "Conserver le profil actuel"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:399
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:443
 msgid "Search: Loading components in the background..."
 msgstr "Recherche : Chargement des éléments en arrière-plan…"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:450
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:494
 msgid "Search: Components could not be loaded. See the log for details."
 msgstr ""
 "Recherche : impossible de charger les composants. Consultez le journal pour "
 "plus de détails."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:468
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:512
 msgid "AI: Loading components in the background..."
 msgstr "IA : Chargement des composants en arrière-plan…"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:490
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:534
 msgid "AI: Components loaded."
 msgstr "IA : Composants chargés."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:503
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:547
 msgid "AI: Components could not be loaded. See the log for details."
 msgstr ""
 "IA : Impossible de charger les composants. Consultez le journal pour plus de "
 "détails."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:513
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:560
 msgid "Loading AI components..."
 msgstr "Chargement des composants IA…"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:543
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:590
 msgid ""
 "Welcome\n"
 "\n"
@@ -14290,61 +14475,61 @@ msgstr ""
 "l’assistant de configuration de l’IA à partir du menu IA de la fenêtre "
 "principale. Cliquez sur « Oui » pour commencer maintenant."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:549
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:596
 msgid "AI Integration"
 msgstr "Intégration IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:598
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:648
 msgid "External MCP"
 msgstr "MCP externe"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:628
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:685
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:791
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:678
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:735
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:841
 msgid "Unsupported QualCoder link target: "
 msgstr "Cible du lien QualCoder non prise en charge : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:631
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:681
 msgid "Menu link has no target path."
 msgstr "Le lien du menu n’a pas de chemin de destination."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:638
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:688
 msgid "Menu not found: "
 msgstr "Menu non trouvé : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:655
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:705
 msgid "Menu entry not found: "
 msgstr "Entrée du menu non trouvée : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:660
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:710
 msgid "Action cannot contain subentries: "
 msgstr "Une action ne peut pas contenir de sous-entrées : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:688
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:738
 msgid "Action link has no target path."
 msgstr "Le lien d’action ne comporte pas de chemin de destination."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:696
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:746
 msgid "Action not found: "
 msgstr "Action non trouvée : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:698
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:748
 msgid "Action name is ambiguous: "
 msgstr "Le nom de l’action est ambigu : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:705
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:755
 msgid "Action link must end with a menu action."
 msgstr "Le lien d’action doit se terminer par une action de menu."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:747
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:797
 msgid "Link error"
 msgstr "Erreur de lien"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:763
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:813
 msgid "Unsupported link scheme."
 msgstr "Schéma de liens non supporté."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:775
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:825
 msgid ""
 "This menu is in the macOS menu bar. Please use the menu bar at the top of "
 "the screen."
@@ -14352,128 +14537,224 @@ msgstr ""
 "Ce menu est dans la barre de menu macOS. Veuillez utiliser la barre de menu "
 "en haut de l’écran."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:777
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:788
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:827
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:838
 msgid "Menu action is currently disabled."
 msgstr "L’action du menu est actuellement désactivée."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1220
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1260
+msgid "Choose a recently opened project to open it"
+msgstr "Choisissez un projet récemment ouvert pour l’ouvrir"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1367
+msgid "Open the file manager"
+msgstr "Ouvrir le gestionnaire de fichier"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1368
+msgid "Open the case manager"
+msgstr "Ouvrir le gestionnaire de cas"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1371
+msgid "Open the journals"
+msgstr "Ouvrir les journaux"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1464
+#, python-brace-format
+msgid "today {0}"
+msgstr "aujourd’hui {0}"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1466
+#, python-brace-format
+msgid "yesterday {0}"
+msgstr "hier {0}"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1489
+#, python-brace-format
+msgid "Last coded, {0}"
+msgstr "Dernier codé, {0}"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1493
+msgid "Text bookmark"
+msgstr "Signet de texte"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1497
+#, python-brace-format
+msgid "Audio/video bookmark at {0}"
+msgstr "Signet audio/vidéo à {0}"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1502
+#, python-brace-format
+msgid "Journal, edited {0}"
+msgstr "Journal, édité {0}"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1505
+msgid "Last AI chat"
+msgstr "Dernière discussion IA"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1532
+msgid "AI chat"
+msgstr "Discussion IA"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1694
+msgid "Images"
+msgstr "Images"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1694
+msgid "Audio/video"
+msgstr "Audio/vidéo"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1703
+#, python-brace-format
+msgid "Linked files not found: {0}."
+msgstr "Fichiers liés non trouvés : {0}."
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1704
+msgid "Manage links"
+msgstr "Gérer les liens"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1706
+#, python-brace-format
+msgid "Files missing from the project folder: {0}."
+msgstr "Fichiers manquants dans le dossier du projet : {0}."
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+msgid "Action log"
+msgstr "Journal des actions"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+msgid "Guide"
+msgstr "Guide"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1771
+msgid "Show the guide"
+msgstr "Montrer le guide"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1771
+msgid "Show the action log"
+msgstr "Montrer le journal des actions"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1995
 msgid "Font"
 msgstr "Police"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1221
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1996
 msgid "Tree font size"
 msgstr "Taille de la police de l’arbre"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1222
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1997
 msgid "Working directory"
 msgstr "Répertoire de travail"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1223
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1998
 msgid "Language"
 msgstr "Langue"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1224
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1999
 msgid "Show IDs"
 msgstr "Afficher les IDs"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1225
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2000
 msgid "Timestamp format"
 msgstr "Format d’horodatage"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1226
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2001
 msgid "Speaker name format"
 msgstr "Format du nom de l’orateur"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1227
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2002
 msgid "Report text context characters: "
 msgstr "Rapporter les caractères du contexte du texte : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1228
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2003
 msgid "Style"
 msgstr "Style"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1229
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2004
 msgid "Backup on open"
 msgstr "Sauvegarde sur les ouvertures"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1230
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2005
 msgid "Backup AV files"
 msgstr "Sauvegarde des fichiers multimédias"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1232
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2007
 msgid "AI integration is enabled"
 msgstr "L’intégration de l’IA est activée"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1234
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2009
 msgid "AI integration is disabled"
 msgstr "L’intégration de l’IA est désactivée"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1241
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2016
 msgid "AI permissions"
 msgstr "Autorisations de l’IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1244
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2019
 msgid "Folder paths / represents \\"
 msgstr "Chemins d’accès aux dossiers / représente \\"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1509
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2285
 msgid "This project contains no text files."
 msgstr "Ce projet ne contient aucun fichier texte."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1510
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2286
 msgid "No text files"
 msgstr "Pas de fichiers texte"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1558
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2334
 msgid "This project contains no pdf files."
 msgstr "Ce projet ne contient aucun fichier PDF."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1559
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2335
 msgid "No pdf files"
 msgstr "Aucun fichier PDF"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1574
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2350
 msgid "This project contains no image files."
 msgstr "Ce projet ne contient aucun fichier image."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1575
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2351
 msgid "No image files"
 msgstr "Pas de fichiers d’images"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1583
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2359
 msgid "This project contains no audio/video files."
 msgstr "Ce projet ne contient pas de fichiers audio/vidéo."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1584
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2360
 msgid "No a/v files"
 msgstr "Pas de fichiers a/v"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1598
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2374
 msgid "A/V Coding"
 msgstr "Codage A/V"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1665
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2445
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2595
 msgid "Move AI Agent to sidebar view"
 msgstr "Déplacer l’agent IA vers la barre latérale"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1939
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2486
+msgid "Help for this tab"
+msgstr "Aide pour cet onglet"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2853
 msgid "Leave the graph and lose the unsaved changes?"
 msgstr "Quitter le graphe et perdre les changements non sauvegarder ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1942
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2856
 msgid "The code organiser has changes that were not applied."
 msgstr "L’organisateur de codes a des changements qui ne sont pas appliqués."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1943
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2857
 msgid "Leave the code organiser and lose the changes?"
 msgstr "Quitter l’organisateur de code et perdre les changements ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2023
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2937
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "IMPORT DU PROJET REFI-QDA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2025
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2939
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -14481,22 +14762,22 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Etape 2 : On vous demandera le fichier QDPX."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2026
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2940
 msgid "REFI-QDA import steps"
 msgstr "Étapes d’import REFI-QDA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2030
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2067
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2085
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2944
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2963
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2981
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2999
 msgid "Project creation"
 msgstr "Création du projet"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2030
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2944
 msgid "REFI-QDA Project not successfully created"
 msgstr "Le projet REFI-QDA n’a pas été créé avec succès"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2044
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2958
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Taguette.sqlite3 file."
@@ -14504,22 +14785,22 @@ msgstr ""
 "Étape 1 : Vous devrez saisir un nouveau nom pour votre projet QualCoder.\n"
 "Étape 2 : Vous devrez sélectionner le fichier Taguette.sqlite3."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2045
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2081
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2959
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2995
 msgid "RQDA import steps"
 msgstr "Étapes d’import du RQDA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2067
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2085
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2963
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2981
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2999
 msgid "Project not successfully created"
 msgstr "Échec dans la création du projet"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2060
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2974
 msgid "IMPORTING SONAL PROJECT"
 msgstr "IMPORT DU PROJET Sonal"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2062
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2976
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the Sonal corpus file (.crp or .zip)."
@@ -14527,15 +14808,15 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Etape 2 : On vous demandera le corpus Sonal (.crp ou .zip)."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2063
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2977
 msgid "Sonal import steps"
 msgstr "Étapes d’import de Sonal"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2078
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2992
 msgid "IMPORTING RQDA PROJECT"
 msgstr "IMPORT DU PROJET RQDA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2080
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2994
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -14543,55 +14824,55 @@ msgstr ""
 "Étape 1 : On vous demandera un nouveau nom pour le projet QualCoder.\n"
 "Étape 2 : On vous demandera le fichier RQDA."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2098
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3012
 msgid "Are you sure you want to quit?"
 msgstr "Êtes-vous sûr de vouloir quitter ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2178
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3095
 msgid "Enter project name"
 msgstr "Entrez le nom du projet"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2181
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3098
 msgid "No project created."
 msgstr "Aucun projet créé."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2203
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3120
 msgid "Project creation error "
 msgstr "Erreur de création de projet "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2204
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3121
 msgid " not successfully created"
 msgstr " n’a pas été créé avec succès"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2301
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3218
 msgid "New project: "
 msgstr "Nouveau projet : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2302
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3219
 msgid "Opening: "
 msgstr "Ouvrir : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2312
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3229
 msgid "New Project Created"
 msgstr "Nouveau projet créé"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2313
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3230
 msgid "DB Version:"
 msgstr "Version BDD :"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2315
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3232
 msgid "About: "
 msgstr "À propos : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2319
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3236
 msgid "Problem creating database "
 msgstr "Problème lors de la création de la base de données "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2380
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3298
 msgid "Coder name changed to: "
 msgstr "Nom du codeur·se changé en : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2389
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3307
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -14613,20 +14894,24 @@ msgstr ""
 "(Tout ce qui est en dessous de cette marque est une note personnelle et ne "
 "sera jamais envoyé à l’IA)."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2394
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3312
 msgid "Memo for project "
 msgstr "Mémo pour le projet "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2401
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3319
 msgid "Project memo entered."
 msgstr "Mémo de projet entré."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2424
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3342
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:112
 msgid "Open project directory"
 msgstr "Ouvrir le répertoire du projet"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2434
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3358
+msgid "Opening project: "
+msgstr "Ouvrir le projet : "
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3388
 msgid ""
 "The selected folder is not a QualCoder project folder. Its name must end "
 "with .qda."
@@ -14634,26 +14919,26 @@ msgstr ""
 "Le dossier sélectionné n’est pas un dossier de projet QualCoder. Son nom "
 "doit se terminer par .qda."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2436
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3390
 msgid "The selected project folder does not exist or cannot be accessed."
 msgstr "Le dossier du projet sélectionné n’existe pas ou est inaccessible."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2438
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3392
 msgid "The project database could not be opened."
 msgstr "Impossible d’ouvrir la base de données du projet."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2439
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3393
 msgid ""
 "The selected folder does not contain a valid QualCoder project database."
 msgstr ""
 "Le dossier sélectionné ne contient pas de base de données de projet "
 "QualCoder valide."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2446
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3400
 msgid "Cannot open project"
 msgstr "Impossible d’ouvrir le projet"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2477
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3431
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
@@ -14663,118 +14948,141 @@ msgstr ""
 "dans le projet (« {} »). Souhaitez-vous conserver votre nom actuel ou "
 "changer à celui du projet ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2480
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3434
 msgid "Coder name"
 msgstr "Nom du codeur⋅se"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2482
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3436
 msgid "Keep"
 msgstr "Conserver"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2483
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3437
 msgid "Switch"
 msgstr "Changer"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2493
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3447
 msgid "Default coder name changed to: "
 msgstr "Le nom du codeur·se par défaut a été changé en : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2521
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2550
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2570
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2595
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2666
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2690
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2698
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2710
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2718
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2726
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2735
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2743
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2751
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2760
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2780
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2794
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3456
+msgid "Checking the project database"
+msgstr "Vérifier la base de données du projet"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3476
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3505
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3525
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3550
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3621
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3645
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3653
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3665
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3673
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3681
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3690
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3698
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3706
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3715
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3735
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3749
 msgid "Updating database to version"
 msgstr "Mise à jour de la base de données à la version"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2772
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3727
 msgid "Repaired project table column avbookmarktextpos"
 msgstr "La colonne avbookmarktextpos de la table project réparé"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2800
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3755
 msgid "Deleting code_text coding to deleted files: "
 msgstr "Suppression du code_texte codant pour les fichiers supprimés : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2807
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3762
 msgid "Deleting code_image coding to deleted files: "
 msgstr "Suppression du codage code_image dans les fichiers supprimés : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2814
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3769
 msgid "Deleting code_av coding to deleted files: "
 msgstr "Suppression du codage code_av dans les fichiers supprimés : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2864
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3819
 msgid "Repaired a cyclic code/category hierarchy."
 msgstr "Hiérarchie cyclique de code/catégorie réparée."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2896
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3843
+msgid "Saving a backup copy of the project"
+msgstr "Enregistrer une copie de sauvegarde du projet"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3846
+msgid "Preparing AI and search components"
+msgstr "Préparer l’IA et les composants de recherche"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3853
+msgid "Preparing the project summary"
+msgstr "Préparer le résumé de projet"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3854
 msgid "Project Opened: "
 msgstr "Projet ouvert : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2916
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3859
+msgid "Project opened"
+msgstr "Projet ouvert"
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3875
 msgid "Project summary"
 msgstr "Résumé du projet"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2918
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3877
 msgid "Project path: "
 msgstr "Chemin du projet : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2919
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3878
 msgid "Project date: "
 msgstr "Date du projet : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2924
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3883
 msgid "Project memo: "
 msgstr "Mémo de projet : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2931
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:403
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:405
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:491
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1006
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1189
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3890
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:235
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:400
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:402
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:714
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1281
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1464
 msgid "Files: "
 msgstr "Fichiers : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2935
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3894
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:402
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:234
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:404
 msgid "Cases: "
 msgstr "Cas : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2939
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3898
 msgid "Code categories: "
 msgstr "Catégories de codes : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2964
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3923
 msgid "Bad links to files"
 msgstr "Liens incorrects vers les dossiers"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2987
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3947
 msgid "Closing project: "
 msgstr "Fermer le projet : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3062
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4023
 msgid "Deleting: "
 msgstr "Suppression : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3070
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3075
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3092
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4031
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4036
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4053
 msgid "AI Setup Wizard"
 msgstr "Assistant de configuration IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3073
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4034
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
@@ -14782,15 +15090,15 @@ msgstr ""
 "L’IA est configurée et activée. Allez dans IA > Paramètres pour modifier les "
 "paramètres."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3077
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4038
 msgid "AI: Setup Wizard"
 msgstr "IA : Assistant de configuration"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3083
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4044
 msgid "AI: Setup Wizard finished"
 msgstr "IA : L’assistant d’installation est terminé"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3087
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4048
 msgid ""
 "The AI setup is complete. The AI is now reading your project data in the "
 "background."
@@ -14798,22 +15106,22 @@ msgstr ""
 "La configuration de l’IA est terminée. L’IA lit désormais les données de "
 "votre projet en arrière-plan."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3089
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4050
 msgid "The AI setup is complete and the AI is ready to use."
 msgstr ""
 "La configuration de l’IA est terminée et celle-ci est prête à l’emploi."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3091
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4052
 msgid "The AI setup is complete."
 msgstr "La configuration de l’IA est terminée."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3100
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3105
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3187
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4061
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4066
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4148
 msgid "Rebuild AI Memory"
 msgstr "Reconstruire la mémoire de l’IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3103
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4064
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
@@ -14821,16 +15129,16 @@ msgstr ""
 "Cette opération relit tous vos documents empiriques, ce qui peut prendre un "
 "certain temps. Voulez-vous continuer ?"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3135
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4096
 msgid "AI Analysis"
 msgstr "Analyse par IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3171
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3186
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4132
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4147
 msgid "Please enable the AI first and set it up in Settings."
 msgstr "Veuillez d’abord activer l’IA et la configurer dans les paramètres."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3183
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4144
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6348
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6352
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6356
@@ -14843,23 +15151,23 @@ msgstr "Veuillez d’abord activer l’IA et la configurer dans les paramètres.
 msgid "AI Search"
 msgstr "Recherche IA"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3194
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4155
 msgid "This version: "
 msgstr "Cette version : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3210
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4171
 msgid "Newer release available: "
 msgstr "Une version plus récente est disponible : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3215
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4176
 msgid "Latest Release: "
 msgstr "Dernière mise à jour : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3218
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4179
 msgid "This version may be a pre-release version."
 msgstr "Cette version peut être une version préliminaire."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:871
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:884
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -14869,26 +15177,26 @@ msgstr ""
 "Erreur de décodage de caractères.\n"
 "Utilisation des paramètres par défaut de QualCoder."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:873
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:886
 msgid "Cannot load config.ini file"
 msgstr "Impossible de charger le fichier config.ini"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1738
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1757
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1758
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1777
 msgid "There is already a backup with this name"
 msgstr "Il existe déjà une sauvegarde à ce nom"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1742
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1760
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1762
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1780
 msgid "Project backup could not be fully created."
 msgstr "La sauvegarde du projet n’a pas pu être entièrement créée."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1755
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1775
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "AVERTISSEMENT : fichiers audio et vidéo NON sauvegardés. Voir les paramètres."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1764
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/app.py:1784
 msgid "Project backup created: "
 msgstr "Création d’une sauvegarde de projet : "
 
@@ -14965,6 +15273,7 @@ msgstr "Sonal importé"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:248
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:139
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:149
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:149
 msgid "Select files by attributes"
 msgstr "Sélectionner des fichiers par attributs"
 
@@ -14978,6 +15287,10 @@ msgstr "Attributs sélectionnés"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:364
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1642
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:76
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:301
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:314
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:322
 msgid "Select categories"
 msgstr "Sélectionner les catégories"
 
@@ -14987,6 +15300,8 @@ msgstr "Toutes les catégories sélectionnées"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:381
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:395
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:327
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:410
 msgid "Categories selected"
 msgstr "Catégories sélectionnées"
 
@@ -15188,7 +15503,7 @@ msgstr "Fichier d’attributs de cas exporté vers : "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:300
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:960
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:560
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:786
 msgid "File export"
 msgstr "Export du fichier"
 
@@ -15362,6 +15677,7 @@ msgid "Max segments to display:"
 msgstr "Nombre maximal de segments à afficher :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:858
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:211
 msgid "No cases"
 msgstr "Pas de cas"
 
@@ -16391,7 +16707,7 @@ msgid "Import from:"
 msgstr "Importer depuis :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:144
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:138
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:199
 msgid "Files selected: "
 msgstr "Fichiers sélectionnés : "
 
@@ -16499,120 +16815,112 @@ msgstr "Paire de codes"
 msgid "Distance (characters)"
 msgstr "Distance (caractères)"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:111
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:124
 msgid "Hide column: "
 msgstr "Masquer la colonne : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:115
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:128
 msgid "Show column: "
 msgstr "Montrer la colonne : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:136
-msgid "Select files to view"
-msgstr "Sélectionnez des fichiers à afficher"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:140
-msgid "File Attributes"
-msgstr "Attributs du fichier"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:400
-msgid "Project: "
-msgstr "Projet : "
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:403
 msgid "selected"
 msgstr "selectionné"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:426
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:618
+msgid "Project: "
+msgstr "Projet : "
+
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:642
 msgid "Coding frequencies text file exported to: "
 msgstr "Fichier texte des effectifs de codage exporté vers : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:427
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:643
 msgid "Text file Export"
 msgstr "Export de fichier texte"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:480
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:703
 msgid "selected files"
 msgstr "fichiers sélectionnés"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:521
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:747
 msgid "Report"
 msgstr "Rapport"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:523
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:749
 msgid "Outline"
 msgstr "Aperçu"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:533
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:759
 msgid "Data"
 msgstr "Données"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:534
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:760
 msgid "Category level"
 msgstr "Niveau de catégorie"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:536
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:762
 msgid "Code level 1"
 msgstr "Code de niveau 1"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:536
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:762
 msgid "Sub-code level"
 msgstr "Niveau de sous-code"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:537
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:763
 msgid "Depth"
 msgstr "Profondeur"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:559
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:785
 msgid "Coding frequencies exported to: "
 msgstr "Fréquences de codage exportées vers : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:851
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1126
 msgid "Export Excel"
 msgstr "Exporter Excel"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:937
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1187
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1212
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1462
 msgid "Files: All"
 msgstr "Fichiers : tous"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:975
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1250
 msgid "Coder comparisons report exported: "
 msgstr "Rapport de comparaison des codeur⋅ses exporté : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:999
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1274
 msgid "CODER COMPARISON"
 msgstr "COMPARAISON DES codeur⋅seS"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:999
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1274
 msgid "Selected coders: "
 msgstr "Codeur⋅ses sélectionnés : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1004
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1279
 msgid "Selected files: "
 msgstr "fichiers sélectionnés : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1022
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1297
 msgid "agreement: "
 msgstr "approuver : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1024
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1299
 msgid ", dual coded: "
 msgstr ", double codage : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1026
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1301
 msgid ", uncoded: "
 msgstr ", non codé : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1028
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1303
 msgid ", disagreement: "
 msgstr ", désapprouver : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1030
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1305
 msgid ", agree coded only: "
 msgstr ", codé en accord seulement : "
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1178
+#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1453
 msgid "Select files for the comparison subcorpus"
 msgstr "Sélectionnez des fichiers à analyser pour comparer les sous-corpus"
 
@@ -16767,6 +17075,12 @@ msgstr " commence avec : "
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:54
 msgid "Uncaught Exception"
 msgstr "Uncaught Exception"
+
+#~ msgid "Select files to view"
+#~ msgstr "Sélectionnez des fichiers à afficher"
+
+#~ msgid "File Attributes"
+#~ msgstr "Attributs du fichier"
 
 #, fuzzy
 #~ msgid "Files: all text files"

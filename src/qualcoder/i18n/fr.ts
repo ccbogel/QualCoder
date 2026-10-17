@@ -255,11 +255,11 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished">Si vous sélectionnez un fichier texte ici, cela remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder. 
-Cette modification est temporaire et doit être sélectionnée à chaque fois que l&apos;écran « Graphiques » est ouvert.
+        <translation>Si vous sélectionnez un fichier texte ici, cela remplacera les mots vides existants dans le logiciel, ainsi que ceux stockés dans le dossier de configuration .qualcoder.
+Cette modification est temporaire et doit être sélectionnée à chaque ouverture de l&apos;écran « Graphiques ».
 
 Le fichier doit être au format texte brut, avec un mot par ligne.
-Chaque mot est exclu du nuage de mots « n-grams=1 ».</translation>
+Chaque mot sera exclu du nuage de mots « n-grams=1 ».</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -2487,7 +2487,7 @@ Rapport ODT : rapport du texte et des zones codées.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
         <source>Search for next occurrence in results</source>
-        <translation type="unfinished">Rechercher la prochaine occurence dans les résultats</translation>
+        <translation>Rechercher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
@@ -3049,7 +3049,7 @@ Le positionnement risque de ne pas sajuster correctement. Effectuez une copie de
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
         <source>Search for next occurrence in results</source>
-        <translation type="unfinished">Rechercher la prochaine occurence dans les résultats</translation>
+        <translation>Rechercher la prochaine occurence dans les résultats</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
@@ -3738,34 +3738,69 @@ Sensible à la casse : ajouter une entrée par variante (ex. : Tom Jones et TOM 
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-        <source>Export text file</source>
-        <translation>Exporter un fichier texte</translation>
+        <source>Select codes</source>
+        <translation>Sélectionner les codes</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-        <source>Export Excel</source>
-        <translation>Exporter un fichier Excel</translation>
+        <source>Select categories</source>
+        <translation>Sélectionner les catégories</translation>
     </message>
     <message>
-        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
         <source>Select files</source>
         <translation>Sélectionner des fichiers</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-        <source>Alphabetic ascending</source>
-        <translation>Alphabétique ascendant</translation>
+        <source>Select cases</source>
+        <translation>Sélectionner des cas</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-        <source>Totals descending</source>
-        <translation>Totaux décroissants</translation>
+        <source>Select files by attributes</source>
+        <translation>Sélectionner des fichiers par attributs</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-        <source>File Attributes</source>
-        <translation>Attributs du fichier</translation>
+        <source>Sort order</source>
+        <translation>Ordre de tri</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>A - z</source>
+        <translation>A - z</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>Z - a</source>
+        <translation>Z - a</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>10 - 1</source>
+        <translation>10 - 1</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>1 - 10</source>
+        <translation>1 - 10</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>Export</source>
+        <translation>Exporter</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>txt</source>
+        <translation>TXT</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+        <source>xlsx</source>
+        <translation>XLSX</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
@@ -4443,6 +4478,16 @@ language = it</translation>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
         <source>Style</source>
         <translation>Style</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>Where the Project, Manage, Coding, Reports and AI Agent tabs are shown</source>
+        <translation>L&apos;endroit où s&apos;affichent les onglets « Projet », « Gestion », « Codage », « Rapports » et « Agent IA »</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>Main tabs</source>
+        <translation>Onglets principaux</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -5240,8 +5285,113 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
-        <source>Action Log</source>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Project</source>
+        <translation>Projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Show the action log panel</source>
+        <translation>Afficher le panneau du journal des actions</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Create a new QualCoder project (Ctrl+N)</source>
+        <translation>Créer un nouveau projet QualCoder (Ctrl + N)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Create new project</source>
+        <translation>Créer un nouveau projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>New project</source>
+        <translation>Nouveau projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Create a new project</source>
+        <translation>Créer un nouveau projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Open an existing QualCoder project (Ctrl+O)</source>
+        <translation>Ouvrir un projet QualCoder existant (Ctrl + O)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Open project</source>
+        <translation>Ouvrir un projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Open an existing project</source>
+        <translation>Ouvrir un projet existant</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Recent projects</source>
+        <translation>Projets récents</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Choose a recently opened project to open it</source>
+        <translation>Choisissez un projet récemment ouvert pour l&apos;ouvrir</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Choose a recent project</source>
+        <translation>Choisissez un projet récent</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Recent activity</source>
+        <translation>Activité récente</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Your recent work in this project will appear here.</source>
+        <translation>Vos travaux récents dans le cadre de ce projet s&apos;afficheront ici.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Project contents</source>
+        <translation>Contenu du projet</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>No project open. Its contents will appear here.</source>
+        <translation>Aucun projet n&apos;est ouvert. Son contenu s&apos;affichera ici.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Hide the action log panel</source>
+        <translation>Masquer le panneau du journal des actions</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Action log</source>
         <translation>Journal des actions</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Show or hide the action log</source>
+        <translation>Afficher ou cacher le journal des actions</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
+        <source>Select an option from the Project menu</source>
+        <translation>Selectionner une option depuis le menu Projet</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
@@ -5280,11 +5430,6 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
         <source>AI Agent</source>
         <translation>Agent IA</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
-        <source>Project</source>
-        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
