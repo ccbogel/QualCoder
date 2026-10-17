@@ -2599,6 +2599,10 @@ class AiLLM():
             name = self._short_change_label(op.get("name", ""))
             return (_("Created case: ") + name) if name != "" else ""
 
+        if op_type == "create_document":
+            name = self._short_change_label(op.get("name", ""))
+            return (_("Created document: ") + name) if name != "" else ""
+
         if op_type == "create_case_attribute":
             name = self._short_change_label(op.get("name", ""))
             return (_("Created case attribute: ") + name) if name != "" else ""
@@ -2946,7 +2950,7 @@ class AiLLM():
                 coding_count += 1
             elif op_type in ("create_case", "update_case"):
                 case_count += 1
-            elif op_type == "update_document":
+            elif op_type in ("create_document", "update_document"):
                 document_count += 1
             elif op_type in ("create_case_text", "delete_case_text"):
                 case_link_count += 1
@@ -3208,6 +3212,27 @@ class AiLLM():
             return False, "changed", row
         if str(row[2]) != self._operation_actor_owner(op):
             return False, "changed", row
+        return True, "ok", row
+
+    def _can_undo_create_document(self, cur, op):
+        """A created document can be removed while nobody has coded, annotated or linked it."""
+
+        fid = int(op.get("fid", -1))
+        if fid <= 0:
+            return False, "invalid", None
+        cur.execute("SELECT id, name, owner FROM source WHERE id=?", (fid,))
+        row = cur.fetchone()
+        if row is None:
+            return False, "missing", None
+        expected_name = str(op.get("name", "")).strip()
+        if expected_name != "" and str(row[1]) != expected_name:
+            return False, "changed", row
+        if str(row[2]) != self._operation_actor_owner(op):
+            return False, "changed", row
+        for table in ("code_text", "annotation", "case_text"):
+            cur.execute(f"SELECT 1 FROM {table} WHERE fid=? LIMIT 1", (fid,))
+            if cur.fetchone() is not None:
+                return False, "changed", row
         return True, "ok", row
 
     def _can_undo_create_case_text(self, cur, op):
@@ -3656,6 +3681,7 @@ class AiLLM():
         code_ids = set()
         category_ids = set()
         case_ids = set()
+        document_ids = set()
         coding_ctids = set()
         case_link_ids = set()
         annotation_ids = set()
@@ -3721,6 +3747,14 @@ class AiLLM():
                 ok, reason, row_data = self._can_undo_create_case(cur, op)
                 if ok:
                     case_ids.add(int(op.get("caseid", -1)))
+                elif reason == "changed":
+                    skipped_changed += 1
+                elif reason == "missing":
+                    skipped_missing += 1
+            elif op_type == "create_document":
+                ok, reason, row_data = self._can_undo_create_document(cur, op)
+                if ok:
+                    document_ids.add(int(op.get("fid", -1)))
                 elif reason == "changed":
                     skipped_changed += 1
                 elif reason == "missing":
@@ -3925,6 +3959,8 @@ class AiLLM():
                 )
         if len(case_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_ids)) + _(" case(s)."))
+        if len(document_ids) > 0:
+            lines.append(_("Undo will remove ") + str(len(document_ids)) + _(" document(s)."))
         if len(case_link_ids) > 0:
             lines.append(_("Undo will remove ") + str(len(case_link_ids)) + _(" case link(s)."))
         if len(annotation_ids) > 0:
@@ -4144,6 +4180,31 @@ class AiLLM():
                     if cur.rowcount > 0:
                         stats["undone"] += 1
                         self._add_project_table_changes(project_table_changes, "cases")
+                    continue
+
+                if op_type == "create_document":
+                    ok, reason, row = self._can_undo_create_document(cur, op)
+                    if not ok:
+                        if reason == "changed":
+                            stats["skipped_changed"] += 1
+                        elif reason == "missing":
+                            stats["skipped_missing"] += 1
+                        else:
+                            stats["skipped_invalid"] += 1
+                        keep_for_retry = self._should_keep_skipped_undo_operation(reason)
+                        stats["skip_details"].append(self._format_undo_skip_detail(op, reason, keep_for_retry))
+                        if keep_for_retry:
+                            stats["blocked_retry"] += 1
+                            remaining_operations.append(op)
+                        else:
+                            stats["removed_skipped"] += 1
+                        continue
+                    fid = int(row[0])
+                    cur.execute("DELETE FROM attribute WHERE attr_type='file' AND id=?", (fid,))
+                    cur.execute("DELETE FROM source WHERE id=?", (fid,))
+                    if cur.rowcount > 0:
+                        stats["undone"] += 1
+                        self._add_project_table_changes(project_table_changes, "source", "attribute")
                     continue
 
                 if op_type in ("create_case_attribute", "create_document_attribute"):
