@@ -1,17 +1,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 10:52+0200\n"
-"PO-Revision-Date: 2026-09-23 10:53+0200\n"
-"Last-Translator: Justin\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2026-10-17 10:59+0200\n"
+"PO-Revision-Date: 2026-10-17 10:59+0200\n"
+"Last-Translator: Auto-translated via Argostranslate (EN -> EO)\n"
 "Language-Team: EO <LL@li.org>\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Argostranslate + Custom Script\n"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/error_dlg.py:44
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1277
@@ -424,11 +422,6 @@ msgstr "TRANSCRIPT:"
 msgid "END OF TRANSCRIPT"
 msgstr "TRANSCRIPT"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:488
-#, fuzzy
-msgid "TRANSCRIPT: "
-msgstr "TRANSCRIPT:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:514
 #, fuzzy
 msgid "PDF IMAGE DETAILS"
@@ -503,8 +496,8 @@ msgstr "STATISTO:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:645
 #, fuzzy
 msgid ""
-"Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators"
 msgstr ""
 "Vortoj utiligas alfabetkarakterojn kaj inkludas la apostrofo. Ĉiuj aliaj "
 "karakteroj estas vorto apartigiloj"
@@ -608,24 +601,6 @@ msgstr "Code-areo / bildo (E)"
 #, fuzzy
 msgid "Go to bookmark (press B to set)"
 msgstr "Iru al librostampo (preso B al aro)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1904
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5967
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6013
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1386
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1453
-#, fuzzy
-msgid "Codings:"
-msgstr "Kodigoj"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1906
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2749
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2756
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2453
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2456
-#, fuzzy
-msgid "Memo:"
-msgstr "Memo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2007
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:725
@@ -796,11 +771,6 @@ msgstr "Coded-areo"
 msgid "Select a code in the list first."
 msgstr "Elektu kodon en la listo unue."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2752
-#, fuzzy
-msgid "Area:"
-msgstr "Areo:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2761
 #, fuzzy
 msgid "Annotation:"
@@ -842,21 +812,6 @@ msgstr "Neniu kodo estis elektita"
 #, fuzzy
 msgid "Text coding is disabled for this file. Re-import the PDF."
 msgstr "Teksto estas handikapita por tiu dosiero. La PDF."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2912
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2949
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3837
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:484
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4675
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4697
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1036
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1057
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2642
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5179
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5201
-#, fuzzy
-msgid "Annotation: "
-msgstr "komentarioj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2989
 #, fuzzy
@@ -954,8 +909,8 @@ msgstr "Neniu dosiero estis selektita."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4530
 #, fuzzy
 msgid ""
-"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the "
-"speaker codings?"
+"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the"
+" speaker codings?"
 msgstr ""
 "Coder\" estas nuntempe kaŝita. Ĉu vi volas igi ĝin videbla, vidi la "
 "parolanton ĉifrado?"
@@ -1339,87 +1294,6 @@ msgstr "Teksto:"
 #, fuzzy
 msgid "Annotations for file: "
 msgstr "Notaĵoj por dosiero:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3857
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3866
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4064
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2889
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:458
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1416
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:757
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:774
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:789
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:805
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:817
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:829
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:961
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1016
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1046
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3619
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3694
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3763
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3859
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5596
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5621
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5647
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5673
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5692
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5713
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:847
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:993
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1021
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1274
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1300
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1326
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1727
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2616
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
-#, fuzzy
-msgid "Code: "
-msgstr "Kodo:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3859
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3867
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4066
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:810
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:826
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:846
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:461
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5511
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:760
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:777
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:792
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:963
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1018
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3622
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3695
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3765
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5599
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5625
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5650
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:6050
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:162
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:205
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:248
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:627
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:660
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:685
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:713
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:995
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1023
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1052
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1276
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1302
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1329
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1729
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1579
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2619
-#, fuzzy
-msgid "Memo: "
-msgstr "Memo por:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3869
 #, fuzzy
@@ -1867,8 +1741,8 @@ msgstr "La teksto eltirita de tiu PDF ne egalas la importitan tekston."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5783
 #, fuzzy
 msgid ""
-"This usually means the file was imported in an older QualCoder version using "
-"an older text method."
+"This usually means the file was imported in an older QualCoder version using"
+" an older text method."
 msgstr ""
 "Tio kutime signifas ke la dosiero estis importita en pli malnova QualCoder-"
 "versio uzanta pli malnovan tekstmetodon."
@@ -1924,8 +1798,8 @@ msgstr "Transformi la stokitan tekston de tiu PDF al la elektita enpaĝigo?"
 #, fuzzy
 msgid ""
 "The stored text will be rewritten and its codings (all coders), annotations "
-"and case assignments will be relocated in the new text. Segments that cannot "
-"be located exactly keep their original quote and are reported for review."
+"and case assignments will be relocated in the new text. Segments that cannot"
+" be located exactly keep their original quote and are reported for review."
 msgstr ""
 "La stokita teksto estos rewriten kaj ĝiaj ĉifradoj (ĉiuj kodigiloj), "
 "komentadoj kaj kaztaskoj estos translokigitaj en la nova teksto. Segmentoj "
@@ -2061,22 +1935,6 @@ msgstr "Libera raporto al ĵurnalo"
 #, fuzzy
 msgid "PDF restructure report"
 msgstr "PDF-restrukturraporto"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6009
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3062
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1143
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3682
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3742
-#, fuzzy
-msgid "File:"
-msgstr "Dosiero:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6010
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5802
-#, fuzzy
-msgid "Date:"
-msgstr "Dato:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6011
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1501
@@ -2563,8 +2421,9 @@ msgstr "Atributo aldonis al kazoj:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2192
+#, fuzzy
 msgid "type"
-msgstr ""
+msgstr "tipo tipo tipo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/journals.py:316
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:139
@@ -2898,8 +2757,9 @@ msgid "AI: Closed"
 msgstr "Fermu proksime"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:114
+#, fuzzy
 msgid "AI: Closing"
-msgstr ""
+msgstr "A: Vestaĵoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:116
 #, fuzzy
@@ -2912,15 +2772,21 @@ msgid "MCP active"
 msgstr "Indiĝeno"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:133
+#, fuzzy
 msgid ""
 "No project is open. Open or create a project in QualCoder, then try again."
 msgstr ""
+"Neniu projekto estas malfermita. Malfermita aŭ krei projekton en QualCoder, "
+"tiam provu denove."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:135
+#, fuzzy
 msgid ""
-"The AI components could not be loaded. Please restart QualCoder or check the "
-"log for details."
+"The AI components could not be loaded. Please restart QualCoder or check the"
+" log for details."
 msgstr ""
+"La AI-komponentoj ne povus esti ŝarĝitaj. Bonvolu restartigi QualCoder aŭ "
+"kontroli la registron por detaloj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:137
 #, fuzzy
@@ -2934,19 +2800,26 @@ msgid "The AI is busy. Please wait a moment and retry."
 msgstr "La AI estas okupata. Bonvolu atendi momenton kaj reiro."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:141
+#, fuzzy
 msgid ""
 "The project search index is not available yet. Please retry in a moment."
 msgstr ""
+"La projekto serĉindekso ankoraŭ ne estas havebla. Bonvolu reveni en unu "
+"momento."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:143
+#, fuzzy
 msgid "The AI is still preparing the project data. Please retry in a moment."
 msgstr ""
+"La AI daŭre preparas la projektodatenojn. Bonvolu reveni en unu momento."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:145
+#, fuzzy
 msgid ""
 "The AI components are still loading in the background. Please retry in a "
 "moment."
 msgstr ""
+"La AI-komponentoj daŭre ŝarĝas en la fono. Bonvolu reveni en unu momento."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:256
 #, fuzzy
@@ -3326,8 +3199,8 @@ msgstr "Ŝanĝita AI-ŝanĝo"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3626
 #, fuzzy
 msgid ""
-"Could not be undone because the affected item no longer matches the recorded "
-"state. It may have been edited afterwards or still be blocked by dependent "
+"Could not be undone because the affected item no longer matches the recorded"
+" state. It may have been edited afterwards or still be blocked by dependent "
 "data."
 msgstr ""
 "Ne povus esti nefarita ĉar la trafita objekto jam ne egalas la registritan "
@@ -3417,10 +3290,13 @@ msgid " standalone text coding(s)."
 msgstr "memstara tekstoĉifrado (j)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3924
+#, fuzzy
 msgid ""
 " standalone coding(s) belong to another user or agent and will also be "
 "deleted."
 msgstr ""
+"memstara ĉifrado (j) apartenas al alia uzanto aŭ agento kaj ankaŭ estos "
+"forigita."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3927
 #, fuzzy
@@ -3443,21 +3319,6 @@ msgstr "komentadoj:"
 #, fuzzy
 msgid " attribute definition(s)."
 msgstr "atribuas difinon (s)."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3937
-#, fuzzy
-msgid " category(ies)"
-msgstr "Kategorio (j)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3939
-#, fuzzy
-msgid " code(s)"
-msgstr "kodo (s)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3941
-#, fuzzy
-msgid " coding(s)"
-msgstr "ĉifrado (s)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3942
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3944
@@ -3582,8 +3443,12 @@ msgid "Skipped operations removed from the list: "
 msgstr "Skipitaj operacioj forigis de la listo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4709
-msgid "Warning: codings belonging to another user or agent were also deleted: "
+#, fuzzy
+msgid ""
+"Warning: codings belonging to another user or agent were also deleted: "
 msgstr ""
+"Averto: ĉifradoj apartenantaj al alia uzanto aŭ agento ankaŭ estis "
+"forigitaj:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4711
 #, fuzzy
@@ -3653,8 +3518,8 @@ msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
 msgstr ""
-"En la sekva dialogo, iras al \"Advanced AI Opcioj\" kaj selektas grandan kaj "
-"rapidan AI-modelon (ambaŭ povas esti la samaj)."
+"En la sekva dialogo, iras al \"Advanced AI Opcioj\" kaj selektas grandan kaj"
+" rapidan AI-modelon (ambaŭ povas esti la samaj)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4831
 #, fuzzy
@@ -3669,8 +3534,8 @@ msgstr "AI: Neniu granda/rapideca modelo selektita, AI estas handikapita."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4936
 #, fuzzy
 msgid ""
-"An error occured during AI initialization. The AI features will be disabled. "
-"Click on Project > Settings to reenable them."
+"An error occured during AI initialization. The AI features will be disabled."
+" Click on Project > Settings to reenable them."
 msgstr ""
 "Eraro okazis dum AI-inicialigo. La AI-trajtoj estos malfunkciigitaj. Klaku "
 "sur Project > Settings al resurekteblaj ili."
@@ -3693,8 +3558,8 @@ msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
 "the AI to be ready again."
 msgstr ""
-"La AI-operacio ne povus esti nuligita tuj. Ĝi povas preni momenton por la AI "
-"por esti preta denove."
+"La AI-operacio ne povus esti nuligita tuj. Ĝi povas preni momenton por la AI"
+" por esti preta denove."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5025
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:5027
@@ -3749,8 +3614,9 @@ msgid "Top"
 msgstr "Temoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:244
+#, fuzzy
 msgid "Left, icons only"
-msgstr ""
+msgstr "Maldekstruloj, ikonoj nur"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:268
 #, fuzzy
@@ -3771,32 +3637,36 @@ msgstr "Pli granda"
 #, fuzzy
 msgid "Default folder for storing automatic backups and for file outputs."
 msgstr ""
-"Defaŭlta faldo por stokado de aŭtomataj rezervaĵoj kaj por dosierproduktaĵoj."
+"Defaŭlta faldo por stokado de aŭtomataj rezervaĵoj kaj por "
+"dosierproduktaĵoj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:365
+#, fuzzy
 msgid ""
-"External MCP allows third-party AI applications to access data from the "
-"currently opened project. Data returned by MCP tools may be transmitted to "
-"the AI provider configured in that application.\n"
+"External MCP allows third-party AI applications to access data from the currently opened project. Data returned by MCP tools may be transmitted to the AI provider configured in that application.\n"
 "\n"
-"Only enable External MCP if you trust the connected application and "
-"understand how it handles your data."
+"Only enable External MCP if you trust the connected application and understand how it handles your data."
 msgstr ""
+"Ekstera MCP permesas triapartajn AI-aplikojn aliri datenojn de la nuntempe malfermita projekto. Datenoj resenditaj fare de MCP-iloj povas esti elsenditaj al la AI-provizanto formita en tiu petskribo.\n"
+"\n"
+"Nur rajtigi Eksteran MCP se vi fidas la ligitan aplikiĝon kaj komprenas kiel ĝi pritraktas viajn datenojn."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:372
+#, fuzzy
 msgid "External MCP privacy warning"
-msgstr ""
+msgstr "Ekstera MCP privateco avertanta"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:426
 #, fuzzy
 msgid "Close and open the software for the change in language to occur."
-msgstr "Proksime kaj malfermi la programaron por la ŝanĝo en lingvo por okazi."
+msgstr ""
+"Proksime kaj malfermi la programaron por la ŝanĝo en lingvo por okazi."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:427
 #, fuzzy
 msgid ""
-"Additional community supported languages can be installed by selecting \"Add "
-"more languages...\" in the dropdown."
+"Additional community supported languages can be installed by selecting \"Add"
+" more languages...\" in the dropdown."
 msgstr ""
 "Kroma komunumo apogis lingvojn povas esti instalita selektante \"Add pli da "
 "lingvoj ... \" en la guto."
@@ -3834,8 +3704,8 @@ msgid ""
 "Additional languages may not be the most current translations, and they may "
 "contain inaccurate translations."
 msgstr ""
-"Kromaj lingvoj eble ne estas la plej aktualaj tradukoj, kaj ili povas enhavi "
-"malprecizajn tradukojn."
+"Kromaj lingvoj eble ne estas la plej aktualaj tradukoj, kaj ili povas enhavi"
+" malprecizajn tradukojn."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:521
 #, fuzzy
@@ -3848,8 +3718,9 @@ msgid "Add more languages"
 msgstr "Aldonu pli da lingvoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:560
+#, fuzzy
 msgid "AI components are still loading."
-msgstr ""
+msgstr "AI-komponentoj daŭre ŝarĝas."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:590
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3282
@@ -3867,12 +3738,10 @@ msgstr "Edit AI-profila nomo"
 #, fuzzy
 msgid ""
 "Select a profile first. \n"
-"You can only edit the name of an existing profile. To create a new profile "
-"from scratch, follow the instructions in the QualCoder wiki on GitHub."
+"You can only edit the name of an existing profile. To create a new profile from scratch, follow the instructions in the QualCoder wiki on GitHub."
 msgstr ""
 "Elektu profilon unue.\n"
-"Vi povas nur redakti la nomon de ekzistanta profilo. Por krei novan profilon "
-"de gratulo, sekvi la instrukciojn en la QualCoder Vikio sur GitHub."
+"Vi povas nur redakti la nomon de ekzistanta profilo. Por krei novan profilon de gratulo, sekvi la instrukciojn en la QualCoder Vikio sur GitHub."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:679
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:923
@@ -4152,8 +4021,8 @@ msgstr "TExT CODINGS:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:542
 #, fuzzy
 msgid ""
-"Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators."
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators."
 msgstr ""
 "Vortoj utiligas alfabetkarakterojn kaj inkludas la apostrofo. Ĉiuj aliaj "
 "karakteroj estas vorto apartigiloj."
@@ -4450,16 +4319,6 @@ msgstr ""
 "R rotacias kontraŭ-dekstrume\n"
 "+ zoom en kaj eksteren"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2354
-#, fuzzy
-msgid " Height: "
-msgstr "Hejlo:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2355
-#, fuzzy
-msgid " Scale: "
-msgstr "Skalo:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:201
 #, fuzzy
 msgid "1) What do you want to search for?"
@@ -4554,22 +4413,6 @@ msgstr "<no dosierfiltrilo>"
 msgid "Search in all textfiles"
 msgstr "Serĉi en ĉiuj tekstdosieroj"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:641
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2538
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:724
-#, fuzzy
-msgid "Codings: "
-msgstr "Agordoj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:645
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes_by_segments.py:139
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:270
-#, fuzzy
-msgid ""
-"\n"
-"MEMO: "
-msgstr "Fiksigu min:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:653
 #, fuzzy
 msgid "Search in all cases"
@@ -4640,8 +4483,7 @@ msgstr "ne pretas"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:890
 #, fuzzy
 msgid "Please select a code or category (or use \"free search\" instead)."
-msgstr ""
-"Bonvolu elekti kodon aŭ kategorion (aŭ uzi \"liberan serĉon\" anstataŭe)."
+msgstr "Bonvolu elekti kodon aŭ kategorion (aŭ uzi \"liberan serĉon\" anstataŭe)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:922
 #, fuzzy
@@ -4651,8 +4493,8 @@ msgstr "Bonvolu eniri tekston en la \"topa\" kampo."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:988
 #, fuzzy
 msgid ""
-"After combining all filters, there are not files left for the search. Please "
-"check your settings."
+"After combining all filters, there are not files left for the search. Please"
+" check your settings."
 msgstr ""
 "Post kombinado de ĉiuj filtriloj, ekzistas ne dosieroj forlasitaj por la "
 "serĉo. Bonvolu kontroli viajn agordojn."
@@ -4768,14 +4610,12 @@ msgstr "Maksimumo:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:420
 #, fuzzy
 msgid ""
-"Since you are using the AI-powered search for the first time, QualCoder "
-"needs to download and install some additional components. \n"
+"Since you are using the AI-powered search for the first time, QualCoder needs to download and install some additional components. \n"
 "\n"
 "This will download about 2.5 GB of data. Do you \n"
 "want to continue?"
 msgstr ""
-"Ĉar vi uzas la AI-integriĝon por la unua fojo, QualCoder devas elŝuti kaj "
-"instali kelkajn kromajn komponentojn.\n"
+"Ĉar vi uzas la AI-integriĝon por la unua fojo, QualCoder devas elŝuti kaj instali kelkajn kromajn komponentojn.\n"
 "\n"
 "Tio elŝutas proksimume 2.5 Gb de datenoj. Ĉu vi\n"
 "Ĉu vi volas daŭrigi?"
@@ -4829,7 +4669,8 @@ msgstr ""
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1072
 #, fuzzy
-msgid "Migrating the existing AI memory to the new internal search database..."
+msgid ""
+"Migrating the existing AI memory to the new internal search database..."
 msgstr "Migranta la ekzistanta AI-memoro al la nova interna serĉdatumbazo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1080
@@ -5069,6 +4910,7 @@ msgid "Duplicate"
 msgstr "Duplika"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:198
+#, fuzzy
 msgid ""
 "Prompt names may contain Unicode letters, including accents and umlauts, "
 "numbers, hyphens, and underscores. They must start with a letter or number "
@@ -5076,6 +4918,12 @@ msgid ""
 "'Prompt' and 'prompt' are treated as duplicates. Reserved Windows filenames "
 "such as CON, NUL, COM1, and LPT1 are not allowed."
 msgstr ""
+"Promptnomoj povas enhavi Unikodo-leterojn, inkluzive de akĉentoj kaj "
+"umlauts, nombrojn, streketojn, kaj substrekojn. Ili devas komenciĝi kun "
+"letero aŭ nombro kaj enhavi ne pli ol 64 karakterojn. Nomoj estas kaz-"
+"insentemaj, tiel \"Prompt\" kaj \"propto\" estas traktitaj kiel duplikat. "
+"Rezervitaj Fenestroj kiel ekzemple CON, NUL, COM1, kaj LPT1 ne estas "
+"permesitaj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:221
 #, fuzzy
@@ -5183,8 +5031,9 @@ msgid "The folder name must be no longer than 64 characters."
 msgstr "La nomo devas esti ne pli longa ol 64 karakteroj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1123
+#, fuzzy
 msgid "The encoded folder name is too long for a portable filesystem."
-msgstr ""
+msgstr "La ĉifrita faldantnomo estas tro longa por portebla dosiersistemo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1127
 #, fuzzy
@@ -5194,8 +5043,8 @@ msgstr "Tiu filtrilnomo jam estas en uzo:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1130
 #, fuzzy
 msgid ""
-"Folder names must start with a letter or number and contain Unicode letters, "
-"combining marks, numbers, hyphens, and underscores only."
+"Folder names must start with a letter or number and contain Unicode letters,"
+" combining marks, numbers, hyphens, and underscores only."
 msgstr ""
 "Foldernomoj devas esti dosiersistem-kongruaj. Uzu minuskloleterojn, "
 "nombrojn, streketojn, kaj substrekojn nur."
@@ -5312,9 +5161,7 @@ msgstr "La nomo ne povas esti malplena."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1408
 #, fuzzy
-msgid ""
-"Prompt names must not contain \"/\" or \"\\\". Use folders in the tree "
-"instead."
+msgid "Prompt names must not contain \"/\" or \"\\\". Use folders in the tree instead."
 msgstr ""
 "Promptaj nomoj ne rajtas enhavi \"/\" aŭ \"\\\". Uzu faldojn en la arbo "
 "anstataŭe."
@@ -5330,18 +5177,22 @@ msgid "The name must be no longer than 64 characters."
 msgstr "La nomo devas esti ne pli longa ol 64 karakteroj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1422
+#, fuzzy
 msgid "The encoded prompt filename is too long for a portable filesystem."
 msgstr ""
+"La ĉifrita prompta dosiernomo estas tro longa por portebla dosiersistemo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1428
+#, fuzzy
 msgid "This prompt name is reserved by Windows and cannot be used."
 msgstr ""
+"Tiu prompta nomo estas rezervita fare de Fenestroj kaj ne povas esti uzita."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1431
 #, fuzzy
 msgid ""
-"Prompt names must start with a letter or number and contain Unicode letters, "
-"combining marks, numbers, hyphens, and underscores only."
+"Prompt names must start with a letter or number and contain Unicode letters,"
+" combining marks, numbers, hyphens, and underscores only."
 msgstr ""
 "Promptaj nomoj devas esti dosiersistem-kongruaj. Uzu minuskloleterojn, "
 "nombrojn, streketojn, kaj substrekojn nur."
@@ -5833,11 +5684,6 @@ msgstr "Reversita renomita datumbazo dosiereniro:"
 msgid "Bulk Rename of database file name entries"
 msgstr "Bulk Rename de datumbazo dosiernomoj"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:1600
-#, fuzzy
-msgid "Renamed database file entry:"
-msgstr "Renomita datumbazo dosiereniro:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:1656
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2135
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2184
@@ -6017,8 +5863,8 @@ msgstr "komentarioj"
 msgid ""
 "Replacing it may shift or remove existing codings and annotations. Continue?"
 msgstr ""
-"Anstataŭigi ĝin povas ŝanĝi aŭ forigi ekzistantajn kodigojn kaj komentadojn. "
-"Daŭrigu?"
+"Anstataŭigi ĝin povas ŝanĝi aŭ forigi ekzistantajn kodigojn kaj komentadojn."
+" Daŭrigu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2541
 #, fuzzy
@@ -6085,13 +5931,6 @@ msgstr "Presumita kolumnolimigilo por csv aŭ tsv-dosiero:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2715
 #, fuzzy
 msgid "No columns assigned as qualitative."
-msgstr "Neniuj kolonoj asignitaj kiel kvalitaj."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2716
-#, fuzzy
-msgid ""
-"\n"
-"No columns assigned as qualitative."
 msgstr "Neniuj kolonoj asignitaj kiel kvalitaj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2736
@@ -6277,12 +6116,6 @@ msgstr "PDF sen teksto"
 msgid "Cannot import"
 msgstr "Ne povas importi"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3369
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:340
-#, fuzzy
-msgid "Cannot import "
-msgstr "Ne povas importi"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3420
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:1013
 #, fuzzy
@@ -6356,8 +6189,8 @@ msgstr "Dosieroj eksportis"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3637
 #, fuzzy
 msgid ""
-"Search index is busy; the deleted file will be removed from the index on the "
-"next update."
+"Search index is busy; the deleted file will be removed from the index on the"
+" next update."
 msgstr ""
 "AI-indekso estas okupata; la forigita dosiero estos forigita de la indekso "
 "en la venonta ĝisdatigo."
@@ -6396,16 +6229,6 @@ msgstr "Dediĉita dosiero:"
 #, fuzzy
 msgid "Deleted: "
 msgstr "Dediĉita:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3982
-#, fuzzy
-msgid "Minimum: "
-msgstr "Minimumo:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3983
-#, fuzzy
-msgid "Maximum: "
-msgstr "Maksimumo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:4004
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:4006
@@ -6545,36 +6368,28 @@ msgid ""
 "Click to fit and center the graph. In the graph, press + or W to zoom in, - "
 "or Q to zoom out."
 msgstr ""
-"Klaku por konveni kaj koncentriĝi la grafeon. En la grafeo, gazetar+ aŭ W al "
-"zoom en, - aŭ Q por zomi eksteren."
+"Klaku por konveni kaj koncentriĝi la grafeon. En la grafeo, gazetar+ aŭ W al"
+" zoom en, - aŭ Q por zomi eksteren."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:128
 #, fuzzy
 msgid ""
 "BACK UP PROJECT before applying changes to the codes tree.\n"
-"The Code organiser is used mainly with grounded theory to help you develop "
-"and organise the coding concepts and their hierarchy.\n"
+"The Code organiser is used mainly with grounded theory to help you develop and organise the coding concepts and their hierarchy.\n"
 "Select a code branch or All, then right click to:\n"
-"Add categories, rename codes and categories, update memos, merge codes, "
-"merge categories, delete codes, delete categories.\n"
-"Rubber-band or Ctrl+click several nodes, then right click any of them for "
-"group actions (delete, or link them under a code/category).\n"
-"Pan the canvas by dragging with the middle mouse button, or hold the "
-"spacebar and drag with the left button.\n"
+"Add categories, rename codes and categories, update memos, merge codes, merge categories, delete codes, delete categories.\n"
+"Rubber-band or Ctrl+click several nodes, then right click any of them for group actions (delete, or link them under a code/category).\n"
+"Pan the canvas by dragging with the middle mouse button, or hold the spacebar and drag with the left button.\n"
 "\n"
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
 "BACK UP PROJECT antaŭ aplikado de ŝanĝoj al la kodoj arbo.\n"
-"La Code-organizilo estas uzita plejparte kun blokita teorio por helpi vin "
-"formiĝi kaj organizi la parodiajn konceptojn kaj ilian hierarkion.\n"
+"La Code-organizilo estas uzita plejparte kun blokita teorio por helpi vin formiĝi kaj organizi la parodiajn konceptojn kaj ilian hierarkion.\n"
 "Elekti kodon branĉo aŭ Ĉio, tiam dekstra klako al:\n"
-"Aldonu kategoriojn, renomikodojn kaj kategoriojn, ĝisdatignotojn, kunfandas "
-"kodojn, kunfalantajn kategoriojn, forigas kodojn, forigas kategoriojn.\n"
-"Rubber-grupo aŭ Ctrl+click pluraj nodoj, tiam rekte klakas iujn ajn da ili "
-"por grupagoj (delete, aŭ interligas ilin sub kodo/kategorio).\n"
-"Pano la kanvaso per tirado kun la meza musbutono, aŭ tenas la spacdrinkejon "
-"kaj tiriĝon kun la maldekstra butono.\n"
+"Aldonu kategoriojn, renomikodojn kaj kategoriojn, ĝisdatignotojn, kunfandas kodojn, kunfalantajn kategoriojn, forigas kodojn, forigas kategoriojn.\n"
+"Rubber-grupo aŭ Ctrl+click pluraj nodoj, tiam rekte klakas iujn ajn da ili por grupagoj (delete, aŭ interligas ilin sub kodo/kategorio).\n"
+"Pano la kanvaso per tirado kun la meza musbutono, aŭ tenas la spacdrinkejon kaj tiriĝon kun la maldekstra butono.\n"
 "\n"
 "Eble neatenditaj eraroj povus okazi.\n"
 "Ne estas UNDO OPON APPLYING CHANGES WITH la APPLY."
@@ -6598,7 +6413,8 @@ msgid ""
 "Selecting a different branch will discard unsaved changes to the code tree. "
 "Continue?"
 msgstr ""
-"Elekti malsaman branĉon forĵetos malŝparitajn ŝanĝojn al la kodarbo. Daŭrigu?"
+"Elekti malsaman branĉon forĵetos malŝparitajn ŝanĝojn al la kodarbo. "
+"Daŭrigu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:218
 #, fuzzy
@@ -6826,20 +6642,10 @@ msgstr "Memo ĝisdatigis:"
 msgid "category "
 msgstr "Kategorio kategorio"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1492
-#, fuzzy
-msgid "Code "
-msgstr "Kodo"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1496
 #, fuzzy
 msgid "under "
 msgstr "sub"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1501
-#, fuzzy
-msgid "Category "
-msgstr "Kategorio:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1509
 #, fuzzy
@@ -6870,11 +6676,6 @@ msgstr "Nomo jam en uzo:"
 #, fuzzy
 msgid "Code organiser - applied changes:"
 msgstr "Kodoorganizilo - aplikataj ŝanĝoj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1701
-#, fuzzy
-msgid "Code organiser "
-msgstr "Kodo organizinto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1709
 #, fuzzy
@@ -7109,7 +6910,8 @@ msgstr "Kaŝita de kategorio"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2890
 #, fuzzy
-msgid "All codings of this code will also be deleted when changes are applied."
+msgid ""
+"All codings of this code will also be deleted when changes are applied."
 msgstr ""
 "Ĉiuj ĉifradoj de tiu kodo ankaŭ estos forigitaj kiam ŝanĝoj estas uzitaj."
 
@@ -7137,7 +6939,8 @@ msgstr "Elekti kodon arbobranĉo"
 #, fuzzy
 msgid ""
 "Select a branch to organise (a category, a code, or a sub-code), or All:"
-msgstr "Elekti branĉon por organizi (kategorion, kodon, aŭ sub-kodon), aŭ Ĉio:"
+msgstr ""
+"Elekti branĉon por organizi (kategorion, kodon, aŭ sub-kodon), aŭ Ĉio:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:221
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5201
@@ -7264,15 +7067,12 @@ msgstr "Frazoj:"
 #, fuzzy
 msgid ""
 "Sync coding is enabled, but the transcript has no timestamps.\n"
-"Without timestamps the coding cannot be mirrored between the text and the "
-"wave (there is no way to map text positions to media time).\n"
+"Without timestamps the coding cannot be mirrored between the text and the wave (there is no way to map text positions to media time).\n"
 "The coding was saved normally, without its mirror.\n"
 "Add timestamps to the transcript, or untick Sync coding."
 msgstr ""
-"Sync-ĉifrado estas permesita, sed la transskribo havas neniujn "
-"tempostampojn.\n"
-"Sen tempstampoj la ĉifrado ne povas esti spegulitaj inter la teksto kaj la "
-"ondo (ekzistas neniu maniero mapi tekstpoziciojn al amaskomunikilartempo).\n"
+"Sync-ĉifrado estas permesita, sed la transskribo havas neniujn tempostampojn.\n"
+"Sen tempstampoj la ĉifrado ne povas esti spegulitaj inter la teksto kaj la ondo (ekzistas neniu maniero mapi tekstpoziciojn al amaskomunikilartempo).\n"
 "La ĉifrado estis savita normale, sen sia spegulo.\n"
 "Aldonu tempostampojn al la transskribo, aŭ netick Sync-ĉifrado."
 
@@ -7281,7 +7081,8 @@ msgstr ""
 #, fuzzy, python-format
 msgid ""
 "Keyframes in this file are about %s seconds apart, so seeking may stall or "
-"repeat frames. Re-encoding it with denser keyframes gives precise navigation."
+"repeat frames. Re-encoding it with denser keyframes gives precise "
+"navigation."
 msgstr ""
 "Klaskadroj en tiu dosiero estas proksimume% sekundoj dise, tiel serĉante "
 "povas bud aŭ ripeti kadrojn. Re-ĉifri ĝin kun pli densaj ŝlosilkadroj donas "
@@ -7299,15 +7100,6 @@ msgstr "Komencu segmenton"
 #, fuzzy
 msgid "Clear segment"
 msgstr "Klara segmento"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2391
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2883
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2899
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5511
-#, fuzzy
-msgid "Segment: "
-msgstr "Segmento:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2392
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2900
@@ -7765,14 +7557,6 @@ msgstr "KODO-NOTO:"
 msgid "CODED MEMO"
 msgstr "KODO-NOTO:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:383
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1487
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2612
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:545
-#, fuzzy
-msgid "Coder: "
-msgstr "Programistoj:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:396
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1502
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1643
@@ -7971,7 +7755,8 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:452
 #, fuzzy
 msgid ""
-"All variables are stored as text. Cast as text or float for SQL operations.\n"
+"All variables are stored as text. Cast as text or float for SQL "
+"operations.\n"
 msgstr ""
 "Ĉiuj variabloj estas stokitaj kiel teksto. Cast kiel teksto aŭ flosilo por "
 "SQL-operacioj."
@@ -8316,21 +8101,27 @@ msgid "Perspective: "
 msgstr "Perspektivo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:194
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "The external MCP server could not be started at {endpoint}."
-msgstr ""
+msgstr "La ekstera MCP-servilo ne povus esti komencita ĉe {endpoint} ."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:198
+#, fuzzy
 msgid ""
 "The port may already be in use by another QualCoder instance, or server "
 "initialization failed."
 msgstr ""
+"La haveno jam povas esti en uzo de alia QualCoder kazo, aŭ servila "
+"inicialigo malsukcesis."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:203
+#, fuzzy
 msgid ""
-"MCP access to this QualCoder instance is unavailable. You can continue using "
-"QualCoder. See the log for details."
+"MCP access to this QualCoder instance is unavailable. You can continue using"
+" QualCoder. See the log for details."
 msgstr ""
+"MCP-aliro al tiu QualCoder-kazo estas neatingebla. Vi povas daŭrigi uzi "
+"QualCoder. Vidu la tagalon por detaloj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:200
 #, fuzzy
@@ -8637,20 +8428,6 @@ msgstr "Kalkulo de interkovroj:"
 msgid "Total: "
 msgstr "Totala:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:574
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:584
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:832
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1047
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3620
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3834
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:4968
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5716
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1050
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1327
-#, fuzzy
-msgid "msecs"
-msgstr "milisekundoj"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:703
 #, fuzzy
 msgid "Total pixels: "
@@ -8688,12 +8465,6 @@ msgstr "Neniuj intersekciĝoj"
 #, fuzzy
 msgid "Count of intersections: "
 msgstr "Kalkulo de intersekciĝoj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:722
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:732
-#, fuzzy
-msgid "pixels"
-msgstr "pikseloj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:838
 #, fuzzy
@@ -8776,11 +8547,6 @@ msgstr ""
 "R rotacias kontraŭ-dekstrume\n"
 "+ zoom en kaj eksteren\n"
 "E Export Image"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/helpers.py:994
-#, fuzzy
-msgid "Scale:"
-msgstr "Skalo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/helpers.py:1053
 #, fuzzy
@@ -9144,23 +8910,6 @@ msgstr "Agordoj:"
 msgid "Codes: "
 msgstr "Kodoj:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1626
-#, fuzzy
-msgid "Attributes:"
-msgstr "Atributoj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1645
-#, fuzzy
-msgid ""
-"\n"
-"Files:\n"
-msgstr "Dosieroj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1650
-#, fuzzy
-msgid " Files: "
-msgstr "Dosieroj:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1652
 #, fuzzy
 msgid ""
@@ -9172,13 +8921,6 @@ msgstr "Kazoj:"
 #, fuzzy
 msgid "Text code statistics:"
 msgstr "Teksto kodo statistiko:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2086
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2168
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2243
-#, fuzzy
-msgid "Count:"
-msgstr "Kalkulo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2087
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2169
@@ -9207,12 +8949,6 @@ msgstr ""
 #, fuzzy
 msgid "Code count totals"
 msgstr "Node kalkuloj de tipo"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2400
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3315
-#, fuzzy
-msgid "MEMO:"
-msgstr "Fiksigu min:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2413
 #, fuzzy
@@ -9334,16 +9070,6 @@ msgstr "Delete kodigita sekcio"
 #, fuzzy
 msgid "Delete coded section"
 msgstr "Delete kodigita sekcio"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3064
-#, fuzzy
-msgid "FILE MEMO:"
-msgstr "Fiksigu min:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3072
-#, fuzzy
-msgid "CASE MEMO:"
-msgstr "KAZ-NOTO:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3442
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1274
@@ -9543,8 +9269,7 @@ msgstr "Elekti organizan modelon"
 msgid ""
 "Are you sure you want to generate an analytical model?\n"
 "\n"
-"This action will clear the current graph view and all unsaved nodes will be "
-"lost."
+"This action will clear the current graph view and all unsaved nodes will be lost."
 msgstr ""
 "Ĉu vi volas generi analizan modelon?\n"
 "\n"
@@ -9708,11 +9433,6 @@ msgstr "Elekti bildon dosierojn"
 #, fuzzy
 msgid " width"
 msgstr "larĝo"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3674
-#, fuzzy
-msgid " height:"
-msgstr "alteco:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3682
 #, fuzzy
@@ -10053,11 +9773,6 @@ msgstr "Softvarcitaĵo:"
 msgid "Analytical summary exported to:\n"
 msgstr "Analiza resumo eksportis al:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5184
-#, fuzzy
-msgid "The file could not be saved:\n"
-msgstr "La dosiero ne povus esti savita:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5213
 #, fuzzy
 msgid "Save Graph"
@@ -10205,12 +9920,14 @@ msgstr "Load grafeo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5745
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2852
+#, fuzzy
 msgid "The graph has unsaved changes."
-msgstr ""
+msgstr "La grafeo havas nesavitajn ŝanĝojn."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5746
+#, fuzzy
 msgid "Load another graph and lose the unsaved changes?"
-msgstr ""
+msgstr "Prunte alian grafeon kaj perdi la sendanĝerajn ŝanĝojn?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5747
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2851
@@ -10694,7 +10411,8 @@ msgid ""
 "code per colour (named and coloured after the closest QualCoder colour)."
 msgstr ""
 "Ĉu tiuj segmentoj? PDF Highlights kategorio estos kreita, kun unu kodo per "
-"kulminaĵokoloro (nomita kaj kolorita post la plej proksima QualCoder koloro)."
+"kulminaĵokoloro (nomita kaj kolorita post la plej proksima QualCoder "
+"koloro)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_utils.py:441
 #, fuzzy
@@ -10709,7 +10427,8 @@ msgid ""
 "colour)."
 msgstr ""
 "Ĉu tiuj segmentoj? PDF Highlights kategorio estos kreita, kun unu kodo per "
-"kulminaĵokoloro (nomita kaj kolorita post la plej proksima QualCoder koloro)."
+"kulminaĵokoloro (nomita kaj kolorita post la plej proksima QualCoder "
+"koloro)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_utils.py:446
 #, fuzzy
@@ -10725,7 +10444,8 @@ msgid ""
 "QualCoder colour)."
 msgstr ""
 "Ĉu tiuj segmentoj? PDF Highlights kategorio estos kreita, kun unu kodo per "
-"kulminaĵokoloro (nomita kaj kolorita post la plej proksima QualCoder koloro)."
+"kulminaĵokoloro (nomita kaj kolorita post la plej proksima QualCoder "
+"koloro)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_utils.py:457
 #, fuzzy
@@ -11182,7 +10902,8 @@ msgstr "Devas ĝisdatigi la fontan projektan datumbazon."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1035
 #, fuzzy
-msgid "Please open the source project using QualCoder. Then close the project."
+msgid ""
+"Please open the source project using QualCoder. Then close the project."
 msgstr ""
 "Bonvolu malfermi la fontan projekton uzante QualCoder. Tiam fermi la "
 "projekton."
@@ -11199,12 +10920,14 @@ msgid "About"
 msgstr "pri:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:184
+#, fuzzy
 msgid "Optional: Install VLC for audio and video coding."
-msgstr ""
+msgstr "Instali VLC por aŭdio kaj videoĉifrado."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:185
+#, fuzzy
 msgid "Optional: Install ffmpeg for waveform images."
-msgstr ""
+msgstr "Opcia: Install ffmpeg por ondformoj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:188
 #, fuzzy
@@ -11212,12 +10935,14 @@ msgid "Acknowledgements"
 msgstr "Neniuj kodigitaj segmentoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:189
+#, fuzzy
 msgid "Created RQDA - inspiration for QualCoder."
-msgstr ""
+msgstr "Kreita RQDA - inspiro por QualCoder."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:190
+#, fuzzy
 msgid "Source code for the docx module."
-msgstr ""
+msgstr "Fontokodo por la doĉ modulo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:191
 #, fuzzy
@@ -11225,24 +10950,29 @@ msgid "Created the QualCoder logo."
 msgstr "Serĉante la QualCoder helpo ..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:192
+#, fuzzy
 msgid "Programming, artificial intelligence and much more."
-msgstr ""
+msgstr "Programado, artefarita inteligenteco kaj multe pli."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:193
+#, fuzzy
 msgid "French translations, programming, setting up the new website and more."
-msgstr ""
+msgstr "Francaj tradukoj, programado, starigante la novan retejon kaj pli."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:195
+#, fuzzy
 msgid "Programming and Spanish translations."
-msgstr ""
+msgstr "Programado kaj hispanaj tradukoj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:197
+#, fuzzy
 msgid "To the many members on Github for supporting this project."
-msgstr ""
+msgstr "Al la multaj membroj sur Github por apogado de tiu projekto."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:275
+#, fuzzy
 msgid "Menu key shortcuts"
-msgstr ""
+msgstr "Menu esencaj mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:276
 #, fuzzy
@@ -11255,8 +10985,9 @@ msgid "Project menu shortcuts"
 msgstr "Projekto Importo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:277
+#, fuzzy
 msgid "Files and Cases menu shortcuts"
-msgstr ""
+msgstr "Dosieroj kaj Cases menuo mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:278
 #, fuzzy
@@ -11275,8 +11006,9 @@ msgid "Manage files"
 msgstr "Datendosieroj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:281
+#, fuzzy
 msgid "Open Files and Cases menu"
-msgstr ""
+msgstr "Malfermaj Dosieroj kaj Cases menuoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:281
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3359
@@ -11305,8 +11037,9 @@ msgid "Manage journals"
 msgstr "Inkludas ĵurnalon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:283
+#, fuzzy
 msgid "Open Reports menu"
-msgstr ""
+msgstr "Malfermaj raportoj menuoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:283
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1782
@@ -11339,12 +11072,14 @@ msgid "Coding menu shortcuts"
 msgstr "Coded-segmentoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:287
+#, fuzzy
 msgid "Reports menu shortcuts"
-msgstr ""
+msgstr "Raportoj menuo mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:287
+#, fuzzy
 msgid "Help menu shortcuts"
-msgstr ""
+msgstr "Helpu al menuoj mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:288
 #, fuzzy
@@ -11357,8 +11092,9 @@ msgid "Code retrieval"
 msgstr "Kodo de arbo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:288
+#, fuzzy
 msgid "Help contents"
-msgstr ""
+msgstr "Helpo enhavo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:289
 #, fuzzy
@@ -11429,8 +11165,9 @@ msgid "Database queries"
 msgstr "Defaŭltaj Queries"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:299
+#, fuzzy
 msgid "Manage menu key shortcuts"
-msgstr ""
+msgstr "Manaĝ menuoŝlosas mallongigojn"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:300
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:778
@@ -11449,8 +11186,9 @@ msgid "Journals"
 msgstr "Ĵurnalo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:302
+#, fuzzy
 msgid "Help"
-msgstr ""
+msgstr "Helpo helpo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:303
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:247
@@ -11566,12 +11304,14 @@ msgid "Link selected"
 msgstr "Dosiero elektita"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:316
+#, fuzzy
 msgid "Manage files - view A/V shortcuts"
-msgstr ""
+msgstr "Manaĝdosieroj - vido A/V mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:317
+#, fuzzy
 msgid "Rewind 30 seconds."
-msgstr ""
+msgstr "30 sekundoj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:318
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:444
@@ -11581,12 +11321,14 @@ msgstr "Segmento en kunteksto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:319
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:445
+#, fuzzy
 msgid "Forward 30 seconds"
-msgstr ""
+msgstr "Antaŭ 30 sekundoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:320
+#, fuzzy
 msgid "Start / pause.On start rewind slightly"
-msgstr ""
+msgstr "Komencu / haltas. Komencu iomete"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:321
 #, fuzzy
@@ -11594,30 +11336,36 @@ msgid "Insert timestamp in format"
 msgstr "Insert-tempostampo ĉi tie"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:322
+#, fuzzy
 msgid "Enter a new speakers name into shortcuts"
-msgstr ""
+msgstr "Enmetu novajn parolantojn en mallongigojn"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:323
+#, fuzzy
 msgid "Delete speaker names from shortcuts"
-msgstr ""
+msgstr "Delete parolantnomoj de mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:324
+#, fuzzy
 msgid "Insert speaker in format[speaker name]"
-msgstr ""
+msgstr "Insert Parolanto en formato [speaker nomo]"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:325
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:449
+#, fuzzy
 msgid "Increase play rate"
-msgstr ""
+msgstr "Pliiĝo de ludo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:326
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:450
+#, fuzzy
 msgid "Decrease play rate"
-msgstr ""
+msgstr "Decrease ludas indicon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:327
+#, fuzzy
 msgid "When tree item selected - Rename code or category"
-msgstr ""
+msgstr "Kiam arbobjektoj selektis - Rename-kodon aŭ kategorion"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:333
 #, fuzzy
@@ -11720,9 +11468,12 @@ msgid "Show selected code next"
 msgstr "Unu elektita kodo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:353
+#, fuzzy
 msgid ""
 "Show all codes in text ( if selected code previous or next has been used)"
 msgstr ""
+"Montri ĉiujn kodojn en teksto (se selektita kodo antaŭa aŭ venonta estis "
+"uzita)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:354
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:388
@@ -11737,25 +11488,30 @@ msgstr "Montras ĉifradojn markitajn gravajn"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:383
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:412
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:427
+#, fuzzy
 msgid "Help - opens in browser"
-msgstr ""
+msgstr "Helpu - malfermi en retumilo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:356
+#, fuzzy
 msgid "Jump to search box"
-msgstr ""
+msgstr "Saltu serĉi skatolon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:357
+#, fuzzy
 msgid "The last code that was unmarked, restore that coding"
-msgstr ""
+msgstr "La lasta kodo kiu estis nemarkita, reestigi tiun ĉifradon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:358
+#, fuzzy
 msgid "Enter and Exit Edit mode"
-msgstr ""
+msgstr "Situo kaj Exit Edit reĝimo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:359
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:390
+#, fuzzy
 msgid "Annotate - Current text selection"
-msgstr ""
+msgstr "Annotate - Nuna tekstoselektado"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:360
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:391
@@ -11767,25 +11523,31 @@ msgstr "Shift ĉifradoj post klakita pozicio"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:392
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:413
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:431
+#, fuzzy
 msgid ""
 "Create new category. If a category is already selected, the new category "
 "will be underneath"
 msgstr ""
+"Krei novan kategorion. Se kategorio jam estas selektita, la nova kategorio "
+"estos sub"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:363
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:393
+#, fuzzy
 msgid "Hide / Unhide top groupbox"
-msgstr ""
+msgstr "Kaŝo / Unhide pinta grupkesto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:364
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:394
+#, fuzzy
 msgid "Tag coded text at clicked position as important"
-msgstr ""
+msgstr "Tag kodita teksto ĉe klakita pozicio kiel grava"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:365
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:434
+#, fuzzy
 msgid "Show codes like (when text coding area is in focus)"
-msgstr ""
+msgstr "Spektaklokodoj kiel (kiam tekstoĉifrado areo estas en fokuso)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:366
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:396
@@ -11800,34 +11562,40 @@ msgid "New code - for selected text"
 msgstr "Neniuj kodantoj elektis"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:368
+#, fuzzy
 msgid "Shortcut to cycle through overlapping codes - at clicked position"
-msgstr ""
+msgstr "Mallongigo al ciklo tra imbrikitaj kodoj - ĉe klakita pozicio"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:369
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:397
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:437
+#, fuzzy
 msgid "Quick Mark with code - for current selection"
-msgstr ""
+msgstr "Rapida Marko kun kodo - por aktuala selektado"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:370
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:438
+#, fuzzy
 msgid "Search text - may include current selection"
-msgstr ""
+msgstr "Serĉo teksto - povas inkludi nunan selektadon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:371
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:398
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:439
+#, fuzzy
 msgid "Opens a context menu for recently used codes for marking text"
-msgstr ""
+msgstr "Malfermita kunteksto menuo por ĵus uzitaj kodoj por markado de teksto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:372
+#, fuzzy
 msgid "Reverse text direction: Left to Right | Right to Left"
-msgstr ""
+msgstr "Inversa tekstodirekto: Maldekstre dekstren"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:373
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:399
+#, fuzzy
 msgid "Unmark At clicked position in the text"
-msgstr ""
+msgstr "Unmark Ĉe klakita pozicio en la teksto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:374
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:400
@@ -11836,31 +11604,39 @@ msgid "assign in vivo code to selected text"
 msgstr "Ŝanĝo kodo al elektita kodo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:375
+#, fuzzy
 msgid "Alt Left arrow.Shrink coding to the left"
-msgstr ""
+msgstr "Pli granda sago. Shrink-ĉifrado maldekstren"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:376
+#, fuzzy
 msgid "Alt Right arrow.Shrink coding to the right"
-msgstr ""
+msgstr "alta dekstra sago. ĉifrado de la dekstra"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:377
+#, fuzzy
 msgid "Shift Left arrow.Extend coding to the left"
-msgstr ""
+msgstr "Shift forlasis sagon. Eksplicita ĉifrado maldekstren"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:378
+#, fuzzy
 msgid "Shift Right arrow.Extend coding to the right"
-msgstr ""
+msgstr "La dekstra sago. Eksplicita ĉifrado al la rajto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:379
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:404
+#, fuzzy
 msgid "Describes clicked text character position"
-msgstr ""
+msgstr "Priskribas klakitan tekstan karakteron"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:380
+#, fuzzy
 msgid ""
 "Shift all coding positions after a clicked position by X characters "
 "(negative numbers shift left)"
 msgstr ""
+"Shift ĉiuj kodigaj pozicioj post klakita pozicio de X karakteroj (negativaj "
+"nombroj ŝanĝiĝas maldekstro)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:382
 #, fuzzy
@@ -11869,13 +11645,15 @@ msgstr "Kodo de karakteroj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:395
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:414
+#, fuzzy
 msgid "Show codes like (when coding area is in focus)"
-msgstr ""
+msgstr "Spektaklokodoj ŝatas (kiam ĉifrado de areo estas en fokuso)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:401
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:415
+#, fuzzy
 msgid "The last code is unmarked, undo and restore that coding"
-msgstr ""
+msgstr "La lasta kodo estas nemarkita, undo kaj reestigi tiun ĉifradon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:402
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:417
@@ -11897,13 +11675,18 @@ msgid "Code image key shortcuts"
 msgstr "Coded bildsegmentoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:416
+#, fuzzy
 msgid ""
-"Create a grayed-out image with coloured coded highlights (Wait a few seconds)"
+"Create a grayed-out image with coloured coded highlights (Wait a few "
+"seconds)"
 msgstr ""
+"Kreu grizigitan bildon kun koloraj kodigitaj kulminaĵoj (Atendu kelkajn "
+"sekundojn)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:419
+#, fuzzy
 msgid "Right - click on image for menu to rotate image"
-msgstr ""
+msgstr "Dekstra - klakas sur bildo por menuo por rotacii bildon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:421
 #, fuzzy
@@ -11911,8 +11694,9 @@ msgid "Code audio/video key shortcuts"
 msgstr "Kodo de aŭdio/vidbendaj segmentoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:428
+#, fuzzy
 msgid "Annotate - for current selection"
-msgstr ""
+msgstr "Annotate - por aktuala selektado"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:429
 #, fuzzy
@@ -11920,12 +11704,15 @@ msgid "Set Bookmark in text for this audio/video file"
 msgstr "Elekti aŭdio- / video dosierojn"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:430
+#, fuzzy
 msgid "Open file and move to bookmarked text position"
-msgstr ""
+msgstr "Malferma dosiero kaj movo mendi tekstan pozicion"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:432
+#, fuzzy
 msgid "Assign segment to currently selected code, and open memo for segment."
 msgstr ""
+"Assign segmento al nuntempe elektita kodo, kaj malferma noto por segmento."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:433
 #, fuzzy
@@ -11943,12 +11730,14 @@ msgid "Shows cursor position in text area"
 msgstr "Spektaklodosieroj enhavantaj tekston"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:441
+#, fuzzy
 msgid "Go forward 5 seconds."
-msgstr ""
+msgstr "Daŭrigu 5 sekundojn."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:442
+#, fuzzy
 msgid "Restore last unmarked code(s) - text code(s) or segment code"
-msgstr ""
+msgstr "Restore laste nemarkita kodo (j) - tekstokodo (j) aŭ segmentkodo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:443
 #, fuzzy
@@ -11957,16 +11746,19 @@ msgstr "Segmento en kunteksto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:446
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:447
+#, fuzzy
 msgid "Play / pause.On start rewind slightly"
-msgstr ""
+msgstr "Ludu / paŭzo. Komencu iomete"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:448
+#, fuzzy
 msgid "Start and stop av segment creation"
-msgstr ""
+msgstr "Komencu kaj haltu segmenton"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:452
+#, fuzzy
 msgid "Database Queries key shortcuts"
-msgstr ""
+msgstr "Datumbazo Queries esencaj mallongigoj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:453
 #, fuzzy
@@ -11974,70 +11766,51 @@ msgid "Run SQL query"
 msgstr "Evitu query"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:462
+#, fuzzy
 msgid ""
 "# Project\n"
 "\n"
-"The Project tab is the starting point for your work. Create or open a "
-"project with the cards on the left,\n"
-"and go back to your latest work from the Recent activity list. Everything "
-"else is in the [Project menu](qualcoder://menu/project).\n"
-"The action log, shown in place of this guide, records what you do during a "
-"session.\n"
+"The Project tab is the starting point for your work. Create or open a project with the cards on the left,\n"
+"and go back to your latest work from the Recent activity list. Everything else is in the [Project menu](qualcoder://menu/project).\n"
+"The action log, shown in place of this guide, records what you do during a session.\n"
 "\n"
 "\n"
 "## First steps\n"
 "\n"
-"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such "
-"as documents, PDFs, images, audio and video.\n"
-"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/"
-"manage_cases) and describe them with [attributes](qualcoder://menu/"
-"files_and_cases/manage_attributes).\n"
-"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://"
-"menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or "
-"[audio and video](qualcoder://menu/coding/code_audio_video).\n"
-"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/"
-"manage_journals) and the [project memo](qualcoder://menu/project/"
-"project_memo).\n"
-"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the "
-"[AI Agent](qualcoder://menu/ai).\n"
+"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such as documents, PDFs, images, audio and video.\n"
+"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/manage_cases) and describe them with [attributes](qualcoder://menu/files_and_cases/manage_attributes).\n"
+"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or [audio and video](qualcoder://menu/coding/code_audio_video).\n"
+"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/manage_journals) and the [project memo](qualcoder://menu/project/project_memo).\n"
+"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the [AI Agent](qualcoder://menu/ai).\n"
 "\n"
 "\n"
 "## About projects\n"
 "\n"
-"- A QualCoder project is a folder ending in .qda. It contains the project "
-"database and folders for imported documents, images, audio and video.\n"
-"- A dated backup of the project can be made each time it is opened. See the "
-"backup options in [Settings](qualcoder://menu/project/settings).\n"
-"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-"
-"Project/)\n"
+"- A QualCoder project is a folder ending in .qda. It contains the project database and folders for imported documents, images, audio and video.\n"
+"- A dated backup of the project can be made each time it is opened. See the backup options in [Settings](qualcoder://menu/project/settings).\n"
+"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-Project/)\n"
 "\n"
 "\n"
 "## [Project Memo](qualcoder://menu/project/project_memo)\n"
 "\n"
-"- Describe the research topic, questions, methodology, and the participants "
-"and data collected.\n"
+"- Describe the research topic, questions, methodology, and the participants and data collected.\n"
 "- The AI agent reads this memo to understand the context of your project.\n"
 "\n"
 "\n"
 "## [Settings](qualcoder://menu/project/settings)\n"
 "\n"
-"- Set your coder name, fonts, language, colour style, backups, and the AI "
-"integration. Settings and Help are also next to the main tabs.\n"
+"- Set your coder name, fonts, language, colour style, backups, and the AI integration. Settings and Help are also next to the main tabs.\n"
 "- [Help: Settings](qualcoder://help/2.2.-Settings/)\n"
 "\n"
 "\n"
 "## [Project Summary](qualcoder://menu/project/project_summary)\n"
 "\n"
-"- Writes a detailed overview of the open project to the action log, with "
-"files, cases, codes, categories, attributes, journals, and any bad links to "
-"files.\n"
+"- Writes a detailed overview of the open project to the action log, with files, cases, codes, categories, attributes, journals, and any bad links to files.\n"
 "\n"
 "\n"
-"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/"
-"project/export)\n"
+"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/project/export)\n"
 "\n"
-"- Exchange projects and codebooks with other software through the REFI-QDA "
-"standard.\n"
+"- Exchange projects and codebooks with other software through the REFI-QDA standard.\n"
 "- Import RQDA, Taguette and Sonal projects, or a plain text list of codes.\n"
 "- Export the codebook as an ODT file, with or without memos.\n"
 "- [Help: Imports and exports](qualcoder://help/6.1.-Imports-and-Exports/)\n"
@@ -12045,19 +11818,67 @@ msgid ""
 "\n"
 "## [Close Project](qualcoder://menu/project/close_project)\n"
 "\n"
-"- Closes the open project. Workspaces with unsaved changes are checked "
-"first, and a backup made on opening is removed if nothing changed.\n"
+"- Closes the open project. Workspaces with unsaved changes are checked first, and a backup made on opening is removed if nothing changed.\n"
 msgstr ""
+"Projekto\n"
+"\n"
+"La Project-klapeto estas la deirpunkto por via laboro. Krei aŭ malfermi projekton kun la kartoj maldekstre,\n"
+"kaj revenu al via plej lasta laboro de la lastatempa agadlisto. Ĉio alia estas en la [Project menu] (qualcoder://menu/projekci).\n"
+"La batalregistro, montrita modloko de tiu gvidisto, registras kion vi faras dum sesio.\n"
+"\n"
+"\n"
+"Unuaj paŝoj\n"
+"\n"
+"1. [Import your dosieroj] (qualcoder:/menu/dosieroj and cases/manage dosieroj), kiel ekzemple dokumentoj, PDFoj, bildoj, aŭdio kaj vidbendo.\n"
+"2. Group-partoprenantoj aŭ ejoj kiel [kazoj] (qualcoder://menu/dosieroj and cases/manage cases) kaj priskribas ilin kun [atribuoj] (qualcoder://menu/dosieroj and cases/manage attributoj).\n"
+"3. Komencu [ĉifri tekston] (qualcoder:/menu/kodigo/kodoj), [PDFs] (qualcoder://menu/kodigo/kodf), [imagas] (qualcoder:///menu/koding/code image) aŭ [audio kaj vidbendo] (qualcoder:////menu/kodado/kod/kodio vidbendo).\n"
+"4. Skribu viajn reflektadojn en [ĵurnaloj] (qualcoder://menu/dosieroj and cases/manage journals) kaj la [projekta noto] (qualcoder:///menu/projekto/projekcmemo).\n"
+"5. Explore padronoj en la [raportoj] (qualcoder://menu/havenoj) aŭ demandas la [AI Agenton] (qualcoder: /menu/ai).\n"
+"\n"
+"\n"
+"Nombro de projektoj\n"
+"\n"
+"QualCoder projekto estas faldita fino en .qda. Ĝi enhavas la projektodatumbazon kaj faldantojn por importitaj dokumentoj, bildoj, aŭdio kaj vidbendo.\n"
+"Retigita rezervo de la projekto povas esti farita ĉiun fojon ĝi estas malfermita. Vidu la rezervelektojn en [Settings] (qualcoder://menu/projekcioj).\n"
+"[helpo: Krei novan projekton] (qualcoder: // helpo/3.1.-Creating-NIL-New-Project/)\n"
+"\n"
+"\n"
+"numero [Project Memo] (qualcoder://menu/projekcii/projektimo)\n"
+"\n"
+"Priskribu la esplortemon, demandojn, metodaron, kaj la partoprenantojn kaj datenojn kolektis.\n"
+"La AI-agento legas tiun noton por kompreni la kuntekston de via projekto.\n"
+"\n"
+"\n"
+"numero [Settings] (qualcoder:/menu/projekcioj)\n"
+"\n"
+"Meti vian kodnomon, tiparojn, lingvon, kolorstilon, rezervaĵojn, kaj la AI-integriĝon. Settings kaj Helpo estas ankaŭ apud la ĉefaj klakoj.\n"
+"( helpo: Settings) (qualcoder: // helpo/2.2.-Settings/)\n"
+"\n"
+"\n"
+"numero [Project Summary] (qualcoder://menu/projekci/projektiva)\n"
+"\n"
+"Skribas detalan superrigardon de la malferma projekto al la batalregistro, kun dosieroj, kazoj, kodoj, kategorioj, atributoj, ĵurnaloj, kaj ajnaj malbonaj ligiloj al dosieroj.\n"
+"\n"
+"\n"
+"numero [Import] (qualcoder:/menu/projekciilo/import) kaj [Export] (qualcoder:///menu/projekt/eksport)\n"
+"\n"
+"Interŝanĝaj projektoj kaj kodlibroj kun alia programaro tra la REFI-QDA normo.\n"
+"Import RQDA, Taguette kaj Sonal projektoj, aŭ simpla tekstlisto de kodoj.\n"
+"Eksporti la kodlibron kiel ODT-dosiero, kun aŭ sen notoj.\n"
+"( helpo: Importoj kaj eksportaĵoj) (qualcoder://helpo/6.1.-Imports-and-Exports/)\n"
+"\n"
+"\n"
+"numero [Close Project] (qualcoder:/menu/projekci/proksima projekci)\n"
+"\n"
+"Fermu la malfermitan projekton. Laborspacoj kun nesavitaj ŝanĝoj unue estas kontrolitaj, kaj rezervaĵo farita sur malfermaĵo estas forigita se nenio ŝanĝiĝis."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:519
 #, fuzzy
 msgid ""
 "# Manage\n"
 "\n"
-"The Manage tab displays workspaces for organising cases, files, attributes, "
-"journals, and references.\n"
-"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among "
-"them.\n"
+"The Manage tab displays workspaces for organising cases, files, attributes, journals, and references.\n"
+"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among them.\n"
 "\n"
 "\n"
 "## [Manage Files](qualcoder://menu/files_and_cases/manage_files)\n"
@@ -12066,37 +11887,29 @@ msgid ""
 "- You can import plain text and many other document types,\n"
 "including PDFs, images, audio, and video.\n"
 "- You may also import survey data.\n"
-"- Before importing text files, you may want to create pseudonyms to protect "
-"the privacy of people or organisations.\n"
+"- Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.\n"
 "- [Help: Import files](qualcoder://help/3.2.-Files/)\n"
 "\n"
 "\n"
 "## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)\n"
 "\n"
-"- You can use cases to group files together that are related to a topic, "
-"person, organisation, or any other empirical entity in your study. \n"
-"- This can be useful for organising your data and for running reports on "
-"specific groups of files.\n"
+"- You can use cases to group files together that are related to a topic, person, organisation, or any other empirical entity in your study. \n"
+"- This can be useful for organising your data and for running reports on specific groups of files.\n"
 "- [Help: Cases](qualcoder://help/3.3.-Cases/)\n"
 "\n"
 "\n"
 "## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)\n"
 "\n"
-"- Journals are used to record your thoughts when coding and analysing "
-"data. \n"
-"- The journal window opens separately from the main window so you can move "
-"between them easily.\n"
+"- Journals are used to record your thoughts when coding and analysing data. \n"
+"- The journal window opens separately from the main window so you can move between them easily.\n"
 "- [Help: Journals](qualcoder://help/5.2.-Journals/)\n"
 "\n"
 "\n"
 "## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)\n"
 "\n"
-"- Files, cases, and journals can have attributes (variables) that describe "
-"their characteristics. \n"
-"- They can be used to filter and organise data, and to run reports based on "
-"specific criteria. \n"
-"- Use this menu to create and manage such attributes. They can be attached "
-"to files, cases, and journals directly in the respective workspaces. \n"
+"- Files, cases, and journals can have attributes (variables) that describe their characteristics. \n"
+"- They can be used to filter and organise data, and to run reports based on specific criteria. \n"
+"- Use this menu to create and manage such attributes. They can be attached to files, cases, and journals directly in the respective workspaces. \n"
 "- [Help: Attributes](qualcoder://help/3.4.-Attributes/)\n"
 "\n"
 "\n"
@@ -12108,58 +11921,43 @@ msgid ""
 msgstr ""
 "Manaĝo\n"
 "\n"
-"La Manage-klapeto montras laborspacojn por organizado de kazoj, dosieroj, "
-"atributoj, ĵurnaloj, kaj referencoj.\n"
-"Uzu la [Manage menuo] (qualcoder:/menu/dosieroj and cases) elekti inter "
-"ili.\n"
+"La Manage-klapeto montras laborspacojn por organizado de kazoj, dosieroj, atributoj, ĵurnaloj, kaj referencoj.\n"
+"Uzu la [Manage menuo] (qualcoder:/menu/dosieroj and cases) elekti inter ili.\n"
 "\n"
 "\n"
 "numero [Manage Files] (qualcoder:/menu/dosieroj and cases/manage files)\n"
 "\n"
-"Ĉi tiu menuo lasas vin aldoni kaj forigi empiriajn datumojn en via "
-"projekto.\n"
+"Ĉi tiu menuo lasas vin aldoni kaj forigi empiriajn datumojn en via projekto.\n"
 "Vi povas importi klartekston kaj multajn aliajn dokumentspecojn,\n"
 "inkluzive de PDFoj, bildoj, aŭdio, kaj vidbendo.\n"
 "Vi ankaŭ povas importi enketojn.\n"
-"Antaŭ importado de tekstdosieroj, vi povas voli krei pseŭdonimojn por "
-"protekti la privatecon de homoj aŭ organizoj.\n"
+"Antaŭ importado de tekstdosieroj, vi povas voli krei pseŭdonimojn por protekti la privatecon de homoj aŭ organizoj.\n"
 "( helpo: Importdosieroj) (qualcoder: // helpo/3.2.-Files/)\n"
 "\n"
 "\n"
 "numero [ Manage Cases] (qualcoder:/menu/dosieroj and cases/manage cases)\n"
 "\n"
-"Vi povas uzi kazojn al grupdosieroj kune kiuj estas rilatitaj al temo, "
-"persono, organizo, aŭ ajna alia empiria unuo en via studo.\n"
-"Tio povas esti utila por organizado de viaj datenoj kaj por prizorgado de "
-"raportoj pri specifaj grupoj de dosieroj.\n"
+"Vi povas uzi kazojn al grupdosieroj kune kiuj estas rilatitaj al temo, persono, organizo, aŭ ajna alia empiria unuo en via studo.\n"
+"Tio povas esti utila por organizado de viaj datenoj kaj por prizorgado de raportoj pri specifaj grupoj de dosieroj.\n"
 "( helpo: Cas) (qualcoder: // helpo/3.3.-Cases/)\n"
 "\n"
 "\n"
-"numero [Manage Journals] (qualcoder:/menu/dosieroj and cases/manage "
-"journals)\n"
+"numero [Manage Journals] (qualcoder:/menu/dosieroj and cases/manage journals)\n"
 "\n"
-"Ĵurnaloj kutimas registri viajn pensojn dum ĉifrado kaj analizado de "
-"datenoj.\n"
-"La ĵurnalfenestro malfermiĝas aparte de la ĉeffenestro tiel ke vi povas "
-"moviĝi inter ili facile.\n"
+"Ĵurnaloj kutimas registri viajn pensojn dum ĉifrado kaj analizado de datenoj.\n"
+"La ĵurnalfenestro malfermiĝas aparte de la ĉeffenestro tiel ke vi povas moviĝi inter ili facile.\n"
 "( helpo: Ĵurnaloj) (qualcoder: // helpo/5.2.-ĵurnaloj/)\n"
 "\n"
 "\n"
-"numero [ Manage Attributes] (qualcoder:/menu/dosieroj and cases/manage "
-"attributes)\n"
+"numero [ Manage Attributes] (qualcoder:/menu/dosieroj and cases/manage attributes)\n"
 "\n"
-"Dosieroj, kazoj, kaj ĵurnaloj povas havi atributojn (variabloj) kiuj "
-"priskribas siajn karakterizaĵojn.\n"
-"Ili povas esti uzitaj por filtri kaj organizi datenojn, kaj por prizorgi "
-"raportojn bazitajn sur specifaj kriterioj.\n"
-"Uzu tiun menuon por krei kaj administri tiajn atributojn. Ili povas esti "
-"alkroĉitaj al dosieroj, kazoj, kaj ĵurnaloj rekte en la respektivaj "
-"laborspacoj.\n"
+"Dosieroj, kazoj, kaj ĵurnaloj povas havi atributojn (variabloj) kiuj priskribas siajn karakterizaĵojn.\n"
+"Ili povas esti uzitaj por filtri kaj organizi datenojn, kaj por prizorgi raportojn bazitajn sur specifaj kriterioj.\n"
+"Uzu tiun menuon por krei kaj administri tiajn atributojn. Ili povas esti alkroĉitaj al dosieroj, kazoj, kaj ĵurnaloj rekte en la respektivaj laborspacoj.\n"
 "( helpo: Atributoj) (qualcoder: // helpo/3.4.-Attributes/)\n"
 "\n"
 "\n"
-"numero [Manage References] (qualcoder:/menu/dosieroj and cases/manage "
-"referencoj)\n"
+"numero [Manage References] (qualcoder:/menu/dosieroj and cases/manage referencoj)\n"
 "\n"
 "Bibliografaj referencoj povas esti importitaj de NBIB kaj RIS dosieroj.\n"
 "Post tio, referencoj povas esti ligitaj al dosieroj en la projekto.\n"
@@ -12170,130 +11968,100 @@ msgstr ""
 msgid ""
 "# Coding\n"
 "\n"
-"The Coding tab displays workspaces for coding text, PDFs, images, audio, and "
-"video.\n"
-"Use the [Coding menu](qualcoder://menu/coding) to select an option to "
-"begin. \n"
-"Note that you can only open a particular coding workspace if that type of "
-"data is actually present in the current project. \n"
+"The Coding tab displays workspaces for coding text, PDFs, images, audio, and video.\n"
+"Use the [Coding menu](qualcoder://menu/coding) to select an option to begin. \n"
+"Note that you can only open a particular coding workspace if that type of data is actually present in the current project. \n"
 "\n"
 "\n"
 "## [Code Text](qualcoder://menu/coding/codes)\n"
 "\n"
-"- Use this workspace to read textual data closely and assign codes to "
-"selected passages.\n"
-"- You can organise codes in a tree, add memos and annotations, create "
-"bookmarks, and mark especially useful segments as important.\n"
+"- Use this workspace to read textual data closely and assign codes to selected passages.\n"
+"- You can organise codes in a tree, add memos and annotations, create bookmarks, and mark especially useful segments as important.\n"
 "- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)\n"
 "\n"
 "\n"
 "## [Code Images](qualcoder://menu/coding/code_image)\n"
 "\n"
-"- In this workspace, you can select regions in photographs, diagrams, "
-"screenshots, or other visual material and assign codes to them.\n"
-"- Coded areas are displayed as coloured rectangles linked to your code "
-"system.\n"
+"- In this workspace, you can select regions in photographs, diagrams, screenshots, or other visual material and assign codes to them.\n"
+"- Coded areas are displayed as coloured rectangles linked to your code system.\n"
 "- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)\n"
 "\n"
 "\n"
 "## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)\n"
 "\n"
-"- Use this workspace to transcribe and/or code time-based media such as "
-"interviews, focus groups, and field recordings.\n"
-"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-"
-"Video/)\n"
+"- Use this workspace to transcribe and/or code time-based media such as interviews, focus groups, and field recordings.\n"
+"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)\n"
 "\n"
 "\n"
 "## [Code PDFs](qualcoder://menu/coding/code_pdf)\n"
 "\n"
-"- This workspace allows you to code text directly in PDF documents when you "
-"want to keep the original page layout in view.\n"
-"- This is useful for articles, reports, and other source material where page "
-"position and formatting matter.\n"
+"- This workspace allows you to code text directly in PDF documents when you want to keep the original page layout in view.\n"
+"- This is useful for articles, reports, and other source material where page position and formatting matter.\n"
 "- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
 "\n"
 "\n"
 "## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)\n"
 "\n"
-"- This loads a variant of the text coding workspace that uses AI to explore "
-"your data and suggest segments for a selected code.\n"
+"- This loads a variant of the text coding workspace that uses AI to explore your data and suggest segments for a selected code.\n"
 "- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
 "\n"
 "\n"
 "## [Code Organiser](qualcoder://menu/coding/code_organiser)\n"
 "\n"
-"- Use this workspace to reorganise your code system using a graphical, mind-"
-"map style interface.\n"
-"- You can move, merge, and rename codes and categories as your analytic "
-"structure becomes clearer.\n"
+"- Use this workspace to reorganise your code system using a graphical, mind-map style interface.\n"
+"- You can move, merge, and rename codes and categories as your analytic structure becomes clearer.\n"
 "- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)\n"
 "\n"
 "\n"
 "## [Colour Scheme](qualcoder://menu/coding/colour_scheme)\n"
 "\n"
-"- This allows you to change the colour scheme of your codes and "
-"categories. \n"
+"- This allows you to change the colour scheme of your codes and categories. \n"
 "- Special schemes for colour-blind users are available. \n"
 msgstr ""
 "#a?\n"
 "\n"
-"La Coding-klapeto montras laborspacojn por kodigado de teksto, PDFoj, "
-"bildoj, aŭdio, kaj vidbendo.\n"
-"Uzu la [Coding menu] (qualcoder:/menu/ĉifrado) selekti opcion por "
-"komenciĝi.\n"
-"Notu ke vi povas nur malfermi specialan parodian laborspacon se tiu speco de "
-"datenoj ĉeestas fakte en la nuna projekto.\n"
+"La Coding-klapeto montras laborspacojn por kodigado de teksto, PDFoj, bildoj, aŭdio, kaj vidbendo.\n"
+"Uzu la [Coding menu] (qualcoder:/menu/ĉifrado) selekti opcion por komenciĝi.\n"
+"Notu ke vi povas nur malfermi specialan parodian laborspacon se tiu speco de datenoj ĉeestas fakte en la nuna projekto.\n"
 "\n"
 "\n"
 "numero [Code Text] (qualcoder:/menu/kodigo/kodoj)\n"
 "\n"
-"Uzu tiun laborspacon por legi tekstajn datenojn proksime kaj asigni kodojn "
-"al elektitaj trairejoj.\n"
-"Vi povas organizi kodojn en arbo, aldoni notojn kaj komentadojn, krei "
-"libromarkojn, kaj marki aparte utilajn segmentojn kiel gravaj.\n"
+"Uzu tiun laborspacon por legi tekstajn datenojn proksime kaj asigni kodojn al elektitaj trairejoj.\n"
+"Vi povas organizi kodojn en arbo, aldoni notojn kaj komentadojn, krei libromarkojn, kaj marki aparte utilajn segmentojn kiel gravaj.\n"
 "( helpo: Coding teksto) (qualcoder: // helpo/4.1.-Coding-Text/)\n"
 "\n"
 "\n"
 "numero [Code Images] (qualcoder:/menu/kodado/kodbildigo)\n"
 "\n"
-"En tiu laborspaco, vi povas selekti regionojn en fotoj, diagramoj, "
-"ekranpafoj, aŭ alia vida materialo kaj asignas kodojn al ili.\n"
-"Kodareoj estas elmontritaj kiel koloraj rektanguloj ligitaj al via "
-"kodsistemo.\n"
+"En tiu laborspaco, vi povas selekti regionojn en fotoj, diagramoj, ekranpafoj, aŭ alia vida materialo kaj asignas kodojn al ili.\n"
+"Kodareoj estas elmontritaj kiel koloraj rektanguloj ligitaj al via kodsistemo.\n"
 "( helpo: Coding bildoj) (qualcoder: // helpo/4.4.-Coding-Images/)\n"
 "\n"
 "\n"
 "numero [Code Audio kaj Video] (qualcoder://menu/kodigado/kodadio vidbendo)\n"
 "\n"
-"Uzu tiun laborspacon por transskribi kaj/aŭ kodtempo-bazitan "
-"amaskomunikilaron kiel ekzemple intervjuoj, fokusgrupoj, kaj "
-"kamporegistradoj.\n"
-"( helpo: Coding aŭdio kaj vidbendo) (qualcoder: // helpo/4.5.-Coding-Audio-"
-"kaj-Video/)\n"
+"Uzu tiun laborspacon por transskribi kaj/aŭ kodtempo-bazitan amaskomunikilaron kiel ekzemple intervjuoj, fokusgrupoj, kaj kamporegistradoj.\n"
+"( helpo: Coding aŭdio kaj vidbendo) (qualcoder: // helpo/4.5.-Coding-Audio-kaj-Video/)\n"
 "\n"
 "\n"
 "numero [Code PDFs] (qualcoder:/menu/ĉifrado/kodf)\n"
 "\n"
-"Tiu laborspaco permesas al vi kodigi tekston rekte en PDF-dokumentoj kiam vi "
-"volas konservi la originan paĝenpaĝigon en vido.\n"
-"Tio estas utila por artikoloj, raportoj, kaj alia fontomaterialo kie "
-"paĝpozicio kaj formata materio.\n"
+"Tiu laborspaco permesas al vi kodigi tekston rekte en PDF-dokumentoj kiam vi volas konservi la originan paĝenpaĝigon en vido.\n"
+"Tio estas utila por artikoloj, raportoj, kaj alia fontomaterialo kie paĝpozicio kaj formata materio.\n"
 "( helpo: Coding PDFs) (qualcoder://helpo/4.3.-Coding-Text-on-PDFs/)\n"
 "\n"
 "\n"
 "numero [AI Assisted Coding] (qualcoder://menu/kodigo/ai assisted coding)\n"
 "\n"
-"Tio ŝarĝas variaĵon de la teksto ĉifranta laborspacon kiu uzas AI por "
-"esplori viajn datumojn kaj sugesti segmentojn por elektita kodo.\n"
+"Tio ŝarĝas variaĵon de la teksto ĉifranta laborspacon kiu uzas AI por esplori viajn datumojn kaj sugesti segmentojn por elektita kodo.\n"
 "[helpo: AI helpis ĉifradon] (qualcoder://helpo/4.2.-AI-Assisted-Coding/)\n"
 "\n"
 "\n"
 "numero [Code Organiser] (qualcoder:/menu/kodigo/kodorganiziigilo)\n"
 "\n"
-"Uzu tiun laborspacon por reorganizi vian kodsistemon uzantan grafikan, mens-"
-"map stilinterfacon.\n"
-"Vi povas movi, kunfali, kaj renomi kodojn kaj kategoriojn kiam via analiza "
-"strukturo iĝas pli klara.\n"
+"Uzu tiun laborspacon por reorganizi vian kodsistemon uzantan grafikan, mens-map stilinterfacon.\n"
+"Vi povas movi, kunfali, kaj renomi kodojn kaj kategoriojn kiam via analiza strukturo iĝas pli klara.\n"
 "( helpo: Code Organiser) (qualcoder: // helpo/4.6-Code-Organiser/)\n"
 "\n"
 "\n"
@@ -12307,14 +12075,12 @@ msgstr ""
 msgid ""
 "# Reports tab\n"
 "\n"
-"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) "
-"and [Reports](qualcoder://menu/reports) menus.\n"
+"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) and [Reports](qualcoder://menu/reports) menus.\n"
 "\n"
 "\n"
 "## [Analysis](qualcoder://menu/analysis)\n"
 "\n"
-"Use these tools when you want to explore coded segments and relationships in "
-"detail.\n"
+"Use these tools when you want to explore coded segments and relationships in detail.\n"
 "\n"
 "[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
 "\n"
@@ -12323,261 +12089,182 @@ msgid ""
 "\n"
 "These tools help you inspect the actual coded material in your project.\n"
 "\n"
-"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible "
-"analysis tool. It gathers all segments for selected codes or categories and "
-"lets you narrow the results by file, case, attributes, or search text.\n"
-"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) "
-"generates a table with text segments and all associated codes.\n"
+"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible analysis tool. It gathers all segments for selected codes or categories and lets you narrow the results by file, case, attributes, or search text.\n"
+"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) generates a table with text segments and all associated codes.\n"
 "\n"
 "\n"
 "### Code relationships and overlaps\n"
 "\n"
-"Use these tools to examine how codes relate to one another. They only work "
-"with text files.\n"
+"Use these tools to examine how codes relate to one another. They only work with text files.\n"
 "\n"
-"- [Code relations](qualcoder://menu/analysis/code_relations) shows "
-"proximity, overlap, inclusion, and exact matches between selected codes.\n"
-"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses "
-"on where two codes overlap or directly touch.\n"
-"- [Code text exact matches](qualcoder://menu/analysis/"
-"code_text_exact_matches) lists passages where different codes were applied "
-"to exactly the same text.\n"
-"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map "
-"style view of linked project elements like codes, cases, files, etc. [Help: "
-"Graph](qualcoder://help/5.4.-Graph/)\n"
+"- [Code relations](qualcoder://menu/analysis/code_relations) shows proximity, overlap, inclusion, and exact matches between selected codes.\n"
+"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses on where two codes overlap or directly touch.\n"
+"- [Code text exact matches](qualcoder://menu/analysis/code_text_exact_matches) lists passages where different codes were applied to exactly the same text.\n"
+"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map style view of linked project elements like codes, cases, files, etc. [Help: Graph](qualcoder://help/5.4.-Graph/)\n"
 "\n"
 "\n"
 "## [Reports](qualcoder://menu/reports)\n"
 "\n"
-"Use these tools when you want summaries, comparisons, counts, charts, or "
-"exports for reporting purposes.\n"
+"Use these tools when you want summaries, comparisons, counts, charts, or exports for reporting purposes.\n"
 "\n"
 "[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
 "\n"
 "\n"
 "### Inter-Coder Comparisons\n"
 "\n"
-"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and "
-"[Coding comparison by file](qualcoder://menu/reports/"
-"coding_comparison_by_file) are especially useful for collaborative work and "
-"inter-coder checking.\n"
+"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and [Coding comparison by file](qualcoder://menu/reports/coding_comparison_by_file) are especially useful for collaborative work and inter-coder checking.\n"
 "\n"
 "\n"
 "### Summaries, frequencies, and charts\n"
 "\n"
-"These reports summarise patterns across the project rather than showing "
-"every coded segment in detail.\n"
+"These reports summarise patterns across the project rather than showing every coded segment in detail.\n"
 "\n"
-"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how "
-"often codes and categories have been used.\n"
-"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) "
-"gives a compact overview of where selected codes appear most often.\n"
-"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary]"
-"(qualcoder://menu/reports/code_summary) give focused overviews of one file "
-"or one code at a time.\n"
-"- [Charts](qualcoder://menu/reports/charts) visualises distributions and "
-"comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
+"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how often codes and categories have been used.\n"
+"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) gives a compact overview of where selected codes appear most often.\n"
+"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary](qualcoder://menu/reports/code_summary) give focused overviews of one file or one code at a time.\n"
+"- [Charts](qualcoder://menu/reports/charts) visualises distributions and comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
 "\n"
 "\n"
 "### Advanced reporting\n"
 "\n"
-"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct "
-"access to the project database for custom analyses. This is most useful when "
-"the standard reports do not answer a specific research question in the exact "
-"form you need.\n"
+"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct access to the project database for custom analyses. This is most useful when the standard reports do not answer a specific research question in the exact form you need.\n"
 msgstr ""
 "Raportoj klakas\n"
 "\n"
-"Tiu klako elmontras ilojn de kaj la [Analysis] (qualcoder://menu/analizo) "
-"kaj [Reports] (qualcoder://menu/reports) menuoj.\n"
+"Tiu klako elmontras ilojn de kaj la [Analysis] (qualcoder://menu/analizo) kaj [Reports] (qualcoder://menu/reports) menuoj.\n"
 "\n"
 "\n"
 "numero [Analysis] (qualcoder:/menu/analizo)\n"
 "\n"
-"Uzu tiujn ilojn kiam vi volas esplori kodigitajn segmentojn kaj rilatojn en "
-"detalo.\n"
+"Uzu tiujn ilojn kiam vi volas esplori kodigitajn segmentojn kaj rilatojn en detalo.\n"
 "\n"
-"[helpo: Analizo kaj Reports menuo opcioj] (qualcoder: // helpo/5.3.-"
-"raportoj/)\n"
+"[helpo: Analizo kaj Reports menuo opcioj] (qualcoder: // helpo/5.3.-raportoj/)\n"
 "\n"
 "\n"
 "(1933) Retrieval kaj segment-bazita analizo\n"
 "\n"
-"Ĉi tiuj iloj helpas vin inspekti la faktan kodigitan materialon en via "
-"projekto.\n"
+"Ĉi tiuj iloj helpas vin inspekti la faktan kodigitan materialon en via projekto.\n"
 "\n"
-"[Code-havigo] (qualcoder:/menu/analizo/koding reports) estas fleksebla "
-"analiza ilo. Ĝi kolektas ĉiujn segmentojn por elektitaj kodoj aŭ kategorioj "
-"kaj lasas vin malvastigi la rezultojn per dosiero, kazo, atributoj, aŭ "
-"serĉteksto.\n"
-"[Codes per tekstsegmentoj] (qualcoder://menu/analizo/text segments by codes) "
-"generas tablon kun tekstsegmentoj kaj ĉiuj rilataj kodoj.\n"
+"[Code-havigo] (qualcoder:/menu/analizo/koding reports) estas fleksebla analiza ilo. Ĝi kolektas ĉiujn segmentojn por elektitaj kodoj aŭ kategorioj kaj lasas vin malvastigi la rezultojn per dosiero, kazo, atributoj, aŭ serĉteksto.\n"
+"[Codes per tekstsegmentoj] (qualcoder://menu/analizo/text segments by codes) generas tablon kun tekstsegmentoj kaj ĉiuj rilataj kodoj.\n"
 "\n"
 "\n"
 "Kodo rilatoj kaj interkovroj\n"
 "\n"
-"Uzu tiujn ilojn por ekzameni kiel kodoj rilatigas unu al la alia. Ili nur "
-"laboras kun tekstaj dosieroj.\n"
+"Uzu tiujn ilojn por ekzameni kiel kodoj rilatigas unu al la alia. Ili nur laboras kun tekstaj dosieroj.\n"
 "\n"
-"[Code rilatoj] (qualcoder://menu/analizo/kodrilatoj) montras proksimecon, "
-"interkovras, inkludon, kaj precizajn matĉojn inter elektitaj kodoj.\n"
-"[Code co-occurrence] (qualcoder://menu/analizo/code co occurrence) temigas "
-"kie du kodoj interkovras aŭ rekte tuŝon.\n"
-"[Code-teksto precizaj matĉoj] (qualcoder://menu/analizo/code text exactes) "
-"listigas trairejojn kie malsamaj kodoj estis aplikitaj al precize la sama "
-"teksto.\n"
-"(Grafo) (qualcoder://menu/analizo/vido graph) disponigas vidan, mens-map "
-"stilvidon de ligitaj projektelementoj kiel kodoj, kazoj, dosieroj, ktp. "
-"[helpo: Graph] (qualcoder: // helpo/5.4.-Graph/)\n"
+"[Code rilatoj] (qualcoder://menu/analizo/kodrilatoj) montras proksimecon, interkovras, inkludon, kaj precizajn matĉojn inter elektitaj kodoj.\n"
+"[Code co-occurrence] (qualcoder://menu/analizo/code co occurrence) temigas kie du kodoj interkovras aŭ rekte tuŝon.\n"
+"[Code-teksto precizaj matĉoj] (qualcoder://menu/analizo/code text exactes) listigas trairejojn kie malsamaj kodoj estis aplikitaj al precize la sama teksto.\n"
+"(Grafo) (qualcoder://menu/analizo/vido graph) disponigas vidan, mens-map stilvidon de ligitaj projektelementoj kiel kodoj, kazoj, dosieroj, ktp. [helpo: Graph] (qualcoder: // helpo/5.4.-Graph/)\n"
 "\n"
 "\n"
 "numero [Reports] (qualcoder:/menu/raportoj)\n"
 "\n"
-"Uzu tiujn ilojn kiam vi deziras resumojn, komparojn, kalkulojn, furorliston, "
-"aŭ eksportaĵojn por raportado de celoj.\n"
+"Uzu tiujn ilojn kiam vi deziras resumojn, komparojn, kalkulojn, furorliston, aŭ eksportaĵojn por raportado de celoj.\n"
 "\n"
-"[helpo: Analizo kaj Reports menuo opcioj] (qualcoder: // helpo/5.3.-"
-"raportoj/)\n"
+"[helpo: Analizo kaj Reports menuo opcioj] (qualcoder: // helpo/5.3.-raportoj/)\n"
 "\n"
 "\n"
 "(1933) Inter-Coder Komparoj\n"
 "\n"
-"[Coding-komparo] ( kvalcoder:/menu/raportoj/koding comparison) kaj [Coding-"
-"komparo de dosiero] (qualcoder:///menu/reports/coding comparison by file) "
-"estas aparte utilaj por kunlabora laboro kaj inter-kodero kontrolanta.\n"
+"[Coding-komparo] ( kvalcoder:/menu/raportoj/koding comparison) kaj [Coding-komparo de dosiero] (qualcoder:///menu/reports/coding comparison by file) estas aparte utilaj por kunlabora laboro kaj inter-kodero kontrolanta.\n"
 "\n"
 "\n"
 "Summaries, frekvencoj, kaj furorlisto\n"
 "\n"
-"Tiuj raportoj resumas padronojn trans la projekto prefere ol montrado de ĉiu "
-"kodigita segmento en detalo.\n"
+"Tiuj raportoj resumas padronojn trans la projekto prefere ol montrado de ĉiu kodigita segmento en detalo.\n"
 "\n"
-"[Code frekvencoj] (qualcoder://menu/reports/code frequencies) kalkuloj kiom "
-"ofte kodoj kaj kategorioj estis utiligitaj.\n"
-"[Code kalkuloj de dosiero/kazo] (qualcoder://menu/raportoj/code comparison "
-"table) donas kompaktan superrigardon de kie elektitaj kodoj prezentiĝas plej "
-"ofte.\n"
-"[File resumo] (qualcoder:/menu/reports/dosiero summary) kaj [Code resumo] "
-"(qualcoder:///menu/raportoj/code summary) donas fokusitajn superrigardojn de "
-"unu dosiero aŭ unu kodo tiutempe.\n"
-"[Charts] (qualcoder://menu/havenoj/ĉaroj) bildigas distribuojn kaj komparojn "
-"kun diagramoj kiel ekzemple drinkejo-furorlisto, tremapoj, kaj varmomapoj.\n"
+"[Code frekvencoj] (qualcoder://menu/reports/code frequencies) kalkuloj kiom ofte kodoj kaj kategorioj estis utiligitaj.\n"
+"[Code kalkuloj de dosiero/kazo] (qualcoder://menu/raportoj/code comparison table) donas kompaktan superrigardon de kie elektitaj kodoj prezentiĝas plej ofte.\n"
+"[File resumo] (qualcoder:/menu/reports/dosiero summary) kaj [Code resumo] (qualcoder:///menu/raportoj/code summary) donas fokusitajn superrigardojn de unu dosiero aŭ unu kodo tiutempe.\n"
+"[Charts] (qualcoder://menu/havenoj/ĉaroj) bildigas distribuojn kaj komparojn kun diagramoj kiel ekzemple drinkejo-furorlisto, tremapoj, kaj varmomapoj.\n"
 "\n"
 "\n"
 "Progresinta raportado\n"
 "\n"
-"[Database-demandoj] (qualcoder:/menu/reports/sql statements) donas rektan "
-"aliron al la projektodatumbazo por specialadaptitaj analizoj. Tio estas plej "
-"utila kiam la normigitaj raportoj ne respondas specifan esplordemandon en la "
-"preciza formo kiun vi bezonas."
+"[Database-demandoj] (qualcoder:/menu/reports/sql statements) donas rektan aliron al la projektodatumbazo por specialadaptitaj analizoj. Tio estas plej utila kiam la normigitaj raportoj ne respondas specifan esplordemandon en la preciza formo kiun vi bezonas."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:686
 #, fuzzy
 msgid ""
 "# AI Agent\n"
 "\n"
-"Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-"
-"based-analysis/) to\n"
-"explore your empirical text data, get suggestions for coding, obtain "
-"feedback on your codes or memos,\n"
-"and generate summaries and reports. To begin, use the [\"New\" button]"
-"(qualcoder://ai_agent_tab/new) at \n"
+"Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to\n"
+"explore your empirical text data, get suggestions for coding, obtain feedback on your codes or memos,\n"
+"and generate summaries and reports. To begin, use the [\"New\" button](qualcoder://ai_agent_tab/new) at \n"
 "the bottom left and choose one of the options described below.\n"
 "\n"
 "{{AI_WARNING_BLOCK}}\n"
 "\n"
 "## [Chat with the AI Agent](qualcoder://ai_agent_tab/new/new_general_chat)\n"
 "\n"
-"- This is the default starting point for an open-ended analysis or any other "
-"task.\n"
+"- This is the default starting point for an open-ended analysis or any other task.\n"
 "- You can also ask for help using QualCoder.\n"
 "\n"
 "\n"
-"## [AI Topic Exploration](qualcoder://ai_agent_tab/new/"
-"new_topic_exploration)\n"
+"## [AI Topic Exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)\n"
 "\n"
-"- Search and explore a topic or question across the whole corpus of project "
-"data.\n"
-"- This option opens a dialog where you define the topic and select which "
-"data to include in the analysis.\n"
+"- Search and explore a topic or question across the whole corpus of project data.\n"
+"- This option opens a dialog where you define the topic and select which data to include in the analysis.\n"
 "\n"
 "\n"
 "## [AI Text Analysis](qualcoder://ai_agent_tab/new/new_text_analysis)\n"
 "\n"
 "- Analyse a selected text passage from your empirical material in detail.\n"
-"- This will switch to the text coding workspace and let you select a passage "
-"for analysis.\n"
+"- This will switch to the text coding workspace and let you select a passage for analysis.\n"
 "\n"
 "\n"
 "## [AI Code Analysis](qualcoder://ai_agent_tab/new/new_code_analysis)\n"
 "\n"
-"- Discuss your codings with the AI Agent, compare different codes, generate "
-"subcodes, or create reports.\n"
-"- This will also open a dialog to select the code(s) and data you want to "
-"include in the analysis.\n"
+"- Discuss your codings with the AI Agent, compare different codes, generate subcodes, or create reports.\n"
+"- This will also open a dialog to select the code(s) and data you want to include in the analysis.\n"
 "\n"
 "\n"
 "## Other Options\n"
-"- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the "
-"bottom left lets you choose what \n"
+"- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what \n"
 "the AI Agent is allowed to do in your project.\n"
-"- Open the [AI menu](qualcoder://menu/ai) for more options, for example to "
-"edit predefined prompts in the\n"
-"[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted "
-"coding](qualcoder://menu/ai/ai_search_and_coding).\n"
+"- Open the [AI menu](qualcoder://menu/ai) for more options, for example to edit predefined prompts in the\n"
+"[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted coding](qualcoder://menu/ai/ai_search_and_coding).\n"
 msgstr ""
 "AI-agento\n"
 "\n"
-"Ĉi tie, vi povas interagi kun la [AI Agent] (qualcoder: // helpo/5.1.-AI-"
-"chat-bazita-analizo/) al\n"
-"Esploru viajn empiriajn tekstajn datumojn, akiri sugestojn por ĉifrado, "
-"akiri religon sur viaj kodoj aŭ notoj,\n"
-"kaj generas resumojn kaj raportojn. Por komenci, uzi la [\"Novan\" butonon] "
-"(qualcoder://ai agent tab/novan) ĉe\n"
+"Ĉi tie, vi povas interagi kun la [AI Agent] (qualcoder: // helpo/5.1.-AI-chat-bazita-analizo/) al\n"
+"Esploru viajn empiriajn tekstajn datumojn, akiri sugestojn por ĉifrado, akiri religon sur viaj kodoj aŭ notoj,\n"
+"kaj generas resumojn kaj raportojn. Por komenci, uzi la [\"Novan\" butonon] (qualcoder://ai agent tab/novan) ĉe\n"
 "La fundo foriris kaj elektas unu el la opcioj priskribitaj malsupre.\n"
 "\n"
 "\"AI WARNing BLOCK\"\n"
 "\n"
-"numero [Ĉapitro kun la AI-agento] (qualcoder://ai agent tab/nova/new General "
-"chat)\n"
+"numero [Ĉapitro kun la AI-agento] (qualcoder://ai agent tab/nova/new General chat)\n"
 "\n"
-"Tio estas la defaŭlta deirpunkto por malferma-metita analizo aŭ ajna alia "
-"tasko.\n"
+"Tio estas la defaŭlta deirpunkto por malferma-metita analizo aŭ ajna alia tasko.\n"
 "Vi ankaŭ povas peti helpon uzi QualCoder.\n"
 "\n"
 "\n"
-"numero [AI Topic Exploration] (qualcoder://ai agent tab/nova/new topic "
-"esploration)\n"
+"numero [AI Topic Exploration] (qualcoder://ai agent tab/nova/new topic esploration)\n"
 "\n"
-"Serĉo kaj esploras temon aŭ demandon trans la tuta korpuso de "
-"projektodatenoj.\n"
-"Tiu opcio malfermas dialogon kie vi difinas la temon kaj selektas kiu "
-"datenoj por inkludi en la analizo.\n"
+"Serĉo kaj esploras temon aŭ demandon trans la tuta korpuso de projektodatenoj.\n"
+"Tiu opcio malfermas dialogon kie vi difinas la temon kaj selektas kiu datenoj por inkludi en la analizo.\n"
 "\n"
 "\n"
 "numero [AI Text Analysis] (qualcoder://ai agent tab/nova/new text analysis)\n"
 "\n"
 "Analizu elektitan tekstan trairejon de via empiria materialo en detalo.\n"
-"Ĉi tio ŝanĝas al la teksto ĉifrado laborspaco kaj lasas vin selekti "
-"trairejon por analizo.\n"
+"Ĉi tio ŝanĝas al la teksto ĉifrado laborspaco kaj lasas vin selekti trairejon por analizo.\n"
 "\n"
 "\n"
 "numero [AI Code Analysis] (qualcoder://ai agent tab/nova/new code analysis)\n"
 "\n"
-"Diskuti viajn kodigojn kun la AI Agento, kompari malsamajn kodojn, generi "
-"subkodojn, aŭ krei raportojn.\n"
-"Tio ankaŭ malfermos dialogon por selekti la kodon (j) kaj datenojn kiujn vi "
-"volas inkludi en la analizo.\n"
+"Diskuti viajn kodigojn kun la AI Agento, kompari malsamajn kodojn, generi subkodojn, aŭ krei raportojn.\n"
+"Tio ankaŭ malfermos dialogon por selekti la kodon (j) kaj datenojn kiujn vi volas inkludi en la analizo.\n"
 "\n"
 "\n"
 "Aliaj Elektoj\n"
-"La [AI-permesoj] (qualcoder://ai agent tab/permissions) kontrolo ĉe la fundo "
-"forlasis lasas vin elekti kion\n"
+"La [AI-permesoj] (qualcoder://ai agent tab/permissions) kontrolo ĉe la fundo forlasis lasas vin elekti kion\n"
 "La AI-agento estas permesita fari en via projekto.\n"
-"Open the [AI menu] (qualcoder://menu/ai) por pli da opcioj, ekzemple redakti "
-"predefineitajn promptilojn en la\n"
-"[ citaĵo bezonis ] (qualcoder://menu/ai/ai/ai prompts), aŭ komenco [AI "
-"helpis ĉifradon] (qualcoder: /menu/ai/ai/ai search and coding)."
+"Open the [AI menu] (qualcoder://menu/ai) por pli da opcioj, ekzemple redakti predefineitajn promptilojn en la\n"
+"[ citaĵo bezonis ] (qualcoder://menu/ai/ai/ai prompts), aŭ komenco [AI helpis ĉifradon] (qualcoder: /menu/ai/ai/ai search and coding)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:728
 #, fuzzy
@@ -12585,8 +12272,7 @@ msgid ""
 "\n"
 "<br />\n"
 "\n"
-"**Note: The AI Agent is currently not available because AI setup has not "
-"been completed yet.**\n"
+"**Note: The AI Agent is currently not available because AI setup has not been completed yet.**\n"
 "\n"
 "- Start the [AI Setup Wizard](qualcoder://action/ai/ai_setup_wizard)\n"
 "\n"
@@ -12595,8 +12281,7 @@ msgid ""
 msgstr ""
 "<br />\n"
 "\n"
-"La AI-agento estas nuntempe ne havebla ĉar AI-aranĝo ne estis kompletigita "
-"ankoraŭ.\n"
+"La AI-agento estas nuntempe ne havebla ĉar AI-aranĝo ne estis kompletigita ankoraŭ.\n"
 "\n"
 "Komencu la [AI Setup Wizard] (qualcoder: //ago/ai/ai setup wizard)\n"
 "\n"
@@ -12722,7 +12407,8 @@ msgstr "Prompta priskribo:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:1014
 #, fuzzy
 msgid ""
-"Start a new chat with the AI Agent first with the \"New\" button on the left."
+"Start a new chat with the AI Agent first with the \"New\" button on the "
+"left."
 msgstr ""
 "Komencu novan konversacion kun la AI-agento unue kun la \"Nova\" butono "
 "maldekstre."
@@ -12911,7 +12597,8 @@ msgstr "La AI estas handikapita. Iru al “AI” unue."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2570
 #, fuzzy
 msgid ""
-"The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be found."
+"The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be "
+"found."
 msgstr "La interna AI-subteno promptas \" help.md\" ne povus esti trovita."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2574
@@ -13125,15 +12812,16 @@ msgid ""
 "The selected coded material is too large for a meaningful first-pass code "
 "analysis in one bootstrap step. Only {loaded} of {total} coded segments "
 "({coverage:.1f}%) could be loaded before the character limit was reached. "
-"Please narrow the scope by code, files, cases, attributes, or coders. If you "
-"still want to continue, send a follow-up message such as \"Analyze anyway\"."
+"Please narrow the scope by code, files, cases, attributes, or coders. If you"
+" still want to continue, send a follow-up message such as \"Analyze "
+"anyway\"."
 msgstr ""
 "La elektita kodigita materialo estas tro granda por senchava unua-pasa "
 "kodanalizo en unu ricelas paŝon. Nur { loaded} de { totalaj} kodigitaj "
 "segmentoj ({:.1f}%) povus esti ŝarĝitaj antaŭ ol la karaktero limo estis "
 "atingita. Bonvolu malvastigi la amplekson per kodo, dosieroj, kazoj, "
-"atributoj, aŭ kodigiloj. Se vi daŭre volas daŭrigi, sendu sekvaĵmesaĝon kiel "
-"ekzemple \"Analizio ĉiuokaze\"."
+"atributoj, aŭ kodigiloj. Se vi daŭre volas daŭrigi, sendu sekvaĵmesaĝon kiel"
+" ekzemple \"Analizio ĉiuokaze\"."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4680
 #, fuzzy
@@ -13144,12 +12832,10 @@ msgstr "Eraro dum MCP-bazita kodanalizkalibro:"
 #, fuzzy
 msgid ""
 "We will now switch to the text coding workspace.\n"
-" There you can open a document, select a piece of text, right click on it "
-"and choose \"AI Text Analysis\" from the context menu."
+" There you can open a document, select a piece of text, right click on it and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
 "Ni nun ŝanĝas al la teksto ĉifrado de laborspaco.\n"
-"Tie vi povas malfermi dokumenton, selekti pecon de teksto, dekstra klako sur "
-"ĝi kaj elekti \"AI Text Analysis\" de la kunteksto menuo."
+"Tie vi povas malfermi dokumenton, selekti pecon de teksto, dekstra klako sur ĝi kaj elekti \"AI Text Analysis\" de la kunteksto menuo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4745
 #, fuzzy
@@ -13167,15 +12853,6 @@ msgstr ""
 "Analizante la datenojn koditajn kiel \" {} \" ({ \\displaistile { \\matb} ) "
 "egalaj segmentoj ene de aplikeco."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4751
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4821
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5533
-#, fuzzy
-msgid ""
-"\n"
-"Prompt:"
-msgstr "Prompto:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4752
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4822
 #, fuzzy
@@ -13188,8 +12865,8 @@ msgstr "Materialo:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4828
 #, fuzzy
 msgid ""
-"Note that it is highly recommended to use the project memo (Menu \"Project > "
-"Project Memo\") to include a short description of your project's research "
+"Note that it is highly recommended to use the project memo (Menu \"Project >"
+" Project Memo\") to include a short description of your project's research "
 "topics, questions, objectives, and the empirical data collected. This "
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
@@ -13204,13 +12881,6 @@ msgstr ""
 #, fuzzy
 msgid "Exploring the free topic \"{}\" in the data."
 msgstr "Esplorante la liberan temon \"()\" en la datenoj."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4819
-#, fuzzy
-msgid ""
-"\n"
-"Description:"
-msgstr "Priskribo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4879
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9249
@@ -13331,13 +13001,9 @@ msgstr "Tipo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5802
-msgid "Summary:"
-msgstr ""
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
 #, fuzzy
-msgid "Prompt:"
-msgstr "Prompto:"
+msgid "Summary:"
+msgstr "Resumo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5866
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:263
@@ -13447,19 +13113,21 @@ msgid "Internal step"
 msgstr "Interna paŝo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7712
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "{step} has reached QualCoder's time limit. Do you want to stop the "
 "reflection and generate a provisional answer from the results collected so "
 "far?"
 msgstr ""
+"La templimo de QualCoder. Ĉu vi volas ĉesigi la reflekton kaj generi "
+"provizoran respondon de la rezultoj kolektitaj ĝis nun?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7716
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "{step} has reached QualCoder's time limit. Do you want to abort the AI "
 "process?"
-msgstr ""
+msgstr "La templimo de QualCoder. Ĉu vi volas haltigi la AI-procezon?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7765
 #, fuzzy
@@ -13503,8 +13171,9 @@ msgid "Error: Invalid message stream from MCP AI agent chat worker."
 msgstr "Eraro: Invalida mesaĝfluo de MCP AI-agento-babilisto."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9336
+#, fuzzy
 msgid "AI timeout"
-msgstr ""
+msgstr "La tempo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9419
 #, fuzzy
@@ -13539,8 +13208,8 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9481
 #, fuzzy
 msgid ""
-"The AI response was interrupted before it was complete. The partial response "
-"was kept."
+"The AI response was interrupted before it was complete. The partial response"
+" was kept."
 msgstr ""
 "La AI-respondo estis interrompita antaŭ ol ĝi estis kompleta. La parta "
 "respondo estis konservita."
@@ -13612,8 +13281,8 @@ msgid ""
 "to work with an editable copy."
 msgstr ""
 "PDF-dosieroj ne povas esti anstataŭigitaj: ilia stokita teksto devas egali "
-"la tekston eltiritan de la paĝoj. Uzu Manage Files > \"Extract pdf-teksto al "
-"nova dosiero\" labori kun redakta kopio."
+"la tekston eltiritan de la paĝoj. Uzu Manage Files > \"Extract pdf-teksto al"
+" nova dosiero\" labori kun redakta kopio."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:83
 #, fuzzy
@@ -13710,8 +13379,7 @@ msgstr "Dokumento de dokumentoj"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_mcp_server.py:571
 #, fuzzy, python-brace-format
 msgid "Creating text coding for code \"{code}\" in document \"{document}\"..."
-msgstr ""
-"Kreanta tekstoĉifrado por kodo- \"Pcode\" en dokumento \"(dokument) ..."
+msgstr "Kreanta tekstoĉifrado por kodo- \"Pcode\" en dokumento \"(dokument) ..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_mcp_server.py:580
 #, fuzzy, python-brace-format
@@ -13921,8 +13589,7 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_mcp_server.py:2437
 #, fuzzy, python-brace-format
 msgid "Warning: {count} affected coding(s) are not owned by 'AI Agent'."
-msgstr ""
-"Averto: [c] influis ĉifradon (j) ne estas posedataj fare de \"AI Agent\"."
+msgstr "Averto: [c] influis ĉifradon (j) ne estas posedataj fare de \"AI Agent\"."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_mcp_server.py:2432
 #, fuzzy
@@ -14095,21 +13762,6 @@ msgstr "Kodo de bildoj"
 msgid "Coded audio / video"
 msgstr "Coded aŭdio / vidbendo"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:264
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:266
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:728
-#, fuzzy
-msgid " File: "
-msgstr "Dosiero:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:269
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:731
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4047
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4117
-#, fuzzy
-msgid "Code:"
-msgstr "Kodisto:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:405
 #, fuzzy
 msgid "Apply more codes to this segment"
@@ -14250,16 +13902,6 @@ msgstr ""
 #, fuzzy
 msgid "Not saved"
 msgstr "Ne savis"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:830
-#, fuzzy
-msgid "Width:"
-msgstr "Aŭtoro:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:833
-#, fuzzy
-msgid "Height:"
-msgstr "Hejlo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:853
 #, fuzzy
@@ -14438,13 +14080,6 @@ msgstr "Word-nubo farita de kodigitaj tekstsegmentoj"
 #, fuzzy
 msgid "File filter"
 msgstr "Dosiero filtrilo"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:250
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:271
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:292
-#, fuzzy
-msgid "Text:"
-msgstr "Teksto:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:271
 #, fuzzy
@@ -15043,13 +14678,9 @@ msgid "Survey file:"
 msgstr "Selektu enketo dosieron"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:316
-msgid "Fields:"
-msgstr ""
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:316
 #, fuzzy
-msgid "Rows:"
-msgstr "→ Eventoj:"
+msgid "Fields:"
+msgstr "Kampoj:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:331
 #, fuzzy
@@ -15163,8 +14794,8 @@ msgid ""
 "Name must contain only letters and numbers or '_' and must not start with a "
 "number"
 msgstr ""
-"Nomo devas enhavi nur leterojn kaj nombrojn aŭ '  kaj ne devas komenciĝi kun "
-"nombro."
+"Nomo devas enhavi nur leterojn kaj nombrojn aŭ '  kaj ne devas komenciĝi kun"
+" nombro."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:646
 #, fuzzy
@@ -15219,8 +14850,8 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:269
 #, fuzzy
 msgid ""
-"Relations for structuring deductive and inductive category systems following "
-"Mayring's systematic approach to qualitative content analysis."
+"Relations for structuring deductive and inductive category systems following"
+" Mayring's systematic approach to qualitative content analysis."
 msgstr ""
 "Rilatoj por strukturado deduktaj kaj induktaj kategorioj sistemoj sekvantaj "
 "la sisteman aliron de Mayring al kvalita enhavanalizo."
@@ -15233,15 +14864,15 @@ msgid ""
 "phenomenology."
 msgstr ""
 "Rilatoj por prononcado de la strukturo de vivanta sperto, sekvante la "
-"transcendan fenomenologion de Moustakas kaj la hermeneŭtika fenomenologio de "
-"van Manen."
+"transcendan fenomenologion de Moustakas kaj la hermeneŭtika fenomenologio de"
+" van Manen."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:274
 #, fuzzy
 msgid ""
 "Relations for reflexive thematic analysis following Braun & Clarke's six-"
-"phase approach. Emphasizes researcher reflexivity and the active role of the "
-"researcher in generating themes."
+"phase approach. Emphasizes researcher reflexivity and the active role of the"
+" researcher in generating themes."
 msgstr ""
 "Rilatoj por refleksiva tema analizo sekvanta la sesfazan aliron de Braun & "
 "Clarke. Emfazo esploristo reflekso kaj la aktiva rolo de la esploristo en "
@@ -15571,7 +15202,8 @@ msgstr "Du konceptoj estas en streĉiteco, opozicio, aŭ reciproka ekskludo."
 #, fuzzy
 msgid ""
 "One concept provides evidence, confirmation, or reinforcement for another."
-msgstr "Unu koncepto disponigas indicon, konfirmon, aŭ plifortikigon por alia."
+msgstr ""
+"Unu koncepto disponigas indicon, konfirmon, aŭ plifortikigon por alia."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:345
 #, fuzzy
@@ -15621,7 +15253,8 @@ msgstr "Pli larĝa struktura kondiĉo kiu faciligas aŭ limigas strategiojn."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:353
 #, fuzzy
-msgid "The core category or central idea to which all other categories relate."
+msgid ""
+"The core category or central idea to which all other categories relate."
 msgstr ""
 "La kernkategorio aŭ centra ideo al kiuj ĉiuj aliaj kategorioj rilatigas."
 
@@ -15684,7 +15317,8 @@ msgstr "Du kategorioj aŭ rezultoj estas en streĉiteco."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:365
 #, fuzzy
 msgid "One category captures the gist of several lower-level categories."
-msgstr "Unu kategorio kaptas la esencon de pluraj malsupra-nivelaj kategorioj."
+msgstr ""
+"Unu kategorio kaptas la esencon de pluraj malsupra-nivelaj kategorioj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:366
 #, fuzzy
@@ -16260,8 +15894,8 @@ msgstr "Eviti al Uzanto"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:1015
 #, fuzzy
 msgid ""
-"The edited relation has been saved as a new entry in the User framework. The "
-"original system relation remains unchanged."
+"The edited relation has been saved as a new entry in the User framework. The"
+" original system relation remains unchanged."
 msgstr ""
 "La redaktita rilato estis ŝparita kiel nova eniro en la uzantkadro. La "
 "origina sistemrilato restas senŝanĝa."
@@ -16334,8 +15968,7 @@ msgstr ""
 #, fuzzy
 msgid ""
 "The 'User' framework in the file does not contain a valid 'relations' list."
-msgstr ""
-"La \"User\" kadro en la dosiero ne enhavas validan \"rilatoj-\" liston."
+msgstr "La \"User\" kadro en la dosiero ne enhavas validan \"rilatoj-\" liston."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:513
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:1112
@@ -16371,11 +16004,6 @@ msgstr "Uzantaj rilatoj eksportis al:"
 #, fuzzy
 msgid "Relation detail"
 msgstr "Rilato"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:596
-#, fuzzy
-msgid "Framework: "
-msgstr "Kadro:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:601
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:650
@@ -16483,8 +16111,7 @@ msgid ""
 "New profile: {new}\n"
 "\n"
 "Do you want to switch to the new profile now?\n"
-"Your existing API-key (if available) will be copied to the new profile for "
-"convenience."
+"Your existing API-key (if available) will be copied to the new profile for convenience."
 msgstr ""
 "Pli nova defaŭlta AI-profilo nun estas havebla por tiu provizanto.\n"
 "\n"
@@ -16492,8 +16119,7 @@ msgstr ""
 "Nova profilo:\n"
 "\n"
 "Ĉu vi volas ŝanĝi la novan profilon nun?\n"
-"Via ekzistanta API-esenca (se havebla) estos kopiita al la nova profilo por "
-"oportuno."
+"Via ekzistanta API-esenca (se havebla) estos kopiita al la nova profilo por oportuno."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:340
 #, fuzzy
@@ -16506,24 +16132,30 @@ msgid "Keep current profile"
 msgstr "Daŭrigu aktualan profilon"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:443
+#, fuzzy
 msgid "Search: Loading components in the background..."
-msgstr ""
+msgstr "Serĉi komponentojn en la fono."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:494
+#, fuzzy
 msgid "Search: Components could not be loaded. See the log for details."
 msgstr ""
+"Serĉo: Komponantoj ne povus esti ŝarĝitaj. Vidu la tagalon por detaloj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:512
+#, fuzzy
 msgid "AI: Loading components in the background..."
-msgstr ""
+msgstr "AI: Loading komponentoj en la fono ..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:534
+#, fuzzy
 msgid "AI: Components loaded."
-msgstr ""
+msgstr "AI: Komponantoj ŝarĝis."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:547
+#, fuzzy
 msgid "AI: Components could not be loaded. See the log for details."
-msgstr ""
+msgstr "Komponentoj ne povus esti ŝarĝitaj. Vidu la tagalon por detaloj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:560
 #, fuzzy
@@ -16535,17 +16167,11 @@ msgstr "Elŝutu AI-komponentojn"
 msgid ""
 "Welcome\n"
 "\n"
-"The new AI enhanced functions in QualCoder need some additional setup. Do "
-"you want to enable the AI and start the setup? You can also do this later by "
-"starting the AI Setup Wizard from the AI menu in the main window. Click "
-"\"Yes\" to start now."
+"The new AI enhanced functions in QualCoder need some additional setup. Do you want to enable the AI and start the setup? You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. Click \"Yes\" to start now."
 msgstr ""
 "Bonvenon Bonvenon\n"
 "\n"
-"La nova AI plifortigis funkciojn en QualCoder bezonas iun kroman aranĝon. Ĉu "
-"vi volas ebligi la AI kaj komenci la aranĝon? Vi ankaŭ povas fari tion poste "
-"komencante la AI Setup Sorĉiston de la AI menuo en la ĉeffenestro. Klaku "
-"\"Jes\" por komenci nun."
+"La nova AI plifortigis funkciojn en QualCoder bezonas iun kroman aranĝon. Ĉu vi volas ebligi la AI kaj komenci la aranĝon? Vi ankaŭ povas fari tion poste komencante la AI Setup Sorĉiston de la AI menuo en la ĉeffenestro. Klaku \"Jes\" por komenci nun."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:596
 #, fuzzy
@@ -16553,8 +16179,9 @@ msgid "AI Integration"
 msgstr "Integriĝo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:648
+#, fuzzy
 msgid "External MCP"
-msgstr ""
+msgstr "Ekstera MCP"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:678
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:735
@@ -16629,8 +16256,9 @@ msgid "Menu action is currently disabled."
 msgstr "Menu ago estas nuntempe handikapita."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1260
+#, fuzzy
 msgid "Choose a recently opened project to open it"
-msgstr ""
+msgstr "Elektu ĵus malfermitan projekton por malfermi ĝin"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1367
 #, fuzzy
@@ -16648,14 +16276,14 @@ msgid "Open the journals"
 msgstr "Nova Ĵurnalo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1464
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "today {0}"
-msgstr ""
+msgstr "Hodiaŭ"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1466
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "yesterday {0}"
-msgstr ""
+msgstr "Hieraŭ"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1489
 #, fuzzy, python-brace-format
@@ -16668,9 +16296,9 @@ msgid "Text bookmark"
 msgstr "Fiksa libromarko (B)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1497
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Audio/video bookmark at {0}"
-msgstr ""
+msgstr "Aŭdio/vidbenda librostampo ĉe {0}"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1502
 #, fuzzy, python-brace-format
@@ -16678,12 +16306,14 @@ msgid "Journal, edited {0}"
 msgstr "Ĵurnalo kreita:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1505
+#, fuzzy
 msgid "Last AI chat"
-msgstr ""
+msgstr "Lasta AI babilejo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1532
+#, fuzzy
 msgid "AI chat"
-msgstr ""
+msgstr "Ia konversacio"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1694
 #, fuzzy
@@ -16706,17 +16336,19 @@ msgid "Manage links"
 msgstr "Datendosieroj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1706
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Files missing from the project folder: {0}."
-msgstr ""
+msgstr "Dosieroj maltrafantaj de la projektofalinto: { 0} ."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+#, fuzzy
 msgid "Action log"
-msgstr ""
+msgstr "Agadregistro"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+#, fuzzy
 msgid "Guide"
-msgstr ""
+msgstr "Gvidisto"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1771
 #, fuzzy
@@ -16860,12 +16492,14 @@ msgid "Help for this tab"
 msgstr "Labelo por tiu linio:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2853
+#, fuzzy
 msgid "Leave the graph and lose the unsaved changes?"
-msgstr ""
+msgstr "Lasu la grafeon kaj perdi la sendanĝerajn ŝanĝojn?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2856
+#, fuzzy
 msgid "The code organiser has changes that were not applied."
-msgstr ""
+msgstr "La kodorganizilo havas ŝanĝojn kiuj ne estis uzitaj."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2857
 #, fuzzy
@@ -17029,8 +16663,7 @@ msgid ""
 "**Participants and data collected:** \n"
 "\n"
 "#####\n"
-"(Everything below this mark is a personal note and will never be sent to the "
-"AI.)"
+"(Everything below this mark is a personal note and will never be sent to the AI.)"
 msgstr ""
 "Ĉefa artikolo, demandoj kaj celoj:\n"
 "\n"
@@ -17063,10 +16696,13 @@ msgid "Opening project: "
 msgstr "Malfermu projekton unue."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3388
+#, fuzzy
 msgid ""
 "The selected folder is not a QualCoder project folder. Its name must end "
 "with .qda."
 msgstr ""
+"La elektita faldinto ne estas QualCoder projektofalinto. Ĝia nomo devas "
+"finiĝi kun .qda."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3390
 #, fuzzy
@@ -17082,8 +16718,7 @@ msgstr "La projekto ne povus esti plene kreita."
 #, fuzzy
 msgid ""
 "The selected folder does not contain a valid QualCoder project database."
-msgstr ""
-"La \"User\" kadro en la dosiero ne enhavas validan \"rilatoj-\" liston."
+msgstr "La \"User\" kadro en la dosiero ne enhavas validan \"rilatoj-\" liston."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3400
 #, fuzzy
@@ -17094,11 +16729,11 @@ msgstr "Ne povas malfermi:"
 #, fuzzy
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
-"project (\"{}\"). Do you want to keep your current name or switch to the one "
-"from the project?"
+"project (\"{}\"). Do you want to keep your current name or switch to the one"
+" from the project?"
 msgstr ""
-"Via nuna kodantnomo (\" { } \") devias de tiu laste uzita en la projekto (\" "
-"{ \"). Ĉu vi volas teni vian nunan nomon aŭ ŝanĝi al tiu de la projekto?"
+"Via nuna kodantnomo (\" { } \") devias de tiu laste uzita en la projekto (\""
+" { \"). Ĉu vi volas teni vian nunan nomon aŭ ŝanĝi al tiu de la projekto?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3434
 #, fuzzy
@@ -17215,25 +16850,6 @@ msgstr "Projekcia noto:"
 msgid "Project memo: "
 msgstr "Projekcia noto:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3890
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:235
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:400
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:402
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:714
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1281
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1464
-#, fuzzy
-msgid "Files: "
-msgstr "Dosieroj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3894
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:402
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:234
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:404
-#, fuzzy
-msgid "Cases: "
-msgstr "Vidu:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3898
 #, fuzzy
 msgid "Code categories: "
@@ -17308,8 +16924,8 @@ msgstr "Rekonstruis AI-memoron"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4064
 #, fuzzy
 msgid ""
-"This will re-read all of your empirical documents, which may take some time. "
-"Do you want to continue?"
+"This will re-read all of your empirical documents, which may take some time."
+" Do you want to continue?"
 msgstr ""
 "Ĉi tio legos ĉiujn viajn empiriajn dokumentojn, kiuj povas preni iom da "
 "tempo. Ĉu vi volas daŭrigi?"
@@ -17522,11 +17138,6 @@ msgstr "Ĉiuj kategorioj elektis"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:410
 #, fuzzy
 msgid "Categories selected"
-msgstr "elektitaj kategorioj"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:385
-#, fuzzy
-msgid "Categories selected "
 msgstr "elektitaj kategorioj"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:534
@@ -17793,12 +17404,6 @@ msgstr "Ĉu vi volas importi datumojn al override ekzistantaj atributoj?"
 msgid "Cases exist"
 msgstr "Cas ekzistas"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:519
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:603
-#, fuzzy
-msgid "attribute:"
-msgstr "Atributo:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:541
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:625
 #, fuzzy
@@ -17844,16 +17449,6 @@ msgstr "Klaku por administri dosierojn por ĉi tiu kazo"
 #, fuzzy
 msgid "Viewing text of case: "
 msgstr "Spektanta teksto de kazo:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1143
-#, fuzzy
-msgid "Characters:"
-msgstr "karakteroj:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1158
-#, fuzzy
-msgid "Image:"
-msgstr "Bildo:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1170
 #, fuzzy
@@ -18105,14 +17700,12 @@ msgstr "aŭ aŭ"
 #, fuzzy
 msgid ""
 "The pattern may match anywhere in the line.\n"
-"With a capturing group, group 1 is the speaker name: ~(\\w+): detects "
-"QknowSubject\n"
+"With a capturing group, group 1 is the speaker name: ~(\\w+): detects QknowSubject\n"
 "Without a group, the whole match is the name: ~\\w+: detects ~QknowSubject:\n"
 "Several markers on one line each start their own turn."
 msgstr ""
 "La padrono povas egali ie ajn en la linio.\n"
-"Kun kaptanta grupo, grupo 1 estas la parolantnomo: ~(\\w+): detektas Q "
-"Subsciject\n"
+"Kun kaptanta grupo, grupo 1 estas la parolantnomo: ~(\\w+): detektas Q Subsciject\n"
 "Sen grupo, la tuta matĉo estas la nomo: '\\w+: detektas Q Subsciject:\n"
 "Pluraj signoj sur unu linio ĉiu komencas sian propran turnon."
 
@@ -18134,13 +17727,10 @@ msgstr "Elekti identigilojn"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:429
 #, fuzzy
 msgid ""
-"Click a format name to use only that one. Click its checkbox to add or "
-"remove it\n"
-"from a combination. Check 'Custom (regex)' to add your own pattern to the "
-"mix."
+"Click a format name to use only that one. Click its checkbox to add or remove it\n"
+"from a combination. Check 'Custom (regex)' to add your own pattern to the mix."
 msgstr ""
-"Alklaku formatan nomon por uzi nur tiun. Klaku sian kontrolkeston por aldoni "
-"aŭ forigi ĝin\n"
+"Alklaku formatan nomon por uzi nur tiun. Klaku sian kontrolkeston por aldoni aŭ forigi ĝin\n"
 "de kombinaĵo. Kontrolu \"Custom\" aldoni vian propran padronon al la miksaĵo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:610
@@ -18272,13 +17862,10 @@ msgstr "Atributokodoj, \"; \" apartigita"
 #, fuzzy
 msgid ""
 "Extra codes applied to this speaker's turns, in addition to 'code as'.\n"
-"Type new ones (separate several with ';') or pick a previous one from the "
-"list to add it."
+"Type new ones (separate several with ';') or pick a previous one from the list to add it."
 msgstr ""
-"Ekstraj kodoj aplikitaj al la turnoj de tiu parolanto, aldone al \"kodo "
-"kiel\".\n"
-"Tipo novaj (apartaj pluraj kun '; ') aŭ elektas antaŭan el la listo por "
-"aldoni ĝin."
+"Ekstraj kodoj aplikitaj al la turnoj de tiu parolanto, aldone al \"kodo kiel\".\n"
+"Tipo novaj (apartaj pluraj kun '; ') aŭ elektas antaŭan el la listo por aldoni ĝin."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1439
 #, fuzzy
@@ -18338,13 +17925,10 @@ msgstr "Segmentoj"
 #, fuzzy
 msgid ""
 "Ticked segments will be coded. Untick the ones to skip.\n"
-"Inline codes (';' in the marker) apply PER SEGMENT and are editable; right "
-"click one to copy it to all segments or promote it to the whole row."
+"Inline codes (';' in the marker) apply PER SEGMENT and are editable; right click one to copy it to all segments or promote it to the whole row."
 msgstr ""
 "Ticked segmentoj estos kodigitaj. Ne timu tiujn, kiuj saltas.\n"
-"Inline kodoj (';' en la signo) aplikas PER SEGMENTOJ kaj estas redakteblaj; "
-"dekstra klako unu por kopii ĝin al ĉiuj segmentoj aŭ antaŭenigi ĝin al la "
-"tuta vico."
+"Inline kodoj (';' en la signo) aplikas PER SEGMENTOJ kaj estas redakteblaj; dekstra klako unu por kopii ĝin al ĉiuj segmentoj aŭ antaŭenigi ĝin al la tuta vico."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1643
 #, fuzzy
@@ -18549,14 +18133,6 @@ msgstr "Ĉiuj tekstaj ĉifradoj de"
 msgid " resized by "
 msgstr "resigita per"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:232
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:279
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:131
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:174
-#, fuzzy
-msgid " characters."
-msgstr "karakteroj."
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:250
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:148
 #, fuzzy
@@ -18570,8 +18146,9 @@ msgid "Change code end positions"
 msgstr "Ŝanĝo kodo finas poziciojn"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:171
+#, fuzzy
 msgid "EDITING TEXT MODE (Ctrl+E)"
-msgstr ""
+msgstr "TEXT MODE (Ctrl+E)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:173
 #, fuzzy
@@ -18580,8 +18157,8 @@ msgid ""
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
 "assigned)."
 msgstr ""
-"Eviti selekti sekciojn de teksto kun kombinaĵo de ne underlined (ne kodita / "
-"komentita / kaz-asignita) kaj substrekita (kodigita, komentita, kaz-"
+"Eviti selekti sekciojn de teksto kun kombinaĵo de ne underlined (ne kodita /"
+" komentita / kaz-asignita) kaj substrekita (kodigita, komentita, kaz-"
 "asignita)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:176
@@ -18665,8 +18242,9 @@ msgid "Hide control panel (H)"
 msgstr "Kaŝa kontrolpanelo (H)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2170
+#, fuzzy
 msgid "Toggle tooltips"
-msgstr ""
+msgstr "Toggle iltips"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2533
 #, fuzzy
@@ -18676,22 +18254,16 @@ msgstr "Shift ĉifradoj post klakita pozicio"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2536
 #, fuzzy
 msgid ""
-"Shift code positions for all codes after you have clicked on a position in "
-"the text.\n"
+"Shift code positions for all codes after you have clicked on a position in the text.\n"
 "Back up the project before running this action.\n"
-"This function will help if you have edited the coded text and the codes are "
-"out of position.\n"
-"Positive numbers (moves right) or negative numbers (moves left) (-500 to "
-"500)\n"
+"This function will help if you have edited the coded text and the codes are out of position.\n"
+"Positive numbers (moves right) or negative numbers (moves left) (-500 to 500)\n"
 "Clicked character position: "
 msgstr ""
-"Shift kodpozicioj por ĉiuj kodoj post kiam vi klakis sur pozicio en la "
-"teksto.\n"
+"Shift kodpozicioj por ĉiuj kodoj post kiam vi klakis sur pozicio en la teksto.\n"
 "Reen supren laŭ la projekto antaŭ prizorgado de tiu ago.\n"
-"Tiu funkcio helpos se vi redaktis la kodigitan tekston kaj la kodoj estas el "
-"pozicio.\n"
-"Pozitivaj nombroj (movoj dekstra) aŭ negativaj nombroj (movoj foriris) (500 "
-"ĝis 500)\n"
+"Tiu funkcio helpos se vi redaktis la kodigitan tekston kaj la kodoj estas el pozicio.\n"
+"Pozitivaj nombroj (movoj dekstra) aŭ negativaj nombroj (movoj foriris) (500 ĝis 500)\n"
 "Klakita karaktero pozicio:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3115
@@ -18708,7 +18280,8 @@ msgstr "Inkludas ĵurnalon"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3156
 #, fuzzy
 msgid "Journals are linked to this file. Include them in the report?"
-msgstr "Ĵurnaloj estas ligitaj al tiu dosiero. Ĉu mi konas ilin en la raporto?"
+msgstr ""
+"Ĵurnaloj estas ligitaj al tiu dosiero. Ĉu mi konas ilin en la raporto?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3422
 #, fuzzy
@@ -18838,8 +18411,9 @@ msgid "Code text: "
 msgstr "Kodoteksto:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4953
+#, fuzzy
 msgid "Open a search result before coding"
-msgstr ""
+msgstr "Malfermu serĉrezulton antaŭ ĉifrado"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5009
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6554
@@ -18889,11 +18463,11 @@ msgstr "La lasta redakta teksto"
 #, fuzzy
 msgid ""
 "This file is a PDF. Its stored text is not editable: it matches, character "
-"by character, the text extracted from the PDF pages, and the PDF coding view "
-"depends on that mapping."
+"by character, the text extracted from the PDF pages, and the PDF coding view"
+" depends on that mapping."
 msgstr ""
-"Ĉi tiu dosiero estas PDF. Ĝia stokita teksto ne estas redaktebla: ĝi egalas, "
-"karaktero de karaktero, la teksto eltirita de la PDF-paĝoj, kaj la PDF-"
+"Ĉi tiu dosiero estas PDF. Ĝia stokita teksto ne estas redaktebla: ĝi egalas,"
+" karaktero de karaktero, la teksto eltirita de la PDF-paĝoj, kaj la PDF-"
 "ĉifrado vido dependas de tiu mapado."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5775
@@ -19614,409 +19188,404 @@ msgid "Uncaught Exception"
 msgstr "Senkulpa Escepto"
 
 #, fuzzy
-#~ msgid "Select files to view"
-#~ msgstr "Elektu dosierojn por rigardi"
+msgid "Select files to view"
+msgstr "Elektu dosierojn por rigardi"
 
 #, fuzzy
-#~ msgid "File Attributes"
-#~ msgstr "Dosieroj"
+msgid "File Attributes"
+msgstr "Dosieroj"
 
 #, fuzzy
-#~ msgid "The AI not yet fully loaded. Please wait and retry."
-#~ msgstr "La AI ankoraŭ ne plene ŝarĝita. Bonvolu atendi kaj reveni."
+msgid "The AI not yet fully loaded. Please wait and retry."
+msgstr "La AI ankoraŭ ne plene ŝarĝita. Bonvolu atendi kaj reveni."
 
 #, fuzzy
-#~ msgid " of these codings are not owned by 'AI Agent'."
-#~ msgstr "Tiuj kodigoj ne estas posedataj fare de \"AI Agent\"."
+msgid " of these codings are not owned by 'AI Agent'."
+msgstr "Tiuj kodigoj ne estas posedataj fare de \"AI Agent\"."
 
 #, fuzzy
-#~ msgid " standalone coding(s) are not owned by 'AI Agent'."
-#~ msgstr "memstara ĉifrado (j) ne estas posedataj fare de \"AI Agent\"."
+msgid " standalone coding(s) are not owned by 'AI Agent'."
+msgstr "memstara ĉifrado (j) ne estas posedataj fare de \"AI Agent\"."
 
 #, fuzzy
-#~ msgid "Warning: removed codings not owned by 'AI Agent': "
-#~ msgstr "Averto: forigis ĉifradojn ne posedate fare de \"AI Agent\":"
+msgid "Warning: removed codings not owned by 'AI Agent': "
+msgstr "Averto: forigis ĉifradojn ne posedate fare de \"AI Agent\":"
 
 #, fuzzy
-#~ msgid "Codebook for"
-#~ msgstr "Kodora importaĵo"
+msgid "Codebook for"
+msgstr "Kodora importaĵo"
 
 #, fuzzy
-#~ msgid "Category:"
-#~ msgstr "Kategorio:"
+msgid "The AI is busy, please wait a moment and retry."
+msgstr "La AI estas okupata, bonvolu atendi momenton kaj reiro."
 
 #, fuzzy
-#~ msgid "The AI is busy, please wait a moment and retry."
-#~ msgstr "La AI estas okupata, bonvolu atendi momenton kaj reiro."
+msgid "Save graph analytical summary"
+msgstr "Krom grafeo analiza resumo"
 
 #, fuzzy
-#~ msgid "Save graph analytical summary"
-#~ msgstr "Krom grafeo analiza resumo"
+msgid "Cannot open file"
+msgstr "Ne povas malfermi dosieron"
 
 #, fuzzy
-#~ msgid "Cannot open file"
-#~ msgstr "Ne povas malfermi dosieron"
+msgid "Please enable the AI first and set it in Settings."
+msgstr "Bonvolu permesi la AI unue kaj meti ĝin en Settings."
 
 #, fuzzy
-#~ msgid "Please enable the AI first and set it in Settings."
-#~ msgstr "Bonvolu permesi la AI unue kaj meti ĝin en Settings."
+msgid "The AI is busy or not set up correctly."
+msgstr "La AI estas okupata aŭ ne starigita ĝuste."
 
 #, fuzzy
-#~ msgid "The AI is busy or not set up correctly."
-#~ msgstr "La AI estas okupata aŭ ne starigita ĝuste."
-
-#, fuzzy
-#~ msgid "Delete folder"
-#~ msgstr "Delete dosierujo"
+msgid "Delete folder"
+msgstr "Delete dosierujo"
 
 #, fuzzy, python-brace-format
-#~ msgid "You must select a {self.prompt_type} prompt."
-#~ msgstr "Vi devas elekti mem. prompta rapido."
+msgid "You must select a {self.prompt_type} prompt."
+msgstr "Vi devas elekti mem. prompta rapido."
 
 #, fuzzy
-#~ msgid "Coding highlighted segments"
-#~ msgstr "Coding elstarigis segmentojn"
+msgid "Coding highlighted segments"
+msgstr "Coding elstarigis segmentojn"
 
 #, fuzzy
-#~ msgid "QualCoder will crash"
-#~ msgstr "QualCoder kraŝos"
+msgid "QualCoder will crash"
+msgstr "QualCoder kraŝos"
 
 #, fuzzy
-#~ msgid "Memo coded text M"
-#~ msgstr "Memo kodita teksto M"
+msgid "Memo coded text M"
+msgstr "Memo kodita teksto M"
 
 #, fuzzy
-#~ msgid "Click for details."
-#~ msgstr "Klaku por detaloj."
+msgid "Click for details."
+msgstr "Klaku por detaloj."
 
 #, fuzzy
-#~ msgid "Refresh codes trees via menu options for coding, reports"
-#~ msgstr "Refresh kodarboj per menuo ebloj por ĉifrado, raportoj"
+msgid "Refresh codes trees via menu options for coding, reports"
+msgstr "Refresh kodarboj per menuo ebloj por ĉifrado, raportoj"
 
 #, fuzzy
-#~ msgid "Word cloud"
-#~ msgstr "Vorto nubo"
+msgid "Word cloud"
+msgstr "Vorto nubo"
 
 #, fuzzy
-#~ msgid "VLC is not installed. Cannot code audio/video files."
-#~ msgstr ""
-#~ "VLC ne estas instalita. Ne povas kodigi aŭdion/vidbendajn dosierojn."
+msgid "VLC is not installed. Cannot code audio/video files."
+msgstr "VLC ne estas instalita. Ne povas kodigi aŭdion/vidbendajn dosierojn."
 
 #, fuzzy
-#~ msgid "Install VLC"
-#~ msgstr "Instali VLC"
+msgid "Install VLC"
+msgstr "Instali VLC"
 
 #, fuzzy
-#~ msgid "Ticked segments will be coded. Untick the ones to skip."
-#~ msgstr "Ticked segmentoj estos kodigitaj. Ne timu tiujn, kiuj saltas."
+msgid "Ticked segments will be coded. Untick the ones to skip."
+msgstr "Ticked segmentoj estos kodigitaj. Ne timu tiujn, kiuj saltas."
 
 #, fuzzy
-#~ msgid " next  characters"
-#~ msgstr "venontaj karakteroj"
+msgid " next  characters"
+msgstr "venontaj karakteroj"
 
 #, fuzzy
-#~ msgid " previous  characters"
-#~ msgstr "Antaŭaj karakteroj"
+msgid " previous  characters"
+msgstr "Antaŭaj karakteroj"
 
 #, fuzzy
-#~ msgid "QualCoder roughly displays PDFs."
-#~ msgstr "QualCoder malglate montras PDFojn."
+msgid "QualCoder roughly displays PDFs."
+msgstr "QualCoder malglate montras PDFojn."
 
 #, fuzzy
-#~ msgid "Original fonts or bold or italic are not applied."
-#~ msgstr "Originaj tiparoj aŭ aŭdacaj aŭ kursivo ne estas uzitaj."
+msgid "Original fonts or bold or italic are not applied."
+msgstr "Originaj tiparoj aŭ aŭdacaj aŭ kursivo ne estas uzitaj."
 
 #, fuzzy
-#~ msgid "Plain text must match exactly for Code PDF to work correctly."
-#~ msgstr "Simpla teksto devas egali precize por Code PDF por labori ĝuste."
+msgid "Plain text must match exactly for Code PDF to work correctly."
+msgstr "Simpla teksto devas egali precize por Code PDF por labori ĝuste."
 
 #, fuzzy
-#~ msgid ""
-#~ "A warning will display if the parsed PDF text does not match the database "
-#~ "stored plain text."
-#~ msgstr ""
-#~ "Averto montros se la parigita PDF-teksto ne egalas la datumbazon stokitan "
-#~ "klartekston."
+msgid ""
+"A warning will display if the parsed PDF text does not match the database "
+"stored plain text."
+msgstr ""
+"Averto montros se la parigita PDF-teksto ne egalas la datumbazon stokitan "
+"klartekston."
 
 #, fuzzy
-#~ msgid ""
-#~ "Plain text of PDFs loaded in to QualCoder before version 3.4 will not "
-#~ "have the plain text positions correct for PDF display."
-#~ msgstr ""
-#~ "Simpla teksto de PDFoj ŝarĝitaj en al QualCoder antaŭ versio 3.4 ne havos "
-#~ "la simplajn tekstpoziciojn ĝustaj por PDF-ekrano."
+msgid ""
+"Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
+"the plain text positions correct for PDF display."
+msgstr ""
+"Simpla teksto de PDFoj ŝarĝitaj en al QualCoder antaŭ versio 3.4 ne havos la"
+" simplajn tekstpoziciojn ĝustaj por PDF-ekrano."
 
 #, fuzzy
-#~ msgid "This means coding stripes will show in incorrect positions."
-#~ msgstr "Ĉi tio signifas ke ĉifrado de strioj montras en malĝustaj pozicioj."
+msgid "This means coding stripes will show in incorrect positions."
+msgstr "Ĉi tio signifas ke ĉifrado de strioj montras en malĝustaj pozicioj."
 
 #, fuzzy
-#~ msgid ""
-#~ "Similarly, if the PDF plain text has been edited in any way, this will "
-#~ "affect coding stripes display."
-#~ msgstr ""
-#~ "Simile, se la PDF-ebenaĵoteksto estis redaktita laŭ iu maniero, tio "
-#~ "influos ĉifrado de strioj elmontras."
+msgid ""
+"Similarly, if the PDF plain text has been edited in any way, this will "
+"affect coding stripes display."
+msgstr ""
+"Simile, se la PDF-ebenaĵoteksto estis redaktita laŭ iu maniero, tio influos "
+"ĉifrado de strioj elmontras."
 
 #, fuzzy
-#~ msgid "Press Enter to search"
-#~ msgstr "La gazetaro eniras por serĉi"
+msgid "Press Enter to search"
+msgstr "La gazetaro eniras por serĉi"
 
 #, fuzzy
-#~ msgid "PDF objects"
-#~ msgstr "PDF-objekto"
+msgid "PDF objects"
+msgstr "PDF-objekto"
 
 #, fuzzy
-#~ msgid ""
-#~ "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
-#~ "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
-#~ msgstr ""
-#~ "Ŝanĝo komencas pozicion (etendita SHIFT LEFT/ ŝrumpas ALT Right)\n"
-#~ "Ŝanĝo finpozicio (etendita SHIFT Right/ ŝrumpa ALT LEFT)"
+msgid ""
+"Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
+"Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
+msgstr ""
+"Ŝanĝo komencas pozicion (etendita SHIFT LEFT/ ŝrumpas ALT Right)\n"
+"Ŝanĝo finpozicio (etendita SHIFT Right/ ŝrumpa ALT LEFT)"
 
 #, fuzzy
-#~ msgid "Use key presses"
-#~ msgstr "Uzu esencajn gazetarojn"
+msgid "Use key presses"
+msgstr "Uzu esencajn gazetarojn"
 
 #, fuzzy
-#~ msgid "PDF Image exported"
-#~ msgstr "PDF PDF PDF Bildo eksportis"
+msgid "PDF Image exported"
+msgstr "PDF PDF PDF Bildo eksportis"
 
 #, fuzzy
-#~ msgid "Pages: "
-#~ msgstr "Paĝoj:"
+msgid "Pages: "
+msgstr "Paĝoj:"
 
 #, fuzzy
-#~ msgid "Parsing the PDF text."
-#~ msgstr "Parado de la PDF-teksto."
+msgid "Parsing the PDF text."
+msgstr "Parado de la PDF-teksto."
 
 #, fuzzy
-#~ msgid ""
-#~ "Texts do not match. PDF imported before 3.4 QualCodr version or the PDF "
-#~ "text has been edited."
-#~ msgstr ""
-#~ "Tekstoj ne kongruas. PDF importita antaŭ 3.4 QualCodr versio aŭ la PDF-"
-#~ "teksto estis redaktita."
+msgid ""
+"Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text"
+" has been edited."
+msgstr ""
+"Tekstoj ne kongruas. PDF importita antaŭ 3.4 QualCodr versio aŭ la PDF-"
+"teksto estis redaktita."
 
 #, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "View PDF but cannot code. Code positions will appear wrongly.\n"
-#~ "Character difference: "
-#~ msgstr ""
-#~ "Vidu PDF sed ne povas kodigi. Kodo pozicioj aperos erare.\n"
-#~ "Karakteriza diferenco:"
+msgid ""
+"\n"
+"View PDF but cannot code. Code positions will appear wrongly.\n"
+"Character difference: "
+msgstr ""
+"Vidu PDF sed ne povas kodigi. Kodo pozicioj aperos erare.\n"
+"Karakteriza diferenco:"
 
 #, fuzzy
-#~ msgid "TEXT START CHARACTER POSITION: "
-#~ msgstr "TExT START CHAR DE POSI:"
+msgid "TEXT START CHARACTER POSITION: "
+msgstr "TExT START CHAR DE POSI:"
 
 #, fuzzy
-#~ msgid "TEXT END CHARACTER POSITION: "
-#~ msgstr "TExT-ENDO POSI:"
+msgid "TEXT END CHARACTER POSITION: "
+msgstr "TExT-ENDO POSI:"
 
 #, fuzzy
-#~ msgid "NUMBER OF CHARACTERS: "
-#~ msgstr "NUMBER de CHARACLOS:"
+msgid "NUMBER OF CHARACTERS: "
+msgstr "NUMBER de CHARACLOS:"
 
 #, fuzzy
-#~ msgid "Important"
-#~ msgstr "Grava grava"
+msgid "Important"
+msgstr "Grava grava"
 
 #, fuzzy
-#~ msgid "Code memo"
-#~ msgstr "Kodo"
+msgid "Code memo"
+msgstr "Kodo"
 
 #, fuzzy
-#~ msgid "Select code for important flag"
-#~ msgstr "Elekti kodon por grava flago"
+msgid "Select code for important flag"
+msgstr "Elekti kodon por grava flago"
 
 #, fuzzy
-#~ msgid "Select code to remove important flag"
-#~ msgstr "Elektu kodon por forigi gravan flagon"
+msgid "Select code to remove important flag"
+msgstr "Elektu kodon por forigi gravan flagon"
 
 #, fuzzy
-#~ msgid "PDF loaded text does not match Imported PDF text length."
-#~ msgstr "PDF ŝarĝita teksto ne egalis Importitan PDF-tekstolongon."
+msgid "PDF loaded text does not match Imported PDF text length."
+msgstr "PDF ŝarĝita teksto ne egalis Importitan PDF-tekstolongon."
 
 #, fuzzy
-#~ msgid "Mark using the right hand side text pane."
-#~ msgstr "Marko uzanta la dekstran flanktekston pane."
+msgid "Mark using the right hand side text pane."
+msgstr "Marko uzanta la dekstran flanktekston pane."
 
 #, fuzzy
-#~ msgid "Cannot mark"
-#~ msgstr "Ne povas marki"
+msgid "Cannot mark"
+msgstr "Ne povas marki"
 
 #, fuzzy
-#~ msgid "Add a new code"
-#~ msgstr "Aldonu novan kodon"
+msgid "Add a new code"
+msgstr "Aldonu novan kodon"
 
 #, fuzzy
-#~ msgid "Add a new category"
-#~ msgstr "Aldonu novan kategorion"
+msgid "Add a new category"
+msgstr "Aldonu novan kategorion"
 
 #, fuzzy
-#~ msgid "Delete F4"
-#~ msgstr "F4"
+msgid "Delete F4"
+msgstr "F4"
 
 #, fuzzy
-#~ msgid "Report text context style: "
-#~ msgstr "Raporto teksta kuntekstostilo:"
+msgid "Report text context style: "
+msgstr "Raporto teksta kuntekstostilo:"
 
 #, fuzzy
-#~ msgid "QualCoder project missing folders. Created empty folders"
-#~ msgstr "QualCoder projekcias mankantajn faldantojn. Krei malplenajn faldojn"
+msgid "QualCoder project missing folders. Created empty folders"
+msgstr "QualCoder projekcias mankantajn faldantojn. Krei malplenajn faldojn"
 
 #, fuzzy
-#~ msgid "New Entries: "
-#~ msgstr "Novaj Kontribuoj:"
+msgid "New Entries: "
+msgstr "Novaj Kontribuoj:"
 
 #, fuzzy
-#~ msgid "Duplicates not inserted: "
-#~ msgstr "Duplikatoj ne enigis:"
+msgid "Duplicates not inserted: "
+msgstr "Duplikatoj ne enigis:"
 
 #, fuzzy
-#~ msgid "References already exist"
-#~ msgstr "Referencoj jam ekzistas"
+msgid "References already exist"
+msgstr "Referencoj jam ekzistas"
 
 #, fuzzy
-#~ msgid " renamed category(ies) would be restored to their old names."
-#~ msgstr "La jenaj paĝoj ligas al iliaj malnovaj nomoj."
+msgid " renamed category(ies) would be restored to their old names."
+msgstr "La jenaj paĝoj ligas al iliaj malnovaj nomoj."
 
 #, fuzzy
-#~ msgid " renamed code(s) would be restored to their old names."
-#~ msgstr "renomita kodo (j) estus reestigita al iliaj malnovaj nomoj."
+msgid " renamed code(s) would be restored to their old names."
+msgstr "renomita kodo (j) estus reestigita al iliaj malnovaj nomoj."
 
 #, fuzzy
-#~ msgid "original"
-#~ msgstr "originala originalo"
+msgid "original"
+msgstr "originala originalo"
 
 #, fuzzy
-#~ msgid "dark"
-#~ msgstr "malhela mallumo"
+msgid "dark"
+msgstr "malhela mallumo"
 
 #, fuzzy
-#~ msgid "purple"
-#~ msgstr "purpura"
+msgid "purple"
+msgstr "purpura"
 
 #, fuzzy
-#~ msgid "rainbow"
-#~ msgstr "Ĉielarko"
+msgid "rainbow"
+msgstr "Ĉielarko"
 
 #, fuzzy
-#~ msgid "Code renamed: "
-#~ msgstr "Kodo renomis:"
+msgid "Code renamed: "
+msgstr "Kodo renomis:"
 
 #, fuzzy
-#~ msgid "Notice"
-#~ msgstr "Aŭtoroj"
+msgid "Notice"
+msgstr "Aŭtoroj"
 
 #, fuzzy
-#~ msgid "Select at least one Qualitative Text column to analyse."
-#~ msgstr "Elekti almenaŭ unu Kvalitan tekstan kolumnon por analizi."
+msgid "Select at least one Qualitative Text column to analyse."
+msgstr "Elekti almenaŭ unu Kvalitan tekstan kolumnon por analizi."
 
 #, fuzzy
-#~ msgid "New code name"
-#~ msgstr "Nova kodnomo"
+msgid "New code name"
+msgstr "Nova kodnomo"
 
 #, fuzzy
-#~ msgid "Code added: "
-#~ msgstr "Kodo aldonis:"
+msgid "Code added: "
+msgstr "Kodo aldonis:"
 
 #, fuzzy
-#~ msgid "Category renamed: "
-#~ msgstr "Kategorio:"
+msgid "Category renamed: "
+msgstr "Kategorio:"
 
 #, fuzzy
-#~ msgid "Insert coded text items"
-#~ msgstr "Insert kodigita tekstobjektoj"
+msgid "Insert coded text items"
+msgstr "Insert kodigita tekstobjektoj"
 
 #, fuzzy
-#~ msgid "Insert coded image items"
-#~ msgstr "Insert kodigita bildobjektoj"
+msgid "Insert coded image items"
+msgstr "Insert kodigita bildobjektoj"
 
 #, fuzzy
-#~ msgid "Insert coded A/V items"
-#~ msgstr "Insert kodigis A/V erojn"
+msgid "Insert coded A/V items"
+msgstr "Insert kodigis A/V erojn"
 
 #, fuzzy
-#~ msgid "Expand category"
-#~ msgstr "Expand kategorio"
+msgid "Expand category"
+msgstr "Expand kategorio"
 
 #, fuzzy
-#~ msgid "Import and link segments"
-#~ msgstr "Importado kaj ligo segmentoj"
-
-#, fuzzy, python-brace-format
-#~ msgid "Renaming category \"{name}\"..."
-#~ msgstr "\"Renomi kategorion\" ..."
+msgid "Import and link segments"
+msgstr "Importado kaj ligo segmentoj"
 
 #, fuzzy, python-brace-format
-#~ msgid "Renaming code \"{name}\"..."
-#~ msgstr "Renomi kodon \" {"
+msgid "Renaming category \"{name}\"..."
+msgstr "\"Renomi kategorion\" ..."
+
+#, fuzzy, python-brace-format
+msgid "Renaming code \"{name}\"..."
+msgstr "Renomi kodon \" {"
 
 #, fuzzy
-#~ msgid "Cases have already been created."
-#~ msgstr "La kazoj jam estis kreitaj."
+msgid "Cases have already been created."
+msgstr "La kazoj jam estis kreitaj."
 
 #, fuzzy
-#~ msgid ""
-#~ "It appears that you have already used the AI features with this project "
-#~ "before. Meanwhile, we had to change the internal implementation of the "
-#~ "local AI memory to make it more robust. As a result, the AI has to read "
-#~ "through all your empirical documents again to rebuild the local memory. "
-#~ "This may take a while. Sorry for the inconvenience."
-#~ msgstr ""
-#~ "Ŝajnas ke vi jam uzis la AI-trajtojn kun tiu projekto antaŭe. Dume, ni "
-#~ "devis ŝanĝi la internan efektivigon de la loka AI-memoro por igi ĝin pli "
-#~ "fortika. Kiel rezulto, la AI devas legi tra ĉiuj viaj empiriaj dokumentoj "
-#~ "denove por rekonstrui la lokan memoron. Tio povas preni iom da tempo. "
-#~ "Pardonu al la ĝeno."
+msgid ""
+"It appears that you have already used the AI features with this project "
+"before. Meanwhile, we had to change the internal implementation of the local"
+" AI memory to make it more robust. As a result, the AI has to read through "
+"all your empirical documents again to rebuild the local memory. This may "
+"take a while. Sorry for the inconvenience."
+msgstr ""
+"Ŝajnas ke vi jam uzis la AI-trajtojn kun tiu projekto antaŭe. Dume, ni devis"
+" ŝanĝi la internan efektivigon de la loka AI-memoro por igi ĝin pli fortika."
+" Kiel rezulto, la AI devas legi tra ĉiuj viaj empiriaj dokumentoj denove por"
+" rekonstrui la lokan memoron. Tio povas preni iom da tempo. Pardonu al la "
+"ĝeno."
 
 #, fuzzy
-#~ msgid "AI memory"
-#~ msgstr "Memoro"
+msgid "AI memory"
+msgstr "Memoro"
 
 #, fuzzy
-#~ msgid "Vectorstore: Document import failed, faiss_db not present."
-#~ msgstr "Vektoro: Dokumenta importo malsukcesis, faiss db ne prezentas."
+msgid "Vectorstore: Document import failed, faiss_db not present."
+msgstr "Vektoro: Dokumenta importo malsukcesis, faiss db ne prezentas."
 
 #, fuzzy
-#~ msgid "Branch has been selected"
-#~ msgstr "Branĉo estis elektita"
+msgid "Branch has been selected"
+msgstr "Branĉo estis elektita"
 
 #, fuzzy
-#~ msgid ""
-#~ "No coded text found. Please select another code or category, or refine "
-#~ "you filters."
-#~ msgstr ""
-#~ "Neniu kodigita teksto trovita. Bonvolu elekti alian kodon aŭ kategorion, "
-#~ "aŭ rafini vin filtriloj."
+msgid ""
+"No coded text found. Please select another code or category, or refine you "
+"filters."
+msgstr ""
+"Neniu kodigita teksto trovita. Bonvolu elekti alian kodon aŭ kategorion, aŭ "
+"rafini vin filtriloj."
 
 #, fuzzy
-#~ msgid ""
-#~ "ATTENTION: There was more coded data found, but it had to be truncated "
-#~ "because of the limited context window of the AI."
-#~ msgstr ""
-#~ "Estis pli kodigitaj datenoj trovitaj, sed ĝi devis esti stumpigita pro la "
-#~ "limigita kuntekstofenestro de la AI."
+msgid ""
+"ATTENTION: There was more coded data found, but it had to be truncated "
+"because of the limited context window of the AI."
+msgstr ""
+"Estis pli kodigitaj datenoj trovitaj, sed ĝi devis esti stumpigita pro la "
+"limigita kuntekstofenestro de la AI."
 
 #, fuzzy
-#~ msgid "New topic analysis chat"
-#~ msgstr "Nova topika analizo"
+msgid "New topic analysis chat"
+msgstr "Nova topika analizo"
 
 #, fuzzy
-#~ msgid "Ask the AI anything, not related to your data."
-#~ msgstr "Demandu al la AI io ajn, ne rilatita al viaj datumoj."
+msgid "Ask the AI anything, not related to your data."
+msgstr "Demandu al la AI io ajn, ne rilatita al viaj datumoj."
 
 #, fuzzy
-#~ msgid "Names of prompts must be unique within its type and scope."
-#~ msgstr "Nomoj de promptiloj devas esti unikaj ene de ĝia tipo kaj amplekso."
+msgid "Names of prompts must be unique within its type and scope."
+msgstr "Nomoj de promptiloj devas esti unikaj ene de ĝia tipo kaj amplekso."
 
 #, fuzzy
-#~ msgid "Screenshot saved"
-#~ msgstr "Ekrano savis"
+msgid "Screenshot saved"
+msgstr "Ekrano savis"
 
 #, fuzzy
-#~ msgid "Ai Chat"
-#~ msgstr "Ai Babilejo"
+msgid "Ai Chat"
+msgstr "Ai Babilejo"

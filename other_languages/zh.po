@@ -2,9 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 10:53+0200\n"
-"PO-Revision-Date: 2026-08-28 13:07+0200\n"
+"POT-Creation-Date: 2026-10-17 11:18+0200\n"
+"PO-Revision-Date: 2026-10-17 11:18+0200\n"
 "Last-Translator: Auto-translated via Argostranslate (EN -> ZH)\n"
 "Language-Team: ZH <LL@li.org>\n"
 "Language: zh\n"
@@ -403,11 +402,6 @@ msgstr "转录："
 msgid "END OF TRANSCRIPT"
 msgstr "成绩单结束"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:488
-#, fuzzy
-msgid "TRANSCRIPT: "
-msgstr "转录："
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:514
 msgid "PDF IMAGE DETAILS"
 msgstr "pdf 图像详情"
@@ -456,8 +450,7 @@ msgstr "图像太大"
 msgid ""
 "Cannot open image with PIL module to ge t size and details.\n"
 "(DecompressionBombError)"
-msgstr ""
-"无法使用 PIL 模块打开图像以获取大小和详细信息。(DecompressionBombError)"
+msgstr "无法使用 PIL 模块打开图像以获取大小和详细信息。(DecompressionBombError)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:576
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:678
@@ -475,8 +468,8 @@ msgstr "统计："
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:645
 msgid ""
-"Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators"
 msgstr "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:647
@@ -576,24 +569,6 @@ msgstr "代码区域/ 图像 (E)"
 #, fuzzy
 msgid "Go to bookmark (press B to set)"
 msgstr "转到书签( 按 B 键设置)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1904
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5967
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6013
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1386
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1453
-#, fuzzy
-msgid "Codings:"
-msgstr "编码"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1906
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2749
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2756
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2453
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2456
-#, fuzzy
-msgid "Memo:"
-msgstr "备忘录"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2007
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:725
@@ -758,11 +733,6 @@ msgstr "编码区域"
 msgid "Select a code in the list first."
 msgstr "首先在列表中选择一个代码 。"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2752
-#, fuzzy
-msgid "Area:"
-msgstr "区域 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2761
 #, fuzzy
 msgid "Annotation:"
@@ -802,21 +772,6 @@ msgstr "未选择代码"
 #, fuzzy
 msgid "Text coding is disabled for this file. Re-import the PDF."
 msgstr "此文件的文本编码已禁用 。 重新导入PDF."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2912
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2949
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3837
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:484
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4675
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4697
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1036
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1057
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2642
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5179
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5201
-#, fuzzy
-msgid "Annotation: "
-msgstr "注释"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2989
 #, fuzzy
@@ -910,8 +865,8 @@ msgstr "未选择文件 。"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4530
 #, fuzzy
 msgid ""
-"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the "
-"speaker codings?"
+"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the"
+" speaker codings?"
 msgstr "编码器\"QQ\"目前被隐藏. 你想让它显眼, 看到扬声器编码吗?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3299
@@ -1274,87 +1229,6 @@ msgstr "文本 :"
 #, fuzzy
 msgid "Annotations for file: "
 msgstr "文件说明 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3857
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3866
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4064
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2889
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:458
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1416
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:757
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:774
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:789
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:805
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:817
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:829
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:961
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1016
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1046
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3619
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3694
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3763
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3859
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5596
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5621
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5647
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5673
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5692
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5713
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:847
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:993
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1021
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1274
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1300
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1326
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1727
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2616
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
-#, fuzzy
-msgid "Code: "
-msgstr "代码 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3859
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3867
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4066
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:810
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:826
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:846
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:461
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5511
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:760
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:777
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:792
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:963
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1018
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3622
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3695
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3765
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5599
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5625
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5650
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:6050
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:162
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:205
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:248
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:627
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:660
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:685
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:713
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:995
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1023
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1052
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1276
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1302
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1329
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1729
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1579
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2619
-#, fuzzy
-msgid "Memo: "
-msgstr "回忆:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3869
 #, fuzzy
@@ -1782,8 +1656,8 @@ msgstr "从此 PDF 中提取的文本与导入的文本不符 。"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5783
 #, fuzzy
 msgid ""
-"This usually means the file was imported in an older QualCoder version using "
-"an older text method."
+"This usually means the file was imported in an older QualCoder version using"
+" an older text method."
 msgstr "这通常意味着文件是用更古老的文本方法在更古老的QualCoder版本中导入的."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5784
@@ -1796,8 +1670,7 @@ msgstr "现在将此文件调整为新方法吗 ?"
 msgid ""
 "The stored text will be updated. The codings (all coders), annotations and "
 "case assignments will be adjusted to the new text method."
-msgstr ""
-"将更新存储的文本 。 编码器(所有编码器),说明和大小写任务将调整为新的文本方法."
+msgstr "将更新存储的文本 。 编码器(所有编码器),说明和大小写任务将调整为新的文本方法."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5787
 #, fuzzy
@@ -1832,11 +1705,9 @@ msgstr "将 PDF 存储的文本转换为选中的布局 ?"
 #, fuzzy
 msgid ""
 "The stored text will be rewritten and its codings (all coders), annotations "
-"and case assignments will be relocated in the new text. Segments that cannot "
-"be located exactly keep their original quote and are reported for review."
-msgstr ""
-"所存储的文本将被重写,其编码(所有编码器),说明和大小写任务将在新文本中迁移. 无"
-"法准确定位的片段保留原引号并报告审查。"
+"and case assignments will be relocated in the new text. Segments that cannot"
+" be located exactly keep their original quote and are reported for review."
+msgstr "所存储的文本将被重写,其编码(所有编码器),说明和大小写任务将在新文本中迁移. 无法准确定位的片段保留原引号并报告审查。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5857
 #, fuzzy
@@ -1965,22 +1836,6 @@ msgstr "将报表保存到日记"
 msgid "PDF restructure report"
 msgstr "PDF 结构调整报告"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6009
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3062
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1143
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3682
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3742
-#, fuzzy
-msgid "File:"
-msgstr "文件 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6010
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5802
-#, fuzzy
-msgid "Date:"
-msgstr "日期 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6011
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1501
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:1420
@@ -2031,9 +1886,7 @@ msgstr "导出突出显示的 PDF"
 msgid ""
 "Text codings will be skipped: the extracted text is not ready or does not "
 "match the imported text. Only area codings will be exported."
-msgstr ""
-"文本编码将被跳过: 已提取的文本尚未准备好或与导入的文本不符 。 只输出区域编"
-"码 。"
+msgstr "文本编码将被跳过: 已提取的文本尚未准备好或与导入的文本不符 。 只输出区域编码 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6138
 #, fuzzy
@@ -2747,8 +2600,9 @@ msgid "AI: Closed"
 msgstr "关闭"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:114
+#, fuzzy
 msgid "AI: Closing"
-msgstr ""
+msgstr "AI: 结束"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:116
 #, fuzzy
@@ -2761,15 +2615,17 @@ msgid "MCP active"
 msgstr "本地人"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:133
+#, fuzzy
 msgid ""
 "No project is open. Open or create a project in QualCoder, then try again."
-msgstr ""
+msgstr "没有项目打开 。 在QualCoder中打开或创建一个工程,然后再次尝试."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:135
+#, fuzzy
 msgid ""
-"The AI components could not be loaded. Please restart QualCoder or check the "
-"log for details."
-msgstr ""
+"The AI components could not be loaded. Please restart QualCoder or check the"
+" log for details."
+msgstr "无法装入AI组件 。 请重新启动 QualCoder 或检查日志以了解详情 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:137
 #, fuzzy
@@ -2782,19 +2638,22 @@ msgid "The AI is busy. Please wait a moment and retry."
 msgstr "人工智能正忙。请稍等片刻后重试。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:141
+#, fuzzy
 msgid ""
 "The project search index is not available yet. Please retry in a moment."
-msgstr ""
+msgstr "项目搜索索引尚未可用 。 请稍候再试."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:143
+#, fuzzy
 msgid "The AI is still preparing the project data. Please retry in a moment."
-msgstr ""
+msgstr "AI仍在编制项目数据. 请稍候再试."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:145
+#, fuzzy
 msgid ""
 "The AI components are still loading in the background. Please retry in a "
 "moment."
-msgstr ""
+msgstr "AI组件仍在背景中加载. 请稍候再试."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:256
 #, fuzzy
@@ -2847,9 +2706,8 @@ msgid ""
 "the AI access still works as expected. You might need to change to a "
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
-"您正在旧服务器上使用“Blablador”服务，该服务器很快将被禁用。您的配置将自动更"
-"新。请测试AI访问是否仍能正常工作。您可能需要在“高级 AI 设置”下的设置对话框中"
-"更改为不同的 AI 模型。"
+"您正在旧服务器上使用“Blablador”服务，该服务器很快将被禁用。您的配置将自动更新。请测试AI访问是否仍能正常工作。您可能需要在“高级 AI "
+"设置”下的设置对话框中更改为不同的 AI 模型。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:1354
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4781
@@ -3168,12 +3026,10 @@ msgstr "存储的 AI 更改"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3626
 #, fuzzy
 msgid ""
-"Could not be undone because the affected item no longer matches the recorded "
-"state. It may have been edited afterwards or still be blocked by dependent "
+"Could not be undone because the affected item no longer matches the recorded"
+" state. It may have been edited afterwards or still be blocked by dependent "
 "data."
-msgstr ""
-"无法撤销, 因为受影响的项目不再符合记录状态 。 它可能在事后经过编辑,或仍然被依"
-"赖性数据阻断."
+msgstr "无法撤销, 因为受影响的项目不再符合记录状态 。 它可能在事后经过编辑,或仍然被依赖性数据阻断."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3631
 #, fuzzy
@@ -3254,10 +3110,11 @@ msgid " standalone text coding(s)."
 msgstr "独立文本编码。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3924
+#, fuzzy
 msgid ""
 " standalone coding(s) belong to another user or agent and will also be "
 "deleted."
-msgstr ""
+msgstr "独立编码属于另一个用户或代理,也将被删除。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3927
 #, fuzzy
@@ -3280,21 +3137,6 @@ msgstr "说明:"
 #, fuzzy
 msgid " attribute definition(s)."
 msgstr "属性定义。"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3937
-#, fuzzy
-msgid " category(ies)"
-msgstr "类别"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3939
-#, fuzzy
-msgid " code(s)"
-msgstr "代码"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3941
-#, fuzzy
-msgid " coding(s)"
-msgstr "编码"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3942
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3944
@@ -3417,8 +3259,10 @@ msgid "Skipped operations removed from the list: "
 msgstr "从列表中删除的操作跳过 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4709
-msgid "Warning: codings belonging to another user or agent were also deleted: "
-msgstr ""
+#, fuzzy
+msgid ""
+"Warning: codings belonging to another user or agent were also deleted: "
+msgstr "警告:属于另一个用户或代理的编码也被删除:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4711
 #, fuzzy
@@ -3449,8 +3293,7 @@ msgid ""
 "newer model, such as GPT 4.1. Go to Project > Settings to change the AI "
 "profile and model."
 msgstr ""
-"AI: 您仍在使用过时的 GPT-4 涡轮增压。考虑改用较新的型号，如 GPT 4.1。进入 “项"
-"目”>“设置 ”更改 AI 配置文件和型号。"
+"AI: 您仍在使用过时的 GPT-4 涡轮增压。考虑改用较新的型号，如 GPT 4.1。进入 “项目”>“设置 ”更改 AI 配置文件和型号。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4803
 #, fuzzy
@@ -3459,8 +3302,8 @@ msgid ""
 "switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
 "change the AI profile and model."
 msgstr ""
-"AI:你在使用来自Anthropic的过时的Claude Opus 4型号. 考虑改用较新的模式,如Opus "
-"4.1. 转到工程 > 设置来更改 AI 配置和模型 。"
+"AI:你在使用来自Anthropic的过时的Claude Opus 4型号. 考虑改用较新的模式,如Opus 4.1. 转到工程 > 设置来更改 AI "
+"配置和模型 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4814
 msgid "Please enter an API-key for the AI in the following dialog."
@@ -3478,9 +3321,7 @@ msgstr "人工智能：未设置 API 密钥，人工智能已禁用。"
 msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
-msgstr ""
-"在下面的对话框中，转到 “高级人工智能选项”，选择一个大型人工智能模型和一个快速"
-"人工智能模型（两者可以相同）。"
+msgstr "在下面的对话框中，转到 “高级人工智能选项”，选择一个大型人工智能模型和一个快速人工智能模型（两者可以相同）。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4831
 msgid "AI Model Selection"
@@ -3492,11 +3333,9 @@ msgstr "人工智能：未选择大型/快速模型，人工智能被禁用。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4936
 msgid ""
-"An error occured during AI initialization. The AI features will be disabled. "
-"Click on Project > Settings to reenable them."
-msgstr ""
-"人工智能初始化过程中发生错误。人工智能功能将被禁用。单击 “项目”>“设置 ”重新启"
-"用这些功能。"
+"An error occured during AI initialization. The AI features will be disabled."
+" Click on Project > Settings to reenable them."
+msgstr "人工智能初始化过程中发生错误。人工智能功能将被禁用。单击 “项目”>“设置 ”重新启用这些功能。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4937
 msgid "AI Initialization"
@@ -3565,8 +3404,9 @@ msgid "Top"
 msgstr "主题"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:244
+#, fuzzy
 msgid "Left, icons only"
-msgstr ""
+msgstr "左, 仅限图标"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:268
 msgid "Bold"
@@ -3585,18 +3425,20 @@ msgid "Default folder for storing automatic backups and for file outputs."
 msgstr "用于存储自动备份和文件输出的默认文件夹。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:365
+#, fuzzy
 msgid ""
-"External MCP allows third-party AI applications to access data from the "
-"currently opened project. Data returned by MCP tools may be transmitted to "
-"the AI provider configured in that application.\n"
+"External MCP allows third-party AI applications to access data from the currently opened project. Data returned by MCP tools may be transmitted to the AI provider configured in that application.\n"
 "\n"
-"Only enable External MCP if you trust the connected application and "
-"understand how it handles your data."
+"Only enable External MCP if you trust the connected application and understand how it handles your data."
 msgstr ""
+"外部MCP允许第三方AI应用程序从目前打开的项目中访问数据. MCP工具返回的数据可以传送给该应用程序配置的AI提供者.\n"
+"\n"
+"只有当您信任连接的应用程序并理解其如何处理您的数据时,才会启用外部 MCP 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:372
+#, fuzzy
 msgid "External MCP privacy warning"
-msgstr ""
+msgstr "外部 MCP 隐私警告"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:426
 #, fuzzy
@@ -3606,8 +3448,8 @@ msgstr "关闭并打开软件,以进行语言变化。"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:427
 #, fuzzy
 msgid ""
-"Additional community supported languages can be installed by selecting \"Add "
-"more languages...\" in the dropdown."
+"Additional community supported languages can be installed by selecting \"Add"
+" more languages...\" in the dropdown."
 msgstr "可以通过在下架时选择\"添加更多语言...\"来安装额外的社区支持语言."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:457
@@ -3655,8 +3497,9 @@ msgid "Add more languages"
 msgstr "添加更多语言"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:560
+#, fuzzy
 msgid "AI components are still loading."
-msgstr ""
+msgstr "AI组件仍在装入中."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:590
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3282
@@ -3672,12 +3515,10 @@ msgstr "编辑人工智能配置文件名称"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:670
 msgid ""
 "Select a profile first. \n"
-"You can only edit the name of an existing profile. To create a new profile "
-"from scratch, follow the instructions in the QualCoder wiki on GitHub."
+"You can only edit the name of an existing profile. To create a new profile from scratch, follow the instructions in the QualCoder wiki on GitHub."
 msgstr ""
 "先选择一个配置文件。\n"
-"您只能编辑现有配置文件的名称。要从头开始创建一个新的配置文件，请遵循 GitHub "
-"上 QualCoder wiki 中的说明。"
+"您只能编辑现有配置文件的名称。要从头开始创建一个新的配置文件，请遵循 GitHub 上 QualCoder wiki 中的说明。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:679
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:923
@@ -3915,8 +3756,7 @@ msgstr "编剧:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:429
 #, fuzzy
 msgid "CODERS: "
-msgstr ""
-"{\\fn黑体\\fs20\\shad2\\2aH82\\3aH20\\4aH33\\fscx95\\3cH592001\\be1}你觉得呢?"
+msgstr "{\\fn黑体\\fs20\\shad2\\2aH82\\3aH20\\4aH33\\fscx95\\3cH592001\\be1}你觉得呢?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:464
 #, fuzzy
@@ -3937,8 +3777,8 @@ msgstr "特克斯编剧:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:542
 #, fuzzy
 msgid ""
-"Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators."
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators."
 msgstr "单词计算:单词使用字母字符,并包括aposrope. 所有其他字符都是单词分隔符."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:578
@@ -4203,16 +4043,6 @@ msgstr ""
 "R 逆时针旋转\n"
 "+ - 放大和缩小"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2354
-#, fuzzy
-msgid " Height: "
-msgstr "高度 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2355
-#, fuzzy
-msgid " Scale: "
-msgstr "缩放 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:201
 msgid "1) What do you want to search for?"
 msgstr "1) 您想搜索什么？"
@@ -4299,22 +4129,6 @@ msgstr "<无文件过滤器>"
 msgid "Search in all textfiles"
 msgstr "在所有文本文件中搜索"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:641
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2538
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:724
-#, fuzzy
-msgid "Codings: "
-msgstr "编码 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:645
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes_by_segments.py:139
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:270
-#, fuzzy
-msgid ""
-"\n"
-"MEMO: "
-msgstr "玛莫:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:653
 msgid "Search in all cases"
 msgstr "在所有情况下进行搜索"
@@ -4358,8 +4172,7 @@ msgstr "注:此处仅列出第一个{限制}后裔类别/代码;{已发件}其�
 msgid ""
 "Note: Search context was truncated at {limit} characters; some descendant "
 "items or memos were omitted."
-msgstr ""
-"注意: 在 {limit} 字符时, 搜索上下文被切换; 一些后裔项目或备忘录被省略 。"
+msgstr "注意: 在 {limit} 字符时, 搜索上下文被切换; 一些后裔项目或备忘录被省略 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:884
 #, fuzzy
@@ -4384,8 +4197,8 @@ msgstr "请在 “主题 ”栏输入文字。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:988
 msgid ""
-"After combining all filters, there are not files left for the search. Please "
-"check your settings."
+"After combining all filters, there are not files left for the search. Please"
+" check your settings."
 msgstr "合并所有筛选器后，没有文件可供搜索。请检查您的设置。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:989
@@ -4485,8 +4298,7 @@ msgstr "最大数 :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:420
 #, fuzzy
 msgid ""
-"Since you are using the AI-powered search for the first time, QualCoder "
-"needs to download and install some additional components. \n"
+"Since you are using the AI-powered search for the first time, QualCoder needs to download and install some additional components. \n"
 "\n"
 "This will download about 2.5 GB of data. Do you \n"
 "want to continue?"
@@ -4537,7 +4349,8 @@ msgstr "人工智能：重建内存。本地人工智能将读取您的所有文
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1072
 #, fuzzy
-msgid "Migrating the existing AI memory to the new internal search database..."
+msgid ""
+"Migrating the existing AI memory to the new internal search database..."
 msgstr "将现有的AI内存移动到新的内部搜索数据库..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1080
@@ -4646,8 +4459,7 @@ msgstr "合并或重命名过程中发生错误。所有更改均已撤销。"
 msgid ""
 "The merge or rename was successful. If you made a mistake, you can undo all "
 "changes by canceling the Coders dialog."
-msgstr ""
-"合并或重命名已成功完成。若操作有误，可通过取消编码器对话框撤销所有更改。"
+msgstr "合并或重命名已成功完成。若操作有误，可通过取消编码器对话框撤销所有更改。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/attributes.py:97
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/attributes.py:267
@@ -4747,6 +4559,7 @@ msgid "Duplicate"
 msgstr "重复"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:198
+#, fuzzy
 msgid ""
 "Prompt names may contain Unicode letters, including accents and umlauts, "
 "numbers, hyphens, and underscores. They must start with a letter or number "
@@ -4754,6 +4567,9 @@ msgid ""
 "'Prompt' and 'prompt' are treated as duplicates. Reserved Windows filenames "
 "such as CON, NUL, COM1, and LPT1 are not allowed."
 msgstr ""
+"提示名称可能包含Unicode字母,包括重音和umlaut,数字,连字符和下划线. 它们必须从字母或号码开始,包含不超过64个字符. "
+"名称为对大小写不敏感,因此\"Prompt\"和\"Prompt\"作为重复处理. "
+"不允许保留诸如CON,NUL,COM1和LPT1之类的Windows文件名."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:221
 #, fuzzy
@@ -4857,8 +4673,9 @@ msgid "The folder name must be no longer than 64 characters."
 msgstr "名字不得超过64个字符."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1123
+#, fuzzy
 msgid "The encoded folder name is too long for a portable filesystem."
-msgstr ""
+msgstr "编码的文件夹名称对于便携式文件系统来说太长了."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1127
 #, fuzzy
@@ -4868,8 +4685,8 @@ msgstr "此过滤器名称已经使用 :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1130
 #, fuzzy
 msgid ""
-"Folder names must start with a letter or number and contain Unicode letters, "
-"combining marks, numbers, hyphens, and underscores only."
+"Folder names must start with a letter or number and contain Unicode letters,"
+" combining marks, numbers, hyphens, and underscores only."
 msgstr "文件夹名称必须是文件系统兼容的 。 使用小写字母,数字,连字符,并仅下划线."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1140
@@ -4982,9 +4799,7 @@ msgstr "名称不能为空 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1408
 #, fuzzy
-msgid ""
-"Prompt names must not contain \"/\" or \"\\\". Use folders in the tree "
-"instead."
+msgid "Prompt names must not contain \"/\" or \"\\\". Use folders in the tree instead."
 msgstr "提示名称不得包含\"/\"或\"\\\". 在树上使用文件夹代替 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1413
@@ -4998,18 +4813,20 @@ msgid "The name must be no longer than 64 characters."
 msgstr "名字不得超过64个字符."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1422
+#, fuzzy
 msgid "The encoded prompt filename is too long for a portable filesystem."
-msgstr ""
+msgstr "编码的及时文件名对于便携式文件系统来说太长 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1428
+#, fuzzy
 msgid "This prompt name is reserved by Windows and cannot be used."
-msgstr ""
+msgstr "此提示名称由 Windows 保留, 无法使用 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1431
 #, fuzzy
 msgid ""
-"Prompt names must start with a letter or number and contain Unicode letters, "
-"combining marks, numbers, hyphens, and underscores only."
+"Prompt names must start with a letter or number and contain Unicode letters,"
+" combining marks, numbers, hyphens, and underscores only."
 msgstr "提示名称必须是文件系统兼容的 。 使用小写字母,数字,连字符,并仅下划线."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1449
@@ -5457,11 +5274,6 @@ msgstr "已反转重命名的数据库文件条目 :"
 msgid "Bulk Rename of database file name entries"
 msgstr "批量重命名数据库文件名条目"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:1600
-#, fuzzy
-msgid "Renamed database file entry:"
-msgstr "重命名数据库文件条目 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:1656
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2135
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2184
@@ -5698,13 +5510,6 @@ msgstr "Csv 或 tsv 文件假定的列分隔符 :"
 msgid "No columns assigned as qualitative."
 msgstr "没有指定为质的列 。"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2716
-#, fuzzy
-msgid ""
-"\n"
-"No columns assigned as qualitative."
-msgstr "没有指定为质的列 。"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2736
 #, fuzzy
 msgid "Survey"
@@ -5880,12 +5685,6 @@ msgstr "无文本的 PDF"
 msgid "Cannot import"
 msgstr "无法导入"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3369
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:340
-#, fuzzy
-msgid "Cannot import "
-msgstr "无法导入"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3420
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:1013
 #, fuzzy
@@ -5957,8 +5756,8 @@ msgstr "导出的文件"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3637
 #, fuzzy
 msgid ""
-"Search index is busy; the deleted file will be removed from the index on the "
-"next update."
+"Search index is busy; the deleted file will be removed from the index on the"
+" next update."
 msgstr "AI索引繁忙;删除的文件将在下一次更新时从索引中删除."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3649
@@ -5994,16 +5793,6 @@ msgstr "删除的文件 :"
 #, fuzzy
 msgid "Deleted: "
 msgstr "删除:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3982
-#, fuzzy
-msgid "Minimum: "
-msgstr "最小值 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3983
-#, fuzzy
-msgid "Maximum: "
-msgstr "最大数 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:4004
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:4006
@@ -6137,15 +5926,11 @@ msgstr "单击以适应和居中图表。 在图中,按 + 或 W 以缩放, - 或
 #, fuzzy
 msgid ""
 "BACK UP PROJECT before applying changes to the codes tree.\n"
-"The Code organiser is used mainly with grounded theory to help you develop "
-"and organise the coding concepts and their hierarchy.\n"
+"The Code organiser is used mainly with grounded theory to help you develop and organise the coding concepts and their hierarchy.\n"
 "Select a code branch or All, then right click to:\n"
-"Add categories, rename codes and categories, update memos, merge codes, "
-"merge categories, delete codes, delete categories.\n"
-"Rubber-band or Ctrl+click several nodes, then right click any of them for "
-"group actions (delete, or link them under a code/category).\n"
-"Pan the canvas by dragging with the middle mouse button, or hold the "
-"spacebar and drag with the left button.\n"
+"Add categories, rename codes and categories, update memos, merge codes, merge categories, delete codes, delete categories.\n"
+"Rubber-band or Ctrl+click several nodes, then right click any of them for group actions (delete, or link them under a code/category).\n"
+"Pan the canvas by dragging with the middle mouse button, or hold the spacebar and drag with the left button.\n"
 "\n"
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
@@ -6154,8 +5939,7 @@ msgstr ""
 "代码组织器主要使用基于理论来帮助您发展和组织编码概念及其等级.\n"
 "选择一个代码分支或全部,然后右键点击:\n"
 "增加类别,重命名代码和类别,更新备忘,合并代码,合并类别,删除代码,删除类别.\n"
-"橡胶带或Ctrl+点击几个节点,然后右键点击其中任何节点进行分组动作(删除,或在代码/"
-"分类下将其链接).\n"
+"橡胶带或Ctrl+点击几个节点,然后右键点击其中任何节点进行分组动作(删除,或在代码/分类下将其链接).\n"
 "用鼠标中键拖动画布,或按住空间栏,用左键拖动。\n"
 "\n"
 "可能出现出乎意料的错误。\n"
@@ -6401,20 +6185,10 @@ msgstr "最新备忘录 :"
 msgid "category "
 msgstr "类别"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1492
-#, fuzzy
-msgid "Code "
-msgstr "代码 A"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1496
 #, fuzzy
 msgid "under "
 msgstr "下级"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1501
-#, fuzzy
-msgid "Category "
-msgstr "类别 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1509
 #, fuzzy
@@ -6445,11 +6219,6 @@ msgstr "已经使用的代码名称 :"
 #, fuzzy
 msgid "Code organiser - applied changes:"
 msgstr "代码组织器 - 应用的更改 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1701
-#, fuzzy
-msgid "Code organiser "
-msgstr "代码组织者"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1709
 #, fuzzy
@@ -6666,7 +6435,8 @@ msgstr "从类别合并"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2890
 #, fuzzy
-msgid "All codings of this code will also be deleted when changes are applied."
+msgid ""
+"All codings of this code will also be deleted when changes are applied."
 msgstr "此代码的所有编码在应用修改时也会被删除."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2930
@@ -6815,8 +6585,7 @@ msgstr "句子编码 :"
 #, fuzzy
 msgid ""
 "Sync coding is enabled, but the transcript has no timestamps.\n"
-"Without timestamps the coding cannot be mirrored between the text and the "
-"wave (there is no way to map text positions to media time).\n"
+"Without timestamps the coding cannot be mirrored between the text and the wave (there is no way to map text positions to media time).\n"
 "The coding was saved normally, without its mirror.\n"
 "Add timestamps to the transcript, or untick Sync coding."
 msgstr ""
@@ -6830,10 +6599,9 @@ msgstr ""
 #, fuzzy, python-format
 msgid ""
 "Keyframes in this file are about %s seconds apart, so seeking may stall or "
-"repeat frames. Re-encoding it with denser keyframes gives precise navigation."
-msgstr ""
-"此文件中的密钥框架相隔大约 %s 秒, 因此寻求可能拖动或重复框架 。 用更稠密的键"
-"框重新编码它会提供精确的导航."
+"repeat frames. Re-encoding it with denser keyframes gives precise "
+"navigation."
+msgstr "此文件中的密钥框架相隔大约 %s 秒, 因此寻求可能拖动或重复框架 。 用更稠密的键框重新编码它会提供精确的导航."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2379
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:3792
@@ -6845,15 +6613,6 @@ msgstr "起始分段"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2890
 msgid "Clear segment"
 msgstr "清除分段"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2391
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2883
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2899
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5511
-#, fuzzy
-msgid "Segment: "
-msgstr "部件 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2392
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2900
@@ -7280,14 +7039,6 @@ msgstr "科代德·梅莫"
 msgid "CODED MEMO"
 msgstr "科代德·梅莫"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:383
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1487
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2612
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:545
-#, fuzzy
-msgid "Coder: "
-msgstr "编译器 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:396
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1502
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1643
@@ -7477,7 +7228,8 @@ msgstr "布尔变量作为字符处理(文本) 。 整数变量作为浮点处�
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:452
 #, fuzzy
 msgid ""
-"All variables are stored as text. Cast as text or float for SQL operations.\n"
+"All variables are stored as text. Cast as text or float for SQL "
+"operations.\n"
 msgstr "所有变量都作为文本存储 。 为 SQL 操作铸作文本或浮点。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:453
@@ -7489,8 +7241,7 @@ msgstr "外部文件的相对路径尚未测试 。"
 msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
-msgstr ""
-"在 “设置 ”下拉框中选择编码器名称，否则已编码的文本和媒体可能会显示为未编码。"
+msgstr "在 “设置 ”下拉框中选择编码器名称，否则已编码的文本和媒体可能会显示为未编码。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:455
 msgid "REFI-QDA Project import"
@@ -7783,21 +7534,23 @@ msgid "Perspective: "
 msgstr "视角 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:194
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "The external MCP server could not be started at {endpoint}."
-msgstr ""
+msgstr "无法在 {endpoint} 启动外部 MCP 服务器 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:198
+#, fuzzy
 msgid ""
 "The port may already be in use by another QualCoder instance, or server "
 "initialization failed."
-msgstr ""
+msgstr "该端口可能已被另一个QualCoder 实例使用, 或者服务器初始化失败 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:203
+#, fuzzy
 msgid ""
-"MCP access to this QualCoder instance is unavailable. You can continue using "
-"QualCoder. See the log for details."
-msgstr ""
+"MCP access to this QualCoder instance is unavailable. You can continue using"
+" QualCoder. See the log for details."
+msgstr "MCP无法访问这个QualCoder 实例 。 你可以继续使用QualCoder. 详情见日志。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:200
 #, fuzzy
@@ -8087,20 +7840,6 @@ msgstr "重叠数:"
 msgid "Total: "
 msgstr "共计:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:574
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:584
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:832
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1047
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3620
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3834
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:4968
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5716
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1050
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1327
-#, fuzzy
-msgid "msecs"
-msgstr "毫秒数"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:703
 #, fuzzy
 msgid "Total pixels: "
@@ -8137,12 +7876,6 @@ msgstr "无交叉路口"
 #, fuzzy
 msgid "Count of intersections: "
 msgstr "交叉点数 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:722
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:732
-#, fuzzy
-msgid "pixels"
-msgstr "像素"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:838
 #, fuzzy
@@ -8221,11 +7954,6 @@ msgstr ""
 "R 逆时针旋转\n"
 "+ - 放大和缩小\n"
 "E 导出图像"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/helpers.py:994
-#, fuzzy
-msgid "Scale:"
-msgstr "缩放 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/helpers.py:1053
 msgid "Rotate clockwise R"
@@ -8541,23 +8269,6 @@ msgstr "编码："
 msgid "Codes: "
 msgstr "代码 :"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1626
-#, fuzzy
-msgid "Attributes:"
-msgstr "属性 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1645
-#, fuzzy
-msgid ""
-"\n"
-"Files:\n"
-msgstr "文件："
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1650
-#, fuzzy
-msgid " Files: "
-msgstr "文件："
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1652
 #, fuzzy
 msgid ""
@@ -8568,13 +8279,6 @@ msgstr "案例:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2084
 msgid "Text code statistics:"
 msgstr "文本代码统计："
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2086
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2168
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2243
-#, fuzzy
-msgid "Count:"
-msgstr "计数 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2087
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2169
@@ -8598,12 +8302,6 @@ msgstr "文件百分比： 未知。要么 VLC 不是安装程序，要么找不
 #, fuzzy
 msgid "Code count totals"
 msgstr "上下文中的代码"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2400
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3315
-#, fuzzy
-msgid "MEMO:"
-msgstr "玛莫:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2413
 #, fuzzy
@@ -8719,16 +8417,6 @@ msgstr "删除编码部分。"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2947
 msgid "Delete coded section"
 msgstr "删除编码部分"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3064
-#, fuzzy
-msgid "FILE MEMO:"
-msgstr "佛尔梅莫:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3072
-#, fuzzy
-msgid "CASE MEMO:"
-msgstr "科斯梅莫: 科斯梅莫:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3442
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1274
@@ -8921,8 +8609,7 @@ msgstr "选择组织模式"
 msgid ""
 "Are you sure you want to generate an analytical model?\n"
 "\n"
-"This action will clear the current graph view and all unsaved nodes will be "
-"lost."
+"This action will clear the current graph view and all unsaved nodes will be lost."
 msgstr ""
 "您确定要生成一个分析模型吗 ?\n"
 "\n"
@@ -9078,11 +8765,6 @@ msgstr "选择图像文件"
 #, fuzzy
 msgid " width"
 msgstr "宽度"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3674
-#, fuzzy
-msgid " height:"
-msgstr "高度:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3682
 msgid "Select coded area"
@@ -9401,11 +9083,6 @@ msgstr "软件引用:"
 msgid "Analytical summary exported to:\n"
 msgstr "分析摘要导出到:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5184
-#, fuzzy
-msgid "The file could not be saved:\n"
-msgstr "无法保存文件 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5213
 #, fuzzy
 msgid "Save Graph"
@@ -9540,12 +9217,14 @@ msgstr "载荷图"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5745
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2852
+#, fuzzy
 msgid "The graph has unsaved changes."
-msgstr ""
+msgstr "图表有未保存的更改 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5746
+#, fuzzy
 msgid "Load another graph and lose the unsaved changes?"
-msgstr ""
+msgstr "装入另一个图表并丢失未保存的更改 ?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5747
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2851
@@ -9998,9 +9677,7 @@ msgstr "在进口的PDF中检测到了突出部分。"
 msgid ""
 "Code those segments? A 'PDF Underlines' category will be created, with one "
 "code per colour (named and coloured after the closest QualCoder colour)."
-msgstr ""
-"密码? 将创建一个'PDF Highlights'分类,每个亮点颜色有一个代码(在最接近的"
-"QualCoder颜色后命名和配色)."
+msgstr "密码? 将创建一个'PDF Highlights'分类,每个亮点颜色有一个代码(在最接近的QualCoder颜色后命名和配色)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_utils.py:441
 #, fuzzy
@@ -10013,9 +9690,7 @@ msgid ""
 "Code those segments? A 'PDF Highlights' category will be created, with one "
 "code per highlight colour (named and coloured after the closest QualCoder "
 "colour)."
-msgstr ""
-"密码? 将创建一个'PDF Highlights'分类,每个亮点颜色有一个代码(在最接近的"
-"QualCoder颜色后命名和配色)."
+msgstr "密码? 将创建一个'PDF Highlights'分类,每个亮点颜色有一个代码(在最接近的QualCoder颜色后命名和配色)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_utils.py:446
 #, fuzzy
@@ -10029,9 +9704,7 @@ msgid ""
 "Code those segments? 'PDF Highlights' and 'PDF Underlines' categories will "
 "be created, with one code per colour (named and coloured after the closest "
 "QualCoder colour)."
-msgstr ""
-"密码? 将创建一个'PDF Highlights'分类,每个亮点颜色有一个代码(在最接近的"
-"QualCoder颜色后命名和配色)."
+msgstr "密码? 将创建一个'PDF Highlights'分类,每个亮点颜色有一个代码(在最接近的QualCoder颜色后命名和配色)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/pdf_utils.py:457
 #, fuzzy
@@ -10466,7 +10139,8 @@ msgid "Need to update the source project database."
 msgstr "需要更新源项目数据库。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1035
-msgid "Please open the source project using QualCoder. Then close the project."
+msgid ""
+"Please open the source project using QualCoder. Then close the project."
 msgstr "请使用 QualCoder 打开源代码项目。然后关闭项目。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1036
@@ -10480,12 +10154,14 @@ msgid "About"
 msgstr "关于"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:184
+#, fuzzy
 msgid "Optional: Install VLC for audio and video coding."
-msgstr ""
+msgstr "可选:安装VLC用于音频和视频编码."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:185
+#, fuzzy
 msgid "Optional: Install ffmpeg for waveform images."
-msgstr ""
+msgstr "可选:为波形图像安装ffmpeg."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:188
 #, fuzzy
@@ -10493,12 +10169,14 @@ msgid "Acknowledgements"
 msgstr "鸣谢"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:189
+#, fuzzy
 msgid "Created RQDA - inspiration for QualCoder."
-msgstr ""
+msgstr "创建了 RQDA - QualCoder 的灵感."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:190
+#, fuzzy
 msgid "Source code for the docx module."
-msgstr ""
+msgstr "docx模块的源代码."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:191
 #, fuzzy
@@ -10506,20 +10184,24 @@ msgid "Created the QualCoder logo."
 msgstr "正在搜索 Qualcoder 帮助..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:192
+#, fuzzy
 msgid "Programming, artificial intelligence and much more."
-msgstr ""
+msgstr "编程、人工智能等等"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:193
+#, fuzzy
 msgid "French translations, programming, setting up the new website and more."
-msgstr ""
+msgstr "法文翻译,编程,新网站的设置等."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:195
+#, fuzzy
 msgid "Programming and Spanish translations."
-msgstr ""
+msgstr "编程和西班牙文翻译。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:197
+#, fuzzy
 msgid "To the many members on Github for supporting this project."
-msgstr ""
+msgstr "感谢吉苏布的许多成员支持这个项目."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:275
 msgid "Menu key shortcuts"
@@ -11036,10 +10718,11 @@ msgstr "创建书签 - 点击位置"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:392
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:413
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:431
+#, fuzzy
 msgid ""
 "Create new category. If a category is already selected, the new category "
 "will be underneath"
-msgstr ""
+msgstr "创建新类别 。 如果已经选中一个类别, 新的类别将在下面"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:363
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:393
@@ -11166,7 +10849,8 @@ msgstr "代码图像密钥快捷键"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:416
 msgid ""
-"Create a grayed-out image with coloured coded highlights (Wait a few seconds)"
+"Create a grayed-out image with coloured coded highlights (Wait a few "
+"seconds)"
 msgstr "生成一张灰度图像，其中高亮部分采用颜色编码（请稍等几秒钟）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:419
@@ -11188,8 +10872,9 @@ msgid "Set Bookmark in text for this audio/video file"
 msgstr "选择音频/视频文件"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:430
+#, fuzzy
 msgid "Open file and move to bookmarked text position"
-msgstr ""
+msgstr "打开文件并移动到书签文本位置"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:432
 msgid "Assign segment to currently selected code, and open memo for segment."
@@ -11241,70 +10926,51 @@ msgid "Run SQL query"
 msgstr "运行 SQL 查询"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:462
+#, fuzzy
 msgid ""
 "# Project\n"
 "\n"
-"The Project tab is the starting point for your work. Create or open a "
-"project with the cards on the left,\n"
-"and go back to your latest work from the Recent activity list. Everything "
-"else is in the [Project menu](qualcoder://menu/project).\n"
-"The action log, shown in place of this guide, records what you do during a "
-"session.\n"
+"The Project tab is the starting point for your work. Create or open a project with the cards on the left,\n"
+"and go back to your latest work from the Recent activity list. Everything else is in the [Project menu](qualcoder://menu/project).\n"
+"The action log, shown in place of this guide, records what you do during a session.\n"
 "\n"
 "\n"
 "## First steps\n"
 "\n"
-"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such "
-"as documents, PDFs, images, audio and video.\n"
-"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/"
-"manage_cases) and describe them with [attributes](qualcoder://menu/"
-"files_and_cases/manage_attributes).\n"
-"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://"
-"menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or "
-"[audio and video](qualcoder://menu/coding/code_audio_video).\n"
-"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/"
-"manage_journals) and the [project memo](qualcoder://menu/project/"
-"project_memo).\n"
-"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the "
-"[AI Agent](qualcoder://menu/ai).\n"
+"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such as documents, PDFs, images, audio and video.\n"
+"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/manage_cases) and describe them with [attributes](qualcoder://menu/files_and_cases/manage_attributes).\n"
+"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or [audio and video](qualcoder://menu/coding/code_audio_video).\n"
+"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/manage_journals) and the [project memo](qualcoder://menu/project/project_memo).\n"
+"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the [AI Agent](qualcoder://menu/ai).\n"
 "\n"
 "\n"
 "## About projects\n"
 "\n"
-"- A QualCoder project is a folder ending in .qda. It contains the project "
-"database and folders for imported documents, images, audio and video.\n"
-"- A dated backup of the project can be made each time it is opened. See the "
-"backup options in [Settings](qualcoder://menu/project/settings).\n"
-"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-"
-"Project/)\n"
+"- A QualCoder project is a folder ending in .qda. It contains the project database and folders for imported documents, images, audio and video.\n"
+"- A dated backup of the project can be made each time it is opened. See the backup options in [Settings](qualcoder://menu/project/settings).\n"
+"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-Project/)\n"
 "\n"
 "\n"
 "## [Project Memo](qualcoder://menu/project/project_memo)\n"
 "\n"
-"- Describe the research topic, questions, methodology, and the participants "
-"and data collected.\n"
+"- Describe the research topic, questions, methodology, and the participants and data collected.\n"
 "- The AI agent reads this memo to understand the context of your project.\n"
 "\n"
 "\n"
 "## [Settings](qualcoder://menu/project/settings)\n"
 "\n"
-"- Set your coder name, fonts, language, colour style, backups, and the AI "
-"integration. Settings and Help are also next to the main tabs.\n"
+"- Set your coder name, fonts, language, colour style, backups, and the AI integration. Settings and Help are also next to the main tabs.\n"
 "- [Help: Settings](qualcoder://help/2.2.-Settings/)\n"
 "\n"
 "\n"
 "## [Project Summary](qualcoder://menu/project/project_summary)\n"
 "\n"
-"- Writes a detailed overview of the open project to the action log, with "
-"files, cases, codes, categories, attributes, journals, and any bad links to "
-"files.\n"
+"- Writes a detailed overview of the open project to the action log, with files, cases, codes, categories, attributes, journals, and any bad links to files.\n"
 "\n"
 "\n"
-"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/"
-"project/export)\n"
+"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/project/export)\n"
 "\n"
-"- Exchange projects and codebooks with other software through the REFI-QDA "
-"standard.\n"
+"- Exchange projects and codebooks with other software through the REFI-QDA standard.\n"
 "- Import RQDA, Taguette and Sonal projects, or a plain text list of codes.\n"
 "- Export the codebook as an ODT file, with or without memos.\n"
 "- [Help: Imports and exports](qualcoder://help/6.1.-Imports-and-Exports/)\n"
@@ -11312,19 +10978,67 @@ msgid ""
 "\n"
 "## [Close Project](qualcoder://menu/project/close_project)\n"
 "\n"
-"- Closes the open project. Workspaces with unsaved changes are checked "
-"first, and a backup made on opening is removed if nothing changed.\n"
+"- Closes the open project. Workspaces with unsaved changes are checked first, and a backup made on opening is removed if nothing changed.\n"
 msgstr ""
+"# 项目\n"
+"\n"
+"工程标签是您工作的起点 。 创建或打开左边的卡片项目,\n"
+"并回到你的最新作品 从最近的活动列表。 其他一切都在[项目菜单]中(qualcoder://menu/project).\n"
+"动作日志以代替本指南,记录您在会话中的工作.\n"
+"\n"
+"\n"
+"□ 第一步\n"
+"\n"
+"1. [输入你的档案](qualcoder://menu/files and cases/manage files),如文件,PDF,图像,音频和视频.\n"
+"2. 分组参与者或网站作为[案 (qualcoder://menu/files and cases/manage cases),并以[属性](qualcoder://menu/files and cases/manage atprofiles)来描述.\n"
+"3. 开始[编码文本](qualcoder://menu/coding/codes),[PDFs](qualcoder://menu/coding/code pdf),[images](qualcoder://menu/coding/code code image)或[audio和视频](qualcoder://menu/coding/code audio video).\n"
+"4. 在[期刊](qualcoder://menu/files and cases/manage journals)和[项目备忘录](qualcoder://menu/project/project memo)中写下你的反省.\n"
+"5. 探索[报 (qualcoder://menu/reports)或问[AI Agent](qualcoder://menu/ai)中的图案.\n"
+"\n"
+"\n"
+"□ 关于项目\n"
+"\n"
+"QualCoder项目是一个以.qda结尾的文件夹。 其中包括项目数据库和进口文件、图像、音频和视频的文件夹。\n"
+"- 每次打开项目时都可提供项目日期备份。 见[设置]中的备份选项(qualcoder://menu/project/sets).\n"
+"- [帮助:创建新项目] (qualcoder://help/3.1.-创建-a-New-Project/).\n"
+"\n"
+"\n"
+"^ [项目备忘录](qualcoder://menu/project/project memo) 互联网档案馆的存檔,存档日期2013-03-02.\n"
+"\n"
+"- 说明研究专题、问题、方法、参与者和收集的数据。\n"
+"- AI代理阅读这个备忘录 来理解你项目的背景。\n"
+"\n"
+"\n"
+"□[定 (qualcoder://menu/project/设置).\n"
+"\n"
+"- 设置您的编码器名称,字体,语言,颜色风格,备份,以及AI集成. 设置和帮助也位于主标签旁边.\n"
+"- [帮助:设置] (qualcoder://help/2.2.-Settings/).\n"
+"\n"
+"\n"
+"□[项目摘要](qualcoder://menu/project/project summary) ##.\n"
+"\n"
+"- 向动作日志详细记录公开项目,包括文件、案例、代码、类别、属性、日记和与文件的任何不良链接。\n"
+"\n"
+"\n"
+"□[进口](qualcoder://menu/project/import)和[出口](qualcoder://menu/project/export)\n"
+"\n"
+"- 通过REFI-QDA标准与其他软件交换项目和密码本。\n"
+"- 导入 RQDA、Taguette 和 Sonal 项目,或简单文本代码列表。\n"
+"- 将代码簿导出为 OTT 文件, 是否备忘 。\n"
+"-[帮助:进出口] (qualcoder://help/6.1.-进出口/).\n"
+"\n"
+"\n"
+"^ [关闭项目](qualcoder://menu/project/close project).\n"
+"\n"
+"- 关闭开放式项目 未保存更改的工作空间首先被检查,如果没有更改,则打开时的备份将被删除 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:519
 #, fuzzy
 msgid ""
 "# Manage\n"
 "\n"
-"The Manage tab displays workspaces for organising cases, files, attributes, "
-"journals, and references.\n"
-"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among "
-"them.\n"
+"The Manage tab displays workspaces for organising cases, files, attributes, journals, and references.\n"
+"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among them.\n"
 "\n"
 "\n"
 "## [Manage Files](qualcoder://menu/files_and_cases/manage_files)\n"
@@ -11333,37 +11047,29 @@ msgid ""
 "- You can import plain text and many other document types,\n"
 "including PDFs, images, audio, and video.\n"
 "- You may also import survey data.\n"
-"- Before importing text files, you may want to create pseudonyms to protect "
-"the privacy of people or organisations.\n"
+"- Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.\n"
 "- [Help: Import files](qualcoder://help/3.2.-Files/)\n"
 "\n"
 "\n"
 "## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)\n"
 "\n"
-"- You can use cases to group files together that are related to a topic, "
-"person, organisation, or any other empirical entity in your study. \n"
-"- This can be useful for organising your data and for running reports on "
-"specific groups of files.\n"
+"- You can use cases to group files together that are related to a topic, person, organisation, or any other empirical entity in your study. \n"
+"- This can be useful for organising your data and for running reports on specific groups of files.\n"
 "- [Help: Cases](qualcoder://help/3.3.-Cases/)\n"
 "\n"
 "\n"
 "## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)\n"
 "\n"
-"- Journals are used to record your thoughts when coding and analysing "
-"data. \n"
-"- The journal window opens separately from the main window so you can move "
-"between them easily.\n"
+"- Journals are used to record your thoughts when coding and analysing data. \n"
+"- The journal window opens separately from the main window so you can move between them easily.\n"
 "- [Help: Journals](qualcoder://help/5.2.-Journals/)\n"
 "\n"
 "\n"
 "## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)\n"
 "\n"
-"- Files, cases, and journals can have attributes (variables) that describe "
-"their characteristics. \n"
-"- They can be used to filter and organise data, and to run reports based on "
-"specific criteria. \n"
-"- Use this menu to create and manage such attributes. They can be attached "
-"to files, cases, and journals directly in the respective workspaces. \n"
+"- Files, cases, and journals can have attributes (variables) that describe their characteristics. \n"
+"- They can be used to filter and organise data, and to run reports based on specific criteria. \n"
+"- Use this menu to create and manage such attributes. They can be attached to files, cases, and journals directly in the respective workspaces. \n"
 "- [Help: Attributes](qualcoder://help/3.4.-Attributes/)\n"
 "\n"
 "\n"
@@ -11389,17 +11095,14 @@ msgstr ""
 "- [帮助:导入文件] (qualcoder://help/3.2.-Files/) (中文(简体) ).\n"
 "\n"
 "\n"
-"^ [管理案例](qualcoder://menu/files and cases/manage cases) 互联网档案馆的存"
-"檔,存档日期2016-03-02.\n"
+"^ [管理案例](qualcoder://menu/files and cases/manage cases) 互联网档案馆的存檔,存档日期2016-03-02.\n"
 "\n"
-"- 您可以使用案例来组合与研究中某一主题、个人、组织或任何其他经验实体有关的文"
-"件。\n"
+"- 您可以使用案例来组合与研究中某一主题、个人、组织或任何其他经验实体有关的文件。\n"
 "- 这可用于组织您的数据和运行特定文件组的报告。\n"
 "-[帮助:案例] (qualcoder://help/3.3.-Cases/) (中文(简体) ).\n"
 "\n"
 "\n"
-"^ [管理日报] (qualcoder://menu/files and cases/manage journals) (中文(简"
-"体) ).\n"
+"^ [管理日报] (qualcoder://menu/files and cases/manage journals) (中文(简体) ).\n"
 "\n"
 "- 日记用来记录你在编码和分析数据时的想法。\n"
 "- 日记窗口与主窗口分开打开,这样你就可以轻松地在它们之间移动.\n"
@@ -11410,8 +11113,7 @@ msgstr ""
 "\n"
 "——文件,案例和日记可以有描述其特征的属性(可变).\n"
 "- 它们可用于筛选和组织数据,并根据具体标准进行报告。\n"
-"- 使用此菜单创建和管理此类属性。 它们可直接附在相应工作空间的文件、案件和日记"
-"上。\n"
+"- 使用此菜单创建和管理此类属性。 它们可直接附在相应工作空间的文件、案件和日记上。\n"
 "- [帮助:属性] (qualcoder:// help/3.4. - 属性/).\n"
 "\n"
 "\n"
@@ -11426,69 +11128,54 @@ msgstr ""
 msgid ""
 "# Coding\n"
 "\n"
-"The Coding tab displays workspaces for coding text, PDFs, images, audio, and "
-"video.\n"
-"Use the [Coding menu](qualcoder://menu/coding) to select an option to "
-"begin. \n"
-"Note that you can only open a particular coding workspace if that type of "
-"data is actually present in the current project. \n"
+"The Coding tab displays workspaces for coding text, PDFs, images, audio, and video.\n"
+"Use the [Coding menu](qualcoder://menu/coding) to select an option to begin. \n"
+"Note that you can only open a particular coding workspace if that type of data is actually present in the current project. \n"
 "\n"
 "\n"
 "## [Code Text](qualcoder://menu/coding/codes)\n"
 "\n"
-"- Use this workspace to read textual data closely and assign codes to "
-"selected passages.\n"
-"- You can organise codes in a tree, add memos and annotations, create "
-"bookmarks, and mark especially useful segments as important.\n"
+"- Use this workspace to read textual data closely and assign codes to selected passages.\n"
+"- You can organise codes in a tree, add memos and annotations, create bookmarks, and mark especially useful segments as important.\n"
 "- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)\n"
 "\n"
 "\n"
 "## [Code Images](qualcoder://menu/coding/code_image)\n"
 "\n"
-"- In this workspace, you can select regions in photographs, diagrams, "
-"screenshots, or other visual material and assign codes to them.\n"
-"- Coded areas are displayed as coloured rectangles linked to your code "
-"system.\n"
+"- In this workspace, you can select regions in photographs, diagrams, screenshots, or other visual material and assign codes to them.\n"
+"- Coded areas are displayed as coloured rectangles linked to your code system.\n"
 "- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)\n"
 "\n"
 "\n"
 "## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)\n"
 "\n"
-"- Use this workspace to transcribe and/or code time-based media such as "
-"interviews, focus groups, and field recordings.\n"
-"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-"
-"Video/)\n"
+"- Use this workspace to transcribe and/or code time-based media such as interviews, focus groups, and field recordings.\n"
+"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)\n"
 "\n"
 "\n"
 "## [Code PDFs](qualcoder://menu/coding/code_pdf)\n"
 "\n"
-"- This workspace allows you to code text directly in PDF documents when you "
-"want to keep the original page layout in view.\n"
-"- This is useful for articles, reports, and other source material where page "
-"position and formatting matter.\n"
+"- This workspace allows you to code text directly in PDF documents when you want to keep the original page layout in view.\n"
+"- This is useful for articles, reports, and other source material where page position and formatting matter.\n"
 "- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
 "\n"
 "\n"
 "## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)\n"
 "\n"
-"- This loads a variant of the text coding workspace that uses AI to explore "
-"your data and suggest segments for a selected code.\n"
+"- This loads a variant of the text coding workspace that uses AI to explore your data and suggest segments for a selected code.\n"
 "- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
 "\n"
 "\n"
 "## [Code Organiser](qualcoder://menu/coding/code_organiser)\n"
 "\n"
-"- Use this workspace to reorganise your code system using a graphical, mind-"
-"map style interface.\n"
-"- You can move, merge, and rename codes and categories as your analytic "
-"structure becomes clearer.\n"
+"- Use this workspace to reorganise your code system using a graphical, mind-map style interface.\n"
+"- You can move, merge, and rename codes and categories as your analytic structure becomes clearer.\n"
 "- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)\n"
 "\n"
 "\n"
 "## [Colour Scheme](qualcoder://menu/coding/colour_scheme)\n"
 "\n"
-"- This allows you to change the colour scheme of your codes and "
-"categories. \n"
+"- This allows you to change the colour scheme of your codes and categories. \n"
 "- Special schemes for colour-blind users are available. \n"
 msgstr ""
 "# 编码\n"
@@ -11501,24 +11188,20 @@ msgstr ""
 "^ [代码文本] (qualcoder://menu/coding/codes) (中文(简体) ).\n"
 "\n"
 "- 利用这个工作空间仔细阅读文字数据,并为选定的段落指定代码。\n"
-"– 您可以在树上组织代码, 添加备忘和说明, 创建书签, 并将特别有用的片段标为重"
-"要 。\n"
+"– 您可以在树上组织代码, 添加备忘和说明, 创建书签, 并将特别有用的片段标为重要 。\n"
 "- [帮助:编码文本] (qualcoder://help/4.1.-编码-Text/).\n"
 "\n"
 "\n"
 "^ [代码图像] (qualcoder://menu/coding/code image) (中文(简体) ).\n"
 "\n"
-"- 在这个工作区,您可以在照片、图表、截图或其他视觉材料中选择区域,并为它们指定"
-"代码。\n"
+"- 在这个工作区,您可以在照片、图表、截图或其他视觉材料中选择区域,并为它们指定代码。\n"
 "- 编码区域显示为与您的编码系统相连的彩色矩形。\n"
 "- [帮助:编码图像] (qualcoder://help/4. - 编码-IMages/).\n"
 "\n"
 "\n"
-"^ [代码音频和视频] (qualcoder://menu/coding/code audio video) (中文(简"
-"体) ).\n"
+"^ [代码音频和视频] (qualcoder://menu/coding/code audio video) (中文(简体) ).\n"
 "\n"
-"- 利用这个工作空间来翻译和/或编码基于时间的媒体,如访谈、焦点小组和现场录"
-"音。\n"
+"- 利用这个工作空间来翻译和/或编码基于时间的媒体,如访谈、焦点小组和现场录音。\n"
 "-[帮助:编码音频和视频] (qualcoder://help/4.5.-编码-Audio-and-Video/).\n"
 "\n"
 "\n"
@@ -11529,17 +11212,13 @@ msgstr ""
 "-[帮助:编码PDFs] (qualcoder://help/4.3.) - 编码-Text-on-PDFs/).\n"
 "\n"
 "\n"
-"^ [AI辅助编码](qualcoder://menu/coding/ai aid coding) 互联网档案馆的存檔,存档"
-"日期2013-12-21.\n"
+"^ [AI辅助编码](qualcoder://menu/coding/ai aid coding) 互联网档案馆的存檔,存档日期2013-12-21.\n"
 "\n"
-"- 这加载了文本编码工作空间的一个变体,该变体使用AI来探索您的数据,并为选定的代"
-"码建议片段.\n"
-"-[帮助:AI协助编码](qualcoder://help/4.2.-AI-Assisted-Coding/) 互联网档案馆的"
-"存檔,存档日期2013-03-02.\n"
+"- 这加载了文本编码工作空间的一个变体,该变体使用AI来探索您的数据,并为选定的代码建议片段.\n"
+"-[帮助:AI协助编码](qualcoder://help/4.2.-AI-Assisted-Coding/) 互联网档案馆的存檔,存档日期2013-03-02.\n"
 "\n"
 "\n"
-"^ [代码召集人](qualcoder://menu/coding/code organiser) 互联网档案馆的存檔,存"
-"档日期2013-03-02.\n"
+"^ [代码召集人](qualcoder://menu/coding/code organiser) 互联网档案馆的存檔,存档日期2013-03-02.\n"
 "\n"
 "——利用这个工作空间,使用图形,思维图风格界面,重新组织您的代码系统.\n"
 "- 您可以移动、合并和重命名代码和类别, 随着分析结构变得更加清晰。\n"
@@ -11556,14 +11235,12 @@ msgstr ""
 msgid ""
 "# Reports tab\n"
 "\n"
-"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) "
-"and [Reports](qualcoder://menu/reports) menus.\n"
+"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) and [Reports](qualcoder://menu/reports) menus.\n"
 "\n"
 "\n"
 "## [Analysis](qualcoder://menu/analysis)\n"
 "\n"
-"Use these tools when you want to explore coded segments and relationships in "
-"detail.\n"
+"Use these tools when you want to explore coded segments and relationships in detail.\n"
 "\n"
 "[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
 "\n"
@@ -11572,73 +11249,49 @@ msgid ""
 "\n"
 "These tools help you inspect the actual coded material in your project.\n"
 "\n"
-"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible "
-"analysis tool. It gathers all segments for selected codes or categories and "
-"lets you narrow the results by file, case, attributes, or search text.\n"
-"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) "
-"generates a table with text segments and all associated codes.\n"
+"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible analysis tool. It gathers all segments for selected codes or categories and lets you narrow the results by file, case, attributes, or search text.\n"
+"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) generates a table with text segments and all associated codes.\n"
 "\n"
 "\n"
 "### Code relationships and overlaps\n"
 "\n"
-"Use these tools to examine how codes relate to one another. They only work "
-"with text files.\n"
+"Use these tools to examine how codes relate to one another. They only work with text files.\n"
 "\n"
-"- [Code relations](qualcoder://menu/analysis/code_relations) shows "
-"proximity, overlap, inclusion, and exact matches between selected codes.\n"
-"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses "
-"on where two codes overlap or directly touch.\n"
-"- [Code text exact matches](qualcoder://menu/analysis/"
-"code_text_exact_matches) lists passages where different codes were applied "
-"to exactly the same text.\n"
-"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map "
-"style view of linked project elements like codes, cases, files, etc. [Help: "
-"Graph](qualcoder://help/5.4.-Graph/)\n"
+"- [Code relations](qualcoder://menu/analysis/code_relations) shows proximity, overlap, inclusion, and exact matches between selected codes.\n"
+"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses on where two codes overlap or directly touch.\n"
+"- [Code text exact matches](qualcoder://menu/analysis/code_text_exact_matches) lists passages where different codes were applied to exactly the same text.\n"
+"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map style view of linked project elements like codes, cases, files, etc. [Help: Graph](qualcoder://help/5.4.-Graph/)\n"
 "\n"
 "\n"
 "## [Reports](qualcoder://menu/reports)\n"
 "\n"
-"Use these tools when you want summaries, comparisons, counts, charts, or "
-"exports for reporting purposes.\n"
+"Use these tools when you want summaries, comparisons, counts, charts, or exports for reporting purposes.\n"
 "\n"
 "[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
 "\n"
 "\n"
 "### Inter-Coder Comparisons\n"
 "\n"
-"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and "
-"[Coding comparison by file](qualcoder://menu/reports/"
-"coding_comparison_by_file) are especially useful for collaborative work and "
-"inter-coder checking.\n"
+"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and [Coding comparison by file](qualcoder://menu/reports/coding_comparison_by_file) are especially useful for collaborative work and inter-coder checking.\n"
 "\n"
 "\n"
 "### Summaries, frequencies, and charts\n"
 "\n"
-"These reports summarise patterns across the project rather than showing "
-"every coded segment in detail.\n"
+"These reports summarise patterns across the project rather than showing every coded segment in detail.\n"
 "\n"
-"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how "
-"often codes and categories have been used.\n"
-"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) "
-"gives a compact overview of where selected codes appear most often.\n"
-"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary]"
-"(qualcoder://menu/reports/code_summary) give focused overviews of one file "
-"or one code at a time.\n"
-"- [Charts](qualcoder://menu/reports/charts) visualises distributions and "
-"comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
+"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how often codes and categories have been used.\n"
+"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) gives a compact overview of where selected codes appear most often.\n"
+"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary](qualcoder://menu/reports/code_summary) give focused overviews of one file or one code at a time.\n"
+"- [Charts](qualcoder://menu/reports/charts) visualises distributions and comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
 "\n"
 "\n"
 "### Advanced reporting\n"
 "\n"
-"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct "
-"access to the project database for custom analyses. This is most useful when "
-"the standard reports do not answer a specific research question in the exact "
-"form you need.\n"
+"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct access to the project database for custom analyses. This is most useful when the standard reports do not answer a specific research question in the exact form you need.\n"
 msgstr ""
 "# 报表标签\n"
 "\n"
-"此标签显示来自[分析](qualcoder://menu/analysis)和[报告](qualcoder://menu/"
-"reports)菜单的工具.\n"
+"此标签显示来自[分析](qualcoder://menu/analysis)和[报告](qualcoder://menu/reports)菜单的工具.\n"
 "\n"
 "\n"
 "□[分析](qualcoder://menu/分析)\n"
@@ -11652,25 +11305,18 @@ msgstr ""
 "\n"
 "这些工具可以帮助您检查您项目中的实际编码材料.\n"
 "\n"
-"- [代码检索](qualcoder://menu/analysis/coding reports)是一个灵活的分析工具. "
-"它为选定的代码或类别收集所有片段,并让您通过文件、大小写、属性或搜索文本来缩小"
-"结果。\n"
-"- [按文本片段编码](qualcoder://menu/analysis/text segments by codes)生成一个"
-"带有文本片段和所有相关代码的表格.\n"
+"- [代码检索](qualcoder://menu/analysis/coding reports)是一个灵活的分析工具. 它为选定的代码或类别收集所有片段,并让您通过文件、大小写、属性或搜索文本来缩小结果。\n"
+"- [按文本片段编码](qualcoder://menu/analysis/text segments by codes)生成一个带有文本片段和所有相关代码的表格.\n"
 "\n"
 "\n"
 "编码关系和重叠\n"
 "\n"
 "利用这些工具来审查守则如何相互关联。 他们只使用文本文件.\n"
 "\n"
-"- [代码关系](qualcoder://menu/analysis/code relations)显示所选代码之间的相近,"
-"重叠,包含,以及精确匹配.\n"
-"- [代码共触](qualcoder://menu/analysis/code co occurence)侧重于两个代码重叠或"
-"直接触碰的地方.\n"
-"- [代码精确匹配](qualcoder://menu/analysis/code text exact matches)列出了对完"
-"全相同的文本适用不同代码的段落.\n"
-"-[Graph](qualcoder://menu/analysis/view graph))提供了连接的项目元素如代码,案"
-"例,文件等的视觉,思维图风格视图[帮助:Graph](qualcoder://help/5.4.-Graph/).\n"
+"- [代码关系](qualcoder://menu/analysis/code relations)显示所选代码之间的相近,重叠,包含,以及精确匹配.\n"
+"- [代码共触](qualcoder://menu/analysis/code co occurence)侧重于两个代码重叠或直接触碰的地方.\n"
+"- [代码精确匹配](qualcoder://menu/analysis/code text exact matches)列出了对完全相同的文本适用不同代码的段落.\n"
+"-[Graph](qualcoder://menu/analysis/view graph))提供了连接的项目元素如代码,案例,文件等的视觉,思维图风格视图[帮助:Graph](qualcoder://help/5.4.-Graph/).\n"
 "\n"
 "\n"
 "□[报 (夸尔coder://menu/reports).\n"
@@ -11682,119 +11328,93 @@ msgstr ""
 "\n"
 "编辑器间比较\n"
 "\n"
-"- [编码比较](qualcoder://menu/reports/coding comparison)和[按文件进行编码比"
-"较](qualcoder://menu/reports/coding comparison by file)对协作工作和编码间核对"
-"特别有用.\n"
+"- [编码比较](qualcoder://menu/reports/coding comparison)和[按文件进行编码比较](qualcoder://menu/reports/coding comparison by file)对协作工作和编码间核对特别有用.\n"
 "\n"
 "\n"
 "摘要、频率和图表\n"
 "\n"
 "这些报告总结了整个项目的规律,而不是详细显示每个编码部分。\n"
 "\n"
-"- [代码频率](qualcoder://menu/reports/code frequencies)计算代码和类别使用次"
-"数.\n"
-"- [代码按文件/案例计数](qualcoder://menu/reports/code comparidson table)提供"
-"了对所选代码最常出现之处的紧凑概述.\n"
-"- [文件摘要](qualcoder://menu/reports/file summary)和[代码摘要](qualcoder://"
-"menu/reports/code summary)一次给出一个文件或一个代码的重点概述.\n"
-"- [图 (qualcoder://menu/reports/charts) 可视化分布,并与条形图,树图,热图等图表"
-"进行比较.\n"
+"- [代码频率](qualcoder://menu/reports/code frequencies)计算代码和类别使用次数.\n"
+"- [代码按文件/案例计数](qualcoder://menu/reports/code comparidson table)提供了对所选代码最常出现之处的紧凑概述.\n"
+"- [文件摘要](qualcoder://menu/reports/file summary)和[代码摘要](qualcoder://menu/reports/code summary)一次给出一个文件或一个代码的重点概述.\n"
+"- [图 (qualcoder://menu/reports/charts) 可视化分布,并与条形图,树图,热图等图表进行比较.\n"
 "\n"
 "\n"
 "高级报告\n"
 "\n"
-"- [数据库查询](qualcoder://menu/reports/sql statements)可直接进入项目数据库进"
-"行自定义分析。 当标准报告没有以你所需要的确切形式回答一个具体的研究问题时,这"
-"样做最有用."
+"- [数据库查询](qualcoder://menu/reports/sql statements)可直接进入项目数据库进行自定义分析。 当标准报告没有以你所需要的确切形式回答一个具体的研究问题时,这样做最有用."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:686
 #, fuzzy
 msgid ""
 "# AI Agent\n"
 "\n"
-"Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-"
-"based-analysis/) to\n"
-"explore your empirical text data, get suggestions for coding, obtain "
-"feedback on your codes or memos,\n"
-"and generate summaries and reports. To begin, use the [\"New\" button]"
-"(qualcoder://ai_agent_tab/new) at \n"
+"Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to\n"
+"explore your empirical text data, get suggestions for coding, obtain feedback on your codes or memos,\n"
+"and generate summaries and reports. To begin, use the [\"New\" button](qualcoder://ai_agent_tab/new) at \n"
 "the bottom left and choose one of the options described below.\n"
 "\n"
 "{{AI_WARNING_BLOCK}}\n"
 "\n"
 "## [Chat with the AI Agent](qualcoder://ai_agent_tab/new/new_general_chat)\n"
 "\n"
-"- This is the default starting point for an open-ended analysis or any other "
-"task.\n"
+"- This is the default starting point for an open-ended analysis or any other task.\n"
 "- You can also ask for help using QualCoder.\n"
 "\n"
 "\n"
-"## [AI Topic Exploration](qualcoder://ai_agent_tab/new/"
-"new_topic_exploration)\n"
+"## [AI Topic Exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)\n"
 "\n"
-"- Search and explore a topic or question across the whole corpus of project "
-"data.\n"
-"- This option opens a dialog where you define the topic and select which "
-"data to include in the analysis.\n"
+"- Search and explore a topic or question across the whole corpus of project data.\n"
+"- This option opens a dialog where you define the topic and select which data to include in the analysis.\n"
 "\n"
 "\n"
 "## [AI Text Analysis](qualcoder://ai_agent_tab/new/new_text_analysis)\n"
 "\n"
 "- Analyse a selected text passage from your empirical material in detail.\n"
-"- This will switch to the text coding workspace and let you select a passage "
-"for analysis.\n"
+"- This will switch to the text coding workspace and let you select a passage for analysis.\n"
 "\n"
 "\n"
 "## [AI Code Analysis](qualcoder://ai_agent_tab/new/new_code_analysis)\n"
 "\n"
-"- Discuss your codings with the AI Agent, compare different codes, generate "
-"subcodes, or create reports.\n"
-"- This will also open a dialog to select the code(s) and data you want to "
-"include in the analysis.\n"
+"- Discuss your codings with the AI Agent, compare different codes, generate subcodes, or create reports.\n"
+"- This will also open a dialog to select the code(s) and data you want to include in the analysis.\n"
 "\n"
 "\n"
 "## Other Options\n"
-"- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the "
-"bottom left lets you choose what \n"
+"- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what \n"
 "the AI Agent is allowed to do in your project.\n"
-"- Open the [AI menu](qualcoder://menu/ai) for more options, for example to "
-"edit predefined prompts in the\n"
-"[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted "
-"coding](qualcoder://menu/ai/ai_search_and_coding).\n"
+"- Open the [AI menu](qualcoder://menu/ai) for more options, for example to edit predefined prompts in the\n"
+"[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted coding](qualcoder://menu/ai/ai_search_and_coding).\n"
 msgstr ""
 "AI探员\n"
 "\n"
-"在这里,您可以与 [AI Agent] (qualcoder://help/5.1.-AI-chat-based-analysis/) 交"
-"互到\n"
+"在这里,您可以与 [AI Agent] (qualcoder://help/5.1.-AI-chat-based-analysis/) 交互到\n"
 "探索你的经验文本数据,获取编码建议,获取对代码或备忘的反馈,\n"
 "编写摘要和报告。 要开始,请使用 [“新”按钮] (qualcoder://ai agent tab/new) at\n"
 "左下方并选择下面描述的选项之一。\n"
 "\n"
 "\\ \\ \\ \\ \\ \\ \\ \\\n"
 "\n"
-"□[与AI代理的聊天](qualcoder://ai agent tab/new/new general chat) 互联网档案馆"
-"的存檔,存档日期2013-12-11.\n"
+"□[与AI代理的聊天](qualcoder://ai agent tab/new/new general chat) 互联网档案馆的存檔,存档日期2013-12-11.\n"
 "\n"
 "- 这是开放式分析或任何其他任务的默认起点。\n"
 "- 您也可以使用QualCoder求救。\n"
 "\n"
 "\n"
-"^ [AI专题探索](qualcoder://ai agent tab/new/new topic exploration) 互联网档案"
-"馆的存檔,存档日期2013-03-02.\n"
+"^ [AI专题探索](qualcoder://ai agent tab/new/new topic exploration) 互联网档案馆的存檔,存档日期2013-03-02.\n"
 "\n"
 "- 在整个项目数据中搜索和探讨一个专题或问题。\n"
 "- 此选项打开一个对话框, 您可以定义主题并选择要包含在分析中的数据 。\n"
 "\n"
 "\n"
-"^ [AI文本分析](qualcoder://ai agent tab/new/new text analysis) 互联网档案馆的"
-"存檔,存档日期2013-12-11.\n"
+"^ [AI文本分析](qualcoder://ai agent tab/new/new text analysis) 互联网档案馆的存檔,存档日期2013-12-11.\n"
 "\n"
 "- 从你的经验材料中详细分析一个选定的文本段落。\n"
 "这将切换到文本编码工作空间,让你选择一个段落进行分析。\n"
 "\n"
 "\n"
-"^ [AI代码分析] (qualcoder://ai agent tab/new/new code analysis) (中文(简"
-"体) ).\n"
+"^ [AI代码分析] (qualcoder://ai agent tab/new/new code analysis) (中文(简体) ).\n"
 "\n"
 "- 与AI代理商讨论你的编码,比较不同的代码,生成子代码,或者创建报告.\n"
 "- 这将打开一个对话框来选择您想要包含在分析中的代码和数据 。\n"
@@ -11804,8 +11424,7 @@ msgstr ""
 "- [AI权限] (qualcoder://ai agent tab/permissions) 左下方的控制让您选择什么\n"
 "人工智能特工被允许在您的项目中做。\n"
 "- 打开 [AI菜单] (qualcoder://menu/ai) 以获取更多选项,例如编辑预定义的提示\n"
-"[prompt库](qualcoder://menu/ai/ai prompts),或开始[AI协助编码](qualcoder://"
-"menu/ai/ai search and coding)."
+"[prompt库](qualcoder://menu/ai/ai prompts),或开始[AI协助编码](qualcoder://menu/ai/ai search and coding)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:728
 #, fuzzy
@@ -11813,8 +11432,7 @@ msgid ""
 "\n"
 "<br />\n"
 "\n"
-"**Note: The AI Agent is currently not available because AI setup has not "
-"been completed yet.**\n"
+"**Note: The AI Agent is currently not available because AI setup has not been completed yet.**\n"
 "\n"
 "- Start the [AI Setup Wizard](qualcoder://action/ai/ai_setup_wizard)\n"
 "\n"
@@ -11946,7 +11564,8 @@ msgstr "快速描述 :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:1014
 #, fuzzy
 msgid ""
-"Start a new chat with the AI Agent first with the \"New\" button on the left."
+"Start a new chat with the AI Agent first with the \"New\" button on the "
+"left."
 msgstr "先用左侧的\"新\"按钮与AI代理开始新的聊天."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:1015
@@ -12126,7 +11745,8 @@ msgstr "人工智能已禁用。请先进入 “人工智能 > 设置向导”�
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2570
 #, fuzzy
 msgid ""
-"The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be found."
+"The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be "
+"found."
 msgstr "无法找到内部的 AI 支持 express \"  help.md\" 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2574
@@ -12249,9 +11869,7 @@ msgstr "内部重新规划超时. 请再试一次"
 msgid ""
 "Error: The AI returned an inconsistent retrieval plan without executable "
 "steps. Please try again or choose a different model."
-msgstr ""
-"错误:AI返回了一个不一致的检索计划,没有可执行步骤. 请再次尝试或选择不同的模"
-"型 。"
+msgstr "错误:AI返回了一个不一致的检索计划,没有可执行步骤. 请再次尝试或选择不同的模型 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:3700
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4496
@@ -12297,8 +11915,8 @@ msgstr "可见编码器;"
 #, fuzzy
 msgid "Coders: {}; "
 msgstr ""
-"编"
-"者:                                                                                                                                       "
+"编者:"
+"                                                                                                                                       "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4180
 #, fuzzy
@@ -12342,12 +11960,13 @@ msgid ""
 "The selected coded material is too large for a meaningful first-pass code "
 "analysis in one bootstrap step. Only {loaded} of {total} coded segments "
 "({coverage:.1f}%) could be loaded before the character limit was reached. "
-"Please narrow the scope by code, files, cases, attributes, or coders. If you "
-"still want to continue, send a follow-up message such as \"Analyze anyway\"."
+"Please narrow the scope by code, files, cases, attributes, or coders. If you"
+" still want to continue, send a follow-up message such as \"Analyze "
+"anyway\"."
 msgstr ""
-"所选的编码材料太大了,无法在一个靴子夹步骤中进行有意义的首通码分析. 在字符限制"
-"达到之前,只能装入{total}编码段({覆盖:1f}%})的{loadd}. 请通过代码,文件,案例,属"
-"性,或编码器来缩小范围. 如果您还想要继续,请发送\"反正分析\"等后续信息."
+"所选的编码材料太大了,无法在一个靴子夹步骤中进行有意义的首通码分析. "
+"在字符限制达到之前,只能装入{total}编码段({覆盖:1f}%})的{loadd}. 请通过代码,文件,案例,属性,或编码器来缩小范围. "
+"如果您还想要继续,请发送\"反正分析\"等后续信息."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4680
 #, fuzzy
@@ -12357,12 +11976,10 @@ msgstr "基于 MCP 代码分析拖曳错误 :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4699
 msgid ""
 "We will now switch to the text coding workspace.\n"
-" There you can open a document, select a piece of text, right click on it "
-"and choose \"AI Text Analysis\" from the context menu."
+" There you can open a document, select a piece of text, right click on it and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
 "现在我们将切换到文本编码工作区。\n"
-" 在那里，您可以打开一个文档，选择一段文本，右击该文本并从右键菜单中选择 “AI "
-"文本分析”。"
+" 在那里，您可以打开一个文档，选择一段文本，右击该文本并从右键菜单中选择 “AI 文本分析”。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4745
 msgid ""
@@ -12375,15 +11992,6 @@ msgstr "未找到此编码器、文档过滤器和代码的特定组合的编码
 msgid "Analyzing the data coded as \"{}\" ({} matching segments in scope.)"
 msgstr "分析编码为\"QQ\"的数据(XQ匹配范围段)."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4751
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4821
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5533
-#, fuzzy
-msgid ""
-"\n"
-"Prompt:"
-msgstr "提示 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4752
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4822
 #, fuzzy
@@ -12395,27 +12003,19 @@ msgstr "材料 :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4758
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4828
 msgid ""
-"Note that it is highly recommended to use the project memo (Menu \"Project > "
-"Project Memo\") to include a short description of your project's research "
+"Note that it is highly recommended to use the project memo (Menu \"Project >"
+" Project Memo\") to include a short description of your project's research "
 "topics, questions, objectives, and the empirical data collected. This "
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
-"请注意，强烈建议使用项目备忘录（菜单 “项目 > 项目备忘录”）简短描述项目的研究"
-"课题、问题、目标和收集的经验数据。这些信息将伴随发送到人工智能的每个提示，从"
-"而使结果更有针对性"
+"请注意，强烈建议使用项目备忘录（菜单 “项目 > "
+"项目备忘录”）简短描述项目的研究课题、问题、目标和收集的经验数据。这些信息将伴随发送到人工智能的每个提示，从而使结果更有针对性"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4817
 #, fuzzy
 msgid "Exploring the free topic \"{}\" in the data."
 msgstr "探索数据中的免费话题\"QQ\"."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4819
-#, fuzzy
-msgid ""
-"\n"
-"Description:"
-msgstr "说明 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4879
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9249
@@ -12523,11 +12123,6 @@ msgstr "类型："
 msgid "Summary:"
 msgstr "摘要："
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
-#, fuzzy
-msgid "Prompt:"
-msgstr "提示 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5866
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:263
 msgid "User"
@@ -12625,19 +12220,19 @@ msgid "Internal step"
 msgstr "内部步骤"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7712
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "{step} has reached QualCoder's time limit. Do you want to stop the "
 "reflection and generate a provisional answer from the results collected so "
 "far?"
-msgstr ""
+msgstr "{step}已经到了QualCoder的期限。 您是否想停止反省, 从迄今为止收集的结果中得出一个临时答案 ?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7716
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "{step} has reached QualCoder's time limit. Do you want to abort the AI "
 "process?"
-msgstr ""
+msgstr "{step}已经到了QualCoder的期限。 您想要中止人工智能进程吗 ?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7765
 #, fuzzy
@@ -12680,8 +12275,9 @@ msgid "Error: Invalid message stream from MCP AI agent chat worker."
 msgstr "错误: 来自 MCP AI 代理聊天器的无效消息流 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9336
+#, fuzzy
 msgid "AI timeout"
-msgstr ""
+msgstr "AI 超时"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9419
 #, fuzzy
@@ -12705,15 +12301,13 @@ msgstr "聊天已被用户取消 。 部分答复得到保留。"
 msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
-msgstr ""
-"错误： 人工智能返回的结果为空。这可能表明该人工智能模型暂时不可用。请稍后再试"
-"或选择其他模型。"
+msgstr "错误： 人工智能返回的结果为空。这可能表明该人工智能模型暂时不可用。请稍后再试或选择其他模型。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9481
 #, fuzzy
 msgid ""
-"The AI response was interrupted before it was complete. The partial response "
-"was kept."
+"The AI response was interrupted before it was complete. The partial response"
+" was kept."
 msgstr "大赦国际的答复在完成之前就中断了。 部分答复得到保留。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9488
@@ -12777,8 +12371,8 @@ msgid ""
 "extracted from the pages. Use Manage Files > 'Extract pdf text to new file' "
 "to work with an editable copy."
 msgstr ""
-"无法替换 PDF 文件:其存储的文本必须与从页面中提取的文本匹配. 使用 Management "
-"文件 > “ extract pdf text to new file ” 来使用可编辑的副本 。"
+"无法替换 PDF 文件:其存储的文本必须与从页面中提取的文本匹配. 使用 Management 文件 > “ extract pdf text to "
+"new file ” 来使用可编辑的副本 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:83
 #, fuzzy
@@ -13087,8 +12681,7 @@ msgstr "警告: {count} 受影响的编码不是“ AI Agent” 所拥有 。"
 msgid ""
 "Deleting this code removes the full subcode tree, including descendant "
 "subcodes and all codings that use any code in the subtree."
-msgstr ""
-"删除此代码会删除完整的子代码树,包括子代码和所有使用子树中任意代码的编码."
+msgstr "删除此代码会删除完整的子代码树,包括子代码和所有使用子树中任意代码的编码."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:246
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:657
@@ -13236,21 +12829,6 @@ msgstr "编码图像"
 msgid "Coded audio / video"
 msgstr "编码音频/视频"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:264
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:266
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:728
-#, fuzzy
-msgid " File: "
-msgstr "文件 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:269
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:731
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4047
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4117
-#, fuzzy
-msgid "Code:"
-msgstr "代码 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:405
 #, fuzzy
 msgid "Apply more codes to this segment"
@@ -13322,9 +12900,7 @@ msgstr "输出重叠"
 msgid ""
 "F4 play/pause  F3 rewind 5s  F5 forward 5s | Ctrl+T timestamp  Ctrl+N new "
 "speaker  Ctrl+1-8 speaker  Alt+Enter next speaker"
-msgstr ""
-"转录区域： Ctrl+T（插入时间戳） Ctrl+N（新发言者） Ctrl+1-8（选择发言者） "
-"Ctrl+D（删除发言者）"
+msgstr "转录区域： Ctrl+T（插入时间戳） Ctrl+N（新发言者） Ctrl+1-8（选择发言者） Ctrl+D（删除发言者）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:167
 #, fuzzy
@@ -13382,16 +12958,6 @@ msgstr "替换它可能会转移或删除现有的编码和说明."
 #, fuzzy
 msgid "Not saved"
 msgstr "未保存"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:830
-#, fuzzy
-msgid "Width:"
-msgstr "宽度 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:833
-#, fuzzy
-msgid "Height:"
-msgstr "高度 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:853
 #, fuzzy
@@ -13554,13 +13120,6 @@ msgstr "根据编码文本片段制作的词云"
 #, fuzzy
 msgid "File filter"
 msgstr "文件过滤器"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:250
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:271
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:292
-#, fuzzy
-msgid "Text:"
-msgstr "文本 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:271
 #, fuzzy
@@ -14129,11 +13688,6 @@ msgstr "调查文件："
 msgid "Fields:"
 msgstr "领域："
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:316
-#, fuzzy
-msgid "Rows:"
-msgstr "行数 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:331
 msgid "Attribute name error"
 msgstr "属性名称错误"
@@ -14276,15 +13830,13 @@ msgid ""
 "Relations derived from Strauss & Corbin's axial coding paradigm model. Used "
 "during open, axial, and selective coding to articulate the structure around "
 "a central phenomenon."
-msgstr ""
-"关系来源于Strauss & Corbin的轴编码范式模型. 在开放、轴线和选择性编码期间,用来"
-"阐明围绕一个中心现象的结构。"
+msgstr "关系来源于Strauss & Corbin的轴编码范式模型. 在开放、轴线和选择性编码期间,用来阐明围绕一个中心现象的结构。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:269
 #, fuzzy
 msgid ""
-"Relations for structuring deductive and inductive category systems following "
-"Mayring's systematic approach to qualitative content analysis."
+"Relations for structuring deductive and inductive category systems following"
+" Mayring's systematic approach to qualitative content analysis."
 msgstr "在梅林对定性内容分析采取系统方法之后,建立扣减和诱导类系统的结构关系。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:271
@@ -14299,11 +13851,9 @@ msgstr "根据Moustakas的超常现象学和van Mannen的病变现象学,"
 #, fuzzy
 msgid ""
 "Relations for reflexive thematic analysis following Braun & Clarke's six-"
-"phase approach. Emphasizes researcher reflexivity and the active role of the "
-"researcher in generating themes."
-msgstr ""
-"Braun & Clarke的六阶段方法之后的反射性主题分析关系. 强调研究人员的反射性和研"
-"究人员在产生主题方面的积极作用。"
+"phase approach. Emphasizes researcher reflexivity and the active role of the"
+" researcher in generating themes."
+msgstr "Braun & Clarke的六阶段方法之后的反射性主题分析关系. 强调研究人员的反射性和研究人员在产生主题方面的积极作用。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:277
 #, fuzzy
@@ -14311,9 +13861,7 @@ msgid ""
 "Relations for Critical Discourse Analysis (Fairclough) and Foucauldian "
 "discourse analysis. Focus on how language constructs social reality, power "
 "relations, and subject positions."
-msgstr ""
-"关键论文分析关系(Fairclough)和福考尔德话语分析. 关注语言如何构建社会现实,权力"
-"关系,以及主题位置."
+msgstr "关键论文分析关系(Fairclough)和福考尔德话语分析. 关注语言如何构建社会现实,权力关系,以及主题位置."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:280
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:959
@@ -14675,7 +14223,8 @@ msgstr "一个有利于或限制战略的更广泛的结构条件。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:353
 #, fuzzy
-msgid "The core category or central idea to which all other categories relate."
+msgid ""
+"The core category or central idea to which all other categories relate."
 msgstr "所有其他类别所涉及的核心类别或中心思想。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:354
@@ -15312,8 +14861,8 @@ msgstr "保存到用户"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:1015
 #, fuzzy
 msgid ""
-"The edited relation has been saved as a new entry in the User framework. The "
-"original system relation remains unchanged."
+"The edited relation has been saved as a new entry in the User framework. The"
+" original system relation remains unchanged."
 msgstr "编辑后的关系已被保存为用户框架中的新条目. 原系统关系不变."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:500
@@ -15322,9 +14871,7 @@ msgstr "编辑后的关系已被保存为用户框架中的新条目. 原系统�
 msgid ""
 "System relations cannot be deleted. They are part of the academic reference "
 "frameworks. Only relations in the User framework can be removed."
-msgstr ""
-"系统关系不能删除 。 它们是学术参考框架的一部分。 只有用户框架中的关系才能删"
-"除."
+msgstr "系统关系不能删除 。 它们是学术参考框架的一部分。 只有用户框架中的关系才能删除."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:502
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:1162
@@ -15418,11 +14965,6 @@ msgstr "用户关系导出至 :"
 #, fuzzy
 msgid "Relation detail"
 msgstr "关系细节"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:596
-#, fuzzy
-msgid "Framework: "
-msgstr "框架 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:601
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:650
@@ -15529,8 +15071,7 @@ msgid ""
 "New profile: {new}\n"
 "\n"
 "Do you want to switch to the new profile now?\n"
-"Your existing API-key (if available) will be copied to the new profile for "
-"convenience."
+"Your existing API-key (if available) will be copied to the new profile for convenience."
 msgstr ""
 "该提供者现在可以使用更新的默认 AI 配置 。\n"
 "\n"
@@ -15551,24 +15092,29 @@ msgid "Keep current profile"
 msgstr "保持当前配置"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:443
+#, fuzzy
 msgid "Search: Loading components in the background..."
-msgstr ""
+msgstr "搜索: 在背景中装入组件..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:494
+#, fuzzy
 msgid "Search: Components could not be loaded. See the log for details."
-msgstr ""
+msgstr "搜索: 组件无法装入 。 详情见日志。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:512
+#, fuzzy
 msgid "AI: Loading components in the background..."
-msgstr ""
+msgstr "AI:在背景中装入组件..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:534
+#, fuzzy
 msgid "AI: Components loaded."
-msgstr ""
+msgstr "AI:组件装入."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:547
+#, fuzzy
 msgid "AI: Components could not be loaded. See the log for details."
-msgstr ""
+msgstr "AI: 组件无法装入 。 详情见日志。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:560
 #, fuzzy
@@ -15579,23 +15125,20 @@ msgstr "下载人工智能组件"
 msgid ""
 "Welcome\n"
 "\n"
-"The new AI enhanced functions in QualCoder need some additional setup. Do "
-"you want to enable the AI and start the setup? You can also do this later by "
-"starting the AI Setup Wizard from the AI menu in the main window. Click "
-"\"Yes\" to start now."
+"The new AI enhanced functions in QualCoder need some additional setup. Do you want to enable the AI and start the setup? You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. Click \"Yes\" to start now."
 msgstr ""
 "欢迎\n"
 "\n"
-"QualCoder 中的新人工智能增强功能需要一些额外设置。您想启用 AI 并开始设置吗？"
-"您也可以稍后从主窗口的 AI 菜单启动 AI 设置向导。点击 “是 ”立即开始。"
+"QualCoder 中的新人工智能增强功能需要一些额外设置。您想启用 AI 并开始设置吗？您也可以稍后从主窗口的 AI 菜单启动 AI 设置向导。点击 “是 ”立即开始。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:596
 msgid "AI Integration"
 msgstr "人工智能集成"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:648
+#, fuzzy
 msgid "External MCP"
-msgstr ""
+msgstr "外部MCP"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:678
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:735
@@ -15668,8 +15211,9 @@ msgid "Menu action is currently disabled."
 msgstr "菜单动作目前已禁用 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1260
+#, fuzzy
 msgid "Choose a recently opened project to open it"
-msgstr ""
+msgstr "选择最近打开的工程打开"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1367
 #, fuzzy
@@ -15687,14 +15231,14 @@ msgid "Open the journals"
 msgstr "删除日记"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1464
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "today {0}"
-msgstr ""
+msgstr "今天 {0}"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1466
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "yesterday {0}"
-msgstr ""
+msgstr "昨日{0}"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1489
 #, fuzzy, python-brace-format
@@ -15707,9 +15251,9 @@ msgid "Text bookmark"
 msgstr "设置书签 (B)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1497
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Audio/video bookmark at {0}"
-msgstr ""
+msgstr "{0} 的音频/视频书签"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1502
 #, fuzzy, python-brace-format
@@ -15717,12 +15261,14 @@ msgid "Journal, edited {0}"
 msgstr "创建的日记 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1505
+#, fuzzy
 msgid "Last AI chat"
-msgstr ""
+msgstr "上次 AI 聊天"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1532
+#, fuzzy
 msgid "AI chat"
-msgstr ""
+msgstr "AI 聊天"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1694
 #, fuzzy
@@ -15745,17 +15291,19 @@ msgid "Manage links"
 msgstr "管理文件"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1706
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Files missing from the project folder: {0}."
-msgstr ""
+msgstr "工程文件夹中缺少的文件 :{0}."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+#, fuzzy
 msgid "Action log"
-msgstr ""
+msgstr "行动日志"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+#, fuzzy
 msgid "Guide"
-msgstr ""
+msgstr "指南"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1771
 #, fuzzy
@@ -15878,12 +15426,14 @@ msgid "Help for this tab"
 msgstr "此行的标签 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2853
+#, fuzzy
 msgid "Leave the graph and lose the unsaved changes?"
-msgstr ""
+msgstr "留下图表,失去未保存的更改?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2856
+#, fuzzy
 msgid "The code organiser has changes that were not applied."
-msgstr ""
+msgstr "代码组织器有未应用的更改 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2857
 #, fuzzy
@@ -16032,8 +15582,7 @@ msgid ""
 "**Participants and data collected:** \n"
 "\n"
 "#####\n"
-"(Everything below this mark is a personal note and will never be sent to the "
-"AI.)"
+"(Everything below this mark is a personal note and will never be sent to the AI.)"
 msgstr ""
 "**研究课题、问题和目标：*** \n"
 "\n"
@@ -16064,10 +15613,11 @@ msgid "Opening project: "
 msgstr "打开工程"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3388
+#, fuzzy
 msgid ""
 "The selected folder is not a QualCoder project folder. Its name must end "
 "with .qda."
-msgstr ""
+msgstr "选中的文件夹不是 QualCoder 工程文件夹 。 其名称必须以.qda结尾."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3390
 #, fuzzy
@@ -16093,11 +15643,9 @@ msgstr "无法打开 :"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3431
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
-"project (\"{}\"). Do you want to keep your current name or switch to the one "
-"from the project?"
-msgstr ""
-"您当前的编码者名称（“{}”）与项目中上次使用的名称（“{}”）不一致。您要保留当前"
-"名称还是切换为项目中的名称？"
+"project (\"{}\"). Do you want to keep your current name or switch to the one"
+" from the project?"
+msgstr "您当前的编码者名称（“{}”）与项目中上次使用的名称（“{}”）不一致。您要保留当前名称还是切换为项目中的名称？"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3434
 #, fuzzy
@@ -16210,25 +15758,6 @@ msgstr "项目日期："
 msgid "Project memo: "
 msgstr "项目备忘录:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3890
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:235
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:400
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:402
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:714
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1281
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1464
-#, fuzzy
-msgid "Files: "
-msgstr "文件："
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3894
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:402
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:234
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:404
-#, fuzzy
-msgid "Cases: "
-msgstr "案例 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3898
 #, fuzzy
 msgid "Code categories: "
@@ -16258,9 +15787,7 @@ msgstr "人工智能设置向导"
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
-msgstr ""
-"人工智能已设置并启用，因此这里没有什么可做的。请转到人工智能 > 设置，更改当前"
-"模型或其他设置。"
+msgstr "人工智能已设置并启用，因此这里没有什么可做的。请转到人工智能 > 设置，更改当前模型或其他设置。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4038
 msgid "AI: Setup Wizard"
@@ -16295,8 +15822,8 @@ msgstr "重建人工智能记忆"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4064
 msgid ""
-"This will re-read all of your empirical documents, which may take some time. "
-"Do you want to continue?"
+"This will re-read all of your empirical documents, which may take some time."
+" Do you want to continue?"
 msgstr "这将重新读取您的所有经验文件，可能需要一些时间。您想继续吗？"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4096
@@ -16497,11 +16024,6 @@ msgstr "选定的所有类别"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:327
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:410
 msgid "Categories selected"
-msgstr "选择的类别"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:385
-#, fuzzy
-msgid "Categories selected "
 msgstr "选择的类别"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:534
@@ -16744,12 +16266,6 @@ msgstr "您想要导入的数据覆盖已有属性吗 ?"
 msgid "Cases exist"
 msgstr "现有案件"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:519
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:603
-#, fuzzy
-msgid "attribute:"
-msgstr "属性 :"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:541
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:625
 #, fuzzy
@@ -16790,16 +16306,6 @@ msgstr "点击管理此案件的文件"
 #, fuzzy
 msgid "Viewing text of case: "
 msgstr "查看案件文本 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1143
-#, fuzzy
-msgid "Characters:"
-msgstr "字符数 :"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1158
-#, fuzzy
-msgid "Image:"
-msgstr "图像 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1170
 msgid "AV media:"
@@ -17047,8 +16553,7 @@ msgstr "或"
 #, fuzzy
 msgid ""
 "The pattern may match anywhere in the line.\n"
-"With a capturing group, group 1 is the speaker name: ~(\\w+): detects "
-"QknowSubject\n"
+"With a capturing group, group 1 is the speaker name: ~(\\w+): detects QknowSubject\n"
 "Without a group, the whole match is the name: ~\\w+: detects ~QknowSubject:\n"
 "Several markers on one line each start their own turn."
 msgstr ""
@@ -17075,10 +16580,8 @@ msgstr "选择标识符"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:429
 #, fuzzy
 msgid ""
-"Click a format name to use only that one. Click its checkbox to add or "
-"remove it\n"
-"from a combination. Check 'Custom (regex)' to add your own pattern to the "
-"mix."
+"Click a format name to use only that one. Click its checkbox to add or remove it\n"
+"from a combination. Check 'Custom (regex)' to add your own pattern to the mix."
 msgstr ""
 "单击格式名称只使用该格式名称。 单击其复选框添加或删除\n"
 "从组合。 请检查access-date=中的日期值 (帮助) 。"
@@ -17124,8 +16627,7 @@ msgstr "保存的正则图案"
 msgid ""
 "Patterns saved for this project. Double click one to edit it. 'Use' copies "
 "the current pattern to the regex field."
-msgstr ""
-"此工程保存的模式 。 双击一键进行编辑. “ 使用” 复制当前模式到 regex 字段 。"
+msgstr "此工程保存的模式 。 双击一键进行编辑. “ 使用” 复制当前模式到 regex 字段 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:784
 #, fuzzy
@@ -17206,8 +16708,7 @@ msgstr "属性代码,“;”已分离"
 #, fuzzy
 msgid ""
 "Extra codes applied to this speaker's turns, in addition to 'code as'.\n"
-"Type new ones (separate several with ';') or pick a previous one from the "
-"list to add it."
+"Type new ones (separate several with ';') or pick a previous one from the list to add it."
 msgstr ""
 "除了\"代码是\"之外,这个扬声器的转弯还应用了额外的代码.\n"
 "键入新的( 将数个与“ ; ” 分开) 或从列表中选择上一个添加 。"
@@ -17238,9 +16739,7 @@ msgstr "转弯"
 msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
-msgstr ""
-"发言者姓名不能为空。如果您想要从标记中排除某个发言者，请取消选中左侧的复选"
-"框。"
+msgstr "发言者姓名不能为空。如果您想要从标记中排除某个发言者，请取消选中左侧的复选框。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1586
 #, fuzzy
@@ -17267,12 +16766,10 @@ msgstr "部分"
 #, fuzzy
 msgid ""
 "Ticked segments will be coded. Untick the ones to skip.\n"
-"Inline codes (';' in the marker) apply PER SEGMENT and are editable; right "
-"click one to copy it to all segments or promote it to the whole row."
+"Inline codes (';' in the marker) apply PER SEGMENT and are editable; right click one to copy it to all segments or promote it to the whole row."
 msgstr ""
 "选中的片段将被编码 。 解开他们跳过。\n"
-"内置代码 (';' in the mark) 应用 PER SEGMENT 并可以编辑; 右键点击一键将其复制"
-"到所有部分或将其推广到整行."
+"内置代码 (';' in the mark) 应用 PER SEGMENT 并可以编辑; 右键点击一键将其复制到所有部分或将其推广到整行."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1643
 #, fuzzy
@@ -17462,14 +16959,6 @@ msgstr "所有文本编码"
 msgid " resized by "
 msgstr "调整规模"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:232
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:279
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:131
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:174
-#, fuzzy
-msgid " characters."
-msgstr "字符键。"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:250
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:148
 #, fuzzy
@@ -17490,9 +16979,7 @@ msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
 "assigned)."
-msgstr ""
-"避免选择未加下划线（未编码/已注释/已指定案例）和加下划线（已编码、已注释、已"
-"指定案例）的文本部分。"
+msgstr "避免选择未加下划线（未编码/已注释/已指定案例）和加下划线（已编码、已注释、已指定案例）的文本部分。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:176
 msgid ""
@@ -17578,13 +17065,10 @@ msgstr "点击位置后移动编码"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2536
 #, fuzzy
 msgid ""
-"Shift code positions for all codes after you have clicked on a position in "
-"the text.\n"
+"Shift code positions for all codes after you have clicked on a position in the text.\n"
 "Back up the project before running this action.\n"
-"This function will help if you have edited the coded text and the codes are "
-"out of position.\n"
-"Positive numbers (moves right) or negative numbers (moves left) (-500 to "
-"500)\n"
+"This function will help if you have edited the coded text and the codes are out of position.\n"
+"Positive numbers (moves right) or negative numbers (moves left) (-500 to 500)\n"
 "Clicked character position: "
 msgstr ""
 "单击文本中的位置后,所有代码的移动代码位置。\n"
@@ -17728,8 +17212,9 @@ msgid "Code text: "
 msgstr "代码文本 :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4953
+#, fuzzy
 msgid "Open a search result before coding"
-msgstr ""
+msgstr "编码前打开搜索结果"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5009
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6554
@@ -17775,19 +17260,16 @@ msgstr "撤销上次编辑的文本"
 #, fuzzy
 msgid ""
 "This file is a PDF. Its stored text is not editable: it matches, character "
-"by character, the text extracted from the PDF pages, and the PDF coding view "
-"depends on that mapping."
-msgstr ""
-"此文件为 PDF 。 它所存储的文本是不可编辑的:它与PDF页面中提取的文本匹配,按字符"
-"排序,PDF编码视图取决于该映射."
+"by character, the text extracted from the PDF pages, and the PDF coding view"
+" depends on that mapping."
+msgstr "此文件为 PDF 。 它所存储的文本是不可编辑的:它与PDF页面中提取的文本匹配,按字符排序,PDF编码视图取决于该映射."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5775
 #, fuzzy
 msgid ""
 "To work with an editable copy of the text use Manage Files > 'Extract pdf "
 "text to new file'."
-msgstr ""
-"要与文本的可编辑副本合作,请使用管理文件 > “ extract pdf text to new file” 。"
+msgstr "要与文本的可编辑副本合作,请使用管理文件 > “ extract pdf text to new file” 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6351
 msgid "Please finish editing the text before starting an AI search."
@@ -17959,18 +17441,14 @@ msgstr "- Zotero开放和运行(第7版或更新版)。"
 msgid ""
 "- Enable the local API in Zotero: Settings, Advanced, General, and check "
 "'Allow other applications on this computer to communicate with Zotero'."
-msgstr ""
-"- 启用 Zotero 中的本地 API: 设置、 高级、 通用, 并检查“ 打开此计算机上的其他"
-"应用程序与 Zotero 通信 ” 。"
+msgstr "- 启用 Zotero 中的本地 API: 设置、 高级、 通用, 并检查“ 打开此计算机上的其他应用程序与 Zotero 通信 ” 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references_import_zotero.py:386
 #, fuzzy
 msgid ""
 "- If you cannot find that option: Settings, Advanced, Config Editor, set "
 "extensions.zotero.httpServer.enabled to true."
-msgstr ""
-"- 如果您找不到此选项: 设置、 高级、 配置编辑器, 设置扩展名. Zotero. "
-"httpServer. 启用为真 。"
+msgstr "- 如果您找不到此选项: 设置、 高级、 配置编辑器, 设置扩展名. Zotero. httpServer. 启用为真 。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references_import_zotero.py:388
 #, fuzzy
@@ -18427,627 +17905,607 @@ msgstr "以 :"
 msgid "Uncaught Exception"
 msgstr "未执行例外"
 
-#~ msgid "Select files to view"
-#~ msgstr "选择要查看的文件"
+msgid "Select files to view"
+msgstr "选择要查看的文件"
 
-#~ msgid "File Attributes"
-#~ msgstr "文件属性"
+msgid "File Attributes"
+msgstr "文件属性"
 
-#~ msgid "The AI not yet fully loaded. Please wait and retry."
-#~ msgstr "人工智能尚未完全加载。请稍后重试。"
-
-#, fuzzy
-#~ msgid " of these codings are not owned by 'AI Agent'."
-#~ msgstr "这些编码不属于“AI Agent”所有。"
+msgid "The AI not yet fully loaded. Please wait and retry."
+msgstr "人工智能尚未完全加载。请稍后重试。"
 
 #, fuzzy
-#~ msgid " standalone coding(s) are not owned by 'AI Agent'."
-#~ msgstr "独立编码不属于“AI Agent”所有。"
+msgid " of these codings are not owned by 'AI Agent'."
+msgstr "这些编码不属于“AI Agent”所有。"
 
 #, fuzzy
-#~ msgid "Warning: removed codings not owned by 'AI Agent': "
-#~ msgstr "警告: 不为“ AI Agent” 所拥有的已删除的编码 :"
-
-#~ msgid "Codebook for"
-#~ msgstr "编码手册"
+msgid " standalone coding(s) are not owned by 'AI Agent'."
+msgstr "独立编码不属于“AI Agent”所有。"
 
 #, fuzzy
-#~ msgid "Category:"
-#~ msgstr "类别 :"
+msgid "Warning: removed codings not owned by 'AI Agent': "
+msgstr "警告: 不为“ AI Agent” 所拥有的已删除的编码 :"
 
-#~ msgid "The AI is busy, please wait a moment and retry."
-#~ msgstr "人工智能正忙，请稍等片刻后重试。"
+msgid "Codebook for"
+msgstr "编码手册"
 
-#, fuzzy
-#~ msgid "Save graph analytical summary"
-#~ msgstr "保存图表分析摘要"
-
-#~ msgid "Cannot open file"
-#~ msgstr "无法打开文件"
-
-#~ msgid "Please enable the AI first and set it in Settings."
-#~ msgstr "请先启用人工智能，并在设置中进行设置。"
-
-#~ msgid "The AI is busy or not set up correctly."
-#~ msgstr "人工智能忙或设置不正确。"
+msgid "The AI is busy, please wait a moment and retry."
+msgstr "人工智能正忙，请稍等片刻后重试。"
 
 #, fuzzy
-#~ msgid "Delete folder"
-#~ msgstr "删除文件夹"
+msgid "Save graph analytical summary"
+msgstr "保存图表分析摘要"
+
+msgid "Cannot open file"
+msgstr "无法打开文件"
+
+msgid "Please enable the AI first and set it in Settings."
+msgstr "请先启用人工智能，并在设置中进行设置。"
+
+msgid "The AI is busy or not set up correctly."
+msgstr "人工智能忙或设置不正确。"
+
+#, fuzzy
+msgid "Delete folder"
+msgstr "删除文件夹"
 
 #, python-brace-format
-#~ msgid "You must select a {self.prompt_type} prompt."
-#~ msgstr "您必须选择一个 {self.prompt_type} 提示。"
+msgid "You must select a {self.prompt_type} prompt."
+msgstr "您必须选择一个 {self.prompt_type} 提示。"
 
 #, fuzzy
-#~ msgid "Coding highlighted segments"
-#~ msgstr "编码突出显示段"
+msgid "Coding highlighted segments"
+msgstr "编码突出显示段"
 
-#~ msgid "QualCoder will crash"
-#~ msgstr "QualCoder 将崩溃"
+msgid "QualCoder will crash"
+msgstr "QualCoder 将崩溃"
 
-#~ msgid "Memo coded text M"
-#~ msgstr "备忘编码文本 M"
+msgid "Memo coded text M"
+msgstr "备忘编码文本 M"
 
-#~ msgid "Click for details."
-#~ msgstr "点击查看详情。"
+msgid "Click for details."
+msgstr "点击查看详情。"
 
-#~ msgid "Refresh codes trees via menu options for coding, reports"
-#~ msgstr "通过编码、报告菜单选项刷新代码树"
+msgid "Refresh codes trees via menu options for coding, reports"
+msgstr "通过编码、报告菜单选项刷新代码树"
 
-#~ msgid "Word cloud"
-#~ msgstr "词汇云"
+msgid "Word cloud"
+msgstr "词汇云"
 
-#~ msgid "VLC is not installed. Cannot code audio/video files."
-#~ msgstr "未安装 VLC。无法编码音频/视频文件。"
+msgid "VLC is not installed. Cannot code audio/video files."
+msgstr "未安装 VLC。无法编码音频/视频文件。"
 
-#~ msgid "Install VLC"
-#~ msgstr "安装 VLC"
-
-#, fuzzy
-#~ msgid "Ticked segments will be coded. Untick the ones to skip."
-#~ msgstr "选中的片段将被编码 。 解开他们跳过。"
+msgid "Install VLC"
+msgstr "安装 VLC"
 
 #, fuzzy
-#~ msgid " next  characters"
-#~ msgstr "下一个字符"
+msgid "Ticked segments will be coded. Untick the ones to skip."
+msgstr "选中的片段将被编码 。 解开他们跳过。"
 
 #, fuzzy
-#~ msgid " previous  characters"
-#~ msgstr "上一个字符"
-
-#~ msgid "QualCoder roughly displays PDFs."
-#~ msgstr "QualCoder 可大致显示 PDF。"
-
-#~ msgid "Original fonts or bold or italic are not applied."
-#~ msgstr "不使用原始字体、粗体或斜体。"
-
-#~ msgid "Plain text must match exactly for Code PDF to work correctly."
-#~ msgstr "纯文本必须完全匹配，代码 PDF 才能正常工作。"
-
-#~ msgid ""
-#~ "A warning will display if the parsed PDF text does not match the database "
-#~ "stored plain text."
-#~ msgstr "如果解析的 PDF 文本与数据库存储的纯文本不匹配，则会显示警告。"
-
-#~ msgid ""
-#~ "Plain text of PDFs loaded in to QualCoder before version 3.4 will not "
-#~ "have the plain text positions correct for PDF display."
-#~ msgstr ""
-#~ "在 3.4 版之前载入 QualCoder 的 PDF 纯文本，其纯文本位置将无法正确显示为 "
-#~ "PDF。"
-
-#~ msgid "This means coding stripes will show in incorrect positions."
-#~ msgstr "这意味着编码条纹会显示在不正确的位置。"
-
-#~ msgid ""
-#~ "Similarly, if the PDF plain text has been edited in any way, this will "
-#~ "affect coding stripes display."
-#~ msgstr "同样，如果对 PDF 纯文本进行了任何编辑，也会影响编码条纹的显示。"
-
-#~ msgid "Press Enter to search"
-#~ msgstr "按 Enter 键搜索"
-
-#~ msgid "PDF objects"
-#~ msgstr "PDF 对象"
-
-#~ msgid ""
-#~ "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
-#~ "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
-#~ msgstr ""
-#~ "更改起始位置（向左延伸 SHIFT/向右收缩 ALT）\n"
-#~ "更改结束位置（向右延伸 SHIFT/向左收缩 ALT）"
-
-#~ msgid "Use key presses"
-#~ msgstr "使用按键"
-
-#~ msgid "PDF Image exported"
-#~ msgstr "导出 PDF 图像"
+msgid " next  characters"
+msgstr "下一个字符"
 
 #, fuzzy
-#~ msgid "Pages: "
-#~ msgstr "页面 :"
+msgid " previous  characters"
+msgstr "上一个字符"
 
-#~ msgid "Parsing the PDF text."
-#~ msgstr "解析 PDF 文本"
+msgid "QualCoder roughly displays PDFs."
+msgstr "QualCoder 可大致显示 PDF。"
 
-#~ msgid ""
-#~ "Texts do not match. PDF imported before 3.4 QualCodr version or the PDF "
-#~ "text has been edited."
-#~ msgstr "文本不匹配。PDF 在 3.4 QualCodr 版本之前导入或 PDF 文本已被编辑。"
+msgid "Original fonts or bold or italic are not applied."
+msgstr "不使用原始字体、粗体或斜体。"
 
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "View PDF but cannot code. Code positions will appear wrongly.\n"
-#~ "Character difference: "
-#~ msgstr ""
-#~ "查看 PDF 但不能代码 。 代码位置会出现错误。\n"
-#~ "字符差异 :"
+msgid "Plain text must match exactly for Code PDF to work correctly."
+msgstr "纯文本必须完全匹配，代码 PDF 才能正常工作。"
 
-#, fuzzy
-#~ msgid "TEXT START CHARACTER POSITION: "
-#~ msgstr "剧情开始"
+msgid ""
+"A warning will display if the parsed PDF text does not match the database "
+"stored plain text."
+msgstr "如果解析的 PDF 文本与数据库存储的纯文本不匹配，则会显示警告。"
 
-#, fuzzy
-#~ msgid "TEXT END CHARACTER POSITION: "
-#~ msgstr "文本结束"
+msgid ""
+"Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
+"the plain text positions correct for PDF display."
+msgstr "在 3.4 版之前载入 QualCoder 的 PDF 纯文本，其纯文本位置将无法正确显示为 PDF。"
 
-#, fuzzy
-#~ msgid "NUMBER OF CHARACTERS: "
-#~ msgstr "人数:"
+msgid "This means coding stripes will show in incorrect positions."
+msgstr "这意味着编码条纹会显示在不正确的位置。"
 
-#~ msgid "Important"
-#~ msgstr "重要"
+msgid ""
+"Similarly, if the PDF plain text has been edited in any way, this will "
+"affect coding stripes display."
+msgstr "同样，如果对 PDF 纯文本进行了任何编辑，也会影响编码条纹的显示。"
 
-#~ msgid "Code memo"
-#~ msgstr "代码备忘录"
+msgid "Press Enter to search"
+msgstr "按 Enter 键搜索"
 
-#~ msgid "Select code for important flag"
-#~ msgstr "选择重要标志的代码"
+msgid "PDF objects"
+msgstr "PDF 对象"
 
-#~ msgid "Select code to remove important flag"
-#~ msgstr "选择删除重要标志的代码"
+msgid ""
+"Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
+"Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
+msgstr ""
+"更改起始位置（向左延伸 SHIFT/向右收缩 ALT）\n"
+"更改结束位置（向右延伸 SHIFT/向左收缩 ALT）"
 
-#~ msgid "PDF loaded text does not match Imported PDF text length."
-#~ msgstr "PDF 加载的文本与导入的 PDF 文本长度不匹配。"
+msgid "Use key presses"
+msgstr "使用按键"
 
-#~ msgid "Mark using the right hand side text pane."
-#~ msgstr "使用右侧文本窗格进行标记。"
-
-#~ msgid "Cannot mark"
-#~ msgstr "无法标记"
-
-#~ msgid "Add a new code"
-#~ msgstr "添加新代码"
-
-#~ msgid "Add a new category"
-#~ msgstr "添加新类别"
+msgid "PDF Image exported"
+msgstr "导出 PDF 图像"
 
 #, fuzzy
-#~ msgid "Delete F4"
-#~ msgstr "删除 F4"
+msgid "Pages: "
+msgstr "页面 :"
+
+msgid "Parsing the PDF text."
+msgstr "解析 PDF 文本"
+
+msgid ""
+"Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text"
+" has been edited."
+msgstr "文本不匹配。PDF 在 3.4 QualCodr 版本之前导入或 PDF 文本已被编辑。"
 
 #, fuzzy
-#~ msgid "Report text context style: "
-#~ msgstr "报告文本上下文样式 :"
-
-#~ msgid "QualCoder project missing folders. Created empty folders"
-#~ msgstr "QualCoder 项目缺少文件夹。创建了空文件夹"
-
-#, fuzzy
-#~ msgid "New Entries: "
-#~ msgstr "新条目 :"
+msgid ""
+"\n"
+"View PDF but cannot code. Code positions will appear wrongly.\n"
+"Character difference: "
+msgstr ""
+"查看 PDF 但不能代码 。 代码位置会出现错误。\n"
+"字符差异 :"
 
 #, fuzzy
-#~ msgid "Duplicates not inserted: "
-#~ msgstr "未插入复制件 :"
+msgid "TEXT START CHARACTER POSITION: "
+msgstr "剧情开始"
 
 #, fuzzy
-#~ msgid "References already exist"
-#~ msgstr "参考文献已经存在"
-
-#~ msgid "original"
-#~ msgstr "原创"
-
-#~ msgid "dark"
-#~ msgstr "暗处"
-
-#~ msgid "purple"
-#~ msgstr "紫色"
-
-#~ msgid "rainbow"
-#~ msgstr "彩虹"
+msgid "TEXT END CHARACTER POSITION: "
+msgstr "文本结束"
 
 #, fuzzy
-#~ msgid "Code renamed: "
-#~ msgstr "重新命名的代码 :"
+msgid "NUMBER OF CHARACTERS: "
+msgstr "人数:"
 
-#~ msgid "Notice"
-#~ msgstr "通知"
+msgid "Important"
+msgstr "重要"
 
-#~ msgid "Select at least one Qualitative Text column to analyse."
-#~ msgstr "请选择至少一个“定性文本”列进行分析。"
+msgid "Code memo"
+msgstr "代码备忘录"
 
-#~ msgid "New code name"
-#~ msgstr "新代号"
+msgid "Select code for important flag"
+msgstr "选择重要标志的代码"
 
-#, fuzzy
-#~ msgid "Code added: "
-#~ msgstr "代码添加:"
+msgid "Select code to remove important flag"
+msgstr "选择删除重要标志的代码"
 
-#, fuzzy
-#~ msgid "Category renamed: "
-#~ msgstr "重新命名的类别 :"
+msgid "PDF loaded text does not match Imported PDF text length."
+msgstr "PDF 加载的文本与导入的 PDF 文本长度不匹配。"
 
-#~ msgid "Insert coded text items"
-#~ msgstr "插入编码文本项目"
+msgid "Mark using the right hand side text pane."
+msgstr "使用右侧文本窗格进行标记。"
 
-#~ msgid "Insert coded image items"
-#~ msgstr "插入编码图像项目"
+msgid "Cannot mark"
+msgstr "无法标记"
 
-#~ msgid "Insert coded A/V items"
-#~ msgstr "插入编码音频/视频项目"
+msgid "Add a new code"
+msgstr "添加新代码"
 
-#, fuzzy
-#~ msgid "Expand category"
-#~ msgstr "扩展类别"
+msgid "Add a new category"
+msgstr "添加新类别"
 
 #, fuzzy
-#~ msgid "Import and link segments"
-#~ msgstr "导入和链接段"
+msgid "Delete F4"
+msgstr "删除 F4"
 
 #, fuzzy
-#~ msgid "Import Co-occurrences"
-#~ msgstr "导入同时发生"
+msgid "Report text context style: "
+msgstr "报告文本上下文样式 :"
+
+msgid "QualCoder project missing folders. Created empty folders"
+msgstr "QualCoder 项目缺少文件夹。创建了空文件夹"
+
+#, fuzzy
+msgid "New Entries: "
+msgstr "新条目 :"
+
+#, fuzzy
+msgid "Duplicates not inserted: "
+msgstr "未插入复制件 :"
+
+#, fuzzy
+msgid "References already exist"
+msgstr "参考文献已经存在"
+
+msgid "original"
+msgstr "原创"
+
+msgid "dark"
+msgstr "暗处"
+
+msgid "purple"
+msgstr "紫色"
+
+msgid "rainbow"
+msgstr "彩虹"
+
+#, fuzzy
+msgid "Code renamed: "
+msgstr "重新命名的代码 :"
+
+msgid "Notice"
+msgstr "通知"
+
+msgid "Select at least one Qualitative Text column to analyse."
+msgstr "请选择至少一个“定性文本”列进行分析。"
+
+msgid "New code name"
+msgstr "新代号"
+
+#, fuzzy
+msgid "Code added: "
+msgstr "代码添加:"
+
+#, fuzzy
+msgid "Category renamed: "
+msgstr "重新命名的类别 :"
+
+msgid "Insert coded text items"
+msgstr "插入编码文本项目"
+
+msgid "Insert coded image items"
+msgstr "插入编码图像项目"
+
+msgid "Insert coded A/V items"
+msgstr "插入编码音频/视频项目"
+
+#, fuzzy
+msgid "Expand category"
+msgstr "扩展类别"
+
+#, fuzzy
+msgid "Import and link segments"
+msgstr "导入和链接段"
+
+#, fuzzy
+msgid "Import Co-occurrences"
+msgstr "导入同时发生"
 
 #, fuzzy, python-brace-format
-#~ msgid "Renaming category \"{name}\"..."
-#~ msgstr "重命名类别 \"{名称}}\"..."
+msgid "Renaming category \"{name}\"..."
+msgstr "重命名类别 \"{名称}}\"..."
 
 #, fuzzy, python-brace-format
-#~ msgid "Renaming code \"{name}\"..."
-#~ msgstr "重命名代码\"{名称}\"..."
+msgid "Renaming code \"{name}\"..."
+msgstr "重命名代码\"{名称}\"..."
 
-#~ msgid "Cases have already been created."
-#~ msgstr "案例已经创建。"
+msgid "Cases have already been created."
+msgstr "案例已经创建。"
 
-#~ msgid ""
-#~ "It appears that you have already used the AI features with this project "
-#~ "before. Meanwhile, we had to change the internal implementation of the "
-#~ "local AI memory to make it more robust. As a result, the AI has to read "
-#~ "through all your empirical documents again to rebuild the local memory. "
-#~ "This may take a while. Sorry for the inconvenience."
-#~ msgstr ""
-#~ "看来您之前已经在这个项目中使用过人工智能功能。同时，我们不得不更改本地人工"
-#~ "智能内存的内部实现，使其更加稳健。因此，人工智能必须重新读取您的所有经验文"
-#~ "档，以重建本地内存。这可能需要一段时间。不便之处，敬请原谅。"
+msgid ""
+"It appears that you have already used the AI features with this project "
+"before. Meanwhile, we had to change the internal implementation of the local"
+" AI memory to make it more robust. As a result, the AI has to read through "
+"all your empirical documents again to rebuild the local memory. This may "
+"take a while. Sorry for the inconvenience."
+msgstr ""
+"看来您之前已经在这个项目中使用过人工智能功能。同时，我们不得不更改本地人工智能内存的内部实现，使其更加稳健。因此，人工智能必须重新读取您的所有经验文档，以重建本地内存。这可能需要一段时间。不便之处，敬请原谅。"
 
-#~ msgid "AI memory"
-#~ msgstr "人工智能存储器"
+msgid "AI memory"
+msgstr "人工智能存储器"
 
-#~ msgid "Vectorstore: Document import failed, faiss_db not present."
-#~ msgstr "向量存储： 文档导入失败，faiss_db 不存在。"
+msgid "Vectorstore: Document import failed, faiss_db not present."
+msgstr "向量存储： 文档导入失败，faiss_db 不存在。"
 
-#~ msgid "Branch has been selected"
-#~ msgstr "已选择分支机构"
+msgid "Branch has been selected"
+msgstr "已选择分支机构"
 
-#~ msgid ""
-#~ "No coded text found. Please select another code or category, or refine "
-#~ "you filters."
-#~ msgstr "未找到编码文本。请选择其他编码或类别，或改进您的筛选条件。"
+msgid ""
+"No coded text found. Please select another code or category, or refine you "
+"filters."
+msgstr "未找到编码文本。请选择其他编码或类别，或改进您的筛选条件。"
 
-#~ msgid ""
-#~ "ATTENTION: There was more coded data found, but it had to be truncated "
-#~ "because of the limited context window of the AI."
-#~ msgstr ""
-#~ "注意：虽然发现了更多的编码数据，但由于人工智能的上下文窗口有限，这些数据不"
-#~ "得不被截断。"
+msgid ""
+"ATTENTION: There was more coded data found, but it had to be truncated "
+"because of the limited context window of the AI."
+msgstr "注意：虽然发现了更多的编码数据，但由于人工智能的上下文窗口有限，这些数据不得不被截断。"
 
-#~ msgid "New topic analysis chat"
-#~ msgstr "新话题分析聊天"
+msgid "New topic analysis chat"
+msgstr "新话题分析聊天"
 
-#~ msgid "Ask the AI anything, not related to your data."
-#~ msgstr "向人工智能提出任何与您的数据无关的问题。"
+msgid "Ask the AI anything, not related to your data."
+msgstr "向人工智能提出任何与您的数据无关的问题。"
 
-#~ msgid "Names of prompts must be unique within its type and scope."
-#~ msgstr "提示名称在其类型和范围内必须是唯一的。"
+msgid "Names of prompts must be unique within its type and scope."
+msgstr "提示名称在其类型和范围内必须是唯一的。"
 
-#~ msgid "Screenshot saved"
-#~ msgstr "保存截图"
+msgid "Screenshot saved"
+msgstr "保存截图"
 
-#~ msgid "Ai Chat"
-#~ msgstr "人工智能聊天"
+msgid "Ai Chat"
+msgstr "人工智能聊天"
 
-#~ msgid "AI"
-#~ msgstr "人工智能"
+msgid "AI"
+msgstr "人工智能"
 
-#~ msgid "EXAMPLES:"
-#~ msgstr "举例说明："
+msgid "EXAMPLES:"
+msgstr "举例说明："
 
 #, fuzzy
-#~ msgid "Folder paths / represents backslash"
-#~ msgstr "文件夹路径 / 代表反斜线"
+msgid "Folder paths / represents backslash"
+msgstr "文件夹路径 / 代表反斜线"
 
-#~ msgid "Date time now:"
-#~ msgstr "现在的日期时间："
+msgid "Date time now:"
+msgstr "现在的日期时间："
 
-#~ msgid ""
-#~ "Avoid selecting text combinations of unmarked text sections and coded/"
-#~ "annotated/case-assigned sections."
-#~ msgstr "避免选择无标记文本部分和编码/注释/案例指定部分的文本组合。"
+msgid ""
+"Avoid selecting text combinations of unmarked text sections and "
+"coded/annotated/case-assigned sections."
+msgstr "避免选择无标记文本部分和编码/注释/案例指定部分的文本组合。"
 
-#~ msgid "Positions may not correctly adjust."
-#~ msgstr "位置可能无法正确调整。"
+msgid "Positions may not correctly adjust."
+msgstr "位置可能无法正确调整。"
 
-#~ msgid ""
-#~ "Do not code this text until you reload Coding - Code Text from the menu "
-#~ "bar."
-#~ msgstr "在从菜单栏重新加载 “编码--编码文本 ”之前，请勿对该文本进行编码。"
+msgid ""
+"Do not code this text until you reload Coding - Code Text from the menu bar."
+msgstr "在从菜单栏重新加载 “编码--编码文本 ”之前，请勿对该文本进行编码。"
 
-#~ msgid "Toggle automatic column resize"
-#~ msgstr "切换自动调整列宽"
+msgid "Toggle automatic column resize"
+msgstr "切换自动调整列宽"
 
-#~ msgid "CODE MEMO: All memo"
-#~ msgstr "代码备忘录： 所有备忘"
+msgid "CODE MEMO: All memo"
+msgstr "代码备忘录： 所有备忘"
 
-#~ msgid "Also alll memos"
-#~ msgstr "还包括所有备忘录"
+msgid "Also alll memos"
+msgstr "还包括所有备忘录"
 
-#~ msgid "New code name:"
-#~ msgstr "新代号："
+msgid "New code name:"
+msgstr "新代号："
 
-#~ msgid "is already in use, choose another name."
-#~ msgstr "已被使用，请选择其他名称。"
+msgid "is already in use, choose another name."
+msgstr "已被使用，请选择其他名称。"
 
-#~ msgid "Duplicate code name"
-#~ msgstr "代码名称重复"
+msgid "Duplicate code name"
+msgstr "代码名称重复"
 
-#~ msgid "to:"
-#~ msgstr "到："
+msgid "to:"
+msgstr "到："
 
-#~ msgid "Coder comparison text file exported to:"
-#~ msgstr "编码器比较文本文件导出为:"
+msgid "Coder comparison text file exported to:"
+msgstr "编码器比较文本文件导出为:"
 
-#~ msgid "Text file export"
-#~ msgstr "导出文本文件"
+msgid "Text file export"
+msgstr "导出文本文件"
 
-#~ msgid "Show coded text and media"
-#~ msgstr "显示编码文本和媒体"
+msgid "Show coded text and media"
+msgstr "显示编码文本和媒体"
 
-#~ msgid "Name already in use, choose another."
-#~ msgstr "名称已被使用，请另选。"
+msgid "Name already in use, choose another."
+msgstr "名称已被使用，请另选。"
 
-#~ msgid "Choose another name"
-#~ msgstr "选择其他名称"
+msgid "Choose another name"
+msgstr "选择其他名称"
 
-#~ msgid ""
-#~ "An error occured while writing to the project folder. Please close the "
-#~ "project and try to open it again."
-#~ msgstr "在写入项目文件夹时发生错误。请关闭项目并尝试再次打开。"
+msgid ""
+"An error occured while writing to the project folder. Please close the "
+"project and try to open it again."
+msgstr "在写入项目文件夹时发生错误。请关闭项目并尝试再次打开。"
 
-#~ msgid "I/O Error"
-#~ msgstr "输入/输出错误"
+msgid "I/O Error"
+msgstr "输入/输出错误"
 
-#~ msgid ""
-#~ "QualCoder detected that the project was not properly closed the last time "
-#~ "it was used by \""
-#~ msgstr "QualCoder 检测到该项目上次被“ ”使用时未正确关闭。"
+msgid ""
+"QualCoder detected that the project was not properly closed the last time it"
+" was used by \""
+msgstr "QualCoder 检测到该项目上次被“ ”使用时未正确关闭。"
 
-#~ msgid ""
-#~ "In most cases, you can still continue your work as usual. If you "
-#~ "encounter any problems, search for a recent backup in the project folder."
-#~ msgstr ""
-#~ "在大多数情况下，您仍然可以照常工作。如果遇到任何问题，请在项目文件夹中查找"
-#~ "最近的备份。"
+msgid ""
+"In most cases, you can still continue your work as usual. If you encounter "
+"any problems, search for a recent backup in the project folder."
+msgstr "在大多数情况下，您仍然可以照常工作。如果遇到任何问题，请在项目文件夹中查找最近的备份。"
 
-#~ msgid "Project cannot be opened since it's already in use by \""
-#~ msgstr "项目已被“ ”使用，因此无法打开。"
+msgid "Project cannot be opened since it's already in use by \""
+msgstr "项目已被“ ”使用，因此无法打开。"
 
-#~ msgid "Change code position key presses"
-#~ msgstr "更改代码位置按键"
+msgid "Change code position key presses"
+msgstr "更改代码位置按键"
 
-#~ msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
-#~ msgstr "更改起始位置（左移/右移）"
+msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
+msgstr "更改起始位置（左移/右移）"
 
-#~ msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
-#~ msgstr "更改末端位置（右移/左移）"
+msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
+msgstr "更改末端位置（右移/左移）"
 
-#~ msgid "Unknown file type"
-#~ msgstr "未知文件类型"
+msgid "Unknown file type"
+msgstr "未知文件类型"
 
-#~ msgid "Trying to import as text"
-#~ msgstr "尝试以文本形式导入"
+msgid "Trying to import as text"
+msgstr "尝试以文本形式导入"
 
-#~ msgid "This is an external linked file"
-#~ msgstr "这是一个外部链接文件"
+msgid "This is an external linked file"
+msgstr "这是一个外部链接文件"
 
-#~ msgid "Can export text"
-#~ msgstr "可导出文本"
+msgid "Can export text"
+msgstr "可导出文本"
 
-#~ msgid ""
-#~ "Show codes containing text.\n"
-#~ "(Blank for all)"
-#~ msgstr ""
-#~ "显示包含文本的代码。\n"
-#~ "(全部为空）"
+msgid ""
+"Show codes containing text.\n"
+"(Blank for all)"
+msgstr ""
+"显示包含文本的代码。\n"
+"(全部为空）"
 
-#~ msgid "Change start position"
-#~ msgstr "更改启动位置"
+msgid "Change start position"
+msgstr "更改启动位置"
 
-#~ msgid ""
-#~ "Change start character position.\n"
-#~ "Positive or negative number:"
-#~ msgstr ""
-#~ "更改起始字符位置。\n"
-#~ "正数或负数："
+msgid ""
+"Change start character position.\n"
+"Positive or negative number:"
+msgstr ""
+"更改起始字符位置。\n"
+"正数或负数："
 
-#~ msgid "Change end position"
-#~ msgstr "更改末端位置"
+msgid "Change end position"
+msgstr "更改末端位置"
 
-#~ msgid ""
-#~ "Change end character position.\n"
-#~ "Positive or negative number:"
-#~ msgstr ""
-#~ "更改结束符位置。\n"
-#~ "正数或负数："
+msgid ""
+"Change end character position.\n"
+"Positive or negative number:"
+msgstr ""
+"更改结束符位置。\n"
+"正数或负数："
 
-#~ msgid "ANNOTATED:"
-#~ msgstr "附注："
+msgid "ANNOTATED:"
+msgstr "附注："
 
-#~ msgid "Regex compliation error"
-#~ msgstr "Regex 编译错误"
+msgid "Regex compliation error"
+msgstr "Regex 编译错误"
 
-#~ msgid ""
-#~ "Word calculations: Words use alphabet characters and include the "
-#~ "apostrophe. All other characters are word separators. Excludes English "
-#~ "stopwords"
-#~ msgstr ""
-#~ "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符。不包括"
-#~ "英文停止词"
+msgid ""
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators. Excludes English stopwords"
+msgstr "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符。不包括英文停止词"
 
-#~ msgid "Excludes English Stopwords"
-#~ msgstr "排除英语停用词"
+msgid "Excludes English Stopwords"
+msgstr "排除英语停用词"
 
-#~ msgid "Show files"
-#~ msgstr "显示文件"
+msgid "Show files"
+msgstr "显示文件"
 
-#~ msgid "Larger font"
-#~ msgstr "字体更大"
+msgid "Larger font"
+msgstr "字体更大"
 
-#~ msgid "Smaller font"
-#~ msgstr "字体更小"
+msgid "Smaller font"
+msgstr "字体更小"
 
-#~ msgid "Yellow text"
-#~ msgstr "黄色文本"
+msgid "Yellow text"
+msgstr "黄色文本"
 
-#~ msgid "Blue text"
-#~ msgstr "蓝色文本"
+msgid "Blue text"
+msgstr "蓝色文本"
 
-#~ msgid "Orange text"
-#~ msgstr "橙色文本"
+msgid "Orange text"
+msgstr "橙色文本"
 
-#~ msgid "Cyan text"
-#~ msgstr "青色文本"
+msgid "Cyan text"
+msgstr "青色文本"
 
-#~ msgid "Magenta text"
-#~ msgstr "洋红色文本"
+msgid "Magenta text"
+msgstr "洋红色文本"
 
-#~ msgid "Gray text"
-#~ msgstr "灰色文本"
+msgid "Gray text"
+msgstr "灰色文本"
 
-#~ msgid "Black text"
-#~ msgstr "黑色文本"
+msgid "Black text"
+msgstr "黑色文本"
 
-#~ msgid "White text"
-#~ msgstr "白色文本"
+msgid "White text"
+msgstr "白色文本"
 
-#~ msgid "Thicker"
-#~ msgstr "更厚"
+msgid "Thicker"
+msgstr "更厚"
 
-#~ msgid "Thinner"
-#~ msgstr "稀释剂"
+msgid "Thinner"
+msgstr "稀释剂"
 
-#~ msgid "Automatic coding in files:"
-#~ msgstr "文件自动编码："
+msgid "Automatic coding in files:"
+msgstr "文件自动编码："
 
-#~ msgid "Using Regex."
-#~ msgstr "使用 Regex。"
+msgid "Using Regex."
+msgstr "使用 Regex。"
 
-#~ msgid "Current coder:"
-#~ msgstr "现任编码员："
+msgid "Current coder:"
+msgstr "现任编码员："
 
 #, fuzzy
-#~ msgid "Are you sure?"
-#~ msgstr "你确定吗?"
+msgid "Are you sure?"
+msgstr "你确定吗?"
 
-#~ msgid "Csv file Export"
-#~ msgstr "Csv 文件导出"
+msgid "Csv file Export"
+msgstr "Csv 文件导出"
 
-#~ msgid "Code relations stats csv file exported to:"
-#~ msgstr "代码关系统计 csv 文件已导出："
+msgid "Code relations stats csv file exported to:"
+msgstr "代码关系统计 csv 文件已导出："
 
-#~ msgid "Csv summary file Export"
-#~ msgstr "导出 Csv 摘要文件"
+msgid "Csv summary file Export"
+msgstr "导出 Csv 摘要文件"
 
-#~ msgid "Select Twitter csv file"
-#~ msgstr "选择 Twitter csv 文件"
+msgid "Select Twitter csv file"
+msgstr "选择 Twitter csv 文件"
 
-#~ msgid "Tweet file loaded. Please check via Manage files and Manage cases"
-#~ msgstr "Tweet 文件已加载。请通过 “管理文件 ”和 “管理案例 ”进行检查"
+msgid "Tweet file loaded. Please check via Manage files and Manage cases"
+msgstr "Tweet 文件已加载。请通过 “管理文件 ”和 “管理案例 ”进行检查"
 
-#~ msgid "Tweets:"
-#~ msgstr "Tweets:"
+msgid "Tweets:"
+msgstr "Tweets:"
 
-#~ msgid "Row error:"
-#~ msgstr "行错误："
+msgid "Row error:"
+msgstr "行错误："
 
-#~ msgid "Number of columns is inconsistent. May not be all quoted"
-#~ msgstr "列数不一致。可能没有全部引用"
+msgid "Number of columns is inconsistent. May not be all quoted"
+msgstr "列数不一致。可能没有全部引用"
 
-#~ msgid "Missing header columns:"
-#~ msgstr "缺少标题栏："
+msgid "Missing header columns:"
+msgstr "缺少标题栏："
 
-#~ msgid "Tweet field:"
-#~ msgstr "Tweet 字段："
+msgid "Tweet field:"
+msgstr "Tweet 字段："
 
-#~ msgid "User field:"
-#~ msgstr "用户字段："
+msgid "User field:"
+msgstr "用户字段："
 
-#~ msgid "Importing twitter data"
-#~ msgstr "导入 twitter 数据"
+msgid "Importing twitter data"
+msgstr "导入 twitter 数据"
 
-#~ msgid "Choose project directory"
-#~ msgstr "选择项目目录"
+msgid "Choose project directory"
+msgstr "选择项目目录"
 
-#~ msgid "AI: Please set up the AI model"
-#~ msgstr "人工智能：请设置人工智能模型"
+msgid "AI: Please set up the AI model"
+msgstr "人工智能：请设置人工智能模型"
 
-#~ msgid ""
-#~ "Please enter an API-key for the AI in the following dialog (or \"None\" "
-#~ "if not API-key is needed)."
-#~ msgstr ""
-#~ "请在以下对话框中输入人工智能的 API 密钥（如果不需要 API 密钥，则输入 "
-#~ "“无”）。"
+msgid ""
+"Please enter an API-key for the AI in the following dialog (or \"None\" if "
+"not API-key is needed)."
+msgstr "请在以下对话框中输入人工智能的 API 密钥（如果不需要 API 密钥，则输入 “无”）。"
 
-#~ msgid ""
-#~ "Some images will not display and image masks and rotations will not work."
-#~ msgstr "某些图像将无法显示，图像遮罩和旋转也无法使用。"
+msgid ""
+"Some images will not display and image masks and rotations will not work."
+msgstr "某些图像将无法显示，图像遮罩和旋转也无法使用。"
 
-#~ msgid ""
-#~ "There is not enough information in pdfminer to accurately display polygon "
-#~ "curves."
-#~ msgstr "pdfminer 中没有足够的信息来准确显示多边形曲线。"
+msgid ""
+"There is not enough information in pdfminer to accurately display polygon "
+"curves."
+msgstr "pdfminer 中没有足够的信息来准确显示多边形曲线。"
 
-#~ msgid ""
-#~ "Similarly, if the PDF plain text has beeen edited in any way, this will "
-#~ "affect coding stripes display."
-#~ msgstr "同样，如果对 PDF 纯文本进行了任何编辑，也会影响编码条纹的显示。"
+msgid ""
+"Similarly, if the PDF plain text has beeen edited in any way, this will "
+"affect coding stripes display."
+msgstr "同样，如果对 PDF 纯文本进行了任何编辑，也会影响编码条纹的显示。"
 
-#~ msgid ""
-#~ "Word calculations: Words use alphabet characters and include the "
-#~ "apostrophe.All other characters are word separators"
-#~ msgstr "单词计算： 单词使用字母字符，包括撇号，所有其他字符均为单词分隔符"
+msgid ""
+"Word calculations: Words use alphabet characters and include the "
+"apostrophe.All other characters are word separators"
+msgstr "单词计算： 单词使用字母字符，包括撇号，所有其他字符均为单词分隔符"
 
-#~ msgid "Please select an AI model or disable the AI altogether."
-#~ msgstr "请选择人工智能模式或完全禁用人工智能。"
+msgid "Please select an AI model or disable the AI altogether."
+msgstr "请选择人工智能模式或完全禁用人工智能。"
 
-#~ msgid ""
-#~ "Please enter a valid API-key for the AI model. \n"
-#~ "(If you are sure that your particular model does not need an API-key, "
-#~ "enter \"None\" instead.)"
-#~ msgstr ""
-#~ "请输入人工智能模型的有效 API 密钥。\n"
-#~ "(如果您确定您的特定模型不需要 API 密钥，请输入 “无”）。"
+msgid ""
+"Please enter a valid API-key for the AI model. \n"
+"(If you are sure that your particular model does not need an API-key, enter \"None\" instead.)"
+msgstr ""
+"请输入人工智能模型的有效 API 密钥。\n"
+"(如果您确定您的特定模型不需要 API 密钥，请输入 “无”）。"
 
-#~ msgid ""
-#~ "Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
-#~ "Ctrl+1-8 Ctrl+D"
-#~ msgstr ""
-#~ "转录区 Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"
+msgid ""
+"Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
+"Ctrl+1-8 Ctrl+D"
+msgstr "转录区 Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"
 
-#~ msgid "Please select an AI provider or disable the AI altogether."
-#~ msgstr "请选择人工智能提供商或完全禁用人工智能。"
+msgid "Please select an AI provider or disable the AI altogether."
+msgstr "请选择人工智能提供商或完全禁用人工智能。"
 
-#~ msgid "AI provider"
-#~ msgstr "人工智能供应商"
+msgid "AI provider"
+msgstr "人工智能供应商"

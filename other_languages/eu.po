@@ -1,17 +1,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 10:52+0200\n"
-"PO-Revision-Date: 2026-09-23 10:53+0200\n"
-"Last-Translator: Justin\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2026-10-17 11:01+0200\n"
+"PO-Revision-Date: 2026-10-17 11:01+0200\n"
+"Last-Translator: Auto-translated via Argostranslate (EN -> EU)\n"
 "Language-Team: EU <LL@li.org>\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Argostranslate + Custom Script\n"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/error_dlg.py:44
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1277
@@ -426,11 +424,6 @@ msgstr "Laburpena:"
 msgid "END OF TRANSCRIPT"
 msgstr "Laburpenaren amaiera"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:488
-#, fuzzy
-msgid "TRANSCRIPT: "
-msgstr "Laburpena:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:514
 #, fuzzy
 msgid "PDF IMAGE DETAILS"
@@ -505,8 +498,8 @@ msgstr "Estatistikak:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:645
 #, fuzzy
 msgid ""
-"Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators"
 msgstr ""
 "Hitzen kalkuluak: alfabetoko karaktereak erabiltzen dituzte eta apostrofea "
 "sartzen dute. Beste karaktere guztiak hitzen bereizleak dira."
@@ -610,24 +603,6 @@ msgstr "Kode-area / irudia (E)"
 #, fuzzy
 msgid "Go to bookmark (press B to set)"
 msgstr "Joan laster-markara (B tekla ezartzeko)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1904
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5967
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6013
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1386
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1453
-#, fuzzy
-msgid "Codings:"
-msgstr "Kodetzeak"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1906
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2749
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2756
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2453
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2456
-#, fuzzy
-msgid "Memo:"
-msgstr "Zirkularra"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2007
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:725
@@ -798,11 +773,6 @@ msgstr "Kodetutako area"
 msgid "Select a code in the list first."
 msgstr "Hautatu kodea zerrendan lehenik."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2752
-#, fuzzy
-msgid "Area:"
-msgstr "Eremua:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2761
 #, fuzzy
 msgid "Annotation:"
@@ -844,21 +814,6 @@ msgstr "Ez da koderik hautatu"
 #, fuzzy
 msgid "Text coding is disabled for this file. Re-import the PDF."
 msgstr "Testu-kodeketa desgaituta dago fitxategi honetan. Eman berriro PDFa."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2912
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2949
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3837
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:484
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4675
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4697
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1036
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1057
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2642
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5179
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5201
-#, fuzzy
-msgid "Annotation: "
-msgstr "Oharpenak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2989
 #, fuzzy
@@ -956,8 +911,8 @@ msgstr "Ez da fitxategirik hautatu."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4530
 #, fuzzy
 msgid ""
-"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the "
-"speaker codings?"
+"Coder \"{}\" is currently hidden. Do you want to make it visible, to see the"
+" speaker codings?"
 msgstr ""
 "\"{}\" kodetzailea ezkutatuta dago. Bozgorailuaren kodeketak ikusi nahi "
 "dituzu?"
@@ -1341,87 +1296,6 @@ msgstr "Testua:"
 #, fuzzy
 msgid "Annotations for file: "
 msgstr "Fitxategiaren oharrak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3857
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3866
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4064
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2889
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:458
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1416
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:757
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:774
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:789
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:805
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:817
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:829
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:961
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1016
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1046
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3619
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3694
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3763
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3859
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5596
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5621
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5647
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5673
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5692
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5713
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:847
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:993
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1021
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1274
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1300
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1326
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1727
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2616
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:631
-#, fuzzy
-msgid "Code: "
-msgstr "Kodea:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3859
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3867
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4066
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:810
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:826
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:846
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:461
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5511
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:760
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:777
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:792
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:963
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1018
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1049
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3622
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3695
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3765
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5599
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5625
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5650
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:6050
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:162
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:205
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:248
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:627
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:660
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:685
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:713
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:995
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1023
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1052
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1276
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1302
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1329
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1729
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1579
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2619
-#, fuzzy
-msgid "Memo: "
-msgstr "Zirkularra:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:3869
 #, fuzzy
@@ -1864,13 +1738,14 @@ msgstr "Kodetutako eremu zehatz hori badago lehendik ere."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5782
 #, fuzzy
 msgid "The text extracted from this PDF does not match the imported text."
-msgstr "PDF honetatik ateratako testua ez dator bat inportatutako testuarekin."
+msgstr ""
+"PDF honetatik ateratako testua ez dator bat inportatutako testuarekin."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5783
 #, fuzzy
 msgid ""
-"This usually means the file was imported in an older QualCoder version using "
-"an older text method."
+"This usually means the file was imported in an older QualCoder version using"
+" an older text method."
 msgstr ""
 "Horrek esan nahi du fitxategia QualCoder bertsio zaharrago batean inportatu "
 "zela testu-metodo zaharrago batekin."
@@ -1926,8 +1801,8 @@ msgstr "Bihurtu PDF honen gordetako testua hautatutako diseinura?"
 #, fuzzy
 msgid ""
 "The stored text will be rewritten and its codings (all coders), annotations "
-"and case assignments will be relocated in the new text. Segments that cannot "
-"be located exactly keep their original quote and are reported for review."
+"and case assignments will be relocated in the new text. Segments that cannot"
+" be located exactly keep their original quote and are reported for review."
 msgstr ""
 "Gordetako testua berriro idatziko da eta bere kodeketak (kodetzaile "
 "guztiak), oharpenak eta kasu-esleipenak testu berrian lekuz aldatuko dira. "
@@ -2064,22 +1939,6 @@ msgstr "Gorde txostena egunkarian"
 msgid "PDF restructure report"
 msgstr "PDF berregituratze txostena"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6009
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3062
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1143
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3682
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3742
-#, fuzzy
-msgid "File:"
-msgstr "Fitxategia:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6010
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5802
-#, fuzzy
-msgid "Date:"
-msgstr "Data:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6011
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1501
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:1420
@@ -2131,8 +1990,8 @@ msgid ""
 "Text codings will be skipped: the extracted text is not ready or does not "
 "match the imported text. Only area codings will be exported."
 msgstr ""
-"Testu-kodeketak saltatuko dira: erauzitako testua ez dago prest edo ez dator "
-"bat inportatutako testuarekin. Eremu-kodeketak bakarrik esportatuko dira."
+"Testu-kodeketak saltatuko dira: erauzitako testua ez dago prest edo ez dator"
+" bat inportatutako testuarekin. Eremu-kodeketak bakarrik esportatuko dira."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:6138
 #, fuzzy
@@ -2567,8 +2426,9 @@ msgstr "Atributua kasuei gehituta:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/journals.py:256
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2192
+#, fuzzy
 msgid "type"
-msgstr ""
+msgstr "Mota"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/journals.py:316
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:139
@@ -2902,8 +2762,9 @@ msgid "AI: Closed"
 msgstr "Itxi"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:114
+#, fuzzy
 msgid "AI: Closing"
-msgstr ""
+msgstr "AI: ixtea"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:116
 #, fuzzy
@@ -2916,15 +2777,21 @@ msgid "MCP active"
 msgstr "bertakoa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:133
+#, fuzzy
 msgid ""
 "No project is open. Open or create a project in QualCoder, then try again."
 msgstr ""
+"Ez dago proiekturik irekita. Ireki edo sortu proiektu bat QualCoder-en, eta "
+"saiatu berriro."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:135
+#, fuzzy
 msgid ""
-"The AI components could not be loaded. Please restart QualCoder or check the "
-"log for details."
+"The AI components could not be loaded. Please restart QualCoder or check the"
+" log for details."
 msgstr ""
+"AAren osagaiak ezin izan dira kargatu. Mesedez, berrabiarazi QualCoder edo "
+"egiaztatu egunkaria xehetasun gehiagorako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:137
 #, fuzzy
@@ -2938,19 +2805,27 @@ msgid "The AI is busy. Please wait a moment and retry."
 msgstr "AA lanpetuta dago. Itxaron pixka bat eta saiatu berriro."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:141
+#, fuzzy
 msgid ""
 "The project search index is not available yet. Please retry in a moment."
 msgstr ""
+"Proiektuaren bilaketa-indizea ez dago oraindik erabilgarri. Saiatu berriro "
+"une batez."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:143
+#, fuzzy
 msgid "The AI is still preparing the project data. Please retry in a moment."
 msgstr ""
+"AAk proiektuaren datuak prestatzen jarraitzen du. Saiatu berriro une batez."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_runtime.py:145
+#, fuzzy
 msgid ""
 "The AI components are still loading in the background. Please retry in a "
 "moment."
 msgstr ""
+"AAren osagaiak oraindik kargatzen ari dira atzeko planoan. Saiatu berriro "
+"une batez."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:256
 #, fuzzy
@@ -2985,8 +2860,8 @@ msgid ""
 "ChatGPT authentication expired or could not be renewed. Open the settings "
 "dialog and click \"Renew\" to authenticate again."
 msgstr ""
-"ChatGPT autentifikazioa iraungi egin da edo ezin da berritu. Ireki ezarpenen "
-"elkarrizketa-koadroa eta egin klik \"Berria\" berriro autentifikatzeko."
+"ChatGPT autentifikazioa iraungi egin da edo ezin da berritu. Ireki ezarpenen"
+" elkarrizketa-koadroa eta egin klik \"Berria\" berriro autentifikatzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:303
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:767
@@ -3007,11 +2882,11 @@ msgid ""
 "the AI access still works as expected. You might need to change to a "
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
-"\"Blablador\" zerbitzua erabiltzen ari zara laster desgaituko den zerbitzari "
-"zahar batean. Zure konfigurazioa automatikoki eguneratuko da. Proba ezazu ea "
-"AAren sarbideak espero bezala funtzionatzen duen. AAren beste eredu batera "
-"aldatu beharko zenuke ezarpenen elkarrizketa-koadroan, \"AAAren ezarpen "
-"aurreratuak\" atalean."
+"\"Blablador\" zerbitzua erabiltzen ari zara laster desgaituko den zerbitzari"
+" zahar batean. Zure konfigurazioa automatikoki eguneratuko da. Proba ezazu "
+"ea AAren sarbideak espero bezala funtzionatzen duen. AAren beste eredu "
+"batera aldatu beharko zenuke ezarpenen elkarrizketa-koadroan, \"AAAren "
+"ezarpen aurreratuak\" atalean."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:1354
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4781
@@ -3330,8 +3205,8 @@ msgstr "AAren aldaketa gordeta"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3626
 #, fuzzy
 msgid ""
-"Could not be undone because the affected item no longer matches the recorded "
-"state. It may have been edited afterwards or still be blocked by dependent "
+"Could not be undone because the affected item no longer matches the recorded"
+" state. It may have been edited afterwards or still be blocked by dependent "
 "data."
 msgstr ""
 "Ezin izan da desegin, kaltetutako elementua ez dagoelako jadanik "
@@ -3421,10 +3296,13 @@ msgid " standalone text coding(s)."
 msgstr "testu-kodetzaile bakarra."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3924
+#, fuzzy
 msgid ""
 " standalone coding(s) belong to another user or agent and will also be "
 "deleted."
 msgstr ""
+"kodetze bakarra beste erabiltzaile edo agente batena da eta ezabatu egingo "
+"da."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3927
 #, fuzzy
@@ -3447,21 +3325,6 @@ msgstr "oharpenak:"
 #, fuzzy
 msgid " attribute definition(s)."
 msgstr "atributuen definizioak."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3937
-#, fuzzy
-msgid " category(ies)"
-msgstr "kategoria(k)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3939
-#, fuzzy
-msgid " code(s)"
-msgstr "kodea(k)"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3941
-#, fuzzy
-msgid " coding(s)"
-msgstr "irudiaren kodeketa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3942
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:3944
@@ -3585,8 +3448,11 @@ msgid "Skipped operations removed from the list: "
 msgstr "Eragiketa saltatuak zerrendatik kenduak:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4709
-msgid "Warning: codings belonging to another user or agent were also deleted: "
+#, fuzzy
+msgid ""
+"Warning: codings belonging to another user or agent were also deleted: "
 msgstr ""
+"Abisua: beste erabiltzaile edo agente baten kodeketak ere ezabatu dira:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4711
 #, fuzzy
@@ -3631,9 +3497,9 @@ msgid ""
 "switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
 "change the AI profile and model."
 msgstr ""
-"AA: Anthropic-eko Claude Opus 4 modelo zaharkitua erabiltzen ari zara. Eredu "
-"berriago batera aldatzea, Opus 4.1era adibidez. Joan Proiektura > Ezarpenak "
-"AAren profila eta modeloa aldatzeko."
+"AA: Anthropic-eko Claude Opus 4 modelo zaharkitua erabiltzen ari zara. Eredu"
+" berriago batera aldatzea, Opus 4.1era adibidez. Joan Proiektura > Ezarpenak"
+" AAren profila eta modeloa aldatzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4814
 #, fuzzy
@@ -3656,8 +3522,8 @@ msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
 msgstr ""
-"Hurrengo elkarrizketa-koadroan, joan \"Azale aurreratuaren aukerak\" atalera "
-"eta hautatu AA eredu handi eta azkar bat (biak berdinak izan daitezke)."
+"Hurrengo elkarrizketa-koadroan, joan \"Azale aurreratuaren aukerak\" atalera"
+" eta hautatu AA eredu handi eta azkar bat (biak berdinak izan daitezke)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4831
 #, fuzzy
@@ -3672,8 +3538,8 @@ msgstr "AA: Ez da modelo handi/azkarrik hautatu, AA desgaituta dago."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_llm.py:4936
 #, fuzzy
 msgid ""
-"An error occured during AI initialization. The AI features will be disabled. "
-"Click on Project > Settings to reenable them."
+"An error occured during AI initialization. The AI features will be disabled."
+" Click on Project > Settings to reenable them."
 msgstr ""
 "Errorea gertatu da AA hasieratzean. AAren ezaugarriak desgaitu egingo dira. "
 "Egin klik Proiektuan > Ezarpenak birgaitzeko."
@@ -3752,8 +3618,9 @@ msgid "Top"
 msgstr "Gaia"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:244
+#, fuzzy
 msgid "Left, icons only"
-msgstr ""
+msgstr "Ezkerrean, ikonoak bakarrik"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:268
 #, fuzzy
@@ -3778,18 +3645,20 @@ msgstr ""
 "irteerak gordetzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:365
+#, fuzzy
 msgid ""
-"External MCP allows third-party AI applications to access data from the "
-"currently opened project. Data returned by MCP tools may be transmitted to "
-"the AI provider configured in that application.\n"
+"External MCP allows third-party AI applications to access data from the currently opened project. Data returned by MCP tools may be transmitted to the AI provider configured in that application.\n"
 "\n"
-"Only enable External MCP if you trust the connected application and "
-"understand how it handles your data."
+"Only enable External MCP if you trust the connected application and understand how it handles your data."
 msgstr ""
+"Kanpoko MCPk hirugarrenen AA aplikazioei aukera ematen die unean irekitako proiektutik datuak eskuratzeko. MCP tresnak itzulitako datuak aplikazio horretan konfiguratutako AA hornitzaileari transmititu ahal izango zaizkio.\n"
+"\n"
+"Kanpoko MCP gaitu soilik konektatutako aplikazioaz fidatzen bazara eta zure datuak nola kudeatzen dituen ulertzen baduzu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:372
+#, fuzzy
 msgid "External MCP privacy warning"
-msgstr ""
+msgstr "Kanpoko MCP pribatutasun abisua"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:426
 #, fuzzy
@@ -3799,8 +3668,8 @@ msgstr "Itxi eta ireki softwarea hizkuntza aldatzeko."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:427
 #, fuzzy
 msgid ""
-"Additional community supported languages can be installed by selecting \"Add "
-"more languages...\" in the dropdown."
+"Additional community supported languages can be installed by selecting \"Add"
+" more languages...\" in the dropdown."
 msgstr ""
 "Komunitatean onartutako hizkuntza gehiago ezar daitezke, goitibeherako "
 "\"Gehitu hizkuntza gehiago...\" hautatuz."
@@ -3838,8 +3707,8 @@ msgid ""
 "Additional languages may not be the most current translations, and they may "
 "contain inaccurate translations."
 msgstr ""
-"Hizkuntza osagarriak ez dira oraingo itzulpenik onenak, eta itzulpen okerrak "
-"izan ditzakete."
+"Hizkuntza osagarriak ez dira oraingo itzulpenik onenak, eta itzulpen okerrak"
+" izan ditzakete."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:521
 #, fuzzy
@@ -3853,8 +3722,9 @@ msgid "Add more languages"
 msgstr "Gehitu hizkuntza gehiago"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:560
+#, fuzzy
 msgid "AI components are still loading."
-msgstr ""
+msgstr "AAko osagaiak kargatzen ari dira oraindik."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:590
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3282
@@ -3872,12 +3742,10 @@ msgstr "Editatu AI profilaren izena"
 #, fuzzy
 msgid ""
 "Select a profile first. \n"
-"You can only edit the name of an existing profile. To create a new profile "
-"from scratch, follow the instructions in the QualCoder wiki on GitHub."
+"You can only edit the name of an existing profile. To create a new profile from scratch, follow the instructions in the QualCoder wiki on GitHub."
 msgstr ""
 "Hautatu profila lehenik.\n"
-"Existitzen den profil baten izena bakarrik edita dezakezu. Profil berria "
-"hutsetik sortzeko, jarraitu GitHub-eko QualCoder wikiko argibideak."
+"Existitzen den profil baten izena bakarrik edita dezakezu. Profil berria hutsetik sortzeko, jarraitu GitHub-eko QualCoder wikiko argibideak."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:679
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:923
@@ -3997,8 +3865,8 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
-"Kodetzaileen izenak aldatu dituzula dirudi. Aldaketa hauek ere galduko dira. "
-"Benetan bertan behera utzi nahi duzu?"
+"Kodetzaileen izenak aldatu dituzula dirudi. Aldaketa hauek ere galduko dira."
+" Benetan bertan behera utzi nahi duzu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/settings.py:1066
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:284
@@ -4147,8 +4015,8 @@ msgid ""
 "Report code summary. Code_text, code_image or code_av had a coding to a "
 "deleted file"
 msgstr ""
-"Kodeen laburpena. Code text, code image edo code av-ek ezabatutako fitxategi "
-"batera kodetu du"
+"Kodeen laburpena. Code text, code image edo code av-ek ezabatutako fitxategi"
+" batera kodetu du"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:485
 #, fuzzy
@@ -4158,8 +4026,8 @@ msgstr "CODING TEXT:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:542
 #, fuzzy
 msgid ""
-"Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators."
+"Word calculations: Words use alphabet characters and include the apostrophe."
+" All other characters are word separators."
 msgstr ""
 "Hitzen kalkuluak: alfabetoko karaktereak erabiltzen dituzte eta apostrofea "
 "sartzen dute. Beste karaktere guztiak hitzen bereizleak dira."
@@ -4456,16 +4324,6 @@ msgstr ""
 "R erlojuaren aurkako noranzkoan biratu\n"
 "Handiagotu eta txikiagotu"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2354
-#, fuzzy
-msgid " Height: "
-msgstr "Altuera:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2355
-#, fuzzy
-msgid " Scale: "
-msgstr "Eskala:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:201
 #, fuzzy
 msgid "1) What do you want to search for?"
@@ -4560,22 +4418,6 @@ msgstr "< fitxategi-iragazkirik ez>"
 msgid "Search in all textfiles"
 msgstr "Bilatu testu-fitxategi guztietan"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:641
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2538
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:724
-#, fuzzy
-msgid "Codings: "
-msgstr "Kodetzeak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:645
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes_by_segments.py:139
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:270
-#, fuzzy
-msgid ""
-"\n"
-"MEMO: "
-msgstr "Oharra:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:653
 #, fuzzy
 msgid "Search in all cases"
@@ -4656,8 +4498,8 @@ msgstr "Sartu testua \"topic\" eremuan."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_search_dialog.py:988
 #, fuzzy
 msgid ""
-"After combining all filters, there are not files left for the search. Please "
-"check your settings."
+"After combining all filters, there are not files left for the search. Please"
+" check your settings."
 msgstr ""
 "Iragazkiak konbinatu ondoren, ez dago fitxategirik bilaketarako. Egiaztatu "
 "ezarpenak."
@@ -4773,14 +4615,12 @@ msgstr "Gehienezkoa:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:420
 #, fuzzy
 msgid ""
-"Since you are using the AI-powered search for the first time, QualCoder "
-"needs to download and install some additional components. \n"
+"Since you are using the AI-powered search for the first time, QualCoder needs to download and install some additional components. \n"
 "\n"
 "This will download about 2.5 GB of data. Do you \n"
 "want to continue?"
 msgstr ""
-"AAren integrazioa lehen aldiz erabiltzen ari zarenez, QualCoder-ek osagai "
-"gehigarriak deskargatu eta instalatu behar ditu.\n"
+"AAren integrazioa lehen aldiz erabiltzen ari zarenez, QualCoder-ek osagai gehigarriak deskargatu eta instalatu behar ditu.\n"
 "\n"
 "Honek 2,5 GB datu inguru deskargatuko ditu. Egizu zuk\n"
 "Jarraitu nahi duzu?"
@@ -4834,7 +4674,8 @@ msgstr ""
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1072
 #, fuzzy
-msgid "Migrating the existing AI memory to the new internal search database..."
+msgid ""
+"Migrating the existing AI memory to the new internal search database..."
 msgstr ""
 "Lehendik dagoen AAren memoria migratzea barne-bilaketaren datu-base "
 "berrira..."
@@ -4845,8 +4686,8 @@ msgid ""
 "The old AI memory could not be migrated automatically. Rebuilding from the "
 "project texts instead."
 msgstr ""
-"AAren memoria zaharra ezin da automatikoki migratu. Proiektuaren testuetatik "
-"berreraikitzea."
+"AAren memoria zaharra ezin da automatikoki migratu. Proiektuaren testuetatik"
+" berreraikitzea."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1093
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:1154
@@ -5080,6 +4921,7 @@ msgid "Duplicate"
 msgstr "Bikoiztu"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:198
+#, fuzzy
 msgid ""
 "Prompt names may contain Unicode letters, including accents and umlauts, "
 "numbers, hyphens, and underscores. They must start with a letter or number "
@@ -5087,6 +4929,12 @@ msgid ""
 "'Prompt' and 'prompt' are treated as duplicates. Reserved Windows filenames "
 "such as CON, NUL, COM1, and LPT1 are not allowed."
 msgstr ""
+"Goranzko izenek Unicode letrak izan ditzakete, azentuak eta ahapaldiak, "
+"zenbakiak, marratxoak eta azpimarrak barne. Letra edo zenbaki batekin hasi "
+"behar dute eta 64 karaktere baino gehiago ez dituzte. Izenak maiuskulak eta "
+"minuskulak bereizten dira, beraz, 'Prompt' eta 'prompt' bikoiztu gisa "
+"tratatzen dira. Ez dira onartzen CON, NUL, COM1 eta LPT1 bezalako fitxategi-"
+"izenak."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:221
 #, fuzzy
@@ -5194,8 +5042,10 @@ msgid "The folder name must be no longer than 64 characters."
 msgstr "Izenak ez du 64 karaktere baino gehiago izan behar."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1123
+#, fuzzy
 msgid "The encoded folder name is too long for a portable filesystem."
 msgstr ""
+"Karpeta-izen kodetua luzeegia da fitxategi-sistema eramangarri baterako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1127
 #, fuzzy
@@ -5205,11 +5055,11 @@ msgstr "Iragazki-izen hau jadanik erabilita dago:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1130
 #, fuzzy
 msgid ""
-"Folder names must start with a letter or number and contain Unicode letters, "
-"combining marks, numbers, hyphens, and underscores only."
+"Folder names must start with a letter or number and contain Unicode letters,"
+" combining marks, numbers, hyphens, and underscores only."
 msgstr ""
-"Karpeta-izenak fitxategi-sistemarekin bateragarriak izan behar dute. Erabili "
-"letra maiuskulak, zenbakiak, marratxoak eta azpimarrak soilik."
+"Karpeta-izenak fitxategi-sistemarekin bateragarriak izan behar dute. Erabili"
+" letra maiuskulak, zenbakiak, marratxoak eta azpimarrak soilik."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1140
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1268
@@ -5323,11 +5173,8 @@ msgstr "Izena ezin da hutsik egon."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1408
 #, fuzzy
-msgid ""
-"Prompt names must not contain \"/\" or \"\\\". Use folders in the tree "
-"instead."
-msgstr ""
-"Gonbiteak ez du \"/\" edo \"\\\" eduki behar. Erabili karpetak zuhaitzean."
+msgid "Prompt names must not contain \"/\" or \"\\\". Use folders in the tree instead."
+msgstr "Gonbiteak ez du \"/\" edo \"\\\" eduki behar. Erabili karpetak zuhaitzean."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1413
 #, fuzzy
@@ -5340,18 +5187,20 @@ msgid "The name must be no longer than 64 characters."
 msgstr "Izenak ez du 64 karaktere baino gehiago izan behar."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1422
+#, fuzzy
 msgid "The encoded prompt filename is too long for a portable filesystem."
-msgstr ""
+msgstr "Fitxategi-izena luzeegia da fitxategi-sistema eramangarri baterako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1428
+#, fuzzy
 msgid "This prompt name is reserved by Windows and cannot be used."
-msgstr ""
+msgstr "Izen bizkor hau Windowsek gordetzen du eta ezin da erabili."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1431
 #, fuzzy
 msgid ""
-"Prompt names must start with a letter or number and contain Unicode letters, "
-"combining marks, numbers, hyphens, and underscores only."
+"Prompt names must start with a letter or number and contain Unicode letters,"
+" combining marks, numbers, hyphens, and underscores only."
 msgstr ""
 "Goranzko izenak fitxategi-sistemarekin bateragarriak izan behar dute. "
 "Erabili letra maiuskulak, zenbakiak, marratxoak eta azpimarrak soilik."
@@ -5361,8 +5210,8 @@ msgstr ""
 msgid ""
 "The name of the prompt must be unique within its folder, type, and scope."
 msgstr ""
-"Eskatzailearen izenak esklusiboa izan behar du karpeta, mota eta esparruaren "
-"barruan."
+"Eskatzailearen izenak esklusiboa izan behar du karpeta, mota eta esparruaren"
+" barruan."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_prompt_library.py:1618
 #, fuzzy
@@ -5844,11 +5693,6 @@ msgstr "Aldatutako datu-basearen fitxategi-sarrera:"
 msgid "Bulk Rename of database file name entries"
 msgstr "Datu-basearen fitxategi-izenen sarreren izena aldatu"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:1600
-#, fuzzy
-msgid "Renamed database file entry:"
-msgstr "Datu-basearen fitxategi-sarrera izenez aldatua:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:1656
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2135
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:2184
@@ -6097,13 +5941,6 @@ msgstr "csv edo tsv fitxategiaren zutabe-mugatzailea:"
 msgid "No columns assigned as qualitative."
 msgstr "Ez dago zutabe kualitatiborik."
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2716
-#, fuzzy
-msgid ""
-"\n"
-"No columns assigned as qualitative."
-msgstr "Ez dago zutabe kualitatiborik."
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2736
 #, fuzzy
 msgid "Survey"
@@ -6287,12 +6124,6 @@ msgstr "PDF testurik gabe"
 msgid "Cannot import"
 msgstr "Ezin da inportatu"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3369
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:340
-#, fuzzy
-msgid "Cannot import "
-msgstr "Ezin da inportatu"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3420
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:1013
 #, fuzzy
@@ -6367,8 +6198,8 @@ msgstr "Fitxategiak esportatuta"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3637
 #, fuzzy
 msgid ""
-"Search index is busy; the deleted file will be removed from the index on the "
-"next update."
+"Search index is busy; the deleted file will be removed from the index on the"
+" next update."
 msgstr ""
 "AAren indizea lanpetuta dago; ezabatutako fitxategia hurrengo eguneratzeko "
 "indizetik kenduko da."
@@ -6407,16 +6238,6 @@ msgstr "Ezabatutako fitxategia:"
 #, fuzzy
 msgid "Deleted: "
 msgstr "Ezabatua:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3982
-#, fuzzy
-msgid "Minimum: "
-msgstr "Gutxienekoa:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:3983
-#, fuzzy
-msgid "Maximum: "
-msgstr "Gehienezkoa:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:4004
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:4006
@@ -6564,30 +6385,21 @@ msgstr ""
 #, fuzzy
 msgid ""
 "BACK UP PROJECT before applying changes to the codes tree.\n"
-"The Code organiser is used mainly with grounded theory to help you develop "
-"and organise the coding concepts and their hierarchy.\n"
+"The Code organiser is used mainly with grounded theory to help you develop and organise the coding concepts and their hierarchy.\n"
 "Select a code branch or All, then right click to:\n"
-"Add categories, rename codes and categories, update memos, merge codes, "
-"merge categories, delete codes, delete categories.\n"
-"Rubber-band or Ctrl+click several nodes, then right click any of them for "
-"group actions (delete, or link them under a code/category).\n"
-"Pan the canvas by dragging with the middle mouse button, or hold the "
-"spacebar and drag with the left button.\n"
+"Add categories, rename codes and categories, update memos, merge codes, merge categories, delete codes, delete categories.\n"
+"Rubber-band or Ctrl+click several nodes, then right click any of them for group actions (delete, or link them under a code/category).\n"
+"Pan the canvas by dragging with the middle mouse button, or hold the spacebar and drag with the left button.\n"
 "\n"
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
 "Itzuli PROIEKTUA kodeen zuhaitzari aldaketak aplikatu aurretik.\n"
-"Kode-antolatzailea oinarri-teoriarekin erabiltzen da batez ere kode-"
-"kontzeptuak eta haien hierarkia garatzen eta antolatzen laguntzeko.\n"
+"Kode-antolatzailea oinarri-teoriarekin erabiltzen da batez ere kode-kontzeptuak eta haien hierarkia garatzen eta antolatzen laguntzeko.\n"
 "Hautatu kode-adar bat edo Denak, eta egin klik eskuineko botoiaz:\n"
-"Gehitu kategoriak, aldatu kodeak eta kategoriak, eguneratu zirkularrak, batu "
-"kodeak, bateratu kategoriak, ezabatu kodeak, ezabatu kategoriak.\n"
-"Goma-banda edo Ktrl+k hainbat nodotan klik egin, eta gero egin klik "
-"eskuineko botoiaz talde-ekintzak egiteko (desezabatu edo estekatu kode/"
-"kategoria baten azpian).\n"
-"Sartu oihala saguaren erdiko botoiarekin arrastatuz, edo eutsi zuriune-"
-"barrari eta arrastatu ezkerreko botoia.\n"
+"Gehitu kategoriak, aldatu kodeak eta kategoriak, eguneratu zirkularrak, batu kodeak, bateratu kategoriak, ezabatu kodeak, ezabatu kategoriak.\n"
+"Goma-banda edo Ktrl+k hainbat nodotan klik egin, eta gero egin klik eskuineko botoiaz talde-ekintzak egiteko (desezabatu edo estekatu kode/kategoria baten azpian).\n"
+"Sartu oihala saguaren erdiko botoiarekin arrastatuz, edo eutsi zuriune-barrari eta arrastatu ezkerreko botoia.\n"
 "\n"
 "Ustekabeko erroreen potentziala gerta daiteke.\n"
 "Ez dago alternatibarik, BUTTON aplikazioari ekin ondoren."
@@ -6701,8 +6513,8 @@ msgid ""
 "Reuse the existing codes and categories (no duplicates), or import them as "
 "copies with a numeric suffix?"
 msgstr ""
-"Existitzen diren kodeak eta kategoriak berrerabiltzea edo zenbakizko atzizki "
-"batekin kopia gisa inportatzea?"
+"Existitzen diren kodeak eta kategoriak berrerabiltzea edo zenbakizko atzizki"
+" batekin kopia gisa inportatzea?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:999
 #, fuzzy
@@ -6840,20 +6652,10 @@ msgstr "Zirkularra eguneratua:"
 msgid "category "
 msgstr "Kategoria"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1492
-#, fuzzy
-msgid "Code "
-msgstr "A kodea"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1496
 #, fuzzy
 msgid "under "
 msgstr "azpian"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1501
-#, fuzzy
-msgid "Category "
-msgstr "Kategoria:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1509
 #, fuzzy
@@ -6884,11 +6686,6 @@ msgstr "Kodearen izena jadanik erabilita dago:"
 #, fuzzy
 msgid "Code organiser - applied changes:"
 msgstr "Kode-antolatzailea - aldaketa aplikatuak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1701
-#, fuzzy
-msgid "Code organiser "
-msgstr "Kode-antolatzailea"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:1709
 #, fuzzy
@@ -7122,7 +6919,8 @@ msgstr "Kategoriatik batera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2890
 #, fuzzy
-msgid "All codings of this code will also be deleted when changes are applied."
+msgid ""
+"All codings of this code will also be deleted when changes are applied."
 msgstr "Kode honen kodetze guztiak ere ezabatuko dira aldaketak aplikatzean."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_organiser.py:2930
@@ -7150,8 +6948,8 @@ msgstr "Hautatu kode-zuhaitzaren adarra"
 msgid ""
 "Select a branch to organise (a category, a code, or a sub-code), or All:"
 msgstr ""
-"Hautatu adar bat antolatzeko (kategoria bat, kode bat edo azpikode bat), edo "
-"Denak:"
+"Hautatu adar bat antolatzeko (kategoria bat, kode bat edo azpikode bat), edo"
+" Denak:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:221
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5201
@@ -7278,14 +7076,12 @@ msgstr "Esaldiaren kodeketa:"
 #, fuzzy
 msgid ""
 "Sync coding is enabled, but the transcript has no timestamps.\n"
-"Without timestamps the coding cannot be mirrored between the text and the "
-"wave (there is no way to map text positions to media time).\n"
+"Without timestamps the coding cannot be mirrored between the text and the wave (there is no way to map text positions to media time).\n"
 "The coding was saved normally, without its mirror.\n"
 "Add timestamps to the transcript, or untick Sync coding."
 msgstr ""
 "Sink. kodeketa gaituta dago, baina transkripzioak ez du ordutegi-zigilurik.\n"
-"Denbora-zigilurik gabe, kodeketa ezin da testuaren eta uhinaren artean "
-"islatu (ez dago testu-posizioak euskarri-denborara mapatzeko modurik).\n"
+"Denbora-zigilurik gabe, kodeketa ezin da testuaren eta uhinaren artean islatu (ez dago testu-posizioak euskarri-denborara mapatzeko modurik).\n"
 "Kodeketa normalean gorde zen, ispilurik gabe.\n"
 "Gehitu ordu-zigiluak transkripzioari, edo kendu Sync kodeketa."
 
@@ -7294,7 +7090,8 @@ msgstr ""
 #, fuzzy, python-format
 msgid ""
 "Keyframes in this file are about %s seconds apart, so seeking may stall or "
-"repeat frames. Re-encoding it with denser keyframes gives precise navigation."
+"repeat frames. Re-encoding it with denser keyframes gives precise "
+"navigation."
 msgstr ""
 "Fitxategi honetako gako-fotogramak %s segundo ingurukoak dira, beraz, "
 "bilaketak gelditu edo fotogramak errepikatu ditzake. Gako-fotogramen bidez "
@@ -7312,15 +7109,6 @@ msgstr "Hasi segmentua"
 #, fuzzy
 msgid "Clear segment"
 msgstr "Garbitu segmentua"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2391
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2883
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2899
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:4896
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:5511
-#, fuzzy
-msgid "Segment: "
-msgstr "Segmentua:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2392
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:2900
@@ -7780,14 +7568,6 @@ msgstr "MEMO"
 msgid "CODED MEMO"
 msgstr "MEMO"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:383
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1487
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2612
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:545
-#, fuzzy
-msgid "Coder: "
-msgstr "Kodetzaileak:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/memo.py:396
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1502
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1643
@@ -7962,8 +7742,8 @@ msgstr "REFI-QDA PROJECT EXPERIMENTAL  - Ez TESTUA"
 msgid ""
 "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
 msgstr ""
-"Audio/bideo transkripzioak: transkripzioak eta sinkronizazio-puntuak ez dira "
-"probatu."
+"Audio/bideo transkripzioak: transkripzioak eta sinkronizazio-puntuak ez dira"
+" probatu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:449
 #, fuzzy
@@ -7981,13 +7761,14 @@ msgid ""
 "Boolean variables treated as character (text). Integer variables treated as "
 "floating point. \n"
 msgstr ""
-"Aldagai boolearrak karaktere gisa tratatzen dira (testua). Integer aldagaiak "
-"koma mugikorreko gisa tratatzen dira."
+"Aldagai boolearrak karaktere gisa tratatzen dira (testua). Integer aldagaiak"
+" koma mugikorreko gisa tratatzen dira."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:452
 #, fuzzy
 msgid ""
-"All variables are stored as text. Cast as text or float for SQL operations.\n"
+"All variables are stored as text. Cast as text or float for SQL "
+"operations.\n"
 msgstr ""
 "Aldagai guztiak testu gisa gordetzen dira. Testu gisa edo SQL "
 "eragiketetarako mugikorra."
@@ -8085,7 +7866,8 @@ msgstr "Ezin da TextSource fitxategia kopiatu hemendik:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:1714
 #, fuzzy
 msgid "Duplicated text coding for code and coder. Only one loaded."
-msgstr "Kodetzaile eta kodetzaileentzako testu bikoiztua. Kargatutako bakarra."
+msgstr ""
+"Kodetzaile eta kodetzaileentzako testu bikoiztua. Kargatutako bakarra."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:1715
 #, fuzzy
@@ -8333,21 +8115,27 @@ msgid "Perspective: "
 msgstr "Perspektiba:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:194
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "The external MCP server could not be started at {endpoint}."
-msgstr ""
+msgstr "Kanpoko MCP zerbitzaria ezin izan da {endpoint}-en abiarazi."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:198
+#, fuzzy
 msgid ""
 "The port may already be in use by another QualCoder instance, or server "
 "initialization failed."
 msgstr ""
+"Dagoeneko QualCoder-en beste instantzia batek erabil dezake ataka, edo "
+"zerbitzariaren hasieratzeak huts egin du."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/external_mcp.py:203
+#, fuzzy
 msgid ""
-"MCP access to this QualCoder instance is unavailable. You can continue using "
-"QualCoder. See the log for details."
+"MCP access to this QualCoder instance is unavailable. You can continue using"
+" QualCoder. See the log for details."
 msgstr ""
+"MCP QualCoder instantziarako sarbidea ez dago erabilgarri. QualCoder erabil "
+"dezakezu. Ikusi egunkaria xehetasun gehiagorako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_comparison_table.py:200
 #, fuzzy
@@ -8548,7 +8336,8 @@ msgstr "A/V iraupena: ezezaguna, 1 milisegundotan ezarrita"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:498
 #, fuzzy
 msgid "Statistical comparisons will be incorrect. VLC not installed."
-msgstr "Kalkulu estatistikoak ez dira zuzenak izango. VLC ez dago instalatuta."
+msgstr ""
+"Kalkulu estatistikoak ez dira zuzenak izango. VLC ez dago instalatuta."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:552
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:699
@@ -8653,20 +8442,6 @@ msgstr "Gainjarritako kopurua:"
 msgid "Total: "
 msgstr "Guztira:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:574
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:584
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:832
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:1047
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3620
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3834
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:4968
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5716
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1050
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_models.py:1327
-#, fuzzy
-msgid "msecs"
-msgstr "milisegundoak"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:703
 #, fuzzy
 msgid "Total pixels: "
@@ -8704,12 +8479,6 @@ msgstr "Ebakidurarik ez"
 #, fuzzy
 msgid "Count of intersections: "
 msgstr "Ebakidura kopurua:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:722
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:732
-#, fuzzy
-msgid "pixels"
-msgstr "pixel"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:838
 #, fuzzy
@@ -8792,11 +8561,6 @@ msgstr ""
 "R erlojuaren aurkako noranzkoan biratu\n"
 "Handiagotu eta txikiagotu\n"
 "E Esportatu irudia"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/helpers.py:994
-#, fuzzy
-msgid "Scale:"
-msgstr "Eskala:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/helpers.py:1053
 #, fuzzy
@@ -9164,23 +8928,6 @@ msgstr "Kodetzeak:"
 msgid "Codes: "
 msgstr "Kodeak:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1626
-#, fuzzy
-msgid "Attributes:"
-msgstr "Atributuak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1645
-#, fuzzy
-msgid ""
-"\n"
-"Files:\n"
-msgstr "Fitxategiak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1650
-#, fuzzy
-msgid " Files: "
-msgstr "Fitxategiak:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:1652
 #, fuzzy
 msgid ""
@@ -9192,13 +8939,6 @@ msgstr "Kasuak:"
 #, fuzzy
 msgid "Text code statistics:"
 msgstr "Testu-kodeen estatistikak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2086
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2168
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2243
-#, fuzzy
-msgid "Count:"
-msgstr "Zenbat:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2087
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2169
@@ -9228,12 +8968,6 @@ msgstr ""
 #, fuzzy
 msgid "Code count totals"
 msgstr "Nodoak motaren arabera zenbatzen ditu"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2400
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3315
-#, fuzzy
-msgid "MEMO:"
-msgstr "Oharra:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:2413
 #, fuzzy
@@ -9356,16 +9090,6 @@ msgstr "Ezabatu kodetutako atala"
 #, fuzzy
 msgid "Delete coded section"
 msgstr "Ezabatu kodetutako atala"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3064
-#, fuzzy
-msgid "FILE MEMO:"
-msgstr "FITXATEGIA MEMO:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3072
-#, fuzzy
-msgid "CASE MEMO:"
-msgstr "Kasu memoa:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:3442
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1274
@@ -9565,13 +9289,11 @@ msgstr "Hautatu antolaketa modeloa"
 msgid ""
 "Are you sure you want to generate an analytical model?\n"
 "\n"
-"This action will clear the current graph view and all unsaved nodes will be "
-"lost."
+"This action will clear the current graph view and all unsaved nodes will be lost."
 msgstr ""
 "Ziur zaude eredu analitiko bat sortu nahi duzula?\n"
 "\n"
-"Ekintza honek uneko grafikoaren ikuspegia argituko du eta gorde gabeko nodo "
-"guztiak galduko dira."
+"Ekintza honek uneko grafikoaren ikuspegia argituko du eta gorde gabeko nodo guztiak galduko dira."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:2605
 #, fuzzy
@@ -9731,11 +9453,6 @@ msgstr "Hautatu irudien fitxategiak"
 #, fuzzy
 msgid " width"
 msgstr "zabalera"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3674
-#, fuzzy
-msgid " height:"
-msgstr "altuera:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3682
 #, fuzzy
@@ -10076,11 +9793,6 @@ msgstr "Softwarearen aipua:"
 msgid "Analytical summary exported to:\n"
 msgstr "Hona hemen laburpen analitikoa:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5184
-#, fuzzy
-msgid "The file could not be saved:\n"
-msgstr "Ezin izan da fitxategia gorde:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5213
 #, fuzzy
 msgid "Save Graph"
@@ -10228,12 +9940,14 @@ msgstr "Kargatu grafikoa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5745
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2852
+#, fuzzy
 msgid "The graph has unsaved changes."
-msgstr ""
+msgstr "Grafikoak gorde gabeko aldaketak ditu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5746
+#, fuzzy
 msgid "Load another graph and lose the unsaved changes?"
-msgstr ""
+msgstr "Kargatu beste grafikoa eta galdu gorde gabeko aldaketak?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:5747
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2851
@@ -11165,8 +10879,8 @@ msgid ""
 "Warning! Inaccurate coding positions. Text lengths different for same text "
 "file: "
 msgstr ""
-"Kontuz! Kodeketa-posizio zehaztugabeak. Testu luzerak desberdinak dira testu-"
-"fitxategi berean:"
+"Kontuz! Kodeketa-posizio zehaztugabeak. Testu luzerak desberdinak dira "
+"testu-fitxategi berean:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:851
 #, fuzzy
@@ -11210,13 +10924,15 @@ msgstr "Iturburu-proiektuaren datu-basea eguneratu behar da."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1035
 #, fuzzy
-msgid "Please open the source project using QualCoder. Then close the project."
+msgid ""
+"Please open the source project using QualCoder. Then close the project."
 msgstr "Ireki iturburu-proiektua QualCoder erabiliz. Gero itxi proiektua."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/merge_projects.py:1036
 #, fuzzy
 msgid "This will update the database schema. Then try merging again."
-msgstr "Honek datu-basearen eskema eguneratuko du. Saiatu berriro konbinatzen."
+msgstr ""
+"Honek datu-basearen eskema eguneratuko du. Saiatu berriro konbinatzen."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:182
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:289
@@ -11225,12 +10941,14 @@ msgid "About"
 msgstr "Honi buruz:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:184
+#, fuzzy
 msgid "Optional: Install VLC for audio and video coding."
-msgstr ""
+msgstr "Aukerakoa: Instalatu VLC audio eta bideo kodeketarako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:185
+#, fuzzy
 msgid "Optional: Install ffmpeg for waveform images."
-msgstr ""
+msgstr "Aukerakoa: instalatu ffmpeg uhin-formen irudietarako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:188
 #, fuzzy
@@ -11238,12 +10956,14 @@ msgid "Acknowledgements"
 msgstr "Kodetutako segmenturik ez"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:189
+#, fuzzy
 msgid "Created RQDA - inspiration for QualCoder."
-msgstr ""
+msgstr "RQDA sortu zen, QualCoder-en inspirazioa."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:190
+#, fuzzy
 msgid "Source code for the docx module."
-msgstr ""
+msgstr "Docx moduluaren iturburu-kodea."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:191
 #, fuzzy
@@ -11251,24 +10971,29 @@ msgid "Created the QualCoder logo."
 msgstr "Laguntza bilatzen..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:192
+#, fuzzy
 msgid "Programming, artificial intelligence and much more."
-msgstr ""
+msgstr "Programazioa, adimen artifiziala eta askoz gehiago."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:193
+#, fuzzy
 msgid "French translations, programming, setting up the new website and more."
-msgstr ""
+msgstr "Frantses itzulpenak, programazioa, web berria eta gehiago."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:195
+#, fuzzy
 msgid "Programming and Spanish translations."
-msgstr ""
+msgstr "Programazioa eta gaztelania itzulpena."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:197
+#, fuzzy
 msgid "To the many members on Github for supporting this project."
-msgstr ""
+msgstr "Githubeko kide askori proiektu hau laguntzeagatik."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:275
+#, fuzzy
 msgid "Menu key shortcuts"
-msgstr ""
+msgstr "Menuko lasterbideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:276
 #, fuzzy
@@ -11281,8 +11006,9 @@ msgid "Project menu shortcuts"
 msgstr "Proiektuak inportatzea"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:277
+#, fuzzy
 msgid "Files and Cases menu shortcuts"
-msgstr ""
+msgstr "Fitxategiak eta Cases menuko lasterbideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:278
 #, fuzzy
@@ -11301,8 +11027,9 @@ msgid "Manage files"
 msgstr "Datu-fitxategiak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:281
+#, fuzzy
 msgid "Open Files and Cases menu"
-msgstr ""
+msgstr "Fitxategi eta Cases menua"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:281
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3359
@@ -11331,8 +11058,9 @@ msgid "Manage journals"
 msgstr "Sartu egunkaria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:283
+#, fuzzy
 msgid "Open Reports menu"
-msgstr ""
+msgstr "Ireki txostenaren menua"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:283
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1782
@@ -11356,8 +11084,9 @@ msgid "Manage references"
 msgstr "Txertatu erreferentzia"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:285
+#, fuzzy
 msgid "Exit"
-msgstr ""
+msgstr "Irten"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:287
 #, fuzzy
@@ -11365,12 +11094,14 @@ msgid "Coding menu shortcuts"
 msgstr "Kodetutako segmentuak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:287
+#, fuzzy
 msgid "Reports menu shortcuts"
-msgstr ""
+msgstr "Menuaren lasterbideak jakinarazi"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:287
+#, fuzzy
 msgid "Help menu shortcuts"
-msgstr ""
+msgstr "Laguntza menuko lasterbideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:288
 #, fuzzy
@@ -11383,8 +11114,9 @@ msgid "Code retrieval"
 msgstr "Kode-zuhaitza"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:288
+#, fuzzy
 msgid "Help contents"
-msgstr ""
+msgstr "Laguntzaren edukia"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:289
 #, fuzzy
@@ -11455,8 +11187,9 @@ msgid "Database queries"
 msgstr "Kontsulta lehenetsiak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:299
+#, fuzzy
 msgid "Manage menu key shortcuts"
-msgstr ""
+msgstr "Kudeatu menuko lasterbideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:300
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:778
@@ -11475,8 +11208,9 @@ msgid "Journals"
 msgstr "Egunkaria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:302
+#, fuzzy
 msgid "Help"
-msgstr ""
+msgstr "Laguntza"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:303
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_references.py:247
@@ -11592,12 +11326,14 @@ msgid "Link selected"
 msgstr "Fitxategia hautatuta"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:316
+#, fuzzy
 msgid "Manage files - view A/V shortcuts"
-msgstr ""
+msgstr "Kudeatu fitxategiak - ikusi A/V lasterbideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:317
+#, fuzzy
 msgid "Rewind 30 seconds."
-msgstr ""
+msgstr "Atzera egin 30 segundo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:318
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:444
@@ -11607,12 +11343,14 @@ msgstr "Testuinguruko segmentua"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:319
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:445
+#, fuzzy
 msgid "Forward 30 seconds"
-msgstr ""
+msgstr "Aurrera 30 segundo"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:320
+#, fuzzy
 msgid "Start / pause.On start rewind slightly"
-msgstr ""
+msgstr "Hasi/gelditu. Hasieran pixka bat atzera egiten du"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:321
 #, fuzzy
@@ -11620,30 +11358,36 @@ msgid "Insert timestamp in format"
 msgstr "Txertatu ordu-zigilua hemen"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:322
+#, fuzzy
 msgid "Enter a new speakers name into shortcuts"
-msgstr ""
+msgstr "Sartu lasterbideetan izen berria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:323
+#, fuzzy
 msgid "Delete speaker names from shortcuts"
-msgstr ""
+msgstr "Ezabatu lasterbideen izenak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:324
+#, fuzzy
 msgid "Insert speaker in format[speaker name]"
-msgstr ""
+msgstr "Txertatu hizlaria formatuan[hiztun-izena]"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:325
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:449
+#, fuzzy
 msgid "Increase play rate"
-msgstr ""
+msgstr "Handiagotu erreprodukzio-tasa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:326
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:450
+#, fuzzy
 msgid "Decrease play rate"
-msgstr ""
+msgstr "Txikiagotu erreproduzitzeko tasa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:327
+#, fuzzy
 msgid "When tree item selected - Rename code or category"
-msgstr ""
+msgstr "Zuhaitz-elementua hautatuta dagoenean, aldatu kodea edo kategoria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:333
 #, fuzzy
@@ -11746,9 +11490,11 @@ msgid "Show selected code next"
 msgstr "hautatutako kodea"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:353
+#, fuzzy
 msgid ""
 "Show all codes in text ( if selected code previous or next has been used)"
 msgstr ""
+"Erakutsi kode guztiak testuan (aurreko edo hurrengo kodea erabili bada)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:354
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:388
@@ -11763,25 +11509,30 @@ msgstr "Erakutsi kodeketak garrantzitsu markatuak"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:383
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:412
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:427
+#, fuzzy
 msgid "Help - opens in browser"
-msgstr ""
+msgstr "Laguntza - arakatzailean irekitzen da"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:356
+#, fuzzy
 msgid "Jump to search box"
-msgstr ""
+msgstr "Joan bilaketa-koadrora"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:357
+#, fuzzy
 msgid "The last code that was unmarked, restore that coding"
-msgstr ""
+msgstr "Markatu gabeko azken kodea, leheneratu kode hori"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:358
+#, fuzzy
 msgid "Enter and Exit Edit mode"
-msgstr ""
+msgstr "Sartu eta irten edizio modua"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:359
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:390
+#, fuzzy
 msgid "Annotate - Current text selection"
-msgstr ""
+msgstr "Oharpena - Uneko testuaren hautapena"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:360
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:391
@@ -11793,25 +11544,31 @@ msgstr "Maius kodeketak klik egin ondoren"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:392
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:413
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:431
+#, fuzzy
 msgid ""
 "Create new category. If a category is already selected, the new category "
 "will be underneath"
 msgstr ""
+"Sortu kategoria berria. Kategoria bat hautatuta badago, kategoria berria "
+"behean egongo da"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:363
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:393
+#, fuzzy
 msgid "Hide / Unhide top groupbox"
-msgstr ""
+msgstr "Ezkutatu goiko talde-kutxa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:364
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:394
+#, fuzzy
 msgid "Tag coded text at clicked position as important"
-msgstr ""
+msgstr "Etiketa testu kodetua klik egindako posizioan garrantzitsu gisa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:365
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:434
+#, fuzzy
 msgid "Show codes like (when text coding area is in focus)"
-msgstr ""
+msgstr "Erakutsi kodeak (testu-kodeketaren area fokupean dagoenean)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:366
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:396
@@ -11826,34 +11583,42 @@ msgid "New code - for selected text"
 msgstr "Ez da kodetzailerik hautatu"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:368
+#, fuzzy
 msgid "Shortcut to cycle through overlapping codes - at clicked position"
-msgstr ""
+msgstr "Gainjarritako kodeen zikloaren lasterbidea - klik egitean"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:369
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:397
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:437
+#, fuzzy
 msgid "Quick Mark with code - for current selection"
-msgstr ""
+msgstr "Marka azkarra kodearekin - uneko hautapenerako"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:370
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:438
+#, fuzzy
 msgid "Search text - may include current selection"
-msgstr ""
+msgstr "Bilaketa-testua - uneko hautapena sar daiteke"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:371
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:398
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:439
+#, fuzzy
 msgid "Opens a context menu for recently used codes for marking text"
 msgstr ""
+"Testuinguruko menua irekitzen du duela gutxi erabilitako kodeentzat testua "
+"markatzeko"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:372
+#, fuzzy
 msgid "Reverse text direction: Left to Right | Right to Left"
-msgstr ""
+msgstr "Alderantzizko testuaren norabidea: Ezkerretik eskuinera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:373
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:399
+#, fuzzy
 msgid "Unmark At clicked position in the text"
-msgstr ""
+msgstr "Desmarkatu Testuan klik egindako posizioan"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:374
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:400
@@ -11862,31 +11627,39 @@ msgid "assign in vivo code to selected text"
 msgstr "Aldatu kodea hautatutako kodeari"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:375
+#, fuzzy
 msgid "Alt Left arrow.Shrink coding to the left"
-msgstr ""
+msgstr "Alt Ezker-gezia. Uzkurtu ezkerrerako kodeketa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:376
+#, fuzzy
 msgid "Alt Right arrow.Shrink coding to the right"
-msgstr ""
+msgstr "Alt Eskuin-gezia. Txikitu kodeketa eskuinera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:377
+#, fuzzy
 msgid "Shift Left arrow.Extend coding to the left"
-msgstr ""
+msgstr "Desplazatu ezkerrera gezia. Ezkerrerago kodetzen"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:378
+#, fuzzy
 msgid "Shift Right arrow.Extend coding to the right"
-msgstr ""
+msgstr "Sakatu eskuinera. Luzatu kodetzea eskuinera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:379
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:404
+#, fuzzy
 msgid "Describes clicked text character position"
-msgstr ""
+msgstr "Testu-karakterearen posizioa deskribatzen du"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:380
+#, fuzzy
 msgid ""
 "Shift all coding positions after a clicked position by X characters "
 "(negative numbers shift left)"
 msgstr ""
+"Desplazatu kodetze-posizio guztiak X karaktereen bidez klik egindako "
+"posizioaren ondoren (zenbaki negatiboak ezkerrera mugitzen dira)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:382
 #, fuzzy
@@ -11895,13 +11668,17 @@ msgstr "Kodeketa karaktereen arabera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:395
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:414
+#, fuzzy
 msgid "Show codes like (when coding area is in focus)"
-msgstr ""
+msgstr "Erakutsi kodeak (kodetze-area fokuan dagoenean)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:401
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:415
+#, fuzzy
 msgid "The last code is unmarked, undo and restore that coding"
 msgstr ""
+"Azken kodea markatu gabe dago, desegin eta kodetze hori berrezarri egiten "
+"da."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:402
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:417
@@ -11923,13 +11700,17 @@ msgid "Code image key shortcuts"
 msgstr "Irudi-segmentu kodetuak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:416
+#, fuzzy
 msgid ""
-"Create a grayed-out image with coloured coded highlights (Wait a few seconds)"
+"Create a grayed-out image with coloured coded highlights (Wait a few "
+"seconds)"
 msgstr ""
+"Sortu irudi gris bat koloredun nabarmenduekin (Itxaron segundo batzuk)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:419
+#, fuzzy
 msgid "Right - click on image for menu to rotate image"
-msgstr ""
+msgstr "Eskuina - egin klik irudian menuan irudia biratzeko"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:421
 #, fuzzy
@@ -11937,8 +11718,9 @@ msgid "Code audio/video key shortcuts"
 msgstr "Kodea audio/bideo segmentuen arabera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:428
+#, fuzzy
 msgid "Annotate - for current selection"
-msgstr ""
+msgstr "Annotate - uneko hautapenerako"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:429
 #, fuzzy
@@ -11946,12 +11728,16 @@ msgid "Set Bookmark in text for this audio/video file"
 msgstr "Hautatu audio/bideo fitxategiak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:430
+#, fuzzy
 msgid "Open file and move to bookmarked text position"
-msgstr ""
+msgstr "Ireki fitxategia eta mugitu laster-markako testuaren posiziora"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:432
+#, fuzzy
 msgid "Assign segment to currently selected code, and open memo for segment."
 msgstr ""
+"Esleitu segmentua unean hautatutako kodeari eta ireki zirkularra "
+"segmenturako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:433
 #, fuzzy
@@ -11969,12 +11755,15 @@ msgid "Shows cursor position in text area"
 msgstr "Erakutsi testua duten fitxategiak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:441
+#, fuzzy
 msgid "Go forward 5 seconds."
-msgstr ""
+msgstr "Aurrera 5 segundo."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:442
+#, fuzzy
 msgid "Restore last unmarked code(s) - text code(s) or segment code"
 msgstr ""
+"Markatu gabeko azken kodea berreskuratu - testu-kodea(k) edo segmentu-kodea"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:443
 #, fuzzy
@@ -11983,16 +11772,19 @@ msgstr "Testuinguruko segmentua"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:446
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:447
+#, fuzzy
 msgid "Play / pause.On start rewind slightly"
-msgstr ""
+msgstr "Jolastu/gelditu. Hasieran pixka bat atzera egiten du"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:448
+#, fuzzy
 msgid "Start and stop av segment creation"
-msgstr ""
+msgstr "Hasi eta gelditu av segmentuaren sorrera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:452
+#, fuzzy
 msgid "Database Queries key shortcuts"
-msgstr ""
+msgstr "Datu-basearen lasterbideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:453
 #, fuzzy
@@ -12000,70 +11792,51 @@ msgid "Run SQL query"
 msgstr "Gorde kontsulta"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:462
+#, fuzzy
 msgid ""
 "# Project\n"
 "\n"
-"The Project tab is the starting point for your work. Create or open a "
-"project with the cards on the left,\n"
-"and go back to your latest work from the Recent activity list. Everything "
-"else is in the [Project menu](qualcoder://menu/project).\n"
-"The action log, shown in place of this guide, records what you do during a "
-"session.\n"
+"The Project tab is the starting point for your work. Create or open a project with the cards on the left,\n"
+"and go back to your latest work from the Recent activity list. Everything else is in the [Project menu](qualcoder://menu/project).\n"
+"The action log, shown in place of this guide, records what you do during a session.\n"
 "\n"
 "\n"
 "## First steps\n"
 "\n"
-"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such "
-"as documents, PDFs, images, audio and video.\n"
-"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/"
-"manage_cases) and describe them with [attributes](qualcoder://menu/"
-"files_and_cases/manage_attributes).\n"
-"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://"
-"menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or "
-"[audio and video](qualcoder://menu/coding/code_audio_video).\n"
-"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/"
-"manage_journals) and the [project memo](qualcoder://menu/project/"
-"project_memo).\n"
-"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the "
-"[AI Agent](qualcoder://menu/ai).\n"
+"1. [Import your files](qualcoder://menu/files_and_cases/manage_files), such as documents, PDFs, images, audio and video.\n"
+"2. Group participants or sites as [cases](qualcoder://menu/files_and_cases/manage_cases) and describe them with [attributes](qualcoder://menu/files_and_cases/manage_attributes).\n"
+"3. Start [coding text](qualcoder://menu/coding/codes), [PDFs](qualcoder://menu/coding/code_pdf), [images](qualcoder://menu/coding/code_image) or [audio and video](qualcoder://menu/coding/code_audio_video).\n"
+"4. Write your reflections in [journals](qualcoder://menu/files_and_cases/manage_journals) and the [project memo](qualcoder://menu/project/project_memo).\n"
+"5. Explore patterns in the [reports](qualcoder://menu/reports) or ask the [AI Agent](qualcoder://menu/ai).\n"
 "\n"
 "\n"
 "## About projects\n"
 "\n"
-"- A QualCoder project is a folder ending in .qda. It contains the project "
-"database and folders for imported documents, images, audio and video.\n"
-"- A dated backup of the project can be made each time it is opened. See the "
-"backup options in [Settings](qualcoder://menu/project/settings).\n"
-"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-"
-"Project/)\n"
+"- A QualCoder project is a folder ending in .qda. It contains the project database and folders for imported documents, images, audio and video.\n"
+"- A dated backup of the project can be made each time it is opened. See the backup options in [Settings](qualcoder://menu/project/settings).\n"
+"- [Help: Creating a new project](qualcoder://help/3.1.-Creating-a-New-Project/)\n"
 "\n"
 "\n"
 "## [Project Memo](qualcoder://menu/project/project_memo)\n"
 "\n"
-"- Describe the research topic, questions, methodology, and the participants "
-"and data collected.\n"
+"- Describe the research topic, questions, methodology, and the participants and data collected.\n"
 "- The AI agent reads this memo to understand the context of your project.\n"
 "\n"
 "\n"
 "## [Settings](qualcoder://menu/project/settings)\n"
 "\n"
-"- Set your coder name, fonts, language, colour style, backups, and the AI "
-"integration. Settings and Help are also next to the main tabs.\n"
+"- Set your coder name, fonts, language, colour style, backups, and the AI integration. Settings and Help are also next to the main tabs.\n"
 "- [Help: Settings](qualcoder://help/2.2.-Settings/)\n"
 "\n"
 "\n"
 "## [Project Summary](qualcoder://menu/project/project_summary)\n"
 "\n"
-"- Writes a detailed overview of the open project to the action log, with "
-"files, cases, codes, categories, attributes, journals, and any bad links to "
-"files.\n"
+"- Writes a detailed overview of the open project to the action log, with files, cases, codes, categories, attributes, journals, and any bad links to files.\n"
 "\n"
 "\n"
-"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/"
-"project/export)\n"
+"## [Import](qualcoder://menu/project/import) and [Export](qualcoder://menu/project/export)\n"
 "\n"
-"- Exchange projects and codebooks with other software through the REFI-QDA "
-"standard.\n"
+"- Exchange projects and codebooks with other software through the REFI-QDA standard.\n"
 "- Import RQDA, Taguette and Sonal projects, or a plain text list of codes.\n"
 "- Export the codebook as an ODT file, with or without memos.\n"
 "- [Help: Imports and exports](qualcoder://help/6.1.-Imports-and-Exports/)\n"
@@ -12071,19 +11844,67 @@ msgid ""
 "\n"
 "## [Close Project](qualcoder://menu/project/close_project)\n"
 "\n"
-"- Closes the open project. Workspaces with unsaved changes are checked "
-"first, and a backup made on opening is removed if nothing changed.\n"
+"- Closes the open project. Workspaces with unsaved changes are checked first, and a backup made on opening is removed if nothing changed.\n"
 msgstr ""
+"# proiektua\n"
+"\n"
+"Proiektuaren fitxa zure lanaren abiapuntua da. Proiektu bat sortu edo ireki ezkerreko kartekin,\n"
+"eta itzuli zure azken lanetara azken jarduera-zerrendatik. Beste guztia [Proiektuaren menua](qualcoder://menu/project) da.\n"
+"Ekintza-erregistroak, gida honen ordez, saio batean egiten duzuna erregistratzen du.\n"
+"\n"
+"\n"
+"Lehen urratsak\n"
+"\n"
+"1. [Inportatu zure fitxategiak] (qualcoder://menu/files and cases/manage files), hala nola dokumentuak, PDFak, irudiak, audioa eta bideoa.\n"
+"2. taldeko parte-hartzaileak edo guneak [cases](qualcoder://menu/files and cases/manage cases) eta deskribatu [attributes](qualcoder://menu/files and cases/manage attributes).\n"
+"3. Hasi [kodeketa testua](qualcoder://menu/coding/codes), [PDFs](qualcoder://menu/coding/code pdf), [irudiak](qualcoder://menu/coding/code image) edo [audio eta bideoa](qualcoder://menu/coding/code audio video).\n"
+"4. Idatzi zure gogoetak (qualcoder://menu/files and cases/manage journals) eta [proiektuaren memo](qualcoder://menu/project/project memo).\n"
+"5. Arakatu ereduak [txostenak](qualcoder://menu/reports) edo galdetu [AI Agent](qualcoder://menu/ai).\n"
+"\n"
+"\n"
+"Proiektuei buruz\n"
+"\n"
+"- QualCoder proiektua.qdan amaitzen den karpeta da. Proiektuaren datu-basea eta inportatutako dokumentu, irudi, audio eta bideoen karpetak dauzka.\n"
+"- Proiektuaren babes-kopia bat egin daiteke irekitzen den bakoitzean. Ikusi babeskopia-aukerak [Settings](qualcoder://menu/project/settings).\n"
+"- [Laguntza: proiektu berri bat sortzen](qualcoder://help/3.1.-Creating-a-New-Project/)\n"
+"\n"
+"\n"
+") [Project Memo](qualcoder://menu/project memo)\n"
+"\n"
+"- Azaldu ikerketa-gaia, galderak, metodologia eta parte-hartzaileak eta bildutako datuak.\n"
+"- AAko agenteak ohar hau irakurtzen du zure proiektuaren testuingurua ulertzeko.\n"
+"\n"
+"\n"
+") [Settings](qualcoder://menu/project/settings)\n"
+"\n"
+"- Ezarri kodetzailearen izena, letra-tipoak, hizkuntza, kolore-estiloa, babeskopiak eta AAren integrazioa. Ezarpenak eta laguntza ere fitxa nagusien ondoan daude.\n"
+"- [Laguntza: Ezarpenak] (qualcoder://help/2.-Settings/)\n"
+"\n"
+"\n"
+") [Proiektuaren laburpena](qualcoder://menu/project/summary)\n"
+"\n"
+"- Proiektu irekiaren ikuspegi zehatza idazten du ekintza-erregistroan, fitxategi, kasu, kode, kategoria, atributu, aldizkari eta fitxategietarako esteka txarrekin.\n"
+"\n"
+"\n"
+") [Inportatu](qualcoder://menu/project/import) eta [Export](qualcoder://menu/project/export)\n"
+"\n"
+"- Proiektu eta kode-liburuak beste software batzuekin trukatzeko, REFI-QDA estandarraren bidez.\n"
+"Inportatu RQDA, Taguette eta Sonal proiektuak, edo kodeen testu soil bat.\n"
+"- Esportatu kode-liburua ODT fitxategi gisa, zirkularrarekin edo gabe.\n"
+"- [Laguntza: inportazioak eta esportazioak](qualcoder://help/6.1.- Imports-and-Exports/)\n"
+"\n"
+"\n"
+") [Itxi proiektua](qualcoder://menu/proiektua/close project)\n"
+"\n"
+"- Irekitako proiektua ixten du. Gorde gabeko aldaketak dituzten laneko areak egiaztatzen dira lehenik, eta irekitzeko babeskopia kentzen da ezer aldatzen ez bada."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:519
 #, fuzzy
 msgid ""
 "# Manage\n"
 "\n"
-"The Manage tab displays workspaces for organising cases, files, attributes, "
-"journals, and references.\n"
-"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among "
-"them.\n"
+"The Manage tab displays workspaces for organising cases, files, attributes, journals, and references.\n"
+"Use the [Manage menu](qualcoder://menu/files_and_cases) to choose among them.\n"
 "\n"
 "\n"
 "## [Manage Files](qualcoder://menu/files_and_cases/manage_files)\n"
@@ -12092,37 +11913,29 @@ msgid ""
 "- You can import plain text and many other document types,\n"
 "including PDFs, images, audio, and video.\n"
 "- You may also import survey data.\n"
-"- Before importing text files, you may want to create pseudonyms to protect "
-"the privacy of people or organisations.\n"
+"- Before importing text files, you may want to create pseudonyms to protect the privacy of people or organisations.\n"
 "- [Help: Import files](qualcoder://help/3.2.-Files/)\n"
 "\n"
 "\n"
 "## [Manage Cases](qualcoder://menu/files_and_cases/manage_cases)\n"
 "\n"
-"- You can use cases to group files together that are related to a topic, "
-"person, organisation, or any other empirical entity in your study. \n"
-"- This can be useful for organising your data and for running reports on "
-"specific groups of files.\n"
+"- You can use cases to group files together that are related to a topic, person, organisation, or any other empirical entity in your study. \n"
+"- This can be useful for organising your data and for running reports on specific groups of files.\n"
 "- [Help: Cases](qualcoder://help/3.3.-Cases/)\n"
 "\n"
 "\n"
 "## [Manage Journals](qualcoder://menu/files_and_cases/manage_journals)\n"
 "\n"
-"- Journals are used to record your thoughts when coding and analysing "
-"data. \n"
-"- The journal window opens separately from the main window so you can move "
-"between them easily.\n"
+"- Journals are used to record your thoughts when coding and analysing data. \n"
+"- The journal window opens separately from the main window so you can move between them easily.\n"
 "- [Help: Journals](qualcoder://help/5.2.-Journals/)\n"
 "\n"
 "\n"
 "## [Manage Attributes](qualcoder://menu/files_and_cases/manage_attributes)\n"
 "\n"
-"- Files, cases, and journals can have attributes (variables) that describe "
-"their characteristics. \n"
-"- They can be used to filter and organise data, and to run reports based on "
-"specific criteria. \n"
-"- Use this menu to create and manage such attributes. They can be attached "
-"to files, cases, and journals directly in the respective workspaces. \n"
+"- Files, cases, and journals can have attributes (variables) that describe their characteristics. \n"
+"- They can be used to filter and organise data, and to run reports based on specific criteria. \n"
+"- Use this menu to create and manage such attributes. They can be attached to files, cases, and journals directly in the respective workspaces. \n"
 "- [Help: Attributes](qualcoder://help/3.4.-Attributes/)\n"
 "\n"
 "\n"
@@ -12134,191 +11947,147 @@ msgid ""
 msgstr ""
 "# Kudeatu\n"
 "\n"
-"Kudeatu fitxak laneko areak erakusten ditu kasu, fitxategi, atributu, "
-"aldizkari eta erreferentziak antolatzeko.\n"
-"Erabili [Kudeatu menua] (qualcoder://menu/files and cases) haien artean "
-"aukeratzeko.\n"
+"Kudeatu fitxak laneko areak erakusten ditu kasu, fitxategi, atributu, aldizkari eta erreferentziak antolatzeko.\n"
+"Erabili [Kudeatu menua] (qualcoder://menu/files and cases) haien artean aukeratzeko.\n"
 "\n"
 "\n"
 ") [Kudeatu-fitxategiak](qualcoder://menu/files and cases/manage files)\n"
 "\n"
-"Menu honek zure proiektuan datu enpirikoak gehitu eta kentzeko aukera ematen "
-"dizu.\n"
+"Menu honek zure proiektuan datu enpirikoak gehitu eta kentzeko aukera ematen dizu.\n"
 "- Testu soila eta beste dokumentu mota asko inporta ditzakezu.\n"
 "PDFak, irudiak, audioa eta bideoa barne.\n"
 "- Inkestaren datuak ere inporta ditzakezu.\n"
-"- Testu-fitxategiak inportatu aurretik, pseudonimoak sortu nahi dituzu "
-"pertsonen edo erakundeen pribatutasuna babesteko.\n"
+"- Testu-fitxategiak inportatu aurretik, pseudonimoak sortu nahi dituzu pertsonen edo erakundeen pribatutasuna babesteko.\n"
 "- [Laguntza: Inportatu fitxategiak](qualcoder://help/3.2.-Fitxategiak/)\n"
 "\n"
 "\n"
 ") [Manage Cases](qualcoder://menu/files and cases/manage cases)\n"
 "\n"
-"- Kasuak erabil ditzakezu gai, pertsona, erakunde edo beste edozein erakunde "
-"enpirikorekin zerikusia duten fitxategiak elkartzeko.\n"
-"- Erabilgarria izan daiteke zure datuak antolatzeko eta fitxategi-talde "
-"zehatzei buruzko txostenak egiteko.\n"
+"- Kasuak erabil ditzakezu gai, pertsona, erakunde edo beste edozein erakunde enpirikorekin zerikusia duten fitxategiak elkartzeko.\n"
+"- Erabilgarria izan daiteke zure datuak antolatzeko eta fitxategi-talde zehatzei buruzko txostenak egiteko.\n"
 "- [Laguntza: Kasuak](qualcoder://help/3.3.-Cases/)\n"
 "\n"
 "\n"
 ") [Manage Journals](qualcoder://menu/files and cases/manage journals)\n"
 "\n"
-"- Egunkariak erabiltzen dira zure pentsamenduak grabatzeko datuak kodetzean "
-"eta aztertzean.\n"
+"- Egunkariak erabiltzen dira zure pentsamenduak grabatzeko datuak kodetzean eta aztertzean.\n"
 "- Egunkari-leihoa leiho nagusitik bereizita irekitzen da, erraz mugitzeko.\n"
 "- [Laguntza: egunkariak](qualcoder://help/5.2.-Journals/)\n"
 "\n"
 "\n"
 ") [Kudeatu atributuak](qualcoder://menu/files and cases/manage attributes)\n"
 "\n"
-"- Fitxategiak, kasuak eta egunkariak beren ezaugarriak azaltzen dituzten "
-"atributuak (aldagarriak) izan ditzakete.\n"
-"- Datuak iragazteko eta antolatzeko erabil daitezke, eta txostenak egiteko "
-"irizpide zehatzen arabera.\n"
-"- Erabili menu hau atributu horiek sortzeko eta kudeatzeko. Fitxategi, kasu "
-"eta aldizkariei zuzenean erantsi ahal izango zaizkie dagozkien laneko "
-"areetan.\n"
+"- Fitxategiak, kasuak eta egunkariak beren ezaugarriak azaltzen dituzten atributuak (aldagarriak) izan ditzakete.\n"
+"- Datuak iragazteko eta antolatzeko erabil daitezke, eta txostenak egiteko irizpide zehatzen arabera.\n"
+"- Erabili menu hau atributu horiek sortzeko eta kudeatzeko. Fitxategi, kasu eta aldizkariei zuzenean erantsi ahal izango zaizkie dagozkien laneko areetan.\n"
 "- [Laguntza: atributuak](qualcoder://help/3.4.-Attributes/)\n"
 "\n"
 "\n"
 ") [Erreferentziak](qualcoder://menu/files and cases/manage references)\n"
 "\n"
-"- Erreferentzia bibliografikoak NBIB eta RIS fitxategietatik inportatu "
-"daitezke.\n"
+"- Erreferentzia bibliografikoak NBIB eta RIS fitxategietatik inportatu daitezke.\n"
 "- Ondoren, erreferentziak proiektuaren fitxategiekin esteka daitezke.\n"
-"- [Laguntza: Inportatu erreferentziak] (qualcoder://help/6.1.- Imports-and-"
-"Exports/)"
+"- [Laguntza: Inportatu erreferentziak] (qualcoder://help/6.1.- Imports-and-Exports/)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:568
 #, fuzzy
 msgid ""
 "# Coding\n"
 "\n"
-"The Coding tab displays workspaces for coding text, PDFs, images, audio, and "
-"video.\n"
-"Use the [Coding menu](qualcoder://menu/coding) to select an option to "
-"begin. \n"
-"Note that you can only open a particular coding workspace if that type of "
-"data is actually present in the current project. \n"
+"The Coding tab displays workspaces for coding text, PDFs, images, audio, and video.\n"
+"Use the [Coding menu](qualcoder://menu/coding) to select an option to begin. \n"
+"Note that you can only open a particular coding workspace if that type of data is actually present in the current project. \n"
 "\n"
 "\n"
 "## [Code Text](qualcoder://menu/coding/codes)\n"
 "\n"
-"- Use this workspace to read textual data closely and assign codes to "
-"selected passages.\n"
-"- You can organise codes in a tree, add memos and annotations, create "
-"bookmarks, and mark especially useful segments as important.\n"
+"- Use this workspace to read textual data closely and assign codes to selected passages.\n"
+"- You can organise codes in a tree, add memos and annotations, create bookmarks, and mark especially useful segments as important.\n"
 "- [Help: Coding text](qualcoder://help/4.1.-Coding-Text/)\n"
 "\n"
 "\n"
 "## [Code Images](qualcoder://menu/coding/code_image)\n"
 "\n"
-"- In this workspace, you can select regions in photographs, diagrams, "
-"screenshots, or other visual material and assign codes to them.\n"
-"- Coded areas are displayed as coloured rectangles linked to your code "
-"system.\n"
+"- In this workspace, you can select regions in photographs, diagrams, screenshots, or other visual material and assign codes to them.\n"
+"- Coded areas are displayed as coloured rectangles linked to your code system.\n"
 "- [Help: Coding images](qualcoder://help/4.4.-Coding-Images/)\n"
 "\n"
 "\n"
 "## [Code Audio and Video](qualcoder://menu/coding/code_audio_video)\n"
 "\n"
-"- Use this workspace to transcribe and/or code time-based media such as "
-"interviews, focus groups, and field recordings.\n"
-"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-"
-"Video/)\n"
+"- Use this workspace to transcribe and/or code time-based media such as interviews, focus groups, and field recordings.\n"
+"- [Help: Coding audio and video](qualcoder://help/4.5.-Coding-Audio-and-Video/)\n"
 "\n"
 "\n"
 "## [Code PDFs](qualcoder://menu/coding/code_pdf)\n"
 "\n"
-"- This workspace allows you to code text directly in PDF documents when you "
-"want to keep the original page layout in view.\n"
-"- This is useful for articles, reports, and other source material where page "
-"position and formatting matter.\n"
+"- This workspace allows you to code text directly in PDF documents when you want to keep the original page layout in view.\n"
+"- This is useful for articles, reports, and other source material where page position and formatting matter.\n"
 "- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
 "\n"
 "\n"
 "## [AI Assisted Coding](qualcoder://menu/coding/ai_assisted_coding)\n"
 "\n"
-"- This loads a variant of the text coding workspace that uses AI to explore "
-"your data and suggest segments for a selected code.\n"
+"- This loads a variant of the text coding workspace that uses AI to explore your data and suggest segments for a selected code.\n"
 "- [Help: AI assisted coding](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
 "\n"
 "\n"
 "## [Code Organiser](qualcoder://menu/coding/code_organiser)\n"
 "\n"
-"- Use this workspace to reorganise your code system using a graphical, mind-"
-"map style interface.\n"
-"- You can move, merge, and rename codes and categories as your analytic "
-"structure becomes clearer.\n"
+"- Use this workspace to reorganise your code system using a graphical, mind-map style interface.\n"
+"- You can move, merge, and rename codes and categories as your analytic structure becomes clearer.\n"
 "- [Help: Code Organiser](qualcoder://help/4.6-Code-Organiser/)\n"
 "\n"
 "\n"
 "## [Colour Scheme](qualcoder://menu/coding/colour_scheme)\n"
 "\n"
-"- This allows you to change the colour scheme of your codes and "
-"categories. \n"
+"- This allows you to change the colour scheme of your codes and categories. \n"
 "- Special schemes for colour-blind users are available. \n"
 msgstr ""
 "♪ Coding\n"
 "\n"
-"Coding fitxak testuak, PDFak, irudiak, audioa eta bideoa kodetzeko laneko "
-"areak bistaratzen ditu.\n"
+"Coding fitxak testuak, PDFak, irudiak, audioa eta bideoa kodetzeko laneko areak bistaratzen ditu.\n"
 "Erabili menu nagusia (qualcoder://menu/coding) hasteko aukera hautatzeko.\n"
-"Kontuan izan kodetze-espazio jakin bat bakarrik ireki dezakezula datu mota "
-"hori uneko proiektuan badago.\n"
+"Kontuan izan kodetze-espazio jakin bat bakarrik ireki dezakezula datu mota hori uneko proiektuan badago.\n"
 "\n"
 "\n"
 ") [Testu kodea](qualcoder://menu/coding/codes)\n"
 "\n"
-"- Erabili laneko area hau testu-datuak arretaz irakurtzeko eta hautatutako "
-"pasarteei kodeak esleitzeko.\n"
-"- Zuhaitz batean kodeak antola ditzakezu, zirkularrak eta oharrak gehitu, "
-"laster-markak sortu eta segmentu oso erabilgarriak markatu.\n"
+"- Erabili laneko area hau testu-datuak arretaz irakurtzeko eta hautatutako pasarteei kodeak esleitzeko.\n"
+"- Zuhaitz batean kodeak antola ditzakezu, zirkularrak eta oharrak gehitu, laster-markak sortu eta segmentu oso erabilgarriak markatu.\n"
 "- [Laguntza: Coding text](qualcoder://help/4.1.-Coding-Text/)\n"
 "\n"
 "\n"
 ") [Kode-irudiak](qualcoder://menu/coding/code image)\n"
 "\n"
-"Laneko area honetan, eskualdeak hauta ditzakezu argazkietan, diagrametan, "
-"pantaila-argazkian edo beste material bisual batean, eta kodeak esleitu.\n"
-"-Kodeatutako eremuak zure kode-sistemari lotutako laukizuzen koloreztatu "
-"gisa bistaratzen dira.\n"
+"Laneko area honetan, eskualdeak hauta ditzakezu argazkietan, diagrametan, pantaila-argazkian edo beste material bisual batean, eta kodeak esleitu.\n"
+"-Kodeatutako eremuak zure kode-sistemari lotutako laukizuzen koloreztatu gisa bistaratzen dira.\n"
 "- [Laguntza: Coding images](qualcoder://help/4.4.-Coding-Images/)\n"
 "\n"
 "\n"
 ") [Audioa eta bideoa](qualcoder://menu/coding/code audio video)\n"
 "\n"
-"- Erabili laneko area hau denbora-mugan oinarritutako multimediak "
-"transkribatzeko eta/edo kodetzeko, hala nola elkarrizketak, foku-taldeak eta "
-"eremu-grabazioak.\n"
-"- [Laguntza: audioa eta bideoa](qualcoder://help/4.5.-Coding-Audio-and-"
-"Video/)\n"
+"- Erabili laneko area hau denbora-mugan oinarritutako multimediak transkribatzeko eta/edo kodetzeko, hala nola elkarrizketak, foku-taldeak eta eremu-grabazioak.\n"
+"- [Laguntza: audioa eta bideoa](qualcoder://help/4.5.-Coding-Audio-and-Video/)\n"
 "\n"
 "\n"
 ") [PDF kodea](qualcoder://menu/coding/code pdf)\n"
 "\n"
-"- Laneko area honek testua zuzenean PDF dokumentuetan kodetzeko aukera "
-"ematen dizu jatorrizko orrialdearen diseinua ikusteko.\n"
-"- Artikulu, txosten eta iturburuko beste materialetarako erabilgarria da, "
-"non orrialdearen posizioa eta formatua ematen duen.\n"
+"- Laneko area honek testua zuzenean PDF dokumentuetan kodetzeko aukera ematen dizu jatorrizko orrialdearen diseinua ikusteko.\n"
+"- Artikulu, txosten eta iturburuko beste materialetarako erabilgarria da, non orrialdearen posizioa eta formatua ematen duen.\n"
 "- [Help: Coding PDFs](qualcoder://help/4.3.-Coding-Text-on-PDFs/)\n"
 "\n"
 "\n"
 ") [AI Assisted Coding](qualcoder://menu/coding/ai assisted coding)\n"
 "\n"
-"- Testu-kodeketako laneko arearen aldaera bat kargatzen du, AA erabiltzen "
-"duena zure datuak aztertzeko eta hautatutako kode baterako segmentuak "
-"proposatzeko.\n"
-"- [Laguntza: AAk lagundutako kodeketa](qualcoder://help/4.2.-AI-Assisted-"
-"Coding/)\n"
+"- Testu-kodeketako laneko arearen aldaera bat kargatzen du, AA erabiltzen duena zure datuak aztertzeko eta hautatutako kode baterako segmentuak proposatzeko.\n"
+"- [Laguntza: AAk lagundutako kodeketa](qualcoder://help/4.2.-AI-Assisted-Coding/)\n"
 "\n"
 "\n"
 ") [Kode Antolatzailea](qualcoder://menu/coding/code organiser)\n"
 "\n"
-"- Erabili laneko area hau zure kode-sistema berrantolatzeko, estilo "
-"grafikoko interfazea erabiliz.\n"
-"-Kodeak eta kategoriak mugi, batu eta alda ditzakezu, zure egitura "
-"analitikoa argiagotu ahala.\n"
+"- Erabili laneko area hau zure kode-sistema berrantolatzeko, estilo grafikoko interfazea erabiliz.\n"
+"-Kodeak eta kategoriak mugi, batu eta alda ditzakezu, zure egitura analitikoa argiagotu ahala.\n"
 "- [Laguntza: Kode Antolatzailea](qualcoder://help/4.6-Code-Organiser/)\n"
 "\n"
 "\n"
@@ -12332,14 +12101,12 @@ msgstr ""
 msgid ""
 "# Reports tab\n"
 "\n"
-"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) "
-"and [Reports](qualcoder://menu/reports) menus.\n"
+"This tab displays tools from both the [Analysis](qualcoder://menu/analysis) and [Reports](qualcoder://menu/reports) menus.\n"
 "\n"
 "\n"
 "## [Analysis](qualcoder://menu/analysis)\n"
 "\n"
-"Use these tools when you want to explore coded segments and relationships in "
-"detail.\n"
+"Use these tools when you want to explore coded segments and relationships in detail.\n"
 "\n"
 "[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
 "\n"
@@ -12348,262 +12115,182 @@ msgid ""
 "\n"
 "These tools help you inspect the actual coded material in your project.\n"
 "\n"
-"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible "
-"analysis tool. It gathers all segments for selected codes or categories and "
-"lets you narrow the results by file, case, attributes, or search text.\n"
-"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) "
-"generates a table with text segments and all associated codes.\n"
+"- [Code retrieval](qualcoder://menu/analysis/coding_reports) is a flexible analysis tool. It gathers all segments for selected codes or categories and lets you narrow the results by file, case, attributes, or search text.\n"
+"- [Codes by text segments](qualcoder://menu/analysis/text_segments_by_codes) generates a table with text segments and all associated codes.\n"
 "\n"
 "\n"
 "### Code relationships and overlaps\n"
 "\n"
-"Use these tools to examine how codes relate to one another. They only work "
-"with text files.\n"
+"Use these tools to examine how codes relate to one another. They only work with text files.\n"
 "\n"
-"- [Code relations](qualcoder://menu/analysis/code_relations) shows "
-"proximity, overlap, inclusion, and exact matches between selected codes.\n"
-"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses "
-"on where two codes overlap or directly touch.\n"
-"- [Code text exact matches](qualcoder://menu/analysis/"
-"code_text_exact_matches) lists passages where different codes were applied "
-"to exactly the same text.\n"
-"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map "
-"style view of linked project elements like codes, cases, files, etc. [Help: "
-"Graph](qualcoder://help/5.4.-Graph/)\n"
+"- [Code relations](qualcoder://menu/analysis/code_relations) shows proximity, overlap, inclusion, and exact matches between selected codes.\n"
+"- [Code co-occurrence](qualcoder://menu/analysis/code_co_occurrence) focuses on where two codes overlap or directly touch.\n"
+"- [Code text exact matches](qualcoder://menu/analysis/code_text_exact_matches) lists passages where different codes were applied to exactly the same text.\n"
+"- [Graph](qualcoder://menu/analysis/view_graph) provides a visual, mind-map style view of linked project elements like codes, cases, files, etc. [Help: Graph](qualcoder://help/5.4.-Graph/)\n"
 "\n"
 "\n"
 "## [Reports](qualcoder://menu/reports)\n"
 "\n"
-"Use these tools when you want summaries, comparisons, counts, charts, or "
-"exports for reporting purposes.\n"
+"Use these tools when you want summaries, comparisons, counts, charts, or exports for reporting purposes.\n"
 "\n"
 "[Help: Analysis and Reports menu options](qualcoder://help/5.3.-Reports/)\n"
 "\n"
 "\n"
 "### Inter-Coder Comparisons\n"
 "\n"
-"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and "
-"[Coding comparison by file](qualcoder://menu/reports/"
-"coding_comparison_by_file) are especially useful for collaborative work and "
-"inter-coder checking.\n"
+"- [Coding comparison](qualcoder://menu/reports/coding_comparison) and [Coding comparison by file](qualcoder://menu/reports/coding_comparison_by_file) are especially useful for collaborative work and inter-coder checking.\n"
 "\n"
 "\n"
 "### Summaries, frequencies, and charts\n"
 "\n"
-"These reports summarise patterns across the project rather than showing "
-"every coded segment in detail.\n"
+"These reports summarise patterns across the project rather than showing every coded segment in detail.\n"
 "\n"
-"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how "
-"often codes and categories have been used.\n"
-"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) "
-"gives a compact overview of where selected codes appear most often.\n"
-"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary]"
-"(qualcoder://menu/reports/code_summary) give focused overviews of one file "
-"or one code at a time.\n"
-"- [Charts](qualcoder://menu/reports/charts) visualises distributions and "
-"comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
+"- [Code frequencies](qualcoder://menu/reports/code_frequencies) counts how often codes and categories have been used.\n"
+"- [Code counts by file/case](qualcoder://menu/reports/code_comparison_table) gives a compact overview of where selected codes appear most often.\n"
+"- [File summary](qualcoder://menu/reports/file_summary) and [Code summary](qualcoder://menu/reports/code_summary) give focused overviews of one file or one code at a time.\n"
+"- [Charts](qualcoder://menu/reports/charts) visualises distributions and comparisons with diagrams such as bar charts, treemaps, and heatmaps.\n"
 "\n"
 "\n"
 "### Advanced reporting\n"
 "\n"
-"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct "
-"access to the project database for custom analyses. This is most useful when "
-"the standard reports do not answer a specific research question in the exact "
-"form you need.\n"
+"- [Database queries](qualcoder://menu/reports/sql_statements) gives direct access to the project database for custom analyses. This is most useful when the standard reports do not answer a specific research question in the exact form you need.\n"
 msgstr ""
 "# Txostenak fitxa\n"
 "\n"
-"Fitxa honek tresnak erakusten ditu bi menuetatik:qualcoder://menu/analysis) "
-"eta [Reports] (qualcoder://menu/reports).\n"
+"Fitxa honek tresnak erakusten ditu bi menuetatik:qualcoder://menu/analysis) eta [Reports] (qualcoder://menu/reports).\n"
 "\n"
 "\n"
 ") [Analysis](qualcoder://menu/analysis)\n"
 "\n"
-"Erabili tresna hauek kodetutako segmentuak eta harremanak xehetasunez "
-"aztertu nahi dituzunean.\n"
+"Erabili tresna hauek kodetutako segmentuak eta harremanak xehetasunez aztertu nahi dituzunean.\n"
 "\n"
-"[Laguntza: analisi eta txostenen menu-aukerak](qualcoder://help/5.3.-"
-"Reports/)\n"
+"[Laguntza: analisi eta txostenen menu-aukerak](qualcoder://help/5.3.-Reports/)\n"
 "\n"
 "\n"
 "- Berreskuratzea eta segmentuan oinarritutako analisia\n"
 "\n"
-"Tresna hauek zure proiektuan kodetutako materiala ikuskatzen laguntzen "
-"dizute.\n"
+"Tresna hauek zure proiektuan kodetutako materiala ikuskatzen laguntzen dizute.\n"
 "\n"
-"-(qualcoder://menu/analysis/coding reports) analisi-tresna malgua da. "
-"Hautatutako kode edo kategorien segmentu guztiak biltzen ditu, eta emaitzak "
-"fitxategi, kasu, atributu edo bilaketa-testuaren bidez murrizten uzten "
-"dizu.\n"
-"- [Testu-segmentuen arabera kodea] (qualcoder://menu/analysis/text segments "
-"by codes) taula bat sortzen du testu-segmentuekin eta lotutako kode "
-"guztiekin.\n"
+"-(qualcoder://menu/analysis/coding reports) analisi-tresna malgua da. Hautatutako kode edo kategorien segmentu guztiak biltzen ditu, eta emaitzak fitxategi, kasu, atributu edo bilaketa-testuaren bidez murrizten uzten dizu.\n"
+"- [Testu-segmentuen arabera kodea] (qualcoder://menu/analysis/text segments by codes) taula bat sortzen du testu-segmentuekin eta lotutako kode guztiekin.\n"
 "\n"
 "\n"
 "Kode-harremanak eta gainjarriak\n"
 "\n"
-"Erabili tresna hauek kodeak elkarren artean nola erlazionatzen diren "
-"aztertzeko. Testu-fitxategiekin bakarrik egiten dute lan.\n"
+"Erabili tresna hauek kodeak elkarren artean nola erlazionatzen diren aztertzeko. Testu-fitxategiekin bakarrik egiten dute lan.\n"
 "\n"
-"- [Kode-erlazioak] (qualcoder://menu/analysis/code relations) Hurbiltasuna, "
-"gainjartzea, inklusioa eta bat datozen zehatzak erakusten ditu hautatutako "
-"kodeen artean.\n"
-"- [Kode co-occurrence](qualcoder://menu/analysis/code co occurrence) bi kode "
-"gainjartzen edo zuzenean ukitzen diren lekuan zentratzen da.\n"
-"- [Kodearen testu zehatza bat dator] (qualcoder://menu/analysis/code text "
-"exact matches) pasarteak zerrendatzen ditu, non kode desberdinak testu "
-"berari aplikatzen zaizkion.\n"
-"- [Graph](qualcoder://menu/analysis/view graph) estekatutako proiektu-"
-"elementuen ikuspegi bisuala eskaintzen du, adibidez, kode, kasu, fitxategi "
-"eta abar.\n"
+"- [Kode-erlazioak] (qualcoder://menu/analysis/code relations) Hurbiltasuna, gainjartzea, inklusioa eta bat datozen zehatzak erakusten ditu hautatutako kodeen artean.\n"
+"- [Kode co-occurrence](qualcoder://menu/analysis/code co occurrence) bi kode gainjartzen edo zuzenean ukitzen diren lekuan zentratzen da.\n"
+"- [Kodearen testu zehatza bat dator] (qualcoder://menu/analysis/code text exact matches) pasarteak zerrendatzen ditu, non kode desberdinak testu berari aplikatzen zaizkion.\n"
+"- [Graph](qualcoder://menu/analysis/view graph) estekatutako proiektu-elementuen ikuspegi bisuala eskaintzen du, adibidez, kode, kasu, fitxategi eta abar.\n"
 "\n"
 "\n"
 ") [Txostenak](qualcoder://menu/reports)\n"
 "\n"
-"Erabili tresna hauek laburpenak, konparazioak, zenbaketak, diagramak edo "
-"esportazioak nahi dituzunean berri emateko.\n"
+"Erabili tresna hauek laburpenak, konparazioak, zenbaketak, diagramak edo esportazioak nahi dituzunean berri emateko.\n"
 "\n"
-"[Laguntza: analisi eta txostenen menu-aukerak](qualcoder://help/5.3.-"
-"Reports/)\n"
+"[Laguntza: analisi eta txostenen menu-aukerak](qualcoder://help/5.3.-Reports/)\n"
 "\n"
 "\n"
 "Inter-Coder Comparisons\n"
 "\n"
-"- [Konparazioa](qualcoder://menu/reports/coding comparison) eta [Coding "
-"comparison by file](qualcoder://menu/reports/coding comparison by file) oso "
-"erabilgarriak dira lankidetza-lanetarako eta kode-en arteko "
-"egiaztaketetarako.\n"
+"- [Konparazioa](qualcoder://menu/reports/coding comparison) eta [Coding comparison by file](qualcoder://menu/reports/coding comparison by file) oso erabilgarriak dira lankidetza-lanetarako eta kode-en arteko egiaztaketetarako.\n"
 "\n"
 "\n"
 "Zenbakiak, maiztasunak eta diagramak\n"
 "\n"
-"Txosten hauek proiektuaren zehar ereduak laburtzen dituzte, kodetutako "
-"segmentu guztiak zehatz-mehatz erakutsi ordez.\n"
+"Txosten hauek proiektuaren zehar ereduak laburtzen dituzte, kodetutako segmentu guztiak zehatz-mehatz erakutsi ordez.\n"
 "\n"
-"- [Kode maiztasuna] (qualcoder://menu/reports/code frequencies) zenbat aldiz "
-"erabili diren kodeak eta kategoriak.\n"
-"- [Kodea fitxategi/kaxaren arabera kontatzen da] (qualcoder://menu/reports/"
-"code comparison table), hautatutako kodeak gehienetan agertzen diren "
-"ikuspegi trinkoa ematen du.\n"
-"- [Fitxategiaren laburpena](qualcoder://menu/reports/file summary) eta "
-"[Kodearen laburpena](qualcoder://menu/reports/code summary) fitxategi baten "
-"edo kode baten ikuspegi orokorrak ematen dituzte aldi berean.\n"
-"- [Charts](qualcoder://menu/reports/charts) diagramen banaketak eta "
-"konparazioak erakusten ditu, hala nola barra-diagramak, zuhaitz-mapak eta "
-"bero-mapak.\n"
+"- [Kode maiztasuna] (qualcoder://menu/reports/code frequencies) zenbat aldiz erabili diren kodeak eta kategoriak.\n"
+"- [Kodea fitxategi/kaxaren arabera kontatzen da] (qualcoder://menu/reports/code comparison table), hautatutako kodeak gehienetan agertzen diren ikuspegi trinkoa ematen du.\n"
+"- [Fitxategiaren laburpena](qualcoder://menu/reports/file summary) eta [Kodearen laburpena](qualcoder://menu/reports/code summary) fitxategi baten edo kode baten ikuspegi orokorrak ematen dituzte aldi berean.\n"
+"- [Charts](qualcoder://menu/reports/charts) diagramen banaketak eta konparazioak erakusten ditu, hala nola barra-diagramak, zuhaitz-mapak eta bero-mapak.\n"
 "\n"
 "\n"
 "Informazio aurreratua\n"
 "\n"
-"- [Database kontsultak] (qualcoder://menu/reports/sql statements) "
-"proiektuaren datu-basera sarbide zuzena ematen du analisi pertsonalizatuak "
-"egiteko. Hau oso erabilgarria da txosten estandarrek ez badute erantzuten "
-"ikerketa-gai zehatz bati behar duzun moduan."
+"- [Database kontsultak] (qualcoder://menu/reports/sql statements) proiektuaren datu-basera sarbide zuzena ematen du analisi pertsonalizatuak egiteko. Hau oso erabilgarria da txosten estandarrek ez badute erantzuten ikerketa-gai zehatz bati behar duzun moduan."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:686
 #, fuzzy
 msgid ""
 "# AI Agent\n"
 "\n"
-"Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-"
-"based-analysis/) to\n"
-"explore your empirical text data, get suggestions for coding, obtain "
-"feedback on your codes or memos,\n"
-"and generate summaries and reports. To begin, use the [\"New\" button]"
-"(qualcoder://ai_agent_tab/new) at \n"
+"Here, you can interact with the [AI Agent](qualcoder://help/5.1.-AI-chat-based-analysis/) to\n"
+"explore your empirical text data, get suggestions for coding, obtain feedback on your codes or memos,\n"
+"and generate summaries and reports. To begin, use the [\"New\" button](qualcoder://ai_agent_tab/new) at \n"
 "the bottom left and choose one of the options described below.\n"
 "\n"
 "{{AI_WARNING_BLOCK}}\n"
 "\n"
 "## [Chat with the AI Agent](qualcoder://ai_agent_tab/new/new_general_chat)\n"
 "\n"
-"- This is the default starting point for an open-ended analysis or any other "
-"task.\n"
+"- This is the default starting point for an open-ended analysis or any other task.\n"
 "- You can also ask for help using QualCoder.\n"
 "\n"
 "\n"
-"## [AI Topic Exploration](qualcoder://ai_agent_tab/new/"
-"new_topic_exploration)\n"
+"## [AI Topic Exploration](qualcoder://ai_agent_tab/new/new_topic_exploration)\n"
 "\n"
-"- Search and explore a topic or question across the whole corpus of project "
-"data.\n"
-"- This option opens a dialog where you define the topic and select which "
-"data to include in the analysis.\n"
+"- Search and explore a topic or question across the whole corpus of project data.\n"
+"- This option opens a dialog where you define the topic and select which data to include in the analysis.\n"
 "\n"
 "\n"
 "## [AI Text Analysis](qualcoder://ai_agent_tab/new/new_text_analysis)\n"
 "\n"
 "- Analyse a selected text passage from your empirical material in detail.\n"
-"- This will switch to the text coding workspace and let you select a passage "
-"for analysis.\n"
+"- This will switch to the text coding workspace and let you select a passage for analysis.\n"
 "\n"
 "\n"
 "## [AI Code Analysis](qualcoder://ai_agent_tab/new/new_code_analysis)\n"
 "\n"
-"- Discuss your codings with the AI Agent, compare different codes, generate "
-"subcodes, or create reports.\n"
-"- This will also open a dialog to select the code(s) and data you want to "
-"include in the analysis.\n"
+"- Discuss your codings with the AI Agent, compare different codes, generate subcodes, or create reports.\n"
+"- This will also open a dialog to select the code(s) and data you want to include in the analysis.\n"
 "\n"
 "\n"
 "## Other Options\n"
-"- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the "
-"bottom left lets you choose what \n"
+"- The [AI permissions](qualcoder://ai_agent_tab/permissions) control at the bottom left lets you choose what \n"
 "the AI Agent is allowed to do in your project.\n"
-"- Open the [AI menu](qualcoder://menu/ai) for more options, for example to "
-"edit predefined prompts in the\n"
-"[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted "
-"coding](qualcoder://menu/ai/ai_search_and_coding).\n"
+"- Open the [AI menu](qualcoder://menu/ai) for more options, for example to edit predefined prompts in the\n"
+"[prompt library](qualcoder://menu/ai/ai_prompts), or start [AI assisted coding](qualcoder://menu/ai/ai_search_and_coding).\n"
 msgstr ""
 "# AI agentea\n"
 "\n"
-"Hemen, [AI Agent]-ekin elkarreragin dezakezu (qualcoder://help/5.1.-AI-chat-"
-"analysis/)\n"
-"Aztertu testu enpirikoko datuak, kodetzeko iradokizunak lortu, zure kode edo "
-"zirkularren oharrak lortu,\n"
-"eta laburpenak eta txostenak sortu. Hasteko, erabili [\"Berria\" botoia]"
-"(qualcoder://ai agent tab/new) at\n"
+"Hemen, [AI Agent]-ekin elkarreragin dezakezu (qualcoder://help/5.1.-AI-chat-analysis/)\n"
+"Aztertu testu enpirikoko datuak, kodetzeko iradokizunak lortu, zure kode edo zirkularren oharrak lortu,\n"
+"eta laburpenak eta txostenak sortu. Hasteko, erabili [\"Berria\" botoia](qualcoder://ai agent tab/new) at\n"
 "behean ezkerrean eta behean azaldutako aukeretako bat aukeratu.\n"
 "\n"
 "\n"
 "\n"
 "the [Chat with AI Agent](qualcoder://ai agent tab/new/new general chat)\n"
 "\n"
-"-Abiadura-puntu lehenetsia da azterketa ireki baterako edo beste edozein "
-"zereginetarako.\n"
+"-Abiadura-puntu lehenetsia da azterketa ireki baterako edo beste edozein zereginetarako.\n"
 "- Laguntza eska dezakezu QualCoder erabiliz.\n"
 "\n"
 "\n"
 ") [AI Topic Exploration](qualcoder://ai agent tab/new topic exploration)\n"
 "\n"
-"- Bilatu eta aztertu gai edo galdera bat proiektuaren datuen corpus osoan "
-"zehar.\n"
-"- Aukera honek elkarrizketa-koadro bat irekitzen du gaia definitzeko eta "
-"analisian zein datu sartu behar diren hautatzeko.\n"
+"- Bilatu eta aztertu gai edo galdera bat proiektuaren datuen corpus osoan zehar.\n"
+"- Aukera honek elkarrizketa-koadro bat irekitzen du gaia definitzeko eta analisian zein datu sartu behar diren hautatzeko.\n"
 "\n"
 "\n"
 ") [AI Text Analysis](qualcoder://ai agent tab/new/new text analysis)\n"
 "\n"
 "-Zure material enpirikotik hautatutako testu-pasabide bat aztertu.\n"
-"- Testu-kodeketako laneko areara aldatuko da eta analisirako pasarte bat "
-"hautatuko duzu.\n"
+"- Testu-kodeketako laneko areara aldatuko da eta analisirako pasarte bat hautatuko duzu.\n"
 "\n"
 "\n"
 ") [AI kodearen analisia](qualcoder://ai agent tab/new/new code analysis)\n"
 "\n"
-"-Hitz egin AAko agentearekin kode ezberdinak konparatuz, azpikodeak sortu "
-"edo txostenak sortu.\n"
+"-Hitz egin AAko agentearekin kode ezberdinak konparatuz, azpikodeak sortu edo txostenak sortu.\n"
 "- Elkarrizketa-koadro bat irekiko da, kodea eta datuak aztertzeko.\n"
 "\n"
 "\n"
 "Beste aukera batzuk\n"
-"- [AI baimenak] (qualcoder://ai agent tab/permissions) beheko ezkerreko "
-"kontrolean aukera ematen dizu aukeratzeko zer\n"
+"- [AI baimenak] (qualcoder://ai agent tab/permissions) beheko ezkerreko kontrolean aukera ematen dizu aukeratzeko zer\n"
 "AAko agenteak zure proiektuan egin dezake.\n"
-"- Ireki [AI menua] (qualcoder://menu/ai) aukera gehiago lortzeko, adibidez "
-"aurrez definitutako galderak editatzeko.\n"
-"[liburutegia](qualcoder://menu/ai/ai prompts), edo hasi [AI lagundutako "
-"kodeketa](qualcoder://menu/ai/search and coding)."
+"- Ireki [AI menua] (qualcoder://menu/ai) aukera gehiago lortzeko, adibidez aurrez definitutako galderak editatzeko.\n"
+"[liburutegia](qualcoder://menu/ai/ai prompts), edo hasi [AI lagundutako kodeketa](qualcoder://menu/ai/search and coding)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:728
 #, fuzzy
@@ -12611,8 +12298,7 @@ msgid ""
 "\n"
 "<br />\n"
 "\n"
-"**Note: The AI Agent is currently not available because AI setup has not "
-"been completed yet.**\n"
+"**Note: The AI Agent is currently not available because AI setup has not been completed yet.**\n"
 "\n"
 "- Start the [AI Setup Wizard](qualcoder://action/ai/ai_setup_wizard)\n"
 "\n"
@@ -12621,8 +12307,7 @@ msgid ""
 msgstr ""
 "<br />\n"
 "\n"
-"**Oharra: AAko agentea ez dago erabilgarri, AAren konfigurazioa oraindik "
-"osatu ez delako.**\n"
+"**Oharra: AAko agentea ez dago erabilgarri, AAren konfigurazioa oraindik osatu ez delako.**\n"
 "\n"
 "- Hasi [AI Setup Wizard](qualcoder://action/ai setup wizard)\n"
 "\n"
@@ -12748,7 +12433,8 @@ msgstr "Gonbitaren azalpena:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:1014
 #, fuzzy
 msgid ""
-"Start a new chat with the AI Agent first with the \"New\" button on the left."
+"Start a new chat with the AI Agent first with the \"New\" button on the "
+"left."
 msgstr ""
 "Hasi berriketa berri bat AAko agentearekin, lehenik ezkerreko \"Berria\" "
 "botoiarekin."
@@ -12936,7 +12622,8 @@ msgstr "AA desgaituta dago. Joan \"AI > Setup Wizard\"-ra lehenik."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2570
 #, fuzzy
 msgid ""
-"The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be found."
+"The AI-readiness prompt \"Check-project-AI-readiness.md\" could not be "
+"found."
 msgstr "Ezin izan da barneko AAren euskarria \" help.md\" galdera aurkitu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:2574
@@ -13151,13 +12838,14 @@ msgid ""
 "The selected coded material is too large for a meaningful first-pass code "
 "analysis in one bootstrap step. Only {loaded} of {total} coded segments "
 "({coverage:.1f}%) could be loaded before the character limit was reached. "
-"Please narrow the scope by code, files, cases, attributes, or coders. If you "
-"still want to continue, send a follow-up message such as \"Analyze anyway\"."
+"Please narrow the scope by code, files, cases, attributes, or coders. If you"
+" still want to continue, send a follow-up message such as \"Analyze "
+"anyway\"."
 msgstr ""
 "Hautatutako kodetutako materiala handiegia da bottrap urrats batean lehen "
 "urratseko kode-analisi esanguratsua egiteko. Soilik {loaded} of {total} "
-"coded segments ({coverage:1f}%) karga daiteke karaktere-muga lortu aurretik. "
-"Itxi esparrua kodearen, fitxategien, kasuen, atributuen edo kodetzaileen "
+"coded segments ({coverage:1f}%) karga daiteke karaktere-muga lortu aurretik."
+" Itxi esparrua kodearen, fitxategien, kasuen, atributuen edo kodetzaileen "
 "bidez. Jarraitu nahi baduzu, bidali jarraipen-mezu bat, hala nola "
 "\"Analyze\"."
 
@@ -13170,12 +12858,10 @@ msgstr "Errorea MCPn oinarritutako kode-analisian bottrap:"
 #, fuzzy
 msgid ""
 "We will now switch to the text coding workspace.\n"
-" There you can open a document, select a piece of text, right click on it "
-"and choose \"AI Text Analysis\" from the context menu."
+" There you can open a document, select a piece of text, right click on it and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
 "Testua kodetzeko laneko areara aldatuko gara.\n"
-"Hemen dokumentu bat ireki, testu zati bat hautatu, bertan eskuineko botoiaz "
-"klik egin eta testuinguruko menuan \"AI Text Analysis\" aukera dezakezu."
+"Hemen dokumentu bat ireki, testu zati bat hautatu, bertan eskuineko botoiaz klik egin eta testuinguruko menuan \"AI Text Analysis\" aukera dezakezu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4745
 #, fuzzy
@@ -13190,17 +12876,8 @@ msgstr ""
 #, fuzzy
 msgid "Analyzing the data coded as \"{}\" ({} matching segments in scope.)"
 msgstr ""
-"Datuak \"{}\" gisa kodetuta aztertzea (eta {} bat datozen segmentuak esparru "
-"horretan)."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4751
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4821
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5533
-#, fuzzy
-msgid ""
-"\n"
-"Prompt:"
-msgstr "Gonbitea:"
+"Datuak \"{}\" gisa kodetuta aztertzea (eta {} bat datozen segmentuak esparru"
+" horretan)."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4752
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4822
@@ -13214,8 +12891,8 @@ msgstr "Materiala:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4828
 #, fuzzy
 msgid ""
-"Note that it is highly recommended to use the project memo (Menu \"Project > "
-"Project Memo\") to include a short description of your project's research "
+"Note that it is highly recommended to use the project memo (Menu \"Project >"
+" Project Memo\") to include a short description of your project's research "
 "topics, questions, objectives, and the empirical data collected. This "
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
@@ -13230,13 +12907,6 @@ msgstr ""
 #, fuzzy
 msgid "Exploring the free topic \"{}\" in the data."
 msgstr "Datuetan \"{}\" gai librea aztertzea."
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4819
-#, fuzzy
-msgid ""
-"\n"
-"Description:"
-msgstr "Azalpena:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:4879
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9249
@@ -13302,7 +12972,8 @@ msgstr "Errorea MCPn oinarritutako testu-analisian bota-trapean:"
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
-msgstr "Testua luzeegia da joan batean aztertzeko. Hautatu pasarte laburragoa."
+msgstr ""
+"Testua luzeegia da joan batean aztertzeko. Hautatu pasarte laburragoa."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5521
 #, fuzzy
@@ -13354,13 +13025,9 @@ msgstr "Mota"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5802
-msgid "Summary:"
-msgstr ""
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5798
 #, fuzzy
-msgid "Prompt:"
-msgstr "Gonbitea:"
+msgid "Summary:"
+msgstr "Laburpena:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:5866
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:263
@@ -13469,19 +13136,23 @@ msgid "Internal step"
 msgstr "Barneko urratsa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7712
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "{step} has reached QualCoder's time limit. Do you want to stop the "
 "reflection and generate a provisional answer from the results collected so "
 "far?"
 msgstr ""
+"{step} QualCoderren denbora-mugara iritsi da. Erreflexua gelditu eta orain "
+"arte bildutako emaitzen behin-behineko erantzuna sortu nahi duzu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7716
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "{step} has reached QualCoder's time limit. Do you want to abort the AI "
 "process?"
 msgstr ""
+"{step} QualCoderren denbora-mugara iritsi da. AA prozesua bertan behera utzi"
+" nahi duzu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:7765
 #, fuzzy
@@ -13526,8 +13197,9 @@ msgstr ""
 "Errorea: MCP AI agentearen berriketa-langilearen mezu-korronte baliogabea."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9336
+#, fuzzy
 msgid "AI timeout"
-msgstr ""
+msgstr "AAren denbora-muga"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9419
 #, fuzzy
@@ -13548,7 +13220,8 @@ msgstr ""
 #, fuzzy
 msgid "Chat has been canceled by the user. The partial response was kept."
 msgstr ""
-"Erabiltzaileak berriketa bertan behera utzi du. Erantzun partziala gorde zen."
+"Erabiltzaileak berriketa bertan behera utzi du. Erantzun partziala gorde "
+"zen."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9444
 #, fuzzy
@@ -13556,15 +13229,15 @@ msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
 msgstr ""
-"Errorea: AAk emaitza huts bat itzuli du. Horrek adieraz dezake AA modeloa ez "
-"dagoela erabilgarri une honetan. Saiatu beranduago edo aukeratu beste modelo "
-"bat."
+"Errorea: AAk emaitza huts bat itzuli du. Horrek adieraz dezake AA modeloa ez"
+" dagoela erabilgarri une honetan. Saiatu beranduago edo aukeratu beste "
+"modelo bat."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9481
 #, fuzzy
 msgid ""
-"The AI response was interrupted before it was complete. The partial response "
-"was kept."
+"The AI response was interrupted before it was complete. The partial response"
+" was kept."
 msgstr ""
 "AAren erantzuna eten egin zen amaitu aurretik. Erantzun partziala gorde zen."
 
@@ -13641,7 +13314,8 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:83
 #, fuzzy
 msgid " New file name matches another existing file name"
-msgstr "Fitxategi-izen berria lehendik dagoen fitxategi-izen batekin bat dator"
+msgstr ""
+"Fitxategi-izen berria lehendik dagoen fitxategi-izen batekin bat dator"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/text_file_replacement.py:99
 #, fuzzy
@@ -14117,21 +13791,6 @@ msgstr "Kodetutako irudiak"
 msgid "Coded audio / video"
 msgstr "Kodetutako audioa / bideoa"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:264
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:266
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:728
-#, fuzzy
-msgid " File: "
-msgstr "Fitxategia:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:269
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:731
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4047
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4117
-#, fuzzy
-msgid "Code:"
-msgstr "Kodetzailea:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_in_all_files.py:405
 #, fuzzy
 msgid "Apply more codes to this segment"
@@ -14231,14 +13890,15 @@ msgid ""
 "Positions of the underlying codes / annotations / case-assigned may be "
 "incorrect if text is typed over or deleted."
 msgstr ""
-"Azpi-kodeen posizioak / oharpenak / kasu-sinadura okerra izan daiteke testua "
-"idatzi edo ezabatzen bada."
+"Azpi-kodeen posizioak / oharpenak / kasu-sinadura okerra izan daiteke testua"
+" idatzi edo ezabatzen bada."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:172
 #, fuzzy
 msgid "Auto-save: Text changes are automatically saved every 20 seconds."
 msgstr ""
-"Gorde automatikoki: testu-aldaketak automatikoki gordetzen dira 20 segundoro."
+"Gorde automatikoki: testu-aldaketak automatikoki gordetzen dira 20 "
+"segundoro."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:272
 #, fuzzy
@@ -14272,16 +13932,6 @@ msgstr "Hau ordeztean dauden kodeketak eta oharrak alda edo ken daitezke."
 #, fuzzy
 msgid "Not saved"
 msgstr "Ez gorde"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:830
-#, fuzzy
-msgid "Width:"
-msgstr "Zabalera:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:833
-#, fuzzy
-msgid "Height:"
-msgstr "Altuera:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_av.py:853
 #, fuzzy
@@ -14460,13 +14110,6 @@ msgstr "Hitz-hodeia testu-segmentu kodetuez egina"
 #, fuzzy
 msgid "File filter"
 msgstr "Fitxategi-iragazkia"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:250
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:271
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:292
-#, fuzzy
-msgid "Text:"
-msgstr "Testua:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:271
 #, fuzzy
@@ -14822,7 +14465,8 @@ msgstr "Kategoriaren adarra"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:959
 #, fuzzy
 msgid "All categories and codes under this category will also be deleted."
-msgstr "Kategoria honetako kategoria eta kode guztiak ere ezabatu egingo dira."
+msgstr ""
+"Kategoria honetako kategoria eta kode guztiak ere ezabatu egingo dira."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_tree.py:960
 #, fuzzy
@@ -15065,13 +14709,9 @@ msgid "Survey file:"
 msgstr "Hautatu inkesta-fitxategia"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:316
-msgid "Fields:"
-msgstr ""
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:316
 #, fuzzy
-msgid "Rows:"
-msgstr "Errenkadak:"
+msgid "Fields:"
+msgstr "Eremuak:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/import_survey.py:331
 #, fuzzy
@@ -15235,15 +14875,15 @@ msgid ""
 "during open, axial, and selective coding to articulate the structure around "
 "a central phenomenon."
 msgstr ""
-"Strauss eta Corbinen kodetze axialaren paradigmatik eratorritako harremanak. "
-"Kodeketa ireki, axial eta selektiboan erabiltzen da fenomeno zentral baten "
+"Strauss eta Corbinen kodetze axialaren paradigmatik eratorritako harremanak."
+" Kodeketa ireki, axial eta selektiboan erabiltzen da fenomeno zentral baten "
 "inguruan egitura artikulatzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:269
 #, fuzzy
 msgid ""
-"Relations for structuring deductive and inductive category systems following "
-"Mayring's systematic approach to qualitative content analysis."
+"Relations for structuring deductive and inductive category systems following"
+" Mayring's systematic approach to qualitative content analysis."
 msgstr ""
 "Kategoria-sistema deduktibo eta induktiboak egituratzeko harremanak, "
 "Mayringek eduki kualitatiboen analisirako ikuspegi sistematikoari jarraituz."
@@ -15263,8 +14903,8 @@ msgstr ""
 #, fuzzy
 msgid ""
 "Relations for reflexive thematic analysis following Braun & Clarke's six-"
-"phase approach. Emphasizes researcher reflexivity and the active role of the "
-"researcher in generating themes."
+"phase approach. Emphasizes researcher reflexivity and the active role of the"
+" researcher in generating themes."
 msgstr ""
 "Analisi tematiko erreflexiboarekiko harremanak, Braun eta Clarkeren sei "
 "faseko ikuspegiaren ondoren. Ikertzailearen erreflexibitatea eta "
@@ -15596,7 +15236,8 @@ msgstr "Bi kontzeptu daude tentsioan, oposizioan edo elkarrekiko bazterketan."
 msgid ""
 "One concept provides evidence, confirmation, or reinforcement for another."
 msgstr ""
-"Kontzeptu batek beste baten frogak, berrespenak edo errefortzuak ematen ditu."
+"Kontzeptu batek beste baten frogak, berrespenak edo errefortzuak ematen "
+"ditu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:345
 #, fuzzy
@@ -15648,7 +15289,8 @@ msgstr "Estrategiak errazten edo mugatzen dituen egitura-egoera zabalagoa."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:353
 #, fuzzy
-msgid "The core category or central idea to which all other categories relate."
+msgid ""
+"The core category or central idea to which all other categories relate."
 msgstr ""
 "Oinarrizko kategoria edo ideia nagusia, zeinari beste kategoria guztiak "
 "dagozkion."
@@ -15780,7 +15422,8 @@ msgstr "Esanahiaren unitate batek gai zabalago bat eraikitzen du."
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:378
 #, fuzzy
 msgid "A data-driven or theory-driven label assigned to a data segment."
-msgstr "Datu-segmentu bati esleitutako datu-segmentu bati buruzko etiketa bat."
+msgstr ""
+"Datu-segmentu bati esleitutako datu-segmentu bati buruzko etiketa bat."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:379
 #, fuzzy
@@ -16295,8 +15938,8 @@ msgstr "Erabiltzailearentzat gordeta"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:1015
 #, fuzzy
 msgid ""
-"The edited relation has been saved as a new entry in the User framework. The "
-"original system relation remains unchanged."
+"The edited relation has been saved as a new entry in the User framework. The"
+" original system relation remains unchanged."
 msgstr ""
 "Erlazio editatua erabiltzailearen esparruan sarrera berri gisa gorde da. "
 "Jatorrizko sistema-erlazioa ez da aldatu."
@@ -16407,11 +16050,6 @@ msgstr "Erabiltzaile-harremanak hona esportatuta:"
 msgid "Relation detail"
 msgstr "Xehetasunak"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:596
-#, fuzzy
-msgid "Framework: "
-msgstr "Esparrua:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:601
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph_relations.py:650
 #, fuzzy
@@ -16518,8 +16156,7 @@ msgid ""
 "New profile: {new}\n"
 "\n"
 "Do you want to switch to the new profile now?\n"
-"Your existing API-key (if available) will be copied to the new profile for "
-"convenience."
+"Your existing API-key (if available) will be copied to the new profile for convenience."
 msgstr ""
 "AAren profil lehenetsi berria eskuragarri dago hornitzaile honentzat.\n"
 "\n"
@@ -16527,8 +16164,7 @@ msgstr ""
 "Profil berria: {new}\n"
 "\n"
 "Profil berrira aldatu nahi duzu orain?\n"
-"Zure API-gakoa (erabilgarri badago) profil berrira kopiatuko da, behar "
-"bezala."
+"Zure API-gakoa (erabilgarri badago) profil berrira kopiatuko da, behar bezala."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:340
 #, fuzzy
@@ -16541,24 +16177,30 @@ msgid "Keep current profile"
 msgstr "Mantendu uneko profila"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:443
+#, fuzzy
 msgid "Search: Loading components in the background..."
-msgstr ""
+msgstr "Bilatu: osagaiak kargatzen atzeko planoan..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:494
+#, fuzzy
 msgid "Search: Components could not be loaded. See the log for details."
 msgstr ""
+"Bilatu: osagaiak ezin dira kargatu. Ikusi egunkaria xehetasun gehiagorako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:512
+#, fuzzy
 msgid "AI: Loading components in the background..."
-msgstr ""
+msgstr "AA: osagaiak kargatzen atzeko planoan..."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:534
+#, fuzzy
 msgid "AI: Components loaded."
-msgstr ""
+msgstr "A: Osagaiak kargatuta."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:547
+#, fuzzy
 msgid "AI: Components could not be loaded. See the log for details."
-msgstr ""
+msgstr "A: Osagaiak ezin dira kargatu. Ikusi egunkaria xehetasun gehiagorako."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:560
 #, fuzzy
@@ -16570,17 +16212,11 @@ msgstr "Deskargatu AAren osagaiak"
 msgid ""
 "Welcome\n"
 "\n"
-"The new AI enhanced functions in QualCoder need some additional setup. Do "
-"you want to enable the AI and start the setup? You can also do this later by "
-"starting the AI Setup Wizard from the AI menu in the main window. Click "
-"\"Yes\" to start now."
+"The new AI enhanced functions in QualCoder need some additional setup. Do you want to enable the AI and start the setup? You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. Click \"Yes\" to start now."
 msgstr ""
 "Ongi etorri\n"
 "\n"
-"AAk QualCoder-eko funtzio hobetu berriek beste konfigurazio bat behar dute. "
-"AA gaitu eta konfigurazioa hasi nahi duzu? Hori geroago ere egin dezakezu AI "
-"konfigurazioko morroia leiho nagusiko AA menutik hasita. Egin klik \"Bai\" "
-"botoian orain hasteko."
+"AAk QualCoder-eko funtzio hobetu berriek beste konfigurazio bat behar dute. AA gaitu eta konfigurazioa hasi nahi duzu? Hori geroago ere egin dezakezu AI konfigurazioko morroia leiho nagusiko AA menutik hasita. Egin klik \"Bai\" botoian orain hasteko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:596
 #, fuzzy
@@ -16588,8 +16224,9 @@ msgid "AI Integration"
 msgstr "Integrazioa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:648
+#, fuzzy
 msgid "External MCP"
-msgstr ""
+msgstr "Kanpoko MCP"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:678
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:735
@@ -16663,8 +16300,9 @@ msgid "Menu action is currently disabled."
 msgstr "Menu-ekintza desgaituta dago."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1260
+#, fuzzy
 msgid "Choose a recently opened project to open it"
-msgstr ""
+msgstr "Aukeratu proiektu ireki berria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1367
 #, fuzzy
@@ -16682,14 +16320,14 @@ msgid "Open the journals"
 msgstr "Egunkari berria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1464
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "today {0}"
-msgstr ""
+msgstr "gaur {0}"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1466
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "yesterday {0}"
-msgstr ""
+msgstr "atzo, {0}"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1489
 #, fuzzy, python-brace-format
@@ -16702,9 +16340,9 @@ msgid "Text bookmark"
 msgstr "Ezarri laster-marka (B)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1497
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Audio/video bookmark at {0}"
-msgstr ""
+msgstr "Audio/bideo laster-marka {0}-n"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1502
 #, fuzzy, python-brace-format
@@ -16712,8 +16350,9 @@ msgid "Journal, edited {0}"
 msgstr "Egunkaria sortu zen:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1505
+#, fuzzy
 msgid "Last AI chat"
-msgstr ""
+msgstr "Azken AA berriketa"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1532
 msgid "AI chat"
@@ -16740,17 +16379,19 @@ msgid "Manage links"
 msgstr "Datu-fitxategiak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1706
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Files missing from the project folder: {0}."
-msgstr ""
+msgstr "Proiektuko karpetatik falta diren fitxategiak: {0}."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+#, fuzzy
 msgid "Action log"
-msgstr ""
+msgstr "Ekintza egunkaria"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1770
+#, fuzzy
 msgid "Guide"
-msgstr ""
+msgstr "Gida"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:1771
 #, fuzzy
@@ -16894,12 +16535,14 @@ msgid "Help for this tab"
 msgstr "Lerro honen etiketa:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2853
+#, fuzzy
 msgid "Leave the graph and lose the unsaved changes?"
-msgstr ""
+msgstr "Utzi grafikoa eta galdu gorde gabeko aldaketak?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2856
+#, fuzzy
 msgid "The code organiser has changes that were not applied."
-msgstr ""
+msgstr "Kode-antolatzaileak ez diren aldaketak ditu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:2857
 #, fuzzy
@@ -17063,8 +16706,7 @@ msgid ""
 "**Participants and data collected:** \n"
 "\n"
 "#####\n"
-"(Everything below this mark is a personal note and will never be sent to the "
-"AI.)"
+"(Everything below this mark is a personal note and will never be sent to the AI.)"
 msgstr ""
 "**Ikerketa-gaia, galderak eta helburuak:**\n"
 "\n"
@@ -17097,10 +16739,13 @@ msgid "Opening project: "
 msgstr "Lehenik proiektu bat ireki."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3388
+#, fuzzy
 msgid ""
 "The selected folder is not a QualCoder project folder. Its name must end "
 "with .qda."
 msgstr ""
+"Hautatutako karpeta ez da QualCoder proiektuaren karpeta. Izena .qda-rekin "
+"amaitu behar du."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3390
 #, fuzzy
@@ -17128,8 +16773,8 @@ msgstr "Ezin da ireki:"
 #, fuzzy
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
-"project (\"{}\"). Do you want to keep your current name or switch to the one "
-"from the project?"
+"project (\"{}\"). Do you want to keep your current name or switch to the one"
+" from the project?"
 msgstr ""
 "Zure uneko kodetzailearen izena (\"{}\") desberdina da proiektuan "
 "erabilitako azkenaren aldean (\"{}\"). Uneko izena gorde edo proiektuko "
@@ -17250,25 +16895,6 @@ msgstr "Proiektuaren zirkularra:"
 msgid "Project memo: "
 msgstr "Proiektuaren zirkularra:"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3890
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:235
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:400
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:402
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:714
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1281
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:1464
-#, fuzzy
-msgid "Files: "
-msgstr "Fitxategiak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3894
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:402
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:234
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:404
-#, fuzzy
-msgid "Cases: "
-msgstr "Kasua:"
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:3898
 #, fuzzy
 msgid "Code categories: "
@@ -17302,8 +16928,8 @@ msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
-"AA konfiguratua eta gaituta dago, beraz, hemen ez dago zer eginik. Joan AA > "
-"ezarpenetara uneko modeloa edo bestelako ezarpenak aldatzeko."
+"AA konfiguratua eta gaituta dago, beraz, hemen ez dago zer eginik. Joan AA >"
+" ezarpenetara uneko modeloa edo bestelako ezarpenak aldatzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4038
 #, fuzzy
@@ -17344,11 +16970,11 @@ msgstr "AI memoria berreraikia"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4064
 #, fuzzy
 msgid ""
-"This will re-read all of your empirical documents, which may take some time. "
-"Do you want to continue?"
+"This will re-read all of your empirical documents, which may take some time."
+" Do you want to continue?"
 msgstr ""
-"Honek zure dokumentu enpiriko guztiak berriro irakurriko ditu, denbora pixka "
-"bat beharko dutenak. Jarraitu nahi duzu?"
+"Honek zure dokumentu enpiriko guztiak berriro irakurriko ditu, denbora pixka"
+" bat beharko dutenak. Jarraitu nahi duzu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/__main__.py:4096
 #, fuzzy
@@ -17559,11 +17185,6 @@ msgstr "Hautatutako kategoria guztiak"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:410
 #, fuzzy
 msgid "Categories selected"
-msgstr "Kategoriak hautatuta"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:385
-#, fuzzy
-msgid "Categories selected "
 msgstr "Kategoriak hautatuta"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_cooccurrence.py:534
@@ -17822,18 +17443,13 @@ msgstr "Hautatu kasuen fitxategia"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:450
 #, fuzzy
 msgid "Do you want imported data to override existing attributes?"
-msgstr "Inportatutako datuak lehendik dauden atributuak gainidaztea nahi duzu?"
+msgstr ""
+"Inportatutako datuak lehendik dauden atributuak gainidaztea nahi duzu?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:451
 #, fuzzy
 msgid "Cases exist"
 msgstr "Kasuak existitzen dira"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:519
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:603
-#, fuzzy
-msgid "attribute:"
-msgstr "atributua:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:541
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:625
@@ -17880,16 +17496,6 @@ msgstr "Egin klik fitxategiak kudeatzeko kasu honetan"
 #, fuzzy
 msgid "Viewing text of case: "
 msgstr "Kasuaren testua ikusteko:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1143
-#, fuzzy
-msgid "Characters:"
-msgstr "Karaktereak:"
-
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1158
-#, fuzzy
-msgid "Image:"
-msgstr "Irudia:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/cases.py:1170
 #, fuzzy
@@ -18141,14 +17747,12 @@ msgstr "edo"
 #, fuzzy
 msgid ""
 "The pattern may match anywhere in the line.\n"
-"With a capturing group, group 1 is the speaker name: ~(\\w+): detects "
-"QknowSubject\n"
+"With a capturing group, group 1 is the speaker name: ~(\\w+): detects QknowSubject\n"
 "Without a group, the whole match is the name: ~\\w+: detects ~QknowSubject:\n"
 "Several markers on one line each start their own turn."
 msgstr ""
 "Eredua lerroko edozein lekutan aurki daiteke.\n"
-"Talde harrapatu batekin, 1. taldea da bozgorailuaren izena: ~(\\w+): "
-"QknowSubject detektatzen du\n"
+"Talde harrapatu batekin, 1. taldea da bozgorailuaren izena: ~(\\w+): QknowSubject detektatzen du\n"
 "Talderik gabe, izen osoa dator:  thew+: detektatzen du ~QknowSubject:\n"
 "Lerro bateko markatzaile batzuek beren txanda hasten dute."
 
@@ -18170,15 +17774,11 @@ msgstr "Hautatu identifikatzaileak"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:429
 #, fuzzy
 msgid ""
-"Click a format name to use only that one. Click its checkbox to add or "
-"remove it\n"
-"from a combination. Check 'Custom (regex)' to add your own pattern to the "
-"mix."
+"Click a format name to use only that one. Click its checkbox to add or remove it\n"
+"from a combination. Check 'Custom (regex)' to add your own pattern to the mix."
 msgstr ""
-"Egin klik formatu-izen batean hori bakarrik erabiltzeko. Egin klik kontrol-"
-"laukian gehitzeko edo kentzeko\n"
-"konbinazio batetik. Egiaztatu 'Pertsonalizatu (regex)' zure eredua "
-"nahasketari gehitzeko."
+"Egin klik formatu-izen batean hori bakarrik erabiltzeko. Egin klik kontrol-laukian gehitzeko edo kentzeko\n"
+"konbinazio batetik. Egiaztatu 'Pertsonalizatu (regex)' zure eredua nahasketari gehitzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:610
 #, fuzzy
@@ -18301,7 +17901,8 @@ msgstr ""
 #, fuzzy
 msgid "Ticked segments / total. Right-click the row to preview."
 msgstr ""
-"Zatiak / guztira. Egin klik eskuineko botoiaz errenkadan aurrebista ikusteko."
+"Zatiak / guztira. Egin klik eskuineko botoiaz errenkadan aurrebista "
+"ikusteko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1432
 #, fuzzy
@@ -18312,13 +17913,10 @@ msgstr "Atributu-kodeak, ';' bananduak"
 #, fuzzy
 msgid ""
 "Extra codes applied to this speaker's turns, in addition to 'code as'.\n"
-"Type new ones (separate several with ';') or pick a previous one from the "
-"list to add it."
+"Type new ones (separate several with ';') or pick a previous one from the list to add it."
 msgstr ""
-"Bozgorailuaren biraketei aplikatzen zaizkien kode gehigarriak, kodetzeaz "
-"gain.\n"
-"Idatzi berriak (batzuk ';'-rekin bananduz) edo aurreko bat zerrendatik "
-"gehitu."
+"Bozgorailuaren biraketei aplikatzen zaizkien kode gehigarriak, kodetzeaz gain.\n"
+"Idatzi berriak (batzuk ';'-rekin bananduz) edo aurreko bat zerrendatik gehitu."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1439
 #, fuzzy
@@ -18378,13 +17976,10 @@ msgstr "Segmentuak"
 #, fuzzy
 msgid ""
 "Ticked segments will be coded. Untick the ones to skip.\n"
-"Inline codes (';' in the marker) apply PER SEGMENT and are editable; right "
-"click one to copy it to all segments or promote it to the whole row."
+"Inline codes (';' in the marker) apply PER SEGMENT and are editable; right click one to copy it to all segments or promote it to the whole row."
 msgstr ""
 "Hautatutako segmentuak kodetuko dira. Kendu denak saltatzeko.\n"
-"Lineako kodeak ('' markatzailean') PER SEGMENT aplikatzen dute eta "
-"editagarriak dira; eskuineko klik bat segmentu guztiei kopiatzeko edo "
-"errenkada osora sustatzeko."
+"Lineako kodeak ('' markatzailean') PER SEGMENT aplikatzen dute eta editagarriak dira; eskuineko klik bat segmentu guztiei kopiatzeko edo errenkada osora sustatzeko."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1643
 #, fuzzy
@@ -18432,8 +18027,8 @@ msgid ""
 "Use those existing codes, or create new codes under Speakers with a numeric "
 "suffix, e.g. \"{}\"?"
 msgstr ""
-"Existitzen diren kodeak eta kategoriak berrerabiltzea edo zenbakizko atzizki "
-"batekin kopia gisa inportatzea?"
+"Existitzen diren kodeak eta kategoriak berrerabiltzea edo zenbakizko atzizki"
+" batekin kopia gisa inportatzea?"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/speakers.py:1842
 #, fuzzy
@@ -18591,14 +18186,6 @@ msgstr "Testu-kodeketa guztiak"
 msgid " resized by "
 msgstr "tamainaz aldatua"
 
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:232
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:279
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:131
-#: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:174
-#, fuzzy
-msgid " characters."
-msgstr "Karaktereak."
-
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/special_functions.py:250
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:148
 #, fuzzy
@@ -18613,8 +18200,9 @@ msgid "Change code end positions"
 msgstr "Aldatu kodearen amaierako posizioak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:171
+#, fuzzy
 msgid "EDITING TEXT MODE (Ctrl+E)"
-msgstr ""
+msgstr "EDITING TEXT MODE (Ktrl+E)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:173
 #, fuzzy
@@ -18708,8 +18296,9 @@ msgid "Hide control panel (H)"
 msgstr "Ezkutatu kontrol-panela (H)"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2170
+#, fuzzy
 msgid "Toggle tooltips"
-msgstr ""
+msgstr "Txandakatze argibideak"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2533
 #, fuzzy
@@ -18719,21 +18308,16 @@ msgstr "Maius kodeketak klik egin ondoren"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:2536
 #, fuzzy
 msgid ""
-"Shift code positions for all codes after you have clicked on a position in "
-"the text.\n"
+"Shift code positions for all codes after you have clicked on a position in the text.\n"
 "Back up the project before running this action.\n"
-"This function will help if you have edited the coded text and the codes are "
-"out of position.\n"
-"Positive numbers (moves right) or negative numbers (moves left) (-500 to "
-"500)\n"
+"This function will help if you have edited the coded text and the codes are out of position.\n"
+"Positive numbers (moves right) or negative numbers (moves left) (-500 to 500)\n"
 "Clicked character position: "
 msgstr ""
 "Maius kode guztien posizioak testuko posizio batean klik egin ondoren.\n"
 "Proiektua babestu ekintza hau exekutatu aurretik.\n"
-"Funtzio honek lagunduko dizu kodetutako testua editatu baduzu eta kodeak "
-"lekuz kanpo badaude.\n"
-"Zenbaki positiboak (eskuinera mugitzen da) edo zenbaki negatiboak (-500 - "
-"500)\n"
+"Funtzio honek lagunduko dizu kodetutako testua editatu baduzu eta kodeak lekuz kanpo badaude.\n"
+"Zenbaki positiboak (eskuinera mugitzen da) edo zenbaki negatiboak (-500 - 500)\n"
 "Klikatutako karaktere-posizioa:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:3115
@@ -18880,8 +18464,9 @@ msgid "Code text: "
 msgstr "Kodearen testua:"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4953
+#, fuzzy
 msgid "Open a search result before coding"
-msgstr ""
+msgstr "Ireki bilaketa-emaitza kodetu aurretik"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5009
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6554
@@ -18910,8 +18495,8 @@ msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
 msgstr ""
-"AAren interpretazioa memo batean gorde nahi duzu kodeketarekin batera?<br/"
-"><br/><br/>"
+"AAren interpretazioa memo batean gorde nahi duzu kodeketarekin "
+"batera?<br/><br/><br/>"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:5017
 #, fuzzy
@@ -18932,8 +18517,8 @@ msgstr "Desegin azken editatutako testua"
 #, fuzzy
 msgid ""
 "This file is a PDF. Its stored text is not editable: it matches, character "
-"by character, the text extracted from the PDF pages, and the PDF coding view "
-"depends on that mapping."
+"by character, the text extracted from the PDF pages, and the PDF coding view"
+" depends on that mapping."
 msgstr ""
 "Fitxategi hau PDF bat da. Gordetako testua ez da editagarria: bat dator "
 "karakterez, PDF orrialdeetatik ateratako testuarekin, eta PDF kodeketa-"
@@ -19061,7 +18646,8 @@ msgstr "Bilaketa gelditu nahi duzu?"
 msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
-msgstr "Ez dago datu gehiago bilaketa hau aztertzeko. Hasi bilaketa berri bat."
+msgstr ""
+"Ez dago datu gehiago bilaketa hau aztertzeko. Hasi bilaketa berri bat."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:6906
 #, fuzzy
@@ -19283,7 +18869,8 @@ msgstr "Inklusioa"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:867
 #, fuzzy
 msgid "Report of exact matches for text codings by file and code"
-msgstr "Bat datorren zehatzari buruzko txostena fitxategi eta kodearen arabera"
+msgstr ""
+"Bat datorren zehatzari buruzko txostena fitxategi eta kodearen arabera"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_relations.py:868
 #, fuzzy
@@ -19656,411 +19243,404 @@ msgid "Uncaught Exception"
 msgstr "Salbuespenik gabea"
 
 #, fuzzy
-#~ msgid "Select files to view"
-#~ msgstr "Hautatu fitxategiak ikusteko"
+msgid "Select files to view"
+msgstr "Hautatu fitxategiak ikusteko"
 
 #, fuzzy
-#~ msgid "File Attributes"
-#~ msgstr "Fitxategiaren atributuak"
+msgid "File Attributes"
+msgstr "Fitxategiaren atributuak"
 
 #, fuzzy
-#~ msgid "The AI not yet fully loaded. Please wait and retry."
-#~ msgstr "AA oraindik ez dago erabat kargatuta. Itxaron eta saiatu berriro."
+msgid "The AI not yet fully loaded. Please wait and retry."
+msgstr "AA oraindik ez dago erabat kargatuta. Itxaron eta saiatu berriro."
 
 #, fuzzy
-#~ msgid " of these codings are not owned by 'AI Agent'."
-#~ msgstr "Kodeketa horietako bat ez da 'AI Agent'-ena."
+msgid " of these codings are not owned by 'AI Agent'."
+msgstr "Kodeketa horietako bat ez da 'AI Agent'-ena."
 
 #, fuzzy
-#~ msgid " standalone coding(s) are not owned by 'AI Agent'."
-#~ msgstr "Kodeketa bakarra (k) ez da AAren agentea."
+msgid " standalone coding(s) are not owned by 'AI Agent'."
+msgstr "Kodeketa bakarra (k) ez da AAren agentea."
 
 #, fuzzy
-#~ msgid "Warning: removed codings not owned by 'AI Agent': "
-#~ msgstr "Abisua: kendutako kodeketak ez dira 'AI Agent'enak:"
+msgid "Warning: removed codings not owned by 'AI Agent': "
+msgstr "Abisua: kendutako kodeketak ez dira 'AI Agent'enak:"
 
 #, fuzzy
-#~ msgid "Codebook for"
-#~ msgstr "Codebook inportazioa"
+msgid "Codebook for"
+msgstr "Codebook inportazioa"
 
 #, fuzzy
-#~ msgid "Category:"
-#~ msgstr "Kategoria:"
+msgid "The AI is busy, please wait a moment and retry."
+msgstr "AA lanpetuta dago, itxaron pixka bat eta saiatu berriro."
 
 #, fuzzy
-#~ msgid "The AI is busy, please wait a moment and retry."
-#~ msgstr "AA lanpetuta dago, itxaron pixka bat eta saiatu berriro."
+msgid "Save graph analytical summary"
+msgstr "Gorde grafikoen laburpen analitikoa"
 
 #, fuzzy
-#~ msgid "Save graph analytical summary"
-#~ msgstr "Gorde grafikoen laburpen analitikoa"
+msgid "Cannot open file"
+msgstr "Ezin da fitxategia ireki"
 
 #, fuzzy
-#~ msgid "Cannot open file"
-#~ msgstr "Ezin da fitxategia ireki"
+msgid "Please enable the AI first and set it in Settings."
+msgstr "Mesedez, gaitu AA lehenik eta ezarri Ezarpenak atalean."
 
 #, fuzzy
-#~ msgid "Please enable the AI first and set it in Settings."
-#~ msgstr "Mesedez, gaitu AA lehenik eta ezarri Ezarpenak atalean."
+msgid "The AI is busy or not set up correctly."
+msgstr "AA lanpetuta dago edo ez dago ongi konfiguratuta."
 
 #, fuzzy
-#~ msgid "The AI is busy or not set up correctly."
-#~ msgstr "AA lanpetuta dago edo ez dago ongi konfiguratuta."
-
-#, fuzzy
-#~ msgid "Delete folder"
-#~ msgstr "Ezabatu karpeta"
+msgid "Delete folder"
+msgstr "Ezabatu karpeta"
 
 #, fuzzy, python-brace-format
-#~ msgid "You must select a {self.prompt_type} prompt."
-#~ msgstr "{self bat hautatu behar duzu. galdera."
+msgid "You must select a {self.prompt_type} prompt."
+msgstr "{self bat hautatu behar duzu. galdera."
 
 #, fuzzy
-#~ msgid "Coding highlighted segments"
-#~ msgstr "Coding nabarmendutako segmentuak"
+msgid "Coding highlighted segments"
+msgstr "Coding nabarmendutako segmentuak"
 
 #, fuzzy
-#~ msgid "QualCoder will crash"
-#~ msgstr "QualCoder kraskatuko da"
+msgid "QualCoder will crash"
+msgstr "QualCoder kraskatuko da"
 
 #, fuzzy
-#~ msgid "Memo coded text M"
-#~ msgstr "Zirkularren testu kodetua M"
+msgid "Memo coded text M"
+msgstr "Zirkularren testu kodetua M"
 
 #, fuzzy
-#~ msgid "Click for details."
-#~ msgstr "Egin klik xehetasun gehiagorako."
+msgid "Click for details."
+msgstr "Egin klik xehetasun gehiagorako."
 
 #, fuzzy
-#~ msgid "Refresh codes trees via menu options for coding, reports"
-#~ msgstr "Freskatu kode-zuhaitzak kodetzeko menu-aukeraren bidez, txostenak"
+msgid "Refresh codes trees via menu options for coding, reports"
+msgstr "Freskatu kode-zuhaitzak kodetzeko menu-aukeraren bidez, txostenak"
 
 #, fuzzy
-#~ msgid "Word cloud"
-#~ msgstr "Hitz hodeia"
+msgid "Word cloud"
+msgstr "Hitz hodeia"
 
 #, fuzzy
-#~ msgid "VLC is not installed. Cannot code audio/video files."
-#~ msgstr "VLC ez dago instalatuta. Ezin dira audio/bideo fitxategiak kodetu."
+msgid "VLC is not installed. Cannot code audio/video files."
+msgstr "VLC ez dago instalatuta. Ezin dira audio/bideo fitxategiak kodetu."
 
 #, fuzzy
-#~ msgid "Install VLC"
-#~ msgstr "Instalatu VLC"
+msgid "Install VLC"
+msgstr "Instalatu VLC"
 
 #, fuzzy
-#~ msgid "Ticked segments will be coded. Untick the ones to skip."
-#~ msgstr "Hautatutako segmentuak kodetuko dira. Kendu denak saltatzeko."
+msgid "Ticked segments will be coded. Untick the ones to skip."
+msgstr "Hautatutako segmentuak kodetuko dira. Kendu denak saltatzeko."
 
 #, fuzzy
-#~ msgid " next  characters"
-#~ msgstr "hurrengo karaktereak"
+msgid " next  characters"
+msgstr "hurrengo karaktereak"
 
 #, fuzzy
-#~ msgid " previous  characters"
-#~ msgstr "aurreko karaktereak"
+msgid " previous  characters"
+msgstr "aurreko karaktereak"
 
 #, fuzzy
-#~ msgid "QualCoder roughly displays PDFs."
-#~ msgstr "QualCoder-ek gutxi gorabehera PDFak bistaratzen ditu."
+msgid "QualCoder roughly displays PDFs."
+msgstr "QualCoder-ek gutxi gorabehera PDFak bistaratzen ditu."
 
 #, fuzzy
-#~ msgid "Original fonts or bold or italic are not applied."
-#~ msgstr ""
-#~ "Jatorrizko letra-tipoak, letra lodiak edo letra etzanak ez dira "
-#~ "aplikatzen."
+msgid "Original fonts or bold or italic are not applied."
+msgstr ""
+"Jatorrizko letra-tipoak, letra lodiak edo letra etzanak ez dira aplikatzen."
 
 #, fuzzy
-#~ msgid "Plain text must match exactly for Code PDF to work correctly."
-#~ msgstr ""
-#~ "Testu soilak bat etorri behar du Kodearen PDFarekin zuzen lan egiteko."
+msgid "Plain text must match exactly for Code PDF to work correctly."
+msgstr ""
+"Testu soilak bat etorri behar du Kodearen PDFarekin zuzen lan egiteko."
 
 #, fuzzy
-#~ msgid ""
-#~ "A warning will display if the parsed PDF text does not match the database "
-#~ "stored plain text."
-#~ msgstr ""
-#~ "Abisu bat bistaratuko da analizatutako PDF testua ez badator bat "
-#~ "gordetako testu soilarekin."
+msgid ""
+"A warning will display if the parsed PDF text does not match the database "
+"stored plain text."
+msgstr ""
+"Abisu bat bistaratuko da analizatutako PDF testua ez badator bat gordetako "
+"testu soilarekin."
 
 #, fuzzy
-#~ msgid ""
-#~ "Plain text of PDFs loaded in to QualCoder before version 3.4 will not "
-#~ "have the plain text positions correct for PDF display."
-#~ msgstr ""
-#~ "QualCoder-era 3.4 bertsioa baino lehen kargatutako PDFen testu soila ez "
-#~ "da zuzena izango PDF bistaratzeko."
+msgid ""
+"Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
+"the plain text positions correct for PDF display."
+msgstr ""
+"QualCoder-era 3.4 bertsioa baino lehen kargatutako PDFen testu soila ez da "
+"zuzena izango PDF bistaratzeko."
 
 #, fuzzy
-#~ msgid "This means coding stripes will show in incorrect positions."
-#~ msgstr ""
-#~ "Horrek esan nahi du zerrenda-zerrendak okerreko posizioetan agertuko "
-#~ "direla."
+msgid "This means coding stripes will show in incorrect positions."
+msgstr ""
+"Horrek esan nahi du zerrenda-zerrendak okerreko posizioetan agertuko direla."
 
 #, fuzzy
-#~ msgid ""
-#~ "Similarly, if the PDF plain text has been edited in any way, this will "
-#~ "affect coding stripes display."
-#~ msgstr ""
-#~ "Era berean, PDF testu soila nolabait editatu bada, kodeketa-bandak "
-#~ "bistaratzean eragina izango du."
+msgid ""
+"Similarly, if the PDF plain text has been edited in any way, this will "
+"affect coding stripes display."
+msgstr ""
+"Era berean, PDF testu soila nolabait editatu bada, kodeketa-bandak "
+"bistaratzean eragina izango du."
 
 #, fuzzy
-#~ msgid "Press Enter to search"
-#~ msgstr "Sakatu Sartu bilatzeko"
+msgid "Press Enter to search"
+msgstr "Sakatu Sartu bilatzeko"
 
 #, fuzzy
-#~ msgid "PDF objects"
-#~ msgstr "PDF objektuak"
+msgid "PDF objects"
+msgstr "PDF objektuak"
 
 #, fuzzy
-#~ msgid ""
-#~ "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
-#~ "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
-#~ msgstr ""
-#~ "Aldatu hasierako posizioa (TIFT LEFT/Txertatu ALT RIGHT)\n"
-#~ "Aldatu amaierako posizioa (TIFT RIGHT/ shrink ALT LEFT)"
+msgid ""
+"Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
+"Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
+msgstr ""
+"Aldatu hasierako posizioa (TIFT LEFT/Txertatu ALT RIGHT)\n"
+"Aldatu amaierako posizioa (TIFT RIGHT/ shrink ALT LEFT)"
 
 #, fuzzy
-#~ msgid "Use key presses"
-#~ msgstr "Erabili tekla prentsak"
+msgid "Use key presses"
+msgstr "Erabili tekla prentsak"
 
 #, fuzzy
-#~ msgid "PDF Image exported"
-#~ msgstr "PDF Irudia esportatuta"
+msgid "PDF Image exported"
+msgstr "PDF Irudia esportatuta"
 
 #, fuzzy
-#~ msgid "Pages: "
-#~ msgstr "Orrialdeak:"
+msgid "Pages: "
+msgstr "Orrialdeak:"
 
 #, fuzzy
-#~ msgid "Parsing the PDF text."
-#~ msgstr "PDF testua analizatzen."
+msgid "Parsing the PDF text."
+msgstr "PDF testua analizatzen."
 
 #, fuzzy
-#~ msgid ""
-#~ "Texts do not match. PDF imported before 3.4 QualCodr version or the PDF "
-#~ "text has been edited."
-#~ msgstr ""
-#~ "Testuak ez datoz bat. 3.4 QualCodr bertsioa edo PDF testua editatu da."
+msgid ""
+"Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text"
+" has been edited."
+msgstr ""
+"Testuak ez datoz bat. 3.4 QualCodr bertsioa edo PDF testua editatu da."
 
 #, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "View PDF but cannot code. Code positions will appear wrongly.\n"
-#~ "Character difference: "
-#~ msgstr ""
-#~ "PDFa ikusi baina ezin kodeatu. Kode-posizioak gaizki agertuko dira.\n"
-#~ "Karaktere-diferentzia:"
+msgid ""
+"\n"
+"View PDF but cannot code. Code positions will appear wrongly.\n"
+"Character difference: "
+msgstr ""
+"PDFa ikusi baina ezin kodeatu. Kode-posizioak gaizki agertuko dira.\n"
+"Karaktere-diferentzia:"
 
 #, fuzzy
-#~ msgid "TEXT START CHARACTER POSITION: "
-#~ msgstr "TEXT START: POSIZIOA:"
+msgid "TEXT START CHARACTER POSITION: "
+msgstr "TEXT START: POSIZIOA:"
 
 #, fuzzy
-#~ msgid "TEXT END CHARACTER POSITION: "
-#~ msgstr "Amaierako politika:"
+msgid "TEXT END CHARACTER POSITION: "
+msgstr "Amaierako politika:"
 
 #, fuzzy
-#~ msgid "NUMBER OF CHARACTERS: "
-#~ msgstr "ZENBAKIA:"
+msgid "NUMBER OF CHARACTERS: "
+msgstr "ZENBAKIA:"
 
 #, fuzzy
-#~ msgid "Important"
-#~ msgstr "Garrantzitsua"
+msgid "Important"
+msgstr "Garrantzitsua"
 
 #, fuzzy
-#~ msgid "Code memo"
-#~ msgstr "Kode zirkularra"
+msgid "Code memo"
+msgstr "Kode zirkularra"
 
 #, fuzzy
-#~ msgid "Select code for important flag"
-#~ msgstr "Hautatu bandera garrantzitsuaren kodea"
+msgid "Select code for important flag"
+msgstr "Hautatu bandera garrantzitsuaren kodea"
 
 #, fuzzy
-#~ msgid "Select code to remove important flag"
-#~ msgstr "Hautatu bandera garrantzitsua kentzeko kodea"
+msgid "Select code to remove important flag"
+msgstr "Hautatu bandera garrantzitsua kentzeko kodea"
 
 #, fuzzy
-#~ msgid "PDF loaded text does not match Imported PDF text length."
-#~ msgstr ""
-#~ "PDFan kargatutako testua ez dator bat inportatutako PDF testu luzerarekin."
+msgid "PDF loaded text does not match Imported PDF text length."
+msgstr ""
+"PDFan kargatutako testua ez dator bat inportatutako PDF testu luzerarekin."
 
 #, fuzzy
-#~ msgid "Mark using the right hand side text pane."
-#~ msgstr "Markatu eskuineko testuaren panela erabiliz."
+msgid "Mark using the right hand side text pane."
+msgstr "Markatu eskuineko testuaren panela erabiliz."
 
 #, fuzzy
-#~ msgid "Cannot mark"
-#~ msgstr "Ezin da markatu"
+msgid "Cannot mark"
+msgstr "Ezin da markatu"
 
 #, fuzzy
-#~ msgid "Add a new code"
-#~ msgstr "Gehitu kode berria"
+msgid "Add a new code"
+msgstr "Gehitu kode berria"
 
 #, fuzzy
-#~ msgid "Add a new category"
-#~ msgstr "Gehitu kategoria berria"
+msgid "Add a new category"
+msgstr "Gehitu kategoria berria"
 
 #, fuzzy
-#~ msgid "Delete F4"
-#~ msgstr "Ezabatu F4"
+msgid "Delete F4"
+msgstr "Ezabatu F4"
 
 #, fuzzy
-#~ msgid "Report text context style: "
-#~ msgstr "Txostenaren testuaren testuinguru-estiloa:"
+msgid "Report text context style: "
+msgstr "Txostenaren testuaren testuinguru-estiloa:"
 
 #, fuzzy
-#~ msgid "QualCoder project missing folders. Created empty folders"
-#~ msgstr "QualCoder proiektuak karpetak falta ditu. Karpeta hutsak sortu dira"
+msgid "QualCoder project missing folders. Created empty folders"
+msgstr "QualCoder proiektuak karpetak falta ditu. Karpeta hutsak sortu dira"
 
 #, fuzzy
-#~ msgid "New Entries: "
-#~ msgstr "Sarrera berriak:"
+msgid "New Entries: "
+msgstr "Sarrera berriak:"
 
 #, fuzzy
-#~ msgid "Duplicates not inserted: "
-#~ msgstr "Bikoizketak ez dira sartu:"
+msgid "Duplicates not inserted: "
+msgstr "Bikoizketak ez dira sartu:"
 
 #, fuzzy
-#~ msgid "References already exist"
-#~ msgstr "Erreferentziak existitzen dira."
+msgid "References already exist"
+msgstr "Erreferentziak existitzen dira."
 
 #, fuzzy
-#~ msgid " renamed category(ies) would be restored to their old names."
-#~ msgstr "Izena aldatutako kategoria(k) lehengo izenetara itzuliko lirateke."
+msgid " renamed category(ies) would be restored to their old names."
+msgstr "Izena aldatutako kategoria(k) lehengo izenetara itzuliko lirateke."
 
 #, fuzzy
-#~ msgid " renamed code(s) would be restored to their old names."
-#~ msgstr "izen zaharrak berreskuratuko lirateke."
+msgid " renamed code(s) would be restored to their old names."
+msgstr "izen zaharrak berreskuratuko lirateke."
 
 #, fuzzy
-#~ msgid "original"
-#~ msgstr "jatorrizkoa"
+msgid "original"
+msgstr "jatorrizkoa"
 
 #, fuzzy
-#~ msgid "dark"
-#~ msgstr "iluna"
+msgid "dark"
+msgstr "iluna"
 
 #, fuzzy
-#~ msgid "purple"
-#~ msgstr "purpura"
+msgid "purple"
+msgstr "purpura"
 
 #, fuzzy
-#~ msgid "rainbow"
-#~ msgstr "ortzadarra"
+msgid "rainbow"
+msgstr "ortzadarra"
 
 #, fuzzy
-#~ msgid "Code renamed: "
-#~ msgstr "Kodeak izena aldatu du:"
+msgid "Code renamed: "
+msgstr "Kodeak izena aldatu du:"
 
 #, fuzzy
-#~ msgid "Notice"
-#~ msgstr "Oharra"
+msgid "Notice"
+msgstr "Oharra"
 
 #, fuzzy
-#~ msgid "Select at least one Qualitative Text column to analyse."
-#~ msgstr "Hautatu gutxienez testu kualitatibo bat aztertzeko."
+msgid "Select at least one Qualitative Text column to analyse."
+msgstr "Hautatu gutxienez testu kualitatibo bat aztertzeko."
 
 #, fuzzy
-#~ msgid "New code name"
-#~ msgstr "Kode berriaren izena"
+msgid "New code name"
+msgstr "Kode berriaren izena"
 
 #, fuzzy
-#~ msgid "Code added: "
-#~ msgstr "Kodea gehitu da:"
+msgid "Code added: "
+msgstr "Kodea gehitu da:"
 
 #, fuzzy
-#~ msgid "Category renamed: "
-#~ msgstr "Kategoriaren izena:"
+msgid "Category renamed: "
+msgstr "Kategoriaren izena:"
 
 #, fuzzy
-#~ msgid "Insert coded text items"
-#~ msgstr "Txertatu testu-elementu kodetuak"
+msgid "Insert coded text items"
+msgstr "Txertatu testu-elementu kodetuak"
 
 #, fuzzy
-#~ msgid "Insert coded image items"
-#~ msgstr "Txertatu irudi kodetuak"
+msgid "Insert coded image items"
+msgstr "Txertatu irudi kodetuak"
 
 #, fuzzy
-#~ msgid "Insert coded A/V items"
-#~ msgstr "Txertatu A/V elementuak"
+msgid "Insert coded A/V items"
+msgstr "Txertatu A/V elementuak"
 
 #, fuzzy
-#~ msgid "Expand category"
-#~ msgstr "Zabaldu kategoria"
+msgid "Expand category"
+msgstr "Zabaldu kategoria"
 
 #, fuzzy
-#~ msgid "Import and link segments"
-#~ msgstr "Inportatu eta estekatu segmentuak"
+msgid "Import and link segments"
+msgstr "Inportatu eta estekatu segmentuak"
 
 #, fuzzy, python-brace-format
-#~ msgid "Renaming category \"{name}\"..."
-#~ msgstr "\"{name}\" kategoria aldatzen..."
+msgid "Renaming category \"{name}\"..."
+msgstr "\"{name}\" kategoria aldatzen..."
 
 #, fuzzy, python-brace-format
-#~ msgid "Renaming code \"{name}\"..."
-#~ msgstr "\"{name}\" kodea aldatzen..."
+msgid "Renaming code \"{name}\"..."
+msgstr "\"{name}\" kodea aldatzen..."
 
 #, fuzzy
-#~ msgid "Cases have already been created."
-#~ msgstr "Dagoeneko kasuak sortu dira."
+msgid "Cases have already been created."
+msgstr "Dagoeneko kasuak sortu dira."
 
 #, fuzzy
-#~ msgid ""
-#~ "It appears that you have already used the AI features with this project "
-#~ "before. Meanwhile, we had to change the internal implementation of the "
-#~ "local AI memory to make it more robust. As a result, the AI has to read "
-#~ "through all your empirical documents again to rebuild the local memory. "
-#~ "This may take a while. Sorry for the inconvenience."
-#~ msgstr ""
-#~ "Badirudi lehendik ere AAren ezaugarriak erabili dituzula proiektu "
-#~ "honekin. Bitartean, AA lokaleko memoriaren barne-inplementazioa aldatu "
-#~ "behar izan genuen, sendoagoa izateko. Ondorioz, AIk zure dokumentu "
-#~ "enpiriko guztiak irakurri behar ditu, memoria lokala berreraikitzeko. "
-#~ "Honek denbora behar du. Barkatu eragozpenak."
+msgid ""
+"It appears that you have already used the AI features with this project "
+"before. Meanwhile, we had to change the internal implementation of the local"
+" AI memory to make it more robust. As a result, the AI has to read through "
+"all your empirical documents again to rebuild the local memory. This may "
+"take a while. Sorry for the inconvenience."
+msgstr ""
+"Badirudi lehendik ere AAren ezaugarriak erabili dituzula proiektu honekin. "
+"Bitartean, AA lokaleko memoriaren barne-inplementazioa aldatu behar izan "
+"genuen, sendoagoa izateko. Ondorioz, AIk zure dokumentu enpiriko guztiak "
+"irakurri behar ditu, memoria lokala berreraikitzeko. Honek denbora behar du."
+" Barkatu eragozpenak."
 
 #, fuzzy
-#~ msgid "AI memory"
-#~ msgstr "AI memoria"
+msgid "AI memory"
+msgstr "AI memoria"
 
 #, fuzzy
-#~ msgid "Vectorstore: Document import failed, faiss_db not present."
-#~ msgstr ""
-#~ "Vectorstore: Dokumentuak inportatzeak huts egin du, faiss db ez dago."
+msgid "Vectorstore: Document import failed, faiss_db not present."
+msgstr "Vectorstore: Dokumentuak inportatzeak huts egin du, faiss db ez dago."
 
 #, fuzzy
-#~ msgid "Branch has been selected"
-#~ msgstr "Sailburua hautatu dute"
+msgid "Branch has been selected"
+msgstr "Sailburua hautatu dute"
 
 #, fuzzy
-#~ msgid ""
-#~ "No coded text found. Please select another code or category, or refine "
-#~ "you filters."
-#~ msgstr ""
-#~ "Ez da testu kodeturik aurkitu. Hautatu beste kode edo kategoria bat, edo "
-#~ "findu iragazkiak."
+msgid ""
+"No coded text found. Please select another code or category, or refine you "
+"filters."
+msgstr ""
+"Ez da testu kodeturik aurkitu. Hautatu beste kode edo kategoria bat, edo "
+"findu iragazkiak."
 
 #, fuzzy
-#~ msgid ""
-#~ "ATTENTION: There was more coded data found, but it had to be truncated "
-#~ "because of the limited context window of the AI."
-#~ msgstr ""
-#~ "Informazio kodetu gehiago aurkitu dira, baina trunkatu egin behar izan da "
-#~ "AAren testuinguru-leiho mugatua dela eta."
+msgid ""
+"ATTENTION: There was more coded data found, but it had to be truncated "
+"because of the limited context window of the AI."
+msgstr ""
+"Informazio kodetu gehiago aurkitu dira, baina trunkatu egin behar izan da "
+"AAren testuinguru-leiho mugatua dela eta."
 
 #, fuzzy
-#~ msgid "New topic analysis chat"
-#~ msgstr "Gaiaren analisi berria"
+msgid "New topic analysis chat"
+msgstr "Gaiaren analisi berria"
 
 #, fuzzy
-#~ msgid "Ask the AI anything, not related to your data."
-#~ msgstr "Galdetu AAri ezer, zure datuekin zerikusirik ez duena."
+msgid "Ask the AI anything, not related to your data."
+msgstr "Galdetu AAri ezer, zure datuekin zerikusirik ez duena."
 
 #, fuzzy
-#~ msgid "Names of prompts must be unique within its type and scope."
-#~ msgstr ""
-#~ "Eskarien izenak bereziak izan behar dute mota eta esparruaren barruan."
+msgid "Names of prompts must be unique within its type and scope."
+msgstr ""
+"Eskarien izenak bereziak izan behar dute mota eta esparruaren barruan."
 
 #, fuzzy
-#~ msgid "Screenshot saved"
-#~ msgstr "Pantaila-argazkia gordeta"
+msgid "Screenshot saved"
+msgstr "Pantaila-argazkia gordeta"
