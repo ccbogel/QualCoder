@@ -28,13 +28,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>72</height>
+       <height>94</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>72</height>
+       <height>94</height>
       </size>
      </property>
      <property name="title">
@@ -45,34 +45,34 @@
        <rect>
         <x>10</x>
         <y>2</y>
-        <width>300</width>
-        <height>40</height>
+        <width>760</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>40</height>
+        <height>22</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777213</width>
-        <height>40</height>
+        <height>22</height>
        </size>
       </property>
       <property name="text">
        <string>Code and category frequencies: overall and by coder</string>
       </property>
       <property name="wordWrap">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_select_codes">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>4</y>
+        <x>10</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -99,8 +99,8 @@
      <widget class="QPushButton" name="pushButton_select_categories">
       <property name="geometry">
        <rect>
-        <x>356</x>
-        <y>4</y>
+        <x>46</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -127,8 +127,8 @@
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
-        <x>400</x>
-        <y>4</y>
+        <x>90</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -155,8 +155,8 @@
      <widget class="QPushButton" name="pushButton_select_cases">
       <property name="geometry">
        <rect>
-        <x>436</x>
-        <y>4</y>
+        <x>126</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -183,8 +183,8 @@
      <widget class="QPushButton" name="pushButton_file_attributes">
       <property name="geometry">
        <rect>
-        <x>472</x>
-        <y>4</y>
+        <x>162</x>
+        <y>28</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -211,8 +211,8 @@
      <widget class="QComboBox" name="comboBox_sort">
       <property name="geometry">
        <rect>
-        <x>520</x>
-        <y>5</y>
+        <x>210</x>
+        <y>29</y>
         <width>91</width>
         <height>30</height>
        </rect>
@@ -244,8 +244,8 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>626</x>
-        <y>8</y>
+        <x>316</x>
+        <y>32</y>
         <width>24</width>
         <height>24</height>
        </rect>
@@ -260,8 +260,8 @@
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>654</x>
-        <y>5</y>
+        <x>344</x>
+        <y>29</y>
         <width>91</width>
         <height>30</height>
        </rect>
@@ -289,7 +289,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>46</y>
+        <y>66</y>
         <width>441</width>
         <height>23</height>
        </rect>
