@@ -250,16 +250,12 @@ Codings from the entire text file are used for the calculations.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_charts.ui" line="0"/>
-      <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+      <source>Selecting a text file here will override existing stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-      <translation>ここでテキストファイルを選択すると、ソフトウェア内の既存のストップワードが上書きされ、.qualcoder設定フォルダに保存されているストップワードも上書きされます。
-これは一時的な設定であり、チャート画面を開くたびに選択する必要があります。
-
-ファイルはプレーンテキスト形式で、1行に1語のみ記載してください。
-各語はn-grams=1のワードクラウドから除外されます。</translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -1108,8 +1104,8 @@ Warning. No Undo option.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>結果内の次の語句を検索</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
@@ -1216,8 +1212,8 @@ Ordered by file name and code name.</source>
     <name>Dialog_Coocurrence</name>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Code Co-occurence</source>
-      <translation>コード共同</translation>
+      <source>Code Co-occurrence</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -1226,8 +1222,8 @@ Ordered by file name and code name.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Code co-occurence</source>
-      <translation>コード共同</translation>
+      <source>Code co-occurrence</source>
+      <translation type="unfinished">コード共起</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -1266,10 +1262,9 @@ Ordered by file name and code name.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Export Co-occurence Graph Image
+      <source>Export Co-occurrence Graph Image
 Right-click for format options</source>
-      <translation>共起グラフの画像をエクスポート
-右クリックでフォーマットオプションを表示</translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -2486,8 +2481,8 @@ odt レポート: コードされたテキストと領域のレポート。</tra
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>結果内の次の語句を検索</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
@@ -2692,9 +2687,8 @@ As all assigned positions may be incorrect. </source>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_text.ui" line="0"/>
       <source>After editing the text:
-Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</source>
-      <translation type="unfinished">テキストを編集した後:
-編集されたテキストをレビューして、コードの位置が正しいことを確認します。 コードの投稿が間違っている場合は、編集されていないテキストにボタンを押します。</translation>
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code positions are incorrect.</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_text.ui" line="0"/>
@@ -3047,8 +3041,8 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>結果内の次の語句を検索</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
@@ -3272,10 +3266,8 @@ check All journals for searching all journals</source>
       <location filename="../src/GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
       <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
-(You can open the project folder and copy/paste the orignal text file if preferred.)</source>
-      <translation>選択したファイルをエクスポートします。
-テキストファイル(ソースは問いません)は、データベースに保存されているテキストから.txtファイルとしてエクスポートされます。
-(必要であれば、プロジェクトフォルダを開き、元のテキストファイルをコピー/ペーストすることもできます)。</translation>
+(You can open the project folder and copy/paste the original text file if preferred.)</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
@@ -3733,34 +3725,69 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Export text file</source>
-      <translation>テキストファイルのエクスポート</translation>
+      <source>Select codes</source>
+      <translation type="unfinished">コードを選択</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Export Excel</source>
-      <translation>エクセルファイルのエクスポート</translation>
+      <source>Select categories</source>
+      <translation type="unfinished">カテゴリーを選択</translation>
     </message>
     <message>
-      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
       <source>Select files</source>
       <translation>ファイルを選択</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Alphabetic ascending</source>
-      <translation>アルファベット昇順</translation>
+      <source>Select cases</source>
+      <translation type="unfinished">ケースの選択</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Totals descending</source>
-      <translation>合計降順</translation>
+      <source>Select files by attributes</source>
+      <translation type="unfinished">属性でファイルを選択する</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>File Attributes</source>
-      <translation type="unfinished">ファイル属性</translation>
+      <source>Sort order</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>A - z</source>
+      <translation type="unfinished">A - Z</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>Z - a</source>
+      <translation type="unfinished">郵便番号</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>10 - 1</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>1 - 10</source>
+      <translation type="unfinished">1 ～ 10</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>Export</source>
+      <translation type="unfinished">輸出</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>txt</source>
+      <translation type="unfinished">ログイン</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>xlsx</source>
+      <translation type="unfinished">ログイン</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
@@ -3902,8 +3929,8 @@ Change Settings for number of characters and display style.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>結果内の次の語句を検索</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -4018,6 +4045,64 @@ Select 2 coders, 1 file, 1 code.</source>
       <location filename="../src/GUI_UIs/ui_report_compare_coder_file.ui" line="0"/>
       <source>Statistics explanation</source>
       <translation>統計の説明</translation>
+    </message>
+  </context>
+  <context>
+    <name>Dialog_reportComparisons</name>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder Comparisons</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder</source>
+      <translation type="unfinished">コーダー</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Select two coders</source>
+      <translation type="unfinished">2つのコーダを選択</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder comparisons - text files</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coders selected:</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Run comparison</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Clear selection</source>
+      <translation type="unfinished">クリアセレクション</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Export Excel</source>
+      <translation type="unfinished">エクセルファイルのエクスポート</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Statistics help</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Select files for comparison subcorpus.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Files: All</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -4242,16 +4327,10 @@ Not recommended unless you have many large files slowing the backup.</source>
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
 To do this update the config.ini  file to another language that is available.
-Find the line begining language =
+Find the line beginning language =
 Then update it. For example:
-langauge = it</source>
-      <translation type="unfinished">言語の変更を反映させるには、ソフトウェアを一度閉じてから再度開いてください。
-定期的に（人間および／またはAIによって）更新される言語は、de、es、fr、ja、pt、sv、zhです。
-src/qualcoder/i18n フォルダにリストされている言語であれば、追加することができます。
-これを行うには、config.ini ファイルを利用可能な別の言語に更新してください。
-「language =」で始まる行を探してください。
-その後、その行を更新してください。例：
-language = it</translation>
+language = it</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4372,13 +4451,23 @@ language = it</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Codesstripe view</source>
-      <translation type="unfinished">コードストリップビュー</translation>
+      <source>Codes stripe view</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
       <source>Style</source>
       <translation>スタイル</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
+      <source>Where the Project, Manage, Coding, Reports and AI Agent tabs are shown</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
+      <source>Main tabs</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4475,8 +4564,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Authentification:</source>
-      <translation type="unfinished">認証:</translation>
+      <source>Authentication:</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4537,8 +4626,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Advanced option. Only change when you know whatr you are doing.</source>
-      <translation>高度なオプション。自分が何をしているかわかっているときだけ変更してください。</translation>
+      <source>Advanced option. Only change when you know what you are doing.</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4692,8 +4781,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_speakers.ui" line="0"/>
-      <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished">「コード名」をダブルクリックして編集します</translation>
+      <source>Double-click a "code as" name to edit</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -5175,8 +5264,113 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
-      <source>Action Log</source>
-      <translation>行動ログ</translation>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Project</source>
+      <translation>プロジェクト</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Show the action log panel</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create a new QualCoder project (Ctrl+N)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create new project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>New project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create a new project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open an existing QualCoder project (Ctrl+O)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open an existing project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Recent projects</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Choose a recently opened project to open it</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Choose a recent project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Recent activity</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Your recent work in this project will appear here.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Project contents</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>No project open. Its contents will appear here.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Hide the action log panel</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Action log</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Show or hide the action log</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Select an option from the Project menu</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
@@ -5215,11 +5409,6 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
       <source>AI Agent</source>
       <translation type="unfinished">AIエージェント</translation>
-    </message>
-    <message>
-      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
-      <source>Project</source>
-      <translation>プロジェクト</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>

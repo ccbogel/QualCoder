@@ -248,16 +248,12 @@ Codings from the entire text file are used for the calculations.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_charts.ui" line="0"/>
-      <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+      <source>Selecting a text file here will override existing stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-      <translation type="unfinished">Chwazi yon fichye tèks isit la ap ranplase mo stopwords ki egziste deja nan lojisyèl la, epi li ap ranplase tou mo stopwords ki estoke nan dosye konfigirasyon .qualcoder la. 
-Sa a se tanporè e li dwe chwazi chak fwa ekran Charts la louvri. 
-
-Fichye a dwe tèks senp ak yon mo pa liy.
-Chak mo enkli nan n-grams=1 Word cloud la.</translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -1106,8 +1102,8 @@ Avètisman. Pa gen opsyon pou anile.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation type="unfinished">Chèche pwochen aparisyon an nan rezilta yo.</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
@@ -1214,8 +1210,8 @@ Klase pa non fichye ak non kòd.</translation>
     <name>Dialog_Coocurrence</name>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Code Co-occurence</source>
-      <translation type="unfinished">Kòd ko-okirans</translation>
+      <source>Code Co-occurrence</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -1224,7 +1220,7 @@ Klase pa non fichye ak non kòd.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Code co-occurence</source>
+      <source>Code co-occurrence</source>
       <translation type="unfinished">Kòd ko-okirans</translation>
     </message>
     <message>
@@ -1264,10 +1260,9 @@ Klase pa non fichye ak non kòd.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Export Co-occurence Graph Image
+      <source>Export Co-occurrence Graph Image
 Right-click for format options</source>
-      <translation type="unfinished">Ekspòte Imaj Grafik Koko-prezans
-Klike dwat pou opsyon fòma</translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -2483,8 +2478,8 @@ Rapò ODT: rapò sou tèks ak zòn ki kode yo.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation type="unfinished">Chèche pwochen aparisyon an nan rezilta yo</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
@@ -2689,9 +2684,8 @@ Paske tout pozisyon ki afekte yo ka pa kòrèk.</translation>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_text.ui" line="0"/>
       <source>After editing the text:
-Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</source>
-      <translation type="unfinished">Apre w fin modifye tèks la:
-Revize tèks modifye a pou konfime pozisyon kòd yo kòrèk. Peze bouton an pou anile modifikasyon tèks la, si pozisyon kòd yo pa kòrèk.</translation>
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code positions are incorrect.</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_text.ui" line="0"/>
@@ -3043,8 +3037,8 @@ Positions may not correctly adjust. Make  a backup copy of the project before ed
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation type="unfinished">Chèche pwochen aparisyon an nan rezilta yo</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
@@ -3268,10 +3262,8 @@ Tcheke tout jounal yo pou rechèch nan tout jounal yo</translation>
       <location filename="../src/GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
       <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
-(You can open the project folder and copy/paste the orignal text file if preferred.)</source>
-      <translation type="unfinished">Ekspòte fichye seleksyone a.
-Fichye tèks (ki soti nan nenpòt sous) yo ekspòte apati tèks ki estoke nan baz done a kòm fichye .txt.
-(Ou ka louvri dosye pwojè a epi kopye/kole fichye tèks orijinal la si w prefere.)</translation>
+(You can open the project folder and copy/paste the original text file if preferred.)</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
@@ -3733,34 +3725,69 @@ Sènsib a majiskil/miniskil, ajoute plizyè antre pou chak: pa egzanp, Tom Jones
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Export text file</source>
-      <translation type="unfinished">Ekspòte fichye tèks</translation>
+      <source>Select codes</source>
+      <translation type="unfinished">Chwazi kòd yo</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Export Excel</source>
-      <translation type="unfinished">Ekspòte Excel</translation>
+      <source>Select categories</source>
+      <translation type="unfinished">Chwazi kategori</translation>
     </message>
     <message>
-      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
       <source>Select files</source>
       <translation type="unfinished">Chwazi fichye</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Alphabetic ascending</source>
-      <translation type="unfinished">Alfabetik monte</translation>
+      <source>Select cases</source>
+      <translation type="unfinished">Seleksyone ka</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Totals descending</source>
-      <translation type="unfinished">Total k ap desann</translation>
+      <source>Select files by attributes</source>
+      <translation type="unfinished">Chwazi fichye dapre atribi yo</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>File Attributes</source>
-      <translation type="unfinished">Atribit Fichye</translation>
+      <source>Sort order</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>A - z</source>
+      <translation type="unfinished">A – Z</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>Z - a</source>
+      <translation type="unfinished">Z – ak</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>10 - 1</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>1 - 10</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>Export</source>
+      <translation type="unfinished">Ekspòte</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>txt</source>
+      <translation type="unfinished">tekst</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>xlsx</source>
+      <translation type="unfinished">Excel 2016</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
@@ -3902,8 +3929,8 @@ Chanje Paramèt pou kantite karaktè ak stil afichaj.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation type="unfinished">Chèche pwochen aparisyon an nan rezilta yo</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -4017,6 +4044,64 @@ Chwazi 2 kodè, 1 fichye, 1 kòd.</translation>
       <location filename="../src/GUI_UIs/ui_report_compare_coder_file.ui" line="0"/>
       <source>Statistics explanation</source>
       <translation type="unfinished">Eksplikasyon estatistik</translation>
+    </message>
+  </context>
+  <context>
+    <name>Dialog_reportComparisons</name>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder Comparisons</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder</source>
+      <translation type="unfinished">Kodè</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Select two coders</source>
+      <translation type="unfinished">Chwazi de kodè</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder comparisons - text files</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coders selected:</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Run comparison</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Clear selection</source>
+      <translation type="unfinished">Chwa klè</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Export Excel</source>
+      <translation type="unfinished">Ekspòte Excel</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Statistics help</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Select files for comparison subcorpus.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Files: All</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -4241,16 +4326,10 @@ Pa rekòmande sof si ou gen anpil gwo fichye k ap ralanti sovgad la.</translatio
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
 To do this update the config.ini  file to another language that is available.
-Find the line begining language =
+Find the line beginning language =
 Then update it. For example:
-langauge = it</source>
-      <translation type="unfinished">Fèmen epi louvri lojisyèl an pou chanjman lang lan ka fèt.
-Lang yo mete ajou regilyèman (pa moun ak/oswa AI) se: de, es, fr, ja, pt, sv, zh.
-Ou ka ajoute lòt lang si yo nan lis ki nan dosye src/qualcoder/i18n nan.
-Pou fè sa, mete ajou fichye config.ini a pou yon lòt lang ki disponib.
-Jwenn liy ki kòmanse ak language = la.
-Apre sa, mete l ajou. Pa egzanp:
-langauge = it</translation>
+language = it</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4371,13 +4450,23 @@ langauge = it</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Codesstripe view</source>
-      <translation type="unfinished">Vizyon Codesstripe</translation>
+      <source>Codes stripe view</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
       <source>Style</source>
       <translation type="unfinished">Stil</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
+      <source>Where the Project, Manage, Coding, Reports and AI Agent tabs are shown</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
+      <source>Main tabs</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4474,8 +4563,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Authentification:</source>
-      <translation type="unfinished">Otorizasyon:</translation>
+      <source>Authentication:</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4536,8 +4625,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Advanced option. Only change when you know whatr you are doing.</source>
-      <translation type="unfinished">Opsyon avanse. Chanje sèlman lè ou konnen sa w ap fè.</translation>
+      <source>Advanced option. Only change when you know what you are doing.</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4690,8 +4779,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_speakers.ui" line="0"/>
-      <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished">Doub-klike sou yon non "code as" pou modifye</translation>
+      <source>Double-click a "code as" name to edit</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -5171,8 +5260,113 @@ Pa kode tèks sa a jiskaske ou re-chaje Coding - Code Text nan ba meni an.</tran
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
-      <source>Action Log</source>
-      <translation type="unfinished">Jounal Aksyon</translation>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Project</source>
+      <translation type="unfinished">Pwojè</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Show the action log panel</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create a new QualCoder project (Ctrl+N)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create new project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>New project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create a new project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open an existing QualCoder project (Ctrl+O)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open an existing project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Recent projects</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Choose a recently opened project to open it</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Choose a recent project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Recent activity</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Your recent work in this project will appear here.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Project contents</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>No project open. Its contents will appear here.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Hide the action log panel</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Action log</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Show or hide the action log</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Select an option from the Project menu</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
@@ -5211,11 +5405,6 @@ Pa kode tèks sa a jiskaske ou re-chaje Coding - Code Text nan ba meni an.</tran
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
       <source>AI Agent</source>
       <translation type="unfinished">Ajan Entèlijans Atifisyèl</translation>
-    </message>
-    <message>
-      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
-      <source>Project</source>
-      <translation type="unfinished">Pwojè</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>

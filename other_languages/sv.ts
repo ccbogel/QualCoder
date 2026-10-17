@@ -250,16 +250,12 @@ Beräkningarna baseras på kodningarna från hela textfilen.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_charts.ui" line="0"/>
-      <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+      <source>Selecting a text file here will override existing stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-      <translation>Om du väljer en textfil här kommer befintliga stoppord i programvaran att åsidosättas, liksom stoppord som lagrats i konfigurationsmappen .qualcoder. 
-Detta är tillfälligt och måste väljas varje gång skärmen Diagram öppnas.
-
-Filen måste vara ren text med ett ord per rad.
-Varje ord exkluderas i n-grams=1 Word cloud.</translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_charts.ui" line="0"/>
@@ -1108,8 +1104,8 @@ Varning. Inget Undo-alternativ.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>Sök efter nästa händelse i resultat</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_relations.ui" line="0"/>
@@ -1216,8 +1212,8 @@ Sorterad efter filnamn och kodnamn.</translation>
     <name>Dialog_Coocurrence</name>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Code Co-occurence</source>
-      <translation>Kodens förekomst</translation>
+      <source>Code Co-occurrence</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -1226,8 +1222,8 @@ Sorterad efter filnamn och kodnamn.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Code co-occurence</source>
-      <translation>Kodens förekomst</translation>
+      <source>Code co-occurrence</source>
+      <translation type="unfinished">Kodens förekomst</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -1266,10 +1262,9 @@ Sorterad efter filnamn och kodnamn.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
-      <source>Export Co-occurence Graph Image
+      <source>Export Co-occurrence Graph Image
 Right-click for format options</source>
-      <translation>Exportera bild av samförekomstdiagram
-Högerklicka för formatalternativ</translation>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_cooccurrence.ui" line="0"/>
@@ -2485,8 +2480,8 @@ odt report: Rapport om kodad text och områden.</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>Sök efter nästa händelse i resultat</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_summary.ui" line="0"/>
@@ -2691,9 +2686,8 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_text.ui" line="0"/>
       <source>After editing the text:
-Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect.</source>
-      <translation type="unfinished">Efter redigering av texten:
-Granska redigerad text för att bekräfta kodpositioner är korrekta. Tryck på knappen till Undo redigerad text, om kodposter är felaktiga.</translation>
+Review edited text to confirm code positions are correct. Press button to Undo edited text, if code positions are incorrect.</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_code_text.ui" line="0"/>
@@ -3046,8 +3040,8 @@ Positioner kan inte korrekt justera. Gör en säkerhetskopia av projektet innan 
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>Sök efter nästa händelse i resultat</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_file_summary.ui" line="0"/>
@@ -3271,10 +3265,8 @@ kontrollera alla tidskrifter för att söka alla tidskrifter</translation>
       <location filename="../src/GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
       <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
-(You can open the project folder and copy/paste the orignal text file if preferred.)</source>
-      <translation>Exportera vald fil.
-Textfiler (från vilken källa som helst) exporteras från texten lagrad i databasen som .txt -filer.
-(Du kan öppna projektmappen och kopiera/klistra in den orignala textfilen om den föredras.)</translation>
+(You can open the project folder and copy/paste the original text file if preferred.)</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
@@ -3732,34 +3724,69 @@ Skiftlägeskänsligt, lägg till flera poster för varje: t.ex. Tom Jones  och T
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Export text file</source>
-      <translation>Exportera textfil</translation>
+      <source>Select codes</source>
+      <translation type="unfinished">Välj koder</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Export Excel</source>
-      <translation>Exportera Excel-fil</translation>
+      <source>Select categories</source>
+      <translation type="unfinished">Välj kategorier</translation>
     </message>
     <message>
-      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
       <source>Select files</source>
       <translation>Välj filer</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Alphabetic ascending</source>
-      <translation>Alfabetisk stigande</translation>
+      <source>Select cases</source>
+      <translation type="unfinished">Välj fall</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>Totals descending</source>
-      <translation>Totalt fallande</translation>
+      <source>Select files by attributes</source>
+      <translation type="unfinished">Välj filer efter attribut</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
-      <source>File Attributes</source>
-      <translation type="unfinished">Filinställningar</translation>
+      <source>Sort order</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>A - z</source>
+      <translation type="unfinished">A - ö</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>Z - a</source>
+      <translation type="unfinished">Z - A</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>10 - 1</source>
+      <translation type="unfinished">10 - 1</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>1 - 10</source>
+      <translation type="unfinished">1 - 10</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>Export</source>
+      <translation type="unfinished">Exportera</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>txt</source>
+      <translation type="unfinished">txt</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
+      <source>xlsx</source>
+      <translation type="unfinished">xlsx</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_code_frequencies.ui" line="0"/>
@@ -3900,8 +3927,8 @@ Change Settings for number of characters and display style.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-      <source>Search for next occurence in results</source>
-      <translation>Sök efter nästa händelse i resultat</translation>
+      <source>Search for next occurrence in results</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -4016,6 +4043,64 @@ Välj 2 kodare, 1 fil, 1 kod.</translation>
       <location filename="../src/GUI_UIs/ui_report_compare_coder_file.ui" line="0"/>
       <source>Statistics explanation</source>
       <translation>Förklaring av statistik</translation>
+    </message>
+  </context>
+  <context>
+    <name>Dialog_reportComparisons</name>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder Comparisons</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder</source>
+      <translation type="unfinished">Kodare</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Select two coders</source>
+      <translation type="unfinished">Välj två kodare</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coder comparisons - text files</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Coders selected:</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Run comparison</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Clear selection</source>
+      <translation type="unfinished">Tydligt urval</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Export Excel</source>
+      <translation type="unfinished">Exportera Excel-fil</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Statistics help</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Select files for comparison subcorpus.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_report_comparisons.ui" line="0"/>
+      <source>Files: All</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -4241,16 +4326,10 @@ Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopia
 Languages regularly updated (by human and / or AI) are: de, es, fr, ja, pt, sv, zh.
 Additional languages can be added if they are listed in the src/qualcoder/i18n folder.
 To do this update the config.ini  file to another language that is available.
-Find the line begining language =
+Find the line beginning language =
 Then update it. For example:
-langauge = it</source>
-      <translation type="unfinished">Stäng och öppna programmet för att språkändringen ska träda i kraft.
-Språk som uppdateras regelbundet (av människor och/eller AI) är: de, es, fr, ja, pt, sv, zh.
-Ytterligare språk kan läggas till om de finns listade i mappen src/qualcoder/i18n.
-För att göra detta uppdaterar du filen config.ini till ett annat tillgängligt språk.
-Leta reda på raden som börjar med language =
-Uppdatera sedan den. Till exempel:
-language = it</translation>
+language = it</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4371,13 +4450,23 @@ language = it</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Codesstripe view</source>
-      <translation type="unfinished">Codesstripe View</translation>
+      <source>Codes stripe view</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
       <source>Style</source>
       <translation>Stil</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
+      <source>Where the Project, Manage, Coding, Reports and AI Agent tabs are shown</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
+      <source>Main tabs</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4474,8 +4563,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Authentification:</source>
-      <translation type="unfinished">Autentisering:</translation>
+      <source>Authentication:</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4536,8 +4625,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
-      <source>Advanced option. Only change when you know whatr you are doing.</source>
-      <translation>Avancerat alternativ.Byt bara när du vet vad du gör.</translation>
+      <source>Advanced option. Only change when you know what you are doing.</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_settings.ui" line="0"/>
@@ -4690,8 +4779,8 @@ This is an experimental feature. Use it with care.</source>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_dialog_speakers.ui" line="0"/>
-      <source>Doubleclick a "code as" name to edit</source>
-      <translation type="unfinished">Dubbelklicka på ett ”code as”-namn för att redigera det</translation>
+      <source>Double-click a "code as" name to edit</source>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
@@ -5173,8 +5262,113 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
-      <source>Action Log</source>
-      <translation>Handlingslogg</translation>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Project</source>
+      <translation>Projekt</translation>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Show the action log panel</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create a new QualCoder project (Ctrl+N)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create new project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>New project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Create a new project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open an existing QualCoder project (Ctrl+O)</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Open an existing project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Recent projects</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Choose a recently opened project to open it</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Choose a recent project</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Recent activity</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Your recent work in this project will appear here.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Project contents</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>No project open. Its contents will appear here.</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Hide the action log panel</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Action log</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Show or hide the action log</source>
+      <translation type="unfinished"/>
+    </message>
+    <message>
+      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
+      <source>Select an option from the Project menu</source>
+      <translation type="unfinished"/>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
@@ -5213,11 +5407,6 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
       <source>AI Agent</source>
       <translation type="unfinished">AI-agent</translation>
-    </message>
-    <message>
-      <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
-      <source>Project</source>
-      <translation>Projekt</translation>
     </message>
     <message>
       <location filename="../src/GUI_UIs/ui_main.ui" line="0"/>
