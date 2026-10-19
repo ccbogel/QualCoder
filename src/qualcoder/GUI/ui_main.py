@@ -8,6 +8,8 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from qualcoder.helpers import ActionLog
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -238,7 +240,7 @@ class Ui_MainWindow(object):
         self.textBrowser_project.setOpenExternalLinks(True)
         self.textBrowser_project.setObjectName("textBrowser_project")
         self.stackedWidget_project.addWidget(self.textBrowser_project)
-        self.textEdit = QtWidgets.QTextEdit()
+        self.textEdit = ActionLog()
         self.textEdit.setObjectName("textEdit")
         self.stackedWidget_project.addWidget(self.textEdit)
         self.verticalLayout_log_panel.addWidget(self.stackedWidget_project)

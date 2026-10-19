@@ -418,6 +418,30 @@ def extract_epub_fulltext(filepath):
     return text_
 
 
+class ActionLog(QtWidgets.QTextBrowser):
+    """Keep ordinary log entries from inheriting a selected link's formatting."""
+
+    @QtCore.pyqtSlot(str)
+    def append(self, text: str) -> None:
+        """Append plain text or HTML without carrying over cursor formatting.
+
+        Args:
+            text: Log entry to append.
+        """
+
+        cursor = self.textCursor()
+        original_position = cursor.position()
+        original_anchor = cursor.anchor()
+        restore_cursor = cursor.hasSelection() or not cursor.atEnd()
+        self.moveCursor(QtGui.QTextCursor.MoveOperation.End)
+        self.setCurrentCharFormat(QtGui.QTextCharFormat())
+        super().append(text)
+        if restore_cursor:
+            cursor.setPosition(original_anchor)
+            cursor.setPosition(original_position, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            self.setTextCursor(cursor)
+
+
 class ElidedLabel(QtWidgets.QLabel):
     """Keep the full text accessible while painting an ellipsis when necessary."""
 

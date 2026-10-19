@@ -642,7 +642,7 @@
                 <bool>true</bool>
                </property>
               </widget>
-              <widget class="QTextEdit" name="textEdit">
+              <widget class="ActionLog" name="textEdit">
                <property name="accessibleName">
                 <string>Action log</string>
                </property>
@@ -1354,6 +1354,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ActionLog</class>
+   <extends>QTextBrowser</extends>
+   <header>qualcoder.helpers</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -386,6 +386,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_sidebar_splitter_is_restoring = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.init_action_log()
         self.init_placeholder_tab_layouts()
         # Test of macOS menu bar
         if self.app.settings['stylesheet'] == "native":
@@ -639,7 +640,9 @@ Click "Yes" to start now.')
 
         logger.info(message)
         if getattr(self, "ui", None) is not None and hasattr(self.ui, "textEdit"):
-            self.ui.textEdit.append(message)
+            endpoint = html.escape(self.external_mcp.endpoint)
+            message_html = html.escape(message).replace(endpoint, '<br />' + endpoint)
+            self.ui.textEdit.append(f'<p>{message_html}</p>')
 
     @QtCore.pyqtSlot(str)
     def _external_mcp_start_failed(self, message: str) -> None:
@@ -1044,7 +1047,6 @@ Click "Yes" to start now.')
         self.ui.splitter.setCollapsible(1, False)
         self.ui.sidebar.setMinimumWidth(0)
         self.ui.splitter.splitterMoved.connect(self.on_main_splitter_moved)
-        self.settings_report()
         
         self.ui.tabWidget.setCurrentIndex(0)
         self.last_non_ai_chat_tab = self.ui.tab_action_log
@@ -1175,6 +1177,8 @@ Click "Yes" to start now.')
             label.setStyleSheet(f"color: {secondary}; background-color: transparent; border: none;")
         self.project_panel_colors["highlight"] = highlight.name()
         self.project_panel_colors["base"] = base.name()
+        self.ui.textEdit.document().setDefaultStyleSheet(
+            f"p {{margin-top: 0; margin-bottom: 8px;}} a {{color: {highlight.name()};}}")
         tint = f"rgba({highlight.red()}, {highlight.green()}, {highlight.blue()}, 18)"
         self.ui.comboBox_recent_projects.setStyleSheet(
             f"QComboBox#comboBox_recent_projects {{background-color: {base.name()}; color: {text.name()};"
@@ -2110,41 +2114,6 @@ Click "Yes" to start now.')
         if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_5:
             self.ui.menuHelp.popup(QtGui.QCursor.pos())
 
-    def settings_report(self, swith_to_action_log: bool = True):
-        """ Display general settings and project summary """
-
-        self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        msg = "<p>" + _("Coder") + f": {self.app.settings['codername']}<br />"
-        msg += _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']} | "
-        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}<br />"
-        msg += _("Working directory") + f": {self.app.settings['directory']}<br />"
-        msg += _("Language") + f": {self.app.settings['language']} | "
-        msg += _("Show IDs") + f": {self.app.settings['showids']}<br />"
-        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']} | "
-        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}<br />"
-        msg += _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}<br /> "
-        msg += _("Style") + f": {self.app.settings['stylesheet']}<br />"
-        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']} | "
-        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}<br />"
-        if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI integration is enabled")
-        else:
-            msg += _("AI integration is disabled")
-        ai_permissions = self.app.settings.get('ai_permissions', 1)
-        ai_permissions_labels = {
-            0: 'Read-only',
-            1: 'Sandboxed',
-            2: 'Full access'
-        }
-        msg += " | " + _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}</p>"
-        self.ui.textEdit.append(msg)
-        if platform.system() == "Windows":
-            self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
-        self.ui.textEdit.append("<p></p>")
-        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
-        if swith_to_action_log:
-            self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
-
     def text_segments_codes_table(self):
         """ Show table of text segments (rows) by codes (columns). """
 
@@ -2254,8 +2223,28 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(coding_shortcuts_display)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         
+    def init_action_log(self) -> None:
+        """Set up paragraph spacing and clickable links in the action log."""
+
+        self.ui.textEdit.setOpenLinks(False)
+        self.ui.textEdit.anchorClicked.connect(self.action_log_link_clicked)
+        self.ui.textEdit.document().setDefaultStyleSheet("p {margin-top: 0; margin-bottom: 8px;}")
+        self.ui.textEdit.document().setDocumentMargin(8)
+
+    def action_log_link_clicked(self, url: QtCore.QUrl) -> None:
+        """Open backup folders, websites or QualCoder actions from the log.
+
+        Args:
+            url: Link activated in the action log.
+        """
+
+        if url.isLocalFile():
+            QtGui.QDesktopServices.openUrl(url)
+        else:
+            self.handle_placeholder_link(url)
+
     def action_log_scroll_bottom(self):
-        """Scrolls the action log to the very bottom, malking new entries visible."""
+        """Scroll the action log to the bottom to show new entries."""
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
     def about(self):
@@ -3391,7 +3380,6 @@ Click "Yes" to start now.')
 
         self.app.settings, self.app.ai_models = self.app.load_settings()
         self.external_mcp.sync_with_application_state()
-        self.settings_report(swith_to_action_log=False)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.update_placeholder_tab_styles()
@@ -3965,7 +3953,13 @@ Click "Yes" to start now.')
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self._project_open_step(progress, 2, _("Saving a backup copy of the project"))
             msg, backup_name = self.app.save_backup()
-            self.ui.textEdit.append(msg)
+            backup_path = Path(backup_name)
+            backup_url = QtCore.QUrl.fromLocalFile(str(backup_path)).toString()
+            backup_link = (f'<a href="{html.escape(backup_url)}" title="{html.escape(str(backup_path))}">'
+                           f'{html.escape(backup_path.name)}</a>')
+            backup_message = html.escape(msg).replace(html.escape(backup_name), '<br />' + backup_link)
+            backup_message = backup_message.replace("\n", "<br />")
+            self.ui.textEdit.append(f'<p>{backup_message}</p>')
         self._project_open_step(progress, 3, _("Preparing AI and search components"))
         # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
         if self.app.ai is not None:
@@ -3974,9 +3968,18 @@ Click "Yes" to start now.')
         if self.ai_chat_window is not None:
             self.ai_chat_window.init_ai_chat(self.app)
         self._project_open_step(progress, 4, _("Preparing the project summary"))
-        msg = f"{_('Project Opened: ')}{self.app.project_name}"
+        project_url = QtCore.QUrl.fromLocalFile(self.app.project_path).toString()
+        msg = (f"<p><b>{html.escape(_('Project Opened: '))}</b><br />"
+               f'<a href="{html.escape(project_url)}" title="{html.escape(self.app.project_path)}">'
+               f"{html.escape(self.app.project_name)}</a></p>")
         self.ui.textEdit.append(msg)
-        self.project_summary_report()
+        cur.execute("select databaseversion, date, memo from project")
+        result = cur.fetchall()[-1]
+        self.project['databaseversion'] = result[0]
+        self.project['date'] = result[1]
+        self.project['memo'] = result[2]
+        self.request_project_summary_update()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.show_menu_options()
         self.external_mcp.sync_with_application_state()
         self._project_open_step(progress, 5, _("Project opened"))
@@ -3994,8 +3997,7 @@ Click "Yes" to start now.')
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
-        self.ui.textEdit.append("<br />")
-        self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
+        self.ui.textEdit.append(f"<p><b>{html.escape(_('Project summary'))}</b></p>")
         msg = f"<p>{self.app.project_name}<br />"
         msg += f'{_("Project path: ")}{self.app.project_path}<br />'
         msg += f"{_('Project date: ')}{self.project['date']}<br />"
@@ -4273,11 +4275,12 @@ Click "Yes" to start now.')
         self.text_coding(task='ai_search')
 
     def get_latest_github_release(self):
-        """ Get latest github release. Some issues on some platforms, so in try except. """
+        """Show a compact version header and check GitHub for newer releases."""
 
-        self.ui.textEdit.append(_("This version: ") + self.app.version)
+        self.ui.textEdit.append(
+            f'<p><b>{html.escape(self.app.version)}</b> &middot; '
+            f'<a href="qualcoder://action/about">{html.escape(_("About"))}</a></p>')
         if "beta" in self.app.version.lower():
-            self.ui.textEdit.append(self.app.citation.split('Retrieved')[0])
             return
         try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
@@ -4290,20 +4293,18 @@ Click "Yes" to start now.')
             temp_this_version = self.app.version.replace("QualCoder", "")
             tmp_this_version_num = temp_this_version.split('.', 1)
             this_version_num = float(tmp_this_version_num[0] + '.' + tmp_this_version_num[1].replace('.', ''))
+            release_link = (f'<a href="{html.escape(_json["html_url"])}">'
+                            f'{html.escape(_json["name"])}</a>')
             if release_num > this_version_num:
-                html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
-                self.ui.textEdit.append(html)
-                html = f'<span style="color:red">{_json["html_url"]}</span><br />'
-                self.ui.textEdit.append(html)
+                html_string = '<span style="color:red">' + html.escape(_("Newer release available: "))
+                self.ui.textEdit.append(html_string + release_link + '</span>')
             elif str(release_num) == str(this_version_num):
-                self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
-                self.ui.textEdit.append(_json['html_url'] + "\n")
+                self.ui.textEdit.append(html.escape(_("Latest Release: ")) + release_link)
             else:
                 self.ui.textEdit.append(_("This version may be a pre-release version."))
         except Exception as err:
             print(err)
             logger.warning(str(err))
-        self.ui.textEdit.append(self.app.citation)
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
