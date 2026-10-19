@@ -22,7 +22,7 @@ Report privately through GitHub: open the repository's **Security** tab and choo
 Include, where possible:
 
 - QualCoder version and operating system
-- How you installed it (binary from the Releases page, or from source)
+- How you installed QualCoder (binary from the Releases page, or installed from source)
 - Steps to reproduce
 - What the impact is (for example, data exposure, code execution, denial of service)
 
