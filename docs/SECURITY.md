@@ -56,7 +56,7 @@ The following are out of scope:
 - Local semantic search uses a model downloaded once to the user's machine; the resulting embeddings are stored in the project's `ai_data` folder.
 - A pseudonymisation tool is available to replace names before documents are imported (excluding PDFs).
 - Windows and macOS binaries are currently unsigned, so operating systems show an "unknown publisher" warning.
-- SHA-256 Checksums for each binary are listed on the release page so downloads can be verified. You should check the dowloaded binary hash matches the hash shown for that binary on GitHub.
+- SHA-256 Checksums for each binary are listed on the GitHub release page so downloads can be verified. You should check the dowloaded binary hash matches the hash shown for that binary on GitHub.
 
 ## Dependency updates
 
