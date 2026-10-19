@@ -70,6 +70,33 @@ class TestProjectSummaryChats(TestCase):
                                    [(chat_types[index % len(chat_types)],) for index in range(count)])
             connection.commit()
 
+    def test_long_activity_text_does_not_change_panel_widths(self):
+        self.window.build_recent_activity_rows()
+        self.window.update_project_summary_panel()
+        self.window.resize(1100, 800)
+        self.window.show()
+        short_title = "Interview"
+        long_title = 'Topic exploration "Wandel der Rolle der Väter" ' * 20
+        for window_width in (1100, 1400):
+            self.window.resize(window_width, 800)
+            for title_text in (short_title, long_title, short_title):
+                MainWindow.show_recent_activity(self.window, {
+                    "ai_chat": (title_text, "AI chat, last changed today 18:44", 1, "2026-10-19 18:44:00")})
+                self.qt_app.processEvents()
+                panel_widths = (self.window.ui.frame_recent_activity.width(),
+                                self.window.ui.frame_project_summary.width())
+                if title_text == short_title:
+                    expected_widths = panel_widths
+                else:
+                    self.assertEqual(expected_widths, panel_widths)
+                    title_label = self.window.recent_activity_rows["ai_chat"]["title"]
+                    self.assertEqual(long_title, title_label.text())
+                    self.assertEqual(long_title, title_label.toolTip())
+                    self.assertIn(long_title, self.window.recent_activity_rows["ai_chat"]["row"].toolTip())
+                    self.assertGreater(title_label.fontMetrics().horizontalAdvance(long_title), title_label.width())
+                    # Render the custom paint path as well as exercising layout negotiation.
+                    self.assertFalse(title_label.grab().isNull())
+
     def test_chat_tile_visibility_matches_count_and_ai_setting(self):
         tile = self.window.project_summary_tiles["ai_chats"]
         for count in (0, 3):

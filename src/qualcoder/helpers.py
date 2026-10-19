@@ -418,6 +418,29 @@ def extract_epub_fulltext(filepath):
     return text_
 
 
+class ElidedLabel(QtWidgets.QLabel):
+    """Keep the full text accessible while painting an ellipsis when necessary."""
+
+    def __init__(self, parent: QtWidgets.QWidget = None):
+        super().__init__(parent)
+        self.setTextFormat(QtCore.Qt.TextFormat.PlainText)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Ignored, QtWidgets.QSizePolicy.Policy.Preferred)
+
+    def setText(self, text: str) -> None:
+        super().setText(text)
+        self.setToolTip(text)
+
+    def paintEvent(self, event):
+        painter = QtWidgets.QStylePainter(self)
+        style_option = QtWidgets.QStyleOption()
+        style_option.initFrom(self)
+        painter.drawPrimitive(QtWidgets.QStyle.PrimitiveElement.PE_Widget, style_option)
+        visible_text = self.fontMetrics().elidedText(
+            self.text(), QtCore.Qt.TextElideMode.ElideRight, self.contentsRect().width())
+        painter.drawItemText(self.contentsRect(), self.alignment() | QtCore.Qt.TextFlag.TextSingleLine,
+                             self.palette(), self.isEnabled(), visible_text, QtGui.QPalette.ColorRole.WindowText)
+
+
 class Message(QtWidgets.QMessageBox):
     """ This is called a lot , but is styled to font size """
 

@@ -87,7 +87,7 @@ from qualcoder.coder_names import DialogCoderNames
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import get_default_user_directory, Message
+from qualcoder.helpers import ElidedLabel, get_default_user_directory, Message
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.information import project_tab_info, manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
@@ -1471,8 +1471,8 @@ Click "Yes" to start now.')
             row_layout.addWidget(icon_label)
             text_layout = QtWidgets.QVBoxLayout()
             text_layout.setSpacing(0)
-            title_label = QtWidgets.QLabel(row)
-            detail_label = QtWidgets.QLabel(row)
+            title_label = ElidedLabel(row)
+            detail_label = ElidedLabel(row)
             text_layout.addWidget(title_label)
             text_layout.addWidget(detail_label)
             row_layout.addLayout(text_layout, 1)
@@ -1608,6 +1608,7 @@ Click "Yes" to start now.')
             title, detail, target = entry[:3]
             row["title"].setText(title)
             row["detail"].setText(detail)
+            row["row"].setToolTip(f"{title}\n{detail}")
             row["row"].setAccessibleName(f"{title}, {detail}")
             self.recent_activity_targets[key] = target
         ordered_keys = sorted(self.recent_activity_targets,
