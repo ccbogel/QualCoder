@@ -37,7 +37,7 @@ import shutil
 import sqlite3
 import sys
 import traceback
-from typing import Optional
+from typing import Any, Optional
 import urllib.request
 import webbrowser
 
@@ -87,7 +87,7 @@ from qualcoder.coder_names import DialogCoderNames
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import get_default_user_directory, Message
+from qualcoder.helpers import ElidedLabel, get_default_user_directory, Message
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.information import project_tab_info, manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
@@ -386,6 +386,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_sidebar_splitter_is_restoring = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.init_action_log()
         self.init_placeholder_tab_layouts()
         # Test of macOS menu bar
         if self.app.settings['stylesheet'] == "native":
@@ -639,7 +640,9 @@ Click "Yes" to start now.')
 
         logger.info(message)
         if getattr(self, "ui", None) is not None and hasattr(self.ui, "textEdit"):
-            self.ui.textEdit.append(message)
+            endpoint = html.escape(self.external_mcp.endpoint)
+            message_html = html.escape(message).replace(endpoint, '<br />' + endpoint)
+            self.ui.textEdit.append(f'<p>{message_html}</p>')
 
     @QtCore.pyqtSlot(str)
     def _external_mcp_start_failed(self, message: str) -> None:
@@ -1044,7 +1047,6 @@ Click "Yes" to start now.')
         self.ui.splitter.setCollapsible(1, False)
         self.ui.sidebar.setMinimumWidth(0)
         self.ui.splitter.splitterMoved.connect(self.on_main_splitter_moved)
-        self.settings_report()
         
         self.ui.tabWidget.setCurrentIndex(0)
         self.last_non_ai_chat_tab = self.ui.tab_action_log
@@ -1071,8 +1073,10 @@ Click "Yes" to start now.')
         """Wire the project cards, recent projects list and log toggle in the Project tab."""
 
         self.project_cards = {
-            self.ui.frame_new_project: self.new_project,
-            self.ui.frame_open_project: self.open_project,
+            self.ui.frame_new_project: lambda: self.activate_project_panel_action(
+                self.ui.actionCreate_New_Project, self.ui.label_project_title),
+            self.ui.frame_open_project: lambda: self.activate_project_panel_action(
+                self.ui.actionOpen_Project, self.ui.label_project_title),
         }
         for card in self.project_cards:
             card.installEventFilter(self)
@@ -1092,9 +1096,10 @@ Click "Yes" to start now.')
         arrow_layout.addStretch()
         arrow_layout.addWidget(self.recent_projects_arrow)
         files_label = self.ui.label_project_summary_files
-        files_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
-        files_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
-                                            QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
+        for link_label in (files_label, self.ui.label_project_summary_warning):
+            link_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
+            link_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
+                                              QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
         files_label.linkActivated.connect(self.open_coding_for_file_type)
         self.ui.label_project_summary_warning.linkActivated.connect(self.project_summary_warning_link)
         # Project contents refresh after database changes and when the Project tab is shown
@@ -1172,6 +1177,8 @@ Click "Yes" to start now.')
             label.setStyleSheet(f"color: {secondary}; background-color: transparent; border: none;")
         self.project_panel_colors["highlight"] = highlight.name()
         self.project_panel_colors["base"] = base.name()
+        self.ui.textEdit.document().setDefaultStyleSheet(
+            f"p {{margin-top: 0; margin-bottom: 8px;}} a {{color: {highlight.name()};}}")
         tint = f"rgba({highlight.red()}, {highlight.green()}, {highlight.blue()}, 18)"
         self.ui.comboBox_recent_projects.setStyleSheet(
             f"QComboBox#comboBox_recent_projects {{background-color: {base.name()}; color: {text.name()};"
@@ -1261,15 +1268,24 @@ Click "Yes" to start now.')
         combo.blockSignals(False)
         self.request_project_summary_update()
 
-    def open_recent_project_from_combo(self, index):
+    def open_recent_project_from_combo(self, index: int) -> None:
         """Open the project chosen in the recent projects drop-down."""
 
         combo = self.ui.comboBox_recent_projects
+        self.ui.label_recent_projects.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
         project_path = combo.itemData(index, PATH_ROLE)
         if project_path and project_path != self.app.project_path:
             self.open_project(combo.itemData(index))
         # Show the project that is really open, also if opening was cancelled
         self.fill_recent_projects_list()
+        self.focus_project_navigation_destination(self.ui.tabWidget.currentWidget())
+
+    def reset_recent_projects_focus(self) -> None:
+        """Clear the drop-down outline after popup focus restoration, including cancellation."""
+
+        combo = self.ui.comboBox_recent_projects
+        if combo.hasFocus() and not combo.view().isVisible():
+            self.ui.label_recent_projects.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
 
     def connect_project_summary_events(self):
         """Listen to database changes of the current App (new_project replaces the App)."""
@@ -1289,7 +1305,7 @@ Click "Yes" to start now.')
         """React to database changes that alter the counts shown in the project contents box."""
 
         relevant = {"source", "cases", "code_name", "code_cat", "attribute_type", "journal",
-                    "code_text", "code_image", "code_av", "project"}
+                    "code_text", "code_image", "code_av", "project", "chats", "chat_messages"}
         if tables is not None and not relevant.intersection(tables):
             return
         if tables is not None and "source" in tables:
@@ -1321,13 +1337,16 @@ Click "Yes" to start now.')
         if state == QtCore.Qt.ApplicationState.ApplicationActive:
             self.request_project_summary_update()
 
-    def project_summary_warning_link(self, link):
+    def project_summary_warning_link(self, link: str) -> None:
         """Open the dialog that fixes the reported file problem."""
 
-        if link == "bad_links":
-            self.manage_bad_file_links()
-        elif link == "missing_files":
-            self.ui.actionManage_files.trigger()
+        actions = {
+            "bad_links": self.ui.actionManage_bad_links_to_files,
+            "missing_files": self.ui.actionManage_files,
+        }
+        action = actions.get(link)
+        if action is not None:
+            self.activate_project_panel_action(action, self.ui.label_project_summary)
 
     def count_missing_project_files(self):
         """Count imported images, audio, video and PDFs missing from the project folder.
@@ -1346,7 +1365,7 @@ Click "Yes" to start now.')
                 missing += 1
         return missing
 
-    def open_coding_for_file_type(self, file_type):
+    def open_coding_for_file_type(self, file_type: str) -> None:
         """Open the coding workspace for a file type chosen in the project contents box."""
 
         actions = {
@@ -1357,7 +1376,34 @@ Click "Yes" to start now.')
         }
         action = actions.get(file_type)
         if action is not None:
-            action.trigger()
+            self.activate_project_panel_action(action, self.ui.label_project_summary)
+
+    def activate_project_panel_action(self, action: QtGui.QAction, heading: QtWidgets.QWidget) -> None:
+        """Activate a Project tab action without retaining its focus highlight.
+
+        Args:
+            action: Menu action associated with the panel, tile or text link.
+            heading: Neutral focus target to remember when returning to the Project tab.
+        """
+
+        if not action.isEnabled():
+            return
+        heading.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+        action.trigger()
+        destination = self.ui.tabWidget.currentWidget()
+        if action is self.ui.actionManage_journals:
+            destination = self.journal_display
+        self.focus_project_navigation_destination(destination)
+
+    def open_ai_chats_from_summary(self) -> None:
+        """Open saved chats in their current tab or sidebar without retaining a tile outline."""
+
+        if self.app.conn is None:
+            return
+        self.ui.label_project_summary.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+        self.ai_go_chat()
+        destination = self.ai_chat_window or self.ui.tabWidget.currentWidget()
+        self.focus_project_navigation_destination(destination)
 
     def build_project_summary_tiles(self):
         """Create the count tiles of the project contents box once; refreshes only change the numbers."""
@@ -1369,19 +1415,25 @@ Click "Yes" to start now.')
             ("codes", "mdi6.tag-outline", _("Codes"), None, ""),
             ("journals", "mdi6.notebook-outline", _("Journals"), self.ui.actionManage_journals,
              _("Open the journals")),
+            ("ai_chats", "mdi6.message-processing-outline", _("AI agent chats"), None, _("Open the AI Agent")),
         ]
         self.project_summary_tiles = {}
         for position, (key, icon_name, caption, action, tooltip) in enumerate(specs):
             tile = QtWidgets.QFrame(self.ui.frame_project_summary)
             tile.setProperty("summary_tile", True)
-            tile.setProperty("clickable", action is not None)
-            if action is not None:
+            clickable = action is not None or key == "ai_chats"
+            tile.setProperty("clickable", clickable)
+            if clickable:
                 tile.setToolTip(tooltip)
                 tile.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
                 tile.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
                 tile.installEventFilter(self)
                 # Same click and keyboard handling as the New and Open project cards
-                self.project_cards[tile] = action.trigger
+                if key == "ai_chats":
+                    self.project_cards[tile] = self.open_ai_chats_from_summary
+                else:
+                    self.project_cards[tile] = lambda menu_action=action: self.activate_project_panel_action(
+                        menu_action, self.ui.label_project_summary)
             tile_layout = QtWidgets.QHBoxLayout(tile)
             tile_layout.setContentsMargins(8, 6, 8, 6)
             tile_layout.setSpacing(8)
@@ -1397,6 +1449,8 @@ Click "Yes" to start now.')
             for child in (icon_label, value_label, caption_label):
                 child.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
             self.ui.gridLayout_project_summary.addWidget(tile, position // 2, position % 2)
+            if key == "ai_chats":
+                tile.hide()
             self.project_summary_tiles[key] = {"tile": tile, "icon": icon_label, "icon_name": icon_name,
                                                "value": value_label, "caption": caption_label,
                                                "caption_text": caption}
@@ -1421,8 +1475,8 @@ Click "Yes" to start now.')
             row_layout.addWidget(icon_label)
             text_layout = QtWidgets.QVBoxLayout()
             text_layout.setSpacing(0)
-            title_label = QtWidgets.QLabel(row)
-            detail_label = QtWidgets.QLabel(row)
+            title_label = ElidedLabel(row)
+            detail_label = ElidedLabel(row)
             text_layout.addWidget(title_label)
             text_layout.addWidget(detail_label)
             row_layout.addLayout(text_layout, 1)
@@ -1452,7 +1506,7 @@ Click "Yes" to start now.')
             row["detail"].setStyleSheet(f"color: {colors.get('secondary')};")
 
     @staticmethod
-    def format_activity_date(date_text):
+    def format_activity_date(date_text: Optional[str]) -> str:
         """Short date for the recent activity list: today, yesterday or the date."""
 
         try:
@@ -1466,14 +1520,14 @@ Click "Yes" to start now.')
             return _("yesterday {0}").format(moment.strftime("%H:%M"))
         return moment.strftime("%Y-%m-%d %H:%M")
 
-    def collect_recent_activity(self):
+    def collect_recent_activity(self) -> dict[str, tuple[str, str, Any, Optional[str]]]:
         """Find where the current coder left off: last coding, bookmarks, last journal and AI chat."""
 
         cur = self.app.conn.cursor()
         coder = self.app.settings['codername']
         activity = {}
 
-        def source_name(file_id):
+        def source_name(file_id: int) -> Optional[str]:
             cur.execute("select name from source where id=?", [file_id])
             res = cur.fetchone()
             return res[0] if res else None
@@ -1486,27 +1540,31 @@ Click "Yes" to start now.')
         res = cur.fetchone()
         if res and source_name(res[1]):
             activity["coded"] = (source_name(res[1]),
-                                 _("Last coded, {0}").format(self.format_activity_date(res[4])), res)
+                                 _("Last coded, {0}").format(self.format_activity_date(res[4])), res, res[4])
         cur.execute("select bookmarkfile, bookmarkpos, avbookmarkfile, avbookmarkmsec from project")
         res = cur.fetchone()
         if res and res[0] is not None and source_name(res[0]):
-            activity["text_bookmark"] = (source_name(res[0]), _("Text bookmark"), None)
+            activity["text_bookmark"] = (source_name(res[0]), _("Text bookmark"), None, None)
         if res and res[2] is not None and source_name(res[2]):
             seconds = int(res[3] or 0) // 1000
             activity["av_bookmark"] = (source_name(res[2]),
                                        _("Audio/video bookmark at {0}").format(f"{seconds // 60}:{seconds % 60:02d}"),
-                                       None)
+                                       None, None)
         cur.execute("select jid, name, date from journal order by date desc limit 1")
         res = cur.fetchone()
         if res:
-            activity["journal"] = (res[1], _("Journal, edited {0}").format(self.format_activity_date(res[2])), res[0])
+            activity["journal"] = (res[1], _("Journal, edited {0}").format(self.format_activity_date(res[2])),
+                                   res[0], res[2])
         chat = self.last_ai_chat()
         if chat is not None:
-            activity["ai_chat"] = (chat[1], _("Last AI chat"), chat[0])
+            detail = _("Last AI chat")
+            if chat[2]:
+                detail = _("AI chat, last changed {0}").format(self.format_activity_date(chat[2]))
+            activity["ai_chat"] = (chat[1], detail, chat[0], chat[2])
         return activity
 
-    def last_ai_chat(self):
-        """Id and name of the AI chat with the newest message, read from the project's chat history."""
+    def last_ai_chat(self) -> Optional[tuple[int, str, Optional[str]]]:
+        """Return the latest AI chat, using its creation date for undated messages."""
 
         if self.app.settings.get('ai_enable', 'False') != 'True':
             return None
@@ -1516,9 +1574,13 @@ Click "Yes" to start now.')
         try:
             conn = sqlite3.connect(f"{history.as_uri()}?mode=ro", uri=True)
             try:
-                res = conn.execute("select chats.id, chats.name, chats.analysis_type from chat_messages "
-                                   "join chats on chats.id = chat_messages.chat_id "
-                                   "order by chat_messages.id desc limit 1").fetchone()
+                columns = {row[1] for row in conn.execute("PRAGMA table_info(chat_messages)")}
+                # The Project tab can read history before AI initialization upgrades its schema.
+                date_column = "COALESCE(NULLIF(chat_messages.date, ''), chats.date)" if "date" in columns else "chats.date"
+                res = conn.execute(f"select chats.id, chats.name, chats.analysis_type, {date_column} as activity_date "
+                                   "from chat_messages join chats on chats.id = chat_messages.chat_id "
+                                   "where chat_messages.msg_type in ('user', 'ai', 'info', 'agent_status') "
+                                   "order by activity_date desc, chat_messages.id desc limit 1").fetchone()
             finally:
                 conn.close()
         except sqlite3.Error as err:
@@ -1529,10 +1591,14 @@ Click "Yes" to start now.')
         name = str(res[1] or "").strip()
         if self.ai_chat_window is not None:
             name = self.ai_chat_window._display_chat_name(res[1], res[2])
-        return res[0], name or _("AI chat")
+        return res[0], name or _("AI chat"), res[3]
 
-    def show_recent_activity(self, activity):
-        """Fill the recent activity rows; hide the ones without data."""
+    def show_recent_activity(self, activity: dict[str, tuple[str, str, Any, Optional[str]]]) -> None:
+        """Fill and sort activity rows by date, placing undated entries last.
+
+        Args:
+            activity: Entries containing a title, detail, target and optional local timestamp.
+        """
 
         rows = getattr(self, "recent_activity_rows", None)
         if not rows:
@@ -1543,18 +1609,34 @@ Click "Yes" to start now.')
             row["row"].setVisible(entry is not None)
             if entry is None:
                 continue
-            title, detail, target = entry
+            title, detail, target = entry[:3]
             row["title"].setText(title)
             row["detail"].setText(detail)
+            row["row"].setToolTip(f"{title}\n{detail}")
             row["row"].setAccessibleName(f"{title}, {detail}")
             self.recent_activity_targets[key] = target
+        ordered_keys = sorted(self.recent_activity_targets,
+                              key=lambda activity_key: activity[activity_key][3] or "", reverse=True)
+        previous_row = None
+        for position, key in enumerate(ordered_keys):
+            activity_row = rows[key]["row"]
+            self.ui.verticalLayout_recent_activity.insertWidget(position, activity_row)
+            if previous_row is not None:
+                QtWidgets.QWidget.setTabOrder(previous_row, activity_row)
+            previous_row = activity_row
         self.ui.label_recent_activity_empty.setVisible(not self.recent_activity_targets)
 
-    def open_recent_activity(self, key):
-        """Take the user back to the item chosen in the recent activity list."""
+    def open_recent_activity(self, key: str) -> None:
+        """Open an activity and clear its focus highlight when returning to the Project tab.
+
+        Args:
+            key: Activity identifier from self.recent_activity_targets.
+        """
 
         if self.app.conn is None or key not in self.recent_activity_targets:
             return
+        # Qt remembers this neutral heading instead of restoring focus to the activated row.
+        self.ui.label_recent_activity.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
         target = self.recent_activity_targets[key]
         if key == "coded":
             kind, file_id, pos0, pos1 = target[0], target[1], target[2], target[3]
@@ -1575,6 +1657,27 @@ Click "Yes" to start now.')
             self.select_journal(target)
         elif key == "ai_chat":
             self.open_ai_chat(target)
+
+        destination = self.ui.tabWidget.currentWidget()
+        if key == "journal":
+            destination = self.journal_display
+        elif key == "ai_chat" and self.ai_chat_window is not None:
+            destination = self.ai_chat_window
+        self.focus_project_navigation_destination(destination)
+
+    def focus_project_navigation_destination(self, destination: Optional[QtWidgets.QWidget]) -> None:
+        """Focus opened content, keeping any child that already has focus.
+
+        Args:
+            destination: Opened tab, sidebar or modeless dialog, if available.
+        """
+
+        if destination is None or not destination.isVisible():
+            return
+        focused_widget = QtWidgets.QApplication.focusWidget()
+        if focused_widget is None or not (focused_widget is destination or destination.isAncestorOf(focused_widget)):
+            focus_target = destination.focusWidget() or destination
+            focus_target.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
 
     def call_on_coding_widget(self, widget_class, method_name):
         """Call a method on the coding workspace of the given class, if it is open."""
@@ -1635,6 +1738,22 @@ Click "Yes" to start now.')
                 f"color: {colors.get('text')}; font-size: {value_size}pt; font-weight: bold;")
             tile["caption"].setStyleSheet(f"color: {colors.get('secondary')};")
 
+    def count_ai_chats(self) -> int:
+        """Count saved AI conversations without loading AI or creating chat storage."""
+
+        history = Path(self.app.project_path) / "ai_data" / "chat_history.sqlite"
+        if not history.exists():
+            return 0
+        try:
+            conn = sqlite3.connect(f"{history.as_uri()}?mode=ro", uri=True)
+            try:
+                return conn.execute("SELECT COUNT(*) FROM chats").fetchone()[0]
+            finally:
+                conn.close()
+        except sqlite3.Error as err:
+            logger.debug(str(err))
+            return 0
+
     def update_project_summary_panel(self):
         """Show counts of files, cases, codes and more for the open project in the Project tab."""
 
@@ -1660,6 +1779,7 @@ Click "Yes" to start now.')
                 image_files = len(self.app.get_image_filenames())
                 av_files = len(self.app.get_av_filenames())
                 counts["files"] = text_files + pdf_files + image_files + av_files
+                counts["ai_chats"] = self.count_ai_chats()
                 # Checking links touches the disk, so only after file changes, opening or closing
                 activity = self.collect_recent_activity()
                 if self.project_summary_check_links:
@@ -1681,8 +1801,11 @@ Click "Yes" to start now.')
         self.ui.label_project_summary_warning.setVisible(bool(bad_links or missing_files))
         self.show_recent_activity(activity if project_open else {})
         for key, tile in tiles.items():
-            tile["tile"].setVisible(project_open)
             value = counts.get(key, 0)
+            visible = project_open
+            if key == "ai_chats":
+                visible = project_open and (value > 0 or self.app.settings.get("ai_enable", "False") == "True")
+            tile["tile"].setVisible(visible)
             tile["value"].setText(str(value))
             tile["tile"].setAccessibleName(f"{tile['caption_text']}: {value}")
         if not project_open:
@@ -1711,18 +1834,22 @@ Click "Yes" to start now.')
     def eventFilter(self, watched, event):
         """Make the project cards clickable and keep the recent projects combo from opening projects by accident."""
 
-        if watched is getattr(self.ui, "comboBox_recent_projects", None) and not watched.view().isVisible():
+        if watched is getattr(self.ui, "comboBox_recent_projects", None):
             event_type = event.type()
-            if event_type == QtCore.QEvent.Type.Wheel:
-                return True
-            if event_type == QtCore.QEvent.Type.KeyPress:
-                navigation_keys = (QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down, QtCore.Qt.Key.Key_PageUp,
-                                   QtCore.Qt.Key.Key_PageDown, QtCore.Qt.Key.Key_Home, QtCore.Qt.Key.Key_End)
-                if event.key() in navigation_keys:
-                    watched.showPopup()
+            if event_type == QtCore.QEvent.Type.FocusIn and event.reason() == QtCore.Qt.FocusReason.PopupFocusReason:
+                # Qt restores combo focus while the popup is still closing.
+                QtCore.QTimer.singleShot(0, self.reset_recent_projects_focus)
+            if not watched.view().isVisible():
+                if event_type == QtCore.QEvent.Type.Wheel:
                     return True
-                if event.text().strip():  # Typing would jump to a matching project and open it
-                    return True
+                if event_type == QtCore.QEvent.Type.KeyPress:
+                    navigation_keys = (QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down, QtCore.Qt.Key.Key_PageUp,
+                                       QtCore.Qt.Key.Key_PageDown, QtCore.Qt.Key.Key_Home, QtCore.Qt.Key.Key_End)
+                    if event.key() in navigation_keys:
+                        watched.showPopup()
+                        return True
+                    if event.text().strip():  # Typing would jump to a matching project and open it
+                        return True
         handler = self.project_cards.get(watched)
         if handler is not None:
             event_type = event.type()
@@ -1987,41 +2114,6 @@ Click "Yes" to start now.')
         if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_5:
             self.ui.menuHelp.popup(QtGui.QCursor.pos())
 
-    def settings_report(self, swith_to_action_log: bool = True):
-        """ Display general settings and project summary """
-
-        self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        msg = "<p>" + _("Coder") + f": {self.app.settings['codername']}<br />"
-        msg += _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']} | "
-        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}<br />"
-        msg += _("Working directory") + f": {self.app.settings['directory']}<br />"
-        msg += _("Language") + f": {self.app.settings['language']} | "
-        msg += _("Show IDs") + f": {self.app.settings['showids']}<br />"
-        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']} | "
-        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}<br />"
-        msg += _("Report text context characters: ") + f"{self.app.settings['report_text_context_characters']}<br /> "
-        msg += _("Style") + f": {self.app.settings['stylesheet']}<br />"
-        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']} | "
-        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}<br />"
-        if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI integration is enabled")
-        else:
-            msg += _("AI integration is disabled")
-        ai_permissions = self.app.settings.get('ai_permissions', 1)
-        ai_permissions_labels = {
-            0: 'Read-only',
-            1: 'Sandboxed',
-            2: 'Full access'
-        }
-        msg += " | " + _("AI permissions") + f": {ai_permissions_labels.get(ai_permissions, ai_permissions)}</p>"
-        self.ui.textEdit.append(msg)
-        if platform.system() == "Windows":
-            self.ui.textEdit.append("<p>" + _("Folder paths / represents \\") + "</p>")
-        self.ui.textEdit.append("<p></p>")
-        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
-        if swith_to_action_log:
-            self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
-
     def text_segments_codes_table(self):
         """ Show table of text segments (rows) by codes (columns). """
 
@@ -2131,8 +2223,28 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(coding_shortcuts_display)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         
+    def init_action_log(self) -> None:
+        """Set up paragraph spacing and clickable links in the action log."""
+
+        self.ui.textEdit.setOpenLinks(False)
+        self.ui.textEdit.anchorClicked.connect(self.action_log_link_clicked)
+        self.ui.textEdit.document().setDefaultStyleSheet("p {margin-top: 0; margin-bottom: 8px;}")
+        self.ui.textEdit.document().setDocumentMargin(8)
+
+    def action_log_link_clicked(self, url: QtCore.QUrl) -> None:
+        """Open backup folders, websites or QualCoder actions from the log.
+
+        Args:
+            url: Link activated in the action log.
+        """
+
+        if url.isLocalFile():
+            QtGui.QDesktopServices.openUrl(url)
+        else:
+            self.handle_placeholder_link(url)
+
     def action_log_scroll_bottom(self):
-        """Scrolls the action log to the very bottom, malking new entries visible."""
+        """Scroll the action log to the bottom to show new entries."""
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
     def about(self):
@@ -3268,7 +3380,6 @@ Click "Yes" to start now.')
 
         self.app.settings, self.app.ai_models = self.app.load_settings()
         self.external_mcp.sync_with_application_state()
-        self.settings_report(swith_to_action_log=False)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.update_placeholder_tab_styles()
@@ -3842,7 +3953,13 @@ Click "Yes" to start now.')
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self._project_open_step(progress, 2, _("Saving a backup copy of the project"))
             msg, backup_name = self.app.save_backup()
-            self.ui.textEdit.append(msg)
+            backup_path = Path(backup_name)
+            backup_url = QtCore.QUrl.fromLocalFile(str(backup_path)).toString()
+            backup_link = (f'<a href="{html.escape(backup_url)}" title="{html.escape(str(backup_path))}">'
+                           f'{html.escape(backup_path.name)}</a>')
+            backup_message = html.escape(msg).replace(html.escape(backup_name), '<br />' + backup_link)
+            backup_message = backup_message.replace("\n", "<br />")
+            self.ui.textEdit.append(f'<p>{backup_message}</p>')
         self._project_open_step(progress, 3, _("Preparing AI and search components"))
         # AI: init llm and update vectorstore after backup to avoid locked sqlite sidecar files.
         if self.app.ai is not None:
@@ -3851,9 +3968,18 @@ Click "Yes" to start now.')
         if self.ai_chat_window is not None:
             self.ai_chat_window.init_ai_chat(self.app)
         self._project_open_step(progress, 4, _("Preparing the project summary"))
-        msg = f"{_('Project Opened: ')}{self.app.project_name}"
+        project_url = QtCore.QUrl.fromLocalFile(self.app.project_path).toString()
+        msg = (f"<p><b>{html.escape(_('Project Opened: '))}</b><br />"
+               f'<a href="{html.escape(project_url)}" title="{html.escape(self.app.project_path)}">'
+               f"{html.escape(self.app.project_name)}</a></p>")
         self.ui.textEdit.append(msg)
-        self.project_summary_report()
+        cur.execute("select databaseversion, date, memo from project")
+        result = cur.fetchall()[-1]
+        self.project['databaseversion'] = result[0]
+        self.project['date'] = result[1]
+        self.project['memo'] = result[2]
+        self.request_project_summary_update()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.show_menu_options()
         self.external_mcp.sync_with_application_state()
         self._project_open_step(progress, 5, _("Project opened"))
@@ -3871,8 +3997,7 @@ Click "Yes" to start now.')
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
-        self.ui.textEdit.append("<br />")
-        self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
+        self.ui.textEdit.append(f"<p><b>{html.escape(_('Project summary'))}</b></p>")
         msg = f"<p>{self.app.project_name}<br />"
         msg += f'{_("Project path: ")}{self.app.project_path}<br />'
         msg += f"{_('Project date: ')}{self.project['date']}<br />"
@@ -4150,11 +4275,12 @@ Click "Yes" to start now.')
         self.text_coding(task='ai_search')
 
     def get_latest_github_release(self):
-        """ Get latest github release. Some issues on some platforms, so in try except. """
+        """Show a compact version header and check GitHub for newer releases."""
 
-        self.ui.textEdit.append(_("This version: ") + self.app.version)
+        self.ui.textEdit.append(
+            f'<p><b>{html.escape(self.app.version)}</b> &middot; '
+            f'<a href="qualcoder://action/about">{html.escape(_("About"))}</a></p>')
         if "beta" in self.app.version.lower():
-            self.ui.textEdit.append(self.app.citation.split('Retrieved')[0])
             return
         try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
@@ -4167,20 +4293,18 @@ Click "Yes" to start now.')
             temp_this_version = self.app.version.replace("QualCoder", "")
             tmp_this_version_num = temp_this_version.split('.', 1)
             this_version_num = float(tmp_this_version_num[0] + '.' + tmp_this_version_num[1].replace('.', ''))
+            release_link = (f'<a href="{html.escape(_json["html_url"])}">'
+                            f'{html.escape(_json["name"])}</a>')
             if release_num > this_version_num:
-                html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
-                self.ui.textEdit.append(html)
-                html = f'<span style="color:red">{_json["html_url"]}</span><br />'
-                self.ui.textEdit.append(html)
+                html_string = '<span style="color:red">' + html.escape(_("Newer release available: "))
+                self.ui.textEdit.append(html_string + release_link + '</span>')
             elif str(release_num) == str(this_version_num):
-                self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
-                self.ui.textEdit.append(_json['html_url'] + "\n")
+                self.ui.textEdit.append(html.escape(_("Latest Release: ")) + release_link)
             else:
                 self.ui.textEdit.append(_("This version may be a pre-release version."))
         except Exception as err:
             print(err)
             logger.warning(str(err))
-        self.ui.textEdit.append(self.app.citation)
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
