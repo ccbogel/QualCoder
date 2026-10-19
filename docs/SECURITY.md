@@ -19,8 +19,6 @@ Please do not open a public issue for security problems.
 
 Report privately through GitHub: open the repository's **Security** tab and choose **Report a vulnerability**. This creates a private advisory that only the maintainers can see.
 
-If you cannot use GitHub, email [email@email.com].
-
 Include, where possible:
 
 - QualCoder version and operating system
