@@ -1571,11 +1571,17 @@ Click "Yes" to start now.')
             previous_row = activity_row
         self.ui.label_recent_activity_empty.setVisible(not self.recent_activity_targets)
 
-    def open_recent_activity(self, key):
-        """Take the user back to the item chosen in the recent activity list."""
+    def open_recent_activity(self, key: str) -> None:
+        """Open an activity and clear its focus highlight when returning to the Project tab.
+
+        Args:
+            key: Activity identifier from self.recent_activity_targets.
+        """
 
         if self.app.conn is None or key not in self.recent_activity_targets:
             return
+        # Qt remembers this neutral heading instead of restoring focus to the activated row.
+        self.ui.label_recent_activity.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
         target = self.recent_activity_targets[key]
         if key == "coded":
             kind, file_id, pos0, pos1 = target[0], target[1], target[2], target[3]
@@ -1596,6 +1602,18 @@ Click "Yes" to start now.')
             self.select_journal(target)
         elif key == "ai_chat":
             self.open_ai_chat(target)
+
+        destination = self.ui.tabWidget.currentWidget()
+        if key == "journal":
+            destination = self.journal_display
+        elif key == "ai_chat" and self.ai_chat_window is not None:
+            destination = self.ai_chat_window
+        if destination is None or not destination.isVisible():
+            return
+        focused_widget = QtWidgets.QApplication.focusWidget()
+        if focused_widget is None or not (focused_widget is destination or destination.isAncestorOf(focused_widget)):
+            focus_target = destination.focusWidget() or destination
+            focus_target.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
 
     def call_on_coding_widget(self, widget_class, method_name):
         """Call a method on the coding workspace of the given class, if it is open."""
