@@ -335,6 +335,48 @@ class TestRecentActivityNavigation(TestCase):
         codes_tile = self.window.project_summary_tiles["codes"]["tile"]
         self.assertNotIn(codes_tile, self.window.project_cards)
 
+    def test_ai_chat_tile_opens_tab_or_focuses_sidebar_even_when_ai_is_disabled(self):
+        self.add_project_contents()
+        self.window.app.settings = {"ai_enable": "False"}
+        self.window.ui.tab_ai_agent = self.ai_page
+        self.window.ui.actionAI_Agent = QtGui.QAction(self.window)
+        self.window.ui.actionAI_Agent.setEnabled(False)
+        tile = self.window.project_summary_tiles["ai_chats"]["tile"]
+        tile.show()
+
+        def configure_sidebar(enabled: bool, persist: bool = True) -> None:
+            current_layout = self.chat_view.parentWidget().layout()
+            current_layout.removeWidget(self.chat_view)
+            target_layout = self.sidebar_layout if enabled else self.ai_page.layout()
+            target_layout.addWidget(self.chat_view)
+            self.sidebar.setVisible(enabled)
+            self.tabs.setTabVisible(self.tabs.indexOf(self.ai_page), not enabled)
+            self.chat_view.show()
+
+        self.window.set_ai_chat_sidebar_mode = MagicMock(side_effect=configure_sidebar)
+        for sidebar_enabled in (False, True):
+            self.window.ai_chat_sidebar_mode = sidebar_enabled
+            for activation in ("mouse", QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter, QtCore.Qt.Key.Key_Space):
+                with self.subTest(sidebar=sidebar_enabled, activation=activation):
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.window.set_ai_chat_sidebar_mode.reset_mock()
+                    tile.setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+                    if activation == "mouse":
+                        self.tabs.tabBar().setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+                        QTest.mouseClick(tile, QtCore.Qt.MouseButton.LeftButton, pos=tile.rect().center())
+                    else:
+                        QTest.keyClick(tile, activation)
+                    self.qt_app.processEvents()
+
+                    self.window.set_ai_chat_sidebar_mode.assert_called_once_with(sidebar_enabled, persist=False)
+                    self.assertIs(self.project_page if sidebar_enabled else self.ai_page, self.tabs.currentWidget())
+                    self.assert_focus_in(self.chat_view)
+                    self.assert_summary_outlines_cleared()
+                    self.assertFalse(self.window.ui.actionAI_Agent.isEnabled())
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.qt_app.processEvents()
+                    self.assert_summary_outlines_cleared()
+
     def test_project_contents_file_type_links_clear_outlines_after_activation_and_return(self):
         self.add_project_contents()
         label = self.window.ui.label_project_summary_files

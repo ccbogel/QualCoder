@@ -1391,6 +1391,16 @@ Click "Yes" to start now.')
             destination = self.journal_display
         self.focus_project_navigation_destination(destination)
 
+    def open_ai_chats_from_summary(self) -> None:
+        """Open saved chats in their current tab or sidebar without retaining a tile outline."""
+
+        if self.app.conn is None:
+            return
+        self.ui.label_project_summary.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+        self.ai_go_chat()
+        destination = self.ai_chat_window or self.ui.tabWidget.currentWidget()
+        self.focus_project_navigation_destination(destination)
+
     def build_project_summary_tiles(self):
         """Create the count tiles of the project contents box once; refreshes only change the numbers."""
 
@@ -1401,20 +1411,25 @@ Click "Yes" to start now.')
             ("codes", "mdi6.tag-outline", _("Codes"), None, ""),
             ("journals", "mdi6.notebook-outline", _("Journals"), self.ui.actionManage_journals,
              _("Open the journals")),
+            ("ai_chats", "mdi6.message-processing-outline", _("AI agent chats"), None, _("Open the AI Agent")),
         ]
         self.project_summary_tiles = {}
         for position, (key, icon_name, caption, action, tooltip) in enumerate(specs):
             tile = QtWidgets.QFrame(self.ui.frame_project_summary)
             tile.setProperty("summary_tile", True)
-            tile.setProperty("clickable", action is not None)
-            if action is not None:
+            clickable = action is not None or key == "ai_chats"
+            tile.setProperty("clickable", clickable)
+            if clickable:
                 tile.setToolTip(tooltip)
                 tile.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
                 tile.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
                 tile.installEventFilter(self)
                 # Same click and keyboard handling as the New and Open project cards
-                self.project_cards[tile] = lambda menu_action=action: self.activate_project_panel_action(
-                    menu_action, self.ui.label_project_summary)
+                if key == "ai_chats":
+                    self.project_cards[tile] = self.open_ai_chats_from_summary
+                else:
+                    self.project_cards[tile] = lambda menu_action=action: self.activate_project_panel_action(
+                        menu_action, self.ui.label_project_summary)
             tile_layout = QtWidgets.QHBoxLayout(tile)
             tile_layout.setContentsMargins(8, 6, 8, 6)
             tile_layout.setSpacing(8)
@@ -1430,6 +1445,8 @@ Click "Yes" to start now.')
             for child in (icon_label, value_label, caption_label):
                 child.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
             self.ui.gridLayout_project_summary.addWidget(tile, position // 2, position % 2)
+            if key == "ai_chats":
+                tile.hide()
             self.project_summary_tiles[key] = {"tile": tile, "icon": icon_label, "icon_name": icon_name,
                                                "value": value_label, "caption": caption_label,
                                                "caption_text": caption}
@@ -1716,6 +1733,22 @@ Click "Yes" to start now.')
                 f"color: {colors.get('text')}; font-size: {value_size}pt; font-weight: bold;")
             tile["caption"].setStyleSheet(f"color: {colors.get('secondary')};")
 
+    def count_ai_chats(self) -> int:
+        """Count saved AI conversations without loading AI or creating chat storage."""
+
+        history = Path(self.app.project_path) / "ai_data" / "chat_history.sqlite"
+        if not history.exists():
+            return 0
+        try:
+            conn = sqlite3.connect(f"{history.as_uri()}?mode=ro", uri=True)
+            try:
+                return conn.execute("SELECT COUNT(*) FROM chats").fetchone()[0]
+            finally:
+                conn.close()
+        except sqlite3.Error as err:
+            logger.debug(str(err))
+            return 0
+
     def update_project_summary_panel(self):
         """Show counts of files, cases, codes and more for the open project in the Project tab."""
 
@@ -1741,6 +1774,7 @@ Click "Yes" to start now.')
                 image_files = len(self.app.get_image_filenames())
                 av_files = len(self.app.get_av_filenames())
                 counts["files"] = text_files + pdf_files + image_files + av_files
+                counts["ai_chats"] = self.count_ai_chats()
                 # Checking links touches the disk, so only after file changes, opening or closing
                 activity = self.collect_recent_activity()
                 if self.project_summary_check_links:
@@ -1762,8 +1796,11 @@ Click "Yes" to start now.')
         self.ui.label_project_summary_warning.setVisible(bool(bad_links or missing_files))
         self.show_recent_activity(activity if project_open else {})
         for key, tile in tiles.items():
-            tile["tile"].setVisible(project_open)
             value = counts.get(key, 0)
+            visible = project_open
+            if key == "ai_chats":
+                visible = project_open and (value > 0 or self.app.settings.get("ai_enable", "False") == "True")
+            tile["tile"].setVisible(visible)
             tile["value"].setText(str(value))
             tile["tile"].setAccessibleName(f"{tile['caption_text']}: {value}")
         if not project_open:
