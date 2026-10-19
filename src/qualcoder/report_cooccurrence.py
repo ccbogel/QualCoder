@@ -146,6 +146,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.process_data()
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def _rebuild_selected_code_strings(self):
         self.code_names_list = []
         self.code_names_str = ""

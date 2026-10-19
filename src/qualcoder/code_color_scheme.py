@@ -86,6 +86,14 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo.pressed.connect(self.undo_color_changes)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
 

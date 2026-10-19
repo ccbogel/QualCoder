@@ -23,9 +23,9 @@ https://qualcoder.org/
 
 import datetime
 import logging
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
@@ -68,6 +68,14 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def get_attributes(self):
         """ Get attributes from sqlite.

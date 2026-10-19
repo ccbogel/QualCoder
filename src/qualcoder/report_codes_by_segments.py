@@ -111,6 +111,14 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.xlsx_results = []  # For export
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def get_files_and_cases(self, file_sort="name asc"):
         """ Get text files with additional details and fill files list widget.
         Get cases and fill case list widget
