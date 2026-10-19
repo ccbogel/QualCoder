@@ -60,3 +60,7 @@ The following are out of scope:
 ## Dependency updates
 
 Dependencies are listed in `requirements.txt`. Automated dependency alerts are enabled on the repository. Updates to dependencies with known vulnerabilities are prioritised for the next release.
+
+## GitHub binaries
+
+- GitHub binaries are made for recent operating systems, typically Windows, macOS and Linux. GitHub hashes these with SHA-256 to create a digital signature. On dowloading a binary you should check the dowloaded binary hash matches the hash shown for that binary on GitHub.
