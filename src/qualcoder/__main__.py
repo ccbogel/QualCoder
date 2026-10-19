@@ -1071,8 +1071,10 @@ Click "Yes" to start now.')
         """Wire the project cards, recent projects list and log toggle in the Project tab."""
 
         self.project_cards = {
-            self.ui.frame_new_project: self.new_project,
-            self.ui.frame_open_project: self.open_project,
+            self.ui.frame_new_project: lambda: self.activate_project_panel_action(
+                self.ui.actionCreate_New_Project, self.ui.label_project_title),
+            self.ui.frame_open_project: lambda: self.activate_project_panel_action(
+                self.ui.actionOpen_Project, self.ui.label_project_title),
         }
         for card in self.project_cards:
             card.installEventFilter(self)
@@ -1262,15 +1264,24 @@ Click "Yes" to start now.')
         combo.blockSignals(False)
         self.request_project_summary_update()
 
-    def open_recent_project_from_combo(self, index):
+    def open_recent_project_from_combo(self, index: int) -> None:
         """Open the project chosen in the recent projects drop-down."""
 
         combo = self.ui.comboBox_recent_projects
+        self.ui.label_recent_projects.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
         project_path = combo.itemData(index, PATH_ROLE)
         if project_path and project_path != self.app.project_path:
             self.open_project(combo.itemData(index))
         # Show the project that is really open, also if opening was cancelled
         self.fill_recent_projects_list()
+        self.focus_project_navigation_destination(self.ui.tabWidget.currentWidget())
+
+    def reset_recent_projects_focus(self) -> None:
+        """Clear the drop-down outline after popup focus restoration, including cancellation."""
+
+        combo = self.ui.comboBox_recent_projects
+        if combo.hasFocus() and not combo.view().isVisible():
+            self.ui.label_recent_projects.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
 
     def connect_project_summary_events(self):
         """Listen to database changes of the current App (new_project replaces the App)."""
@@ -1331,7 +1342,7 @@ Click "Yes" to start now.')
         }
         action = actions.get(link)
         if action is not None:
-            self.activate_project_summary_action(action)
+            self.activate_project_panel_action(action, self.ui.label_project_summary)
 
     def count_missing_project_files(self):
         """Count imported images, audio, video and PDFs missing from the project folder.
@@ -1361,18 +1372,19 @@ Click "Yes" to start now.')
         }
         action = actions.get(file_type)
         if action is not None:
-            self.activate_project_summary_action(action)
+            self.activate_project_panel_action(action, self.ui.label_project_summary)
 
-    def activate_project_summary_action(self, action: QtGui.QAction) -> None:
-        """Open a Project contents link without retaining its focus highlight.
+    def activate_project_panel_action(self, action: QtGui.QAction, heading: QtWidgets.QWidget) -> None:
+        """Activate a Project tab action without retaining its focus highlight.
 
         Args:
-            action: Menu action associated with the tile or text link.
+            action: Menu action associated with the panel, tile or text link.
+            heading: Neutral focus target to remember when returning to the Project tab.
         """
 
         if not action.isEnabled():
             return
-        self.ui.label_project_summary.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+        heading.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
         action.trigger()
         destination = self.ui.tabWidget.currentWidget()
         if action is self.ui.actionManage_journals:
@@ -1401,7 +1413,8 @@ Click "Yes" to start now.')
                 tile.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
                 tile.installEventFilter(self)
                 # Same click and keyboard handling as the New and Open project cards
-                self.project_cards[tile] = lambda menu_action=action: self.activate_project_summary_action(menu_action)
+                self.project_cards[tile] = lambda menu_action=action: self.activate_project_panel_action(
+                    menu_action, self.ui.label_project_summary)
             tile_layout = QtWidgets.QHBoxLayout(tile)
             tile_layout.setContentsMargins(8, 6, 8, 6)
             tile_layout.setSpacing(8)
@@ -1779,18 +1792,22 @@ Click "Yes" to start now.')
     def eventFilter(self, watched, event):
         """Make the project cards clickable and keep the recent projects combo from opening projects by accident."""
 
-        if watched is getattr(self.ui, "comboBox_recent_projects", None) and not watched.view().isVisible():
+        if watched is getattr(self.ui, "comboBox_recent_projects", None):
             event_type = event.type()
-            if event_type == QtCore.QEvent.Type.Wheel:
-                return True
-            if event_type == QtCore.QEvent.Type.KeyPress:
-                navigation_keys = (QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down, QtCore.Qt.Key.Key_PageUp,
-                                   QtCore.Qt.Key.Key_PageDown, QtCore.Qt.Key.Key_Home, QtCore.Qt.Key.Key_End)
-                if event.key() in navigation_keys:
-                    watched.showPopup()
+            if event_type == QtCore.QEvent.Type.FocusIn and event.reason() == QtCore.Qt.FocusReason.PopupFocusReason:
+                # Qt restores combo focus while the popup is still closing.
+                QtCore.QTimer.singleShot(0, self.reset_recent_projects_focus)
+            if not watched.view().isVisible():
+                if event_type == QtCore.QEvent.Type.Wheel:
                     return True
-                if event.text().strip():  # Typing would jump to a matching project and open it
-                    return True
+                if event_type == QtCore.QEvent.Type.KeyPress:
+                    navigation_keys = (QtCore.Qt.Key.Key_Up, QtCore.Qt.Key.Key_Down, QtCore.Qt.Key.Key_PageUp,
+                                       QtCore.Qt.Key.Key_PageDown, QtCore.Qt.Key.Key_Home, QtCore.Qt.Key.Key_End)
+                    if event.key() in navigation_keys:
+                        watched.showPopup()
+                        return True
+                    if event.text().strip():  # Typing would jump to a matching project and open it
+                        return True
         handler = self.project_cards.get(watched)
         if handler is not None:
             event_type = event.type()

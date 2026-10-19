@@ -1,3 +1,4 @@
+from functools import partial
 import os
 from types import SimpleNamespace
 from unittest import TestCase
@@ -8,6 +9,7 @@ from PyQt6.QtTest import QTest
 
 from qualcoder.__main__ import MainWindow
 from qualcoder.main_tab_rail import MainTabRail
+from qualcoder.recent_projects_delegate import PATH_ROLE
 
 
 class TestRecentActivityNavigation(TestCase):
@@ -148,6 +150,69 @@ class TestRecentActivityNavigation(TestCase):
                                     label.contentsRect().center().y())
             QTest.mouseClick(label, QtCore.Qt.MouseButton.LeftButton, pos=position)
         self.qt_app.processEvents()
+
+    def add_recent_projects(self) -> None:
+        """Add the real recent-projects selection and refresh handlers to the fixture."""
+
+        heading = QtWidgets.QLabel("Recent projects", self.project_page)
+        combo = QtWidgets.QComboBox(self.project_page)
+        heading.setBuddy(combo)
+        self.project_page.layout().insertWidget(0, heading)
+        self.project_page.layout().insertWidget(1, combo)
+        self.window.ui.label_recent_projects = heading
+        self.window.ui.comboBox_recent_projects = combo
+        self.window.app.project_path = "C:/projects/current.qda"
+        self.window.recent_projects = [
+            "2026-10-19_10:00:00|C:/projects/current.qda",
+            "2026-10-18_10:00:00|C:/projects/other.qda",
+        ]
+        self.window.request_project_summary_update = MagicMock()
+        self.window.open_project = MagicMock()
+        combo.view()  # Production creates the popup view when installing its custom delegate.
+        combo.installEventFilter(self.window)
+        combo.activated.connect(self.window.open_recent_project_from_combo)
+        translate = patch("qualcoder.__main__._", side_effect=lambda text: text, create=True)
+        translate.start()
+        self.addCleanup(translate.stop)
+        self.window.fill_recent_projects_list()
+        self.qt_app.processEvents()
+
+    def open_recent_projects_popup(self, activation: str) -> None:
+        """Open the popup by clicking or using the existing arrow-key navigation."""
+
+        combo = self.window.ui.comboBox_recent_projects
+        combo.setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+        if activation == "mouse":
+            QTest.mouseMove(combo, combo.rect().center())
+            QTest.mouseClick(combo, QtCore.Qt.MouseButton.LeftButton, pos=combo.rect().center())
+        else:
+            QTest.keyClick(combo, QtCore.Qt.Key.Key_Down)
+        self.qt_app.processEvents()
+        self.assertTrue(combo.view().isVisible())
+
+    def choose_recent_project(self, index: int, activation: str) -> None:
+        """Choose a real popup entry with a mouse click or keyboard confirmation."""
+
+        self.open_recent_projects_popup(activation)
+        view = self.window.ui.comboBox_recent_projects.view()
+        if activation == "mouse":
+            position = view.visualRect(view.model().index(index, 0)).center()
+            QTest.mouseMove(view.viewport(), position)
+            self.qt_app.processEvents()
+            QTest.mouseClick(view.viewport(), QtCore.Qt.MouseButton.LeftButton, pos=position)
+        else:
+            difference = index - view.currentIndex().row()
+            navigation_key = QtCore.Qt.Key.Key_Down if difference > 0 else QtCore.Qt.Key.Key_Up
+            for step in range(abs(difference)):
+                QTest.keyClick(view, navigation_key)
+            QTest.keyClick(view, QtCore.Qt.Key.Key_Return)
+        self.qt_app.processEvents()
+
+    def assert_recent_projects_outline_cleared(self) -> None:
+        combo = self.window.ui.comboBox_recent_projects
+        self.assertFalse(combo.hasFocus())
+        self.assertFalse(combo.view().isVisible())
+        self.assert_activity_outlines_cleared()
 
     def tearDown(self):
         self.journal_dialog.hide()
@@ -307,3 +372,138 @@ class TestRecentActivityNavigation(TestCase):
                     self.tabs.setCurrentWidget(self.project_page)
                     self.qt_app.processEvents()
                     self.assert_summary_outlines_cleared()
+
+    def test_new_and_open_project_panels_clear_outlines_after_accepting_or_cancelling(self):
+        self.add_project_contents()
+        heading = QtWidgets.QLabel("Project", self.project_page)
+        self.project_page.layout().insertWidget(0, heading)
+        self.window.ui.label_project_title = heading
+        panels = {}
+        for position, action_name in enumerate(("actionCreate_New_Project", "actionOpen_Project"), start=1):
+            panel = QtWidgets.QFrame(self.project_page)
+            panel.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+            panel.setFixedHeight(60)
+            panel.installEventFilter(self.window)
+            self.project_page.layout().insertWidget(position, panel)
+            panels[action_name] = panel
+        self.qt_app.processEvents()
+        activations = []
+
+        for action_name, panel in panels.items():
+            for dialog_result in (QtWidgets.QDialog.DialogCode.Accepted, QtWidgets.QDialog.DialogCode.Rejected):
+                for activation in ("mouse", QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter, QtCore.Qt.Key.Key_Space):
+                    with self.subTest(action=action_name, result=dialog_result, activation=activation):
+                        def open_dialog(checked: bool = False) -> None:
+                            chooser = QtWidgets.QDialog(self.window)
+                            chooser_layout = QtWidgets.QVBoxLayout(chooser)
+                            chooser_layout.addWidget(QtWidgets.QLineEdit(chooser))
+                            QtCore.QTimer.singleShot(10, lambda: chooser.done(dialog_result))
+                            activations.append(chooser.exec())
+                            chooser.deleteLater()
+
+                        action = QtGui.QAction(self.window)
+                        action.triggered.connect(open_dialog)
+                        setattr(self.window.ui, action_name, action)
+                        self.window.project_cards[panel] = partial(
+                            self.window.activate_project_panel_action, action, heading,
+                        )
+                        previous_calls = len(activations)
+                        panel.setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+                        self.assertTrue(panel.hasFocus())
+                        if activation == "mouse":
+                            self.tabs.tabBar().setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+                            QTest.mouseClick(panel, QtCore.Qt.MouseButton.LeftButton, pos=panel.rect().center())
+                        else:
+                            QTest.keyClick(panel, activation)
+                        self.window.activateWindow()
+                        self.qt_app.processEvents()
+                        self.assertEqual(previous_calls + 1, len(activations))
+                        self.assertEqual(dialog_result, activations[-1])
+                        self.assertFalse(any(card.hasFocus() for card in panels.values()))
+                        self.assert_summary_outlines_cleared()
+                        self.assert_focus_in(self.project_page)
+
+                        self.tabs.setCurrentWidget(self.coding_page)
+                        self.tabs.setCurrentWidget(self.project_page)
+                        self.qt_app.processEvents()
+                        self.assertFalse(any(card.hasFocus() for card in panels.values()))
+                        self.assert_summary_outlines_cleared()
+                        QTest.keyClick(self.qt_app.focusWidget(), QtCore.Qt.Key.Key_Tab)
+                        self.assertTrue(any(card.hasFocus() for card in panels.values()))
+
+    def test_recent_projects_clear_outline_after_opening_or_cancelling_a_project(self):
+        self.add_recent_projects()
+        combo = self.window.ui.comboBox_recent_projects
+        selected_entry = self.window.recent_projects[1]
+        for dialog_result in (QtWidgets.QDialog.DialogCode.Accepted, QtWidgets.QDialog.DialogCode.Rejected):
+            for activation in ("mouse", "keyboard"):
+                with self.subTest(result=dialog_result, activation=activation):
+                    self.window.app.project_path = "C:/projects/current.qda"
+                    self.window.fill_recent_projects_list()
+                    self.window.open_project.reset_mock()
+
+                    def open_selected_project(entry: str) -> None:
+                        chooser = QtWidgets.QDialog(self.window)
+                        chooser_layout = QtWidgets.QVBoxLayout(chooser)
+                        chooser_layout.addWidget(QtWidgets.QLineEdit(chooser))
+                        QtCore.QTimer.singleShot(10, lambda: chooser.done(dialog_result))
+                        if chooser.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+                            self.window.app.project_path = entry.split("|", maxsplit=1)[-1]
+                        chooser.deleteLater()
+
+                    self.window.open_project.side_effect = open_selected_project
+                    self.choose_recent_project(1, activation)
+                    self.window.activateWindow()
+                    self.qt_app.processEvents()
+                    self.window.open_project.assert_called_once_with(selected_entry)
+                    self.assert_recent_projects_outline_cleared()
+                    expected_path = ("C:/projects/other.qda" if dialog_result == QtWidgets.QDialog.DialogCode.Accepted
+                                     else "C:/projects/current.qda")
+                    self.assertEqual(expected_path, self.window.app.project_path)
+                    self.assertEqual(expected_path, combo.itemData(combo.currentIndex(), PATH_ROLE))
+                    self.tabs.setCurrentWidget(self.coding_page)
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.qt_app.processEvents()
+                    self.assert_recent_projects_outline_cleared()
+
+    def test_reselecting_the_current_project_clears_outline_without_reopening_it(self):
+        self.add_recent_projects()
+        for activation in ("mouse", "keyboard"):
+            with self.subTest(activation=activation):
+                self.choose_recent_project(0, activation)
+                self.window.open_project.assert_not_called()
+                self.assert_recent_projects_outline_cleared()
+                combo = self.window.ui.comboBox_recent_projects
+                self.assertEqual("C:/projects/current.qda", combo.itemData(combo.currentIndex(), PATH_ROLE))
+
+    def test_dismissing_recent_projects_popup_clears_outline_and_preserves_keyboard_navigation(self):
+        self.add_recent_projects()
+        combo = self.window.ui.comboBox_recent_projects
+        for activation in ("mouse", "keyboard"):
+            with self.subTest(activation=activation):
+                self.open_recent_projects_popup(activation)
+                QTest.keyClick(combo.view(), QtCore.Qt.Key.Key_Escape)
+                self.qt_app.processEvents()
+                self.assert_recent_projects_outline_cleared()
+                self.window.open_project.assert_not_called()
+                self.assertEqual("C:/projects/current.qda", combo.itemData(combo.currentIndex(), PATH_ROLE))
+                QTest.keyClick(self.qt_app.focusWidget(), QtCore.Qt.Key.Key_Tab)
+                self.assertTrue(combo.hasFocus())
+                QTest.keyClick(combo, QtCore.Qt.Key.Key_Down)
+                self.qt_app.processEvents()
+                self.assertTrue(combo.view().isVisible())
+                QTest.keyClick(combo.view(), QtCore.Qt.Key.Key_Escape)
+                self.qt_app.processEvents()
+
+    def test_closing_recent_projects_popup_does_not_steal_focus_from_another_control(self):
+        self.add_recent_projects()
+        combo = self.window.ui.comboBox_recent_projects
+        self.open_recent_projects_popup("keyboard")
+        combo.hidePopup()
+        heading = self.window.ui.label_recent_activity
+        heading.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+        self.qt_app.processEvents()
+
+        self.assertTrue(heading.hasFocus())
+        self.assert_recent_projects_outline_cleared()
+        self.window.open_project.assert_not_called()
