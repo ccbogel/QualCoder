@@ -1,9 +1,9 @@
 import os
 from types import SimpleNamespace
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtTest import QTest
 
 from qualcoder.__main__ import MainWindow
@@ -77,6 +77,76 @@ class TestRecentActivityNavigation(TestCase):
         self.window.resize(700, 400)
         self.window.show()
         self.window.activateWindow()
+        self.qt_app.processEvents()
+
+    def add_project_contents(self) -> None:
+        """Add real summary tiles, text links and menu actions to the navigation fixture."""
+
+        self.manage_page = QtWidgets.QWidget()
+        manage_layout = QtWidgets.QVBoxLayout(self.manage_page)
+        manage_layout.addWidget(QtWidgets.QPlainTextEdit(self.manage_page))
+        self.tabs.addTab(self.manage_page, "Manage")
+        frame = QtWidgets.QFrame(self.project_page)
+        self.project_page.layout().addWidget(frame)
+        summary_layout = QtWidgets.QVBoxLayout(frame)
+        heading = QtWidgets.QLabel("Project contents", frame)
+        summary_layout.addWidget(heading)
+        grid = QtWidgets.QGridLayout()
+        summary_layout.addLayout(grid)
+        files_label = QtWidgets.QLabel(frame)
+        warning_label = QtWidgets.QLabel(frame)
+        for link_label in (files_label, warning_label):
+            link_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
+            link_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
+                                              QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
+            summary_layout.addWidget(link_label)
+        files_label.linkActivated.connect(self.window.open_coding_for_file_type)
+        warning_label.linkActivated.connect(self.window.project_summary_warning_link)
+        self.window.ui.frame_project_summary = frame
+        self.window.ui.label_project_summary = heading
+        self.window.ui.gridLayout_project_summary = grid
+        self.window.ui.label_project_summary_files = files_label
+        self.window.ui.label_project_summary_warning = warning_label
+        self.summary_handlers = {}
+        for action_name in ("actionManage_files", "actionManage_cases", "actionManage_journals",
+                            "actionManage_bad_links_to_files", "actionCodes", "actionCode_pdf",
+                            "actionCode_image", "actionCode_audio_video"):
+            action = QtGui.QAction(self.window)
+            if action_name == "actionManage_journals":
+                handler = MagicMock(side_effect=lambda checked=False: self.window.journals())
+            elif action_name.startswith("actionManage_"):
+                handler = MagicMock(side_effect=lambda checked=False: self.tabs.setCurrentWidget(self.manage_page))
+            else:
+                handler = MagicMock(side_effect=lambda checked=False: self.tabs.setCurrentWidget(self.coding_page))
+            action.triggered.connect(handler)
+            setattr(self.window.ui, action_name, action)
+            self.summary_handlers[action_name] = handler
+        with patch("qualcoder.__main__._", side_effect=lambda text: text, create=True):
+            self.window.build_project_summary_tiles()
+        self.window.resize(900, 700)
+        self.qt_app.processEvents()
+
+    def assert_summary_outlines_cleared(self) -> None:
+        self.assert_activity_outlines_cleared()
+        self.assertFalse(any(entry["tile"].hasFocus() for entry in self.window.project_summary_tiles.values()))
+        self.assertFalse(self.window.ui.label_project_summary_files.hasFocus())
+        self.assertFalse(self.window.ui.label_project_summary_warning.hasFocus())
+
+    def activate_summary_text_link(self, label: QtWidgets.QLabel, link: str, caption: str, activation: str) -> None:
+        """Activate a real QLabel anchor using the mouse or Return key."""
+
+        label.setText(f'<a href="{link}">{caption}</a>')
+        self.qt_app.processEvents()
+        if activation == "keyboard":
+            label.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+            QTest.keyClick(label, QtCore.Qt.Key.Key_Tab)
+            self.assertTrue(label.hasFocus())
+            QTest.keyClick(label, QtCore.Qt.Key.Key_Return)
+        else:
+            self.tabs.tabBar().setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+            position = QtCore.QPoint(label.contentsRect().left() + label.fontMetrics().horizontalAdvance(caption) // 2,
+                                    label.contentsRect().center().y())
+            QTest.mouseClick(label, QtCore.Qt.MouseButton.LeftButton, pos=position)
         self.qt_app.processEvents()
 
     def tearDown(self):
@@ -164,3 +234,76 @@ class TestRecentActivityNavigation(TestCase):
 
         self.assertTrue(self.tabs.tabBar().hasFocus())
         self.assertTrue(self.rail.keyboard_focus)
+
+    def test_project_contents_tiles_clear_outlines_after_activation_and_return(self):
+        self.add_project_contents()
+        for tile_key, destination, action_name in (
+            ("files", self.manage_page, "actionManage_files"),
+            ("cases", self.manage_page, "actionManage_cases"),
+            ("journals", self.journal_dialog, "actionManage_journals"),
+        ):
+            for activation in ("mouse", QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter, QtCore.Qt.Key.Key_Space):
+                with self.subTest(tile=tile_key, activation=activation):
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.window.activateWindow()
+                    tile = self.window.project_summary_tiles[tile_key]["tile"]
+                    tile.setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+                    previous_calls = self.summary_handlers[action_name].call_count
+                    if activation == "mouse":
+                        self.tabs.tabBar().setFocus(QtCore.Qt.FocusReason.TabFocusReason)
+                        QTest.mouseClick(tile, QtCore.Qt.MouseButton.LeftButton, pos=tile.rect().center())
+                    else:
+                        QTest.keyClick(tile, activation)
+                    if destination is self.journal_dialog:
+                        self.journal_dialog.activateWindow()
+                    self.qt_app.processEvents()
+                    self.assertEqual(previous_calls + 1, self.summary_handlers[action_name].call_count)
+                    self.assert_summary_outlines_cleared()
+                    self.assert_focus_in(destination)
+
+                    self.journal_dialog.hide()
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.window.activateWindow()
+                    self.qt_app.processEvents()
+                    self.assert_summary_outlines_cleared()
+
+        codes_tile = self.window.project_summary_tiles["codes"]["tile"]
+        self.assertNotIn(codes_tile, self.window.project_cards)
+
+    def test_project_contents_file_type_links_clear_outlines_after_activation_and_return(self):
+        self.add_project_contents()
+        label = self.window.ui.label_project_summary_files
+        for link, caption, action_name in (
+            ("text", "Text", "actionCodes"), ("pdf", "PDF", "actionCode_pdf"),
+            ("image", "Images", "actionCode_image"), ("av", "Audio/video", "actionCode_audio_video"),
+        ):
+            for activation in ("mouse", "keyboard"):
+                with self.subTest(link=link, activation=activation):
+                    self.tabs.setCurrentWidget(self.project_page)
+                    previous_calls = self.summary_handlers[action_name].call_count
+                    self.activate_summary_text_link(label, link, caption, activation)
+                    self.assertEqual(previous_calls + 1, self.summary_handlers[action_name].call_count)
+                    self.assert_summary_outlines_cleared()
+                    self.assert_focus_in(self.coding_page)
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.qt_app.processEvents()
+                    self.assert_summary_outlines_cleared()
+
+    def test_project_contents_repair_links_clear_outlines_after_activation_and_return(self):
+        self.add_project_contents()
+        label = self.window.ui.label_project_summary_warning
+        for link, caption, action_name in (
+            ("bad_links", "Manage links", "actionManage_bad_links_to_files"),
+            ("missing_files", "Manage files", "actionManage_files"),
+        ):
+            for activation in ("mouse", "keyboard"):
+                with self.subTest(link=link, activation=activation):
+                    self.tabs.setCurrentWidget(self.project_page)
+                    previous_calls = self.summary_handlers[action_name].call_count
+                    self.activate_summary_text_link(label, link, caption, activation)
+                    self.assertEqual(previous_calls + 1, self.summary_handlers[action_name].call_count)
+                    self.assert_summary_outlines_cleared()
+                    self.assert_focus_in(self.manage_page)
+                    self.tabs.setCurrentWidget(self.project_page)
+                    self.qt_app.processEvents()
+                    self.assert_summary_outlines_cleared()

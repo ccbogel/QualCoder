@@ -1092,9 +1092,10 @@ Click "Yes" to start now.')
         arrow_layout.addStretch()
         arrow_layout.addWidget(self.recent_projects_arrow)
         files_label = self.ui.label_project_summary_files
-        files_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
-        files_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
-                                            QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
+        for link_label in (files_label, self.ui.label_project_summary_warning):
+            link_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
+            link_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
+                                              QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
         files_label.linkActivated.connect(self.open_coding_for_file_type)
         self.ui.label_project_summary_warning.linkActivated.connect(self.project_summary_warning_link)
         # Project contents refresh after database changes and when the Project tab is shown
@@ -1321,13 +1322,16 @@ Click "Yes" to start now.')
         if state == QtCore.Qt.ApplicationState.ApplicationActive:
             self.request_project_summary_update()
 
-    def project_summary_warning_link(self, link):
+    def project_summary_warning_link(self, link: str) -> None:
         """Open the dialog that fixes the reported file problem."""
 
-        if link == "bad_links":
-            self.manage_bad_file_links()
-        elif link == "missing_files":
-            self.ui.actionManage_files.trigger()
+        actions = {
+            "bad_links": self.ui.actionManage_bad_links_to_files,
+            "missing_files": self.ui.actionManage_files,
+        }
+        action = actions.get(link)
+        if action is not None:
+            self.activate_project_summary_action(action)
 
     def count_missing_project_files(self):
         """Count imported images, audio, video and PDFs missing from the project folder.
@@ -1346,7 +1350,7 @@ Click "Yes" to start now.')
                 missing += 1
         return missing
 
-    def open_coding_for_file_type(self, file_type):
+    def open_coding_for_file_type(self, file_type: str) -> None:
         """Open the coding workspace for a file type chosen in the project contents box."""
 
         actions = {
@@ -1357,7 +1361,23 @@ Click "Yes" to start now.')
         }
         action = actions.get(file_type)
         if action is not None:
-            action.trigger()
+            self.activate_project_summary_action(action)
+
+    def activate_project_summary_action(self, action: QtGui.QAction) -> None:
+        """Open a Project contents link without retaining its focus highlight.
+
+        Args:
+            action: Menu action associated with the tile or text link.
+        """
+
+        if not action.isEnabled():
+            return
+        self.ui.label_project_summary.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+        action.trigger()
+        destination = self.ui.tabWidget.currentWidget()
+        if action is self.ui.actionManage_journals:
+            destination = self.journal_display
+        self.focus_project_navigation_destination(destination)
 
     def build_project_summary_tiles(self):
         """Create the count tiles of the project contents box once; refreshes only change the numbers."""
@@ -1381,7 +1401,7 @@ Click "Yes" to start now.')
                 tile.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
                 tile.installEventFilter(self)
                 # Same click and keyboard handling as the New and Open project cards
-                self.project_cards[tile] = action.trigger
+                self.project_cards[tile] = lambda menu_action=action: self.activate_project_summary_action(menu_action)
             tile_layout = QtWidgets.QHBoxLayout(tile)
             tile_layout.setContentsMargins(8, 6, 8, 6)
             tile_layout.setSpacing(8)
@@ -1608,6 +1628,15 @@ Click "Yes" to start now.')
             destination = self.journal_display
         elif key == "ai_chat" and self.ai_chat_window is not None:
             destination = self.ai_chat_window
+        self.focus_project_navigation_destination(destination)
+
+    def focus_project_navigation_destination(self, destination: Optional[QtWidgets.QWidget]) -> None:
+        """Focus opened content, keeping any child that already has focus.
+
+        Args:
+            destination: Opened tab, sidebar or modeless dialog, if available.
+        """
+
         if destination is None or not destination.isVisible():
             return
         focused_widget = QtWidgets.QApplication.focusWidget()
