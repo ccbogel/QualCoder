@@ -55,12 +55,10 @@ The following are out of scope:
 - AI features are disabled by default. When enabled, the text the user selects for analysis is sent to the LLM provider the user configured (for example OpenAI, Anthropic, Google, Blablador or a local Ollama model). The provider's own privacy terms apply. API keys are stored in the local QualCoder configuration file.
 - Local semantic search uses a model downloaded once to the user's machine; the resulting embeddings are stored in the project's `ai_data` folder.
 - A pseudonymisation tool is available to replace names before documents are imported (excluding PDFs).
-- Windows and macOS binaries are currently unsigned, so operating systems show an "unknown publisher" warning. Checksums for each binary are listed on the release page so downloads can be verified.
+- Windows and macOS binaries are currently unsigned, so operating systems show an "unknown publisher" warning.
+- SHA-256 Checksums for each binary are listed on the release page so downloads can be verified. You should check the dowloaded binary hash matches the hash shown for that binary on GitHub.
 
 ## Dependency updates
 
 Dependencies are listed in `requirements.txt`. Automated dependency alerts are enabled on the repository. Updates to dependencies with known vulnerabilities are prioritised for the next release.
 
-## GitHub binaries
-
-- GitHub binaries are made for recent operating systems, typically Windows, macOS and Linux. GitHub hashes these with SHA-256 to create a digital signature. On dowloading a binary you should check the dowloaded binary hash matches the hash shown for that binary on GitHub.
