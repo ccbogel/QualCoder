@@ -1711,6 +1711,7 @@ class DialogAIChat(QtWidgets.QDialog):
                                 msg_type TEXT,
                                 msg_author TEXT,
                                 msg_content TEXT,
+                                date TEXT,
                                 FOREIGN KEY (chat_id) REFERENCES chats(id))''')
         
         cursor.execute('''CREATE TABLE IF NOT EXISTS topic_chat_embeddings (
@@ -1724,6 +1725,10 @@ class DialogAIChat(QtWidgets.QDialog):
         chat_columns = {str(row[1]).strip() for row in cursor.fetchall() if isinstance(row, tuple) and len(row) > 1}
         if 'compaction_frontier_msg_id' not in chat_columns:
             cursor.execute("ALTER TABLE chats ADD COLUMN compaction_frontier_msg_id INTEGER DEFAULT 0")
+        cursor.execute("PRAGMA table_info(chat_messages)")
+        message_columns = {row[1] for row in cursor.fetchall()}
+        if 'date' not in message_columns:
+            cursor.execute("ALTER TABLE chat_messages ADD COLUMN date TEXT")
         self.chat_history_conn.commit()
         self.current_chat_idx = -1
         self.fill_chat_list()
@@ -2376,6 +2381,7 @@ class DialogAIChat(QtWidgets.QDialog):
         cursor = self.chat_history_conn.cursor()
         cursor.execute('UPDATE chats SET name = ? WHERE id = ?', (clean_name, chat_id))
         self.chat_history_conn.commit()
+        self._emit_project_table_changes(["chats"])
         updated_chat = (chat[0], clean_name, chat[2], chat[3], chat[4], chat[5])
         self.chat_list[row] = updated_chat
         self._refresh_chat_list_item(row)
@@ -2519,6 +2525,7 @@ class DialogAIChat(QtWidgets.QDialog):
         cursor.execute('''INSERT INTO chats (name, analysis_type, summary, date, analysis_prompt)
                             VALUES (?, ?, ?, ?, ?)''', (name, analysis_type, summary, date_text, analysis_prompt))
         self.chat_history_conn.commit()
+        self._emit_project_table_changes(["chats"])
         self.current_chat_idx = -1
         self.fill_chat_list()
         # select new chat
@@ -5589,6 +5596,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             print(e_)
             self.chat_history_conn.rollback()
             raise
+        self._emit_project_table_changes(["chats", "chat_messages"])
         self.current_chat_idx = selected_rows[0]
         self._multi_chat_selection_active = False
         self.fill_chat_list()
@@ -6240,18 +6248,19 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
             self.ai_output_autoscroll = True
                                 
-    def history_update_message_list(self, db_conn=None):
-        """Update sel.chat_msg_list from the database
+    def history_update_message_list(self, db_conn: Optional[sqlite3.Connection] = None) -> None:
+        """Update self.chat_msg_list from the database.
 
         Args:
-            db_conn: database conncetion, if None, use defaults to self.chat:history_conn
+            db_conn: Database connection; defaults to self.chat_history_conn.
         """
         if self.current_chat_idx > -1:
             curr_chat_id = self.chat_list[self.current_chat_idx][0]
             if db_conn is None:
                 db_conn = self.chat_history_conn 
             cursor = db_conn.cursor()
-            cursor.execute('SELECT * FROM chat_messages WHERE chat_id=? ORDER BY id', (curr_chat_id,))
+            cursor.execute('SELECT id, chat_id, msg_type, msg_author, msg_content '
+                           'FROM chat_messages WHERE chat_id=? ORDER BY id', (curr_chat_id,))
             self.chat_msg_list = cursor.fetchall()
         else:
             self.chat_msg_list.clear()
@@ -6661,7 +6670,24 @@ data collected. This information will accompany every prompt sent to the AI, res
             compact_frontier_msg_id=new_frontier,
         )
 
-    def history_add_message(self, msg_type, msg_author, msg_content, chat_idx=None, db_conn=None, refresh=True, commit=True):
+    def _emit_project_table_changes(self, tables: list[str]) -> None:
+        """Notify other views after committed chat history changes."""
+
+        if getattr(self.app, "project_events", None) is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
+
+    def history_add_message(self, msg_type: str, msg_author: str, msg_content: str,
+                            chat_idx: Optional[int] = None, db_conn: Optional[sqlite3.Connection] = None,
+                            refresh: bool = True, commit: bool = True) -> None:
+        """Save a timestamped message and optionally commit and refresh the history.
+
+        Args:
+            chat_idx: Chat list index; defaults to the current chat.
+            db_conn: Database connection; defaults to self.chat_history_conn.
+            refresh: Reload the current chat's message list after inserting.
+            commit: Commit now; callers batching writes must notify views after committing.
+        """
+
         if chat_idx is None:
             chat_idx = self.current_chat_idx
         if chat_idx > -1:
@@ -6672,15 +6698,23 @@ data collected. This information will accompany every prompt sent to the AI, res
                 db_conn = self.chat_history_conn
             cursor = db_conn.cursor()
             # Insert new message
-            cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)'
-                           ' VALUES (?, ?, ?, ?)', (curr_chat_id, msg_type, msg_author, msg_content))
+            date_text = datetime.now().astimezone().strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content, date)'
+                           ' VALUES (?, ?, ?, ?, ?)', (curr_chat_id, msg_type, msg_author, msg_content, date_text))
             if commit:
                 db_conn.commit()
+                self._emit_project_table_changes(["chat_messages"])
             if refresh:
                 self.history_update_message_list(db_conn)
 
-    def history_add_or_append_agent_status(self, status_text: str, chat_idx=None, msg_author='ai_agent'):
-        """Persist one agent status line as its own DB row (not merged)."""
+    def history_add_or_append_agent_status(self, status_text: str, chat_idx: Optional[int] = None,
+                                          msg_author: str = 'ai_agent') -> None:
+        """Save a timestamped agent status, skipping immediate duplicates.
+
+        Args:
+            chat_idx: Chat list index; defaults to the current chat.
+            msg_author: AI profile identifier used to attribute the status.
+        """
         if chat_idx is None:
             chat_idx = self.current_chat_idx
         if chat_idx <= -1:
@@ -6705,9 +6739,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             if prev_author == str(msg_author) and prev_content == status_line:
                 return
 
-        cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)'
-                       ' VALUES (?, ?, ?, ?)', (curr_chat_id, 'agent_status', msg_author, status_line))
+        date_text = datetime.now().astimezone().strftime('%Y-%m-%d %H:%M:%S')
+        cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content, date)'
+                       ' VALUES (?, ?, ?, ?, ?)', (curr_chat_id, 'agent_status', msg_author, status_line, date_text))
         self.chat_history_conn.commit()
+        self._emit_project_table_changes(["chat_messages"])
 
     def _chat_user_message_count(self, chat_id: int, db_conn=None) -> int:
         """Count persisted user messages for one chat."""
@@ -6833,6 +6869,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.chat_history_conn.rollback()
             return
         self.chat_history_conn.commit()
+        self._emit_project_table_changes(["chats"])
 
         row_idx = self.find_chat_idx(chat_id)
         if row_idx is None:
@@ -9277,6 +9314,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                             commit_history=False,
                         )
                 db_conn.commit()
+                self._emit_project_table_changes(["chat_messages"])
                 self.history_update_message_list(db_conn)
             finally:
                 db_conn.close()

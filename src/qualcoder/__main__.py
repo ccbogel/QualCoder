@@ -37,7 +37,7 @@ import shutil
 import sqlite3
 import sys
 import traceback
-from typing import Optional
+from typing import Any, Optional
 import urllib.request
 import webbrowser
 
@@ -1289,7 +1289,7 @@ Click "Yes" to start now.')
         """React to database changes that alter the counts shown in the project contents box."""
 
         relevant = {"source", "cases", "code_name", "code_cat", "attribute_type", "journal",
-                    "code_text", "code_image", "code_av", "project"}
+                    "code_text", "code_image", "code_av", "project", "chats", "chat_messages"}
         if tables is not None and not relevant.intersection(tables):
             return
         if tables is not None and "source" in tables:
@@ -1452,7 +1452,7 @@ Click "Yes" to start now.')
             row["detail"].setStyleSheet(f"color: {colors.get('secondary')};")
 
     @staticmethod
-    def format_activity_date(date_text):
+    def format_activity_date(date_text: Optional[str]) -> str:
         """Short date for the recent activity list: today, yesterday or the date."""
 
         try:
@@ -1466,14 +1466,14 @@ Click "Yes" to start now.')
             return _("yesterday {0}").format(moment.strftime("%H:%M"))
         return moment.strftime("%Y-%m-%d %H:%M")
 
-    def collect_recent_activity(self):
+    def collect_recent_activity(self) -> dict[str, tuple[str, str, Any, Optional[str]]]:
         """Find where the current coder left off: last coding, bookmarks, last journal and AI chat."""
 
         cur = self.app.conn.cursor()
         coder = self.app.settings['codername']
         activity = {}
 
-        def source_name(file_id):
+        def source_name(file_id: int) -> Optional[str]:
             cur.execute("select name from source where id=?", [file_id])
             res = cur.fetchone()
             return res[0] if res else None
@@ -1486,27 +1486,31 @@ Click "Yes" to start now.')
         res = cur.fetchone()
         if res and source_name(res[1]):
             activity["coded"] = (source_name(res[1]),
-                                 _("Last coded, {0}").format(self.format_activity_date(res[4])), res)
+                                 _("Last coded, {0}").format(self.format_activity_date(res[4])), res, res[4])
         cur.execute("select bookmarkfile, bookmarkpos, avbookmarkfile, avbookmarkmsec from project")
         res = cur.fetchone()
         if res and res[0] is not None and source_name(res[0]):
-            activity["text_bookmark"] = (source_name(res[0]), _("Text bookmark"), None)
+            activity["text_bookmark"] = (source_name(res[0]), _("Text bookmark"), None, None)
         if res and res[2] is not None and source_name(res[2]):
             seconds = int(res[3] or 0) // 1000
             activity["av_bookmark"] = (source_name(res[2]),
                                        _("Audio/video bookmark at {0}").format(f"{seconds // 60}:{seconds % 60:02d}"),
-                                       None)
+                                       None, None)
         cur.execute("select jid, name, date from journal order by date desc limit 1")
         res = cur.fetchone()
         if res:
-            activity["journal"] = (res[1], _("Journal, edited {0}").format(self.format_activity_date(res[2])), res[0])
+            activity["journal"] = (res[1], _("Journal, edited {0}").format(self.format_activity_date(res[2])),
+                                   res[0], res[2])
         chat = self.last_ai_chat()
         if chat is not None:
-            activity["ai_chat"] = (chat[1], _("Last AI chat"), chat[0])
+            detail = _("Last AI chat")
+            if chat[2]:
+                detail = _("AI chat, last changed {0}").format(self.format_activity_date(chat[2]))
+            activity["ai_chat"] = (chat[1], detail, chat[0], chat[2])
         return activity
 
-    def last_ai_chat(self):
-        """Id and name of the AI chat with the newest message, read from the project's chat history."""
+    def last_ai_chat(self) -> Optional[tuple[int, str, Optional[str]]]:
+        """Return the latest AI chat, using its creation date for undated messages."""
 
         if self.app.settings.get('ai_enable', 'False') != 'True':
             return None
@@ -1516,9 +1520,13 @@ Click "Yes" to start now.')
         try:
             conn = sqlite3.connect(f"{history.as_uri()}?mode=ro", uri=True)
             try:
-                res = conn.execute("select chats.id, chats.name, chats.analysis_type from chat_messages "
-                                   "join chats on chats.id = chat_messages.chat_id "
-                                   "order by chat_messages.id desc limit 1").fetchone()
+                columns = {row[1] for row in conn.execute("PRAGMA table_info(chat_messages)")}
+                # The Project tab can read history before AI initialization upgrades its schema.
+                date_column = "COALESCE(NULLIF(chat_messages.date, ''), chats.date)" if "date" in columns else "chats.date"
+                res = conn.execute(f"select chats.id, chats.name, chats.analysis_type, {date_column} as activity_date "
+                                   "from chat_messages join chats on chats.id = chat_messages.chat_id "
+                                   "where chat_messages.msg_type in ('user', 'ai', 'info', 'agent_status') "
+                                   "order by activity_date desc, chat_messages.id desc limit 1").fetchone()
             finally:
                 conn.close()
         except sqlite3.Error as err:
@@ -1529,10 +1537,14 @@ Click "Yes" to start now.')
         name = str(res[1] or "").strip()
         if self.ai_chat_window is not None:
             name = self.ai_chat_window._display_chat_name(res[1], res[2])
-        return res[0], name or _("AI chat")
+        return res[0], name or _("AI chat"), res[3]
 
-    def show_recent_activity(self, activity):
-        """Fill the recent activity rows; hide the ones without data."""
+    def show_recent_activity(self, activity: dict[str, tuple[str, str, Any, Optional[str]]]) -> None:
+        """Fill and sort activity rows by date, placing undated entries last.
+
+        Args:
+            activity: Entries containing a title, detail, target and optional local timestamp.
+        """
 
         rows = getattr(self, "recent_activity_rows", None)
         if not rows:
@@ -1543,11 +1555,20 @@ Click "Yes" to start now.')
             row["row"].setVisible(entry is not None)
             if entry is None:
                 continue
-            title, detail, target = entry
+            title, detail, target = entry[:3]
             row["title"].setText(title)
             row["detail"].setText(detail)
             row["row"].setAccessibleName(f"{title}, {detail}")
             self.recent_activity_targets[key] = target
+        ordered_keys = sorted(self.recent_activity_targets,
+                              key=lambda activity_key: activity[activity_key][3] or "", reverse=True)
+        previous_row = None
+        for position, key in enumerate(ordered_keys):
+            activity_row = rows[key]["row"]
+            self.ui.verticalLayout_recent_activity.insertWidget(position, activity_row)
+            if previous_row is not None:
+                QtWidgets.QWidget.setTabOrder(previous_row, activity_row)
+            previous_row = activity_row
         self.ui.label_recent_activity_empty.setVisible(not self.recent_activity_targets)
 
     def open_recent_activity(self, key):
