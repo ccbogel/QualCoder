@@ -97,6 +97,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.comboBox_stopwords.currentTextChanged.connect(self.fill_text_edit)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
 

@@ -116,6 +116,14 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.files.append({'name': r[0], 'fid': r[1]})
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def select_files(self):
         """ Select files for analysis. """
 

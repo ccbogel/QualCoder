@@ -102,6 +102,14 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def clear_table_and_data(self):
         self.data = []
         self.max_count = 0

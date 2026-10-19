@@ -72,6 +72,14 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.ui.pushButton_search_folders.pressed.connect(self.find_filepaths)
         self.ui.pushButton_bulk.pressed.connect(self.bulk_path_rename)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
 

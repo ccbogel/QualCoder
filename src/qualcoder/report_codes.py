@@ -203,6 +203,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
 

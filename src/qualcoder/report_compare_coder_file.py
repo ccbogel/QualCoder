@@ -109,6 +109,14 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.textEdit.setReadOnly(True)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def information(self):
         """ Provide statistical help information. """
 

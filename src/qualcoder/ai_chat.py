@@ -9518,6 +9518,14 @@ data collected. This information will accompany every prompt sent to the AI, res
         finally:
             self._clear_chat_ai_profile_snapshot(self.current_streaming_chat_idx)
     
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the chat workspace."""
+
+        if event.key() == Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def eventFilter(self, source, event):
         editor = self.ui.plainTextEdit_question
         editor_viewport = editor.viewport()

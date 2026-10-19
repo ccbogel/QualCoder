@@ -21,20 +21,20 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtCore import Qt
-
 import csv
 import datetime
 import json
 import logging
-from openpyxl import load_workbook
 import os
 import re
 from shutil import copyfile
 import sqlite3
 # import sys
 # import traceback
+
+from openpyxl import load_workbook
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 
 from .GUI.ui_dialog_import import Ui_Dialog_Import
 from .helpers import Message
@@ -116,6 +116,14 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.ui.label_msg.setText(_("No survey selected."))
             self.ui.label_msg.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.close()
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def load_pseudonyms(self):
         """ Pseudonyms stored in pseudonyms.json in qda data folder.

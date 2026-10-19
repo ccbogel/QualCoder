@@ -105,6 +105,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         tree_header.customContextMenuRequested.connect(self._header_menu)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def _toggle_source_columns(self):
         """ Show or hide the per-source (text / image / A-V) breakdown columns (2, 3, 4).
         The data is always calculated; only the visibility changes. """
@@ -1146,6 +1154,14 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        """Keep unhandled Escape presses from closing the workspace."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape:
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def get_data(self):
         """ Called from init. gets coders, codes, categories, file_summaries.
