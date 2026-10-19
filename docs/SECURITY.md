@@ -54,7 +54,7 @@ The following are out of scope:
 - All project data stays on the user's machine unless the user enables the AI features.
 - AI features are disabled by default. When enabled, the text the user selects for analysis is sent to the LLM provider the user configured (for example OpenAI, Anthropic, Google, Blablador or a local Ollama model). The provider's own privacy terms apply. API keys are stored in the local QualCoder configuration file.
 - Local semantic search uses a model downloaded once to the user's machine; the resulting embeddings are stored in the project's `ai_data` folder.
-- A pseudonymisation tool is available to replace names before documents are imported.
+- A pseudonymisation tool is available to replace names before documents are imported (excluding PDFs).
 - Windows and macOS binaries are currently unsigned, so operating systems show an "unknown publisher" warning. Checksums for each binary are listed on the release page so downloads can be verified.
 
 ## Dependency updates
