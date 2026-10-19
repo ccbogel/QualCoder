@@ -32,6 +32,7 @@ Include, where possible:
 - An assessment of severity and a plan within 30 days. The maintainers are volunteers, so timelines may vary.
 - A fix in a new release, with credit to the reporter in the release notes unless they prefer to stay anonymous.
 - Public disclosure after the fix is available. We ask reporters to wait until then.
+- Note, we do not have the capacity to examine issues on operatng systems that we do not have access to (e.g. Windows 10 or earlier).
 
 ## Scope
 
