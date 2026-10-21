@@ -92,10 +92,6 @@ class Ui_Dialog_code_text(object):
         self.pushButton_auto_code_surround.setGeometry(QtCore.QRect(590, 0, 28, 28))
         self.pushButton_auto_code_surround.setText("")
         self.pushButton_auto_code_surround.setObjectName("pushButton_auto_code_surround")
-        self.pushButton_help = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_help.setGeometry(QtCore.QRect(840, 0, 28, 28))
-        self.pushButton_help.setText("")
-        self.pushButton_help.setObjectName("pushButton_help")
         self.pushButton_show_memos = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_show_memos.setGeometry(QtCore.QRect(340, 0, 28, 28))
         self.pushButton_show_memos.setText("")
@@ -474,8 +470,7 @@ class Ui_Dialog_code_text(object):
         Dialog_code_text.setTabOrder(self.pushButton_auto_code, self.pushButton_auto_code_frag_this_file)
         Dialog_code_text.setTabOrder(self.pushButton_auto_code_frag_this_file, self.pushButton_auto_code_surround)
         Dialog_code_text.setTabOrder(self.pushButton_auto_code_surround, self.pushButton_auto_code_undo)
-        Dialog_code_text.setTabOrder(self.pushButton_auto_code_undo, self.pushButton_help)
-        Dialog_code_text.setTabOrder(self.pushButton_help, self.lineEdit_search)
+        Dialog_code_text.setTabOrder(self.pushButton_auto_code_undo, self.lineEdit_search)
         Dialog_code_text.setTabOrder(self.lineEdit_search, self.checkBox_search_case)
         Dialog_code_text.setTabOrder(self.checkBox_search_case, self.checkBox_search_all_files)
         Dialog_code_text.setTabOrder(self.checkBox_search_all_files, self.pushButton_previous)
@@ -514,7 +509,6 @@ class Ui_Dialog_code_text(object):
 "‘\\. will match the dot symbol, ‘\\?’ will match the question mark. ‘\\n’ will match the line ending symbol.\n"
 "Regex cheatsheet: www.rexegg.com/regex-quickstart.html"))
         self.pushButton_auto_code_surround.setToolTip(_translate("Dialog_code_text", "Auto code using start and end marks."))
-        self.pushButton_help.setToolTip(_translate("Dialog_code_text", "Help"))
         self.pushButton_show_memos.setToolTip(_translate("Dialog_code_text", "Show memos"))
         self.pushButton_show_annotations.setToolTip(_translate("Dialog_code_text", "Show annotations"))
         self.pushButton_edit.setToolTip(_translate("Dialog_code_text", "Edit text \n"

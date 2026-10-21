@@ -322,22 +322,6 @@ Regex cheatsheet: www.rexegg.com/regex-quickstart.html</string>
        </property>
       </item>
      </widget>
-     <widget class="QPushButton" name="pushButton_help">
-      <property name="geometry">
-       <rect>
-        <x>930</x>
-        <y>0</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Help</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
@@ -1099,7 +1083,6 @@ odt report: report of the coded text and areas.</string>
   <tabstop>pushButton_auto_code_surround</tabstop>
   <tabstop>pushButton_auto_code_undo</tabstop>
   <tabstop>comboBox_page_view</tabstop>
-  <tabstop>pushButton_help</tabstop>
   <tabstop>lineEdit_search</tabstop>
   <tabstop>checkBox_search_case</tabstop>
   <tabstop>pushButton_previous</tabstop>

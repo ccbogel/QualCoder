@@ -39,6 +39,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
 
 from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
+from .context_help import open_module_help
 from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
 from .html_parser import html_to_text  # Homologate transcript formats with Manage files
 from .select_items import DialogSelectItems
@@ -800,7 +801,7 @@ class DialogViewAV(QtWidgets.QDialog):
     def help(self):
         """ Open help for transcribe section in browser. """
 
-        self.app.help_wiki("3.2.-Files")
+        open_module_help(self.app, self)
 
     def ddialog_menu(self, position):
         """ Context menu to export a screenshot, to resize dialog """

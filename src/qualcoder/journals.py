@@ -35,6 +35,7 @@ from .add_item_name import DialogAddItemName
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_journals import Ui_Dialog_journals
+from .context_help import open_module_help
 from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
 from .memo import DialogMemo, DialogSelectQuote, DialogSelectReference
 
@@ -345,8 +346,8 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.setFocus()
 
     def help(self):
-        """ Open help for transcribe section in browser. """
-        self.app.help_wiki("5.2.-Journals")
+        """ Open help in browser. """
+        open_module_help(self.app, self)
 
     def keyPressEvent(self, event):
         """ Used to activate buttons. """

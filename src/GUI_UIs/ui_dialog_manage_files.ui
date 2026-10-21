@@ -273,22 +273,6 @@ Cannot export text transcription file associated with an audio or video as a lin
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_help">
-      <property name="geometry">
-       <rect>
-        <x>640</x>
-        <y>3</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Help</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_undo">
       <property name="enabled">
        <bool>false</bool>
@@ -466,7 +450,6 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
   <tabstop>pushButton_bulk_rename</tabstop>
   <tabstop>pushButton_undo</tabstop>
   <tabstop>pushButton_delete</tabstop>
-  <tabstop>pushButton_help</tabstop>
   <tabstop>lineEdit_search_files</tabstop>
   <tabstop>pushButton_clear_filter</tabstop>
   <tabstop>tableWidget</tabstop>

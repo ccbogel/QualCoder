@@ -654,7 +654,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.splitter_ai_output.splitterMoved.connect(self.on_ai_output_splitter_moved)
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
-        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.pushButton_undo.pressed.connect(self._undo_ai_changes_shortcut)
         self.shortcut_undo_ai_changes = QShortcut(QKeySequence("Ctrl+Shift+U"), self)
         self.shortcut_undo_ai_changes.activated.connect(self._undo_ai_changes_shortcut)
@@ -1513,9 +1512,6 @@ class DialogAIChat(QtWidgets.QDialog):
             }}
         """)
         self._prompt_completion_popup.setFont(self.ui.plainTextEdit_question.font())
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
-        self.ui.pushButton_help.setFixedHeight(self.ui.pushButton_delete.height())
-        self.ui.pushButton_help.setFixedWidth(self.ui.pushButton_help.height())
         self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_undo.setFixedHeight(self.ui.pushButton_delete.height())
         self.ui.pushButton_undo.setFixedWidth(self.ui.pushButton_undo.height())
@@ -1800,10 +1796,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self.persist_ai_output_splitter_setting()
         self.reset_for_project_close()
             
-    def help(self):
-        """ Open help in browser. """
-        self.app.help_wiki("5.1.-AI-chat-based-analysis")
-
     def _undo_ai_changes_shortcut(self):
         ai = getattr(self.app, "ai", None)
         if ai is None:
