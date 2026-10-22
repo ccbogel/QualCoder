@@ -20,10 +20,13 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+import logging
 import sys
 import traceback
-import logging
+from types import TracebackType
+
 from PyQt6 import QtCore, QtGui, QtWidgets
+
 from .GUI.ui_error_dlg import Ui_ErrorDlg
 
 logger = logging.getLogger(__name__)
@@ -81,10 +84,9 @@ class UncaughtHook(QtCore.QObject):
         # Connect signal to execute the message box function always on main thread
         self._exception_caught.connect(show_error_dlg)
 
-    def exception_hook(self, exception_type, value, tb_obj):
-        """Function handling uncaught exceptions.
-        It is triggered each time an uncaught exception occurs. 
-        """
+    def exception_hook(self, exception_type: type[BaseException], value: BaseException,
+                       tb_obj: TracebackType | None) -> None:
+        """Report uncaught exceptions, using stderr before the GUI is ready."""
 
         if issubclass(exception_type, KeyboardInterrupt):
             # Ignore keyboard interrupt to support console applications
@@ -92,7 +94,11 @@ class UncaughtHook(QtCore.QObject):
         else:
             msg = exception_type.__name__ + ': ' + str(value)
             tb = '\n'.join(traceback.format_tb(tb_obj))
-            logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
+            # Translation may not be initialized when an early import fails.
+            logger.error("Uncaught exception: %s\n%s", msg, tb)
+            if QtWidgets.QApplication.instance() is None:
+                sys.__excepthook__(exception_type, value, tb_obj)
+                return
             # Trigger message box show
             self._exception_caught.emit(msg, tb)
             
