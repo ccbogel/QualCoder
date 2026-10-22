@@ -21,8 +21,10 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
+from contextlib import closing
 import logging
 from pathlib import Path
+import sqlite3
 
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
@@ -101,25 +103,48 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             return
 
     # Functions to merge external project into this project
-    def select_project_folder(self):
-        """ Select another .qda project """
+    def select_project_folder(self) -> None:
+        """Select and validate another .qda project for merging."""
 
         self.merge_project_path = ""
+        self.ui.pushButton_merge.setEnabled(False)
         default_directory = self.app.settings['directory']
         if default_directory == "":
             default_directory = Path('~').expanduser()
-        self.merge_project_path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                                                                             _('Open project directory'),
-                                                                             default_directory)
-        if self.merge_project_path is False or len(self.merge_project_path) < 5:
-            Message(self.app, _("Error"), _("No project selected")).exec()
+        selected_path = QtWidgets.QFileDialog.getExistingDirectory(
+            self, _('Open project directory'), default_directory
+        )
+        if not selected_path:
             return
-        if self.merge_project_path[-4:] != ".qda":
-            Message(self.app, _("Error"), _("Not a QualCoder project")).exec()
+        project_directory = Path(selected_path)
+        error_message = ""
+        try:
+            if project_directory.suffix.lower() != ".qda":
+                error_message = _("The selected folder is not a QualCoder project folder. "
+                                  "Its name must end with .qda.")
+            elif not project_directory.is_dir():
+                error_message = _("The project folder could not be found or accessed.")
+            elif project_directory.samefile(self.app.project_path):
+                error_message = _("The same project")
+            elif not (project_directory / "data.qda").is_file():
+                error_message = _("No data.qda database found in the selected folder.")
+            else:
+                # Read-only mode prevents validation from creating or changing a database.
+                database_uri = (project_directory / "data.qda").resolve().as_uri() + "?mode=ro"
+                with closing(sqlite3.connect(database_uri, uri=True)) as connection:
+                    result = connection.execute(
+                        "select databaseversion, date, memo, about from project"
+                    ).fetchone()
+                    if result is None or not isinstance(result[3], str) or "QualCoder" not in result[3]:
+                        error_message = _("Not a QualCoder project")
+        except sqlite3.DatabaseError as err:
+            error_message = _("The project database could not be opened.") + f"\n{err}"
+        except OSError as err:
+            error_message = _("The project folder could not be found or accessed.") + f"\n{err}"
+        if error_message:
+            Message(self.app, _("Error"), error_message).exec()
             return
-        if self.merge_project_path == self.app.project_path:
-            Message(self.app, _("Error"), _("The same project")).exec()
-            return
+        self.merge_project_path = project_directory.as_posix()
         msg = _("Merge") + f"\n{self.merge_project_path}\n" + _("into") + f"\n{self.app.project_path}\n"
         msg += _("Press Run Button to merge projects")
         Message(self.app, _("Merge projects"), msg).exec()
