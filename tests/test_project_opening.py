@@ -41,7 +41,9 @@ class TestProjectOpening(TestCase):
             journal_display=journal_display,
             close_project=MagicMock(),
             _open_project_connection=MainWindow._open_project_connection,
+            _show_project_open_progress=MagicMock(),
         )
+        window._open_project_steps = MainWindow._open_project_steps.__get__(window)
         return window, existing_connection, journal_display
 
     def test_trailing_separator_is_normalized_before_validation(self):
