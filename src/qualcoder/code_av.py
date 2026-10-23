@@ -45,6 +45,7 @@ from .coder_names import DialogCoderNames
 from .color_selector import TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
+from .context_help import open_module_help
 from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ToolTipEventFilter, CodeResizeHandle, \
     init_persistent_tree_header, ExportDirectoryPathDialog
 from .memo import DialogMemo
@@ -179,8 +180,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
         self.ui.pushButton_rate_up.setIcon(qta.icon('mdi6.speedometer', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
-        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.pushButton_mark_speakers.setIcon(qta.icon('mdi6.pin-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_mark_speakers.pressed.connect(self.mark_speakers)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
@@ -762,8 +761,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.update_coder_names()
 
     def help(self):
-        """ Open help for transcribe section in browser. """
-        self.app.help_wiki("4.5.-Coding-Audio-and-Video")
+        """ Open help in browser. """
+        open_module_help(self.app, self)
 
     def find_code_in_tree(self):
         """ Find a code by name in the codes tree and select it.

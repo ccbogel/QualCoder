@@ -1686,7 +1686,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous_page.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
@@ -1789,7 +1788,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
         self.ui.pushButton_auto_code_undo.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
-        self.ui.pushButton_help.clicked.connect(lambda: self.app.help_wiki("4.3.-Coding-Text-on-PDFs"))
 
         # Bookmark button: jumps to the saved file and position (key B saves them).
         try:

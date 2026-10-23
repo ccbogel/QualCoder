@@ -55,6 +55,7 @@ from .code_tree import CodeTreeController
 from .codebook import build_codebook_path
 from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
+from .context_help import open_module_help
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
     ToolTipEventFilter, init_persistent_tree_header
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
@@ -329,8 +330,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
-        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.pushButton_right_side_pane.setIcon(qta.icon('mdi6.arrow-expand-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_right_side_pane.pressed.connect(self.show_right_side_pane)
         self.ui.pushButton_delete_all_codes.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
@@ -658,8 +657,8 @@ class DialogCodeText(QtWidgets.QWidget):
         return bool(ai.cancel(ask=False))
 
     def help(self):
-        """ Open help for transcribe section in browser. """
-        self.app.help_wiki("4.1.-Coding-Text")
+        """ Open help in browser, AI-assisted coding page when that tab is in view. """
+        open_module_help(self.app, self)
 
     def _build_code_tooltip_html(self, code):  # <- L
         """ Build the tooltip HTML for a single coded segment """

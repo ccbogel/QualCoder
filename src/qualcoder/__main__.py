@@ -84,6 +84,7 @@ from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.codebook import Codebook, ImportPlainTextCodes
 from qualcoder.coder_names import DialogCoderNames
+from qualcoder.context_help import ContextHelp
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
@@ -127,43 +128,6 @@ except Exception as e:  # python-vlc missing: Qt backend takes over, no console 
     logging.getLogger(__name__).debug(f"python-vlc unavailable: {e}")
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
-
-# Help pages on qualcoder.org/doc for the modules shown in the main tabs
-MODULE_HELP_PAGES = {
-    # Manage
-    "DialogManageFiles": "3.2.-Files/",
-    "DialogManageLinks": "3.2.-Files/#manage-bad-links-to-files",
-    "DialogCases": "3.3.-Cases/",
-    "DialogManageAttributes": "3.4.-Attributes/",
-    "DialogReferenceManager": "3.5.-References/",
-    "DialogImportSurvey": "6.2.-Survey-Imports/",
-    # Coding
-    "DialogCodeText": "4.1.-Coding-Text/",
-    "DialogCodePdf": "4.3.-Coding-Text-on-PDFs/",
-    "DialogCodeImage": "4.4.-Coding-Images/",
-    "DialogCodeAV": "4.5.-Coding-Audio-and-Video/",
-    "CodeOrganiser": "4.6.-Code-Organiser/",
-    "DialogCodeColorScheme": "4.7.-Codes-Tree/#accessibility-and-code-colours",
-    # Analysis menu
-    "DialogReportCodes": "5.3.-Analysis/#code-retrieval",
-    "DialogReportCooccurrence": "5.3.-Analysis/#code-co-occurrence-report",
-    "DialogReportRelations": "5.3.-Analysis/#code-relations-report",
-    "DialogReportExactTextMatches": "5.3.-Analysis/#code-text-by-exact-matches-report",
-    "DialogCodesBySegments": "5.3.-Analysis/#codes-by-text-segments-report",
-    "ViewGraph": "5.5.-Graph/",
-    # Reports menu
-    "DialogReportCoderComparisons": "5.4.-Reports/#coding-comparison-report",
-    "DialogCompareCoderByFile": "5.4.-Reports/#coding-comparison-by-file-report",
-    "DialogReportComparisonTable": "5.4.-Reports/",
-    "DialogReportCodeFrequencies": "5.4.-Reports/#code-frequencies-report",
-    "DialogReportFileSummary": "5.4.-Reports/#file-summary-report",
-    "DialogReportCodeSummary": "5.4.-Reports/#code-summary-report",
-    "ViewCharts": "5.4.-Reports/#charts",
-    "DialogSQL": "5.4.-Reports/#database-queries",
-    # AI
-    "DialogAIChat": "5.1.-AI-chat-based-analysis/",
-}
-AI_ASSISTED_CODING_HELP_PAGE = "4.2.-AI-Assisted-Coding/"
 
 if not qc_config_folder.exists():
     try:
@@ -2595,7 +2559,8 @@ Click "Yes" to start now.')
         self.tab_tools_layout.setContentsMargins(0, 0, 0, 0)
         self.tab_tools_layout.setSpacing(4)
         self.tab_tool_buttons = []
-        for icon_name, tooltip, handler in (("mdi6.help-circle-outline", _("Help for this tab"), self.context_help),
+        self.context_help = ContextHelp(self)
+        for icon_name, tooltip, handler in (("mdi6.help-circle-outline", _("Help for this tab"), self.context_help.open_current),
                                             ("mdi6.cog-outline", _("Settings"), self.change_settings)):
             button = QtWidgets.QToolButton(self.tab_tools)
             button.setAutoRaise(True)
@@ -2606,43 +2571,6 @@ Click "Yes" to start now.')
             button.clicked.connect(lambda _checked=False, h=handler: h())
             self.tab_tools_layout.addWidget(button)
             self.tab_tool_buttons.append(button)
-
-    def context_help(self):
-        """Open the help page of the module or tab in view."""
-
-        tab = self.ui.tabWidget.currentWidget()
-        module = self.current_tab_module(tab)
-        if module is not None:
-            page = MODULE_HELP_PAGES.get(type(module).__name__)
-            if isinstance(module, DialogCodeText) and module.ui.tabWidget.currentIndex() == 1:
-                page = AI_ASSISTED_CODING_HELP_PAGE
-            if page:
-                self.app.help_wiki(page)
-                return
-            if callable(getattr(module, "help", None)):
-                module.help()
-                return
-        tab_pages = {
-            self.ui.tab_action_log: "3.1.-Creating-a-New-Project/",
-            self.ui.tab_manage: "3.2.-Files/",
-            self.ui.tab_coding: "4.1.-Coding-Text/",
-            self.ui.tab_reports: "5.3.-Analysis/",
-            self.ui.tab_ai_agent: "5.1.-AI-chat-based-analysis/",
-        }
-        self.app.help_wiki(tab_pages.get(tab, ""))
-
-    def current_tab_module(self, tab):
-        """The module loaded in a tab (coding, report or manage window), or None."""
-
-        layout = tab.layout() if tab is not None else None
-        if layout is None or tab is self.ui.tab_action_log:
-            return None
-        placeholder = self.tab_placeholders.get(tab)
-        for i in reversed(range(layout.count())):
-            widget = layout.itemAt(i).widget()
-            if widget is not None and widget is not placeholder and widget.isVisibleTo(tab):
-                return widget
-        return None
 
     def place_help_settings_buttons(self, rail_mode):
         """Bottom of the left icon column, or the right corner of the top tabs."""
