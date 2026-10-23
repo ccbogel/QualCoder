@@ -61,6 +61,13 @@ class MainTabRail(QtCore.QObject):
             return
         self.enabled = enabled
         if enabled:
+            self.original["widget_stylesheet"] = self.tab_widget.styleSheet()
+            self.tab_widget.setProperty("main_tab_rail", True)
+            # The native macOS style centres west tabs unless their position is explicit.
+            self.tab_widget.setStyleSheet(
+                self.original["widget_stylesheet"]
+                + '\nQTabWidget[main_tab_rail="true"]::tab-bar {subcontrol-position: top left;}'
+            )
             self.original_tooltips = {self.tab_widget.widget(i): self.bar.tabToolTip(i)
                                       for i in range(self.bar.count())}
             self.original_texts = {self.tab_widget.widget(i): self.bar.tabText(i)
@@ -87,6 +94,8 @@ class MainTabRail(QtCore.QObject):
                 self.bar.setTabText(index, "")
             self.bar.installEventFilter(self)
         else:
+            self.tab_widget.setProperty("main_tab_rail", False)
+            self.tab_widget.setStyleSheet(self.original["widget_stylesheet"])
             for page in list(self.buttons_below_icon):
                 self.detach_button_below_icon(page)
             self.bar.removeEventFilter(self)
