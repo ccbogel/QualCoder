@@ -142,6 +142,7 @@ class AiMcpServer:
         "annotations_create",
         "cases_create_case",
         "cases_link_text_to_case",
+        "documents_create_text_document",
     )
     FULL_ACCESS_WRITE_TOOL_NAMES = (
         "codes_update_category",
@@ -645,6 +646,11 @@ class AiMcpServer:
                 if file_name is None or str(file_name).strip() == "":
                     file_name = _("Document") + (f" #{fid}" if fid > 0 else "")
                 return _('Updating document "{name}"...').format(name=str(file_name))
+            if tool_name == "documents_create_text_document":
+                file_name = " ".join(str(tool_args.get("name", "")).split()).strip()
+                if file_name == "":
+                    file_name = _("(unnamed document)")
+                return _('Creating text document "{name}"...').format(name=file_name)
             if tool_name == "cases_link_text_to_case":
                 caseid = self._to_int(tool_args.get("caseid"), -1)
                 fid = self._to_int(tool_args.get("fid"), -1)
@@ -1591,6 +1597,27 @@ class AiMcpServer:
                     },
                 },
                 {
+                    "name": "documents_create_text_document",
+                    "description": (
+                        "Create a new text document in the open project from plain text, for example a transcript "
+                        "sent by another application. The text is stored as given, with line endings normalized to "
+                        "\\n. Fails with reason already_exists when a document of that name exists, unless "
+                        "rename_if_exists is true, in which case a numbered suffix is added. "
+                        "Requires Sandboxed or Full access."
+                    ),
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string", "description": "Document name, usually ending in .txt"},
+                            "text": {"type": "string", "description": "Full plain text of the document"},
+                            "memo": {"type": "string"},
+                            "rename_if_exists": {"type": "boolean", "default": False},
+                        },
+                        "required": ["name", "text"],
+                        "additionalProperties": False,
+                    },
+                },
+                {
                     "name": "documents_update_document",
                     "description": "Update the memo of a text document. Requires Full access.",
                     "inputSchema": {
@@ -1799,6 +1826,8 @@ class AiMcpServer:
             payload = self._tool_unlink_text_from_case(arguments, change_set_id)
         elif tool_name == "documents_create_attribute":
             payload = self._tool_create_attribute("file", arguments, change_set_id)
+        elif tool_name == "documents_create_text_document":
+            payload = self._tool_create_text_document(arguments, change_set_id)
         elif tool_name == "documents_update_document":
             payload = self._tool_update_document(arguments, change_set_id)
         elif tool_name == "documents_update_attributes":
@@ -3253,6 +3282,116 @@ class AiMcpServer:
                     "memo": new_memo,
                     "owner": str(case_row.get("owner", "")),
                     "date": now,
+                },
+            }
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    @staticmethod
+    def _normalize_document_text(text: Any) -> str:
+        """Match load_file_text: \\n line endings and no BOM, so stored positions equal editor positions."""
+
+        normalized = str(text if text is not None else "").replace("\r\n", "\n").replace("\r", "\n")
+        if normalized.startswith("﻿"):
+            normalized = normalized[1:]
+        return normalized
+
+    @staticmethod
+    def _unused_document_name(cur: sqlite3.Cursor, name: str) -> str:
+        """Return name, or name with a numbered suffix before the extension, that no source uses yet."""
+
+        stem, ext = os.path.splitext(name)
+        if stem == "":
+            stem, ext = name, ""
+        candidate = name
+        suffix = 2
+        while cur.execute("SELECT 1 FROM source WHERE lower(name)=lower(?)", (candidate,)).fetchone() is not None:
+            candidate = f"{stem}_{suffix}{ext}"
+            suffix += 1
+        return candidate
+
+    def _tool_create_text_document(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+        name = " ".join(str(arguments.get("name", "")).split()).strip()
+        if name == "" or name.strip(".") == "":
+            raise ValueError("name must not be empty.")
+        if len(name) > 255:
+            raise ValueError("name must be at most 255 characters.")
+        if not isinstance(arguments.get("text"), str):
+            raise ValueError("text must be a string.")
+        text = self._normalize_document_text(arguments.get("text"))
+        if text.strip() == "":
+            raise ValueError("text must not be empty.")
+        memo = self._memo_update_text(arguments.get("memo", ""))
+        rename_if_exists = bool(arguments.get("rename_if_exists", False))
+
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            existing = cur.execute(
+                "SELECT id, name, owner FROM source WHERE lower(name)=lower(?)", (name,)
+            ).fetchone()
+            if existing is not None:
+                if not rename_if_exists:
+                    return {
+                        "tool": "documents_create_text_document",
+                        "created": False,
+                        "reason": "already_exists",
+                        "document": {
+                            "fid": int(existing[0]),
+                            "name": str(existing[1]),
+                            "owner": "" if existing[2] is None else str(existing[2]),
+                        },
+                    }
+                name = self._unused_document_name(cur, name)
+
+            # Text-only sources have no mediapath, like files created inside QualCoder
+            cur.execute(
+                "INSERT INTO source (name, fulltext, mediapath, memo, owner, date) VALUES (?, ?, NULL, ?, ?, ?)",
+                (name, text, memo, self.request_owner, now),
+            )
+            fid = int(cur.lastrowid)
+            # Placeholder values so the new document shows up in every file attribute
+            attribute_names = [
+                str(row[0]) for row in cur.execute(
+                    "SELECT name FROM attribute_type WHERE caseOrFile='file'"
+                ).fetchall()
+            ]
+            for attribute_name in attribute_names:
+                cur.execute(
+                    "INSERT INTO attribute (name, attr_type, value, id, date, owner) VALUES (?, 'file', '', ?, ?, ?)",
+                    (attribute_name, fid, now, self.request_owner),
+                )
+            conn.commit()
+            if hasattr(self.app, "delete_backup"):
+                self.app.delete_backup = False
+            self._record_ai_change(
+                change_set_id,
+                {
+                    "type": "create_document",
+                    "fid": fid,
+                    "name": name,
+                    "memo": memo,
+                    "owner": self.request_owner,
+                    "characters": len(text),
+                    "created_at": now,
+                },
+            )
+            self._emit_project_table_changes(["source", "attribute"] if attribute_names else ["source"])
+            return {
+                "tool": "documents_create_text_document",
+                "created": True,
+                "document": {
+                    "fid": fid,
+                    "name": name,
+                    "memo": memo,
+                    "owner": self.request_owner,
+                    "date": now,
+                    "characters": len(text),
+                    "attributes_initialized": len(attribute_names),
                 },
             }
         except Exception:
