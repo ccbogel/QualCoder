@@ -370,10 +370,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project_panel_colors = {}
         self.action_log_visible = True
 
-        if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
-            # Make 'Fusion' the standard native style on Windows https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
-            # The default 'Windows' style seems partially broken at the moment, in combination with the native dark mode.
-            # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
+        if platform.system() in ("Windows", "Darwin") and self.app.settings['stylesheet'] == "native":
+            # Use Fusion on Windows and macOS for consistent custom navigation rendering.
+            # It also avoids rendering issues with the native Windows dark style.
             QtWidgets.QApplication.instance().setStyle("Fusion")
 
         QtWidgets.QMainWindow.__init__(self)
@@ -4316,8 +4315,8 @@ def gui():
     if sys.platform in ["linux", "bsd"]: 
         QtWidgets.QApplication.setDesktopFileName("QualCoder")
         
-    if platform.system() == "Windows" and settings.get('stylesheet') == "native":
-        # Avoid early native Windows style initialization crashes in Qt before our later Fusion fallback runs.
+    if platform.system() in ("Windows", "Darwin") and settings.get('stylesheet') == "native":
+        # Select Fusion before QApplication initializes the platform's native style.
         os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
     # Native video frame must not force sibling widgets native
     QtWidgets.QApplication.setAttribute(
