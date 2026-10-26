@@ -45,6 +45,7 @@ import zipfile
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
 from .code_pdf import DialogCodePdf
+from .context_help import open_module_help
 from .pdf_utils import extract_pdf_fulltext, extract_pdf_highlights, \
     pdf_annotations_to_file_memo, code_pdf_highlights, \
     pdf_markups_question_text  # Same extractor and word map as the PDF viewer
@@ -321,8 +322,6 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.ui.pushButton_bulk_rename.setIcon(qta.icon('mdi6.file-multiple-outline', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_bulk_rename.clicked.connect(self.bulk_rename_database_entry)
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
-        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.pushButton_clear_filter.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_clear_filter.pressed.connect(self.clear_file_filter)
         self.ui.pushButton_clear_filter.setToolTip(_("Clear filter"))
@@ -394,8 +393,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self._reload_after_attribute_change()
 
     def help(self):
-        """ Open help for transcribe section in browser. """
-        self.app.help_wiki("3.2.-Files")
+        """ Open help in browser. """
+        open_module_help(self.app, self)
 
     FILE_TYPE_KEYS = ("text", "pdf", "image", "audio", "video")
     PLAIN_TEXT_KEY = "__plain__"

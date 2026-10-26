@@ -34,6 +34,7 @@ import sqlite3
 
 from .GUI.ui_dialog_speakers import Ui_Dialog_speakers
 from .color_selector import colors, colour_ranges
+from .context_help import open_module_help
 from .helpers import Message
 from .select_items import DialogSelectItems  # for the select-files button
 
@@ -2103,4 +2104,4 @@ class DialogSpeakers(QtWidgets.QDialog):
         Open help in browser (Coding Text page describes Mark speakers and its formats). 
         """
         
-        self.app.help_wiki("4.1.-Coding-Text") # Pendiente: ir a hipervinculo 
+        open_module_help(self.app, self)

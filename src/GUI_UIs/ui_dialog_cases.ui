@@ -200,26 +200,10 @@ The file must have a header row and the first column must have the unique case n
           <string/>
          </property>
         </widget>
-        <widget class="QPushButton" name="pushButton_help">
-         <property name="geometry">
-          <rect>
-           <x>200</x>
-           <y>0</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="toolTip">
-          <string>Help</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
         <widget class="QLabel" name="label_cases">
          <property name="geometry">
           <rect>
-           <x>240</x>
+           <x>200</x>
            <y>5</y>
            <width>221</width>
            <height>24</height>
@@ -254,7 +238,6 @@ The file must have a header row and the first column must have the unique case n
   <tabstop>pushButton_file_manager</tabstop>
   <tabstop>pushButton_add_attribute</tabstop>
   <tabstop>pushButton_export_attributes</tabstop>
-  <tabstop>pushButton_help</tabstop>
   <tabstop>pushButton_delete</tabstop>
   <tabstop>tableWidget</tabstop>
   <tabstop>textBrowser</tabstop>

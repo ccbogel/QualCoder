@@ -39,6 +39,7 @@ from .add_item_name import DialogAddItemName
 from .case_file_manager import DialogCaseFileManager
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_cases import Ui_Dialog_cases
+from .context_help import open_module_help
 from .helpers import Message, ExportDirectoryPathDialog
 
 from .memo import DialogMemo
@@ -90,8 +91,6 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
         self.ui.pushButton_export_attributes.setIcon(qta.icon('mdi6.file-export-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
-        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
         self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -251,8 +250,8 @@ class DialogCases(QtWidgets.QDialog):
         if inserted:
             self._emit_project_table_changes(['attribute'])
     def help(self):
-        """ Open help for transcribe section in browser. """
-        self.app.help_wiki("3.3.-Cases")
+        """ Open help in browser. """
+        open_module_help(self.app, self)
 
     # Revise
     def count_selected_items(self):

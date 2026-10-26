@@ -45,6 +45,7 @@ from .color_selector import DialogColorSelect
 from .color_selector import colour_ranges, show_codes_of_colour_range
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
+from .context_help import open_module_help
 from .move_resize_rectangle import DialogMoveResizeRectangle
 from .helpers import ExportDirectoryPathDialog, Message, init_persistent_tree_header
 from .memo import DialogMemo
@@ -1611,8 +1612,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         draw.text(position, text, font=font, fill="black")
 
     def help(self):
-        """ Open help for transcribe section in browser. """
-        self.app.help_wiki("4.4.-Coding-Images")
+        """ Open help in browser. """
+        open_module_help(self.app, self)
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.

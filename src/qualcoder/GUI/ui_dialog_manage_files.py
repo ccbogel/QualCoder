@@ -80,10 +80,6 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_export_attributes.setGeometry(QtCore.QRect(330, 3, 30, 30))
         self.pushButton_export_attributes.setText("")
         self.pushButton_export_attributes.setObjectName("pushButton_export_attributes")
-        self.pushButton_help = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_help.setGeometry(QtCore.QRect(640, 3, 30, 30))
-        self.pushButton_help.setText("")
-        self.pushButton_help.setObjectName("pushButton_help")
         self.pushButton_undo = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_undo.setEnabled(False)
         self.pushButton_undo.setGeometry(QtCore.QRect(560, 3, 30, 30))
@@ -141,8 +137,7 @@ class Ui_Dialog_manage_files(object):
         Dialog_manage_files.setTabOrder(self.pushButton_display_delete, self.pushButton_bulk_rename)
         Dialog_manage_files.setTabOrder(self.pushButton_bulk_rename, self.pushButton_undo)
         Dialog_manage_files.setTabOrder(self.pushButton_undo, self.pushButton_delete)
-        Dialog_manage_files.setTabOrder(self.pushButton_delete, self.pushButton_help)
-        Dialog_manage_files.setTabOrder(self.pushButton_help, self.lineEdit_search_files)
+        Dialog_manage_files.setTabOrder(self.pushButton_delete, self.lineEdit_search_files)
         Dialog_manage_files.setTabOrder(self.lineEdit_search_files, self.pushButton_clear_filter)
         Dialog_manage_files.setTabOrder(self.pushButton_clear_filter, self.tableWidget)
 
@@ -164,7 +159,6 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_export_to_linked.setToolTip(_translate("Dialog_manage_files", "Export file from project folder as a linked file.\n"
 "Cannot export text transcription file associated with an audio or video as a linked file."))
         self.pushButton_export_attributes.setToolTip(_translate("Dialog_manage_files", "Export attributes to file"))
-        self.pushButton_help.setToolTip(_translate("Dialog_manage_files", "Help"))
         self.pushButton_undo.setToolTip(_translate("Dialog_manage_files", "Undo file rename"))
         self.pushButton_bulk_rename.setToolTip(_translate("Dialog_manage_files", "Bulk rename of database name file entries.\n"
 "Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...\n"
