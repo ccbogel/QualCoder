@@ -964,7 +964,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['docfontsize'] = _combo_value(self.ui.comboBox_docfontsize, FONT_SIZES,
                                                     self.app.settings['docfontsize']) 
         self.settings['directory'] = self.ui.label_directory.text()
-        self.settings['showids'] = self.ui.checkBox.isChecked()  # Keep as bool, as other modules expect
+        self.settings['showids'] = self.ui.checkBox.isChecked()  # Keep as bool
         index = self.ui.comboBox_style.currentIndex()
         styles = STYLE_OPTIONS
         if self.settings['stylesheet'] != styles[index]:
