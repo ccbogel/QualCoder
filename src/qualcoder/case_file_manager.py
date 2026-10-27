@@ -80,6 +80,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.doubleClicked.connect(self.double_clicked_to_view)
         self.ui.tableWidget.selectionModel().selectionChanged.connect(self.row_selection_changed)
+        self.ui.tableWidget.setShowGrid(False)
+        self.ui.tableWidget.setAlternatingRowColors(True)
 
         self.ui.label_case.setText(_("Case: ") + self.case['name'])
         self.ui.pushButton_auto_assign.clicked.connect(self.automark)

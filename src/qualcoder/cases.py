@@ -98,6 +98,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.text_edit_menu)
         self.insert_nonexisting_attribute_placeholders()
+        self.ui.tableWidget.setShowGrid(False)
+        self.ui.tableWidget.setAlternatingRowColors(True)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)

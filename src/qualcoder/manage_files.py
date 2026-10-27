@@ -341,6 +341,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
         self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
+        self.ui.tableWidget.setShowGrid(False)
+        self.ui.tableWidget.setAlternatingRowColors(True)
+        self.ui.tableWidget.verticalHeader().hide()
         self.load_file_data()
         if getattr(self.app, "project_events", None) is not None:
             self.app.project_events.project_data_changed.connect(self._on_project_data_changed)

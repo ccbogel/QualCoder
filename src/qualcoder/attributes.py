@@ -63,6 +63,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
         self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
+        self.ui.tableWidget.setShowGrid(False)
+        self.ui.tableWidget.setAlternatingRowColors(True)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
