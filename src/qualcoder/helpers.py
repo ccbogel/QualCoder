@@ -418,6 +418,38 @@ def extract_epub_fulltext(filepath):
     return text_
 
 
+class ComboWheelGuard(QtCore.QObject):
+    """Stop the mouse wheel from changing a closed combobox; scroll the parent instead."""
+
+    def eventFilter(self, obj, event):
+        if event.type() != QtCore.QEvent.Type.Wheel or not isinstance(obj, QtWidgets.QComboBox):
+            return False
+        if obj.view().isVisible():
+            return False  # Popup open: the list handles the wheel
+        # Forward to the nearest scroll area so page scrolling continues over the combo
+        parent = obj.parentWidget()
+        while parent is not None and not isinstance(parent, QtWidgets.QAbstractScrollArea):
+            parent = parent.parentWidget()
+        if parent is not None:
+            viewport = parent.viewport()
+            global_pos = event.globalPosition()
+            local = QtCore.QPointF(viewport.mapFromGlobal(global_pos.toPoint()))
+            forwarded = QtGui.QWheelEvent(local, global_pos, event.pixelDelta(), event.angleDelta(),
+                                          event.buttons(), event.modifiers(), event.phase(),
+                                          event.inverted())
+            QtWidgets.QApplication.sendEvent(viewport, forwarded)
+        return True
+
+
+def guard_combobox_wheel(root):
+    """Install ComboWheelGuard on every combobox inside root."""
+
+    guard = ComboWheelGuard(root)  # Parented to root, so it lives as long as the dialog
+    for combo in root.findChildren(QtWidgets.QComboBox):
+        combo.installEventFilter(guard)
+    return guard
+
+
 class ActionLog(QtWidgets.QTextBrowser):
     """Keep ordinary log entries from inheriting a selected link's formatting."""
 
