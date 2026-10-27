@@ -34,7 +34,7 @@ from PyQt6.QtGui import QIcon
 import shutil
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
-from .helpers import ExportDirectoryPathDialog, guard_combobox_wheel, Message
+from .helpers import ExportDirectoryPathDialog, Message
 from .report_attributes import DialogSelectAttributeParameters
 from .simple_wordcloud import Wordcloud
 from . import stopwords
@@ -73,7 +73,6 @@ class ViewCharts(QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_DialogCharts()
         self.ui.setupUi(self)
-        guard_combobox_wheel(self)
         integers = QtGui.QIntValidator()
         self.ui.lineEdit_filter.setValidator(integers)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
