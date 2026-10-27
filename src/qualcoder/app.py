@@ -28,7 +28,6 @@ import locale as py_locale
 import logging
 import os
 import platform
-from PyQt6 import QtCore, QtGui, QtWidgets
 import shutil
 import sqlite3
 import sys
@@ -39,6 +38,8 @@ import zipfile
 from copy import copy
 from pathlib import Path
 from typing import Any, Optional
+
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
@@ -1076,6 +1077,32 @@ class App(object):
             self.write_config_ini(settings_data, ai_models)
         return settings_data, ai_models
 
+    def _update_native_alternate_base(self, palette: QtGui.QPalette) -> None:
+        """Keep native row stripes subtle when the system palette changes.
+
+        Args:
+            palette: Current application palette, including system appearance updates.
+        """
+        if self.settings['stylesheet'] != 'native':
+            return
+        updated_palette = QtGui.QPalette(palette)
+        for color_group in (
+                QtGui.QPalette.ColorGroup.Active,
+                QtGui.QPalette.ColorGroup.Inactive,
+                QtGui.QPalette.ColorGroup.Disabled,
+        ):
+            base_color = palette.color(color_group, QtGui.QPalette.ColorRole.Base)
+            text_color = palette.color(color_group, QtGui.QPalette.ColorRole.Text)
+            alternate_color = QtGui.QColor(
+                round(base_color.red() * 0.95 + text_color.red() * 0.05),
+                round(base_color.green() * 0.95 + text_color.green() * 0.05),
+                round(base_color.blue() * 0.95 + text_color.blue() * 0.05),
+            )
+            updated_palette.setColor(color_group, QtGui.QPalette.ColorRole.AlternateBase, alternate_color)
+        # setPalette emits paletteChanged again; only write when the stripes differ.
+        if updated_palette != palette:
+            QtWidgets.QApplication.instance().setPalette(updated_palette)
+
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
@@ -1136,6 +1163,7 @@ class App(object):
         QTabBar::tab:selected {border: 2px solid #858585; background-color: #707070; margin-left: 3px;}\n\
         QTabBar::tab:!selected {border: 2px solid #858585; background-color: #2a2a2a; margin-left: 3px;}\n\
         QTabWidget::pane {border: 1px solid #858585;}\n\
+        QTableView {background-color: #2a2a2a; alternate-background-color: #343434;}\n\
         QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QTextBrowser::document::link {color:red;}\n\
@@ -1186,6 +1214,7 @@ class App(object):
         QSplitter::handle:horizontal:hover {background-color: red;}\n\
         QSplitter::handle:vertical:hover {background-color: red;}\n\
         QSplitter::handle:pressed {background-color: red;}\n\
+        QTableView {background-color: #efefef; alternate-background-color: #e3e3e3;}\n\
         QTableWidget {border: 1px solid #f89407; gridline-color: #707070}\n\
         QTableWidget:focus {border: 3px solid #f89407;}\n\
         QTabBar {border: 2px solid #808080;}\n\
@@ -1251,6 +1280,12 @@ class App(object):
                     palette.setColor(color_group, tooltip_text_role, tooltip_text)
                 QtWidgets.QToolTip.setPalette(palette)
         QtWidgets.QApplication.instance().setPalette(palette)
+        if self.settings['stylesheet'] == 'native':
+            application = QtWidgets.QApplication.instance()
+            if not getattr(self, '_native_stripe_palette_connected', False):
+                application.paletteChanged.connect(self._update_native_alternate_base)
+                self._native_stripe_palette_connected = True
+            self._update_native_alternate_base(application.palette())
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark
@@ -1272,17 +1307,22 @@ class App(object):
             return style_rainbow
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
+            style = style.replace("#e3e3e3", "#f2c19c")
             style = style.replace("#f89407", "#306eff")
         if self.settings['stylesheet'] == "yellow":
             style = style.replace("#efefef", "#f9e79f")
+            style = style.replace("#e3e3e3", "#eddb97")
         if self.settings['stylesheet'] == "green":
             style = style.replace("#efefef", "#c8e6c9")
+            style = style.replace("#e3e3e3", "#bedabf")
             style = style.replace("#f89407", "#ea202c")
         if self.settings['stylesheet'] == "blue":
             style = style.replace("#efefef", "#cbe9fa")
+            style = style.replace("#e3e3e3", "#c1ddee")
             style = style.replace("#f89407", "#303f9f")
         if self.settings['stylesheet'] == "purple":
             style = style.replace("#efefef", "#dfe2ff")
+            style = style.replace("#e3e3e3", "#d4d7f2")
             style = style.replace("#f89407", "#ca1b9a")
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
