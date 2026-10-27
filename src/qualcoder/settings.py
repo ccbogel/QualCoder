@@ -43,7 +43,7 @@ from .ai_runtime import ai_runtime_ready, show_ai_runtime_not_ready
 from .coder_names import DialogCoderNames
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
-from .helpers import get_default_user_directory, guard_combobox_wheel, Message
+from .helpers import get_default_user_directory, Message
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -201,7 +201,6 @@ class DialogSettings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
-        guard_combobox_wheel(self)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
