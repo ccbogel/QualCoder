@@ -43,7 +43,7 @@ from .ai_runtime import ai_runtime_ready, show_ai_runtime_not_ready
 from .coder_names import DialogCoderNames
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
-from .helpers import get_default_user_directory, Message
+from .helpers import get_default_user_directory, guard_combobox_wheel, Message
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -201,6 +201,7 @@ class DialogSettings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
+        guard_combobox_wheel(self)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -231,10 +232,8 @@ class DialogSettings(QtWidgets.QDialog):
         _set_combo_by_value(self.ui.comboBox_codetreefontsize, FONT_SIZES, self.settings['treefontsize'])
         _set_combo_by_value(self.ui.comboBox_docfontsize, FONT_SIZES, self.settings['docfontsize'])
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
-        if self.settings['showids'] == 'True':
-            self.ui.checkBox.setChecked(True)
-        else:
-            self.ui.checkBox.setChecked(False)
+        # showids is loaded as a bool from config.ini, not the string 'True'
+        self.ui.checkBox.setChecked(_setting_is_true(self.settings['showids']))
         styles = STYLE_OPTIONS
         styles_translated = [_(style_name) for style_name in styles]
         self.ui.comboBox_style.addItems(styles_translated)
@@ -966,10 +965,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['docfontsize'] = _combo_value(self.ui.comboBox_docfontsize, FONT_SIZES,
                                                     self.app.settings['docfontsize']) 
         self.settings['directory'] = self.ui.label_directory.text()
-        if self.ui.checkBox.isChecked():
-            self.settings['showids'] = 'True'
-        else:
-            self.settings['showids'] = 'False'
+        self.settings['showids'] = self.ui.checkBox.isChecked()  # Keep as bool, as other modules expect
         index = self.ui.comboBox_style.currentIndex()
         styles = STYLE_OPTIONS
         if self.settings['stylesheet'] != styles[index]:
