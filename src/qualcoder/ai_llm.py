@@ -1581,7 +1581,7 @@ class AiLLM():
         self.ai_log_handler = None
         self.ai_log_path = ''
 
-    def _ensure_ai_log_logger(self):
+    def _ensure_ai_log_logger(self) -> bool:
         """Set up or refresh the dedicated rotating AI logger."""
 
         if not self._is_ai_extended_logging_enabled():
@@ -1606,7 +1606,7 @@ class AiLLM():
 
         desired_path = self._ai_log_target_path()
         if self.ai_log_handler is not None and self.ai_log_path == desired_path:
-            return
+            return True
 
         if self.ai_log_handler is not None:
             try:

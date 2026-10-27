@@ -7513,7 +7513,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     "additionalProperties": False,
                 },
             ],
-            "additionalProperties": False,
         }
 
     def _mcp_planner_json_schema(self) -> Dict[str, Any]:

@@ -1,3 +1,5 @@
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -43,6 +45,29 @@ class TestAiErrorReporting(TestCase):
         self.assertIn('[#7] ERROR model="test-model" context="metadata"', logged)
         self.assertIn('RuntimeError: Connection error.', logged)
         self.assertIn('OSError: certificate verify failed', logged)
+
+    def test_ai_log_writes_multiple_entries_with_existing_handler(self):
+        with TemporaryDirectory() as log_directory:
+            self.ai.app = SimpleNamespace(
+                confighome=log_directory,
+                settings={'ai_extended_logging': True},
+            )
+            self.ai.ai_log_logger = None
+            self.ai.ai_log_handler = None
+            self.ai.ai_log_path = ''
+            try:
+                self.ai._write_ai_log('First request')
+                self.ai._write_ai_log('First response')
+                self.ai._write_ai_log('Second request')
+                self.ai.app.settings['ai_extended_logging'] = False
+                self.ai._write_ai_log('Disabled request')
+                logged = Path(log_directory, 'ai.log').read_text(encoding='utf-8')
+                self.assertIn('First request', logged)
+                self.assertIn('First response', logged)
+                self.assertIn('Second request', logged)
+                self.assertNotIn('Disabled request', logged)
+            finally:
+                self.ai._close_ai_log_handler()
 
     def test_normal_chat_includes_cause_and_preserves_partial_response(self):
         error = self._connection_error()
