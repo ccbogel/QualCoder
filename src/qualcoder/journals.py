@@ -132,7 +132,8 @@ class DialogJournals(QtWidgets.QDialog):
         # spell = SpellChecker()  # Was testing this out Dont use
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
         self.ui.tableWidget.setTabKeyNavigation(False)
-
+        self.ui.tableWidget.setShowGrid(False)
+        self.ui.tableWidget.setAlternatingRowColors(True)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
