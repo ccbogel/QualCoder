@@ -88,7 +88,7 @@ from qualcoder.context_help import ContextHelp
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import ElidedLabel, get_default_user_directory, Message
+from qualcoder.helpers import ComboWheelGuard, ElidedLabel, get_default_user_directory, Message
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.information import project_tab_info, manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
@@ -4251,6 +4251,9 @@ def gui():
         QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
     app = QtWidgets.QApplication(sys.argv)
     app._qc_installed_translators = []
+    # Mouse wheel must not change closed comboboxes by accident, in any dialog
+    app._qc_combo_wheel_guard = ComboWheelGuard(app)
+    app.installEventFilter(app._qc_combo_wheel_guard)
     # Noto Sans - for general application
     install_noto_sans()
     QtGui.QFontDatabase.addApplicationFont(str(qc_config_folder / "NotoSans-Regular.ttf"))
