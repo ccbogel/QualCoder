@@ -231,10 +231,8 @@ class DialogSettings(QtWidgets.QDialog):
         _set_combo_by_value(self.ui.comboBox_codetreefontsize, FONT_SIZES, self.settings['treefontsize'])
         _set_combo_by_value(self.ui.comboBox_docfontsize, FONT_SIZES, self.settings['docfontsize'])
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
-        if self.settings['showids'] == 'True':
-            self.ui.checkBox.setChecked(True)
-        else:
-            self.ui.checkBox.setChecked(False)
+        # showids is loaded as a bool from config.ini, not the string 'True'
+        self.ui.checkBox.setChecked(_setting_is_true(self.settings['showids']))
         styles = STYLE_OPTIONS
         styles_translated = [_(style_name) for style_name in styles]
         self.ui.comboBox_style.addItems(styles_translated)
@@ -966,10 +964,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['docfontsize'] = _combo_value(self.ui.comboBox_docfontsize, FONT_SIZES,
                                                     self.app.settings['docfontsize']) 
         self.settings['directory'] = self.ui.label_directory.text()
-        if self.ui.checkBox.isChecked():
-            self.settings['showids'] = 'True'
-        else:
-            self.settings['showids'] = 'False'
+        self.settings['showids'] = self.ui.checkBox.isChecked()  # Keep as bool
         index = self.ui.comboBox_style.currentIndex()
         styles = STYLE_OPTIONS
         if self.settings['stylesheet'] != styles[index]:
