@@ -50,7 +50,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
     selected_colors = []
 
     def __init__(self, app, parent_textedit):
-        """ """
+        """ Colour scheme editor and viewer for various colour impairments. """
 
         super(DialogCodeColorScheme, self).__init__()
         self.app = app
@@ -110,7 +110,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.original_code_colors = deepcopy(self.codes)
 
     def undo_color_changes(self):
-        """  """
 
         cur = self.app.conn.cursor()
         sql = "update code_name set color=? where cid=?"
@@ -324,8 +323,16 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
     def update_selected_colors(self):
         """ Update colour list. Prior to applying colors. """
 
+        for row in range(0, ROWS):
+            for col in range(0, COLS):
+                try:
+                    self.ui.tableWidget.item(row, col).setText("")
+                except AttributeError:
+                    pass
         self.selected_colors = []
         for i in self.ui.tableWidget.selectedItems():
+            print(i.row(), i.column())
+            self.ui.tableWidget.item(i.row(), i.column()).setText("*")
             self.selected_colors.append(colors[i.row() * COLS + i.column()])
 
     def change_perspective(self):
