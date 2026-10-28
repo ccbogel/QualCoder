@@ -1244,8 +1244,8 @@ class DialogReportRelations(QtWidgets.QDialog):
             item = it.value()
             while item:
                 if item.text(1) == f"catid:{c['catid']}":
-                    child.setIcon(0, qta.icon('mdi6.square-rounded', color=c['color']))
                     child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}"])
+                    child.setIcon(0, qta.icon('mdi6.square-rounded', color=c['color']))
                     '''child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))'''
