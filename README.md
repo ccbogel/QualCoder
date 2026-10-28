@@ -20,15 +20,15 @@ If you like QualCoder please buy me a coffee ...
 
 ### Prerequisites
 Optional: VLC for audio/video coding. 
-Optional: ffmpeg installed for waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
+Optional: ffmpeg installed for waveform image see here to install [ffmpeg](https://phoenixnap.com/kb/ffmpeg-windows) on Windows. 
 
 On the first start of QualCoder, you may want to [setup the AI enhanced features](#setup-of-the-ai-features) as described below.
 
 ### Windows
 
-You have two options, see Releases link on the right-hand side of this page:
-- Newer releases contain an **exe file** created on Windows 11. Double-click to run, it takes 20 seconds to start.
-- There are **Windows installers** available on the release page. 
+You have various options, see Releases link on the right-hand side of this page:
+- There is a **Windows installer** available on the release page. 
+- Newer releases contain an **exe file** created on Windows 11. Double-click to run, it takes a minute to start.
 
 On first use of the exe, Windows may ask you to allow to run QualCoder. This is because it is from an unknown publisher. It costs a lot of money to get a trusted publisher certificate - so that will not be possible for the foreseeable future. If you are uncomfortable with these warnings install from the source as detailed next.
 
