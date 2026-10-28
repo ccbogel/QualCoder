@@ -24,11 +24,10 @@ https://qualcoder.org/
 from copy import deepcopy, copy
 import logging
 from pathlib import Path
-import qtawesome as qta
-
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
+import qtawesome as qta
 
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
@@ -331,7 +330,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                     pass
         self.selected_colors = []
         for i in self.ui.tableWidget.selectedItems():
-            print(i.row(), i.column())
             self.ui.tableWidget.item(i.row(), i.column()).setText("*")
             self.selected_colors.append(colors[i.row() * COLS + i.column()])
 
