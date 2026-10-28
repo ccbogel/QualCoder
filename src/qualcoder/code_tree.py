@@ -24,6 +24,7 @@ https://qualcoder.org/
 from copy import deepcopy
 import datetime
 import logging
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
 
@@ -199,8 +200,9 @@ class CodeTreeController(QtCore.QObject):
             if len(code_dict['name']) > 52:
                 code_item.setText(0, f"{code_dict['name'][:25]}..{code_dict['name'][-25:]}")
                 code_item.setToolTip(0, code_dict['name'])
-            code_item.setBackground(0, QBrush(QColor(code_dict['color']), Qt.BrushStyle.SolidPattern))
-            code_item.setForeground(0, QBrush(QColor(TextColor(code_dict['color']).recommendation)))
+            code_item.setIcon(0, qta.icon('mdi6.square-rounded', color=code_dict['color']))
+            '''code_item.setBackground(0, QBrush(QColor(code_dict['color']), Qt.BrushStyle.SolidPattern))
+            code_item.setForeground(0, QBrush(QColor(TextColor(code_dict['color']).recommendation)))'''
             code_item.setFlags(
                 Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
                 Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled |
