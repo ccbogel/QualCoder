@@ -739,9 +739,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}"])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
+                top_item.setIcon(0, qta.icon('mdi6.square-rounded', color=c['color']))
+                '''top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
-                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))'''
                 top_item.setFlags(
                     Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 top_item.setToolTip(0, c['name'])
@@ -757,9 +758,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             while item:
                 if item.text(1) == f'catid:{c["catid"]}':
                     child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}'])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
+                    child.setIcon(0, qta.icon('mdi6.square-rounded', color=c['color']))
+                    '''child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
-                    child.setForeground(0, QBrush(QtGui.QColor(color)))
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))'''
                     child.setFlags(
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, c['name'])
