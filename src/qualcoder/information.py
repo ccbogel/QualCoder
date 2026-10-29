@@ -22,12 +22,14 @@ https://qualcoder.org/
 """
 
 import html
-from markdown_it import MarkdownIt
-from PyQt6 import QtWidgets, QtCore, QtGui
-from pathlib import Path
+import json  # To get the latest GitHub release information
 import logging
+from markdown_it import MarkdownIt
+from pathlib import Path
+from PyQt6 import QtWidgets, QtCore, QtGui
 import qtawesome as qta
 import re
+import urllib.request
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
@@ -159,9 +161,38 @@ class DialogInformation(QtWidgets.QDialog):
         if html_string == "":
             about_modifed = about.replace("qualcoder_version", app.version)
             about_modifed = about_modifed.replace("qualcoder_citation", app.citation)
+            about_modifed = about_modifed.replace("RELEASE INFORMATION", self.get_latest_github_release(app))
             self.setHtml(about_modifed)
         else:
             self.setHtml(html_string)
+
+    def get_latest_github_release(self, app) -> str:
+        """ Check GitHub for newer releases. Format as Qualoder #.# """
+
+        release_info = ""
+        try:
+            _json = json.loads(urllib.request.urlopen(urllib.request.Request(
+                'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
+                headers={'Accept': 'application/vnd.github.v3+json'},
+            )).read())
+            release_version_number = _json['name'].split()[1]
+            tmp_release_num = release_version_number.split('.', 1)
+            release_num = float(tmp_release_num[0] + '.' + tmp_release_num[1].replace('.', ''))
+            temp_this_version = app.version.replace("QualCoder", "")
+            tmp_this_version_num = temp_this_version.split('.', 1)
+            this_version_num = float(tmp_this_version_num[0] + '.' + tmp_this_version_num[1].replace('.', ''))
+            release_link = f'<a href="{html.escape(_json["html_url"])}">{html.escape(_json["name"])}</a>'
+            if release_num > this_version_num:
+                release_info = _("Newer release available: ") + release_link
+            elif str(release_num) == str(this_version_num):
+                release_info = _("Latest Release: ") + release_link
+            else:
+                release_info = _("This version may be a pre-release version.")
+        except Exception as err:
+            print(err)
+            logger.warning(str(err))
+            release_info = _("Could not get latest release from Github")
+        return release_info
 
     def setHtml(self, html_string):
         """This method is used to populate the textEdit.
@@ -184,13 +215,14 @@ about = f'<h1 class="western">{_("About")} QualCoder</h1>\
 <p>{_("Optional: Install VLC for audio and video coding.")}<br /> \
 {_("Optional: Install ffmpeg for waveform images.")}</p>\
 <p>Tested on: Windows 11, Linux Mint 22.3.</p>\
+<p>RELEASE INFORMATION</p>\
 <p></p>\
 <h2 class="western">{_("Acknowledgements")}</h2>\
 <p>Ronggui Huang, Zhang Gehao - {_("Created RQDA - inspiration for QualCoder.")}<br /> \
 Mike MacCana -  {_("Source code for the docx module.")}<br /> \
 Julius Reich - {_("Created the QualCoder logo.")}<br /> \
 Kai Dröge -  {_("Programming, artificial intelligence and much more.")}<br /> \
-Justin Missaghieh-Poncet - {_("French translations, programming, setting up the new website and more.")}<br />\
+Justin Missaghieh-Poncet - {_("French translations, programming, setting up the new website and more.")} \
 <a href="https://qualcoder.org" target="_blank">https://qualcoder.org</a><br /> \
 Lorenzo Salomón - {_("Programming and Spanish translations.")}<br /> \
 Jofen Kihlstrom for past Swedish translations.<br /> \

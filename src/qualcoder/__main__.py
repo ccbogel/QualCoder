@@ -26,7 +26,7 @@ import base64
 import datetime
 import gettext
 import html
-import json  # To get the latest GitHub release information
+#import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
 import multiprocessing
@@ -38,7 +38,7 @@ import sqlite3
 import sys
 import traceback
 from typing import Any, Optional
-import urllib.request
+#import urllib.request
 import webbrowser
 
 if __name__ == "__main__":
@@ -356,7 +356,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(True)
         else:
             self.ui.menubar.setNativeMenuBar(False)
-        self.get_latest_github_release()
+        self.ui.textEdit.append(
+                    f'<p><b>{html.escape(self.app.version)}</b> &middot; '
+                    f'<a href="qualcoder://action/about">{html.escape(_("About"))}</a></p>')
+        # self.get_latest_github_release()
         try:
             # Restore main window geometry (size, position, maximized state) from config
             geometry_hex = self.app.settings.get('mainwindow_geometry', '')
@@ -4201,8 +4204,8 @@ Click "Yes" to start now.')
             return
         self.text_coding(task='ai_search')
 
-    def get_latest_github_release(self):
-        """Show a compact version header and check GitHub for newer releases."""
+    '''def get_latest_github_release(self):
+        """Show a compact version header."""
 
         self.ui.textEdit.append(
             f'<p><b>{html.escape(self.app.version)}</b> &middot; '
@@ -4231,7 +4234,7 @@ Click "Yes" to start now.')
                 self.ui.textEdit.append(_("This version may be a pre-release version."))
         except Exception as err:
             print(err)
-            logger.warning(str(err))
+            logger.warning(str(err))'''
 
 def gui():
     # print("Qt version: " + str(QtCore.qVersion()))
