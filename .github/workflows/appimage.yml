@@ -35,7 +35,7 @@ jobs:
         pip install pyinstaller
     
     - name: Build standalone ELF binary
-      run: pyinstaller --clean --noconfirm qualcoder_onefile_release.spec
+      run: pyinstaller --clean --noconfirm qualcoder_release.spec
     
     - name: Verify PyInstaller output
       run: |
