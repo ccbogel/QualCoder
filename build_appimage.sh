@@ -17,26 +17,26 @@ else
     source .env/bin/activate
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
-    pyinstaller --clear --no-confirm "qualcoder_onefile_release.spec"
+    pyinstaller --clean --noconfirm "qualcoder_release.spec"
     deactivate
 fi
 
 # App Image Structure
 rm -rf QualCoder-x86_64.AppDir
 mkdir -p QualCoder-x86_64.AppDir/usr/bin
-cp dev/qualcoder-appimage/AppRun QualCoder-x86_64.AppDir/
+cp -r dev/qualcoder-appimage/. QualCoder-x86_64.AppDir/
 chmod +x QualCoder-x86_64.AppDir/AppRun
 cp qualcoder.png QualCoder-x86_64.AppDir/
 cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/usr/bin/
 
 # Desktop File
-cat << EOF > QualCoder-x86_64.AppDir/QualCoder.desktop
+cat << EOF > QualCoder-x86_64.AppDir/io.github.ccbogel.QualCoder.desktop
 [Desktop Entry]
 Name=QualCoder
 GenericName=QualCoder
 Icon=qualcoder
 Comment=Qualitative data analysis for text, images, audio, video.
-Exec=/usr/bin/QualCoder
+Exec=qualCoder %F
 Terminal=false
 Type=Application
 Categories=Science;Education;

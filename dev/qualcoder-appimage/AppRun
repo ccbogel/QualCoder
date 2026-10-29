@@ -1,16 +1,3 @@
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "${0}")")"
 exec "$HERE/usr/bin/QualCoder" "$@"
-
-#cat << EOF > QualCoder-x86_64.AppDir/QualCoder.desktop 
-#[Desktop Entry]
-#Name=QualCoder
-#GenericName=QualCoder
-#Icon=qualcoder
-#Comment=Qualitative data analysis for text, images, audio, video.
-#Exec=/usr/bin/QualCoder
-#Terminal=false
-#Type=Application
-#Categories=Science;Education;
-#StartupWMClass=QualCoder
-#EOF
