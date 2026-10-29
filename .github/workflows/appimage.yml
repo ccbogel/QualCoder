@@ -35,7 +35,7 @@ jobs:
         pip install pyinstaller
     
     - name: Build standalone ELF binary
-      run: pyinstaller --clean --noconfirm qualcoder_release.spec
+      run: pyinstaller --clean --noconfirm qualcoder_onefile_release.spec
     
     - name: Verify PyInstaller output
       run: |
@@ -50,8 +50,8 @@ jobs:
         mkdir -p QualCoder-x86_64.AppDir/usr/bin
         cp dev/qualcoder-appimage/AppRun QualCoder-x86_64.AppDir/
         chmod +x QualCoder-x86_64.AppDir/AppRun
-        cp qualcoder.png QualCoder-x86_64.AppDir/.AppDir/
-        cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/.AppDir/usr/bin/
+        cp qualcoder.png QualCoder-x86_64.AppDir/
+        cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/usr/bin/
     
     - name: Create desktop file
       run: |

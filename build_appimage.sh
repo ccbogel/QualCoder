@@ -1,17 +1,12 @@
 #!/usr/bin/bash
 # set -e
 
-if [ -z $1 ]; then
-    echo "Usage: $0 <version> (ex: 3.8.3) <onefile or not> (empty = binary + artifactes; 1 = one file binary)"
+if [ -z "$1" ]; then
+    echo "Usage: $0 <version> (ex: 3.8.3)"
     exit 1
 fi
 
 VERSION="$1"
-TYPE="$2"
-
-COMPLEMENT=""
-
-[[ "$TYPE" -eq 1 ]] && COMPLEMENT="_onefile"
 
 if [ -d dist ]; then
     echo Binary exist
@@ -22,7 +17,7 @@ else
     source .env/bin/activate
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
-    pyinstaller --clear --no-confirm "qualcoder_${COMPLEMENT}release.spec"
+    pyinstaller --clear --no-confirm "qualcoder_onefile_release.spec"
     deactivate
 fi
 
@@ -31,8 +26,8 @@ rm -rf QualCoder-x86_64.AppDir
 mkdir -p QualCoder-x86_64.AppDir/usr/bin
 cp dev/qualcoder-appimage/AppRun QualCoder-x86_64.AppDir/
 chmod +x QualCoder-x86_64.AppDir/AppRun
-cp qualcoder.png QualCoder-x86_64.AppDir/.AppDir/
-cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/.AppDir/usr/bin/
+cp qualcoder.png QualCoder-x86_64.AppDir/
+cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/usr/bin/
 
 # Desktop File
 cat << EOF > QualCoder-x86_64.AppDir/QualCoder.desktop
