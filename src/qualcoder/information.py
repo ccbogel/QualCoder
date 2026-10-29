@@ -173,8 +173,7 @@ class DialogInformation(QtWidgets.QDialog):
         try:
             _json = json.loads(urllib.request.urlopen(urllib.request.Request(
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
-                headers={'Accept': 'application/vnd.github.v3+json'},
-            )).read())
+                headers={'Accept': 'application/vnd.github.v3+json'},), timeout=10).read())
             release_version_number = _json['name'].split()[1]
             tmp_release_num = release_version_number.split('.', 1)
             release_num = float(tmp_release_num[0] + '.' + tmp_release_num[1].replace('.', ''))
@@ -188,7 +187,7 @@ class DialogInformation(QtWidgets.QDialog):
                 release_info = _("Latest Release: ") + release_link
             else:
                 release_info = _("This version may be a pre-release version.")
-        except Exception as err:
+        except Exception as err:  # URLError and more
             print(err)
             logger.warning(str(err))
             release_info = _("Could not get latest release from Github")
