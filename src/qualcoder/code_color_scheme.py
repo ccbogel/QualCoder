@@ -143,9 +143,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 if int(ci.text(1)[4:]) == code_['cid']:
                     code_['color'] = color_list[i]
                     code_['perspective'] = color_list[i]
-                    ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
+                    ci.setIcon(0, qta.icon('mdi6.square-rounded', color=color_list[i]))
+                    '''ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
                     color = TextColor(color_list[i]).recommendation
-                    ci.setForeground(0, QBrush(QtGui.QColor(color)))
+                    ci.setForeground(0, QBrush(QtGui.QColor(color)))'''
                     cur.execute(sql, [color_list[i], int(ci.text(1)[4:])])
         self.app.conn.commit()
         self._emit_project_table_changes(['code_name'])
@@ -275,9 +276,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
+                top_item.setIcon(0, qta.icon('mdi6.square-rounded', color=c['perspective']))
+                '''top_item.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
-                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))'''
                 top_item.setFlags(
                     Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
                     Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
@@ -297,9 +299,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                     if c['memo'] != "":
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
+                    child.setIcon(0, qta.icon('mdi6.square-rounded', color=c['perspective']))
+                    '''child.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
-                    child.setForeground(0, QBrush(QtGui.QColor(color)))
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))'''
                     child.setToolTip(0, c['name'])
                     if len(c['name']) > 52:
                         child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
