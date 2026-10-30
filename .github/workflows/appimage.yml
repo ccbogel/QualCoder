@@ -1,0 +1,90 @@
+# This workflow will build an AppImage 
+
+name: AppImage
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ 'v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build-binary:
+    runs-on: ubuntu-22.04 
+    # Oldest LTS supported ubuntu version -> maximum compatibility for ELF an glibc
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.14
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.14"
+    
+    - name: Print tool versions          # ← new: fails fast if 3.14 missing
+      run: python --version
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y qt6-base-dev libxcb-cursor0 patchelf desktop-file-utils
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install .
+        pip install pyinstaller
+    
+    - name: Build standalone ELF binary
+      run: pyinstaller --clean --noconfirm qualcoder_release.spec
+    
+    - name: Verify PyInstaller output
+      run: |
+        ls -la dist/QualCoder/
+        test -f dist/QualCoder/QualCoder
+        test -d dist/QualCoder/_internal
+    
+    - name: Create and populate AppDir structure
+      run: |
+        rm -rf QualCoder-x86_64.AppDir
+        mkdir -p QualCoder-x86_64.AppDir/usr/bin
+        cp -r dev/qualcoder-appimage/. QualCoder-x86_64.AppDir/
+        chmod +x QualCoder-x86_64.AppDir/AppRun
+        cp qualcoder.png QualCoder-x86_64.AppDir/
+        cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/usr/bin/
+    
+    - name: Create desktop file
+      run: |
+        cat << EOF > QualCoder-x86_64.AppDir/QualCoder.desktop 
+        [Desktop Entry]
+        Name=QualCoder
+        GenericName=QualCoder
+        Icon=qualcoder
+        Comment=Qualitative data analysis for text, images, audio, video.
+        Exec=/usr/bin/QualCoder
+        Terminal=false
+        Type=Application
+        Categories=Science;Education;
+        StartupWMClass=QualCoder
+        EOF
+
+    - name: Verify AppDir structure
+      run: |
+        ls QualCoder-x86_64.AppDir/usr/bin/
+
+    - name: Download appimagetool
+      run: |
+        wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O /tmp/appimagetool
+        chmod +x /tmp/appimagetool
+
+    - name: Build AppImage
+      run: |
+        ARCH=x86_64 /tmp/appimagetool --appimage-extract-and-run \
+          QualCoder-x86_64.AppDir QualCoder-x86_64.AppImage
+    
+    - name: Upload AppImage artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: QualCoder-AppImage
+        path: QualCoder-x86_64.AppImage
+        if-no-files-found: error
+        retention-days: 30
